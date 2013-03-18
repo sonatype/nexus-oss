@@ -361,7 +361,7 @@ public interface Repository
      * 
      * @return
      */
-    Map<String, RequestProcessor> getRequestProcessors();
+    Map<String, RequestProcessor2> getRequestProcessors();
 
     /**
      * If is user managed, the nexus core and nexus core UI handles the store. Thus, for reposes, users are allowed to

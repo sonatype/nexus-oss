@@ -36,6 +36,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheCreate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheUpdate;
@@ -45,14 +46,13 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
-import org.sonatype.nexus.proxy.repository.AbstractRequestProcessor;
+import org.sonatype.nexus.proxy.repository.AbstractRequestProcessor2;
 import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.WrappingInputStream;
 import org.sonatype.tests.http.server.api.Behaviour;
-import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.base.Strings;
@@ -629,7 +629,7 @@ public class SimplePullTest
     }
 
     public static class CounterRequestProcessor
-        extends AbstractRequestProcessor
+        extends AbstractRequestProcessor2
     {
         private int referredCount = 0;
 
@@ -639,12 +639,10 @@ public class SimplePullTest
         }
 
         @Override
-        public boolean process( Repository repository, ResourceStoreRequest request, Action action )
+        public ItemNotFoundInRepositoryReason process( Repository repository, ResourceStoreRequest request, Action action )
         {
             referredCount++;
-
             return super.process( repository, request, action );
         }
     }
-
 }

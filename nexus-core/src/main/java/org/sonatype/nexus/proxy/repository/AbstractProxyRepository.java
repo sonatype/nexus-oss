@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
@@ -978,7 +979,7 @@ public abstract class AbstractProxyRepository
         boolean shouldCache = true;
 
         // ask request processors too
-        for ( RequestProcessor processor : getRequestProcessors().values() )
+        for ( RequestProcessor2 processor : getRequestProcessors().values() )
         {
             shouldCache = processor.shouldCache( this, item );
 
@@ -1180,15 +1181,18 @@ public abstract class AbstractProxyRepository
         // proxyMode and request.localOnly decides 1st
         boolean shouldProxy = shouldTryRemote( request );
 
+        ItemNotFoundInRepositoryReason notFoundReason = null;
+
         if ( shouldProxy )
         {
             // let's ask RequestProcessor
-            for ( RequestProcessor processor : getRequestProcessors().values() )
+            for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                shouldProxy = processor.shouldProxy( this, request );
+                notFoundReason = processor.shouldProxy( this, request );
 
-                if ( !shouldProxy )
+                if ( notFoundReason != null )
                 {
+                    shouldProxy = false;
                     // escape
                     break;
                 }
@@ -1293,7 +1297,8 @@ public abstract class AbstractProxyRepository
                                 autoBlockProxying( ex );
                             }
 
-                            if ( ex instanceof RemoteStorageTransportException || ex instanceof LocalStorageEOFException )
+                            if ( ex instanceof RemoteStorageTransportException
+                                || ex instanceof LocalStorageEOFException )
                             {
                                 throw ex;
                             }
@@ -1391,9 +1396,17 @@ public abstract class AbstractProxyRepository
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
-                throw new ItemNotFoundException( reasonFor( request, this,
-                    "Path %s not found in local storage and remote storage access is prevented of %s repository.",
-                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                if ( notFoundReason != null )
+                {
+                    throw new ItemNotFoundException( notFoundReason );
+                }
+                else
+                {
+                    // a generic one
+                    throw new ItemNotFoundException( reasonFor( request, this,
+                        "Path %s not found in local storage and remote storage access is prevented of %s repository.",
+                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                }
             }
         }
 
@@ -1840,8 +1853,7 @@ public abstract class AbstractProxyRepository
                         else
                         {
                             autoBlockProxying( new ItemNotFoundException( reasonFor( request,
-                                AbstractProxyRepository.this,
-                                "Remote peer of repository %s detected as unavailable.",
+                                AbstractProxyRepository.this, "Remote peer of repository %s detected as unavailable.",
                                 RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
                         }
                     }

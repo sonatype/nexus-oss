@@ -27,9 +27,11 @@ import org.sonatype.plugin.ExtensionPoint;
  * A Processor that is able to process/modify the request before Nexus will serve it.
  * 
  * @author cstamas
+ * @deprecated use {@link RequestProcessor2} instead. This one is left here for backward compatibility only.
  */
 @ExtensionPoint
 @Singleton
+@Deprecated
 public interface RequestProcessor
 {
     /**

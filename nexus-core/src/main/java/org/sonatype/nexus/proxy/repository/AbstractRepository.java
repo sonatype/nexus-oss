@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -153,7 +154,7 @@ public abstract class AbstractRepository
     private PathCache notFoundCache;
 
     /** Request processors list */
-    private Map<String, RequestProcessor> requestProcessors;
+    private Map<String, RequestProcessor2> requestProcessors;
 
     /** if local url changed, need special handling after save */
     private boolean localUrlChanged = false;
@@ -269,11 +270,11 @@ public abstract class AbstractRepository
             DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
-    public Map<String, RequestProcessor> getRequestProcessors()
+    public Map<String, RequestProcessor2> getRequestProcessors()
     {
         if ( requestProcessors == null )
         {
-            requestProcessors = new HashMap<String, RequestProcessor>();
+            requestProcessors = new HashMap<String, RequestProcessor2>();
         }
 
         return requestProcessors;
@@ -638,12 +639,7 @@ public abstract class AbstractRepository
     public StorageItem retrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException
     {
-        if ( !checkConditions( request, Action.read ) )
-        {
-            throw new ItemNotFoundException( reasonFor( request, this,
-                "Retrieval of path %s is rejected by repository %s.", request.getRequestPath(),
-                RepositoryStringUtils.getHumanizedNameString( this ) ) );
-        }
+        checkConditions( request, Action.read );
 
         StorageItem item = retrieveItem( false, request );
 
@@ -657,11 +653,10 @@ public abstract class AbstractRepository
                 RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
-        if ( !checkPostConditions( request, item ) )
+        final ItemNotFoundInRepositoryReason notFoundReason = checkPostConditions( request, item );
+        if ( notFoundReason != null )
         {
-            throw new ItemNotFoundException( reasonFor( request, this,
-                "Retrieval of path %s is rejected by repository %s.", request.getRequestPath(),
-                RepositoryStringUtils.getHumanizedNameString( this ) ) );
+            throw new ItemNotFoundException( notFoundReason );
         }
 
         return item;
@@ -671,14 +666,8 @@ public abstract class AbstractRepository
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
         StorageException, AccessDeniedException
     {
-        if ( !checkConditions( from, Action.read ) )
-        {
-            throw new IllegalRequestException( from, "copyItem: Operation does not fills needed requirements!" );
-        }
-        if ( !checkConditions( to, getResultingActionOnWrite( to ) ) )
-        {
-            throw new IllegalRequestException( to, "copyItem: Operation does not fills needed requirements!" );
-        }
+        checkConditions( from, Action.read );
+        checkConditions( to, getResultingActionOnWrite( to ) );
 
         copyItem( false, from, to );
     }
@@ -687,18 +676,9 @@ public abstract class AbstractRepository
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
         StorageException, AccessDeniedException
     {
-        if ( !checkConditions( from, Action.read ) )
-        {
-            throw new AccessDeniedException( from, "Operation does not fills needed requirements!" );
-        }
-        if ( !checkConditions( from, Action.delete ) )
-        {
-            throw new AccessDeniedException( from, "Operation does not fills needed requirements!" );
-        }
-        if ( !checkConditions( to, getResultingActionOnWrite( to ) ) )
-        {
-            throw new AccessDeniedException( to, "Operation does not fills needed requirements!" );
-        }
+        checkConditions( from, Action.read );
+        checkConditions( from, Action.delete );
+        checkConditions( to, getResultingActionOnWrite( to ) );
 
         moveItem( false, from, to );
     }
@@ -707,10 +687,7 @@ public abstract class AbstractRepository
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
         StorageException, AccessDeniedException
     {
-        if ( !checkConditions( request, Action.delete ) )
-        {
-            throw new AccessDeniedException( request, "Operation does not fills needed requirements!" );
-        }
+        checkConditions( request, Action.delete );
 
         deleteItem( false, request );
     }
@@ -718,9 +695,13 @@ public abstract class AbstractRepository
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
     {
-        if ( !checkConditions( request, getResultingActionOnWrite( request ) ) )
+        try
         {
-            throw new AccessDeniedException( request, "Operation does not fills needed requirements!" );
+            checkConditions( request, getResultingActionOnWrite( request ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new AccessDeniedException( request, e.getMessage() );
         }
 
         DefaultStorageFileItem fItem =
@@ -738,9 +719,13 @@ public abstract class AbstractRepository
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
     {
-        if ( !checkConditions( request, getResultingActionOnWrite( request ) ) )
+        try
         {
-            throw new AccessDeniedException( request, "Operation does not fills needed requirements!" );
+            checkConditions( request, getResultingActionOnWrite( request ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new AccessDeniedException( request, e.getMessage() );
         }
 
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( this, request, true, true );
@@ -756,12 +741,7 @@ public abstract class AbstractRepository
     public Collection<StorageItem> list( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException
     {
-        if ( !checkConditions( request, Action.read ) )
-        {
-            throw new ItemNotFoundException( reasonFor( request, this,
-                "Listing of path %s is rejected by repository %s.", request.getRequestPath(),
-                RepositoryStringUtils.getHumanizedNameString( this ) ) );
-        }
+        checkConditions( request, Action.read );
 
         Collection<StorageItem> items = null;
 
@@ -1270,13 +1250,12 @@ public abstract class AbstractRepository
      * Check conditions, such as availability, permissions, etc.
      * 
      * @param request the request
-     * @return false, if the request should not be processed with response appropriate for current method, or true is
-     *         execution should continue as usual.
+     * @throws ItemNotFoundException
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
-    protected boolean checkConditions( ResourceStoreRequest request, Action action )
-        throws IllegalOperationException, AccessDeniedException
+    protected void checkConditions( ResourceStoreRequest request, Action action )
+        throws ItemNotFoundException, IllegalOperationException, AccessDeniedException
     {
         if ( !this.getLocalStatus().shouldServiceRequest() )
         {
@@ -1300,44 +1279,50 @@ public abstract class AbstractRepository
         getAccessManager().decide( this, request, action );
         // }
 
-        return checkRequestProcessors( request, action );
+        final ItemNotFoundInRepositoryReason itemNotFoundInRepositoryReason = checkRequestProcessors( request, action );
+        if ( itemNotFoundInRepositoryReason != null )
+        {
+            throw new ItemNotFoundException( itemNotFoundInRepositoryReason );
+        }
     }
 
-    protected boolean checkRequestProcessors( final ResourceStoreRequest request, final Action action )
+    protected ItemNotFoundInRepositoryReason checkRequestProcessors( final ResourceStoreRequest request,
+                                                                     final Action action )
     {
         if ( getRequestProcessors().size() > 0 )
         {
-            for ( RequestProcessor processor : getRequestProcessors().values() )
+            for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                if ( !processor.process( this, request, action ) )
+                final ItemNotFoundInRepositoryReason reason = processor.process( this, request, action );
+                if ( reason != null )
                 {
                     // let's not state anything about reason, and allow processor say why it rejected
-                    // by throwing appropriate exception
-                    return false;
+                    return reason;
                 }
             }
         }
 
-        return true;
+        return null;
     }
 
-    protected boolean checkPostConditions( final ResourceStoreRequest request, final StorageItem item )
+    protected ItemNotFoundInRepositoryReason checkPostConditions( final ResourceStoreRequest request,
+                                                                  final StorageItem item )
         throws IllegalOperationException, ItemNotFoundException, AccessDeniedException
     {
         if ( getRequestProcessors().size() > 0 )
         {
-            for ( RequestProcessor processor : getRequestProcessors().values() )
+            for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                if ( !processor.shouldRetrieve( this, request, item ) )
+                final ItemNotFoundInRepositoryReason reason = processor.shouldRetrieve( this, request, item );
+                if ( reason != null )
                 {
                     // let's not state anything about reason, and allow processor say why it rejected
-                    // by throwing appropriate exception
-                    return false;
+                    return reason;
                 }
             }
         }
 
-        return true;
+        return null;
     }
 
     protected void enforceWritePolicy( ResourceStoreRequest request, Action action )
