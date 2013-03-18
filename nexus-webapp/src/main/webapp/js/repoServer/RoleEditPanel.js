@@ -419,6 +419,7 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         labelStyle : 'margin-left: 15px; width: 185px;',
         helpText : ht.id,
         name : 'id',
+        readOnly : !this.isNew,
         allowBlank : false,
         width : this.COMBO_WIDTH
       }, {
