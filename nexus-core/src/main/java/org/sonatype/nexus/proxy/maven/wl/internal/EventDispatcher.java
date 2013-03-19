@@ -339,8 +339,8 @@ public class EventDispatcher
      * 
      * @param evt
      */
-    @Subscribe
-    @AllowConcurrentEvents
+    // @Subscribe
+    // @AllowConcurrentEvents
     public void onConfigurationChangeEvent( final ConfigurationChangeEvent evt )
     {
         for ( Configurable configurable : evt.getChanges() )
