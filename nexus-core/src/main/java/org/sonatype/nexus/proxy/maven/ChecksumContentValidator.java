@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
-
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -34,7 +32,6 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Maven checksum content validator.
