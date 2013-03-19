@@ -35,10 +35,6 @@ public class Upgrade204to205
     implements SecurityUpgrader
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
-
-    public Upgrade204to205() {
-    	System.out.println("foo");
-    }
     
     public Object loadConfiguration( File file )
         throws IOException, ConfigurationIsCorruptedException

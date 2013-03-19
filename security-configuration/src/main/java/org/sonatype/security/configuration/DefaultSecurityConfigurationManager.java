@@ -121,8 +121,7 @@ public class DefaultSecurityConfigurationManager
     
     public int getHashIterations()
     {
-    	//TODO - Add this to security-configuration.xml
-    	return 1024;
+    	return this.getConfiguration().getHashIterations();
     }
 
     public List<String> getRealms()
