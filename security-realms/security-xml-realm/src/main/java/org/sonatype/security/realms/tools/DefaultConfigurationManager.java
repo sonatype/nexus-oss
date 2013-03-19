@@ -15,6 +15,7 @@ package org.sonatype.security.realms.tools;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -41,6 +43,7 @@ import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
@@ -63,19 +66,27 @@ public class DefaultConfigurationManager
     private final SecurityConfigurationCleaner configCleaner;
 
     private final List<SecurityConfigurationModifier> configurationModifiers;
+    
+    private final PasswordGenerator passwordGenerator;
+    
+    private final SecurityConfigurationManager securityConfiguration;
 
     @Inject
     public DefaultConfigurationManager( List<SecurityConfigurationModifier> configurationModifiers,
                                         SecurityConfigurationCleaner configCleaner,
                                         SecurityConfigurationValidator validator,
                                         @Named( "file" ) SecurityModelConfigurationSource configurationSource,
-                                        List<PrivilegeDescriptor> privilegeDescriptors )
+                                        List<PrivilegeDescriptor> privilegeDescriptors,
+                                        PasswordGenerator passwordGenerator,
+                                        SecurityConfigurationManager securityConfiguration)
     {
         this.configurationModifiers = configurationModifiers;
         this.configCleaner = configCleaner;
         this.validator = validator;
         this.configurationSource = configurationSource;
         this.privilegeDescriptors = privilegeDescriptors;
+        this.passwordGenerator = passwordGenerator;
+        this.securityConfiguration = securityConfiguration;
     }
 
     public List<CPrivilege> listPrivileges()
@@ -176,7 +187,8 @@ public class DefaultConfigurationManager
         // set the password if its not null
         if ( password != null && password.trim().length() > 0 )
         {
-            user.setPassword( StringDigester.getSha1Digest( password ) );
+        	user.setSalt(this.passwordGenerator.generateSalt());
+            user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
         }
 
         ValidationResponse vr = validator.validateUser( context, user, roles, false );
@@ -390,6 +402,22 @@ public class DefaultConfigurationManager
             throw new InvalidConfigurationException( vr );
         }
     }
+    
+    public void updateUser( CUser user )
+    	throws InvalidConfigurationException, UserNotFoundException
+	{    	
+        Set<String> roles = new HashSet<String>();
+        try
+        {
+            CUserRoleMapping userRoleMapping = this.readUserRoleMapping( user.getId(), SecurityXmlUserManager.SOURCE );
+            roles.addAll( userRoleMapping.getRoles() );
+        }
+        catch ( NoSuchRoleMappingException e )
+        {
+            this.logger.debug( "User: " + user.getId() + " has no roles." );
+        }        
+        this.updateUser( user, new HashSet<String>( roles ) );
+	}
 
     public void updateUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException, UserNotFoundException

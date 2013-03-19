@@ -208,19 +208,9 @@ public class SecurityXmlUserManager
     public void changePassword( String userId, String newPassword )
         throws UserNotFoundException, InvalidConfigurationException
     {
-        CUser secUser = this.configuration.readUser( userId );
-        Set<String> roles = new HashSet<String>();
-        try
-        {
-            CUserRoleMapping userRoleMapping = this.configuration.readUserRoleMapping( userId, SOURCE );
-            roles.addAll( userRoleMapping.getRoles() );
-        }
-        catch ( NoSuchRoleMappingException e )
-        {
-            this.logger.debug( "User: " + userId + " has no roles." );
-        }
+        CUser secUser = this.configuration.readUser( userId );        
         this.hashPassword(secUser,  newPassword);
-        this.configuration.updateUser( secUser, new HashSet<String>( roles ) );
+        this.configuration.updateUser( secUser );
         this.saveConfiguration();
     }
 

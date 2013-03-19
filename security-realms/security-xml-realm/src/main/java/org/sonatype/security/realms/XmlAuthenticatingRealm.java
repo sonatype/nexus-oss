@@ -29,6 +29,9 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.inject.Description;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CUser;
@@ -51,6 +54,8 @@ public class XmlAuthenticatingRealm
     extends AuthorizingRealm
     implements Realm
 {
+	private final Logger logger = LoggerFactory.getLogger( getClass() );
+	
     public static final String ROLE = "XmlAuthenticatingRealm";
 
     private ConfigurationManager configuration;
@@ -137,11 +142,26 @@ public class XmlAuthenticatingRealm
      * @param user to update
      * @param password cleartext password to hash
      */
-    private void addPasswordSalt(CUser user, String password)
+    private void addPasswordSalt(CUser user, String password)    	
     {
-    	user.setSalt(this.passwordGenerator.generateSalt());
-    	user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
-    	this.configuration.save();
+    	//Store current values to rollback if update fails
+    	String currentPasswordHash = user.getPassword();
+    	String salt = user.getSalt();
+    	
+    	try
+    	{
+	    	user.setSalt(this.passwordGenerator.generateSalt());
+	    	user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
+	    	this.configuration.updateUser(user);
+	    	this.configuration.save();
+    	}
+    	catch(Exception e)
+    	{
+    		//Update failed, rollback to previous values
+    		user.setSalt(salt);
+    		user.setPassword(currentPasswordHash);
+    		this.logger.error("Unable to update hash for user " + user.getId());
+    	}
     }
     
     /*
@@ -151,7 +171,7 @@ public class XmlAuthenticatingRealm
      * @param the user object containing the stored credentials
      * @return true if credentials match, false otherwise
      */
-    boolean isValidCredentials(UsernamePasswordToken token, CUser user)
+    private boolean isValidCredentials(UsernamePasswordToken token, CUser user)
     {
     	try
     	{
@@ -176,7 +196,7 @@ public class XmlAuthenticatingRealm
      * @param user to check
      * @return true if legacy user, false otherwise
      */
-    boolean isLegacyUser(CUser user)
+    private boolean isLegacyUser(CUser user)
     {
     	return user.getSalt() == null;
     }
@@ -188,7 +208,7 @@ public class XmlAuthenticatingRealm
      * @param user
      * @return authentication info object based on user credentials
      */
-    AuthenticationInfo createAuthenticationInfo(CUser user)
+    private AuthenticationInfo createAuthenticationInfo(CUser user)
     {
     	return new SimpleAuthenticationInfo( user.getId(), user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt() != null ? user.getSalt() : ""), getName() );
     }
