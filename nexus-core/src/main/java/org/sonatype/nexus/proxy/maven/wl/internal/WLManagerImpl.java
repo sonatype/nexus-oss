@@ -181,11 +181,12 @@ public class WLManagerImpl
             final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
+            initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenGroupRepository.class ) );
             for ( MavenRepository mavenRepository : initableRepositories )
             {
                 if ( mavenRepository.getLocalStatus().shouldServiceRequest() )
                 {
-                    initializeWhitelist( mavenRepository );
+                    doInitializeWhitelist( mavenRepository, false );
                 }
             }
         }
@@ -225,10 +226,10 @@ public class WLManagerImpl
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
     {
-        doInitializeWhitelist( mavenRepository );
+        doInitializeWhitelist( mavenRepository, true );
     }
 
-    protected void doInitializeWhitelist( final MavenRepository mavenRepository )
+    protected void doInitializeWhitelist( final MavenRepository mavenRepository, final boolean propagate )
     {
         getLogger().debug( "Initializing white-list of {}",
             RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
@@ -239,7 +240,7 @@ public class WLManagerImpl
             {
                 // good, we assume is up to date, which should be unless user tampered with it
                 // in that case, just delete it + update and should be fixed.
-                publish( mavenRepository, prefixSource );
+                publish( mavenRepository, prefixSource, propagate );
                 getLogger().info( "Existing white-list of {} initialized",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
@@ -247,7 +248,7 @@ public class WLManagerImpl
             {
                 // mark it for noscrape if not marked yet
                 // this is mainly important on 1st boot or newly added reposes
-                unpublish( mavenRepository );
+                unpublish( mavenRepository, propagate );
                 // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
                 // publish
                 updateWhitelist( mavenRepository );
@@ -261,7 +262,7 @@ public class WLManagerImpl
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             try
             {
-                unpublish( mavenRepository );
+                unpublish( mavenRepository, propagate );
             }
             catch ( IOException ioe )
             {
@@ -980,6 +981,13 @@ public class WLManagerImpl
     public void publish( final MavenRepository mavenRepository, final PrefixSource prefixSource )
         throws IOException
     {
+        publish( mavenRepository, prefixSource, true );
+    }
+
+    protected void publish( final MavenRepository mavenRepository, final PrefixSource prefixSource,
+                            final boolean propagate )
+        throws IOException
+    {
         // publish prefix file
         final FilePrefixSource prefixesFile = getPrefixSourceFor( mavenRepository );
         try
@@ -998,12 +1006,21 @@ public class WLManagerImpl
         // event
         eventBus.post( new WLPublishedRepositoryEvent( mavenRepository, prefixesFile ) );
 
-        // propagate
-        propagateWLUpdateOf( mavenRepository );
+        if ( propagate )
+        {
+            // propagate
+            propagateWLUpdateOf( mavenRepository );
+        }
     }
 
     @Override
     public void unpublish( final MavenRepository mavenRepository )
+        throws IOException
+    {
+        unpublish( mavenRepository, true );
+    }
+
+    protected void unpublish( final MavenRepository mavenRepository, final boolean propagate )
         throws IOException
     {
         // delete (if any) published files, even those that user might manually put there
@@ -1022,8 +1039,11 @@ public class WLManagerImpl
         // event
         eventBus.post( new WLUnpublishedRepositoryEvent( mavenRepository ) );
 
-        // propagate
-        propagateWLUpdateOf( mavenRepository );
+        if ( propagate )
+        {
+            // propagate
+            propagateWLUpdateOf( mavenRepository );
+        }
     }
 
     protected void propagateWLUpdateOf( final MavenRepository mavenRepository )
