@@ -169,27 +169,55 @@ public class WLManagerImpl
     @Override
     public void startup()
     {
-        // init WLs of repositories on boot, but only hosted needs immediate update
-        // while proxies - if their WL does not exists, like on 1st boot -- will get
-        // inited only and not updated (will be marked for noscrape). Their update will
-        // be commenced a bit later, due to timing issues in Pro + Secure Central, where
-        // RemoteRepositoryStorage for it is not yet ready (is getting prepped for same this
-        // event: NexusStartedEvent).
-        // All this is important for 1st boot only, as on subsequent boot WLs will be alredy
-        // present.
+        // init WLs of repositories on boot. In first "flight" we do not do any update
+        // only ack existing WLs or in case of non-existent (upgrade), we just mark those
+        // reposes as noscrape. First the hosted+proxy reposes are processed, and they
+        // are gathered into a list that we know they need-update (have no WL at all)
+        // 2nd pass is for groups, but they are NOT collected for updates.
+        // Finally, those collected for update will get update bg jobs spawned.
+
+        // All this is important for 1st boot only, as on subsequent boot WLs will be already
+        // present and just event will be published.
+        // hosted + proxies get inited first, collect those needing update
+        // those will be all on upgrade, and none on subsequent boots
+        final ArrayList<MavenRepository> needUpdateRepositories = new ArrayList<MavenRepository>();
         {
             final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
-            initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenGroupRepository.class ) );
             for ( MavenRepository mavenRepository : initableRepositories )
             {
                 if ( mavenRepository.getLocalStatus().shouldServiceRequest() )
                 {
-                    doInitializeWhitelist( mavenRepository, false );
+                    if ( doInitializeWhitelistOnStartup( mavenRepository ) )
+                    {
+                        // collect those marked as need-update
+                        needUpdateRepositories.add( mavenRepository );
+                    }
                 }
             }
         }
+        // groups get inited next, this mostly means they will be marked as noscrape on upgraded instances,
+        // and just a published event will be fired on consequent boots
+        {
+            final ArrayList<MavenRepository> initableGroupRepositories = new ArrayList<MavenRepository>();
+            initableGroupRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenGroupRepository.class ) );
+            for ( MavenRepository mavenRepository : initableGroupRepositories )
+            {
+                if ( mavenRepository.getLocalStatus().shouldServiceRequest() )
+                {
+                    // groups will not be collected to needs-update list
+                    doInitializeWhitelistOnStartup( mavenRepository );
+                }
+            }
+        }
+        // spawn all the needed updates as bg jobs
+        // these will maintaing groups too as needed
+        for ( MavenRepository mavenRepository : needUpdateRepositories )
+        {
+            updateWhitelist( mavenRepository );
+        }
+
         // schedule the "updater" that ping hourly the mayUpdateProxyWhitelist method
         // but wait 1 minute for boot to calm down and then start
         this.executor.scheduleAtFixedRate( new Runnable()
@@ -226,10 +254,41 @@ public class WLManagerImpl
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
     {
-        doInitializeWhitelist( mavenRepository, true );
+        getLogger().debug( "Initializing white-list of newly added {}",
+            RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        try
+        {
+            // mark it for noscrape if not marked yet
+            unpublish( mavenRepository );
+            // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
+            // and publish
+            updateWhitelist( mavenRepository );
+            getLogger().info( "Initializing non existing white-list of newly added {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        }
+        catch ( Exception e )
+        {
+            getLogger().warn( "Problem during white-list initialisation of newly added {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+            try
+            {
+                unpublish( mavenRepository );
+            }
+            catch ( IOException ioe )
+            {
+                // silently
+            }
+        }
     }
 
-    protected void doInitializeWhitelist( final MavenRepository mavenRepository, final boolean propagate )
+    /**
+     * Initializes maven repository WL on startup. Signals with returning {@code true} if the repository needs update of
+     * WL.
+     * 
+     * @param mavenRepository
+     * @return {@code true} if repository needs update.
+     */
+    protected boolean doInitializeWhitelistOnStartup( final MavenRepository mavenRepository )
     {
         getLogger().debug( "Initializing white-list of {}",
             RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
@@ -240,7 +299,7 @@ public class WLManagerImpl
             {
                 // good, we assume is up to date, which should be unless user tampered with it
                 // in that case, just delete it + update and should be fixed.
-                publish( mavenRepository, prefixSource, propagate );
+                publish( mavenRepository, prefixSource, false );
                 getLogger().info( "Existing white-list of {} initialized",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
@@ -248,12 +307,10 @@ public class WLManagerImpl
             {
                 // mark it for noscrape if not marked yet
                 // this is mainly important on 1st boot or newly added reposes
-                unpublish( mavenRepository, propagate );
-                // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
-                // publish
-                updateWhitelist( mavenRepository );
+                unpublish( mavenRepository, false );
                 getLogger().info( "Initializing non existing white-list of {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                return true;
             }
         }
         catch ( Exception e )
@@ -262,13 +319,14 @@ public class WLManagerImpl
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             try
             {
-                unpublish( mavenRepository, propagate );
+                unpublish( mavenRepository, false );
             }
             catch ( IOException ioe )
             {
                 // silently
             }
         }
+        return false;
     }
 
     /**
