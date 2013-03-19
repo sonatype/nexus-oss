@@ -257,6 +257,27 @@
       <artifactId>javasimon-core</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-guice</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-httpclient</artifactId>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

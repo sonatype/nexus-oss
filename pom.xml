@@ -180,6 +180,7 @@
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.6</goodies.version>
+    <metrics.version>2.2.0</metrics.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -834,6 +835,54 @@
         <groupId>org.javasimon</groupId>
         <artifactId>javasimon-core</artifactId>
         <version>3.3.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-guice</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-servlet</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-jersey</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-jetty</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-httpclient</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-logback</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-web</artifactId>
+        <version>${metrics.version}</version>
       </dependency>
 
       <!-- INTERNAL -->

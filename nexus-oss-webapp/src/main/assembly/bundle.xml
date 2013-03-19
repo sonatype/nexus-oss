@@ -106,6 +106,7 @@
           <exclude>WEB-INF/lib/logback-core*.jar</exclude>
           <exclude>WEB-INF/lib/logback-classic*.jar</exclude>
           <exclude>WEB-INF/lib/nexus-logging-extras-appender*.jar</exclude>
+          <exclude>WEB-INF/lib/metrics-core*.jar</exclude>
           <exclude>WEB-INF/classes/logback.xml</exclude>
         </excludes>
       </unpackOptions>
@@ -128,6 +129,9 @@
         <include>org.sonatype.appcontext:*</include>
         <include>org.slf4j:*</include>
         <include>ch.qos.logback:*</include>
+        <include>com.yammer.metrics:metrics-core</include>
+        <include>com.yammer.metrics:metrics-jetty</include>
+        <include>com.yammer.metrics:metrics-logback</include>
       </includes>
     </dependencySet>
   </dependencySets>
