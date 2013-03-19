@@ -107,6 +107,7 @@ public class WhitelistWithHostedRepositoryIT
         assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
         whitelist().updateWhitelist( REPO_ID );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
     }
