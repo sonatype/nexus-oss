@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.jsecurity;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import junit.framework.Assert;
+
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
@@ -74,5 +79,44 @@ public class DefaultPasswordGeneratorTest
         assertFalse( newPw.equals( newEncrypted2 ) );
         assertTrue( newEncrypted.equals( newEncrypted2 ) );
         assertFalse( encrypted.equals( newEncrypted ) );
+    }
+    
+    @Test
+    public void testHashSaltedPassword()
+    	throws Exception
+    {
+    	String password = "test-password";
+    	String salt = pwGenerator.generateSalt();
+    	int hashIterations = 1024;
+    	
+    	String hash1 = pwGenerator.hashPassword(password, salt, hashIterations);
+    	String hash2 = pwGenerator.hashPassword(password, salt, hashIterations);
+    	
+    	Assert.assertEquals(hash1, hash2);
+    	
+    	String salt2 = pwGenerator.generateSalt();
+    	String hash3 = pwGenerator.hashPassword(password, salt2, hashIterations);
+    	
+    	Assert.assertFalse(hash1.equals(hash3));
+    	
+    	String hash4 = pwGenerator.hashPassword(password, salt, 1);
+    	
+    	Assert.assertFalse(hash1.equals(hash4));
+    }
+    
+    @Test
+    public void testGenerateSalt()
+    	throws Exception
+    {
+    	//Just make sure that a unique salt is generated each time generateSalt is called
+    	int iterations = 1000;
+    	Set<String> salts = new HashSet<String>();
+    	
+    	for(int x = 0; x < iterations; ++x)
+    	{
+    		salts.add(pwGenerator.generateSalt());
+    	}
+    	
+    	Assert.assertTrue(salts.size() == iterations);
     }
 }
