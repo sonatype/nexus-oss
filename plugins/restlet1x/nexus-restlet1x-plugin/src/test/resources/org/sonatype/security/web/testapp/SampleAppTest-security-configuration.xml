@@ -13,7 +13,7 @@
 
 -->
 <security-configuration>
-  <version>2.0.3</version>
+  <version>2.0.4</version>
   <enabled>true</enabled>
   <anonymousAccessEnabled>false</anonymousAccessEnabled>
   <anonymousUsername>anonymous-user</anonymousUsername>
@@ -22,5 +22,5 @@
     <realm>XmlAuthorizingRealm</realm>
     <realm>XmlAuthenticatingRealm</realm>
   </realms>
-  
+  <hashIterations>1024</hashIterations>
 </security-configuration>
