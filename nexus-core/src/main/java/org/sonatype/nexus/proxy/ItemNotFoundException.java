@@ -29,16 +29,17 @@ public class ItemNotFoundException
     extends Exception
 {
     private static final long serialVersionUID = -4964273361722823796L;
-    
+
     // ==
-    
+
     /**
      * Creates a new instance of {@link ItemNotFoundReason}.
      * 
-     * @param request
-     * @param message
-     * @param params
+     * @param request The request that causes {@link ItemNotFoundException}.
+     * @param message The reasoning message template (use {@code %s} as place holder). See {@link SimpleFormat}.
+     * @param params The parameters to fill place holders in message with content. See {@link SimpleFormat}.
      * @return the newly created reason.
+     * @since 2.4
      */
     public static ItemNotFoundReason reasonFor( final ResourceStoreRequest request, final String message,
                                                 final Object... params )
@@ -49,11 +50,12 @@ public class ItemNotFoundException
     /**
      * Creates a new instance of {@link ItemNotFoundInRepositoryReason}.
      * 
-     * @param request
-     * @param repository
-     * @param message
-     * @param params
+     * @param request The request that causes {@link ItemNotFoundException}.
+     * @param repository The repository within {@link ItemNotFoundException} is to be thrown.
+     * @param message The reasoning message template (use {@code %s} as place holder). See {@link SimpleFormat}.
+     * @param params The parameters to fill place holders in message with content. See {@link SimpleFormat}.
      * @return the newly created reason.
+     * @since 2.4
      */
     public static ItemNotFoundInRepositoryReason reasonFor( final ResourceStoreRequest request,
                                                             final Repository repository, final String message,
@@ -62,37 +64,23 @@ public class ItemNotFoundException
         return new ItemNotFoundInRepositoryReason( SimpleFormat.template( message, params ), request, repository );
     }
 
-    /**
-     * Constructs a default reasoning.
-     * {@code "Path %s not found in repository %s."}.
-     * 
-     * @param request
-     * @param repository
-     * @return reason existed in request or a new one with default message.
-     */
-    public static ItemNotFoundInRepositoryReason defaultReasonFrom( final ResourceStoreRequest request,
-                                                                  final Repository repository )
-    {
-        // default the message
-        return reasonFor( request, repository, "Path %s not found in repository %s.", request.getRequestPath(),
-            RepositoryStringUtils.getHumanizedNameString( repository ) );
-    }
-
     // ==
 
     /**
-     * Legacy support.
+     * Legacy support. Not to be used in any current code!
      * 
      * @param message
      * @param request
      * @param repository
      * @return reason.
+     * @since 2.4
      * @deprecated Used for legacy support, new code should NOT use this method. See other methods:
      *             {@link #reasonFor(ResourceStoreRequest, String, Object...)} and
      *             {@link #reasonFor(ResourceStoreRequest, Repository, String, Object...)}
      */
-    public static ItemNotFoundReason legacySupport( final String message, final ResourceStoreRequest request,
-                                                    final Repository repository )
+    @Deprecated
+    private static ItemNotFoundReason legacySupport( final String message, final ResourceStoreRequest request,
+                                                     final Repository repository )
     {
         if ( repository != null )
         {
@@ -103,13 +91,15 @@ public class ItemNotFoundException
             return new ItemNotFoundReason( SimpleFormat.template( message ), request );
         }
     }
-    
+
     // ==
 
     /**
      * Reason of item not found when no repository is involved. Usually ther IS one, so you should use
      * {@link ItemNotFoundInRepositoryReason} instead. This one is used in places like {@link RepositoryRouter}, where
      * the "targeted" repository is still unknown or similar places.
+     * 
+     * @since 2.4
      */
     public static class ItemNotFoundReason
     {
@@ -130,9 +120,9 @@ public class ItemNotFoundException
         }
 
         /**
-         * Returns the reason message.
+         * Returns the reason message, never {@code null}.
          * 
-         * @return the reason message.
+         * @return the reason message, never {@code null}.
          */
         public String getMessage()
         {
@@ -140,9 +130,10 @@ public class ItemNotFoundException
         }
 
         /**
-         * Returns the request (originals detached clone, see {@link ResourceStoreRequest#cloneAndDetach()} method).
+         * Returns the request (originals detached clone, see {@link ResourceStoreRequest#cloneAndDetach()} method) that
+         * resulted in {@link ItemNotFoundException}.
          * 
-         * @return the request.
+         * @return the request that resulted in {@link ItemNotFoundException}, never {@code null}.
          */
         public ResourceStoreRequest getResourceStoreRequest()
         {
@@ -152,6 +143,8 @@ public class ItemNotFoundException
 
     /**
      * Reason of item not found that is triggered within a {@link Repository} instance.
+     * 
+     * @since 2.4
      */
     public static class ItemNotFoundInRepositoryReason
         extends ItemNotFoundReason
@@ -176,7 +169,7 @@ public class ItemNotFoundException
         /**
          * Returns the involved {@link Repository} instance.
          * 
-         * @return the repository in which item-not-found occurred.
+         * @return the repository in which {@link ItemNotFoundException} occurred.
          */
         public Repository getRepository()
         {
@@ -214,7 +207,7 @@ public class ItemNotFoundException
     /**
      * Returns the reason of the item not found exception (never {@code null}).
      * 
-     * @return the reason.
+     * @return the reason, never {@code null}.
      * @since 2.4
      */
     public ItemNotFoundReason getReason()
@@ -230,6 +223,7 @@ public class ItemNotFoundException
      * @param request
      * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
+    @Deprecated
     public ItemNotFoundException( final ResourceStoreRequest request )
     {
         this( request, null, null );
@@ -242,6 +236,7 @@ public class ItemNotFoundException
      * @param cause
      * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
+    @Deprecated
     public ItemNotFoundException( final ResourceStoreRequest request, final Throwable cause )
     {
         this( request, null, cause );
@@ -254,6 +249,7 @@ public class ItemNotFoundException
      * @param repository
      * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
+    @Deprecated
     public ItemNotFoundException( final ResourceStoreRequest request, final Repository repository )
     {
         this( request, repository, null );
@@ -267,6 +263,7 @@ public class ItemNotFoundException
      * @param cause
      * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
+    @Deprecated
     public ItemNotFoundException( final ResourceStoreRequest request, final Repository repository, final Throwable cause )
     {
         this( repository != null ? "Item not found for request \"" + String.valueOf( request ) + "\" in repository \""
@@ -282,6 +279,7 @@ public class ItemNotFoundException
      * @param repository
      * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
+    @Deprecated
     protected ItemNotFoundException( final String message, final ResourceStoreRequest request,
                                      final Repository repository )
     {
@@ -297,6 +295,7 @@ public class ItemNotFoundException
      * @param cause
      * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
+    @Deprecated
     protected ItemNotFoundException( final String message, final ResourceStoreRequest request,
                                      final Repository repository, final Throwable cause )
     {
@@ -311,6 +310,7 @@ public class ItemNotFoundException
      * @return the repository where this exception occurred or {@code null}.
      * @deprecated Use {@link #getReason()} and inspect that instead.
      */
+    @Deprecated
     public Repository getRepository()
     {
         if ( reason instanceof ItemNotFoundInRepositoryReason )
@@ -321,11 +321,12 @@ public class ItemNotFoundException
     }
 
     /**
-     * The request.
+     * Returns the original request, that caused this exception to be thrown.
      * 
      * @return the request that caused this exception.
      * @deprecated Use {@link #getReason()} and inspect that instead.
      */
+    @Deprecated
     public ResourceStoreRequest getRequest()
     {
         return getReason().getResourceStoreRequest();
