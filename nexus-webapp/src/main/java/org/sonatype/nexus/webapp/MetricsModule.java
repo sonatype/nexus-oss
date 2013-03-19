@@ -14,6 +14,7 @@ import com.yammer.metrics.reporting.HealthCheckServlet;
 import com.yammer.metrics.reporting.MetricsServlet;
 import com.yammer.metrics.reporting.PingServlet;
 import com.yammer.metrics.reporting.ThreadDumpServlet;
+import com.yammer.metrics.util.DeadlockHealthCheck;
 import com.yammer.metrics.web.DefaultWebappMetricsFilter;
 
 import javax.inject.Named;
@@ -34,20 +35,22 @@ public class MetricsModule
         {
             @Override
             protected void configureServlets() {
+                Clock clock = Clock.defaultClock();
+                bind(Clock.class).toInstance(clock);
+
+                VirtualMachineMetrics virtualMachineMetrics = VirtualMachineMetrics.getInstance();
+                bind(VirtualMachineMetrics.class).toInstance(virtualMachineMetrics);
+
                 JsonFactory jsonFactory = new JsonFactory(new ObjectMapper());
                 bind(JsonFactory.class).toInstance(jsonFactory);
 
                 HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
                 bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
 
+                healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
+
                 MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
                 bind(MetricsRegistry.class).toInstance(metricsRegistry);
-
-                Clock clock = Clock.defaultClock();
-                bind(Clock.class).toInstance(clock);
-
-                VirtualMachineMetrics virtualMachineMetrics = VirtualMachineMetrics.getInstance();
-                bind(VirtualMachineMetrics.class).toInstance(virtualMachineMetrics);
 
                 serve("/internal/ping").with(new PingServlet());
 
