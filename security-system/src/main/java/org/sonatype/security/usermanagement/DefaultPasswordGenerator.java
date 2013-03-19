@@ -12,11 +12,15 @@
  */
 package org.sonatype.security.usermanagement;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.apache.commons.codec.binary.Hex;
+import org.apache.shiro.crypto.hash.Sha512Hash;
 
 /**
  * Default implementation of PasswordGenerator.
@@ -27,6 +31,8 @@ import javax.inject.Singleton;
 public class DefaultPasswordGenerator
     implements PasswordGenerator
 {
+	private static final int SALT_LENGTH = 64;
+	
     private int getRandom( int min, int max )
     {
         Random random = new Random();
@@ -36,6 +42,7 @@ public class DefaultPasswordGenerator
         return min + next;
     }
 
+    @Override
     public String generatePassword( int minChars, int maxChars )
     {
         int length = getRandom( minChars, maxChars );
@@ -56,9 +63,33 @@ public class DefaultPasswordGenerator
 
         return new String( bytes );
     }
+    
+    @Override
+	public String generateSalt()
+    {
+    	SecureRandom r = new SecureRandom();
+    	byte[] salt = new byte[SALT_LENGTH];
+    	r.nextBytes(salt);
+    	return new String(Hex.encodeHex(salt));
+	}
 
+    @Override
     public String hashPassword( String password )
     {
         return StringDigester.getSha1Digest( password );
     }
+
+	@Override
+	public String hashPassword(String clearPassword,
+							   String salt,
+							   int hashIterations)
+	{
+		// set the password if its not null
+        if ( clearPassword != null && clearPassword.trim().length() > 0 )
+        {
+        	return new Sha512Hash(clearPassword, salt, hashIterations).toHex();        	
+        }
+
+        return clearPassword;
+	}
 }
