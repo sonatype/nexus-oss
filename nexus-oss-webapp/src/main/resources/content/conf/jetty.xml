@@ -29,6 +29,9 @@
     <Call name="addConnector">
         <Arg>
             <New class="com.yammer.metrics.jetty.InstrumentedSelectChannelConnector">
+              <!--
+              NOTE: yammer impl doesn't expose a default CTOR, should short this out if we move forward.
+              -->
               <Arg type="int">${application-port}</Arg>
               <!--<Set name="host">${application-host}</Set>-->
               <!--<Set name="port">${application-port}</Set>-->
