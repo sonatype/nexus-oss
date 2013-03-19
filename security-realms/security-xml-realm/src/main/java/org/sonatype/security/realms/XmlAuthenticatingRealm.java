@@ -34,6 +34,7 @@ import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.Sha512ThenSha1ThenMd5CredentialsMatcher;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
@@ -55,13 +56,17 @@ public class XmlAuthenticatingRealm
     private ConfigurationManager configuration;
     
     private SecurityConfigurationManager securityConfiguration;
+    
+    private PasswordGenerator passwordGenerator;
 
     @Inject
     public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration,
-    							   SecurityConfigurationManager securityConfiguration)
+    							   SecurityConfigurationManager securityConfiguration,
+    							   PasswordGenerator passwordGenerator )
     {
         this.configuration = configuration;
         this.securityConfiguration = securityConfiguration;
+        this.passwordGenerator = passwordGenerator;
         setCredentialsMatcher( new Sha512ThenSha1ThenMd5CredentialsMatcher(this.securityConfiguration.getHashIterations()) );
     }
 
@@ -94,7 +99,14 @@ public class XmlAuthenticatingRealm
         
         if ( CUser.STATUS_ACTIVE.equals( user.getStatus() ) )
         {
-            return new SimpleAuthenticationInfo( upToken.getUsername(), user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt() != null ? user.getSalt() : ""), getName() );        	
+        	//Check for legacy user that has unsalted password hash
+        	//Update if legacy user, and valid credentials were specified
+        	if(this.isLegacyUser(user) && this.isValidCredentials(upToken, user))
+        	{
+        		this.addPasswordSalt(user, new String(upToken.getPassword()));
+        	}
+        	
+        	return this.createAuthenticationInfo(user);
         }
         else if ( CUser.STATUS_DISABLED.equals( user.getStatus() ) )
         {
@@ -116,5 +128,68 @@ public class XmlAuthenticatingRealm
     public ConfigurationManager getConfigurationManager()
     {
         return configuration;
+    }
+    
+    
+    /*
+     * Re-hash user password with unique salt, and persist changes
+     * 
+     * @param user to update
+     * @param password cleartext password to hash
+     */
+    private void addPasswordSalt(CUser user, String password)
+    {
+    	user.setSalt(this.passwordGenerator.generateSalt());
+    	user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
+    	this.configuration.save();
+    }
+    
+    /*
+     * Checks to see if the credentials in token match the credentials stored on user
+     * 
+     * @param token the username/password token containing the credentials to verify
+     * @param the user object containing the stored credentials
+     * @return true if credentials match, false otherwise
+     */
+    boolean isValidCredentials(UsernamePasswordToken token, CUser user)
+    {
+    	try
+    	{
+    		AuthenticationInfo info = this.createAuthenticationInfo(user);
+    		this.assertCredentialsMatch(token, info);
+    		
+    		//Credentials match
+    		return true;
+    	}
+    	catch(Exception e)
+    	{
+    		//Nothing to do here except return. Our parent will be asserting
+    		//that the credentials match and will handle the exception appropriately
+    		return false;
+    	}
+    }
+    
+    /*
+     * Checks to see if the specified user is a legacy user
+     * A legacy user has an unsalted password
+     * 
+     * @param user to check
+     * @return true if legacy user, false otherwise
+     */
+    boolean isLegacyUser(CUser user)
+    {
+    	return user.getSalt() == null;
+    }
+    
+    /*
+     * Creates an authentication info object
+     * using the credentials of the provided user
+     * 
+     * @param user
+     * @return authentication info object based on user credentials
+     */
+    AuthenticationInfo createAuthenticationInfo(CUser user)
+    {
+    	return new SimpleAuthenticationInfo( user.getId(), user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt() != null ? user.getSalt() : ""), getName() );
     }
 }

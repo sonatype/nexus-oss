@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
-import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,8 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -31,7 +28,6 @@ import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
-import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
@@ -40,18 +36,14 @@ import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
-import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
-
-import com.google.common.base.Stopwatch;
-import com.google.common.eventbus.Subscribe;
 
 /**
  * A UserManager backed by the security.xml file. This UserManger supports all User CRUD operations.
@@ -69,23 +61,25 @@ public class SecurityXmlUserManager
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public static final String SOURCE = "default";
-    
-    private static final int SALT_LENGTH = 64;
 
     private final ConfigurationManager configuration;
     
     private final SecurityConfigurationManager securityConfiguration;
 
     private final SecuritySystem securitySystem;
+    
+    private final PasswordGenerator passwordGenerator;
 
     @Inject
     public SecurityXmlUserManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
                                    SecuritySystem securitySystem,
-                                   SecurityConfigurationManager securityConfiguration )
+                                   SecurityConfigurationManager securityConfiguration,
+                                   PasswordGenerator passwordGenerator)
     {
         this.configuration = configuration;
         this.securityConfiguration = securityConfiguration;
         this.securitySystem = securitySystem;        
+        this.passwordGenerator = passwordGenerator;
     }
 
     protected CUser toUser( User user )
@@ -203,8 +197,7 @@ public class SecurityXmlUserManager
         throws InvalidConfigurationException
     {
         CUser secUser = this.toUser( user );
-        secUser.setSalt( this.generateSalt() );
-        secUser.setPassword( this.hashPassword( password, secUser.getSalt() ) );
+        this.hashPassword(secUser,  password);
         this.configuration.createUser( secUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
 
@@ -226,8 +219,7 @@ public class SecurityXmlUserManager
         {
             this.logger.debug( "User: " + userId + " has no roles." );
         }
-        secUser.setSalt( this.generateSalt() );
-        secUser.setPassword( this.hashPassword( newPassword, secUser.getSalt() ) );
+        this.hashPassword(secUser,  newPassword);
         this.configuration.updateUser( secUser, new HashSet<String>( roles ) );
         this.saveConfiguration();
     }
@@ -335,27 +327,20 @@ public class SecurityXmlUserManager
     	return this.securityConfiguration;
     }
 
-    private String hashPassword( String clearPassword, String salt )
+    private String hashPassword( CUser user, String clearPassword )
     {
         // set the password if its not null
         if ( clearPassword != null && clearPassword.trim().length() > 0 )
         {
-        	Stopwatch clock = new Stopwatch();
-        	String foo = new Sha512Hash(clearPassword, salt, getSecurityConfiguration().getHashIterations()).toHex();
-        	String time = clock.toString();
-        	System.out.println(time);
-        	return foo;    
+        	user.setSalt(this.passwordGenerator.generateSalt());
+        	user.setPassword(this.passwordGenerator.hashPassword(clearPassword, user.getSalt(), getSecurityConfiguration().getHashIterations()));        	
+        }
+        else
+        {
+        	user.setPassword(clearPassword);
         }
 
         return clearPassword;
-    }
-    
-    private String generateSalt()
-    {
-    	SecureRandom r = new SecureRandom();
-    	byte[] salt = new byte[SALT_LENGTH];
-    	r.nextBytes(salt);
-    	return new String(Hex.encodeHex(salt));
     }
 
     public void setUsersRoles( String userId, String userSource, Set<RoleIdentifier> roleIdentifiers )
