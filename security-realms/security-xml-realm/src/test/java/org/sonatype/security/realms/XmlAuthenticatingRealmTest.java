@@ -99,13 +99,14 @@ public class XmlAuthenticatingRealmTest
         buildTestAuthenticationConfig( CUser.STATUS_ACTIVE );
 
         String clearPassword = "default-password";
+        String username = "testCreateWithPassowrdEmailUserId";
 
         CUser user = new CUser();
         user.setEmail( "testCreateWithPassowrdEmail@somewhere" );
         user.setFirstName( "testCreateWithPassowrdEmail" );
         user.setLastName( "testCreateWithPassowrdEmail" );
         user.setStatus( CUser.STATUS_ACTIVE );
-        user.setId( "testCreateWithPassowrdEmailUserId" );
+        user.setId( username );
 
         Set<String> roles = new HashSet<String>();
         roles.add( "role" );
@@ -117,8 +118,10 @@ public class XmlAuthenticatingRealmTest
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
 
         String password = new String( (char[]) ai.getCredentials() );
+        
+        CUser updatedUser = this.configurationManager.readUser(username);
 
-        //assertEquals( StringDigester.getSha1Digest( clearPassword ), password );
+        assertEquals( this.hashPassword(clearPassword, updatedUser.getSalt()) , password );
     }
 
     public void testFailedAuthentication()
@@ -158,11 +161,34 @@ public class XmlAuthenticatingRealmTest
             // good
         }
     }
+    
+    public void testDetectLegacyUser()
+    	throws Exception
+    {
+    	String password = "password";
+    	String username = "username";
+    	buildLegacyTestAuthenticationConfig(password);
+    	
+    	UsernamePasswordToken upToken = new UsernamePasswordToken(username, password);
+    	AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
+		CUser updatedUser = this.configurationManager.readUser(username);
+		String hash = new String( (char[]) ai.getCredentials() );
+		
+        assertEquals( this.hashPassword(password, updatedUser.getSalt()) , hash );
+        assertEquals(this.hashPassword(password, updatedUser.getSalt()), updatedUser.getPassword());
+    }
 
     private void buildTestAuthenticationConfig( String status )
         throws InvalidConfigurationException
     {
-        CPrivilege priv = new CPrivilege();
+    	String salt = this.passwordGenerator.generateSalt();
+        buildTestAuthenticationConfig(status, this.hashPassword("password", salt), salt);
+    }
+    
+    private void buildTestAuthenticationConfig(String status, String hash, String salt)
+    	throws InvalidConfigurationException
+    {
+    	CPrivilege priv = new CPrivilege();
         priv.setId( "priv" );
         priv.setName( "name" );
         priv.setDescription( "desc" );
@@ -195,8 +221,8 @@ public class XmlAuthenticatingRealmTest
         testUser.setLastName( "dummyLastName" );
         testUser.setStatus( status );
         testUser.setId( "username" );
-        testUser.setSalt(this.passwordGenerator.generateSalt());
-        testUser.setPassword(this.hashPassword("password", testUser.getSalt()));
+        testUser.setSalt(salt);
+        testUser.setPassword(hash);
 
         Set<String> roles = new HashSet<String>();
         roles.add( "role" );
@@ -205,8 +231,19 @@ public class XmlAuthenticatingRealmTest
         configurationManager.save();
     }
     
+    private void buildLegacyTestAuthenticationConfig(String password)
+    	throws InvalidConfigurationException
+    {
+    	buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, this.legacyHashPassword(password), "");
+    }
+    
     private String hashPassword(String password, String salt)
     {
     	return this.passwordGenerator.hashPassword(password, salt, this.securityConfigurationManager.getHashIterations());
+    }
+    
+    private String legacyHashPassword(String password)
+    {
+    	return this.passwordGenerator.hashPassword(password);
     }
 }

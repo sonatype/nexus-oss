@@ -29,9 +29,9 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.inject.Description;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CUser;
@@ -198,7 +198,7 @@ public class XmlAuthenticatingRealm
      */
     private boolean isLegacyUser(CUser user)
     {
-    	return user.getSalt() == null;
+    	return StringUtils.isEmpty(user.getSalt());
     }
     
     /*
