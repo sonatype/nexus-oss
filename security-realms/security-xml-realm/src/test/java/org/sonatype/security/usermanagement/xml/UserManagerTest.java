@@ -27,6 +27,8 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.configuration.DefaultSecurityConfigurationManager;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
@@ -34,6 +36,7 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
@@ -44,6 +47,9 @@ import org.sonatype.security.usermanagement.UserStatus;
 public class UserManagerTest
     extends AbstractSecurityTestCase
 {
+	private DefaultSecurityConfigurationManager securityConfigurationManager;
+    
+    private PasswordGenerator passwordGenerator;
 
     @Override
     protected void setUp()
@@ -55,6 +61,10 @@ public class UserManagerTest
         String securityXml = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security.xml";
         FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ),
                                  new File( CONFIG_DIR, "security.xml" ) );
+        
+        securityConfigurationManager = (DefaultSecurityConfigurationManager) lookup( SecurityConfigurationManager.class, "default" );
+        
+        passwordGenerator = lookup( PasswordGenerator.class, "default" );
     }
 
     public SecuritySystem getSecuritySystem()
@@ -381,7 +391,7 @@ public class UserManagerTest
     
     private String hashPassword(String clearPassword, String salt)
     {
-    	return new Sha512Hash(clearPassword, salt, 1024).toHex();
+    	return this.passwordGenerator.hashPassword(clearPassword, salt, this.securityConfigurationManager.getHashIterations());
     }
 
 }
