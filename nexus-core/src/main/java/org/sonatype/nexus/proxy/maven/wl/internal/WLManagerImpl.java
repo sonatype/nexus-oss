@@ -262,7 +262,7 @@ public class WLManagerImpl
             // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
             // and publish
             updateWhitelist( mavenRepository );
-            getLogger().info( "Initializing non existing white-list of newly added {}",
+            getLogger().info( "Initializing non-existing white-list of newly added {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
         }
         catch ( Exception e )
@@ -306,7 +306,7 @@ public class WLManagerImpl
                 // mark it for noscrape if not marked yet
                 // this is mainly important on 1st boot or newly added reposes
                 unpublish( mavenRepository, false );
-                getLogger().info( "Initializing non existing white-list of {}",
+                getLogger().info( "Initializing non-existing white-list of {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 return true;
             }
