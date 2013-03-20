@@ -187,7 +187,8 @@ public class WLManagerImpl
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
             for ( MavenRepository mavenRepository : initableRepositories )
             {
-                if ( mavenRepository.getLocalStatus().shouldServiceRequest() )
+                if ( isMavenRepositorySupported( mavenRepository )
+                    && mavenRepository.getLocalStatus().shouldServiceRequest() )
                 {
                     if ( doInitializeWhitelistOnStartup( mavenRepository ) )
                     {
@@ -204,7 +205,8 @@ public class WLManagerImpl
             initableGroupRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenGroupRepository.class ) );
             for ( MavenRepository mavenRepository : initableGroupRepositories )
             {
-                if ( mavenRepository.getLocalStatus().shouldServiceRequest() )
+                if ( isMavenRepositorySupported( mavenRepository )
+                    && mavenRepository.getLocalStatus().shouldServiceRequest() )
                 {
                     // groups will not be collected to needs-update list
                     doInitializeWhitelistOnStartup( mavenRepository );
