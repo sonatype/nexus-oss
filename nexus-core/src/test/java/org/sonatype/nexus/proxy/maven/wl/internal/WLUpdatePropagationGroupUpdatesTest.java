@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
 
 import java.io.File;
 import java.io.IOException;
@@ -223,9 +224,16 @@ public class WLUpdatePropagationGroupUpdatesTest
         // boot already happened
         // we have 2 hosted and both are members of the group
         // as we have no WL (clean boot/kinda upgrade), all of them was 1st marked for noscrape,
-        // and then H1 and H2 got WL updated, and as side effect group WL got updated too
-        assertThat( wlUpdateListener.getPublished(),
-            containsInAnyOrder( HOSTED1_REPO_ID, HOSTED2_REPO_ID, GROUP_REPO_ID, GROUP_REPO_ID ) );
+        // and then H1 and H2 got WL updated concurrently in bg job, and as side effect group WL got updated too
+        // This means, that group might be updated once or twice, depending on concurrency.
+        // So the list might contain (in any order):
+        // HOSTED1, HOSTED2, GROUP
+        // or
+        // HOSTED1, HOSTED2, GROUP, GROUP
+        // (group two times updated).
+        assertThat( wlUpdateListener.getPublished(), hasItem( HOSTED1_REPO_ID ) );
+        assertThat( wlUpdateListener.getPublished(), hasItem( HOSTED2_REPO_ID ) );
+        assertThat( wlUpdateListener.getPublished(), hasItem( GROUP_REPO_ID ) );
     }
 
     @Test
