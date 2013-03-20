@@ -192,7 +192,7 @@ public class SecurityWebModule
         public FilterChainManager get()
         {
             FilterChainManager filterChainManager = new DefaultFilterChainManager( filterConfig );
-            beanLocator.watch( Key.get( Filter.class ), this, filterChainManager );
+            beanLocator.watch( Key.get( Filter.class, Named.class ), this, filterChainManager );
             return filterChainManager;
         }
 
