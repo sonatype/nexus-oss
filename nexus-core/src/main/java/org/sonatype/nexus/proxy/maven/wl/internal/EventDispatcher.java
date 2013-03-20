@@ -95,7 +95,7 @@ public class EventDispatcher
         {
             // we will end up here regularly if reconfiguration was about putting repository out of service
             getLogger().debug( "Repository {} is in bad state for white-list update: {}",
-                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e.getMessage() );
+                mavenRepository, e.getMessage() );
         }
     }
 

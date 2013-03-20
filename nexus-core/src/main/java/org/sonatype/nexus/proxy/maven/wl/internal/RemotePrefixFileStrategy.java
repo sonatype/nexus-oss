@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Remote prefix file strategy.
@@ -72,11 +71,10 @@ public class RemotePrefixFileStrategy
         final List<String> remoteFilePath = config.getRemotePrefixFilePaths();
         for ( String path : remoteFilePath )
         {
-            getLogger().debug( "Looking for remote prefix on {} at path {}",
-                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
+            getLogger().debug( "Looking for remote prefix on {} at path {}", mavenProxyRepository, path );
             // we keep exclusive lock on UID during discovery to prevent other WL threads grabbing this file
             // prematurely. We release the lock only when file is present locally, and is validated.
-            // in that moment it's not published yet, but the content is correct and it will be 
+            // in that moment it's not published yet, but the content is correct and it will be
             // the same that will get published.
             final RepositoryItemUid uid = mavenProxyRepository.createUid( path );
             uid.getLock().lock( Action.update );
@@ -85,8 +83,7 @@ public class RemotePrefixFileStrategy
                 item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
                 if ( item != null )
                 {
-                    getLogger().debug( "Remote prefix on {} at path {} found!",
-                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
+                    getLogger().debug( "Remote prefix on {} at path {} found!", mavenProxyRepository, path );
                     long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
                     final PrefixSource prefixSource = createPrefixSource( mavenProxyRepository, path );
                     if ( prefixSource != null )

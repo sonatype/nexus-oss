@@ -254,8 +254,7 @@ public class WLManagerImpl
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
     {
-        getLogger().debug( "Initializing white-list of newly added {}",
-            RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        getLogger().debug( "Initializing white-list of newly added {}", mavenRepository );
         try
         {
             // mark it for noscrape if not marked yet
@@ -290,8 +289,7 @@ public class WLManagerImpl
      */
     protected boolean doInitializeWhitelistOnStartup( final MavenRepository mavenRepository )
     {
-        getLogger().debug( "Initializing white-list of {}",
-            RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        getLogger().debug( "Initializing white-list of {}", mavenRepository );
         final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
         try
         {
@@ -347,7 +345,7 @@ public class WLManagerImpl
             catch ( IllegalStateException e )
             {
                 // just neglect it and continue, this one might be auto blocked if proxy or put out of service
-                getLogger().trace( "Proxy repository {} is not in state to be updated", mavenProxyRepository.getId() );
+                getLogger().trace( "Proxy repository {} is not in state to be updated", mavenProxyRepository );
             }
             catch ( Exception e )
             {
@@ -381,23 +379,19 @@ public class WLManagerImpl
             {
                 if ( discoveryStatus.getStatus() == DStatus.ENABLED_IN_PROGRESS )
                 {
-                    getLogger().debug( "Proxy {} has never been discovered before",
-                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                    getLogger().debug( "Proxy {} has never been discovered before", mavenProxyRepository );
                 }
                 else if ( discoveryStatus.getStatus() == DStatus.ENABLED_NOT_POSSIBLE )
                 {
-                    getLogger().debug( "Proxy {} discovery was not possible before",
-                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                    getLogger().debug( "Proxy {} discovery was not possible before", mavenProxyRepository );
                 }
                 else if ( discoveryStatus.getStatus() == DStatus.ERROR )
                 {
-                    getLogger().debug( "Proxy {} previous discovery hit an error",
-                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                    getLogger().debug( "Proxy {} previous discovery hit an error", mavenProxyRepository );
                 }
                 else
                 {
-                    getLogger().debug( "Proxy {} needs periodic remote discovery update",
-                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                    getLogger().debug( "Proxy {} needs periodic remote discovery update", mavenProxyRepository );
                 }
                 final boolean updateSpawned = doUpdateWhitelistAsync( false, mavenProxyRepository );
                 if ( !updateSpawned )
@@ -412,14 +406,13 @@ public class WLManagerImpl
             }
             else
             {
-                getLogger().debug( "Proxy {} white-list is up to date",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                getLogger().debug( "Proxy {} white-list is up to date", mavenProxyRepository );
             }
         }
         else
         {
             getLogger().debug( "Proxy {} white-list update requested, but it's remote discovery is disabled",
-                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                mavenProxyRepository );
         }
         return false;
     }
@@ -447,8 +440,7 @@ public class WLManagerImpl
         checkUpdateConditions( mavenProxyRepository );
         try
         {
-            getLogger().debug( "Quick updating white-list of {}",
-                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+            getLogger().debug( "Quick updating white-list of {}", mavenProxyRepository );
             constrainedExecutor.cancelRunningWithKey( mavenProxyRepository.getId() );
             final PrefixSource prefixSource =
                 updateProxyWhitelist( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
@@ -546,7 +538,7 @@ public class WLManagerImpl
                 // this is okay, as forced happens rarely, currently only when proxy repo changes remoteURL
                 // (reconfiguration happens)
                 getLogger().debug( "Forced white-list update on {} canceled currently running discovery job",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                    mavenRepository );
             }
             return canceledPreviousJob;
         }
@@ -573,7 +565,7 @@ public class WLManagerImpl
     protected void updateAndPublishWhitelist( final MavenRepository mavenRepository, final boolean notify )
         throws IOException
     {
-        getLogger().debug( "Updating white-list of {}", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        getLogger().debug( "Updating white-list of {}", mavenRepository );
         try
         {
             final PrefixSource prefixSource;
@@ -658,7 +650,7 @@ public class WLManagerImpl
                     remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository, remoteStrategies );
             }
 
-            getLogger().debug( "Results of {} remote discovery: {}", mavenProxyRepository.getId(),
+            getLogger().debug( "Results of {} remote discovery: {}", mavenProxyRepository,
                 discoveryResult.getAllResults() );
 
             if ( discoveryResult.isSuccessful() )
@@ -709,8 +701,7 @@ public class WLManagerImpl
         }
         else
         {
-            getLogger().debug( "{} local discovery unsuccessful",
-                RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
+            getLogger().debug( "{} local discovery unsuccessful", mavenHostedRepository );
         }
         return prefixSource;
     }
