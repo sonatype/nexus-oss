@@ -11,24 +11,26 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global define*/
+/*global NX,Nexus,Ext,Sonatype*/
 /**
  * FIXME This belongs to the timeline plugin and should be moved there.
  */
-define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid'], function(Ext, Sonatype, FeedGrid) {
-
-  var ns = Ext.namespace('Sonatype.repoServer');
+NX.define('Nexus.timeline.FeedView', {
+  extend : 'Ext.Panel',
+  requires : ['Nexus.timeline.FeedGrid'],
 
   /*
    * config object: { feedUrl ; required title }
    */
-  ns.FeedViewPanel = function(cfg) {
-    Ext.apply(this, cfg || {}, {
+  constructor : function(cfg) {
+    var self = this;
+
+    Ext.apply(self, cfg || {}, {
       feedUrl : '',
       title : 'Feed Viewer'
     });
 
-    this.feedRecordConstructor = Ext.data.Record.create([
+    self.feedRecordConstructor = Ext.data.Record.create([
       {
         name : 'resourceURI'
       },
@@ -38,14 +40,14 @@ define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid
       }
     ]);
 
-    this.feedReader = new Ext.data.JsonReader({
+    self.feedReader = new Ext.data.JsonReader({
       root : 'data',
       id : 'resourceURI'
-    }, this.feedRecordConstructor);
+    }, self.feedRecordConstructor);
 
-    this.feedsDataStore = new Ext.data.Store({
+    self.feedsDataStore = new Ext.data.Store({
       url : Sonatype.config.repos.urls.feeds,
-      reader : this.feedReader,
+      reader : self.feedReader,
       sortInfo : {
         field : 'name',
         direction : 'ASC'
@@ -53,7 +55,7 @@ define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid
       autoLoad : true
     });
 
-    this.feedsGridPanel = new Ext.grid.GridPanel({
+    self.feedsGridPanel = new Ext.grid.GridPanel({
       id : 'st-feeds-grid',
       region : 'north',
       layout : 'fit',
@@ -73,20 +75,18 @@ define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid
           text : 'Refresh',
           icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
           cls : 'x-btn-text-icon',
-          scope : this,
           handler : function() {
-            this.feedsDataStore.reload();
-            this.grid.reloadFeed();
+            self.feedsDataStore.reload();
+            self.grid.reloadFeed();
           }
         },
         {
           text : 'Subscribe',
           icon : Sonatype.config.resourcePath + '/images/icons/feed.png',
           cls : 'x-btn-text-icon',
-          scope : this,
           handler : function() {
-            if (this.feedsGridPanel.getSelectionModel().hasSelection()) {
-              var rec = this.feedsGridPanel.getSelectionModel().getSelected();
+            if (self.feedsGridPanel.getSelectionModel().hasSelection()) {
+              var rec = self.feedsGridPanel.getSelectionModel().getSelected();
               Sonatype.utils.openWindow(rec.get('resourceURI'));
             }
           }
@@ -94,7 +94,7 @@ define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid
       ],
 
       // grid view options
-      ds : this.feedsDataStore,
+      ds : self.feedsDataStore,
       sortInfo : {
         field : 'name',
         direction : "ASC"
@@ -122,39 +122,52 @@ define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid
       disableSelection : false
     });
 
-    this.feedsGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
+    self.feedsGridPanel.getSelectionModel().on('rowselect', self.rowSelect, self);
 
-    var tmplTxt = ['<div class="post-data">', '<span class="post-date">{pubDate:date("M j, Y, g:i a")}</span>', '<h3 class="post-title">{title}</h3>', '<h4 class="post-author">by {author:defaultValue("Unknown")}</h4>', '</div>',
-      '<div class="post-body">{content:this.getBody}</div>'];
+    self.viewItemTemplate = new Ext.Template(
+          '<div class="post-data">',
+          '<span class="post-date">{pubDate:date("M j, Y, g:i a")}</span>',
+          '<h3 class="post-title">{title}</h3>',
+          '<h4 class="post-author">by {author:defaultValue("Unknown")}</h4>',
+          '</div>',
+          '<div class="post-body">',
+          '{content:this.getBody}',
+          '</div>');
 
-    this.viewItemTemplate = new Ext.Template(tmplTxt);
-    this.viewItemTemplate.compile();
-    this.viewItemTemplate.getBody = function(v, all) {
+    self.viewItemTemplate.compile();
+    self.viewItemTemplate.getBody = function(v, all) {
       return Ext.util.Format.stripScripts(v || all.description);
     };
 
-    this.grid = new FeedGrid({});
+    self.grid = NX.create('Nexus.timeline.FeedGrid');
 
-    ns.FeedViewPanel.superclass.constructor.call(this, {
+    self.constructor.superclass.constructor.call(self, {
       layout : 'border',
-      title : this.title,
+      title : self.title,
       hideMode : 'offsets',
-      items : [this.feedsGridPanel, this.grid
+      items : [self.feedsGridPanel, self.grid
       ]
     });
 
-    this.gsm = this.grid.getSelectionModel();
-    this.grid.store.on('load', this.gsm.selectFirstRow, this.gsm);
-  };
+    self.gsm = self.grid.getSelectionModel();
+    self.grid.store.on('load', self.gsm.selectFirstRow, self.gsm);
+  },
 
-  Ext.extend(ns.FeedViewPanel, Ext.Panel, {
+  rowSelect : function(selectionModel, index, rec) {
+    this.grid.setFeed(rec.get('name'), rec.get('resourceURI'));
+  }
 
-    rowSelect : function(selectionModel, index, rec) {
-      this.grid.setFeed(rec.get('name'), rec.get('resourceURI'));
-    }
-
+}, function() {
+  Sonatype.config.repos.urls.feeds = Sonatype.config.servicePath + '/feeds';
+  Sonatype.Events.addListener('nexusNavigationInit', function(panel) {
+    var sp = Sonatype.lib.Permissions;
+    panel.add({
+      enabled : sp.checkPermission('nexus:feeds', sp.READ),
+      sectionId : 'st-nexus-views',
+      title : 'System Feeds',
+      tabId : 'feed-view-system-changes',
+      tabCode : Nexus.timeline.FeedView
+    });
   });
-
-  return ns.FeedViewPanel;
 });
 

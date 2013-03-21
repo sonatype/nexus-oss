@@ -288,11 +288,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     title : 'Routing',
                     tabId : 'routes-config',
                     tabCode : Sonatype.repoServer.RoutesEditPanel
-                  }, {
-                    enabled : sp.checkPermission('nexus:feeds', sp.READ),
-                    title : 'System Feeds',
-                    tabId : 'feed-view-system-changes',
-                    tabCode : Sonatype.repoServer.FeedViewPanel
                   }]
             });
 
