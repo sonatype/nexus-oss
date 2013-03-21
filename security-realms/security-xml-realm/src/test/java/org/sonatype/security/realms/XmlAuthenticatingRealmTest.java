@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.realms;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
@@ -163,32 +166,33 @@ public class XmlAuthenticatingRealmTest
     }
     
     public void testDetectLegacyUser()
-    	throws Exception
+        throws Exception
     {
-    	String password = "password";
-    	String username = "username";
-    	buildLegacyTestAuthenticationConfig(password);
-    	
-    	UsernamePasswordToken upToken = new UsernamePasswordToken(username, password);
-    	AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
-		CUser updatedUser = this.configurationManager.readUser(username);
-		String hash = new String( (char[]) ai.getCredentials() );
-		
-        assertEquals( this.hashPassword(password, updatedUser.getSalt()) , hash );
-        assertEquals(this.hashPassword(password, updatedUser.getSalt()), updatedUser.getPassword());
+        String password = "password";
+        String username = "username";
+        buildLegacyTestAuthenticationConfig(password);
+        
+        UsernamePasswordToken upToken = new UsernamePasswordToken(username, password);
+        AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
+        CUser updatedUser = this.configurationManager.readUser(username);
+        String hash = new String( (char[]) ai.getCredentials() );
+        
+        assertThat(hash, is(this.hashPassword(password, updatedUser.getSalt())));
+        assertThat(updatedUser.getPassword(), is(this.hashPassword(password, updatedUser.getSalt())));
+        
     }
 
     private void buildTestAuthenticationConfig( String status )
         throws InvalidConfigurationException
     {
-    	String salt = this.passwordGenerator.generateSalt();
+        String salt = this.passwordGenerator.generateSalt();
         buildTestAuthenticationConfig(status, this.hashPassword("password", salt), salt);
     }
     
     private void buildTestAuthenticationConfig(String status, String hash, String salt)
     	throws InvalidConfigurationException
     {
-    	CPrivilege priv = new CPrivilege();
+        CPrivilege priv = new CPrivilege();
         priv.setId( "priv" );
         priv.setName( "name" );
         priv.setDescription( "desc" );
@@ -234,16 +238,16 @@ public class XmlAuthenticatingRealmTest
     private void buildLegacyTestAuthenticationConfig(String password)
     	throws InvalidConfigurationException
     {
-    	buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, this.legacyHashPassword(password), "");
+        buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, this.legacyHashPassword(password), "");
     }
     
     private String hashPassword(String password, String salt)
     {
-    	return this.passwordGenerator.hashPassword(password, salt, this.securityConfigurationManager.getHashIterations());
+        return this.passwordGenerator.hashPassword(password, salt, this.securityConfigurationManager.getHashIterations());
     }
     
     private String legacyHashPassword(String password)
     {
-    	return this.passwordGenerator.hashPassword(password);
+        return this.passwordGenerator.hashPassword(password);
     }
 }
