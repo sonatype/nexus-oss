@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -167,14 +168,14 @@ public class WLMaintenanceTest
         // initially WL is empty
         {
             final List<String> entries = getEntriesOf( mavenRepository );
-            assertThat( entries.size(), equalTo( 0 ) );
+            assertThat( entries, hasSize( 0 ) );
         }
 
         addSomeContent( mavenRepository, PATHS1 );
 
         {
             final List<String> entries = getEntriesOf( mavenRepository );
-            assertThat( entries.size(), equalTo( 5 ) );
+            assertThat( entries, hasSize( 5 ) );
             assertThat(
                 entries,
                 containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
@@ -185,7 +186,7 @@ public class WLMaintenanceTest
 
         {
             final List<String> entries = getEntriesOf( mavenRepository );
-            assertThat( entries.size(), equalTo( 6 ) );
+            assertThat( entries, hasSize( 6 ) );
             assertThat(
                 entries,
                 containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
@@ -198,7 +199,7 @@ public class WLMaintenanceTest
 
         {
             final List<String> entries = getEntriesOf( mavenRepository );
-            assertThat( entries.size(), equalTo( 6 ) );
+            assertThat( entries, hasSize( 6 ) );
             assertThat(
                 entries,
                 containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
@@ -211,7 +212,7 @@ public class WLMaintenanceTest
 
         {
             final List<String> entries = getEntriesOf( mavenRepository );
-            assertThat( entries.size(), equalTo( 5 ) );
+            assertThat( entries, hasSize( 5 ) );
             assertThat(
                 entries,
                 containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
@@ -224,7 +225,7 @@ public class WLMaintenanceTest
 
         {
             final List<String> entries = getEntriesOf( mavenRepository );
-            assertThat( entries.size(), equalTo( 4 ) );
+            assertThat( entries, hasSize( 4 ) );
             assertThat(
                 entries,
                 containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
