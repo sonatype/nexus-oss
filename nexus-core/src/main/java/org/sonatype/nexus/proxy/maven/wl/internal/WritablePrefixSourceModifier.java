@@ -106,7 +106,7 @@ public class WritablePrefixSourceModifier
             {
                 if ( whitelistEntry.startsWith( normalizedEntry ) )
                 {
-                    toBeRemoved.add( normalizedEntry );
+                    toBeRemoved.add( whitelistEntry );
                     modified = true;
                 }
             }

@@ -13,8 +13,8 @@
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -142,7 +142,7 @@ public class WLMaintenanceTest
         for ( String path : paths )
         {
             final ResourceStoreRequest request = new ResourceStoreRequest( path );
-            mavenRepository.deleteItemWithChecksums( request );
+            mavenRepository.deleteItem( request );
         }
     }
 
@@ -177,7 +177,7 @@ public class WLMaintenanceTest
             assertThat( entries.size(), equalTo( 5 ) );
             assertThat(
                 entries,
-                hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
+                containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
                     "/org/apache", "/org/sonatype" ) );
         }
 
@@ -188,7 +188,7 @@ public class WLMaintenanceTest
             assertThat( entries.size(), equalTo( 6 ) );
             assertThat(
                 entries,
-                hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
+                containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
                     "/com/sonatype", "/org/apache", "/org/sonatype" ) );
         }
 
@@ -201,7 +201,7 @@ public class WLMaintenanceTest
             assertThat( entries.size(), equalTo( 6 ) );
             assertThat(
                 entries,
-                hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
+                containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
                     "/com/sonatype", "/org/apache", "/org/sonatype" ) );
         }
 
@@ -214,7 +214,7 @@ public class WLMaintenanceTest
             assertThat( entries.size(), equalTo( 5 ) );
             assertThat(
                 entries,
-                hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
+                containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
                     "/com/sonatype", "/org/apache" ) );
         }
 
@@ -224,11 +224,11 @@ public class WLMaintenanceTest
 
         {
             final List<String> entries = getEntriesOf( mavenRepository );
-            assertThat( entries.size(), equalTo( 5 ) );
+            assertThat( entries.size(), equalTo( 4 ) );
             assertThat(
                 entries,
-                hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
-                    "/com/sonatype", "/org/apache" ) );
+                containsInAnyOrder( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
+                    "/org/apache" ) );
         }
     }
 }
