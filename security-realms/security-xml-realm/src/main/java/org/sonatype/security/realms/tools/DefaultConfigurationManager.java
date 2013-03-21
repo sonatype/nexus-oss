@@ -44,9 +44,10 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.PasswordGenerator;
-import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+
+import com.google.common.collect.Sets;
 
 @Singleton
 @Typed( ConfigurationManager.class )
@@ -406,7 +407,7 @@ public class DefaultConfigurationManager
     public void updateUser( CUser user )
     	throws InvalidConfigurationException, UserNotFoundException
 	{    	
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = Sets.newHashSet();
         try
         {
             CUserRoleMapping userRoleMapping = this.readUserRoleMapping( user.getId(), SecurityXmlUserManager.SOURCE );
@@ -414,7 +415,7 @@ public class DefaultConfigurationManager
         }
         catch ( NoSuchRoleMappingException e )
         {
-            this.logger.debug( "User: " + user.getId() + " has no roles." );
+            this.logger.debug( "User: {} has no roles", user.getId());
         }        
         this.updateUser( user, new HashSet<String>( roles ) );
 	}

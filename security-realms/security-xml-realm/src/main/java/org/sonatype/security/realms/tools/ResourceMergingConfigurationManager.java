@@ -452,7 +452,7 @@ public class ResourceMergingConfigurationManager
         }
         catch ( NoSuchRoleMappingException e )
         {
-            this.logger.debug( "User: " + user.getId() + " has no roles." );
+            this.logger.debug( "User: {} has no roles", user.getId());
         }        
     	this.updateUser(user, new HashSet<String>( roles ));
     }

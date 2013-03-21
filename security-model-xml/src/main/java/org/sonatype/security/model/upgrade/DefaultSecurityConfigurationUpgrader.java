@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.model.upgrade;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -63,7 +64,9 @@ public class DefaultSecurityConfigurationUpgrader
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
      * the needed (current) model version.
      * 
-     * @throws
+     * @throws IOException if file does not exist or cannot be read
+     * @throws ConfigurationIsCorruptedException if file is corrupt, or does not need updating
+     * @throws UnsupportedConfigurationVersionException if file is of a version for which upgrades are not supported
      */
     public Configuration loadOldConfiguration( File file )
         throws IOException, ConfigurationIsCorruptedException, UnsupportedConfigurationVersionException
@@ -73,7 +76,7 @@ public class DefaultSecurityConfigurationUpgrader
 
         try
         {
-            Reader r = new FileReader( file );
+            Reader r = new BufferedReader(new FileReader( file ));
 
             Xpp3Dom dom = Xpp3DomBuilder.build( r );
 

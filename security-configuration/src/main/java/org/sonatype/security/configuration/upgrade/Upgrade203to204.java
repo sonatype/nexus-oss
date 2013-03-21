@@ -12,9 +12,11 @@
  */
 package org.sonatype.security.configuration.upgrade;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
@@ -41,16 +43,16 @@ public class Upgrade203to204
     public Object loadConfiguration( File file )
         throws IOException, ConfigurationIsCorruptedException
     {
-        FileReader fr = null;
+        Reader r = null;
 
         try
         {
             // reading without interpolation to preserve user settings as variables
-            fr = new FileReader( file );
+            r = new BufferedReader(new FileReader( file ));
 
             SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
 
-            return reader.read( fr );
+            return reader.read( r );
         }
         catch ( XmlPullParserException e )
         {
@@ -58,9 +60,9 @@ public class Upgrade203to204
         }
         finally
         {
-            if ( fr != null )
+            if ( r != null )
             {
-                fr.close();
+                r.close();
             }
         }
     }

@@ -97,8 +97,8 @@ public class DefaultSecurityConfigurationUpgrader
 
         if ( upgrader != null )
         {
-            logger.info( "Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
-                + file.getAbsolutePath() );
+            logger.info( "Upgrading old Security configuration file (version {}) from {}", msg.getModelVersion(),
+                file.getAbsolutePath() );
 
             msg.setConfiguration( upgrader.loadConfiguration( file ) );
 
@@ -117,8 +117,7 @@ public class DefaultSecurityConfigurationUpgrader
                 upgrader = upgraders.get( msg.getModelVersion() );
             }
 
-            logger.info( "Security configuration file upgraded to current version " + msg.getModelVersion()
-                + " succesfully." );
+            logger.info( "Security configuration file upgraded to current version {} successfully", msg.getModelVersion());
 
             return (SecurityConfiguration) msg.getConfiguration();
         }

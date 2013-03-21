@@ -160,33 +160,37 @@ public class XmlAuthenticatingRealm
     		//Update failed, rollback to previous values
     		user.setSalt(salt);
     		user.setPassword(currentPasswordHash);
-    		this.logger.error("Unable to update hash for user " + user.getId());
+    		this.logger.error("Unable to update hash for user {}", user.getId());
     	}
     }
     
     /*
-     * Checks to see if the credentials in token match the credentials stored on user
+     * Checks to see if the credentials in token match the credentials stored on
+     * user
      * 
-     * @param token the username/password token containing the credentials to verify
+     * @param token the username/password token containing the credentials to
+     * verify
      * @param the user object containing the stored credentials
      * @return true if credentials match, false otherwise
      */
     private boolean isValidCredentials(UsernamePasswordToken token, CUser user)
     {
-    	try
-    	{
-    		AuthenticationInfo info = this.createAuthenticationInfo(user);
-    		this.assertCredentialsMatch(token, info);
-    		
-    		//Credentials match
-    		return true;
-    	}
-    	catch(Exception e)
-    	{
-    		//Nothing to do here except return. Our parent will be asserting
-    		//that the credentials match and will handle the exception appropriately
-    		return false;
-    	}
+        try
+        {
+            AuthenticationInfo info = this.createAuthenticationInfo(user);
+            this.assertCredentialsMatch(token, info);
+
+            // Credentials match
+            return true;
+        }
+        catch (AuthenticationException e)
+        {
+            // Credentials did not match
+            // Nothing to do here except return. Our parent will be asserting
+            // that the credentials match and will handle the exception
+            // appropriately
+            return false;
+        }
     }
     
     /*
@@ -198,7 +202,7 @@ public class XmlAuthenticatingRealm
      */
     private boolean isLegacyUser(CUser user)
     {
-    	return StringUtils.isEmpty(user.getSalt());
+    	return StringUtils.isBlank(user.getSalt());
     }
     
     /*

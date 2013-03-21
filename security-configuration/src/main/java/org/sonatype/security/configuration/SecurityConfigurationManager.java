@@ -37,6 +37,12 @@ public interface SecurityConfigurationManager
 
     String getAnonymousPassword();
     
+    /**
+     * The number of iterations to be used when hashing passwords
+     * 
+     * @return number of hash iterations
+     * @since 2.4
+     */
     int getHashIterations();
 
     void setRealms( List<String> realms )

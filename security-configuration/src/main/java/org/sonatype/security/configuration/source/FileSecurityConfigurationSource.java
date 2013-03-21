@@ -130,9 +130,9 @@ public class FileSecurityConfigurationSource
         // check for loaded model
         if ( getConfiguration() == null )
         {
-        	upgradeConfiguration( getConfigurationFile() );
-        
-        	loadConfiguration( getConfigurationFile() );
+            upgradeConfiguration( getConfigurationFile() );
+            
+            loadConfiguration( getConfigurationFile() );
         }
 
         return getConfiguration();
@@ -159,7 +159,7 @@ public class FileSecurityConfigurationSource
     		 throws IOException,
     		 ConfigurationException
      {
-	     this.getLogger().info( "Trying to upgrade the security configuration file " + file.getAbsolutePath() );
+	     this.getLogger().info( "Trying to upgrade the security configuration file {}", file.getAbsolutePath() );
 	    
 	     setConfiguration( configurationUpgrader.loadOldConfiguration( file ) );
 	    
@@ -193,7 +193,7 @@ public class FileSecurityConfigurationSource
     private void loadConfiguration( File file )
         throws IOException
     {
-        this.getLogger().info( "Loading Security configuration from " + file.getAbsolutePath() );
+        this.getLogger().info( "Loading Security configuration from {}", file.getAbsolutePath() );
 
         FileInputStream fis = null;
         try
