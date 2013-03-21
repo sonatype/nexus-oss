@@ -24,6 +24,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
@@ -175,22 +176,19 @@ public class XmlAuthenticatingRealm
      */
     private boolean isValidCredentials(UsernamePasswordToken token, CUser user)
     {
-        try
+        boolean credentialsValid = false;
+        
+        AuthenticationInfo info = this.createAuthenticationInfo(user);
+        CredentialsMatcher matcher = this.getCredentialsMatcher();
+        if(matcher != null)
         {
-            AuthenticationInfo info = this.createAuthenticationInfo(user);
-            this.assertCredentialsMatch(token, info);
-
-            // Credentials match
-            return true;
+            if(matcher.doCredentialsMatch(token, info))
+            {
+                credentialsValid = true;
+            }
         }
-        catch (AuthenticationException e)
-        {
-            // Credentials did not match
-            // Nothing to do here except return. Our parent will be asserting
-            // that the credentials match and will handle the exception
-            // appropriately
-            return false;
-        }
+        
+        return credentialsValid;
     }
     
     /*
