@@ -22,7 +22,6 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.AbstractSecurityTestCase;
@@ -38,7 +37,6 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;

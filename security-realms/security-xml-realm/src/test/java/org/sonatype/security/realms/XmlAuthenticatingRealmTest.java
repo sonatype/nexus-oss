@@ -35,16 +35,15 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.PasswordGenerator;
-import org.sonatype.security.usermanagement.StringDigester;
 
 public class XmlAuthenticatingRealmTest
     extends InjectedTestCase
 {
-    public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
+    private final String SECURITY_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml";
+    
+    private final String SECURITY_CONFIGURATION_FILE_PATH = getBasedir() + "/target/jsecurity/security-configuration.xml";
 
-    private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml";
-
-    private File configFile = new File( SECURITY_CONFIG_FILE_PATH );
+    private File configFile = new File( SECURITY_FILE_PATH );
 
     private XmlAuthenticatingRealm realm;
 
@@ -59,7 +58,8 @@ public class XmlAuthenticatingRealmTest
     @Override
     public void configure( Properties properties )
     {
-        properties.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        properties.put( "security-xml-file", SECURITY_FILE_PATH );
+        properties.put( "application-conf" , SECURITY_CONFIGURATION_FILE_PATH );
         super.configure( properties );
     }
 
