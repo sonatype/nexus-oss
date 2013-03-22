@@ -133,15 +133,15 @@ public class MergeMetadataIT
             testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
 
-        content().upload(
-            repositoryLocation( repo2.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm" ),
-            testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
-        );
-
         waitForNexusToSettleDown();
 
         // force WL to retrieve prefixes from hosted
         client().getSubsystem( Whitelist.class ).updateWhitelist( proxyRepo.id() );
+
+        content().upload(
+            repositoryLocation( repo2.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm" ),
+            testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
+        );
 
         waitForNexusToSettleDown();
 
