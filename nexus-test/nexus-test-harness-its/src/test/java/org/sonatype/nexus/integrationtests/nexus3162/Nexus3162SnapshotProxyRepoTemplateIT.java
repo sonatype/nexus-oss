@@ -42,7 +42,7 @@ public class Nexus3162SnapshotProxyRepoTemplateIT
         Assert.assertTrue( result instanceof RepositoryProxyResource );
         Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getArtifactMaxAge() );
         Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getMetadataMaxAge() );
-        Assert.assertEquals( Integer.valueOf( 1440 ), ( (RepositoryProxyResource) result ).getItemMaxAge() );
+        Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getItemMaxAge() );
     }
 
     @Test
@@ -54,6 +54,6 @@ public class Nexus3162SnapshotProxyRepoTemplateIT
         Assert.assertTrue( result instanceof RepositoryProxyResource );
         Assert.assertEquals( -1, ( (RepositoryProxyResource) result ).getArtifactMaxAge() );
         Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getMetadataMaxAge() );
-        Assert.assertEquals( Integer.valueOf( 1440 ), ( (RepositoryProxyResource) result ).getItemMaxAge() );
+        Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getItemMaxAge() );
     }
 }
