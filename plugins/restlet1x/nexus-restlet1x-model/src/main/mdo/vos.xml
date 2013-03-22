@@ -958,7 +958,7 @@
         <field>
           <name>itemMaxAge</name>
           <version>1.0.0+</version>
-          <type>Integer</type>
+          <type>int</type>
           <required>false</required>
           <description>The max age of items (not artifact not metadata) before we will check remote again for updated (in minutes, -1 for never).</description>
         </field>
