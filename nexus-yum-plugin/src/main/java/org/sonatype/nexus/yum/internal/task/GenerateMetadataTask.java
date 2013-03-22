@@ -35,6 +35,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -97,20 +99,25 @@ public class GenerateMetadataTask
 
     private final YumRegistry yumRegistry;
 
+    private final WLManager wlManager;
+
     @Inject
     public GenerateMetadataTask( final EventBus eventBus,
                                  final RepositoryRegistry repositoryRegistry,
                                  final YumRegistry yumRegistry,
                                  final RepositoryURLBuilder repositoryURLBuilder,
                                  final RpmScanner scanner,
-                                 final NexusScheduler nexusScheduler )
+                                 final NexusScheduler nexusScheduler,
+                                 final WLManager wlManager)
     {
         super( eventBus, null );
+
         this.yumRegistry = checkNotNull( yumRegistry );
         this.nexusScheduler = checkNotNull( nexusScheduler );
         this.scanner = checkNotNull( scanner );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
+        this.wlManager = checkNotNull( wlManager );
 
         getParameters().put( PARAM_SINGLE_RPM_PER_DIR, Boolean.toString( true ) );
     }
@@ -142,6 +149,23 @@ public class GenerateMetadataTask
         }
         // TODO dubious
         Thread.sleep( 100 );
+
+        final Repository repository = findRepository();
+        if ( repository != null )
+        {
+            final MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
+            if ( mavenRepository != null )
+            {
+                try
+                {
+                    wlManager.forceUpdateWhitelist( mavenRepository );
+                }
+                catch ( Exception e )
+                {
+                    logger.warn( "Could not update Whitelist for repository '{}'", mavenRepository, e );
+                }
+            }
+        }
 
         regenerateMetadataForGroups();
         return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );

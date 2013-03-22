@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -170,7 +171,8 @@ public class GenerateMetadataTaskConcurrencyTest
             yumRegistry,
             mock( RepositoryURLBuilder.class ),
             mock( RpmScanner.class ),
-            nexusScheduler
+            nexusScheduler,
+            mock( WLManager.class )
         )
         {
             @Override

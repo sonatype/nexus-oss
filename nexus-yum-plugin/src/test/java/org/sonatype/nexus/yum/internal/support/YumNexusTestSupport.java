@@ -340,6 +340,7 @@ public class YumNexusTestSupport
         if ( isMavenHostedRepository )
         {
             when( repository.adaptToFacet( HostedRepository.class ) ).thenReturn( repository );
+            when( repository.adaptToFacet( MavenRepository.class ) ).thenReturn( repository );
         }
         else
         {
