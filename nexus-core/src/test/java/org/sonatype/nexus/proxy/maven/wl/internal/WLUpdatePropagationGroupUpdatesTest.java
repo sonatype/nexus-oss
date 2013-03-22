@@ -14,12 +14,12 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusContainer;
@@ -59,7 +59,9 @@ public class WLUpdatePropagationGroupUpdatesTest
 
     private static final String HOSTED2_REPO_ID = "hosted2";
 
-    private static final String GROUP_REPO_ID = "group";
+    private static final String GROUP1_REPO_ID = "group1";
+
+    private static final String GROUP2_REPO_ID = "group2";
 
     private final WLUpdateListener wlUpdateListener;
 
@@ -190,16 +192,38 @@ public class WLUpdatePropagationGroupUpdatesTest
                     CRepository repoGroupConf = new DefaultCRepository();
                     repoGroupConf.setProviderRole( GroupRepository.class.getName() );
                     repoGroupConf.setProviderHint( "maven2" );
-                    repoGroupConf.setId( GROUP_REPO_ID );
-                    repoGroupConf.setName( GROUP_REPO_ID );
+                    repoGroupConf.setId( GROUP1_REPO_ID );
+                    repoGroupConf.setName( GROUP1_REPO_ID );
                     repoGroupConf.setLocalStorage( new CLocalStorage() );
                     repoGroupConf.getLocalStorage().setProvider( "file" );
                     repoGroupConf.getLocalStorage().setUrl(
-                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/test" ).toURI().toURL().toString() );
+                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + GROUP1_REPO_ID ).toURI().toURL().toString() );
                     Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
                     repoGroupConf.setExternalConfiguration( exGroupRepo );
                     M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
                     exGroupRepoConf.setMemberRepositoryIds( reposes );
+                    exGroupRepoConf.setMergeMetadata( true );
+                    group.configure( repoGroupConf );
+                    env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
+                    env.getRepositoryRegistry().addRepository( group );
+                }
+                {
+                    // add 2nd group
+                    final M2GroupRepository group =
+                        (M2GroupRepository) container.lookup( GroupRepository.class, "maven2" );
+                    CRepository repoGroupConf = new DefaultCRepository();
+                    repoGroupConf.setProviderRole( GroupRepository.class.getName() );
+                    repoGroupConf.setProviderHint( "maven2" );
+                    repoGroupConf.setId( GROUP2_REPO_ID );
+                    repoGroupConf.setName( GROUP2_REPO_ID );
+                    repoGroupConf.setLocalStorage( new CLocalStorage() );
+                    repoGroupConf.getLocalStorage().setProvider( "file" );
+                    repoGroupConf.getLocalStorage().setUrl(
+                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + GROUP2_REPO_ID ).toURI().toURL().toString() );
+                    Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
+                    repoGroupConf.setExternalConfiguration( exGroupRepo );
+                    M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
+                    exGroupRepoConf.setMemberRepositoryIds( Collections.singletonList( GROUP1_REPO_ID ) );
                     exGroupRepoConf.setMergeMetadata( true );
                     group.configure( repoGroupConf );
                     env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
@@ -227,32 +251,62 @@ public class WLUpdatePropagationGroupUpdatesTest
         // and then H1 and H2 got WL updated concurrently in bg job, and as side effect group WL got updated too
         // This means, that group might be updated once or twice, depending on concurrency.
         // So the list might contain (in any order):
-        // HOSTED1, HOSTED2, GROUP
+        // HOSTED1, HOSTED2, GROUP1, GROUP2
         // or
-        // HOSTED1, HOSTED2, GROUP, GROUP
-        // (group two times updated).
+        // HOSTED1, HOSTED2, GROUP1, GROUP1, GROUP2, GROUP...
+        // (group1 one or two times updated).
         assertThat( wlUpdateListener.getPublished(), hasItem( HOSTED1_REPO_ID ) );
         assertThat( wlUpdateListener.getPublished(), hasItem( HOSTED2_REPO_ID ) );
-        assertThat( wlUpdateListener.getPublished(), hasItem( GROUP_REPO_ID ) );
+        assertThat( wlUpdateListener.getPublished(), hasItem( GROUP1_REPO_ID ) );
+        assertThat( wlUpdateListener.getPublished(), hasItem( GROUP2_REPO_ID ) );
     }
 
     @Test
     public void testUpdateCountOnGroupMemberChange()
         throws Exception
     {
+        // in case of group member changes, the "cascade" is sync, hence
+        // we have no ordering problem as we have with async updates of proxy/hosted
+        // reposes on boot
         wlUpdateListener.reset();
 
         final MavenGroupRepository mgr =
-            getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenGroupRepository.class );
+            getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class );
 
         mgr.removeMemberRepositoryId( HOSTED1_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
 
-        assertThat( wlUpdateListener.getPublished(), contains( GROUP_REPO_ID ) );
+        assertThat( wlUpdateListener.getPublished(), contains( GROUP1_REPO_ID, GROUP2_REPO_ID ) );
 
         mgr.addMemberRepositoryId( HOSTED1_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
 
-        assertThat( wlUpdateListener.getPublished(), contains( GROUP_REPO_ID, GROUP_REPO_ID ) );
+        assertThat( wlUpdateListener.getPublished(),
+            contains( GROUP1_REPO_ID, GROUP2_REPO_ID, GROUP1_REPO_ID, GROUP2_REPO_ID ) );
+    }
+
+    @Test
+    public void testUpdateCountOnGroupOfGroupMemberChange()
+        throws Exception
+    {
+        // in case of group member changes, the "cascade" is sync, hence
+        // we have no ordering problem as we have with async updates of proxy/hosted
+        // reposes on boot
+        wlUpdateListener.reset();
+
+        final MavenGroupRepository mgr =
+            getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID, MavenGroupRepository.class );
+
+        mgr.removeMemberRepositoryId( GROUP1_REPO_ID );
+        mgr.addMemberRepositoryId( HOSTED1_REPO_ID );
+        getApplicationConfiguration().saveConfiguration();
+
+        assertThat( wlUpdateListener.getPublished(), contains( GROUP2_REPO_ID ) );
+
+        mgr.addMemberRepositoryId( HOSTED2_REPO_ID );
+        getApplicationConfiguration().saveConfiguration();
+
+        assertThat( wlUpdateListener.getPublished(),
+            contains( GROUP2_REPO_ID, GROUP2_REPO_ID ) );
     }
 }

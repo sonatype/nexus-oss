@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusContainer;
@@ -63,7 +64,9 @@ public class WLUpdatePropagationContentTest
 
     private static final String PROXY3_REPO_ID = "proxy3";
 
-    private static final String GROUP_REPO_ID = "group";
+    private static final String GROUP1_REPO_ID = "group1";
+
+    private static final String GROUP2_REPO_ID = "group2";
 
     private final Server server1;
 
@@ -242,16 +245,38 @@ public class WLUpdatePropagationContentTest
                     CRepository repoGroupConf = new DefaultCRepository();
                     repoGroupConf.setProviderRole( GroupRepository.class.getName() );
                     repoGroupConf.setProviderHint( "maven2" );
-                    repoGroupConf.setId( GROUP_REPO_ID );
-                    repoGroupConf.setName( GROUP_REPO_ID );
+                    repoGroupConf.setId( GROUP1_REPO_ID );
+                    repoGroupConf.setName( GROUP1_REPO_ID );
                     repoGroupConf.setLocalStorage( new CLocalStorage() );
                     repoGroupConf.getLocalStorage().setProvider( "file" );
                     repoGroupConf.getLocalStorage().setUrl(
-                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/test" ).toURI().toURL().toString() );
+                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + GROUP1_REPO_ID ).toURI().toURL().toString() );
                     Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
                     repoGroupConf.setExternalConfiguration( exGroupRepo );
                     M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
                     exGroupRepoConf.setMemberRepositoryIds( reposes );
+                    exGroupRepoConf.setMergeMetadata( true );
+                    group.configure( repoGroupConf );
+                    env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
+                    env.getRepositoryRegistry().addRepository( group );
+                }
+                {
+                    // add 2nd group
+                    final M2GroupRepository group =
+                        (M2GroupRepository) container.lookup( GroupRepository.class, "maven2" );
+                    CRepository repoGroupConf = new DefaultCRepository();
+                    repoGroupConf.setProviderRole( GroupRepository.class.getName() );
+                    repoGroupConf.setProviderHint( "maven2" );
+                    repoGroupConf.setId( GROUP2_REPO_ID );
+                    repoGroupConf.setName( GROUP2_REPO_ID );
+                    repoGroupConf.setLocalStorage( new CLocalStorage() );
+                    repoGroupConf.getLocalStorage().setProvider( "file" );
+                    repoGroupConf.getLocalStorage().setUrl(
+                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + GROUP2_REPO_ID ).toURI().toURL().toString() );
+                    Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
+                    repoGroupConf.setExternalConfiguration( exGroupRepo );
+                    M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
+                    exGroupRepoConf.setMemberRepositoryIds( Collections.singletonList( GROUP1_REPO_ID ) );
                     exGroupRepoConf.setMergeMetadata( true );
                     group.configure( repoGroupConf );
                     env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
@@ -269,18 +294,34 @@ public class WLUpdatePropagationContentTest
         waitForWLBackgroundUpdates();
 
         // after boot, we should have group WL exist (as all 2 member WLs should exist)
-        // group WL should be union of the 2 proxy member WLs
+        // group1 WL should be union of the 2 proxy member WLs
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
+                    MavenRepository.class ) );
 
-        final PrefixSource groupPrefixSource =
-            wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenRepository.class ) );
+            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
 
-        assertThat( "Group should have WL", groupPrefixSource.exists() );
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 3 ) );
+            assertThat( groupEntries, hasItem( "/com/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+        }
+        // group2 WL should be same as group1 (is only member)
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
+                    MavenRepository.class ) );
 
-        final List<String> groupEntries = groupPrefixSource.readEntries();
-        assertThat( groupEntries, hasSize( 3 ) );
-        assertThat( groupEntries, hasItem( "/com/sonatype" ) );
-        assertThat( groupEntries, hasItem( "/org/sonatype" ) );
-        assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 3 ) );
+            assertThat( groupEntries, hasItem( "/com/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+        }
     }
 
     @Test
@@ -288,23 +329,37 @@ public class WLUpdatePropagationContentTest
         throws Exception
     {
         // remove the proxy2 from group
-        getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenGroupRepository.class ).removeMemberRepositoryId(
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class ).removeMemberRepositoryId(
             PROXY2_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
 
         final WLManager wm = lookup( WLManager.class );
         waitForWLBackgroundUpdates();
 
-        // group WL should have only proxy1 WL
+        // group1 WL should have only proxy1 WL
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
+                    MavenRepository.class ) );
 
-        final PrefixSource groupPrefixSource =
-            wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenRepository.class ) );
+            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
 
-        assertThat( "Group should have WL", groupPrefixSource.exists() );
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 1 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+        }
+        // group2 WL should be same as group1 (is only member)
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
+                    MavenRepository.class ) );
 
-        final List<String> groupEntries = groupPrefixSource.readEntries();
-        assertThat( groupEntries, hasSize( 1 ) );
-        assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 1 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+        }
     }
 
     @Test
@@ -312,7 +367,7 @@ public class WLUpdatePropagationContentTest
         throws Exception
     {
         // add the proxy3 to group
-        getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenGroupRepository.class ).addMemberRepositoryId(
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class ).addMemberRepositoryId(
             PROXY3_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
 
@@ -320,19 +375,36 @@ public class WLUpdatePropagationContentTest
         waitForWLBackgroundUpdates();
 
         // after member addition, we should have all 3 WLs member in group
-        // group WL should be union of the 3 proxy member WLs
+        // group1 WL should be union of the 3 proxy member WLs
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
+                    MavenRepository.class ) );
 
-        final PrefixSource groupPrefixSource =
-            wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenRepository.class ) );
+            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
 
-        assertThat( "Group should have WL", groupPrefixSource.exists() );
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 4 ) );
+            assertThat( groupEntries, hasItem( "/com/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+        }
+        // group2 WL should be same as group1 (is only member)
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
+                    MavenRepository.class ) );
 
-        final List<String> groupEntries = groupPrefixSource.readEntries();
-        assertThat( groupEntries, hasSize( 4 ) );
-        assertThat( groupEntries, hasItem( "/com/sonatype" ) );
-        assertThat( groupEntries, hasItem( "/org/sonatype" ) );
-        assertThat( groupEntries, hasItem( "/org/apache" ) );
-        assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 4 ) );
+            assertThat( groupEntries, hasItem( "/com/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+        }
     }
 
     @Test
@@ -341,25 +413,132 @@ public class WLUpdatePropagationContentTest
     {
         // remove the proxy2 from group
         // add the proxy3 to group
-        getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenGroupRepository.class ).removeMemberRepositoryId(
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class ).removeMemberRepositoryId(
             PROXY2_REPO_ID );
-        getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenGroupRepository.class ).addMemberRepositoryId(
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class ).addMemberRepositoryId(
             PROXY3_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
 
         final WLManager wm = lookup( WLManager.class );
         waitForWLBackgroundUpdates();
 
-        // after member additionand removal, we should have proxy1 and proxt3 WL in group
+        // after member addition and removal, group1 should have proxy1 and proxt3 WL in group
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
+                    MavenRepository.class ) );
 
-        final PrefixSource groupPrefixSource =
-            wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID, MavenRepository.class ) );
+            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
 
-        assertThat( "Group should have WL", groupPrefixSource.exists() );
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 2 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+        }
+        // group2 WL should be same as group1 (is only member)
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
+                    MavenRepository.class ) );
 
-        final List<String> groupEntries = groupPrefixSource.readEntries();
-        assertThat( groupEntries, hasSize( 2 ) );
-        assertThat( groupEntries, hasItem( "/org/apache" ) );
-        assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 2 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+        }
+    }
+
+    @Test
+    public void contentOnMemberAdditionAndRemovalInDifferentGroups()
+        throws Exception
+    {
+        // remove the proxy2 from group1
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class ).removeMemberRepositoryId(
+            PROXY2_REPO_ID );
+        getApplicationConfiguration().saveConfiguration();
+        // add the proxy3 to group2
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID, MavenGroupRepository.class ).addMemberRepositoryId(
+            PROXY3_REPO_ID );
+        getApplicationConfiguration().saveConfiguration();
+
+        final WLManager wm = lookup( WLManager.class );
+        waitForWLBackgroundUpdates();
+
+        // after member removal, group1 should have proxy1 WL in group
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
+                    MavenRepository.class ) );
+
+            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 1 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+        }
+        // after member addition and removal (from member group1), group2 should have proxy1 and proxt3 WL in group
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
+                    MavenRepository.class ) );
+
+            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 2 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+        }
+    }
+
+    @Test
+    public void contentOnMemberAdditionOfSameInDifferentGroups()
+        throws Exception
+    {
+        // add the proxy3 to group1
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class ).addMemberRepositoryId(
+            PROXY3_REPO_ID );
+        getApplicationConfiguration().saveConfiguration();
+        // add the proxy3 to group2
+        getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID, MavenGroupRepository.class ).addMemberRepositoryId(
+            PROXY3_REPO_ID );
+        getApplicationConfiguration().saveConfiguration();
+
+        final WLManager wm = lookup( WLManager.class );
+        waitForWLBackgroundUpdates();
+
+        // after member change, group1 should have proxy1, proxy2 and proxy3 WL in group
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
+                    MavenRepository.class ) );
+
+            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 4 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( groupEntries, hasItem( "/org/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/com/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+        }
+        // after member change, group2 should have g1+p3 but is same as g1 (since p3 is member of g1 too) -- (WL is
+        // kept unique)
+        {
+            final PrefixSource groupPrefixSource =
+                wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
+                    MavenRepository.class ) );
+
+            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+
+            final List<String> groupEntries = groupPrefixSource.readEntries();
+            assertThat( groupEntries, hasSize( 4 ) );
+            assertThat( groupEntries, hasItem( "/org/apache" ) );
+            assertThat( groupEntries, hasItem( "/org/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/com/sonatype" ) );
+            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+        }
     }
 }
