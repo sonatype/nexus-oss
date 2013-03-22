@@ -292,10 +292,7 @@ public class RepositoryPlexusResource
 
                                 pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );
 
-                                if ( proxyModel.getItemMaxAge() != null )
-                                {
-                                    pRepository.setItemMaxAge( proxyModel.getItemMaxAge() );
-                                }
+                                pRepository.setItemMaxAge( proxyModel.getItemMaxAge() );
                             }
                         }
                         else
@@ -320,7 +317,7 @@ public class RepositoryPlexusResource
                                 {
                                     metadataMethod.invoke( repository, proxyModel.getMetadataMaxAge() );
                                 }
-                                if ( itemMethod != null && proxyModel.getItemMaxAge() != null)
+                                if ( itemMethod != null )
                                 {
                                     itemMethod.invoke( repository, proxyModel.getItemMaxAge() );
                                 }
