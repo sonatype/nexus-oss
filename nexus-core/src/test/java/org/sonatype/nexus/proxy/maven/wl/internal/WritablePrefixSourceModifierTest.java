@@ -153,9 +153,9 @@ public class WritablePrefixSourceModifierTest
         assertThat( "Changes were added", wesm.hasChanges() );
         assertThat( "WL would be changed", wesm.revokeEntry( "/org/apache" ) ); // child is in list
         assertThat( "Changes were adde", wesm.hasChanges() );
-        assertThat( "WL would not be changed", wesm.revokeEntry( "/org/sonatype/nexus" ) );
+        assertThat( "WL would not be changed", !wesm.revokeEntry( "/org/sonatype/nexus" ) ); // already removed by parent above
         assertThat( "No changes added yet", wesm.hasChanges() );
-        assertThat( "WL would not be changed", wesm.revokeEntry( "/org/apache/maven" ) );
+        assertThat( "WL would not be changed", !wesm.revokeEntry( "/org/apache/maven" ) ); // already removed by parent above
         assertThat( "No changes added yet", wesm.hasChanges() );
 
         // adding some
@@ -209,9 +209,9 @@ public class WritablePrefixSourceModifierTest
         assertThat( "Changes were added", wesm.hasChanges() );
         assertThat( "WL is changed", wesm.revokeEntry( "/org/apache" ) ); // child is in list
         assertThat( "Changes were added", wesm.hasChanges() );
-        assertThat( "WL would not be changed", wesm.revokeEntry( "/org/sonatype/nexus" ) );
+        assertThat( "WL would not be changed", !wesm.revokeEntry( "/org/sonatype/nexus" ) ); // already removed by parent above
         assertThat( "No changes added yet", wesm.hasChanges() );
-        assertThat( "WL would not be changed", wesm.revokeEntry( "/org/apache/maven" ) );
+        assertThat( "WL would not be changed", !wesm.revokeEntry( "/org/apache/maven" ) ); // already removed by parent above
         assertThat( "No changes added yet", wesm.hasChanges() );
 
         // adding some
