@@ -392,21 +392,25 @@ public abstract class AbstractRepositoryPlexusResource
             // This is a total hack to be able to retrieve this data from a non core repo if available
             try
             {
-                Method artifactMethod = repository.getClass().getMethod( "getArtifactMaxAge", new Class<?>[0] );
-                Method metadataMethod = repository.getClass().getMethod( "getMetadataMaxAge", new Class<?>[0] );
-                Method itemMethod = repository.getClass().getMethod( "getItemMaxAge", new Class<?>[0] );
 
+                // NXCM-5131 Ask for itemMaxAge first, because it's already introduced in AbstractProxyRepository and
+                // may be a superclass for non-maven repositories (e.g. NuGet)
+                Method itemMethod = repository.getClass().getMethod( "getItemMaxAge", new Class<?>[0] );
+                if ( itemMethod != null )
+                {
+                    resource.setItemMaxAge( (Integer) itemMethod.invoke( repository, new Object[0] ) );
+                }
+
+                Method artifactMethod = repository.getClass().getMethod( "getArtifactMaxAge", new Class<?>[0] );
                 if ( artifactMethod != null )
                 {
                     resource.setArtifactMaxAge( (Integer) artifactMethod.invoke( repository, new Object[0] ) );
                 }
+
+                Method metadataMethod = repository.getClass().getMethod( "getMetadataMaxAge", new Class<?>[0] );
                 if ( metadataMethod != null )
                 {
                     resource.setMetadataMaxAge( (Integer) metadataMethod.invoke( repository, new Object[0] ) );
-                }
-                if ( itemMethod != null )
-                {
-                    resource.setItemMaxAge( (Integer) itemMethod.invoke( repository, new Object[0] ) );
                 }
             }
             catch ( Exception e )
