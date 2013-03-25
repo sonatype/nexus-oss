@@ -76,7 +76,7 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( "maven2", result.getFormat() );
         Assert.assertEquals( false, result.isIndexable() );
         Assert.assertEquals( 23, result.getMetadataMaxAge() );
-        Assert.assertEquals( 234, result.getItemMaxAge() );
+        Assert.assertEquals( Integer.valueOf( 234 ), result.getItemMaxAge() );
         Assert.assertEquals( "test-name", result.getName() );
         Assert.assertEquals( 11, result.getNotFoundCacheTTL() );
         Assert.assertEquals( "maven2", result.getProvider() );
@@ -180,7 +180,7 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( "maven2", result.getFormat() );
         Assert.assertEquals( false, result.isIndexable() );
         Assert.assertEquals( 23, result.getMetadataMaxAge() );
-        Assert.assertEquals( 234, result.getItemMaxAge() );
+        Assert.assertEquals( Integer.valueOf( 234 ), result.getItemMaxAge() );
         Assert.assertEquals( "test-name", result.getName() );
         Assert.assertEquals( 11, result.getNotFoundCacheTTL() );
         Assert.assertEquals( "maven2", result.getProvider() );
