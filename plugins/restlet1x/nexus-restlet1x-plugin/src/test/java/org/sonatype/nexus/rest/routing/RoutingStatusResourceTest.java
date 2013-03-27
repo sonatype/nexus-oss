@@ -26,7 +26,11 @@ import org.junit.Test;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.SystemState;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.internal.ManagerImpl;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.RoutingStatusMessageWrapper;
@@ -43,6 +47,7 @@ public class RoutingStatusResourceTest
     public void login()
         throws Exception
     {
+        lookup( ApplicationStatusSource.class ).setState( SystemState.STARTED );
         ThreadContext.bind( new Subject.Builder().buildSubject() );
     }
 
@@ -51,6 +56,23 @@ public class RoutingStatusResourceTest
         throws Exception
     {
         ThreadContext.remove();
+    }
+
+    @Override
+    protected boolean enableAutomaticRoutingFeature()
+    {
+        return true;
+    }
+
+    protected void waitForRoutingBackgroundUpdates()
+        throws Exception
+    {
+        // TODO: A hack, I don't want to expose this over component contract iface
+        final ManagerImpl wm = (ManagerImpl) lookup( Manager.class );
+        while ( wm.isUpdatePrefixFileJobRunning() )
+        {
+            Thread.sleep( 500 );
+        }
     }
 
     /**
@@ -64,6 +86,10 @@ public class RoutingStatusResourceTest
     public void statusUrlHonorsRepoState()
         throws Exception
     {
+        final Manager manager = lookup( Manager.class );
+        manager.startup();
+        waitForRoutingBackgroundUpdates();
+
         final RoutingStatusResource wlStatusResource = (RoutingStatusResource) lookup( PlexusResource.class, "RoutingStatusResource" );
         final Request request = new Request();
         request.setRootRef( new Reference( "http://localhost:8081/nexus" ) );
