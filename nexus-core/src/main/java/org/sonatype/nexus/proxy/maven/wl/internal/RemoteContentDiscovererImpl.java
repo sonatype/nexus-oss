@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Default {@link RemoteContentDiscoverer} implementation.
@@ -73,8 +72,7 @@ public class RemoteContentDiscovererImpl
             new DiscoveryResult<MavenProxyRepository>( mavenProxyRepository );
         for ( RemoteStrategy strategy : remoteStrategies )
         {
-            getLogger().debug( "Discovery of {} with strategy {} attempted",
-                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
+            getLogger().debug( "Discovery of {} with strategy {} attempted", mavenProxyRepository, strategy.getId() );
             try
             {
                 final StrategyResult strategyResult = strategy.discover( mavenProxyRepository );
@@ -103,14 +101,14 @@ public class RemoteContentDiscovererImpl
 
             if ( discoveryResult.isSuccessful() )
             {
-                getLogger().debug( "Discovery of {} with strategy {} successful",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
+                getLogger().debug( "Discovery of {} with strategy {} successful", mavenProxyRepository,
+                    strategy.getId() );
                 break;
             }
             else
             {
-                getLogger().debug( "Discovery of {} with strategy {} unsuccessful",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
+                getLogger().debug( "Discovery of {} with strategy {} unsuccessful", mavenProxyRepository,
+                    strategy.getId() );
             }
         }
         return discoveryResult;

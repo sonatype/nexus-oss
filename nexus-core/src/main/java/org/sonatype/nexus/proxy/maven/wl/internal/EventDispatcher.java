@@ -18,11 +18,8 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.configuration.Configurable;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -31,7 +28,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
-import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
@@ -99,7 +95,7 @@ public class EventDispatcher
         {
             // we will end up here regularly if reconfiguration was about putting repository out of service
             getLogger().debug( "Repository {} is in bad state for white-list update: {}",
-                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e.getMessage() );
+                mavenRepository, e.getMessage() );
         }
     }
 
@@ -310,50 +306,6 @@ public class EventDispatcher
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
             handleRepositoryModified( mavenRepository );
-        }
-    }
-
-    // == Handlers for Group changes (WL of group and groups of groups needs to be updated)
-
-    /**
-     * This subscription is disabled, as this event is fired BEFORE configuration is committed, so group members are NOT
-     * discovered properly and leading to bad WL content!
-     * 
-     * @param evt
-     */
-    // @Subscribe
-    // @AllowConcurrentEvents
-    public void onRepositoryGroupMembersChangedEvent( final RepositoryGroupMembersChangedEvent evt )
-    {
-        if ( isRepositoryHandled( evt.getRepository() ) )
-        {
-            final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
-            handleRepositoryModified( mavenRepository );
-        }
-    }
-
-    /**
-     * Workaround for method above! This tricky subscriber actually listens for group member changes, but it does it by
-     * hooking to {@link ConfigurationChangeEvent} instead of {@link RepositoryGroupMembersChangedEvent}, since former
-     * is fired AFTER configuration is committed, while latter is fired BEFORE.
-     * 
-     * @param evt
-     */
-    @Subscribe
-    @AllowConcurrentEvents
-    public void onConfigurationChangeEvent( final ConfigurationChangeEvent evt )
-    {
-        for ( Configurable configurable : evt.getChanges() )
-        {
-            if ( configurable instanceof Repository )
-            {
-                final Repository repository = (Repository) configurable;
-                final MavenGroupRepository mavenGroupRepository = repository.adaptToFacet( MavenGroupRepository.class );
-                if ( mavenGroupRepository != null && isRepositoryHandled( mavenGroupRepository ) )
-                {
-                    handleRepositoryModified( mavenGroupRepository );
-                }
-            }
         }
     }
 }
