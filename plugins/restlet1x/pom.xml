@@ -159,6 +159,8 @@
   <modules>
     <module>nexus-restlet1x-model</module>
     <module>nexus-restlet1x-plugin</module>
+    <module>nexus-restlet1x-testsuite</module>
+    <module>nexus-restlet1x-testsupport-plugin</module>
   </modules>
 
 </project>
