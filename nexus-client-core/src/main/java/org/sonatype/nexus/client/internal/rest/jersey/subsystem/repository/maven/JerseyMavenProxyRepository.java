@@ -84,4 +84,16 @@ public class JerseyMavenProxyRepository
         return me();
     }
 
+    @Override
+    public int artifactMaxAge()
+    {
+        return settings().getArtifactMaxAge();
+    }
+
+    @Override
+    public int metadataMaxAge()
+    {
+        return settings().getMetadataMaxAge();
+    }
+
 }

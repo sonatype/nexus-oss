@@ -14,6 +14,7 @@ package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository;
 
 import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepositoryStatus;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
@@ -133,6 +134,12 @@ public class JerseyProxyRepository<T extends ProxyRepository>
     }
 
     @Override
+    public int itemMaxAge()
+    {
+        return settings().getItemMaxAge();
+    }
+
+    @Override
     public T autoBlock()
     {
         settings().setAutoBlockActive( true );
@@ -144,6 +151,12 @@ public class JerseyProxyRepository<T extends ProxyRepository>
     {
         settings().setAutoBlockActive( false );
         return me();
+    }
+
+    @Override
+    public boolean isAutoBlocking()
+    {
+        return settings().isAutoBlockActive();
     }
 
     @Override
@@ -164,4 +177,23 @@ public class JerseyProxyRepository<T extends ProxyRepository>
         return me();
     }
 
+    @Override
+    public T enableBrowsing()
+    {
+        settings().setBrowseable( true );
+        return me();
+    }
+
+    @Override
+    public T disableBrowsing()
+    {
+        settings().setBrowseable( false );
+        return me();
+    }
+
+    @Override
+    public boolean isBrowsable()
+    {
+        return settings().isBrowseable();
+    }
 }

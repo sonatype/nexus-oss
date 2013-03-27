@@ -322,4 +322,8 @@ public abstract class JerseyRepository<T extends Repository, S extends Repositor
         }
     }
 
+    public boolean isExposed() {
+        return settings().isExposed();
+    }
+
 }

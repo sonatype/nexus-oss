@@ -83,4 +83,9 @@ public interface Repository<T extends Repository, U extends RepositoryStatus>
      */
     T remove();
 
+    /**
+     * @return {@code true} if the repository is exposed, {@code false} otherwise.
+     * @since 2.4
+     */
+    boolean isExposed();
 }

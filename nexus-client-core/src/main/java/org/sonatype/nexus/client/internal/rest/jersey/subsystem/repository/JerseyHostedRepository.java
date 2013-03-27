@@ -104,4 +104,9 @@ public class JerseyHostedRepository<T extends HostedRepository>
         return me();
     }
 
+    @Override
+    public boolean isBrowsable()
+    {
+        return settings().isBrowseable();
+    }
 }
