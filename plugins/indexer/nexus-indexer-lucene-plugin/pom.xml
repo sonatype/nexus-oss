@@ -31,7 +31,7 @@
     <pluginName>Nexus Indexer Lucene Plugin</pluginName>
     <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
 
-    <mavenIndexer.version>5.1.1</mavenIndexer.version>
+    <mavenIndexer.version>5.1.2-SNAPSHOT</mavenIndexer.version>
     <aether.version>1.13.1</aether.version>
   </properties>
 
