@@ -53,7 +53,7 @@ public class RoutingConfigResource
     /**
      * REST resource URI.
      */
-    public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/wl/config";
+    public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/routing/config";
 
     @Override
     public Object getPayloadInstance()
@@ -70,7 +70,7 @@ public class RoutingConfigResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repositories/*/wl/config", "authcBasic,perms[nexus:repositories]" );
+        return new PathProtectionDescriptor( "/repositories/*/routing/config", "authcBasic,perms[nexus:repositories]" );
     }
 
     /**

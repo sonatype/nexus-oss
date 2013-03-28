@@ -63,7 +63,7 @@ public class RoutingStatusResource
     /**
      * REST resource URI.
      */
-    public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/wl";
+    public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/routing";
 
     @Requirement( hint = "RestletRepositoryUrlBuilder" )
     private RepositoryURLBuilder repositoryURLBuilder;
@@ -83,7 +83,7 @@ public class RoutingStatusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repositories/*/wl", "authcBasic,perms[nexus:repositories]" );
+        return new PathProtectionDescriptor( "/repositories/*/routing", "authcBasic,perms[nexus:repositories]" );
     }
 
     @Override

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define, Ext, Nexus, Sonatype, NX*/
-NX.define('Sonatype.repoServer.RepositoryWLPanel', {
+NX.define('Sonatype.repoServer.RepositoryRoutingPanel', {
   extend : 'Nexus.ext.FormPanel',
 
   requirejs : ['Nexus/config'],
@@ -67,7 +67,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     }
 
     // should be static, but Sonatype.config is not defined yet when statics are defined (before requirejs dep resolution)
-    this.resourceUrl = new Ext.Template(Sonatype.config.repos.urls.repositories + "/{0}/wl").compile();
+    this.resourceUrl = new Ext.Template(Sonatype.config.repos.urls.repositories + "/{0}/routing").compile();
 
     var
           self = this,
@@ -97,13 +97,13 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       load : {
         'publishedStatus' : function(value) {
           self.publishedStatus = value;
-          var store = Sonatype.repoServer.RepositoryWLPanel.publishStatusStore;
+          var store = Sonatype.repoServer.RepositoryRoutingPanel.publishStatusStore;
           return store.getAt(store.find('value', value)).get('text');
         },
 
         'discovery.discoveryLastStatus' : function(value) {
           self.discoveryStatus = value;
-          var store = Sonatype.repoServer.RepositoryWLPanel.discoveryStatusStore;
+          var store = Sonatype.repoServer.RepositoryRoutingPanel.discoveryStatusStore;
           return store.getAt(store.find('value', value)).get('text');
         },
 
@@ -217,7 +217,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
             xtype : 'combo',
             fieldLabel : 'Update interval',
             name : 'discovery.discoveryIntervalHours',
-            store : Sonatype.repoServer.RepositoryWLPanel.discoveryUpdateIntervalStore,
+            store : Sonatype.repoServer.RepositoryRoutingPanel.discoveryUpdateIntervalStore,
             displayField : 'intervalLabel',
             valueField : 'valueHrs',
             emptyText : 'Select...',
@@ -248,7 +248,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       }
     ];
 
-    Sonatype.repoServer.RepositoryWLPanel.superclass.constructor.apply(self, arguments);
+    Sonatype.repoServer.RepositoryRoutingPanel.superclass.constructor.apply(self, arguments);
 
     self.on('actioncomplete', self.onActionComplete);
   },
@@ -399,7 +399,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
 
     if (!newRecord && maven2FormatRepo && notShadowType &&
           ( sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE) || sp.checkPermission('nexus:repositories', sp.EDIT) )) {
-      cardPanel.add(new Sonatype.repoServer.RepositoryWLPanel({
+      cardPanel.add(new Sonatype.repoServer.RepositoryRoutingPanel({
         tabTitle : 'Routing',
         name : 'routing',
         payload : rec

@@ -59,7 +59,7 @@ public class JerseyRouting
         try
         {
             final RoutingStatusMessage message =
-                getNexusClient().serviceResource( wlPath( mavenRepositoryId ) ).get( RoutingStatusMessageWrapper.class ).getData();
+                getNexusClient().serviceResource( routingPath( mavenRepositoryId ) ).get( RoutingStatusMessageWrapper.class ).getData();
 
             final DiscoveryStatus discoveryStatus;
             if ( message.getDiscovery() == null )
@@ -98,7 +98,7 @@ public class JerseyRouting
     {
         try
         {
-            getNexusClient().serviceResource( wlPath( mavenProxyRepositoryId ) ).delete();
+            getNexusClient().serviceResource( routingPath( mavenProxyRepositoryId ) ).delete();
         }
         catch ( UniformInterfaceException e )
         {
@@ -117,7 +117,7 @@ public class JerseyRouting
         try
         {
             final RoutingConfigMessage message =
-                getNexusClient().serviceResource( wlConfigPath( mavenProxyRepositoryId ) ).get(
+                getNexusClient().serviceResource( routingConfigPath( mavenProxyRepositoryId ) ).get(
                     RoutingConfigMessageWrapper.class ).getData();
             return new DiscoveryConfiguration( message.isDiscoveryEnabled(), message.getDiscoveryIntervalHours() );
         }
@@ -143,7 +143,7 @@ public class JerseyRouting
             message.setDiscoveryIntervalHours( configuration.getIntervalHours() );
             final RoutingConfigMessageWrapper wrapper = new RoutingConfigMessageWrapper();
             wrapper.setData( message );
-            getNexusClient().serviceResource( wlConfigPath( mavenProxyRepositoryId ) ).put( wrapper );
+            getNexusClient().serviceResource( routingConfigPath( mavenProxyRepositoryId ) ).put( wrapper );
         }
         catch ( UniformInterfaceException e )
         {
@@ -157,11 +157,11 @@ public class JerseyRouting
 
     // ==
 
-    static String wlPath( final String mavenRepositoryId )
+    static String routingPath( final String mavenRepositoryId )
     {
         try
         {
-            return "repositories/" + URLEncoder.encode( mavenRepositoryId, "UTF-8" ) + "/wl";
+            return "repositories/" + URLEncoder.encode( mavenRepositoryId, "UTF-8" ) + "/routing";
         }
         catch ( UnsupportedEncodingException e )
         {
@@ -169,8 +169,8 @@ public class JerseyRouting
         }
     }
 
-    static String wlConfigPath( final String mavenRepositoryId )
+    static String routingConfigPath( final String mavenRepositoryId )
     {
-        return wlPath( mavenRepositoryId ) + "/config";
+        return routingPath( mavenRepositoryId ) + "/config";
     }
 }
