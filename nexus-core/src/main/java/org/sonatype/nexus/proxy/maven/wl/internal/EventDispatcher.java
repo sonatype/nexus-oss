@@ -94,7 +94,7 @@ public class EventDispatcher
         catch ( IllegalStateException e )
         {
             // we will end up here regularly if reconfiguration was about putting repository out of service
-            getLogger().debug( "Repository {} is in bad state for white-list update: {}",
+            getLogger().debug( "Repository {} is in bad state for prefix file update: {}",
                 mavenRepository, e.getMessage() );
         }
     }
@@ -109,7 +109,7 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn( "Problem while publishing white-list for repository {}",
+            getLogger().warn( "Problem while publishing prefix file for repository {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
         }
     }
@@ -123,7 +123,7 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn( "Problem while unpublishing white-list for repository {}",
+            getLogger().warn( "Problem while unpublishing prefix file for repository {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
         }
     }
@@ -136,7 +136,7 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn( "Problem while maintaining white-list for hosted repository {}, offered path={}",
+            getLogger().warn( "Problem while maintaining prefix file for hosted repository {}, offered path={}",
                 RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ), path, e );
         }
     }
@@ -149,7 +149,7 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn( "Problem while maintaining white-list for hosted repository {}, revoked path={}",
+            getLogger().warn( "Problem while maintaining prefix file for hosted repository {}, revoked path={}",
                 RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ), path, e );
         }
     }

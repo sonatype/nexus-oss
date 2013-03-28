@@ -466,10 +466,10 @@ public abstract class AbstractMavenRepository
             // but filter it only if request is not marked as NFS
             if ( !request.getRequestContext().containsKey( WLManager.WL_REQUEST_NFS_FLAG_KEY ) )
             {
-                final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
-                if ( !whitelistMatched )
+                final boolean proxyFilterAllowed = getProxyRequestFilter().allowed( this, request );
+                if ( !proxyFilterAllowed )
                 {
-                    getLogger().debug( "WL filter rejected remote request for path {} in {}.",
+                    getLogger().debug( "Automatic routing filter rejected remote request for path {} in {}.",
                         request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) );
                     return false;
                 }

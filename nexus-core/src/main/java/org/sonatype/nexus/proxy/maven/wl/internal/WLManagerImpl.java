@@ -256,7 +256,7 @@ public class WLManagerImpl
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
     {
-        getLogger().debug( "Initializing white-list of newly added {}", mavenRepository );
+        getLogger().debug( "Initializing prefix file of newly added {}", mavenRepository );
         try
         {
             // mark it for noscrape if not marked yet
@@ -264,12 +264,12 @@ public class WLManagerImpl
             // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
             // and publish
             updateWhitelist( mavenRepository );
-            getLogger().info( "Initializing non-existing white-list of newly added {}",
+            getLogger().info( "Initializing non-existing prefix file of newly added {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Problem during white-list initialisation of newly added {}",
+            getLogger().warn( "Problem during prefix file initialisation of newly added {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             try
             {
@@ -291,7 +291,7 @@ public class WLManagerImpl
      */
     protected boolean doInitializeWhitelistOnStartup( final MavenRepository mavenRepository )
     {
-        getLogger().debug( "Initializing white-list of {}", mavenRepository );
+        getLogger().debug( "Initializing prefix file of {}", mavenRepository );
         final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
         try
         {
@@ -300,7 +300,7 @@ public class WLManagerImpl
                 // good, we assume is up to date, which should be unless user tampered with it
                 // in that case, just delete it + update and should be fixed.
                 publish( mavenRepository, prefixSource, false );
-                getLogger().info( "Existing white-list of {} initialized",
+                getLogger().info( "Existing prefix file of {} initialized",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             else
@@ -308,14 +308,14 @@ public class WLManagerImpl
                 // mark it for noscrape if not marked yet
                 // this is mainly important on 1st boot or newly added reposes
                 unpublish( mavenRepository, false );
-                getLogger().info( "Initializing non-existing white-list of {}",
+                getLogger().info( "Initializing non-existing prefix file of {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 return true;
             }
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Problem during white-list initialisation of {}",
+            getLogger().warn( "Problem during prefix file initialisation of {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             try
             {
@@ -352,7 +352,7 @@ public class WLManagerImpl
             catch ( Exception e )
             {
                 // just neglect it and continue, but do log it
-                getLogger().warn( "Problem during white-list update of proxy repository {}",
+                getLogger().warn( "Problem during prefix file update of proxy repository {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), e );
             }
         }
@@ -408,12 +408,12 @@ public class WLManagerImpl
             }
             else
             {
-                getLogger().debug( "Proxy {} white-list is up to date", mavenProxyRepository );
+                getLogger().debug( "Proxy {} prefix file is up to date", mavenProxyRepository );
             }
         }
         else
         {
-            getLogger().debug( "Proxy {} white-list update requested, but it's remote discovery is disabled",
+            getLogger().debug( "Proxy {} prefix file update requested, but it's remote discovery is disabled",
                 mavenProxyRepository );
         }
         return false;
@@ -442,19 +442,19 @@ public class WLManagerImpl
         checkUpdateConditions( mavenProxyRepository );
         try
         {
-            getLogger().debug( "Quick updating white-list of {}", mavenProxyRepository );
+            getLogger().debug( "Quick updating prefix file of {}", mavenProxyRepository );
             constrainedExecutor.cancelRunningWithKey( mavenProxyRepository.getId() );
             final PrefixSource prefixSource =
                 updateProxyWhitelist( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
             if ( prefixSource != null )
             {
-                getLogger().info( "Updated and published white-list of {}",
+                getLogger().info( "Updated and published prefix file of {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 publish( mavenProxyRepository, prefixSource );
             }
             else
             {
-                getLogger().info( "Unpublished white-list of {} (and is marked for noscrape)",
+                getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 unpublish( mavenProxyRepository );
             }
@@ -506,7 +506,7 @@ public class WLManagerImpl
             // we should really not see this, it would mean some execution path is buggy as it gets here
             // with unsupported repo
             throw new IllegalStateException(
-                "Repository not supported by white-list feature (only Maven2 hosted, proxy and group repositories are supported)" );
+                "Repository not supported by automatic routing feature (only Maven2 hosted, proxy and group repositories are supported)" );
         }
         final LocalStatus localStatus = mavenRepository.getLocalStatus();
         if ( !localStatus.shouldServiceRequest() )
@@ -539,7 +539,7 @@ public class WLManagerImpl
             {
                 // this is okay, as forced happens rarely, currently only when proxy repo changes remoteURL
                 // (reconfiguration happens)
-                getLogger().debug( "Forced white-list update on {} canceled currently running discovery job",
+                getLogger().debug( "Forced prefix file update on {} canceled currently running discovery job",
                     mavenRepository );
             }
             return canceledPreviousJob;
@@ -554,7 +554,7 @@ public class WLManagerImpl
      * Is visible to expose over the nexus-it-helper-plugin only, and UTs are using this. Should not be used for other
      * means.
      * 
-     * @return {@code true} if there are white-list jobs running.
+     * @return {@code true} if there are prefix file update jobs running.
      */
     @VisibleForTesting
     public boolean isUpdateWhitelistJobRunning()
@@ -567,7 +567,7 @@ public class WLManagerImpl
     protected void updateAndPublishWhitelist( final MavenRepository mavenRepository, final boolean notify )
         throws IOException
     {
-        getLogger().debug( "Updating white-list of {}", mavenRepository );
+        getLogger().debug( "Updating prefix file of {}", mavenRepository );
         try
         {
             final PrefixSource prefixSource;
@@ -585,7 +585,7 @@ public class WLManagerImpl
             }
             else
             {
-                getLogger().info( "Repository {} unsupported by white-list feature",
+                getLogger().info( "Repository {} unsupported by automatic routing feature",
                     RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
                 return;
             }
@@ -593,7 +593,7 @@ public class WLManagerImpl
             {
                 if ( notify )
                 {
-                    getLogger().info( "Updated and published white-list of {}",
+                    getLogger().info( "Updated and published prefix file of {}",
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
                 publish( mavenRepository, prefixSource );
@@ -602,7 +602,7 @@ public class WLManagerImpl
             {
                 if ( notify )
                 {
-                    getLogger().info( "Unpublished white-list of {} (and is marked for noscrape)",
+                    getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
                 unpublish( mavenRepository );
@@ -796,7 +796,7 @@ public class WLManagerImpl
                         }
                     }
                     message =
-                        "Publishing not possible, following members have no published whitelist: "
+                        "Publishing not possible, following members have no published prefix file: "
                             + Joiner.on( ", " ).join( membersWithoutWhitelists );
                 }
                 else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
@@ -832,7 +832,7 @@ public class WLManagerImpl
         else
         {
             publishingStatus =
-                new WLPublishingStatus( PStatus.PUBLISHED, "Whitelist published successfully.",
+                new WLPublishingStatus( PStatus.PUBLISHED, "Prefix file published successfully.",
                     publishedEntrySource.getLostModifiedTimestamp(), publishedEntrySource.getFilePath() );
         }
 
@@ -1114,7 +1114,7 @@ public class WLManagerImpl
                 catch ( IOException e )
                 {
                     getLogger().warn(
-                        "Problem while cascading white-list update to group repository {} from it's member {}",
+                        "Problem while cascading prefix file update to group repository {} from it's member {}",
                         RepositoryStringUtils.getHumanizedNameString( containingGroupRepository ),
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
                 }
