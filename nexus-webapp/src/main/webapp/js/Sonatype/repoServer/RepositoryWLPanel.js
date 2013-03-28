@@ -240,7 +240,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
           {
             xtype : 'button',
             hideLabel : true,
-            text : 'Force remote discovery',
+            text : 'Update now',
             handler : this.forceRemoteDiscoveryHandler,
             scope : this
           }
@@ -340,7 +340,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     var
           self = this,
           mask = new Ext.LoadMask(this.el, {
-            msg : 'Forcing discovery...',
+            msg : 'Updating...',
             removeMask : true
           });
 
@@ -400,8 +400,8 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     if (!newRecord && maven2FormatRepo && notShadowType &&
           ( sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE) || sp.checkPermission('nexus:repositories', sp.EDIT) )) {
       cardPanel.add(new Sonatype.repoServer.RepositoryWLPanel({
-        tabTitle : 'Whitelist',
-        name : 'whitelist',
+        tabTitle : 'Routing',
+        name : 'routing',
         payload : rec
       }));
     }
