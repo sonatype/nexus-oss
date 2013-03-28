@@ -896,8 +896,8 @@ public class ManagerImpl
             (AbstractMavenRepositoryConfiguration) mavenProxyRepository.getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration(
                 false );
 
-        return new DiscoveryConfig( config.isFeatureActive() && configuration.isWLDiscoveryEnabled(),
-            configuration.getWLDiscoveryInterval() );
+        return new DiscoveryConfig( config.isFeatureActive() && configuration.isRoutingDiscoveryEnabled(),
+            configuration.getRoutingDiscoveryInterval() );
     }
 
     @Override
@@ -909,9 +909,9 @@ public class ManagerImpl
             (AbstractMavenRepositoryConfiguration) mavenProxyRepository.getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration(
                 false );
 
-        final boolean enabledChanged = configuration.isWLDiscoveryEnabled() != config.isEnabled();
-        configuration.setWLDiscoveryEnabled( config.isEnabled() );
-        configuration.setWLDiscoveryInterval( config.getDiscoveryInterval() );
+        final boolean enabledChanged = configuration.isRoutingDiscoveryEnabled() != config.isEnabled();
+        configuration.setRoutingDiscoveryEnabled( config.isEnabled() );
+        configuration.setRoutingDiscoveryInterval( config.getDiscoveryInterval() );
         applicationConfiguration.saveConfiguration();
 
         if ( enabledChanged )
