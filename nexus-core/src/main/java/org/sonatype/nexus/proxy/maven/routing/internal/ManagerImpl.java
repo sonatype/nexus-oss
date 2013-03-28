@@ -158,7 +158,7 @@ public class ManagerImpl
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
         this.quickRemoteStrategy = checkNotNull( quickRemoteStrategy );
         this.executor =
-            new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl", "WL-Updater" ),
+            new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "ar", "AR-Updater" ),
                 new ThreadPoolExecutor.AbortPolicy() );
         this.constrainedExecutor = new ConstrainedExecutorImpl( executor );
         // register event dispatcher

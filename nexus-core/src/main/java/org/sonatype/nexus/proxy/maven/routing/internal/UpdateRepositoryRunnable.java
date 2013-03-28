@@ -24,7 +24,7 @@ import org.sonatype.nexus.util.task.ProgressListener;
 import com.google.common.base.Throwables;
 
 /**
- * Job that performs WL update and publishing of one single {@link MavenRepository}.
+ * Job that performs prefix file updates and publishing of one single {@link MavenRepository}.
  * 
  * @author cstamas
  * @since 2.4
@@ -34,7 +34,7 @@ public class UpdateRepositoryRunnable
 {
     private final ApplicationStatusSource applicationStatusSource;
 
-    private final ManagerImpl wlManager;
+    private final ManagerImpl manager;
 
     private final MavenRepository mavenRepository;
 
@@ -43,16 +43,16 @@ public class UpdateRepositoryRunnable
      * 
      * @param progressListener
      * @param applicationStatusSource
-     * @param wlManager
+     * @param manager
      * @param mavenRepository
      */
     public UpdateRepositoryRunnable( final ProgressListener progressListener,
                                        final ApplicationStatusSource applicationStatusSource,
-                                       final ManagerImpl wlManager, final MavenRepository mavenRepository )
+                                       final ManagerImpl manager, final MavenRepository mavenRepository )
     {
-        super( progressListener, mavenRepository.getId() + " WL-updater" );
+        super( progressListener, mavenRepository.getId() + " AR-Updater" );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
-        this.wlManager = checkNotNull( wlManager );
+        this.manager = checkNotNull( manager );
         this.mavenRepository = checkNotNull( mavenRepository );
     }
 
@@ -61,18 +61,18 @@ public class UpdateRepositoryRunnable
     {
         if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
         {
-            getLogger().warn( "Nexus stopped during background WL updates, bailing out." );
+            getLogger().warn( "Nexus stopped during background prefix file updates, bailing out." );
             return;
         }
         try
         {
-            wlManager.updateAndPublishPrefixFile( mavenRepository, true );
+            manager.updateAndPublishPrefixFile( mavenRepository, true );
         }
         catch ( Exception e )
         {
             try
             {
-                wlManager.unpublish( mavenRepository );
+                manager.unpublish( mavenRepository );
             }
             catch ( IOException ioe )
             {
