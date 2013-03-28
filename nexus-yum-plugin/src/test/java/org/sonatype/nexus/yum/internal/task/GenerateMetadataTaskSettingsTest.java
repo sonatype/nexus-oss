@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
@@ -112,7 +112,7 @@ public class GenerateMetadataTaskSettingsTest
             mock( RepositoryURLBuilder.class ),
             mock( RpmScanner.class ),
             mock( NexusScheduler.class ),
-            mock( WLManager.class )
+            mock( Manager.class )
         );
         task.setRpmDir( rpmsDir().getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
@@ -135,7 +135,7 @@ public class GenerateMetadataTaskSettingsTest
             repositoryURLBuilder(),
             mock( RpmScanner.class ),
             mock( NexusScheduler.class ),
-            mock( WLManager.class )
+            mock( Manager.class )
         );
         task.setRepositoryId( REPO );
         // when
@@ -195,7 +195,7 @@ public class GenerateMetadataTaskSettingsTest
             mock( RepositoryURLBuilder.class ),
             mock( RpmScanner.class ),
             mock( NexusScheduler.class ),
-            mock( WLManager.class )
+            mock( Manager.class )
         )
         {
 

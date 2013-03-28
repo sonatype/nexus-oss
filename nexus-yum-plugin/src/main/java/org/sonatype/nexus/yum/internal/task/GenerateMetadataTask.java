@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -36,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -99,7 +100,7 @@ public class GenerateMetadataTask
 
     private final YumRegistry yumRegistry;
 
-    private final WLManager wlManager;
+    private final Manager routingManager;
 
     @Inject
     public GenerateMetadataTask( final EventBus eventBus,
@@ -108,7 +109,7 @@ public class GenerateMetadataTask
                                  final RepositoryURLBuilder repositoryURLBuilder,
                                  final RpmScanner scanner,
                                  final NexusScheduler nexusScheduler,
-                                 final WLManager wlManager)
+                                 final Manager routingManager)
     {
         super( eventBus, null );
 
@@ -117,7 +118,7 @@ public class GenerateMetadataTask
         this.scanner = checkNotNull( scanner );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
-        this.wlManager = checkNotNull( wlManager );
+        this.routingManager = checkNotNull( routingManager );
 
         getParameters().put( PARAM_SINGLE_RPM_PER_DIR, Boolean.toString( true ) );
     }
@@ -158,7 +159,7 @@ public class GenerateMetadataTask
             {
                 try
                 {
-                    wlManager.forceUpdateWhitelist( mavenRepository );
+                    routingManager.forceUpdatePrefixFile( mavenRepository );
                 }
                 catch ( Exception e )
                 {

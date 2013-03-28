@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.GZIPInputStream;
+
 import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
@@ -38,7 +39,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -52,6 +53,7 @@ import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.code.tempusfugit.temporal.Condition;
 
 public class GenerateMetadataTaskConcurrencyTest
@@ -172,7 +174,7 @@ public class GenerateMetadataTaskConcurrencyTest
             mock( RepositoryURLBuilder.class ),
             mock( RpmScanner.class ),
             nexusScheduler,
-            mock( WLManager.class )
+            mock( Manager.class )
         )
         {
             @Override
