@@ -324,12 +324,12 @@ public class XStreamConfiguratorLightweight
         xstream.processAnnotations( UserAccount.class );
         xstream.processAnnotations( UserAccountRequestResponseWrapper.class );
 
-        // Whitelist aka proxy404 (NEXUS-5472)
-        xstream.processAnnotations( WLDiscoveryStatusMessage.class );
-        xstream.processAnnotations( WLStatusMessage.class );
-        xstream.processAnnotations( WLStatusMessageWrapper.class );
-        xstream.processAnnotations( WLConfigMessage.class );
-        xstream.processAnnotations( WLConfigMessageWrapper.class );
+        // Automatic routing aka proxy404 (NEXUS-5472)
+        xstream.processAnnotations( RoutingDiscoveryStatusMessage.class );
+        xstream.processAnnotations( RoutingStatusMessage.class );
+        xstream.processAnnotations( RoutingStatusMessageWrapper.class );
+        xstream.processAnnotations( RoutingConfigMessage.class );
+        xstream.processAnnotations( RoutingConfigMessageWrapper.class );
 
         return xstream;
     }

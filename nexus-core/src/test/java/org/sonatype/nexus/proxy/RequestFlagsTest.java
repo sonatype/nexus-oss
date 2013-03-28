@@ -40,8 +40,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.maven.wl.WLConfig;
-import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
+import org.sonatype.nexus.proxy.maven.routing.Config;
+import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
@@ -80,7 +80,7 @@ public class RequestFlagsTest
             public void configure( Binder binder )
             {
                 // this test will load default config, so disable WL feature to not scrape Central in this UT
-                binder.bind( WLConfig.class ).toInstance( new WLConfigImpl( false ) );
+                binder.bind( Config.class ).toInstance( new ConfigImpl( false ) );
             }
         } };
     }

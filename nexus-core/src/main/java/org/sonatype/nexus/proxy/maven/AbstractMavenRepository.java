@@ -47,8 +47,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
-import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -464,7 +464,7 @@ public abstract class AbstractMavenRepository
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
             // but filter it only if request is not marked as NFS
-            if ( !request.getRequestContext().containsKey( WLManager.WL_REQUEST_NFS_FLAG_KEY ) )
+            if ( !request.getRequestContext().containsKey( Manager.ROUTING_REQUEST_NFS_FLAG_KEY ) )
             {
                 final boolean proxyFilterAllowed = getProxyRequestFilter().allowed( this, request );
                 if ( !proxyFilterAllowed )
@@ -598,7 +598,7 @@ public abstract class AbstractMavenRepository
     protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
     {
         boolean shouldAddToNFC = super.shouldAddToNotFoundCache( request );
-        if ( shouldAddToNFC && request.getRequestContext().containsKey( WLManager.WL_REQUEST_REJECTED_FLAG_KEY ) )
+        if ( shouldAddToNFC && request.getRequestContext().containsKey( Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY ) )
         {
             // TODO: should we un-flag the request?
             shouldAddToNFC = false;
