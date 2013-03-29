@@ -4506,9 +4506,9 @@
     </class>
  
     <class>
-      <name>WLConfigMessage</name>
+      <name>RoutingConfigMessage</name>
       <version>1.0.0+</version>
-      <description>WL Discovery Configuration.</description>
+      <description>Routing Discovery Configuration.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "configMessage" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
@@ -4531,12 +4531,12 @@
       </fields>
     </class>
     <class>
-      <name>WLConfigMessageWrapper</name>
+      <name>RoutingConfigMessageWrapper</name>
       <version>1.0.0+</version>
-      <description>REST request object to retrieve WL status.</description>
+      <description>REST request object to retrieve Routing Discovery Configuration.</description>
       <annotations>
-        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "wl-config-request" )</annotation>
-        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "wl-config-request" )</annotation>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "routing-config-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "routing-config-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
       <fields>
@@ -4544,17 +4544,17 @@
           <name>data</name>
           <version>1.0.0+</version>
           <association>
-            <type>WLConfigMessage</type>
+            <type>RoutingConfigMessage</type>
           </association>
           <required>true</required>
-          <description>The requested WL config.</description>
+          <description>The requested Routing config.</description>
         </field>
       </fields>
     </class>
     <class>
-      <name>WLDiscoveryStatusMessage</name>
+      <name>RoutingDiscoveryStatusMessage</name>
       <version>1.0.0+</version>
-      <description>WL Discovery Status details.</description>
+      <description>Routing Discovery Status details.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "discovery" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
@@ -4605,9 +4605,9 @@
       </fields>
     </class>
     <class>
-      <name>WLStatusMessage</name>
+      <name>RoutingStatusMessage</name>
       <version>1.0.0+</version>
-      <description>WL Status details.</description>
+      <description>Routing Status details.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "statusMessage" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
@@ -4639,26 +4639,26 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
-          <description>The URL of the published WL prefix file or null if not published.</description>
+          <description>The URL of the published prefix file or null if not published.</description>
         </field>
         <field>
           <name>discovery</name>
           <version>1.0.0+</version>
           <association>
-            <type>WLDiscoveryStatusMessage</type>
+            <type>RoutingDiscoveryStatusMessage</type>
           </association>
           <required>true</required>
-          <description>Filled for proxy repositories, false for everything else.</description>
+          <description>Filled for proxy repositories, null for everything else.</description>
         </field>
       </fields>
     </class>
     <class>
-      <name>WLStatusMessageWrapper</name>
+      <name>RoutingStatusMessageWrapper</name>
       <version>1.0.0+</version>
-      <description>REST request object to retrieve WL status.</description>
+      <description>REST request object to retrieve Routing status.</description>
       <annotations>
-        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "wl-status-request" )</annotation>
-        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "wl-status-request" )</annotation>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "routing-status-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "routing-status-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
       <fields>
@@ -4666,10 +4666,10 @@
           <name>data</name>
           <version>1.0.0+</version>
           <association>
-            <type>WLStatusMessage</type>
+            <type>RoutingStatusMessage</type>
           </association>
           <required>true</required>
-          <description>The requested WL status.</description>
+          <description>The requested routing status.</description>
         </field>
       </fields>
     </class>

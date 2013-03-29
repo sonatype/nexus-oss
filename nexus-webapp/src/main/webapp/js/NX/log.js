@@ -99,6 +99,14 @@ define('NX/log', ['NX/base'], function() {
         });
       }
 
+      if ( !NX.global.console ) { // IE without webdev has no console object, so we create an empty one
+        NX.global.console = {
+          log : Ext.emptyFn
+        };
+      } else if ( !NX.global.console.log ) { // We rely on existence of console.log below
+        NX.global.console.log = Ext.emptyFn;
+      }
+
       Ext.each([
           'trace',
           //'log', skipping; as we may want to make an Ext.log compatible method
@@ -108,13 +116,13 @@ define('NX/log', ['NX/base'], function() {
           'warn',
           'error'
       ], function (name) {
-          logger[name] = levelAwareProxy(console, name);
+          logger[name] = levelAwareProxy(NX.global.console, name);
       });
 
       Ext.each([
           'groupEnd'
       ], function (name) {
-          logger[name] = safeProxy(console, name);
+          logger[name] = safeProxy(NX.global.console, name);
       });
 
       return logger;
