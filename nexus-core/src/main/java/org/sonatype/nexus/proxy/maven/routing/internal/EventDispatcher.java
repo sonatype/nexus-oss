@@ -58,19 +58,15 @@ public class EventDispatcher
 
     private final Manager wlManager;
 
-    private final boolean active;
-
     /**
      * Da constructor.
      * 
      * @param wlManager
-     * @param active
      */
-    public EventDispatcher( final Manager wlManager, final boolean active )
+    public EventDispatcher( final Manager wlManager )
     {
         this.logger = LoggerFactory.getLogger( getClass() );
         this.wlManager = checkNotNull( wlManager );
-        this.active = active;
     }
 
     protected Logger getLogger()
@@ -156,11 +152,6 @@ public class EventDispatcher
 
     // == Filters
 
-    protected boolean isActive()
-    {
-        return active;
-    }
-
     protected boolean isRequestContextMarked( final RequestContext context )
     {
         return context.containsKey( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY );
@@ -168,10 +159,9 @@ public class EventDispatcher
 
     protected boolean isRepositoryHandled( final Repository repository )
     {
-        // we handle repository events after this isActive, is not out of service, and only for non-shadow repository
+        // we handle repository events if repo is not out of service, and only for non-shadow repository
         // that are Maven2 reposes
-        return isActive() && repository != null
-            && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
+        return repository != null && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
             && !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
             && Maven2ContentClass.ID.equals( repository.getRepositoryContentClass().getId() );
     }

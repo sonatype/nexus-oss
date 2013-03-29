@@ -130,6 +130,12 @@ public class ManagerImpl
     private final ConstrainedExecutor constrainedExecutor;
 
     /**
+     * Flag that marks that "boot sequence" is finished. If {@code true}, all the "boot initialization" already
+     * happened. Still, depending on {@link WLConfig#isFeatureActive()} what actually was done during this.
+     */
+    private volatile boolean bootSequenceDone;
+
+    /**
      * Da constructor.
      * 
      * @param eventBus
@@ -162,76 +168,125 @@ public class ManagerImpl
                 new ThreadPoolExecutor.AbortPolicy() );
         this.constrainedExecutor = new ConstrainedExecutorImpl( executor );
         // register event dispatcher
-        this.eventDispatcher = new EventDispatcher( this, config.isFeatureActive() );
+        this.eventDispatcher = new EventDispatcher( this );
         this.eventBus.register( this );
     }
 
     @Override
     public void startup()
     {
-        // init WLs of repositories on boot. In first "flight" we do not do any update
-        // only ack existing WLs or in case of non-existent (upgrade), we just mark those
-        // reposes as noscrape. First the hosted+proxy reposes are processed, and they
-        // are gathered into a list that we know they need-update (have no WL at all)
-        // 2nd pass is for groups, but they are NOT collected for updates.
-        // Finally, those collected for update will get update bg jobs spawned.
+        bootSequenceDone = false;
 
-        // All this is important for 1st boot only, as on subsequent boot WLs will be already
-        // present and just event will be published.
-        // hosted + proxies get inited first, collect those needing update
-        // those will be all on upgrade, and none on subsequent boots
-        final ArrayList<MavenRepository> needUpdateRepositories = new ArrayList<MavenRepository>();
+        if ( config.isFeatureActive() )
         {
-            final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
-            initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
-            initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
-            for ( MavenRepository mavenRepository : initableRepositories )
+            // init WLs of repositories on boot. In first "flight" we do not do any update
+            // only ack existing WLs or in case of non-existent (upgrade), we just mark those
+            // reposes as noscrape. First the hosted+proxy reposes are processed, and they
+            // are gathered into a list that we know they need-update (have no WL at all)
+            // 2nd pass is for groups, but they are NOT collected for updates.
+            // Finally, those collected for update will get update bg jobs spawned.
+
+            // All this is important for 1st boot only, as on subsequent boot WLs will be already
+            // present and just event will be published.
+            // hosted + proxies get inited first, collect those needing update
+            // those will be all on upgrade, and none on subsequent boots
+            final ArrayList<MavenRepository> needUpdateRepositories = new ArrayList<MavenRepository>();
             {
-                if ( isMavenRepositorySupported( mavenRepository )
-                    && mavenRepository.getLocalStatus().shouldServiceRequest() )
+                final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
+                initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
+                initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
+                for ( MavenRepository mavenRepository : initableRepositories )
                 {
-                    if ( doInitializePrefixFileOnStartup( mavenRepository ) )
+                    if ( isMavenRepositorySupported( mavenRepository )
+                        && mavenRepository.getLocalStatus().shouldServiceRequest() )
                     {
-                        // collect those marked as need-update
-                        needUpdateRepositories.add( mavenRepository );
+                        if ( doInitializePrefixFileOnStartup( mavenRepository ) )
+                        {
+                            // collect those marked as need-update
+                            needUpdateRepositories.add( mavenRepository );
+                        }
                     }
                 }
             }
-        }
-        // groups get inited next, this mostly means they will be marked as noscrape on upgraded instances,
-        // and just a published event will be fired on consequent boots
-        {
-            final ArrayList<MavenRepository> initableGroupRepositories = new ArrayList<MavenRepository>();
-            initableGroupRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenGroupRepository.class ) );
-            for ( MavenRepository mavenRepository : initableGroupRepositories )
+            // groups get inited next, this mostly means they will be marked as noscrape on upgraded instances,
+            // and just a published event will be fired on consequent boots
             {
-                if ( isMavenRepositorySupported( mavenRepository )
-                    && mavenRepository.getLocalStatus().shouldServiceRequest() )
+                final ArrayList<MavenRepository> initableGroupRepositories = new ArrayList<MavenRepository>();
+                initableGroupRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenGroupRepository.class ) );
+                for ( MavenRepository mavenRepository : initableGroupRepositories )
                 {
-                    // groups will not be collected to needs-update list
-                    doInitializePrefixFileOnStartup( mavenRepository );
+                    if ( isMavenRepositorySupported( mavenRepository )
+                        && mavenRepository.getLocalStatus().shouldServiceRequest() )
+                    {
+                        // groups will not be collected to needs-update list
+                        doInitializePrefixFileOnStartup( mavenRepository );
+                    }
                 }
             }
-        }
-        // spawn all the needed updates as bg jobs
-        // these will maintaing groups too as needed
-        for ( MavenRepository mavenRepository : needUpdateRepositories )
-        {
-            updatePrefixFile( mavenRepository );
-        }
 
-        // schedule the "updater" that ping hourly the mayUpdateAllProxyPrefixFiles method
-        // but wait 1 minute for boot to calm down and then start
-        this.executor.scheduleAtFixedRate( new Runnable()
-        {
-            @Override
-            public void run()
+            // schedule runnable to perform boot-sequence, that as last step schedules updater that ping hourly the
+            // mayUpdateProxyWhitelist method
+            // boot-sequence will run and handle on-boot-updates for repositories collected into list above.
+            // This all happens in periodicUpdater to not defer boot sequence in case
+            // when upgrade happens on larger instance (as then potentially many hosted/proxy reposes
+            // will need prefix file to be built)
+            executor.execute( new Runnable()
             {
-                mayUpdateAllProxyPrefixFiles();
-            }
-        }, TimeUnit.MINUTES.toMillis( 1 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
-        // register event dispatcher, to start receiving events
-        eventBus.register( eventDispatcher );
+                @Override
+                public void run()
+                {
+                    // perform possible updates, create prefix files for hosted and proxy reposes
+                    try
+                    {
+                        for ( MavenRepository mavenRepository : needUpdateRepositories )
+                        {
+                            try
+                            {
+                                updatePrefixFile( mavenRepository );
+                            }
+                            catch ( Exception e )
+                            {
+                                getLogger().warn( "Could not perform initial WL build or repository {}",
+                                    mavenRepository, e );
+                            }
+                        }
+
+                        // after that, schedule a new "updater" runnable that with
+                        // periodically perform updates to proxy reposes only
+                        executor.scheduleAtFixedRate( new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
+                                {
+                                    // this might happen on periodic call AFTER nexus shutdown was commenced
+                                    // or BEFORE nexus booted, if some other plugin/subsystem delays boot for some
+                                    // reason.
+                                    // None of those is a problem, in latter case we will do what we need in next tick.
+                                    // In former case,
+                                    // we should not do anything anyway, we are being shut down.
+                                    getLogger().debug( "Nexus not yet started, bailing out" );
+                                    return;
+                                }
+                                mayUpdateAllProxyPrefixFiles();
+                            }
+                        }, TimeUnit.HOURS.toMillis( 1 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
+                    }
+                    finally
+                    {
+                        bootSequenceDone = true;
+                    }
+                }
+            } );
+
+            // register event dispatcher, to start receiving events
+            eventBus.register( eventDispatcher );
+        }
+        else
+        {
+            bootSequenceDone = true;
+        }
     }
 
     @Override
@@ -554,11 +609,16 @@ public class ManagerImpl
      * Is visible to expose over the nexus-it-helper-plugin only, and UTs are using this. Should not be used for other
      * means.
      * 
-     * @return {@code true} if there are prefix file update jobs running.
+     * @return {@code true} if there are prefix file update jobs running, or boot of feature not yet finished.
      */
     @VisibleForTesting
     public boolean isUpdatePrefixFileJobRunning()
     {
+        if ( !bootSequenceDone )
+        {
+            getLogger().debug( "Boot update sequence not done yet" );
+            return true;
+        }
         final Statistics statistics = constrainedExecutor.getStatistics();
         getLogger().debug( "Running update jobs for {}", statistics.getCurrentlyRunningJobKeys() );
         return !statistics.getCurrentlyRunningJobKeys().isEmpty();

@@ -76,6 +76,7 @@ public class DisabledSmokeIT
         // public
         final Status publicStatus = routing().getStatus( "public" );
         assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
+        assertThat( publicStatus.getDiscoveryStatus(), is( nullValue() ) );
     }
 
     @Test
@@ -83,7 +84,7 @@ public class DisabledSmokeIT
     {
         // releases
         final Status releasesStatus = routing().getStatus( "releases" );
-        assertThat( releasesStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( releasesStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
         assertThat( releasesStatus.getDiscoveryStatus(), is( nullValue() ) );
     }
 
