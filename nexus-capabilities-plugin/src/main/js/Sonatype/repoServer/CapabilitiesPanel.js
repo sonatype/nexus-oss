@@ -226,7 +226,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         url : CAPABILITIES_SERVICE_PATH,
         reader : this.capabilitiesReader,
         sortInfo : {
-          field : 'description',
+          field : 'typeName',
           direction : 'ASC'
         },
         autoLoad : true
@@ -438,7 +438,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         // grid view options
         ds : this.capabilitiesDataStore,
         sortInfo : {
-          field : 'description',
+          field : 'typeName',
           direction : "ASC"
         },
         loadMask : true,
