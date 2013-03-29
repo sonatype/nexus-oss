@@ -275,11 +275,13 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
 
         mgr.removeMemberRepositoryId( HOSTED1_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
+        waitForRoutingBackgroundUpdates();
 
         assertThat( wlUpdateListener.getPublished(), contains( GROUP1_REPO_ID, GROUP2_REPO_ID ) );
 
         mgr.addMemberRepositoryId( HOSTED1_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
+        waitForRoutingBackgroundUpdates();
 
         assertThat( wlUpdateListener.getPublished(),
             contains( GROUP1_REPO_ID, GROUP2_REPO_ID, GROUP1_REPO_ID, GROUP2_REPO_ID ) );
@@ -300,11 +302,13 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
         mgr.removeMemberRepositoryId( GROUP1_REPO_ID );
         mgr.addMemberRepositoryId( HOSTED1_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
+        waitForRoutingBackgroundUpdates();
 
         assertThat( wlUpdateListener.getPublished(), contains( GROUP2_REPO_ID ) );
 
         mgr.addMemberRepositoryId( HOSTED2_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
+        waitForRoutingBackgroundUpdates();
 
         assertThat( wlUpdateListener.getPublished(),
             contains( GROUP2_REPO_ID, GROUP2_REPO_ID ) );
