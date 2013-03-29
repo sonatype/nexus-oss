@@ -435,12 +435,15 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
               disabled : !this.sp.checkPermission('nexus:capabilities', this.sp.DELETE)
             }],
 
-        // grid view options
+        // FIXME: Extjs 3.4 has no ds or sortInfo configuration, where does this come from and how does it work?
+        // FIXME: In the case of sorting this configuration does nothing AFAICT, the config is on the store
         ds : this.capabilitiesDataStore,
         sortInfo : {
           field : 'typeName',
           direction : "ASC"
         },
+        // FIXME: ^^^^
+
         loadMask : true,
         deferredRender : false,
         columns : [
