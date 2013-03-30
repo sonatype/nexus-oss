@@ -76,8 +76,17 @@ public class RemoteContentDiscovererImpl
             try
             {
                 final StrategyResult strategyResult = strategy.discover( mavenProxyRepository );
-                discoveryResult.recordSuccess( strategy.getId(), strategyResult.getMessage(),
-                    strategyResult.getPrefixSource() );
+                if ( strategyResult.isRoutingEnabled() )
+                {
+                    discoveryResult.recordSuccess( strategy.getId(), strategyResult.getMessage(),
+                                                   strategyResult.getPrefixSource() );
+                }
+                else
+                {
+                    // the strategy explicitly requested to disable automatic routing for the repository
+                    discoveryResult.recordFailure( strategy.getId(), strategyResult.getMessage() );
+                    break;
+                }
             }
             catch ( StrategyFailedException e )
             {

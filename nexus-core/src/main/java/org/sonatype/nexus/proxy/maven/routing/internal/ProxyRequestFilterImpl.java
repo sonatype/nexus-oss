@@ -108,7 +108,7 @@ public class ProxyRequestFilterImpl
         try
         {
             final PrefixSource prefixSource = manager.getPrefixSourceFor( mavenProxyRepository );
-            if ( prefixSource.exists() )
+            if ( prefixSource.supported() )
             {
                 final PathMatcher pathMatcher = new PathMatcher( prefixSource.readEntries(), Integer.MAX_VALUE );
                 pathMatchers.put( mavenProxyRepository.getId(), pathMatcher );

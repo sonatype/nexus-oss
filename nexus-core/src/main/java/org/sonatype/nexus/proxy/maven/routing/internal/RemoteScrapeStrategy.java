@@ -25,10 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.util.EntityUtils;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
@@ -106,11 +103,6 @@ public class RemoteScrapeStrategy
             httpClientManager.create( mavenProxyRepository, mavenProxyRepository.getRemoteStorageContext() );
         final ScrapeContext context =
             new ScrapeContext( mavenProxyRepository, httpClient, config.getRemoteScrapeDepth() );
-        if ( isMarkedForNoScrape( context ) )
-        {
-            getLogger().debug( "Remote {} marked as no-scrape, giving up.", mavenProxyRepository );
-            throw new StrategyFailedException( "Remote forbids scraping, is flagged as \"no-scrape\"." );
-        }
         final Page rootPage = Page.getPageFor( context, remoteRepositoryRootUrl );
         final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
         Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
@@ -124,7 +116,7 @@ public class RemoteScrapeStrategy
                 {
                     getLogger().debug( "Remote scraping {} with Scraper {} succeeded.", mavenProxyRepository,
                         scraper.getId() );
-                    return new StrategyResult( context.getMessage(), context.getPrefixSource() );
+                    return new StrategyResult( context.getMessage(), context.getPrefixSource(), true );
                 }
                 else
                 {
@@ -138,36 +130,5 @@ public class RemoteScrapeStrategy
 
         getLogger().debug( "Not possible remote scrape of {}, no scraper succeeded.", mavenProxyRepository );
         throw new StrategyFailedException( "No scraper was able to scrape remote (or remote prevents scraping)." );
-    }
-
-    // ==
-
-    protected boolean isMarkedForNoScrape( final ScrapeContext context )
-        throws IOException
-    {
-        String noscrapeFlag = config.getRemoteNoScrapeFlagPath();
-        while ( noscrapeFlag.startsWith( "/" ) )
-        {
-            noscrapeFlag = noscrapeFlag.substring( 1 );
-        }
-        final String flagRemoteUrl = context.getRemoteRepositoryRootUrl() + noscrapeFlag;
-        HttpResponse response = null;
-        try
-        {
-            final HttpHead head = new HttpHead( flagRemoteUrl );
-            response = context.executeHttpRequest( head );
-            if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 300 )
-            {
-                return true;
-            }
-        }
-        finally
-        {
-            if ( response != null )
-            {
-                EntityUtils.consumeQuietly( response.getEntity() );
-            }
-        }
-        return false;
     }
 }

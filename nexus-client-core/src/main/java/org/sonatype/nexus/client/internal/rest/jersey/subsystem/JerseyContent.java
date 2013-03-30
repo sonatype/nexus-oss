@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkState;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.ws.rs.core.Response;
 
@@ -131,6 +132,13 @@ public class JerseyContent
         download( location, toUri( location, directive ), target );
     }
 
+    @Override
+    public void downloadWith( Location location, Directive directive, OutputStream target )
+        throws IOException
+    {
+        download( location, toUri( location, directive ), target );
+    }
+
     protected void download( final Location location, final String uri, final File target )
         throws IOException
     {
@@ -146,6 +154,21 @@ public class JerseyContent
                 target.getAbsolutePath() );
         }
 
+        FileOutputStream fos = null;
+        try
+        {
+            fos = new FileOutputStream( target );
+            download( location, uri, fos );
+        }
+        finally
+        {
+            IOUtil.close( fos );
+        }
+    }
+
+    protected void download( final Location location, final String uri, final OutputStream target )
+        throws IOException
+    {
         try
         {
             final ClientResponse response = getNexusClient().uri( uri ).get( ClientResponse.class );
@@ -166,16 +189,13 @@ public class JerseyContent
                 } );
             }
 
-            FileOutputStream fos = null;
             try
             {
-                fos = new FileOutputStream( target );
-                IOUtil.copy( response.getEntityInputStream(), fos );
+                IOUtil.copy( response.getEntityInputStream(), target );
             }
             finally
             {
                 response.close();
-                IOUtil.close( fos );
             }
         }
         catch ( ClientHandlerException e )

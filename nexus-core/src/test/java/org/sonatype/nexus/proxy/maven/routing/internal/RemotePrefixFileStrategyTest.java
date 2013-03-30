@@ -224,7 +224,7 @@ public class RemotePrefixFileStrategyTest
                 equalTo( "Remote publishes prefix file (is less than a day old), using it." ) );
 
             final PrefixSource entrySource = result.getPrefixSource();
-            assertThat( entrySource.exists(), is( true ) );
+            assertThat( entrySource.supported(), is( true ) );
             assertThat( entrySource.readEntries(), contains( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite" ) );
             assertThat( entrySource.readEntries().size(), equalTo( 3 ) );
         }
@@ -265,7 +265,7 @@ public class RemotePrefixFileStrategyTest
                 equalTo( "Remote publishes prefix file (is less than a day old), using it." ) );
 
             final PrefixSource entrySource = result.getPrefixSource();
-            assertThat( entrySource.exists(), is( true ) );
+            assertThat( entrySource.supported(), is( true ) );
             assertThat( entrySource.readEntries(), contains( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite" ) );
             assertThat( entrySource.readEntries().size(), equalTo( 3 ) );
         }

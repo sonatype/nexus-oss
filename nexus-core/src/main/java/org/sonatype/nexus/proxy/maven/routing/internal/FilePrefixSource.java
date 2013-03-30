@@ -32,9 +32,9 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.WritablePrefixSource;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -133,6 +133,33 @@ public class FilePrefixSource
     }
 
     @Override
+    public boolean supported()
+    {
+        try
+        {
+            return doReadProtected( new Callable<Boolean>()
+            {
+                @Override
+                public Boolean call()
+                    throws IOException
+                {
+                    StorageFileItem file = getFileItem();
+                    if ( file != null )
+                    {
+                        return getPrefixSourceMarshaller().read( file ).supported();
+                    }
+                    return false;
+                }
+            } );
+        }
+        catch ( IOException e )
+        {
+            // bam
+        }
+        return false;
+    }
+
+    @Override
     public long getLostModifiedTimestamp()
     {
         try
@@ -177,7 +204,7 @@ public class FilePrefixSource
                 {
                     return null;
                 }
-                return getPrefixSourceMarshaller().read( file );
+                return getPrefixSourceMarshaller().read( file ).entries();
             }
         } );
     }
@@ -317,5 +344,13 @@ public class FilePrefixSource
         {
             // ignore
         }
+    }
+
+    public void writeUnsupported()
+        throws IOException
+    {
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        getPrefixSourceMarshaller().writeUnsupported( bos );
+        putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
     }
 }

@@ -176,7 +176,8 @@ public interface Manager
 
     /**
      * Returns {@link PrefixSource} for given {@link MavenRepository}.For the existence of the WL in question (if you
-     * want to read it), check {@link PrefixSource#exists()} method! Never returns {@code null}.
+     * want to read it), check {@link PrefixSource#exists()} and {@link PrefixSource#supported()} method! Never returns
+     * {@code null}.
      * 
      * @param mavenRepository
      * @return the {@link PrefixSource} for given repository.

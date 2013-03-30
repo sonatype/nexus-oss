@@ -49,8 +49,6 @@ public class ConfigImpl
      */
     public static final String FEATURE_ACTIVE_KEY = Config.class.getName() + ".featureActive";
 
-    private static final String LOCAL_NO_SCRAPE_FLAG_PATH = "/.meta/noscrape.txt";
-
     private static final String LOCAL_PREFIX_FILE_PATH = "/.meta/prefixes.txt";
 
     private static final int REMOTE_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( Config.class.getName()
@@ -95,21 +93,9 @@ public class ConfigImpl
     }
 
     @Override
-    public String getLocalNoScrapeFlagPath()
-    {
-        return LOCAL_NO_SCRAPE_FLAG_PATH;
-    }
-
-    @Override
     public String getLocalPrefixFilePath()
     {
         return LOCAL_PREFIX_FILE_PATH;
-    }
-
-    @Override
-    public String getRemoteNoScrapeFlagPath()
-    {
-        return LOCAL_NO_SCRAPE_FLAG_PATH;
     }
 
     @Override

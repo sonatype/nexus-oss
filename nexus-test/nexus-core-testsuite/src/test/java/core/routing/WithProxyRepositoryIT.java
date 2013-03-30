@@ -15,12 +15,14 @@ package core.routing;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.content.Content.Directive;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
@@ -58,12 +60,16 @@ public class WithProxyRepositoryIT
 
     private final Location PREFIX_FILE_LOCATION = Location.repositoryLocation( REPO_ID, "/.meta/prefixes.txt" );
 
-    private final Location NOSCRAPE_FILE_LOCATION = Location.repositoryLocation( REPO_ID, "/.meta/noscrape.txt" );
-
     protected boolean exists( final Location location )
         throws IOException
     {
-        return content().existsWith( location, Directive.LOCAL_ONLY );
+        return exists( location, Directive.LOCAL_ONLY );
+    }
+
+    protected boolean noscrape( final Location location )
+        throws IOException
+    {
+        return noscrape( location, Directive.LOCAL_ONLY );
     }
 
     @Test
@@ -74,7 +80,7 @@ public class WithProxyRepositoryIT
         routingTest().waitForAllRoutingUpdateJobToStop();
         // waitForWLDiscoveryOutcome( REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 
     @Test
@@ -82,7 +88,7 @@ public class WithProxyRepositoryIT
         throws Exception
     {
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         {
             final DiscoveryConfiguration config = routing().getDiscoveryConfigurationFor( REPO_ID );
             config.setEnabled( false );
@@ -90,8 +96,8 @@ public class WithProxyRepositoryIT
             routingTest().waitForAllRoutingUpdateJobToStop();
             // waitForWLDiscoveryOutcome( REPO_ID );
         }
-        assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
+        assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( true ) );
         {
             final DiscoveryConfiguration config = routing().getDiscoveryConfigurationFor( REPO_ID );
             config.setEnabled( true );
@@ -100,7 +106,7 @@ public class WithProxyRepositoryIT
             // waitForWLDiscoveryOutcome( REPO_ID );
         }
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 
     @Test
@@ -109,16 +115,16 @@ public class WithProxyRepositoryIT
     {
         // we did no any waiting, e just booted nexus, so it must be present
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         content().delete( PREFIX_FILE_LOCATION );
         routingTest().waitForAllRoutingUpdateJobToStop();
         // waitForWLDiscoveryOutcome( REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         routing().updatePrefixFile( REPO_ID );
         routingTest().waitForAllRoutingUpdateJobToStop();
         // waitForWLDiscoveryOutcome( REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 }

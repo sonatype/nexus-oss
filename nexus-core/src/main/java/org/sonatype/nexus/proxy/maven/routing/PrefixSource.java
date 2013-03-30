@@ -32,6 +32,12 @@ public interface PrefixSource
     boolean exists();
 
     /**
+     * Returns {@code true} if automatic routing is supported. Automatic routing is considered unsupported if
+     * {@link #exists()} returns {@code false}.
+     */
+    boolean supported();
+
+    /**
      * Reads entries for this source, of {@code null} if not exists ({@link #exists()} returns {@code false} in this
      * case).
      * 

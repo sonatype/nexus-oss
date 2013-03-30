@@ -31,17 +31,12 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -49,20 +44,20 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryConfig;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus;
-import org.sonatype.nexus.proxy.maven.routing.Manager;
-import org.sonatype.nexus.proxy.maven.routing.PublishingStatus;
-import org.sonatype.nexus.proxy.maven.routing.RoutingStatus;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus.DStatus;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
+import org.sonatype.nexus.proxy.maven.routing.PublishingStatus;
 import org.sonatype.nexus.proxy.maven.routing.PublishingStatus.PStatus;
+import org.sonatype.nexus.proxy.maven.routing.RoutingStatus;
 import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult;
+import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.routing.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
-import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFilePublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFileUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -71,7 +66,6 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.task.LoggingProgressListener;
@@ -350,7 +344,7 @@ public class ManagerImpl
         final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
         try
         {
-            if ( prefixSource.exists() )
+            if ( prefixSource.supported() )
             {
                 // good, we assume is up to date, which should be unless user tampered with it
                 // in that case, just delete it + update and should be fixed.
@@ -501,7 +495,7 @@ public class ManagerImpl
             constrainedExecutor.cancelRunningWithKey( mavenProxyRepository.getId() );
             final PrefixSource prefixSource =
                 updateProxyPrefixFile( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
-            if ( prefixSource != null )
+            if ( prefixSource != null && prefixSource.supported() )
             {
                 getLogger().info( "Updated and published prefix file of {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
@@ -649,7 +643,7 @@ public class ManagerImpl
                     RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
                 return;
             }
-            if ( prefixSource != null )
+            if ( prefixSource != null && prefixSource.supported() )
             {
                 if ( notify )
                 {
@@ -790,7 +784,7 @@ public class ManagerImpl
                     lock.lock( Action.read );
                     try
                     {
-                        if ( !memberEntrySource.exists() )
+                        if ( !memberEntrySource.supported() )
                         {
                             allMembersHavePublished = false;
                             break;
@@ -833,7 +827,7 @@ public class ManagerImpl
 
         // publish status
         final FilePrefixSource publishedEntrySource = getPrefixSourceFor( mavenRepository );
-        if ( !publishedEntrySource.exists() )
+        if ( !publishedEntrySource.supported() )
         {
             final String message;
             if ( isMavenRepositorySupported( mavenRepository ) )
@@ -849,7 +843,7 @@ public class ManagerImpl
                         if ( null != memberMavenRepository )
                         {
                             final PrefixSource ps = getPrefixSourceFor( memberMavenRepository );
-                            if ( !ps.exists() )
+                            if ( !ps.supported() )
                             {
                                 membersWithoutPrefixFiles.add( memberMavenRepository.getName() );
                             }
@@ -1002,7 +996,7 @@ public class ManagerImpl
         lock.lock( Action.read );
         try
         {
-            if ( !prefixSource.exists() )
+            if ( !prefixSource.supported() )
             {
                 return false;
             }
@@ -1051,7 +1045,7 @@ public class ManagerImpl
         lock.lock( Action.read );
         try
         {
-            if ( !prefixSource.exists() )
+            if ( !prefixSource.supported() )
             {
                 return false;
             }
@@ -1111,9 +1105,6 @@ public class ManagerImpl
             throw e;
         }
 
-        // unset noscrape flag
-        removeNoscrapeFlag( mavenRepository );
-
         // event
         eventBus.post( new PrefixFilePublishedRepositoryEvent( mavenRepository, prefixesFile ) );
 
@@ -1134,15 +1125,7 @@ public class ManagerImpl
     protected void unpublish( final MavenRepository mavenRepository, final boolean propagate )
         throws IOException
     {
-        // delete (if any) published files, even those that user might manually put there
-        getPrefixSourceFor( mavenRepository ).delete();
-
-        // TODO: We do this due to RemotePrefixFileStrategy, but this is now scattered (that one may write these file,
-        // and here we are cleaning them)
-        new FilePrefixSource( mavenRepository, config.getRemotePrefixFilePath(), config ).delete();
-
-        // set noscrape flag
-        addNoscrapeFlag( mavenRepository );
+        getPrefixSourceFor( mavenRepository ).writeUnsupported();
 
         // event
         eventBus.post( new PrefixFileUnpublishedRepositoryEvent( mavenRepository ) );
@@ -1168,56 +1151,6 @@ public class ManagerImpl
                 // to avoid deadlocks we push group prefix file update to another thread
                 doUpdatePrefixFileAsync( true, containingGroupRepository );
             }
-        }
-    }
-
-    // ==
-
-    protected void addNoscrapeFlag( final MavenRepository mavenRepository )
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        final DefaultStorageFileItem file =
-            new DefaultStorageFileItem( mavenRepository, new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() ),
-                true, true, new StringContentLocator( "noscrape" ) );
-        try
-        {
-            mavenRepository.storeItem( true, file );
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
-        }
-    }
-
-    @SuppressWarnings( "deprecation" )
-    protected void removeNoscrapeFlag( final MavenRepository mavenRepository )
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        try
-        {
-            mavenRepository.deleteItem( true, request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
         }
     }
 

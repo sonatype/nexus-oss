@@ -57,12 +57,16 @@ public class WithHostedRepositoryIT
 
     private final Location PREFIX_FILE_LOCATION = Location.repositoryLocation( REPO_ID, "/.meta/prefixes.txt" );
 
-    private final Location NOSCRAPE_FILE_LOCATION = Location.repositoryLocation( REPO_ID, "/.meta/noscrape.txt" );
-
     protected boolean exists( final Location location )
         throws IOException
     {
-        return content().exists( location );
+        return exists( location, null );
+    }
+
+    protected boolean noscrape( final Location location )
+        throws IOException
+    {
+        return noscrape( location, null );
     }
 
     @Test
@@ -71,7 +75,7 @@ public class WithHostedRepositoryIT
     {
         // we did no any waiting, e just booted nexus, so it must be present
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 
     /**
@@ -84,15 +88,15 @@ public class WithHostedRepositoryIT
     {
         // we did no any waiting, e just booted nexus, so it must be present
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         content().delete( PREFIX_FILE_LOCATION );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         // cannot reboot nexus, this below does not work
         nexus().stop();
         nexus().start();
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 
     @Test
@@ -101,13 +105,13 @@ public class WithHostedRepositoryIT
     {
         // we did no any waiting, e just booted nexus, so it must be present
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         content().delete( PREFIX_FILE_LOCATION );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) ); // autorouting state is unknown
         routing().updatePrefixFile( REPO_ID );
         routingTest().waitForAllRoutingUpdateJobToStop();
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 }

@@ -264,6 +264,12 @@ public class WritablePrefixSourceModifierTest
         }
 
         @Override
+        public boolean supported()
+        {
+            return exists();
+        }
+
+        @Override
         public List<String> readEntries()
             throws IOException
         {

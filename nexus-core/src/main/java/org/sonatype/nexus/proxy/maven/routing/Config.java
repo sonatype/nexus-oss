@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven.routing;
 
-
 /**
- * WL Configuration.
+ * Automatic routing configuration.
  * 
  * @author cstamas
  * @since 2.4
@@ -32,25 +31,11 @@ public interface Config
     boolean isFeatureActive();
 
     /**
-     * Returns the "no scrape" file path used for flagging a repository to not be scraped.
-     * 
-     * @return the no scrape file path.
-     */
-    String getLocalNoScrapeFlagPath();
-
-    /**
      * Returns the local file path to publish prefix file.
      * 
      * @return the prefix file path.
      */
     String getLocalPrefixFilePath();
-
-    /**
-     * Returns the path that should be checked for published no scrape flag on remote.
-     * 
-     * @return the array of paths to have checked on remote.
-     */
-    String getRemoteNoScrapeFlagPath();
 
     /**
      * Returns the path that should be checked for published prefix file on remote.

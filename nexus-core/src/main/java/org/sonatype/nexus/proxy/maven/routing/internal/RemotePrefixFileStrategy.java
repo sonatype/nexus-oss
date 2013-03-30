@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
+import org.sonatype.nexus.proxy.maven.routing.internal.TextFilePrefixSourceMarshaller.Result;
 
 /**
  * Remote prefix file strategy.
@@ -82,23 +83,22 @@ public class RemotePrefixFileStrategy
             {
                 getLogger().debug( "Remote prefix on {} at path {} found!", mavenProxyRepository, path );
                 long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
-                final PrefixSource prefixSource = createPrefixSource( mavenProxyRepository, path );
-                if ( prefixSource != null )
+                Result unmarshalled = new TextFilePrefixSourceMarshaller( config ).read( item );
+                if ( !unmarshalled.supported() )
                 {
-                    if ( prefixFileAgeInDays < 1 )
-                    {
-                        return new StrategyResult(
-                            "Remote publishes prefix file (is less than a day old), using it.", prefixSource );
-                    }
-                    else
-                    {
-                        return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
-                            + " days old), using it.", prefixSource );
-                    }
+                    return new StrategyResult( "Remote disabled automatic routing", null, false );
+                }
+
+                final PrefixSource prefixSource = new ArrayListPrefixSource( unmarshalled.entries() );
+                if ( prefixFileAgeInDays < 1 )
+                {
+                    return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
+                                               prefixSource, true );
                 }
                 else
                 {
-                    getLogger().info( "Prefix file retrieved from {} is corrupt, skipping it.", item.getRemoteUrl() );
+                    return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
+                        + " days old), using it.", prefixSource, true );
                 }
             }
         }
@@ -106,26 +106,10 @@ public class RemotePrefixFileStrategy
         {
             uid.getLock().unlock();
         }
-        throw new StrategyFailedException( "Remote does not publish prefix files on paths " + path );
+        throw new StrategyFailedException( "Remote does not publish prefix files on path " + path );
     }
 
     // ==
-
-    protected FilePrefixSource createPrefixSource( final MavenProxyRepository mavenProxyRepository, final String path )
-        throws IOException
-    {
-        final FilePrefixSource result = new FilePrefixSource( mavenProxyRepository, path, config );
-        try
-        {
-            result.readEntries();
-        }
-        catch ( InvalidInputException e )
-        {
-            result.delete();
-            throw e;
-        }
-        return result;
-    }
 
     protected StorageFileItem retrieveFromRemoteIfExists( final MavenProxyRepository mavenProxyRepository,
                                                           final String path )
