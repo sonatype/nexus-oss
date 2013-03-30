@@ -213,11 +213,6 @@ public class FilePrefixSource
     public void writeEntries( final PrefixSource prefixSource )
         throws IOException
     {
-        if ( prefixSource instanceof FilePrefixSource && equals( (FilePrefixSource) prefixSource ) )
-        {
-            // we would read and then write to the same file, don't do it
-            return;
-        }
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         getPrefixSourceMarshaller().write( prefixSource.readEntries(), bos );
         putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
