@@ -1166,18 +1166,10 @@ public class ManagerImpl
             containingGroupRepository = groupRepository.adaptToFacet( MavenGroupRepository.class );
             if ( mavenRepository != null )
             {
-                try
-                {
-                    // this is a group, so we go with sync method as this is quick
-                    updateAndPublishPrefixFile( containingGroupRepository, false );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn(
-                        "Problem while cascading prefix file update to group repository {} from it's member {}",
-                        RepositoryStringUtils.getHumanizedNameString( containingGroupRepository ),
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-                }
+                // this method is invoked while holding write lock on mavenRepository
+                // group prefix file will need read lock on all members
+                // to avoid deadlocks we push group prefix file update to another thread
+                doUpdatePrefixFileAsync( true, containingGroupRepository );
             }
         }
     }
