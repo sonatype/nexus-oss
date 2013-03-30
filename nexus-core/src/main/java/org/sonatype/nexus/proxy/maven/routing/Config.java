@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.routing;
 
-import java.util.List;
 
 /**
  * WL Configuration.
@@ -47,18 +46,18 @@ public interface Config
     String getLocalPrefixFilePath();
 
     /**
-     * Returns the paths that should be checked for published no scrape flags on remote.
+     * Returns the path that should be checked for published no scrape flag on remote.
      * 
      * @return the array of paths to have checked on remote.
      */
-    List<String> getRemoteNoScrapeFlagPaths();
+    String getRemoteNoScrapeFlagPath();
 
     /**
-     * Returns the paths that should be checked for published prefix files on remote.
+     * Returns the path that should be checked for published prefix file on remote.
      * 
      * @return the array of paths to have checked on remote.
      */
-    List<String> getRemotePrefixFilePaths();
+    String getRemotePrefixFilePath();
 
     /**
      * Returns the depth (directory depth) that remote scrape should dive in.

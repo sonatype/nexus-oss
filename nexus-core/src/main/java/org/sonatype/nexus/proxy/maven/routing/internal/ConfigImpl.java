@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -55,12 +52,6 @@ public class ConfigImpl
     private static final String LOCAL_NO_SCRAPE_FLAG_PATH = "/.meta/noscrape.txt";
 
     private static final String LOCAL_PREFIX_FILE_PATH = "/.meta/prefixes.txt";
-
-    private static final String[] EXTRA_REMOTE_NO_SCRAPE_FLAG_PATHS =
-        SystemPropertiesHelper.getStringlist( Config.class.getName() + ".extraRemoteNoscrapeFlagPaths" );
-
-    private static final String[] EXTRA_REMOTE_PREFIX_FILE_PATHS =
-        SystemPropertiesHelper.getStringlist( Config.class.getName() + ".extraRemotePrefixFilePaths" );
 
     private static final int REMOTE_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( Config.class.getName()
         + ".remoteScrapeDepth", 2 );
@@ -116,33 +107,15 @@ public class ConfigImpl
     }
 
     @Override
-    public List<String> getRemoteNoScrapeFlagPaths()
+    public String getRemoteNoScrapeFlagPath()
     {
-        final ArrayList<String> result = new ArrayList<String>();
-        result.add( LOCAL_NO_SCRAPE_FLAG_PATH );
-        for ( String extra : EXTRA_REMOTE_NO_SCRAPE_FLAG_PATHS )
-        {
-            if ( extra != null && extra.trim().length() > 0 )
-            {
-                result.add( extra );
-            }
-        }
-        return result;
+        return LOCAL_NO_SCRAPE_FLAG_PATH;
     }
 
     @Override
-    public List<String> getRemotePrefixFilePaths()
+    public String getRemotePrefixFilePath()
     {
-        final ArrayList<String> result = new ArrayList<String>();
-        result.add( LOCAL_PREFIX_FILE_PATH );
-        for ( String extra : EXTRA_REMOTE_PREFIX_FILE_PATHS )
-        {
-            if ( extra != null && extra.trim().length() > 0 )
-            {
-                result.add( extra );
-            }
-        }
-        return result;
+        return LOCAL_PREFIX_FILE_PATH;
     }
 
     @Override

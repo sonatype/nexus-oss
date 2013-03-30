@@ -145,30 +145,27 @@ public class RemoteScrapeStrategy
     protected boolean isMarkedForNoScrape( final ScrapeContext context )
         throws IOException
     {
-        final List<String> noscrapeFlags = config.getRemoteNoScrapeFlagPaths();
-        for ( String noscrapeFlag : noscrapeFlags )
+        String noscrapeFlag = config.getRemoteNoScrapeFlagPath();
+        while ( noscrapeFlag.startsWith( "/" ) )
         {
-            while ( noscrapeFlag.startsWith( "/" ) )
+            noscrapeFlag = noscrapeFlag.substring( 1 );
+        }
+        final String flagRemoteUrl = context.getRemoteRepositoryRootUrl() + noscrapeFlag;
+        HttpResponse response = null;
+        try
+        {
+            final HttpHead head = new HttpHead( flagRemoteUrl );
+            response = context.executeHttpRequest( head );
+            if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 300 )
             {
-                noscrapeFlag = noscrapeFlag.substring( 1 );
+                return true;
             }
-            final String flagRemoteUrl = context.getRemoteRepositoryRootUrl() + noscrapeFlag;
-            HttpResponse response = null;
-            try
+        }
+        finally
+        {
+            if ( response != null )
             {
-                final HttpHead head = new HttpHead( flagRemoteUrl );
-                response = context.executeHttpRequest( head );
-                if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 300 )
-                {
-                    return true;
-                }
-            }
-            finally
-            {
-                if ( response != null )
-                {
-                    EntityUtils.consumeQuietly( response.getEntity() );
-                }
+                EntityUtils.consumeQuietly( response.getEntity() );
             }
         }
         return false;

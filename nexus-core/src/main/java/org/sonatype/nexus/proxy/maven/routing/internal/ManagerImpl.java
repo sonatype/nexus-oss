@@ -1139,10 +1139,7 @@ public class ManagerImpl
 
         // TODO: We do this due to RemotePrefixFileStrategy, but this is now scattered (that one may write these file,
         // and here we are cleaning them)
-        for ( String path : config.getRemotePrefixFilePaths() )
-        {
-            new FilePrefixSource( mavenRepository, path, config ).delete();
-        }
+        new FilePrefixSource( mavenRepository, config.getRemotePrefixFilePath(), config ).delete();
 
         // set noscrape flag
         addNoscrapeFlag( mavenRepository );
