@@ -86,11 +86,9 @@ public class RoutingStatusResourceTest
     public void statusUrlHonorsRepoState()
         throws Exception
     {
-        final Manager manager = lookup( Manager.class );
-        manager.startup();
+        final RoutingStatusResource wlStatusResource = (RoutingStatusResource) lookup( PlexusResource.class, "RoutingStatusResource" );
         waitForRoutingBackgroundUpdates();
 
-        final RoutingStatusResource wlStatusResource = (RoutingStatusResource) lookup( PlexusResource.class, "RoutingStatusResource" );
         final Request request = new Request();
         request.setRootRef( new Reference( "http://localhost:8081/nexus" ) );
         request.getAttributes().put( RoutingResourceSupport.REPOSITORY_ID_KEY, REPO_ID );

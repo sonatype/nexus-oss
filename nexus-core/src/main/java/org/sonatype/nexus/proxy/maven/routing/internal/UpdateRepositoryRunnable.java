@@ -61,7 +61,8 @@ public class UpdateRepositoryRunnable
     {
         if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
         {
-            getLogger().warn( "Nexus stopped during background prefix file updates, bailing out." );
+            getLogger().warn( "Nexus stopped during background prefix file updates for {}, bailing out.",
+                              mavenRepository.toString() );
             return;
         }
         try
