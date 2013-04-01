@@ -238,8 +238,6 @@ public class ManagerImpl
         getLogger().debug( "Initializing prefix file of newly added {}", mavenRepository );
         try
         {
-            // mark it for noscrape if not marked yet
-            unpublish( mavenRepository );
             // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
             // and publish
             updatePrefixFile( mavenRepository );
