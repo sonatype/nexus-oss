@@ -872,8 +872,11 @@ public class ManagerImpl
     {
         if ( constrainedExecutor.hasRunningWithKey( mavenHostedRepository.getId() ) )
         {
-            forceUpdatePrefixFile( mavenHostedRepository );
-            return true;
+            // as of 2.4 this is only possible during initial autorouting configuration of hosted repositories
+            // any changes to prefix list performed here will be incomplete, i.e. list single path prefix
+            // and it will be overwritten when initial autorouting configuration completes
+            // although not 100% bulletproof, this logic reduces the risk of this happening
+            return false;
         }
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
@@ -921,8 +924,11 @@ public class ManagerImpl
     {
         if ( constrainedExecutor.hasRunningWithKey( mavenHostedRepository.getId() ) )
         {
-            forceUpdatePrefixFile( mavenHostedRepository );
-            return true;
+            // as of 2.4 this is only possible during initial autorouting configuration of hosted repositories
+            // any changes to prefix list performed here will be incomplete, i.e. list single path prefix
+            // and it will be overwritten when initial autorouting configuration completes
+            // although not 100% bulletproof, this logic reduces the risk of this happening
+            return false;
         }
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
