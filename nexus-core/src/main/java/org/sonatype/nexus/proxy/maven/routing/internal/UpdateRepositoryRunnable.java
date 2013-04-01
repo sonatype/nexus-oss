@@ -18,8 +18,8 @@ import java.io.IOException;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.util.task.CancelableRunnableSupport;
-import org.sonatype.nexus.util.task.ProgressListener;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnableSupport;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.ProgressListener;
 
 import com.google.common.base.Throwables;
 

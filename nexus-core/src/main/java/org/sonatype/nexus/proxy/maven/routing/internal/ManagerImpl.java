@@ -60,6 +60,10 @@ import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFilePublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFileUnpublishedRepositoryEvent;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.LoggingProgressListener;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.ConstrainedExecutor;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.ConstrainedExecutorImpl;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.Statistics;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -68,10 +72,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.NexusThreadFactory;
-import org.sonatype.nexus.util.task.LoggingProgressListener;
-import org.sonatype.nexus.util.task.executor.ConstrainedExecutor;
-import org.sonatype.nexus.util.task.executor.ConstrainedExecutorImpl;
-import org.sonatype.nexus.util.task.executor.Statistics;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -81,6 +81,25 @@ import com.google.common.eventbus.Subscribe;
 
 /**
  * Default implementation.
+ * <p>
+ * Notes on synchronization. As of 2.4,
+ * <ul>
+ * <li>periodic autorouting metadata updates are performed without holding any locks on path prefix file (i.e.
+ * .meta/prefixes.txt). Instead, ConstrainedExecutor is used to avoid multiple concurrent execution of periodic
+ * autorouting metadata updates. If new periodic update is requested while the previous one is already running, which is
+ * theoretically possible if update takes longer than update check period (1 hour as of 2.4), ConstrainedExecutor will
+ * prevent second concurrent execution.</li>
+ * <li>during period update existing metadata, if any, is kept available throughout update and is changed as one
+ * relatively short prefix file update performed while holding write, i.e. exclusive, lock on the prefix file.</li>
+ * <li>contents of the prefix file is cached in memory on first request and the cache is refreshed on each change to the
+ * prefix file. reading of the prefix file into the memory cache is performed while holding read, i.e. shared, lock,
+ * which is necessary to prevent reading prefix file partially written by concurrently running prefix file update.</li>
+ * <li>during repository deploy/delete operations, prefix file contents is first read while holding read lock, then, if
+ * the operation results in changes to the prefix file, the prefix file is read-updated-written while holding write
+ * long. This allows concurrent execution of multiple repository deploy/delete operations that do not require changes to
+ * the contents of the prefix file.</li>
+ * </ul>
+ * </p>
  * 
  * @author cstamas
  * @since 2.4

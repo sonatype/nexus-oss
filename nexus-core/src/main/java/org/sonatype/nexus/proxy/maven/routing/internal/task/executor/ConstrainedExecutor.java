@@ -10,13 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.task.executor;
+package org.sonatype.nexus.proxy.maven.routing.internal.task.executor;
 
-import org.sonatype.nexus.util.task.CancelableRunnable;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnable;
 
 /**
  * Simple {@link java.util.concurrent.Executor} like service, that offers a bit extra functionality in a way it can
  * guarantee no two concurrent commands are running under same key.
+ * <p>
+ * The main point of ConstrainedExecutor is to workaround limitation of RepositoryItemUidLock that does not provide a
+ * mechanism to lock-with-timeout and to identify and cancel long-running lock holders. Together with
+ * CancelableRunnable, ConstrainedExecutor provides ability to avoid multiple concurrent executions of autorouting
+ * metadata update for the same repository.
  * 
  * @author cstamas
  * @since 2.4

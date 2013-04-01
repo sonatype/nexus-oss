@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.task.executor;
+package org.sonatype.nexus.proxy.maven.routing.internal.task.executor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -18,12 +18,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
-import org.sonatype.nexus.util.task.CancelableRunnable;
-import org.sonatype.nexus.util.task.CancelableSupport;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnable;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableSupport;
 
 /**
  * Default implementation of Executor that adds a thin layer around {@link java.util.concurrent.Executor} that is passed
  * in from constructor.
+ * 
  * 
  * @author cstamas
  * @since 2.4
