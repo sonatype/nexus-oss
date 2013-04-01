@@ -67,7 +67,7 @@ public class UpdateRepositoryRunnable
         }
         try
         {
-            manager.updateAndPublishPrefixFile( mavenRepository, true );
+            manager.updateAndPublishPrefixFile( mavenRepository );
         }
         catch ( Exception e )
         {

@@ -508,7 +508,7 @@ public class ManagerImpl
         return !statistics.getCurrentlyRunningJobKeys().isEmpty();
     }
 
-    protected void updateAndPublishPrefixFile( final MavenRepository mavenRepository, final boolean notify )
+    protected void updateAndPublishPrefixFile( final MavenRepository mavenRepository )
         throws IOException
     {
         getLogger().debug( "Updating prefix file of {}", mavenRepository );
@@ -535,20 +535,14 @@ public class ManagerImpl
             }
             if ( prefixSource != null && prefixSource.supported() )
             {
-                if ( notify )
-                {
-                    getLogger().info( "Updated and published prefix file of {}",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
+                getLogger().info( "Updated and published prefix file of {}",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 publish( mavenRepository, prefixSource );
             }
             else
             {
-                if ( notify )
-                {
-                    getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
+                getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 unpublish( mavenRepository );
             }
         }
