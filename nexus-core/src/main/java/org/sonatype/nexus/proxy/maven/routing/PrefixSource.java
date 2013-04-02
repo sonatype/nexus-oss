@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Prefix source main purpose is to serve/read-up WL prefix entries. It might be backed (or sourced) from multiple
+ * Prefix source main purpose is to serve/read-up prefix list entries. It might be backed (or sourced) from multiple
  * things, like file or even a plain array of strings.
  * 
  * @author cstamas

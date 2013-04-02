@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 
 /**
- * WL REST resource support.
+ * Autorouting REST resource support.
  * 
  * @author cstamas
  * @since 2.4

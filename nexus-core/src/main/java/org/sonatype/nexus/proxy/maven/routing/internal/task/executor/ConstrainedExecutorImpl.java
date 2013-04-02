@@ -34,9 +34,9 @@ public class ConstrainedExecutorImpl
 {
     /**
      * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
-     * periodic remote WL update, but also executes background "force" updates (initiated by user over REST or when
-     * repository is added). But, as background threads are bounded by presence of proxy repositories, and introduce
-     * hard limit of possible max executions, it protects this instance that is basically unbounded.
+     * periodic remote prexif list update, but also executes background "force" updates (initiated by user over REST or
+     * when repository is added). But, as background threads are bounded by presence of proxy repositories, and
+     * introduce hard limit of possible max executions, it protects this instance that is basically unbounded.
      */
     private final java.util.concurrent.Executor executor;
 

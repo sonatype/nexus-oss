@@ -44,12 +44,12 @@ public class RoutingWaitForPlexusResource
 
     private static final String RESOURCE_URI = "/routing/waitFor";
 
-    private final Manager wlManager;
+    private final Manager manager;
 
     @Inject
-    public RoutingWaitForPlexusResource( final Manager wlManager )
+    public RoutingWaitForPlexusResource( final Manager manager )
     {
-        this.wlManager = checkNotNull( wlManager );
+        this.manager = checkNotNull( manager );
     }
 
     @Override
@@ -80,7 +80,7 @@ public class RoutingWaitForPlexusResource
             final long startTime = System.currentTimeMillis();
             while ( System.currentTimeMillis() - startTime <= timeout )
             {
-                if ( !( (ManagerImpl) wlManager ).isUpdatePrefixFileJobRunning() )
+                if ( !( (ManagerImpl) manager ).isUpdatePrefixFileJobRunning() )
                 {
                     response.setStatus( Status.SUCCESS_OK );
                     return "Ok";

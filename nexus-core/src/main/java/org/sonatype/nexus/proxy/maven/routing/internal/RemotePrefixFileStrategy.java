@@ -70,7 +70,7 @@ public class RemotePrefixFileStrategy
         StorageFileItem item;
         String path = config.getRemotePrefixFilePath();
         getLogger().debug( "Looking for remote prefix on {} at path {}", mavenProxyRepository, path );
-        // we keep exclusive lock on UID during discovery to prevent other WL threads grabbing this file
+        // we keep exclusive lock on UID during discovery to prevent other threads grabbing this file
         // prematurely. We release the lock only when file is present locally, and is validated.
         // in that moment it's not published yet, but the content is correct and it will be
         // the same that will get published.

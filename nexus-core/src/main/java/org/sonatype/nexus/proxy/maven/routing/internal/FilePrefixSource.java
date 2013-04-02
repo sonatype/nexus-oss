@@ -42,7 +42,7 @@ import com.google.common.base.Throwables;
 
 /**
  * {@link WritablePrefixSource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
- * Also serves as "the main" WL source. This is the only implementation of the {@link WritablePrefixSource}.
+ * Also serves as "the main" prefix list source. This is the only implementation of the {@link WritablePrefixSource}.
  * 
  * @author cstamas
  * @since 2.4

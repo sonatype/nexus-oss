@@ -27,8 +27,8 @@ import org.sonatype.nexus.proxy.maven.routing.WritablePrefixSource;
 
 /**
  * A modifier for {@link WritablePrefixSource}, that makes you able to "edit" it by adding and removing entries from it.
- * It performs entry source changes only when needed (entries added or removed does modify WL), and defers saving of
- * modified WL until you invoke {@link #apply()}.
+ * It performs entry source changes only when needed (entries added or removed does modify prefix list), and defers
+ * saving of modified prefix list until you invoke {@link #apply()}.
  * 
  * @author cstamas
  * @since 2.4
@@ -72,10 +72,11 @@ public class WritablePrefixSourceModifier
 
     /**
      * Adds entry to {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually did
-     * change the WL. Changes are cached, entry source is not modified until you invoke {@link #apply()} method.
+     * change the prefix list. Changes are cached, entry source is not modified until you invoke {@link #apply()}
+     * method.
      * 
      * @param entry
-     * @return {@code true} if the invocation actually did change the WL.
+     * @return {@code true} if the invocation actually did change the prefix list.
      */
     public boolean offerEntry( final String entry )
     {
@@ -91,10 +92,11 @@ public class WritablePrefixSourceModifier
 
     /**
      * Removes entry from {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually
-     * did change the WL. Changes are cached, entry source is not modified until you invoke {@link #apply()} method.
+     * did change the prefix list. Changes are cached, entry source is not modified until you invoke {@link #apply()}
+     * method.
      * 
      * @param entry
-     * @return {@code true} if the invocation actually did change the WL.
+     * @return {@code true} if the invocation actually did change the prefix list.
      */
     public boolean revokeEntry( final String entry )
     {

@@ -85,7 +85,7 @@ public class TextFilePrefixSourceMarshaller
     /**
      * Constructor.
      * 
-     * @param config the WL config.
+     * @param config the autorouting config.
      */
     public TextFilePrefixSourceMarshaller( final Config config )
     {

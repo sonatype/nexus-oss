@@ -130,9 +130,9 @@ public class ManagerImpl
 
     /**
      * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
-     * periodic remote WL update, but also executes background "force" updates (initiated by user over REST or when
-     * repository is added). But, as background threads are bounded by presence of proxy repositories, and introduce
-     * hard limit of possible max executions, it protects this instance that is basically unbounded.
+     * periodic remote prefix list update, but also executes background "force" updates (initiated by user over REST or
+     * when repository is added). But, as background threads are bounded by presence of proxy repositories, and
+     * introduce hard limit of possible max executions, it protects this instance that is basically unbounded.
      */
     private final ScheduledExecutorService executor;
 
@@ -282,8 +282,8 @@ public class ManagerImpl
     }
 
     /**
-     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of WL update period in
-     * hours too), and will perform WL update only on those proxy repositories that needs it.
+     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of prefix list update
+     * period in hours too), and will perform prefix list update only on those proxy repositories that needs it.
      */
     protected void mayUpdateAllProxyPrefixFiles()
     {
@@ -323,12 +323,13 @@ public class ManagerImpl
     }
 
     /**
-     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of WL update period in
-     * hours too), and will perform WL update on proxy repository only if needed (WL is stale, or does not exists).
+     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of prefix list update
+     * period in hours too), and will perform prefix list update on proxy repository only if needed (prefix list is
+     * stale, or does not exists).
      * 
      * @param mavenProxyRepository
-     * @return {@code true} if update has been spawned, {@code false} if no update needed (WL is up to date or remote
-     *         discovery is disable for repository).
+     * @return {@code true} if update has been spawned, {@code false} if no update needed (prefix list is up to date or
+     *         remote discovery is disable for repository).
      */
     protected boolean mayUpdateProxyPrefixFile( final MavenProxyRepository mavenProxyRepository )
     {
@@ -337,7 +338,7 @@ public class ManagerImpl
         {
             // only update if any of these below are true:
             // status is ERROR or ENABLED_NOT_POSSIBLE (hit an error during last discovery)
-            // status is anything else and WL update period is here
+            // status is anything else and prefix list update period is here
             final DiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
             if ( discoveryStatus.getStatus() == DStatus.ERROR
                 || discoveryStatus.getStatus() == DStatus.ENABLED_NOT_POSSIBLE
@@ -671,7 +672,7 @@ public class ManagerImpl
     {
         checkUpdateConditions( mavenGroupRepository );
         PrefixSource prefixSource = null;
-        // save merged WL into group's local storage (if all members has WL)
+        // save merged prefix list into group's local storage (if all members has prefix list)
         boolean allMembersHavePublished = true;
         final LinkedHashSet<String> entries = new LinkedHashSet<String>();
         for ( Repository member : mavenGroupRepository.getMemberRepositories() )

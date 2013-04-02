@@ -39,7 +39,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.google.common.primitives.Ints;
 
 /**
- * WL Configuration REST resource, usable only on Maven Proxy repositories.
+ * Autorouting Configuration REST resource, usable only on Maven Proxy repositories.
  * 
  * @author cstamas
  * @since 2.4
@@ -74,7 +74,7 @@ public class RoutingConfigResource
     }
 
     /**
-     * Returns the current WL configuration for given repository.
+     * Returns the current autorouting configuration for given repository.
      */
     @Override
     @GET
@@ -94,7 +94,7 @@ public class RoutingConfigResource
     }
 
     /**
-     * Sets the WL configuration for given repository.
+     * Sets the autorouting configuration for given repository.
      */
     @Override
     @PUT
