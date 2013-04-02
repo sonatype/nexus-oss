@@ -174,6 +174,12 @@ public class JerseyCapability<C extends Capability<C>>
     }
 
     @Override
+    public boolean hasErrors()
+    {
+        return settings().isError();
+    }
+
+    @Override
     public Map<String, String> properties()
     {
         final Map<String, String> propertiesMap = Maps.newHashMap();
@@ -209,6 +215,12 @@ public class JerseyCapability<C extends Capability<C>>
     public String status()
     {
         return settings().getStatus();
+    }
+
+    @Override
+    public String stateDescription()
+    {
+        return settings().getStateDescription();
     }
 
     @Override

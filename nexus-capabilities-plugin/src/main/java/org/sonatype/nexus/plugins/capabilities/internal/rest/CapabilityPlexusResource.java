@@ -244,6 +244,7 @@ public class CapabilityPlexusResource
         item.setTypeId( reference.context().type().toString() );
         item.setTypeName( reference.context().descriptor().name() );
         item.setActive( reference.context().isActive() );
+        item.setError( reference.context().hasFailure() );
         try
         {
             item.setDescription( reference.capability().description() );

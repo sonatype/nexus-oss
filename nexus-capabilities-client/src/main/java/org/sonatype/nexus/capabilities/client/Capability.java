@@ -46,6 +46,11 @@ public interface Capability<T extends Capability>
     boolean isActive();
 
     /**
+     * @return true if capability transition between states resulted in an unhandled exception
+     */
+    boolean hasErrors();
+
+    /**
      * @return capabilities properties
      */
     Map<String, String> properties();
@@ -66,6 +71,11 @@ public interface Capability<T extends Capability>
      * @return status of capability
      */
     String status();
+
+    /**
+     * @return description of capability state
+     */
+    String stateDescription();
 
     /**
      * Sets capability notes.
