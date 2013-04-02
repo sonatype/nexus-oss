@@ -235,7 +235,10 @@ public class ManagerImpl
     @Override
     public void shutdown()
     {
-        eventBus.unregister( eventDispatcher );
+        if ( config.isFeatureActive() )
+        {
+            eventBus.unregister( eventDispatcher );
+        }
         executor.shutdown();
         constrainedExecutor.cancelAllJobs();
         try
