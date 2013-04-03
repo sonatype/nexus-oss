@@ -21,6 +21,7 @@
 		<user>
 			<id>admin</id>
 			<firstName>Administrator</firstName>
+            <lastName>Nexus</lastName>
 			<!-- admin123 -->
 			<password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
 			<status>active</status>

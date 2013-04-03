@@ -77,7 +77,8 @@ NX.define('Sonatype.repoServer.DefaultUserEditor', {
         labelStyle : 'margin-left: 15px; width: 185px;',
         helpText : ht.firstName,
         name : 'firstName',
-        allowBlank : true,
+        allowBlank : false,
+        itemCls : 'required-field',
         htmlDecode : true,
         width : this.COMBO_WIDTH,
         validator : function(v) {
@@ -94,7 +95,8 @@ NX.define('Sonatype.repoServer.DefaultUserEditor', {
         labelStyle : 'margin-left: 15px; width: 185px;',
         helpText : ht.lastName,
         name : 'lastName',
-        allowBlank : true,
+        allowBlank : false,
+        itemCls : 'required-field',
         htmlDecode : true,
         width : this.COMBO_WIDTH,
         validator : function(v) {
