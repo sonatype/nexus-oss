@@ -107,6 +107,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
       }, {
         name : 'active'
       }, {
+        name : 'error'
+      }, {
         name : 'typeName'
       }, {
         name : 'typeId'
@@ -459,10 +461,14 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
                     var typeName = record.get('typeName'),
                         enabled = record.get('enabled'),
                         active = record.get('active'),
+                        error = record.get('error'),
                         iconName;
 
                     if (!typeName) {
                         iconName = 'capability_new';
+                    }
+                    else if (enabled && error) {
+                        iconName = 'capability_error';
                     }
                     else if (enabled && active) {
                         iconName = 'capability_active';

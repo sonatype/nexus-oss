@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.capabilities.testsuite;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
@@ -374,6 +375,20 @@ public class BasicIT
             .withProperty( "repository", "releases" )
             .withProperty( "message", "XYZ Blah" )
             .save();
+    }
+
+    /**
+     * Verify that in case of an activation failure the flag is set and description contains details.
+     *
+     * @since 2.4
+     */
+    @Test
+    public void checkErrorOnActivation()
+    {
+        final Capability capability = capabilities().create( "[withActivationError]" ).save();
+        assertThat( capability.hasErrors(), is( true ) );
+        assertThat( capability.isActive(), is( false ) );
+        assertThat( capability.stateDescription(), containsString( "This capability always fails on activate" ) );
     }
 
 }

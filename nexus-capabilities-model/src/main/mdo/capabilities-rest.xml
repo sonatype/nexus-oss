@@ -16,8 +16,8 @@
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-       xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-2.0.0"
-       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-2.0.0">
+       xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-2.1.0"
+       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-2.1.0">
 
   <id>capabilities-rest</id>
   <name>NexusCapabilitiesREST</name>
@@ -315,6 +315,14 @@
           <required>true</required>
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is active</description>
+        </field>
+        <field>
+          <name>error</name>
+          <type>boolean</type>
+          <version>2.1.0+</version>
+          <required>true</required>
+          <defaultValue>true</defaultValue>
+          <description>The flag determining if an error occurred during capability states transitions</description>
         </field>
         <field>
           <name>typeName</name>
