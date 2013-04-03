@@ -63,6 +63,12 @@ public class ArrayListPrefixSource
     }
 
     @Override
+    public boolean supported()
+    {
+        return true;
+    }
+
+    @Override
     public List<String> readEntries()
         throws IOException
     {

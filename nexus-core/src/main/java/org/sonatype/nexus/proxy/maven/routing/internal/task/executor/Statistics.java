@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.task.executor;
+package org.sonatype.nexus.proxy.maven.routing.internal.task.executor;
 
 import java.util.Set;
 
-import org.sonatype.nexus.util.task.CancelableRunnable;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnable;
 
 /**
  * Simple statistics for {@link ConstrainedExecutor}.

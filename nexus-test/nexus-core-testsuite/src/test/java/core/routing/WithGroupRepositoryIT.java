@@ -22,8 +22,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
-import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.content.Content.Directive;
+import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
 
 import com.google.common.primitives.Ints;
@@ -59,12 +59,16 @@ public class WithGroupRepositoryIT
 
     private final Location PREFIX_FILE_LOCATION = Location.repositoryLocation( REPO_ID, "/.meta/prefixes.txt" );
 
-    private final Location NOSCRAPE_FILE_LOCATION = Location.repositoryLocation( REPO_ID, "/.meta/noscrape.txt" );
-
     protected boolean exists( final Location location )
         throws IOException
     {
-        return content().existsWith( location, Directive.GROUP_ONLY );
+        return exists( location, Directive.GROUP_ONLY );
+    }
+
+    protected boolean noscrape( final Location location )
+        throws IOException
+    {
+        return noscrape( location, Directive.GROUP_ONLY );
     }
 
     @Test
@@ -76,7 +80,7 @@ public class WithGroupRepositoryIT
         // waitForWLDiscoveryOutcome( "central" );
         // waitForWLPublishingOutcomes( "central", REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 
     @Test
@@ -84,7 +88,7 @@ public class WithGroupRepositoryIT
         throws Exception
     {
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         {
             final DiscoveryConfiguration config = routing().getDiscoveryConfigurationFor( "central" );
             config.setEnabled( false );
@@ -93,8 +97,8 @@ public class WithGroupRepositoryIT
             // waitForWLDiscoveryOutcome( "central" );
             // waitForWLPublishingOutcomes( "central", REPO_ID );
         }
-        assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
+        assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( true ) );
         {
             final DiscoveryConfiguration config = routing().getDiscoveryConfigurationFor( "central" );
             config.setEnabled( true );
@@ -104,7 +108,7 @@ public class WithGroupRepositoryIT
             // waitForWLPublishingOutcomes( "central", REPO_ID );
         }
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
 
     @Test( expected = NexusClientBadRequestException.class )
@@ -113,7 +117,7 @@ public class WithGroupRepositoryIT
     {
         // we did no any waiting, e just booted nexus, so it must be present
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
-        assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
+        assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         content().delete( PREFIX_FILE_LOCATION );
     }
 }

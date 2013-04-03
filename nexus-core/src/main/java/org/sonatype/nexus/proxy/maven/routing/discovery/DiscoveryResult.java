@@ -222,7 +222,7 @@ public class DiscoveryResult<R extends MavenRepository>
 
     /**
      * Records a failure on behalf of a strategy, if this has not yet recorded a success, in which case this method will
-     * do nothing. A failure simply means "this strategy failed to get remote WL".
+     * do nothing. A failure simply means "this strategy failed to get remote prefix list".
      * 
      * @param usedStrategyId
      * @param message

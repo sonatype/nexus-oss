@@ -27,16 +27,19 @@ public class StrategyResult
 
     private final PrefixSource prefixSource;
 
+    private final boolean routingEnabled;
+
     /**
      * Constructor.
      * 
      * @param message
      * @param prefixSource
      */
-    public StrategyResult( final String message, final PrefixSource prefixSource )
+    public StrategyResult( final String message, final PrefixSource prefixSource, boolean routingEnabled )
     {
         this.message = checkNotNull( message );
         this.prefixSource = checkNotNull( prefixSource );
+        this.routingEnabled = routingEnabled;
     }
 
     /**
@@ -57,5 +60,17 @@ public class StrategyResult
     public PrefixSource getPrefixSource()
     {
         return prefixSource;
+    }
+
+    /**
+     * Returns <code>false</code> if remote explicitly requested automatic routing to be disabled. This normally
+     * indicates that remote is not able to provide reliable path prefix information. For example, remote itself is a
+     * proxy of a repository that does not provide prefix file and cannot be scraped. 
+     * 
+     * @return
+     */
+    public boolean isRoutingEnabled()
+    {
+        return routingEnabled;
     }
 }

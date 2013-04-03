@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,6 +25,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
+import org.sonatype.nexus.client.core.subsystem.content.Location;
+import org.sonatype.nexus.client.core.subsystem.content.Content.Directive;
 import org.sonatype.nexus.client.core.subsystem.routing.Routing;
 import org.sonatype.nexus.testsuite.client.RoutingTest;
 
@@ -113,6 +117,27 @@ public abstract class ITSupport
         {
             Closeables.closeQuietly( entityStream );
             throw e;
+        }
+    }
+
+    protected boolean exists( final Location location, Directive directive )
+        throws IOException
+    {
+        return content().existsWith( location, directive );
+    }
+
+    protected boolean noscrape( final Location location, Directive directive )
+        throws IOException
+    {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        try
+        {
+            content().downloadWith( location, directive, buf );
+            return new String( buf.toByteArray(), "UTF-8" ).startsWith( "@ unsupported" );
+        }
+        catch ( NexusClientNotFoundException e )
+        {
+            return false; // requested file was not found, so the repository is not marked as no-scrape
         }
     }
 

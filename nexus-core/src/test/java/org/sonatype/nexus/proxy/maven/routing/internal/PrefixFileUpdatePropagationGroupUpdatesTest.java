@@ -63,21 +63,21 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
 
     private static final String GROUP2_REPO_ID = "group2";
 
-    private final WLUpdateListener wlUpdateListener;
+    private final PrefixFileUpdateListener prefixFileUpdateListener;
 
     public PrefixFileUpdatePropagationGroupUpdatesTest()
         throws Exception
     {
-        this.wlUpdateListener = new WLUpdateListener();
+        this.prefixFileUpdateListener = new PrefixFileUpdateListener();
     }
 
-    protected static class WLUpdateListener
+    protected static class PrefixFileUpdateListener
     {
         private final List<String> publishedIds;
 
         private final List<String> unpublishedIds;
 
-        public WLUpdateListener()
+        public PrefixFileUpdateListener()
         {
             this.publishedIds = new ArrayList<String>();
             this.unpublishedIds = new ArrayList<String>();
@@ -231,7 +231,7 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
                 }
 
                 // register it here BEFORE boot process starts but plx is already created
-                container.lookup( EventBus.class ).register( wlUpdateListener );
+                container.lookup( EventBus.class ).register( prefixFileUpdateListener );
             }
         };
     }
@@ -255,10 +255,10 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
         // or
         // HOSTED1, HOSTED2, GROUP1, GROUP1, GROUP2, GROUP...
         // (group1 one or two times updated).
-        assertThat( wlUpdateListener.getPublished(), hasItem( HOSTED1_REPO_ID ) );
-        assertThat( wlUpdateListener.getPublished(), hasItem( HOSTED2_REPO_ID ) );
-        assertThat( wlUpdateListener.getPublished(), hasItem( GROUP1_REPO_ID ) );
-        assertThat( wlUpdateListener.getPublished(), hasItem( GROUP2_REPO_ID ) );
+        assertThat( prefixFileUpdateListener.getPublished(), hasItem( HOSTED1_REPO_ID ) );
+        assertThat( prefixFileUpdateListener.getPublished(), hasItem( HOSTED2_REPO_ID ) );
+        assertThat( prefixFileUpdateListener.getPublished(), hasItem( GROUP1_REPO_ID ) );
+        assertThat( prefixFileUpdateListener.getPublished(), hasItem( GROUP2_REPO_ID ) );
     }
 
     @Test
@@ -268,7 +268,7 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
         // in case of group member changes, the "cascade" is sync, hence
         // we have no ordering problem as we have with async updates of proxy/hosted
         // reposes on boot
-        wlUpdateListener.reset();
+        prefixFileUpdateListener.reset();
 
         final MavenGroupRepository mgr =
             getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class );
@@ -277,13 +277,13 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
         getApplicationConfiguration().saveConfiguration();
         waitForRoutingBackgroundUpdates();
 
-        assertThat( wlUpdateListener.getPublished(), contains( GROUP1_REPO_ID, GROUP2_REPO_ID ) );
+        assertThat( prefixFileUpdateListener.getPublished(), contains( GROUP1_REPO_ID, GROUP2_REPO_ID ) );
 
         mgr.addMemberRepositoryId( HOSTED1_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
         waitForRoutingBackgroundUpdates();
 
-        assertThat( wlUpdateListener.getPublished(),
+        assertThat( prefixFileUpdateListener.getPublished(),
             contains( GROUP1_REPO_ID, GROUP2_REPO_ID, GROUP1_REPO_ID, GROUP2_REPO_ID ) );
     }
 
@@ -294,7 +294,7 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
         // in case of group member changes, the "cascade" is sync, hence
         // we have no ordering problem as we have with async updates of proxy/hosted
         // reposes on boot
-        wlUpdateListener.reset();
+        prefixFileUpdateListener.reset();
 
         final MavenGroupRepository mgr =
             getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID, MavenGroupRepository.class );
@@ -304,13 +304,13 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
         getApplicationConfiguration().saveConfiguration();
         waitForRoutingBackgroundUpdates();
 
-        assertThat( wlUpdateListener.getPublished(), contains( GROUP2_REPO_ID ) );
+        assertThat( prefixFileUpdateListener.getPublished(), contains( GROUP2_REPO_ID ) );
 
         mgr.addMemberRepositoryId( HOSTED2_REPO_ID );
         getApplicationConfiguration().saveConfiguration();
         waitForRoutingBackgroundUpdates();
 
-        assertThat( wlUpdateListener.getPublished(),
+        assertThat( prefixFileUpdateListener.getPublished(),
             contains( GROUP2_REPO_ID, GROUP2_REPO_ID ) );
     }
 }

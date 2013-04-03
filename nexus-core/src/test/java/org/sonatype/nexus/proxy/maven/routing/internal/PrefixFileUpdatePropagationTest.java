@@ -224,10 +224,10 @@ public class PrefixFileUpdatePropagationTest
                     wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
-                assertThat( "Hosted should have ES", hostedEntrySource.exists() );
-                assertThat( "Proxy should not have ES", !proxyEntrySource.exists() ); // as we serve 404s for prefix
+                assertThat( "Hosted should have ES", hostedEntrySource.supported() );
+                assertThat( "Proxy should not have ES", !proxyEntrySource.supported() ); // as we serve noscrape prefix
                                                                                       // file
-                assertThat( "Group cannot have ES", !groupEntrySource.exists() ); // as proxy member does not have WL
+                assertThat( "Group cannot have ES", !groupEntrySource.supported() ); // as proxy member does not have WL
             }
             finally
             {
@@ -258,9 +258,9 @@ public class PrefixFileUpdatePropagationTest
                     wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
-                assertThat( "Hosted should have ES", hostedEntrySource.exists() );
-                assertThat( "Proxy should have ES", proxyEntrySource.exists() ); // as we did serve file ok
-                assertThat( "Group should have ES", groupEntrySource.exists() ); // as all member should have it
+                assertThat( "Hosted should have ES", hostedEntrySource.supported() );
+                assertThat( "Proxy should have ES", proxyEntrySource.supported() ); // as we did serve file ok
+                assertThat( "Group should have ES", groupEntrySource.supported() ); // as all member should have it
 
                 // GROUP wl must have 4 entries: 1 from hosted (/com/sonatype) + 3 from proxied prefix file
                 final List<String> groupEntries = groupEntrySource.readEntries();

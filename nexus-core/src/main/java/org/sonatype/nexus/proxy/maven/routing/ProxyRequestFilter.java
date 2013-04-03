@@ -27,10 +27,10 @@ public interface ProxyRequestFilter
 {
     /**
      * Evaluates the passed in combination of {@link MavenProxyRepository} and {@link ResourceStoreRequest} and decides
-     * does the WL (if any) of given repository allows the request to be passed to remote storage of proxy repository.
-     * If allows, will return {@code true}, if not, it returns {@code false}. Still, possibility is left to this method
-     * to throw some exceptions too to signal some extraordinary information, or, to provide extra information why some
-     * request should result in "not found" response.
+     * does the prefix list (if any) of given repository allows the request to be passed to remote storage of proxy
+     * repository. If allows, will return {@code true}, if not, it returns {@code false}. Still, possibility is left to
+     * this method to throw some exceptions too to signal some extraordinary information, or, to provide extra
+     * information why some request should result in "not found" response.
      * 
      * @param mavenProxyRepository
      * @param resourceStoreRequest

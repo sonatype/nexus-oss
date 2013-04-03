@@ -18,8 +18,8 @@ import java.io.IOException;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.util.task.CancelableRunnableSupport;
-import org.sonatype.nexus.util.task.ProgressListener;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnableSupport;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.ProgressListener;
 
 import com.google.common.base.Throwables;
 
@@ -61,12 +61,13 @@ public class UpdateRepositoryRunnable
     {
         if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
         {
-            getLogger().warn( "Nexus stopped during background prefix file updates, bailing out." );
+            getLogger().warn( "Nexus stopped during background prefix file updates for {}, bailing out.",
+                              mavenRepository.toString() );
             return;
         }
         try
         {
-            manager.updateAndPublishPrefixFile( mavenRepository, true );
+            manager.updateAndPublishPrefixFile( mavenRepository );
         }
         catch ( Exception e )
         {

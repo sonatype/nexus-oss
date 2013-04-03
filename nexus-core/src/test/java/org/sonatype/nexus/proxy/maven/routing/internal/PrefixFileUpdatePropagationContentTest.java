@@ -300,7 +300,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group1 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 3 ) );
@@ -314,7 +314,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group2 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 3 ) );
@@ -342,7 +342,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group1 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 1 ) );
@@ -354,7 +354,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group2 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 1 ) );
@@ -381,7 +381,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group1 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 4 ) );
@@ -396,7 +396,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group2 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 4 ) );
@@ -428,7 +428,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group1 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 2 ) );
@@ -441,7 +441,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group2 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 2 ) );
@@ -472,7 +472,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group1 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 1 ) );
@@ -484,7 +484,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group2 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 2 ) );
@@ -515,7 +515,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group1 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group1 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 4 ) );
@@ -531,7 +531,7 @@ public class PrefixFileUpdatePropagationContentTest
                 wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID,
                     MavenRepository.class ) );
 
-            assertThat( "Group2 should have WL", groupPrefixSource.exists() );
+            assertThat( "Group2 should have WL", groupPrefixSource.supported() );
 
             final List<String> groupEntries = groupPrefixSource.readEntries();
             assertThat( groupEntries, hasSize( 4 ) );

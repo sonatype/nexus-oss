@@ -239,9 +239,9 @@ public class RemoteContentDiscovererImplTest
                     wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
-                assertThat( "Proxy1 should not have ES", !proxy1EntrySource.exists() ); // we serve 404
-                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we serve 404
-                assertThat( "Group cannot have ES", !groupEntrySource.exists() ); // as proxy member does not have WL
+                assertThat( "Proxy1 should not have ES", !proxy1EntrySource.supported() ); // we served noscrape file
+                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.supported() ); // we served noscrape file
+                assertThat( "Group cannot have ES", !groupEntrySource.supported() ); // as proxy member are disabled
             }
         }
         finally
@@ -278,9 +278,9 @@ public class RemoteContentDiscovererImplTest
                     wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
-                assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
-                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we serve 404
-                assertThat( "Group cannot have ES", !groupEntrySource.exists() ); // as proxy member does not have WL
+                assertThat( "Proxy1 should have ES", proxy1EntrySource.supported() ); // we serve prefix file
+                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.supported() ); // we serve noscrape file
+                assertThat( "Group cannot have ES", !groupEntrySource.supported() ); // we serve noscrape file
             }
         }
         finally
@@ -325,9 +325,9 @@ public class RemoteContentDiscovererImplTest
                     wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
-                assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
-                assertThat( "Proxy2 should have ES", proxy2EntrySource.exists() ); // we served prefix file
-                assertThat( "Group should have ES", groupEntrySource.exists() ); // both proxies have it
+                assertThat( "Proxy1 should have ES", proxy1EntrySource.supported() ); // we served prefix file
+                assertThat( "Proxy2 should have ES", proxy2EntrySource.supported() ); // we served prefix file
+                assertThat( "Group should have ES", groupEntrySource.supported() ); // both proxies have it
 
                 // GROUP wl must have 4 entries: 1 from hosted (/com/sonatype) + 3 from proxied prefix file
                 final List<String> groupEntries = groupEntrySource.readEntries();
@@ -380,9 +380,9 @@ public class RemoteContentDiscovererImplTest
                     wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
-                assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
-                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we served invalid prefix file
-                assertThat( "Group should not have ES", !groupEntrySource.exists() ); // both proxies have it
+                assertThat( "Proxy1 should have ES", proxy1EntrySource.supported() ); // we served prefix file
+                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.supported() ); // we served invalid prefix file
+                assertThat( "Group should not have ES", !groupEntrySource.supported() ); // both proxies have it
 
                 final RoutingStatus status =
                     wm.getStatusFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,

@@ -18,9 +18,9 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
- * Strategy for remote content discovery for WL by some means. It is identified by {@link #getId()} and has priority
- * {@link #getPriority()}. Latter is used to sort (using natural order of integers) the instances and try the one by one
- * in sorted order.
+ * Strategy for remote content discovery for prefix list by some means. It is identified by {@link #getId()} and has
+ * priority {@link #getPriority()}. Latter is used to sort (using natural order of integers) the instances and try the
+ * one by one in sorted order.
  * 
  * @author cstamas
  * @since 2.4

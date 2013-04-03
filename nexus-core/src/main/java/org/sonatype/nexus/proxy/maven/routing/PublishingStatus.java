@@ -28,12 +28,12 @@ public class PublishingStatus
     public static enum PStatus
     {
         /**
-         * WL is published okay for given repository.
+         * Prefix list is published okay for given repository.
          */
         PUBLISHED,
 
         /**
-         * WL is not published for given repository.
+         * Prefix list is not published for given repository.
          */
         NOT_PUBLISHED;
     }
@@ -84,9 +84,9 @@ public class PublishingStatus
     }
 
     /**
-     * Time stamp (milliseconds) of the last published WL, or -1 if not published.
+     * Time stamp (milliseconds) of the last published prefix list, or -1 if not published.
      * 
-     * @return time stamp (milliseconds) of the last published WL, or -1 if not published.
+     * @return time stamp (milliseconds) of the last published prefix list, or -1 if not published.
      */
     public long getLastPublishedTimestamp()
     {
@@ -101,9 +101,9 @@ public class PublishingStatus
     }
 
     /**
-     * Repository path of the published WL file, or, {@code null} if not published.
+     * Repository path of the published prefix list file, or, {@code null} if not published.
      * 
-     * @return repository path of the published WL file, or, {@code null} if not published.
+     * @return repository path of the published prefix list file, or, {@code null} if not published.
      */
     public String getLastPublishedFilePath()
     {

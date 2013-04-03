@@ -56,17 +56,17 @@ public class EventDispatcher
 {
     private final Logger logger;
 
-    private final Manager wlManager;
+    private final Manager manager;
 
     /**
      * Da constructor.
      * 
-     * @param wlManager
+     * @param manager
      */
-    public EventDispatcher( final Manager wlManager )
+    public EventDispatcher( final Manager manager )
     {
         this.logger = LoggerFactory.getLogger( getClass() );
-        this.wlManager = checkNotNull( wlManager );
+        this.manager = checkNotNull( manager );
     }
 
     protected Logger getLogger()
@@ -78,14 +78,14 @@ public class EventDispatcher
 
     protected void handleRepositoryAdded( final MavenRepository mavenRepository )
     {
-        wlManager.initializePrefixFile( mavenRepository );
+        manager.initializePrefixFile( mavenRepository );
     }
 
     protected void handleRepositoryModified( final MavenRepository mavenRepository )
     {
         try
         {
-            wlManager.forceUpdatePrefixFile( mavenRepository );
+            manager.forceUpdatePrefixFile( mavenRepository );
         }
         catch ( IllegalStateException e )
         {
@@ -100,8 +100,8 @@ public class EventDispatcher
         final MavenRepository mavenRepository = (MavenRepository) evt.getRepository();
         try
         {
-            final PrefixSource prefixSource = wlManager.getPrefixSourceFor( mavenRepository );
-            wlManager.publish( mavenRepository, prefixSource );
+            final PrefixSource prefixSource = manager.getPrefixSourceFor( mavenRepository );
+            manager.publish( mavenRepository, prefixSource );
         }
         catch ( IOException e )
         {
@@ -115,7 +115,7 @@ public class EventDispatcher
         final MavenRepository mavenRepository = (MavenRepository) evt.getRepository();
         try
         {
-            wlManager.unpublish( mavenRepository );
+            manager.unpublish( mavenRepository );
         }
         catch ( IOException e )
         {
@@ -128,7 +128,7 @@ public class EventDispatcher
     {
         try
         {
-            wlManager.offerEntry( mavenHostedRepository, path );
+            manager.offerEntry( mavenHostedRepository, path );
         }
         catch ( IOException e )
         {
@@ -141,7 +141,7 @@ public class EventDispatcher
     {
         try
         {
-            wlManager.revokeEntry( mavenHostedRepository, path );
+            manager.revokeEntry( mavenHostedRepository, path );
         }
         catch ( IOException e )
         {
@@ -170,7 +170,7 @@ public class EventDispatcher
     {
         // is not fired as side effect of Publisher publishing this
         return isRepositoryHandled( evt.getRepository() ) && !isRequestContextMarked( evt.getItem().getItemContext() )
-            && wlManager.isEventAboutPrefixFile( evt );
+            && manager.isEventAboutPrefixFile( evt );
     }
 
     protected boolean isPlainItemEvent( final RepositoryItemEvent evt )
@@ -186,7 +186,7 @@ public class EventDispatcher
         return isPlainItemEvent( evt ) && evt.getItem() instanceof StorageFileItem;
     }
 
-    // == handlers for item events (to maintain WL file)
+    // == handlers for item events (to maintain prefix list file)
 
     /**
      * Event handler.
@@ -203,7 +203,7 @@ public class EventDispatcher
         }
         else if ( isPlainFileItemEvent( evt ) )
         {
-            // we maintain WL for hosted reposes only!
+            // we maintain prefix list for hosted reposes only!
             final MavenHostedRepository mavenHostedRepository =
                 evt.getRepository().adaptToFacet( MavenHostedRepository.class );
             if ( mavenHostedRepository != null )
@@ -228,7 +228,7 @@ public class EventDispatcher
         }
         else if ( isPlainFileItemEvent( evt ) )
         {
-            // we maintain WL for hosted reposes only!
+            // we maintain prefix list for hosted reposes only!
             final MavenHostedRepository mavenHostedRepository =
                 evt.getRepository().adaptToFacet( MavenHostedRepository.class );
             if ( mavenHostedRepository != null )
@@ -253,7 +253,7 @@ public class EventDispatcher
         }
         else if ( evt instanceof RepositoryItemEventDeleteRoot && isPlainItemEvent( evt ) )
         {
-            // we maintain WL for hosted reposes only!
+            // we maintain prefix list for hosted reposes only!
             final MavenHostedRepository mavenHostedRepository =
                 evt.getRepository().adaptToFacet( MavenHostedRepository.class );
             if ( mavenHostedRepository != null )
@@ -263,7 +263,7 @@ public class EventDispatcher
         }
     }
 
-    // == Handler for WL initialization
+    // == Handler for prefix list initialization
 
     /**
      * Event handler.

@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Prefix source main purpose is to serve/read-up WL prefix entries. It might be backed (or sourced) from multiple things, like
- * file or even a plain array of strings.
+ * Prefix source main purpose is to serve/read-up prefix list entries. It might be backed (or sourced) from multiple
+ * things, like file or even a plain array of strings.
  * 
  * @author cstamas
  * @since 2.4
@@ -25,11 +25,18 @@ import java.util.List;
 public interface PrefixSource
 {
     /**
-     * Returns {@code true} if this entry source exists, hence, is readable.
+     * Returns {@code true} if this entry source exists, hence, is readable. Behaviour of other PrefixSource methods is
+     * undefined if the source does not exist, i.e. this method returns {@code false}.
      * 
      * @return {@code true} if entry source exists, {@code false} otherwise.
      */
     boolean exists();
+
+    /**
+     * Returns {@code true} if automatic routing is supported. Automatic routing is considered unsupported if
+     * {@link #exists()} returns {@code false}.
+     */
+    boolean supported();
 
     /**
      * Reads entries for this source, of {@code null} if not exists ({@link #exists()} returns {@code false} in this

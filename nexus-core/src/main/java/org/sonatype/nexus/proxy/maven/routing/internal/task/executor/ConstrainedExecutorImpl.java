@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.task.executor;
+package org.sonatype.nexus.proxy.maven.routing.internal.task.executor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -18,12 +18,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
-import org.sonatype.nexus.util.task.CancelableRunnable;
-import org.sonatype.nexus.util.task.CancelableSupport;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnable;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableSupport;
 
 /**
  * Default implementation of Executor that adds a thin layer around {@link java.util.concurrent.Executor} that is passed
  * in from constructor.
+ * 
  * 
  * @author cstamas
  * @since 2.4
@@ -33,9 +34,9 @@ public class ConstrainedExecutorImpl
 {
     /**
      * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
-     * periodic remote WL update, but also executes background "force" updates (initiated by user over REST or when
-     * repository is added). But, as background threads are bounded by presence of proxy repositories, and introduce
-     * hard limit of possible max executions, it protects this instance that is basically unbounded.
+     * periodic remote prexif list update, but also executes background "force" updates (initiated by user over REST or
+     * when repository is added). But, as background threads are bounded by presence of proxy repositories, and
+     * introduce hard limit of possible max executions, it protects this instance that is basically unbounded.
      */
     private final java.util.concurrent.Executor executor;
 
