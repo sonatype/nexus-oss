@@ -28,6 +28,7 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
+import org.sonatype.nexus.client.core.subsystem.routing.Routing;
 
 /**
  * ITs related to metadata merging.
@@ -131,6 +132,11 @@ public class MergeMetadataIT
             repositoryLocation( repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm" ),
             testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
+
+        waitForNexusToSettleDown();
+
+        // force WL to retrieve prefixes from hosted
+        client().getSubsystem( Routing.class ).updatePrefixFile( proxyRepo.id() );
 
         content().upload(
             repositoryLocation( repo2.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm" ),
