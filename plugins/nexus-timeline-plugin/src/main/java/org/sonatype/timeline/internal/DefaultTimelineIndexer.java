@@ -12,6 +12,7 @@
  */
 package org.sonatype.timeline.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -43,6 +44,9 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
@@ -62,6 +66,8 @@ public class DefaultTimelineIndexer
 
     // ==
 
+    private final String luceneFSDirectoryType;
+
     private Directory directory;
 
     private IndexWriter indexWriter;
@@ -69,6 +75,24 @@ public class DefaultTimelineIndexer
     private SearcherManager searcherManager;
 
     private int generation = 0;
+
+    /**
+     * Constructor. The {@code luceneFSDirectoryType} is copied from nexus-indexer-lucene-plugin's DefaultIndexerManager
+     * as part of fix for NEXUS-5658:
+     * <p>
+     * As of 3.6.1, Lucene provides three FSDirectory implementations, all with there pros and cons.
+     * <ul>
+     * <li>mmap -- {@link MMapDirectory}</li>
+     * <li>nio -- {@link NIOFSDirectory}</li>
+     * <li>simple -- {@link SimpleFSDirectory}</li>
+     * </ul>
+     * By default, Lucene selects FSDirectory implementation based on specifics of the operating system and JRE used,
+     * but this configuration parameter allows override.
+     */
+    public DefaultTimelineIndexer( final String luceneFSDirectoryType )
+    {
+        this.luceneFSDirectoryType = luceneFSDirectoryType;
+    }
 
     // ==
     // Public API
@@ -81,7 +105,7 @@ public class DefaultTimelineIndexer
         {
             directory.close();
         }
-        directory = FSDirectory.open( configuration.getIndexDirectory() );
+        directory = openFSDirectory( configuration.getIndexDirectory() );
         if ( IndexReader.indexExists( directory ) )
         {
             if ( IndexWriter.isLocked( directory ) )
@@ -99,6 +123,35 @@ public class DefaultTimelineIndexer
 
         searcherManager = new SearcherManager( indexWriter, false, new SearcherFactory() );
         generation = generation + 1;
+    }
+
+    private FSDirectory openFSDirectory( final File location )
+        throws IOException
+    {
+        if ( luceneFSDirectoryType == null )
+        {
+            // let Lucene select implementation
+            return FSDirectory.open( location );
+        }
+        else if ( "mmap".equals( luceneFSDirectoryType ) )
+        {
+            return new MMapDirectory( location );
+        }
+        else if ( "nio".equals( luceneFSDirectoryType ) )
+        {
+            return new NIOFSDirectory( location );
+        }
+        else if ( "simple".equals( luceneFSDirectoryType ) )
+        {
+            return new SimpleFSDirectory( location );
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                "''"
+                    + luceneFSDirectoryType
+                    + "'' is not valid/supported Lucene FSDirectory type. Only ''mmap'', ''nio'' and ''simple'' are allowed" );
+        }
     }
 
     protected void stop()
