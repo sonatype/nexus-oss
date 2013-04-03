@@ -379,6 +379,8 @@ public class BasicIT
 
     /**
      * Verify that in case of an activation failure the flag is set and description contains details.
+     *
+     * @since 2.4
      */
     @Test
     public void checkErrorOnActivation()

@@ -173,6 +173,9 @@ public class JerseyCapability<C extends Capability<C>>
         return settings().isActive();
     }
 
+    /**
+     * @since 2.4
+     */
     @Override
     public boolean hasErrors()
     {
@@ -217,6 +220,9 @@ public class JerseyCapability<C extends Capability<C>>
         return settings().getStatus();
     }
 
+    /**
+     * @since 2.4
+     */
     @Override
     public String stateDescription()
     {

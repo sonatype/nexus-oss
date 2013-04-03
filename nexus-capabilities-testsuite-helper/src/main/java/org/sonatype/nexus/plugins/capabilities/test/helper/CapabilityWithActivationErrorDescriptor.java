@@ -21,7 +21,10 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
-@Named( CapabilityWithActivationErrorDescriptor.TYPE_ID )
+/**
+ * @since 2.4
+ */
+@Named(CapabilityWithActivationErrorDescriptor.TYPE_ID)
 @Singleton
 public class CapabilityWithActivationErrorDescriptor
     extends CapabilityDescriptorSupport

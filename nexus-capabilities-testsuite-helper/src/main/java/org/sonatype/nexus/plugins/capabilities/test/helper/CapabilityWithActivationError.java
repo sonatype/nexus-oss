@@ -16,6 +16,9 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
 
+/**
+ * @since 2.4
+ */
 @Named( CapabilityWithActivationErrorDescriptor.TYPE_ID )
 public class CapabilityWithActivationError
     extends TestCapability
