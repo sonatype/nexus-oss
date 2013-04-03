@@ -146,8 +146,8 @@ public class DefaultTimelineIndexer
     }
 
     protected void retrieve( final long fromTime, final long toTime, final Set<String> types,
-        final Set<String> subTypes,
-        int from, int count, final TimelineFilter filter, final TimelineCallback callback )
+                             final Set<String> subTypes, int from, int count, final TimelineFilter filter,
+                             final TimelineCallback callback )
         throws IOException
     {
         if ( count == 0 )
@@ -178,7 +178,7 @@ public class DefaultTimelineIndexer
                 // return
                 topDocs =
                     searcher.search( buildQuery( fromTime, toTime, types, subTypes ), null, Integer.MAX_VALUE,
-                                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                        new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
             }
             if ( topDocs.scoreDocs.length == 0 )
             {
@@ -240,7 +240,7 @@ public class DefaultTimelineIndexer
             // just to know how many will we delete, will not actually load 'em up
             final TopFieldDocs topDocs =
                 searcher.search( q, null, searcher.maxDoc(),
-                                 new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                    new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
             if ( topDocs.scoreDocs.length == 0 )
             {
                 // nothing matched to be purged
@@ -279,7 +279,7 @@ public class DefaultTimelineIndexer
     {
         final Document doc = new Document();
         doc.add( new Field( TIMESTAMP, DateTools.timeToString( record.getTimestamp(), TIMELINE_RESOLUTION ),
-                            Field.Store.YES, Field.Index.NOT_ANALYZED ) );
+            Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         doc.add( new Field( TYPE, record.getType(), Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         doc.add( new Field( SUBTYPE, record.getSubType(), Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         for ( Map.Entry<String, String> dataEntry : record.getData().entrySet() )
@@ -294,14 +294,14 @@ public class DefaultTimelineIndexer
         if ( isEmptySet( types ) && isEmptySet( subTypes ) )
         {
             return new TermRangeQuery( TIMESTAMP, DateTools.timeToString( from, TIMELINE_RESOLUTION ),
-                                       DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true );
+                DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true );
         }
         else
         {
             final BooleanQuery result = new BooleanQuery();
             result.add(
                 new TermRangeQuery( TIMESTAMP, DateTools.timeToString( from, TIMELINE_RESOLUTION ),
-                                    DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true ), Occur.MUST );
+                    DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true ), Occur.MUST );
             if ( !isEmptySet( types ) )
             {
                 final BooleanQuery typeQ = new BooleanQuery();

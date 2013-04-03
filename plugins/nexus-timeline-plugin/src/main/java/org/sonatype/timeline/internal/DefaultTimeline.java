@@ -15,6 +15,7 @@ package org.sonatype.timeline.internal;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -187,8 +188,8 @@ public class DefaultTimeline
     }
 
     @Override
-    public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter
-        filter, TimelineCallback callback )
+    public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
+                          TimelineCallback callback )
     {
         if ( !started )
         {
@@ -199,7 +200,7 @@ public class DefaultTimeline
 
     @Override
     public void retrieve( long fromTime, long toTime, int from, int count, Set<String> types, Set<String> subTypes,
-        TimelineFilter filter, TimelineCallback callback )
+                          TimelineFilter filter, TimelineCallback callback )
     {
         if ( !started )
         {
@@ -225,7 +226,7 @@ public class DefaultTimeline
     }
 
     protected int purgeFromIndexer( final long timestamp, final Set<String> types, final Set<String> subTypes,
-        final TimelineFilter filter )
+                                    final TimelineFilter filter )
     {
         return doShared( new Work<Integer>()
         {
@@ -239,8 +240,8 @@ public class DefaultTimeline
     }
 
     protected void retrieveFromIndexer( final long fromTime, final long toTime, final int from, final int count,
-        final Set<String> types, final Set<String> subTypes, final TimelineFilter filter,
-        final TimelineCallback callback )
+                                        final Set<String> types, final Set<String> subTypes,
+                                        final TimelineFilter filter, final TimelineCallback callback )
     {
         doShared( new Work<Void>()
         {
@@ -254,7 +255,7 @@ public class DefaultTimeline
         } );
     }
 
-// ==
+    // ==
 
     protected static interface Work<E>
     {
