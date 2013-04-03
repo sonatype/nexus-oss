@@ -60,8 +60,6 @@ import static org.hamcrest.Matchers.not;
 
 /**
  * Tests {@link DefaultFSLocalRepositoryStorage} in relation to issue https://issues.sonatype.org/browse/NEXUS-5612
- * 
- * @since 2.0
  */
 public class NEXUS5612DefaultFSLocalRepositoryStorageTest
     extends AbstractProxyTestEnvironment
