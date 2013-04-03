@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -22,12 +25,11 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.authc.credential.PasswordService;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.configuration.DefaultSecurityConfigurationManager;
-import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
@@ -35,7 +37,6 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -45,9 +46,7 @@ import org.sonatype.security.usermanagement.UserStatus;
 public class UserManagerTest
     extends AbstractSecurityTestCase
 {
-	private DefaultSecurityConfigurationManager securityConfigurationManager;
-    
-    private PasswordGenerator passwordGenerator;
+    private PasswordService passwordService;
 
     @Override
     protected void setUp()
@@ -60,9 +59,7 @@ public class UserManagerTest
         FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ),
                                  new File( CONFIG_DIR, "security.xml" ) );
         
-        securityConfigurationManager = (DefaultSecurityConfigurationManager) lookup( SecurityConfigurationManager.class, "default" );
-        
-        passwordGenerator = lookup( PasswordGenerator.class, "default" );
+        passwordService = lookup( PasswordService.class, "default" );
     }
 
     public SecuritySystem getSecuritySystem()
@@ -127,7 +124,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
         Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
         Assert.assertEquals( secUser.getLastName(), user.getLastName() );
-        Assert.assertEquals( secUser.getPassword(), this.hashPassword("my-password", secUser.getSalt()) );
+        assertThat( this.passwordService.passwordsMatch("my-password", secUser.getPassword()), is(true) );
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
@@ -151,8 +148,7 @@ public class UserManagerTest
         userManager.changePassword( "test-user", "new-user-password" );
 
         CUser user = this.getConfigurationManager().readUser( "test-user" );
-        Assert.assertEquals( user.getPassword(),
-        					 this.hashPassword("new-user-password", user.getSalt()));
+        assertThat(this.passwordService.passwordsMatch("new-user-password", user.getPassword()), is(true));
     }
 
     public void testUpdateUser()
@@ -386,10 +382,4 @@ public class UserManagerTest
 
         return roleIds;
     }
-    
-    private String hashPassword(String clearPassword, String salt)
-    {
-    	return this.passwordGenerator.hashPassword(clearPassword, salt, this.securityConfigurationManager.getHashIterations());
-    }
-
 }

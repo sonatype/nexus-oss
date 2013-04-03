@@ -23,11 +23,10 @@ import java.util.Set;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.realm.Realm;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.security.configuration.DefaultSecurityConfigurationManager;
-import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -49,9 +48,9 @@ public class XmlAuthenticatingRealmTest
 
     private DefaultConfigurationManager configurationManager;
     
-    private DefaultSecurityConfigurationManager securityConfigurationManager;
-    
     private PasswordGenerator passwordGenerator;
+    
+    private PasswordService passwordService;
     
     private CUser testUser;
 
@@ -75,9 +74,8 @@ public class XmlAuthenticatingRealmTest
 
         configurationManager.clearCache();
         
-        securityConfigurationManager = (DefaultSecurityConfigurationManager) lookup( SecurityConfigurationManager.class, "default" );
-        
         passwordGenerator = lookup( PasswordGenerator.class, "default" );
+        passwordService = lookup( PasswordService.class, "default" );
 
         configFile.delete();
     }
@@ -93,7 +91,7 @@ public class XmlAuthenticatingRealmTest
 
         String password = new String( (char[]) ai.getCredentials() );
 
-        assertEquals( this.hashPassword("password", testUser.getSalt()), password );
+        assertThat(this.passwordService.passwordsMatch("password", password), is(true));
     }
 
     public void testCreateWithPassowrd()
@@ -122,9 +120,7 @@ public class XmlAuthenticatingRealmTest
 
         String password = new String( (char[]) ai.getCredentials() );
         
-        CUser updatedUser = this.configurationManager.readUser(username);
-
-        assertEquals( this.hashPassword(clearPassword, updatedUser.getSalt()) , password );
+        assertThat(this.passwordService.passwordsMatch(clearPassword, password), is(true));
     }
 
     public void testFailedAuthentication()
@@ -177,19 +173,17 @@ public class XmlAuthenticatingRealmTest
         CUser updatedUser = this.configurationManager.readUser(username);
         String hash = new String( (char[]) ai.getCredentials() );
         
-        assertThat(hash, is(this.hashPassword(password, updatedUser.getSalt())));
-        assertThat(updatedUser.getPassword(), is(this.hashPassword(password, updatedUser.getSalt())));
-        
+        assertThat(this.passwordService.passwordsMatch(password, hash), is(true));
+        assertThat(this.passwordService.passwordsMatch(password, updatedUser.getPassword()), is(true));
     }
 
     private void buildTestAuthenticationConfig( String status )
         throws InvalidConfigurationException
     {
-        String salt = this.passwordGenerator.generateSalt();
-        buildTestAuthenticationConfig(status, this.hashPassword("password", salt), salt);
+        buildTestAuthenticationConfig(status, this.hashPassword("password"));
     }
     
-    private void buildTestAuthenticationConfig(String status, String hash, String salt)
+    private void buildTestAuthenticationConfig(String status, String hash)
     	throws InvalidConfigurationException
     {
         CPrivilege priv = new CPrivilege();
@@ -225,7 +219,6 @@ public class XmlAuthenticatingRealmTest
         testUser.setLastName( "dummyLastName" );
         testUser.setStatus( status );
         testUser.setId( "username" );
-        testUser.setSalt(salt);
         testUser.setPassword(hash);
 
         Set<String> roles = new HashSet<String>();
@@ -238,12 +231,12 @@ public class XmlAuthenticatingRealmTest
     private void buildLegacyTestAuthenticationConfig(String password)
     	throws InvalidConfigurationException
     {
-        buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, this.legacyHashPassword(password), "");
+        buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, this.legacyHashPassword(password));
     }
     
-    private String hashPassword(String password, String salt)
+    private String hashPassword(String password)
     {
-        return this.passwordGenerator.hashPassword(password, salt, this.securityConfigurationManager.getHashIterations());
+        return this.passwordService.encryptPassword(password);
     }
     
     private String legacyHashPassword(String password)

@@ -25,20 +25,17 @@ import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authc.credential.PasswordMatcher;
+import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.util.ByteSource;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.inject.Description;
-import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.Sha512ThenSha1ThenMd5CredentialsMatcher;
-import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
@@ -61,19 +58,18 @@ public class XmlAuthenticatingRealm
 
     private ConfigurationManager configuration;
     
-    private SecurityConfigurationManager securityConfiguration;
-    
-    private PasswordGenerator passwordGenerator;
+    private PasswordService passwordService;
 
     @Inject
     public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration,
-    							   SecurityConfigurationManager securityConfiguration,
-    							   PasswordGenerator passwordGenerator )
+                                   PasswordService passwordService)
     {
         this.configuration = configuration;
-        this.securityConfiguration = securityConfiguration;
-        this.passwordGenerator = passwordGenerator;
-        setCredentialsMatcher( new Sha512ThenSha1ThenMd5CredentialsMatcher(this.securityConfiguration.getHashIterations()) );
+        this.passwordService = passwordService;
+        
+        PasswordMatcher passwordMatcher = new PasswordMatcher();
+        passwordMatcher.setPasswordService(this.passwordService);
+        setCredentialsMatcher( passwordMatcher );
     }
 
     @Override
@@ -147,19 +143,20 @@ public class XmlAuthenticatingRealm
     {
     	//Store current values to rollback if update fails
     	String currentPasswordHash = user.getPassword();
-    	String salt = user.getSalt();
+    	//String salt = user.getSalt();
     	
     	try
     	{
-	    	user.setSalt(this.passwordGenerator.generateSalt());
-	    	user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
+	    	//user.setSalt(this.passwordGenerator.generateSalt());
+	    	//user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
+    	    user.setPassword(this.passwordService.encryptPassword(password));
 	    	this.configuration.updateUser(user);
 	    	this.configuration.save();
     	}
     	catch(Exception e)
     	{
     		//Update failed, rollback to previous values
-    		user.setSalt(salt);
+    		//user.setSalt(salt);
     		user.setPassword(currentPasswordHash);
     		this.logger.error("Unable to update hash for user {}", user.getId());
     	}
@@ -200,7 +197,8 @@ public class XmlAuthenticatingRealm
      */
     private boolean isLegacyUser(CUser user)
     {
-    	return StringUtils.isBlank(user.getSalt());
+        //return StringUtils.isBlank(user.getSalt());
+        return user.getPassword().length() <= 40;
     }
     
     /*
@@ -212,6 +210,7 @@ public class XmlAuthenticatingRealm
      */
     private AuthenticationInfo createAuthenticationInfo(CUser user)
     {
-    	return new SimpleAuthenticationInfo( user.getId(), user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt() != null ? user.getSalt() : ""), getName() );
+    	//return new SimpleAuthenticationInfo( user.getId(), user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt() != null ? user.getSalt() : ""), getName() );
+    	return new SimpleAuthenticationInfo( user.getId(), user.getPassword().toCharArray(), getName() );
     }
 }

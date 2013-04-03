@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.shiro.authc.credential.PasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -64,22 +65,20 @@ public class SecurityXmlUserManager
 
     private final ConfigurationManager configuration;
     
-    private final SecurityConfigurationManager securityConfiguration;
+    //private final SecurityConfigurationManager securityConfiguration;
 
     private final SecuritySystem securitySystem;
     
-    private final PasswordGenerator passwordGenerator;
+    private final PasswordService passwordService;
 
     @Inject
     public SecurityXmlUserManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
-                                   SecuritySystem securitySystem,
-                                   SecurityConfigurationManager securityConfiguration,
-                                   PasswordGenerator passwordGenerator)
+                                   SecuritySystem securitySystem,                                   
+                                   PasswordService passwordService)
     {
         this.configuration = configuration;
-        this.securityConfiguration = securityConfiguration;
-        this.securitySystem = securitySystem;        
-        this.passwordGenerator = passwordGenerator;
+        this.securitySystem = securitySystem;
+        this.passwordService = passwordService;
     }
 
     protected CUser toUser( User user )
@@ -197,7 +196,7 @@ public class SecurityXmlUserManager
         throws InvalidConfigurationException
     {
         CUser secUser = this.toUser( user );
-        this.hashPassword(secUser,  password);
+        secUser.setPassword(this.passwordService.encryptPassword(password));
         this.configuration.createUser( secUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
 
@@ -208,8 +207,8 @@ public class SecurityXmlUserManager
     public void changePassword( String userId, String newPassword )
         throws UserNotFoundException, InvalidConfigurationException
     {
-        CUser secUser = this.configuration.readUser( userId );        
-        this.hashPassword(secUser,  newPassword);
+        CUser secUser = this.configuration.readUser( userId );
+        secUser.setPassword(this.passwordService.encryptPassword(newPassword));
         this.configuration.updateUser( secUser );
         this.saveConfiguration();
     }
@@ -221,7 +220,6 @@ public class SecurityXmlUserManager
         CUser oldSecUser = this.configuration.readUser( user.getUserId() );
         CUser newSecUser = this.toUser( user );
         newSecUser.setPassword( oldSecUser.getPassword() );
-        newSecUser.setSalt( oldSecUser.getSalt() );
 
         this.configuration.updateUser( newSecUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
@@ -312,27 +310,6 @@ public class SecurityXmlUserManager
         return this.securitySystem;
     }
     
-    private SecurityConfigurationManager getSecurityConfiguration()
-    {
-    	return this.securityConfiguration;
-    }
-
-    private String hashPassword( CUser user, String clearPassword )
-    {
-        // set the password if its not null
-        if ( clearPassword != null && clearPassword.trim().length() > 0 )
-        {
-        	user.setSalt(this.passwordGenerator.generateSalt());
-        	user.setPassword(this.passwordGenerator.hashPassword(clearPassword, user.getSalt(), getSecurityConfiguration().getHashIterations()));        	
-        }
-        else
-        {
-        	user.setPassword(clearPassword);
-        }
-
-        return clearPassword;
-    }
-
     public void setUsersRoles( String userId, String userSource, Set<RoleIdentifier> roleIdentifiers )
         throws UserNotFoundException, InvalidConfigurationException
     {

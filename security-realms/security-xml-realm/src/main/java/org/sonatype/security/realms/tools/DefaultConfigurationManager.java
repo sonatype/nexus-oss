@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.shiro.authc.credential.PasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
@@ -32,7 +33,6 @@ import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -43,7 +43,6 @@ import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
-import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
@@ -68,9 +67,7 @@ public class DefaultConfigurationManager
 
     private final List<SecurityConfigurationModifier> configurationModifiers;
     
-    private final PasswordGenerator passwordGenerator;
-    
-    private final SecurityConfigurationManager securityConfiguration;
+    private final PasswordService passwordService;
 
     @Inject
     public DefaultConfigurationManager( List<SecurityConfigurationModifier> configurationModifiers,
@@ -78,16 +75,14 @@ public class DefaultConfigurationManager
                                         SecurityConfigurationValidator validator,
                                         @Named( "file" ) SecurityModelConfigurationSource configurationSource,
                                         List<PrivilegeDescriptor> privilegeDescriptors,
-                                        PasswordGenerator passwordGenerator,
-                                        SecurityConfigurationManager securityConfiguration)
+                                        PasswordService passwordService )
     {
         this.configurationModifiers = configurationModifiers;
         this.configCleaner = configCleaner;
         this.validator = validator;
         this.configurationSource = configurationSource;
         this.privilegeDescriptors = privilegeDescriptors;
-        this.passwordGenerator = passwordGenerator;
-        this.securityConfiguration = securityConfiguration;
+        this.passwordService = passwordService;
     }
 
     public List<CPrivilege> listPrivileges()
@@ -188,8 +183,7 @@ public class DefaultConfigurationManager
         // set the password if its not null
         if ( password != null && password.trim().length() > 0 )
         {
-        	user.setSalt(this.passwordGenerator.generateSalt());
-            user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
+            user.setPassword(this.passwordService.encryptPassword(password));
         }
 
         ValidationResponse vr = validator.validateUser( context, user, roles, false );
