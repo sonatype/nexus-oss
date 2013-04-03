@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,6 +49,35 @@ public class RemotePrefixFileStrategy
     extends AbstractRemoteStrategy
     implements RemoteStrategy
 {
+    private static final PrefixSource UNSUPPORTED_PREFIXSOURCE = new PrefixSource()
+    {
+        @Override
+        public boolean exists()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean supported()
+        {
+            return false;
+        }
+
+        @Override
+        public List<String> readEntries()
+            throws IOException
+        {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public long getLostModifiedTimestamp()
+        {
+            return 0;
+        }
+
+    };
+
     protected static final String ID = "prefix-file";
 
     private final Config config;
@@ -86,7 +117,7 @@ public class RemotePrefixFileStrategy
                 Result unmarshalled = new TextFilePrefixSourceMarshaller( config ).read( item );
                 if ( !unmarshalled.supported() )
                 {
-                    return new StrategyResult( "Remote disabled automatic routing", null, false );
+                    return new StrategyResult( "Remote disabled automatic routing", UNSUPPORTED_PREFIXSOURCE, false );
                 }
 
                 final PrefixSource prefixSource = new ArrayListPrefixSource( unmarshalled.entries() );
