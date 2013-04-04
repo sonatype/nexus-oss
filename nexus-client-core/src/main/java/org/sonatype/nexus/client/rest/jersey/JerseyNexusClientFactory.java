@@ -127,8 +127,7 @@ public class JerseyNexusClientFactory
 
     protected String discoverClientVersion()
     {
-        // TODO: Should default be "1.0" to behave as older clients, if version is not discovered
-        return Version.readVersion( "/META-INF/maven/org.sonatype.nexus.client/nexus-client-core/pom.properties", "1.0" );
+        return Version.readVersion( "/META-INF/maven/org.sonatype.nexus.client/nexus-client-core/pom.properties", "unknown" );
     }
 
     // ==
