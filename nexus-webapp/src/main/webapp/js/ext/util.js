@@ -13,8 +13,7 @@
 /*global define*/
 define('ext/util',
       [
-        'ext/util/event',
-        'ext/util/CSS'
+        'ext/util/event'
       ],
       function(Ext) {
         return Ext;
