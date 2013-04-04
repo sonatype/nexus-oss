@@ -20,9 +20,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.security.model.v2_0_5.CRole;
-import org.sonatype.security.model.v2_0_5.CUserRoleMapping;
-import org.sonatype.security.model.v2_0_5.Configuration;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.upgrade.AbstractDataUpgrader;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
 
