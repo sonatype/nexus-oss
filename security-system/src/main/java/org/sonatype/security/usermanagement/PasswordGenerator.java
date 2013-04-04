@@ -27,13 +27,6 @@ public interface PasswordGenerator
      * @return
      */
     String generatePassword( int minChars, int maxChars );
-    
-    /**
-     * Generate a random string of data to be used to salt a password hash
-     * 
-     * @return the generated salt
-     */
-    String generateSalt();
 
     /**
      * Hash a password String.
@@ -43,15 +36,4 @@ public interface PasswordGenerator
      * @deprecated use only to generate legacy unsalted password hashes
      */
     String hashPassword( String password );
-    
-    /**
-     * Hash a password, using the specified salt, for the specified
-     * number of iterations
-     * 
-     * @param clearPassword password to be hashed
-     * @param salt used to randomize and strengthen the hash
-     * @param hashIterations number of hash iterations to perform. Provides key stretching
-     * @return the hashed password
-     */
-    String hashPassword( String clearPassword, String salt, int hashIterations);
 }
