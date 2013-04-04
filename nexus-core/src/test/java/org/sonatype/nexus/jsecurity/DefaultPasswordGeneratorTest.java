@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.jsecurity;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -96,16 +92,16 @@ public class DefaultPasswordGeneratorTest
     	String hash1 = pwGenerator.hashPassword(password, salt, hashIterations);
     	String hash2 = pwGenerator.hashPassword(password, salt, hashIterations);
     	
-    	assertThat(hash2, is(hash1));
+    	Assert.assertEquals(hash1, hash2);
     	
     	String salt2 = pwGenerator.generateSalt();
     	String hash3 = pwGenerator.hashPassword(password, salt2, hashIterations);
-
-    	assertThat(hash3, not(hash1));
+    	
+    	Assert.assertFalse(hash1.equals(hash3));
     	
     	String hash4 = pwGenerator.hashPassword(password, salt, 1);
     	
-    	assertThat(hash4, not(hash1));
+    	Assert.assertFalse(hash1.equals(hash4));
     }
     
     @Test
@@ -121,6 +117,6 @@ public class DefaultPasswordGeneratorTest
     		salts.add(pwGenerator.generateSalt());
     	}
     	
-    	assertThat(salts.size(), is(iterations));
+    	Assert.assertTrue(salts.size() == iterations);
     }
 }
