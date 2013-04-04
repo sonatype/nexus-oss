@@ -83,10 +83,4 @@ public class DefaultSecurityConfigurationUpgraderTest
     {
     	testUpgrade("security-202.xml");        
     }
-    
-    public void testFrom205()
-        throws Exception
-    {
-    	testUpgrade("security-205.xml");
-    }
 }

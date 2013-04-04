@@ -137,12 +137,6 @@
     public static final String MODEL_VERSION = "2.0.5";
 ]]></code>
                 </codeSegment>
-                <codeSegment>
-                    <version>2.0.6</version>
-                    <code><![CDATA[
-    public static final String MODEL_VERSION = "2.0.6";
-]]></code>
-                </codeSegment>
             </codeSegments>
         </class>
 
@@ -186,13 +180,6 @@
                     <type>String</type>
                     <required>true</required>
                     <description>Users password, note this is just the hash of the password, not the actual password.</description>
-                </field>
-                <field>
-                    <name>salt</name>
-                    <version>2.0.6+</version>
-                    <type>String</type>
-                    <required>false</required>
-                    <description>Password salt</description>
                 </field>
                 <field>
                     <name>status</name>
