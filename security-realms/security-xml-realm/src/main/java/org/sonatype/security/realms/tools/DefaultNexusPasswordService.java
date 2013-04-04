@@ -17,15 +17,25 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.authc.credential.HashingPasswordService;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.Hash;
-import org.apache.shiro.crypto.hash.format.HexFormat;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 
+/*
+ * A PasswordService based on the current Nexus password policy, which is
+ * also backward compatible with legacy Nexus passwords
+ * 
+ * The intent of the password service is to encapsulate all password handling
+ * details, such as password comparisons, hashing algorithm, hash iterations, salting policy, etc.
+ * 
+ * This class is just a wrapper around DefaultPasswordService to apply Nexus-specific hashing policy,
+ * and provide backward compatibility with legacy Nexus passwords
+ * 
+ * @since 2.5
+ */
 @Singleton
 @Typed( PasswordService.class )
 @Named( "default" )
@@ -41,15 +51,24 @@ public class DefaultNexusPasswordService
      */
     private final SecurityConfigurationManager securityConfiguration;
     
+    /**
+     * Provides the actual implementation of PasswordService.
+     * We are just wrapping to apply Nexus policy
+     */
     private final DefaultPasswordService passwordService;
     
-    private final DefaultPasswordService legacyPasswordService;
+    /**
+     * Provides password services for legacy passwords (e.g. pre-2.5 SHA-1/MD5-based hashes)
+     */
+    private final PasswordService legacyPasswordService;
     
     @Inject
-    public DefaultNexusPasswordService(SecurityConfigurationManager securityConfiguration)
+    public DefaultNexusPasswordService(SecurityConfigurationManager securityConfiguration,
+                                       @Named("legacy") PasswordService legacyPasswordService)
     {
         this.securityConfiguration = securityConfiguration;
         this.passwordService = new DefaultPasswordService();
+        this.legacyPasswordService = legacyPasswordService;
 
         //Create and set a hash service according to our hashing policies 
         DefaultHashService hashService = new DefaultHashService();
@@ -57,15 +76,6 @@ public class DefaultNexusPasswordService
         hashService.setHashIterations(this.securityConfiguration.getHashIterations());
         hashService.setGeneratePublicSalt(true);
         this.passwordService.setHashService(hashService);
-        
-        this.legacyPasswordService = new DefaultPasswordService();
-        DefaultHashService legacyHashService = new DefaultHashService();
-        legacyHashService.setHashAlgorithmName("SHA-1");
-        legacyHashService.setHashIterations(1);
-        legacyHashService.setGeneratePublicSalt(false);
-        this.legacyPasswordService.setHashService(legacyHashService);
-        this.legacyPasswordService.setHashFormat(new HexFormat());
-        
     }
 
     @Override
@@ -78,7 +88,20 @@ public class DefaultNexusPasswordService
     @Override
     public boolean passwordsMatch(Object submittedPlaintext, String encrypted)
     {
-        return this.legacyPasswordService.passwordsMatch(submittedPlaintext,  encrypted);
+        //When hash is just a string, it could be a legacy password. Check both
+        //current and legacy password services
+        
+        if(this.passwordService.passwordsMatch(submittedPlaintext, encrypted))
+        {
+            return true;
+        }
+        
+        if(this.legacyPasswordService.passwordsMatch(submittedPlaintext,  encrypted))
+        {
+            return true;
+        }
+        
+        return false;
     }
 
     @Override
