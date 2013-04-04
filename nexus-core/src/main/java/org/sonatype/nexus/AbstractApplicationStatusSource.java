@@ -71,24 +71,19 @@ public abstract class AbstractApplicationStatusSource
     // ==
 
     /**
-     * Returns the SystemStatus, guaranteeing it's consistent state.
+     * Returns the SystemStatus, guaranteeing its consistent state.
      */
     public SystemStatus getSystemStatus()
     {
-        updateSystemStatusIfNeeded( false );
+        return doGetSystemStatus(false);
+    }
 
-        Lock lock = getLock().readLock();
-
-        lock.lock();
-
-        try
-        {
-            return getSystemStatusInternal();
-        }
-        finally
-        {
-            lock.unlock();
-        }
+    /**
+     * Returns the SystemStatus, forcing an update of possibly cached information, and guaranteeing its consistent state.
+     */
+    public SystemStatus getUpdatedSystemStatus()
+    {
+        return doGetSystemStatus( true );
     }
 
     public boolean setState( SystemState state )
@@ -102,6 +97,24 @@ public abstract class AbstractApplicationStatusSource
             getSystemStatusInternal().setState( state );
 
             return true;
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    private SystemStatus doGetSystemStatus(boolean force)
+    {
+        updateSystemStatusIfNeeded( force );
+
+        Lock lock = getLock().readLock();
+
+        lock.lock();
+
+        try
+        {
+            return getSystemStatusInternal();
         }
         finally
         {
