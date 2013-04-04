@@ -59,8 +59,6 @@ import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 import org.sonatype.security.SecuritySystem;
 
-import com.google.common.base.Strings;
-
 public abstract class AbstractArtifactPlexusResource
     extends AbstractNexusPlexusResource
 {
@@ -315,102 +313,52 @@ public abstract class AbstractArtifactPlexusResource
         // of multipart form upload, where params will contain "extra" fields:
         // "r"=repoId, "g"=G, "a"=A, "v"=V, "p"=P, "c"=C, "e"=E
 
-        String repositoryId = null;
-        boolean hasPom = false;
-        String extension = null;
-        String classifier = null;
-        ArtifactCoordinate coords = null;
-
-        PomArtifactManager pomManager =
+        final PomArtifactManager pomManager =
             new PomArtifactManager( getNexus().getNexusConfiguration().getTemporaryDirectory() );
+
+        final UploadContext uploadContext = createUploadContext();
 
         try
         {
-            String groupId = null;
-            String artifactId = null;
-            String version = null;
-            String packaging = null;
-
             for ( FileItem fi : files )
             {
                 if ( fi.isFormField() )
                 {
-                    // a parameter
-                    if ( "r".equals( fi.getFieldName() ) )
-                    {
-                        repositoryId = fi.getString();
-                    }
-                    else if ( "g".equals( fi.getFieldName() ) )
-                    {
-                        groupId = fi.getString();
-                    }
-                    else if ( "a".equals( fi.getFieldName() ) )
-                    {
-                        artifactId = fi.getString();
-                    }
-                    else if ( "v".equals( fi.getFieldName() ) )
-                    {
-                        version = fi.getString();
-                    }
-                    else if ( "p".equals( fi.getFieldName() ) )
-                    {
-                        packaging = fi.getString();
-                    }
-                    else if ( "c".equals( fi.getFieldName() ) )
-                    {
-                        classifier = fi.getString();
-                    }
-                    else if ( "e".equals( fi.getFieldName() ) )
-                    {
-                        extension = fi.getString();
-                    }
-                    else if ( "hasPom".equals( fi.getFieldName() ) )
-                    {
-                        hasPom = Boolean.parseBoolean( fi.getString() );
-                    }
-
-                    // create it once we have all, and only if needed
-                    if ( !hasPom && coords == null && !Strings.isNullOrEmpty( groupId )
-                        && !Strings.isNullOrEmpty( artifactId ) && !Strings.isNullOrEmpty( version )
-                        && !Strings.isNullOrEmpty( packaging ) )
-                    {
-                        // repositoryId might be null (staging)
-                        coords = new ArtifactCoordinate();
-                        coords.setGroupId( groupId );
-                        coords.setArtifactId( artifactId );
-                        coords.setVersion( version );
-                        coords.setPackaging( packaging );
-                        uploadGavParametersAvailable( request, repositoryId, coords );
-                    }
+                    // parameters are first in "nibble"
+                    processFormField( request, uploadContext, fi );
                 }
                 else
                 {
-                    // a file
+                    // a file, this means NO parameters will income anymore
+                    // we either received all the GAVs as params, or we have a POM to work with (file1)
                     boolean isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
                     InputStream is = null;
 
                     ArtifactStoreRequest gavRequest = null;
 
-                    if ( hasPom )
+                    if ( uploadContext.isHasPom() )
                     {
                         if ( isPom )
                         {
+                            // this is file1, the POM file content
                             // let it "thru" the pomManager to be able to get GAV from it on later pass
                             pomManager.storeTempPomFile( fi.getInputStream() );
                             is = pomManager.getTempPomFileInputStream();
                         }
                         else
                         {
+                            // this is file2, POM already stored into pomManager
                             is = fi.getInputStream();
                         }
 
                         try
                         {
-                            coords = pomManager.getArtifactCoordinateFromTempPomFile();
-                            if ( isPom )
-                            {
-                                uploadGavParametersAvailable( request, repositoryId, coords );
-                            }
+                            // parse and read GAVs from stored POM, fill in them all into context
+                            final ArtifactCoordinate coords = pomManager.getArtifactCoordinateFromTempPomFile();
+                            uploadContext.setGroupId( coords.getGroupId() );
+                            uploadContext.setArtifactId( coords.getArtifactId() );
+                            uploadContext.setVersion( coords.getVersion() );
+                            uploadContext.setPackaging( coords.getPackaging() );
                         }
                         catch ( IOException e )
                         {
@@ -421,25 +369,30 @@ public abstract class AbstractArtifactPlexusResource
 
                         if ( isPom )
                         {
+                            uploadGavParametersAvailable( request, uploadContext );
                             gavRequest =
-                                getResourceStoreRequest( request, true, false, repositoryId, coords.getGroupId(),
-                                    coords.getArtifactId(), coords.getVersion(), coords.getPackaging(), null, null );
+                                getResourceStoreRequest( request, true, false, uploadContext.getRepositoryId(),
+                                    uploadContext.getGroupId(), uploadContext.getArtifactId(),
+                                    uploadContext.getVersion(), uploadContext.getPackaging(), null, null );
                         }
                         else
                         {
                             gavRequest =
-                                getResourceStoreRequest( request, true, false, repositoryId, coords.getGroupId(),
-                                    coords.getArtifactId(), coords.getVersion(), coords.getPackaging(), classifier,
-                                    extension );
+                                getResourceStoreRequest( request, true, false, uploadContext.getRepositoryId(),
+                                    uploadContext.getGroupId(), uploadContext.getArtifactId(),
+                                    uploadContext.getVersion(), uploadContext.getPackaging(),
+                                    uploadContext.getClassifier(), uploadContext.getExtension() );
                         }
                     }
                     else
                     {
+                        uploadGavParametersAvailable( request, uploadContext );
                         is = fi.getInputStream();
                         gavRequest =
-                            getResourceStoreRequest( request, true, false, repositoryId, coords.getGroupId(),
-                                coords.getArtifactId(), coords.getVersion(), coords.getPackaging(), classifier,
-                                extension );
+                            getResourceStoreRequest( request, true, false, uploadContext.getRepositoryId(),
+                                uploadContext.getGroupId(), uploadContext.getArtifactId(), uploadContext.getVersion(),
+                                uploadContext.getPackaging(), uploadContext.getClassifier(),
+                                uploadContext.getExtension() );
                     }
 
                     final MavenRepository mr = gavRequest.getMavenRepository();
@@ -470,13 +423,13 @@ public abstract class AbstractArtifactPlexusResource
                     }
                     else
                     {
-                        if ( hasPom )
+                        if ( uploadContext.isHasPom() )
                         {
                             helper.storeArtifact( gavRequest, is, null );
                         }
                         else
                         {
-                            helper.storeArtifactWithGeneratedPom( gavRequest, coords.getPackaging(), is, null );
+                            helper.storeArtifactWithGeneratedPom( gavRequest, uploadContext.getPackaging(), is, null );
                         }
                     }
                 }
@@ -488,13 +441,172 @@ public abstract class AbstractArtifactPlexusResource
         }
         finally
         {
-            if ( hasPom )
+            if ( uploadContext.isHasPom() )
             {
                 pomManager.removeTempPomFile();
             }
         }
 
+        final ArtifactCoordinate coords = new ArtifactCoordinate();
+        coords.setGroupId( uploadContext.getGroupId() );
+        coords.setArtifactId( uploadContext.getArtifactId() );
+        coords.setVersion( uploadContext.getVersion() );
+        coords.setPackaging( uploadContext.getPackaging() );
         return coords;
+    }
+
+    protected static class UploadContext
+    {
+        private String repositoryId = null;
+
+        private boolean hasPom = false;
+
+        private String extension = null;
+
+        private String classifier = null;
+
+        private String groupId = null;
+
+        private String artifactId = null;
+
+        private String version = null;
+
+        private String packaging = null;
+
+        public String getRepositoryId()
+        {
+            return repositoryId;
+        }
+
+        public void setRepositoryId( String repositoryId )
+        {
+            this.repositoryId = repositoryId;
+        }
+
+        public boolean isHasPom()
+        {
+            return hasPom;
+        }
+
+        public void setHasPom( boolean hasPom )
+        {
+            this.hasPom = hasPom;
+        }
+
+        public String getExtension()
+        {
+            return extension;
+        }
+
+        public void setExtension( String extension )
+        {
+            this.extension = extension;
+        }
+
+        public String getClassifier()
+        {
+            return classifier;
+        }
+
+        public void setClassifier( String classifier )
+        {
+            this.classifier = classifier;
+        }
+
+        public String getGroupId()
+        {
+            return groupId;
+        }
+
+        public void setGroupId( String groupId )
+        {
+            this.groupId = groupId;
+        }
+
+        public String getArtifactId()
+        {
+            return artifactId;
+        }
+
+        public void setArtifactId( String artifactId )
+        {
+            this.artifactId = artifactId;
+        }
+
+        public String getVersion()
+        {
+            return version;
+        }
+
+        public void setVersion( String version )
+        {
+            this.version = version;
+        }
+
+        public String getPackaging()
+        {
+            return packaging;
+        }
+
+        public void setPackaging( String packaging )
+        {
+            this.packaging = packaging;
+        }
+    }
+
+    /**
+     * Creates instance of {@link UploadContext} to be used throughout of upload process.
+     * 
+     * @return
+     */
+    protected UploadContext createUploadContext()
+    {
+        return new UploadContext();
+    }
+
+    /**
+     * Invoked for every form field that upload is receiving.
+     * 
+     * @param request
+     * @param uploadContext
+     * @param fileItem
+     * @throws ResourceException
+     */
+    protected void processFormField( final Request request, final UploadContext uploadContext, final FileItem fi )
+        throws ResourceException
+    {
+        if ( "r".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setRepositoryId( fi.getString() );
+        }
+        else if ( "g".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setGroupId( fi.getString() );
+        }
+        else if ( "a".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setArtifactId( fi.getString() );
+        }
+        else if ( "v".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setVersion( fi.getString() );
+        }
+        else if ( "p".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setPackaging( fi.getString() );
+        }
+        else if ( "c".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setClassifier( fi.getString() );
+        }
+        else if ( "e".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setExtension( fi.getString() );
+        }
+        else if ( "hasPom".equals( fi.getFieldName() ) )
+        {
+            uploadContext.setHasPom( Boolean.parseBoolean( fi.getString() ) );
+        }
     }
 
     /**
@@ -502,12 +614,10 @@ public abstract class AbstractArtifactPlexusResource
      * is parsed).
      * 
      * @param request
-     * @param repositoryId
-     * @param coords
+     * @param uploadContext
      * @throws ResourceException
      */
-    protected void uploadGavParametersAvailable( final Request request, final String repositoryId,
-                                                 final ArtifactCoordinate coords )
+    protected void uploadGavParametersAvailable( final Request request, final UploadContext uploadContext )
         throws ResourceException
     {
         // nop
