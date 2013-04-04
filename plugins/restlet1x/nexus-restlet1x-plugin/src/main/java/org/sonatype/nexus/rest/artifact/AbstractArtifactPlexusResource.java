@@ -59,6 +59,8 @@ import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 import org.sonatype.security.SecuritySystem;
 
+import com.google.common.base.Strings;
+
 public abstract class AbstractArtifactPlexusResource
     extends AbstractNexusPlexusResource
 {
@@ -288,29 +290,35 @@ public abstract class AbstractArtifactPlexusResource
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
-        // we have "nibbles": (params,fileA,[fileB])+
-        // the second file is optional
-        // if two files are present, one of them should be POM
+        // Every file selected for upload will generate a SEPARATE upload HTTP POST request
+        // that is multipart form upload basically.
+        // Each upload request has form like: (params, file1, [file2]).
+        // we have two cases, either POM is present for upload too, or user filled in GAVP
+        // fields in upload form and wants us to generate a POM for him.
+        // Params ALWAYS have param "r"=repoId as first element (unless we talk about staging, where this is NOT the
+        // case)
+
+        // First case, when POM is present (POM file is selected), file1 is always POM
+        // and file2 is the (main or classified) artifact (UI does not validate, but cases when packaging=pom,
+        // or user error when packaging=jar but no main artifact selected are possible!)
+        // params are then "r", "hasPom"=TRUE, "c"=C, "e"=E
+        // Interestingly, subsequent requests (those for "extra" artifacts with classifiers
+        // follows the "second case" pattern below, as they get GAV from ArtifactCoordinate response.
+        // The "c" param if null means file2 is classified artifact or main artifact.
+        // The "e" param might be null, if pom is the only upload (ie. packaging=pom)
+        // Still, in case POM.packaging=pom plus one classified artifact, parameters
+        // "c" and "e" will belong to the classified artifact!
+
+        // Second case, when POM is not present (we need to generate it), user has to
+        // fill in the GAVP fields in form on UI. In that case, nibble is always in form of
+        // (params, file1), so it will strictly have only one file appended as last content part
+        // of multipart form upload, where params will contain "extra" fields:
+        // "r"=repoId, "g"=G, "a"=A, "v"=V, "p"=P, "c"=C, "e"=E
+
         String repositoryId = null;
-
         boolean hasPom = false;
-
-        boolean isPom = false;
-
-        InputStream is = null;
-
-        String groupId = null;
-
-        String artifactId = null;
-
-        String version = null;
-
-        String classifier = null;
-
-        String packaging = null;
-
         String extension = null;
-
+        String classifier = null;
         ArtifactCoordinate coords = null;
 
         PomArtifactManager pomManager =
@@ -318,6 +326,11 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
+            String groupId = null;
+            String artifactId = null;
+            String version = null;
+            String packaging = null;
+
             for ( FileItem fi : files )
             {
                 if ( fi.isFormField() )
@@ -356,16 +369,25 @@ public abstract class AbstractArtifactPlexusResource
                         hasPom = Boolean.parseBoolean( fi.getString() );
                     }
 
-                    coords = new ArtifactCoordinate();
-                    coords.setGroupId( groupId );
-                    coords.setArtifactId( artifactId );
-                    coords.setVersion( version );
-                    coords.setPackaging( packaging );
+                    // create it once we have all, and only if needed
+                    if ( !hasPom && coords == null && !Strings.isNullOrEmpty( groupId )
+                        && !Strings.isNullOrEmpty( artifactId ) && !Strings.isNullOrEmpty( version )
+                        && !Strings.isNullOrEmpty( packaging ) )
+                    {
+                        // repositoryId might be null (staging)
+                        coords = new ArtifactCoordinate();
+                        coords.setGroupId( groupId );
+                        coords.setArtifactId( artifactId );
+                        coords.setVersion( version );
+                        coords.setPackaging( packaging );
+                        uploadGavParametersAvailable( request, repositoryId, coords );
+                    }
                 }
                 else
                 {
                     // a file
-                    isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
+                    boolean isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
+                    InputStream is = null;
 
                     ArtifactStoreRequest gavRequest = null;
 
@@ -375,7 +397,6 @@ public abstract class AbstractArtifactPlexusResource
                         {
                             // let it "thru" the pomManager to be able to get GAV from it on later pass
                             pomManager.storeTempPomFile( fi.getInputStream() );
-
                             is = pomManager.getTempPomFileInputStream();
                         }
                         else
@@ -386,13 +407,16 @@ public abstract class AbstractArtifactPlexusResource
                         try
                         {
                             coords = pomManager.getArtifactCoordinateFromTempPomFile();
+                            if ( isPom )
+                            {
+                                uploadGavParametersAvailable( request, repositoryId, coords );
+                            }
                         }
                         catch ( IOException e )
                         {
-                            getLogger().info( e.getMessage() );
-
+                            getLogger().info( "Error occurred while reading the POM file. Malformed POM?", e );
                             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                                "Error occurred while reading the POM file. Malformed POM?" );
+                                "Error occurred while reading the POM file. Malformed POM?", e );
                         }
 
                         if ( isPom )
@@ -412,29 +436,29 @@ public abstract class AbstractArtifactPlexusResource
                     else
                     {
                         is = fi.getInputStream();
-
                         gavRequest =
-                            getResourceStoreRequest( request, true, false, repositoryId, groupId, artifactId, version,
-                                packaging, classifier, extension );
+                            getResourceStoreRequest( request, true, false, repositoryId, coords.getGroupId(),
+                                coords.getArtifactId(), coords.getVersion(), coords.getPackaging(), classifier,
+                                extension );
                     }
 
-                    MavenRepository mr = gavRequest.getMavenRepository();
-
-                    ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
+                    final MavenRepository mr = gavRequest.getMavenRepository();
+                    final ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
 
                     // temporarily we disable SNAPSHOT upload
                     // check is it a Snapshot repo
                     if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
                     {
-                        getLogger().info( "Upload to SNAPSHOT maven repository attempted, returning Bad Request." );
-
+                        getLogger().info( "Upload to SNAPSHOT maven repository {} attempted, returning Bad Request.",
+                            mr );
                         throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                             "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
                     }
 
                     if ( !versionMatchesPolicy( gavRequest.getVersion(), mr.getRepositoryPolicy() ) )
                     {
-                        getLogger().warn( "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
+                        getLogger().info( "Artifact version {} and {} Repository Policy {} mismatch",
+                            gavRequest.getVersion(), mr, mr.getRepositoryPolicy() );
                         throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "The version "
                             + gavRequest.getVersion() + " does not match the repository policy!" );
                     }
@@ -442,7 +466,6 @@ public abstract class AbstractArtifactPlexusResource
                     if ( isPom )
                     {
                         helper.storeArtifactPom( gavRequest, is, null );
-
                         isPom = false;
                     }
                     else
@@ -453,7 +476,7 @@ public abstract class AbstractArtifactPlexusResource
                         }
                         else
                         {
-                            helper.storeArtifactWithGeneratedPom( gavRequest, packaging, is, null );
+                            helper.storeArtifactWithGeneratedPom( gavRequest, coords.getPackaging(), is, null );
                         }
                     }
                 }
@@ -472,6 +495,22 @@ public abstract class AbstractArtifactPlexusResource
         }
 
         return coords;
+    }
+
+    /**
+     * Invoked once from upload method, when all the coordinates are ready (either all form params are processed or POM
+     * is parsed).
+     * 
+     * @param request
+     * @param repositoryId
+     * @param coords
+     * @throws ResourceException
+     */
+    protected void uploadGavParametersAvailable( final Request request, final String repositoryId,
+                                                 final ArtifactCoordinate coords )
+        throws ResourceException
+    {
+        // nop
     }
 
     protected String buildUploadFailedHtmlResponse( Throwable t, Request request, Response response )
