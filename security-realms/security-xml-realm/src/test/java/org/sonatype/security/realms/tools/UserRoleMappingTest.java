@@ -20,12 +20,12 @@ import java.util.Properties;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 
 public class UserRoleMappingTest
-    extends InjectedTestCase
+    extends AbstractSecurityTestCase
 {
 
     public ConfigurationManager getConfigManager()
@@ -124,8 +124,10 @@ public class UserRoleMappingTest
     @Override
     public void configure( Properties properties )
     {
-        properties.put( "security-xml-file", "target/test-classes/org/sonatype/security/locators/security-test.xml" );
         super.configure( properties );
+        
+        //Overriding default value set in parent
+        properties.put( "security-xml-file", "target/test-classes/org/sonatype/security/locators/security-test.xml" );
     }
 
 }
