@@ -34,14 +34,15 @@ import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * UT for NexusClient UA, as it should carry the version from now on.
+ * 
  * @author cstamas
- *
+ * @since 2.5
  */
 public class JerseyNexusTestClientUserAgentTest
     extends JerseyNexusClientTestSupport
 {
     @Test
-    public void createWithGoodUrl()
+    public void checkUAVersionIsProperlyReadAndSet()
         throws MalformedURLException
     {
         final String version =
