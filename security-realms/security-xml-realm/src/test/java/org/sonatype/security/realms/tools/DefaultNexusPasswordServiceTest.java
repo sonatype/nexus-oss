@@ -18,10 +18,10 @@ import static org.hamcrest.Matchers.is;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.crypto.hash.Hash;
 import org.junit.Test;
-import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.security.AbstractSecurityTestCase;
 
 public class DefaultNexusPasswordServiceTest
-    extends InjectedTestCase
+    extends AbstractSecurityTestCase
 {
     DefaultNexusPasswordService passwordService;
 
