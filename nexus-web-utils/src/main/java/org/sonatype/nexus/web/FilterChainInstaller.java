@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.siesta;
+package org.sonatype.nexus.web;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.siesta.SiestaModule.MOUNT_POINT;
 
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -22,30 +22,35 @@ import javax.inject.Provider;
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.security.FilterChain;
 import org.sonatype.security.web.ProtectedPathManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 /**
- * Configures Siesta protected resources.
+ * Installs configured {@link FilterChain}s with {@link ProtectedPathManager}.
  *
- * @since 2.5.0
+ * @since 2.5
  */
 @Named
 @EagerSingleton
-public class SiestaProtectedPaths
+public class FilterChainInstaller
 {
 
     private final EventBus eventBus;
 
     private final Provider<ProtectedPathManager> protectedPathManager;
 
+    private final List<FilterChain> filterChains;
+
     @Inject
-    public SiestaProtectedPaths( final EventBus eventBus,
-                                 final Provider<ProtectedPathManager> protectedPathManager )
+    public FilterChainInstaller( final EventBus eventBus,
+                                 final Provider<ProtectedPathManager> protectedPathManager,
+                                 final List<FilterChain> filterChains )
     {
         this.eventBus = checkNotNull( eventBus );
         this.protectedPathManager = checkNotNull( protectedPathManager );
+        this.filterChains = checkNotNull( filterChains );
 
         eventBus.register( this );
     }
@@ -53,16 +58,18 @@ public class SiestaProtectedPaths
     @Subscribe
     public void onEvent( final NexusStartedEvent event )
     {
-        protectedPathManager.get().addProtectedResource(
-            MOUNT_POINT + "/**", "noSessionCreation,authcBasic"
-        );
+        for ( final FilterChain filterChain : filterChains )
+        {
+            protectedPathManager.get().addProtectedResource(
+                filterChain.getPathPattern(), filterChain.getFilterExpression()
+            );
+        }
     }
 
     @Subscribe
-    public void onEvent( final NexusStoppedEvent evt )
+    public void onEvent( final NexusStoppedEvent event )
     {
         eventBus.unregister( this );
     }
-
 
 }
