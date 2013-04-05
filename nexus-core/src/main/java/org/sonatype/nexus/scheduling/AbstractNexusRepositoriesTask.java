@@ -125,6 +125,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
         for ( String taskType : activeTasks.keySet() )
         {
+            // FIXME: Use nexus scheduler to perform any task lookups so the code can be isolated/managed in one place
+            // FIXME: avoid using plexus container apis directly
+
             ComponentDescriptor<?> cd =
                 plexusContainer.getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
                     taskType );
@@ -163,7 +166,8 @@ public abstract class AbstractNexusRepositoriesTask<T>
             }
             else
             {
-                getLogger().warn( "Could not find component that implements SchedulerTask of type='" + taskType + "'!" );
+                // this can happen due to mismatch between plexus and sisu naming, nothing we need to WARN the user about however
+                getLogger().debug( "Could not find component that implements SchedulerTask of type='" + taskType + "'!" );
             }
         }
 
