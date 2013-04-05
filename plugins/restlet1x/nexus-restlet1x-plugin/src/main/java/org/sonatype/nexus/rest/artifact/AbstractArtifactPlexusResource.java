@@ -284,7 +284,7 @@ public abstract class AbstractArtifactPlexusResource
         return null;
     }
     
-    // ==
+    // == Upload related stuff
     
     /**
      * Method accepting artifact uploads in special form (HTTP POST multipart requests). This resource processes uploads
@@ -459,6 +459,9 @@ public abstract class AbstractArtifactPlexusResource
         return coords;
     }
 
+    /**
+     * Upload context that is used to carry state across FileItem processing iterations.
+     */
     protected static class UploadContext
     {
         private String repositoryId = null;
