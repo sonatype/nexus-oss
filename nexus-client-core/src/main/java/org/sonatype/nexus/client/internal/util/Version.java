@@ -25,7 +25,7 @@ import com.google.common.io.Closeables;
  * Helper static methods for reading Maven properties file to get the version from it.
  * 
  * @author cstamas
- * @since 2.4.1
+ * @since 2.5.0
  */
 public class Version
 {
