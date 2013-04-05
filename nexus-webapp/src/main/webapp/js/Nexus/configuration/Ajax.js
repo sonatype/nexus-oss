@@ -17,11 +17,13 @@ define('Nexus/configuration/Ajax', ['extjs'], function(Ext) {
   };
 
   Ext.Ajax.on('requestexception', function(connection, response) {
-    var contentType = response.getResponseHeader('Content-Type');
-    if ( contentType === 'application/vnd.siesta-error-v1+json') {
-      response.siestaError = Ext.decode(response.responseText);
-    } else if ( contentType === 'application/vnd.siesta-validation-errors-v1+json') {
-      response.siestaValidationError = Ext.decode(response.responseText);
+    if ( response && Ext.isFunction(response.getResponseHeader) ) { // timeouts/socket closed response does not have this method(?)
+      var contentType = response.getResponseHeader('Content-Type');
+      if ( contentType === 'application/vnd.siesta-error-v1+json') {
+        response.siestaError = Ext.decode(response.responseText);
+      } else if ( contentType === 'application/vnd.siesta-validation-errors-v1+json') {
+        response.siestaValidationError = Ext.decode(response.responseText);
+      }
     }
   });
 

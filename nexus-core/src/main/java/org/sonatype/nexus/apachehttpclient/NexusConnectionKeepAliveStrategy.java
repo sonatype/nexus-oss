@@ -35,8 +35,6 @@ public class NexusConnectionKeepAliveStrategy
     private final long maxKeepAliveDuration;
 
     /**
-     * Constructor.
-     *
      * @param maxKeepAliveDuration the max duration in millis for how long to pool the connection.
      */
     public NexusConnectionKeepAliveStrategy( final long maxKeepAliveDuration )
@@ -52,8 +50,6 @@ public class NexusConnectionKeepAliveStrategy
      * idle. Nexus by default does not "believe" much to remote servers, and will never
      * keep connection pooled "forever", nor will keep it pooled for unreasonable long time.
      *
-     * @param response
-     * @param context
      * @return the duration of time which this connection can be safely kept idle in pool.
      */
     public long getKeepAliveDuration( HttpResponse response, HttpContext context )

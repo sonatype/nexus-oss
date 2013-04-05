@@ -15,15 +15,23 @@ package org.sonatype.security.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.basic.StringConverter;
+import com.thoughtworks.xstream.converters.collections.CollectionConverter;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -31,6 +39,7 @@ import org.restlet.data.Status;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -43,6 +52,9 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.rest.model.RoleAndPrivilegeListFilterResource;
+import org.sonatype.security.rest.model.RoleAndPrivilegeListResource;
+import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -307,8 +319,52 @@ public abstract class AbstractSecurityPlexusResource
     public void configureXStream( final XStream xstream )
     {
         super.configureXStream( xstream );
-        xstream.registerLocalConverter( UserChangePasswordResource.class, "oldPassword", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( UserChangePasswordResource.class, "oldPassword",
+                                        new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( UserChangePasswordResource.class, "newPassword", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( RoleResource.class, "id", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( UserResource.class, "userId", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListResource.class, "id", new HtmlUnescapeStringConverter( true) );
+
+        xstream.registerLocalConverter( UserResource.class, "roles", new HtmlUnescapeStringCollectionConverter( "role" ) );
+        xstream.registerLocalConverter( RoleResource.class, "roles", new HtmlUnescapeStringCollectionConverter( "role" ) );
+        xstream.registerLocalConverter( RoleResource.class, "privileges", new HtmlUnescapeStringCollectionConverter( "privilege" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedRoleIds", new HtmlUnescapeStringCollectionConverter( "selectedRoleId" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedPrivilegeIds",
+                                        new HtmlUnescapeStringCollectionConverter( "selectedPrivilegeId" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenRoleIds", new HtmlUnescapeStringCollectionConverter( "hiddenRoleId" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenPrivilegeIds", new HtmlUnescapeStringCollectionConverter( "hiddenPrivilegeId" ) );
+    }
+
+    private static class HtmlUnescapeStringCollectionConverter
+        extends AliasingListConverter
+    {
+
+        public HtmlUnescapeStringCollectionConverter(String alias)
+        {
+            super( String.class, alias );
+        }
+
+        @Override
+        public Object unmarshal( final HierarchicalStreamReader reader, final UnmarshallingContext context )
+        {
+            final List<Object> unmarshal = (List<Object>) super.unmarshal( reader, context );
+
+            // return value needs to be a "real" List
+            return Lists.newArrayList( Collections2.transform( unmarshal, new Function() {
+                @Nullable
+                @Override
+                public Object apply( @Nullable final Object input )
+                {
+                    if ( input instanceof String )
+                    {
+                        return StringEscapeUtils.unescapeHtml( (String) input );
+                    }
+
+                    return input;
+                }
+            } ));
+        }
     }
 
     private class HtmlUnescapeStringConverter

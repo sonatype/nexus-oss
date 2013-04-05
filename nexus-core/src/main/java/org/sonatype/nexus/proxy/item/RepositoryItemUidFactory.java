@@ -45,12 +45,4 @@ public interface RepositoryItemUidFactory
      * @return
      */
     RepositoryItemUidLock createUidLock( RepositoryItemUid uid );
-
-    /**
-     * Creates a shared attribute UIDLock based on a uid reference.
-     * 
-     * @param uid
-     * @return
-     */
-    RepositoryItemUidLock createUidAttributeLock( RepositoryItemUid uid );
 }

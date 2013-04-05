@@ -131,7 +131,7 @@ public class LegacyFSAttributeStorage
             return false;
         }
 
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.delete );
 
@@ -171,7 +171,7 @@ public class LegacyFSAttributeStorage
             return null;
         }
 
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.read );
 

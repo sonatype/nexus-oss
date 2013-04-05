@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 
 import org.apache.http.client.methods.AbortableHttpRequest;
+import org.sonatype.nexus.util.WrappingInputStream;
 
 /**
  * Best-effort interruptable InputStream wrapper. The wrapper checks for Thread.isInterrupred before delegating to the
@@ -24,17 +25,14 @@ import org.apache.http.client.methods.AbortableHttpRequest;
  * InterruptedIOException.
  */
 class InterruptableInputStream
-    extends InputStream
+    extends WrappingInputStream
 {
-
-    private final InputStream stream;
-
     private AbortableHttpRequest request;
 
     public InterruptableInputStream( final AbortableHttpRequest request, final InputStream stream )
     {
+        super(stream);
         this.request = request;
-        this.stream = stream;
     }
 
     public InterruptableInputStream( final InputStream stream )
@@ -60,7 +58,7 @@ class InterruptableInputStream
         throws IOException
     {
         abortIfInterrupted();
-        return stream.read();
+        return super.read();
     }
 
     @Override
@@ -68,7 +66,7 @@ class InterruptableInputStream
         throws IOException
     {
         abortIfInterrupted();
-        return stream.read( b );
+        return super.read( b );
     }
 
     @Override
@@ -76,7 +74,7 @@ class InterruptableInputStream
         throws IOException
     {
         abortIfInterrupted();
-        return stream.read( b, off, len );
+        return super.read( b, off, len );
     }
 
     @Override
@@ -84,7 +82,7 @@ class InterruptableInputStream
         throws IOException
     {
         abortIfInterrupted();
-        return stream.skip( n );
+        return super.skip( n );
     }
 
     @Override
@@ -92,7 +90,7 @@ class InterruptableInputStream
         throws IOException
     {
         abortIfInterrupted();
-        return stream.available();
+        return super.available();
     }
 
     @Override
@@ -101,26 +99,14 @@ class InterruptableInputStream
     {
         // do not throw InterruptedIOException here!
         // this will not close the stream and likely mask original exception!
-        stream.close();
+        super.close();
     }
 
     @Override
-    public void mark( int readlimit )
-    {
-        stream.mark( readlimit );
-    }
-
-    @Override
-    public void reset()
+    public synchronized void reset()
         throws IOException
     {
         abortIfInterrupted();
-        stream.reset();
-    }
-
-    @Override
-    public boolean markSupported()
-    {
-        return stream.markSupported();
+        super.reset();
     }
 }

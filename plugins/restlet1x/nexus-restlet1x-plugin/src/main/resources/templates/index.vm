@@ -15,7 +15,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <title>$appName</title>
-  
+
+  <meta http-equiv="X-UA-Compatible" content="IE=8,IE=9" />
+
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
   <link rel="icon" type="image/png" href="favicon.png"><!-- Major Browsers -->
@@ -98,18 +100,23 @@
                     require([ js ], init, errorCallback);
                 });
 
+                var deps = ['require'];
+                var bootModules = [];
+
                 ## for each r.js enabled plugin...
                 #foreach($rJs in $rJsContributions)
-                    var deps = ['require'];
-                    ## ... construct preload/dependency array
                     #foreach($dependency in $rJs.getDependencies())
                         deps.push('$dependency');
                     #end
-                    ## ... and require the bootstrap module with the dependencies
-                    require(deps, function(require) {
-                        require(['$rJs.getModule()'], init, errorCallback);
-                    });
+
+                    bootModules.push('$rJs.getModule()');
                 #end
+
+                require(deps, function(require) {
+                    Ext.each(bootModules, function(mod) {
+                        require([mod], init, errorCallback);
+                    });
+                });
             });
         }
 

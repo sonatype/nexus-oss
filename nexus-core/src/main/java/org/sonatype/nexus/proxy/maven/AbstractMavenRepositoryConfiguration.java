@@ -32,9 +32,9 @@ public abstract class AbstractMavenRepositoryConfiguration
 
     public static final String CLEANSE_REPOSITORY_METADATA = "cleanseRepositoryMetadata";
 
-    public static final String WL_DISCOVERY_ENABLED = "wlDiscoveryEnabled";
+    public static final String ROUTING_DISCOVERY_ENABLED = "routingDiscoveryEnabled";
 
-    public static final String WL_DISCOVERY_INTERVAL = "wlDiscoveryInterval";
+    public static final String ROUTING_DISCOVERY_INTERVAL = "routingDiscoveryInterval";
 
     public AbstractMavenRepositoryConfiguration( Xpp3Dom configuration )
     {
@@ -102,24 +102,24 @@ public abstract class AbstractMavenRepositoryConfiguration
         setNodeValue( getRootNode(), CLEANSE_REPOSITORY_METADATA, Boolean.toString( val ) );
     }
 
-    public boolean isWLDiscoveryEnabled()
+    public boolean isRoutingDiscoveryEnabled()
     {
-        return Boolean.parseBoolean( getNodeValue( getRootNode(), WL_DISCOVERY_ENABLED, Boolean.TRUE.toString() ) );
+        return Boolean.parseBoolean( getNodeValue( getRootNode(), ROUTING_DISCOVERY_ENABLED, Boolean.TRUE.toString() ) );
     }
 
-    public void setWLDiscoveryEnabled( boolean val )
+    public void setRoutingDiscoveryEnabled( boolean val )
     {
-        setNodeValue( getRootNode(), WL_DISCOVERY_ENABLED, Boolean.toString( val ) );
+        setNodeValue( getRootNode(), ROUTING_DISCOVERY_ENABLED, Boolean.toString( val ) );
     }
 
-    public long getWLDiscoveryInterval()
+    public long getRoutingDiscoveryInterval()
     {
-        return Long.parseLong( getNodeValue( getRootNode(), WL_DISCOVERY_INTERVAL,
+        return Long.parseLong( getNodeValue( getRootNode(), ROUTING_DISCOVERY_INTERVAL,
             String.valueOf( TimeUnit.HOURS.toMillis( 24 ) ) ) );
     }
 
-    public void setWLDiscoveryInterval( long val )
+    public void setRoutingDiscoveryInterval( long val )
     {
-        setNodeValue( getRootNode(), WL_DISCOVERY_INTERVAL, String.valueOf( val ) );
+        setNodeValue( getRootNode(), ROUTING_DISCOVERY_INTERVAL, String.valueOf( val ) );
     }
 }
