@@ -41,7 +41,7 @@ public interface SecurityConfigurationManager
      * The number of iterations to be used when hashing passwords
      * 
      * @return number of hash iterations
-     * @since 2.4
+     * @since 2.5
      */
     int getHashIterations();
 

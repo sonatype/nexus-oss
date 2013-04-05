@@ -59,6 +59,8 @@ public class XmlAuthenticatingRealm
     private ConfigurationManager configuration;
     
     private PasswordService passwordService;
+    
+    private final int MAX_LEGACY_PASSWORD_LENGTH = 40;
 
     @Inject
     public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration,
@@ -105,7 +107,7 @@ public class XmlAuthenticatingRealm
         	//Update if legacy user, and valid credentials were specified
         	if(this.isLegacyUser(user) && this.isValidCredentials(upToken, user))
         	{
-        		this.addPasswordSalt(user, new String(upToken.getPassword()));
+        		this.reHashPassword(user, new String(upToken.getPassword()));
         	}
         	
         	return this.createAuthenticationInfo(user);
@@ -134,21 +136,18 @@ public class XmlAuthenticatingRealm
     
     
     /*
-     * Re-hash user password with unique salt, and persist changes
+     * Re-hash user password, and persist changes
      * 
      * @param user to update
      * @param password cleartext password to hash
      */
-    private void addPasswordSalt(CUser user, String password)    	
+    private void reHashPassword(CUser user, String password)    	
     {
     	//Store current values to rollback if update fails
     	String currentPasswordHash = user.getPassword();
-    	//String salt = user.getSalt();
     	
     	try
     	{
-	    	//user.setSalt(this.passwordGenerator.generateSalt());
-	    	//user.setPassword(this.passwordGenerator.hashPassword(password, user.getSalt(), this.securityConfiguration.getHashIterations()));
     	    user.setPassword(this.passwordService.encryptPassword(password));
 	    	this.configuration.updateUser(user);
 	    	this.configuration.save();
@@ -156,7 +155,6 @@ public class XmlAuthenticatingRealm
     	catch(Exception e)
     	{
     		//Update failed, rollback to previous values
-    		//user.setSalt(salt);
     		user.setPassword(currentPasswordHash);
     		this.logger.error("Unable to update hash for user {}", user.getId());
     	}
@@ -197,8 +195,8 @@ public class XmlAuthenticatingRealm
      */
     private boolean isLegacyUser(CUser user)
     {
-        //return StringUtils.isBlank(user.getSalt());
-        return user.getPassword().length() <= 40;
+        //Legacy users have a shorter, unsalted, SHA1 or MD5 based hash
+        return user.getPassword().length() <= this.MAX_LEGACY_PASSWORD_LENGTH;
     }
     
     /*
@@ -210,7 +208,6 @@ public class XmlAuthenticatingRealm
      */
     private AuthenticationInfo createAuthenticationInfo(CUser user)
     {
-    	//return new SimpleAuthenticationInfo( user.getId(), user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt() != null ? user.getSalt() : ""), getName() );
     	return new SimpleAuthenticationInfo( user.getId(), user.getPassword().toCharArray(), getName() );
     }
 }

@@ -196,7 +196,7 @@ public class SecurityXmlUserManager
         throws InvalidConfigurationException
     {
         CUser secUser = this.toUser( user );
-        secUser.setPassword(this.passwordService.encryptPassword(password));
+        secUser.setPassword(this.hashPassword(password));
         this.configuration.createUser( secUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
 
@@ -208,7 +208,7 @@ public class SecurityXmlUserManager
         throws UserNotFoundException, InvalidConfigurationException
     {
         CUser secUser = this.configuration.readUser( userId );
-        secUser.setPassword(this.passwordService.encryptPassword(newPassword));
+        secUser.setPassword(this.hashPassword(newPassword));
         this.configuration.updateUser( secUser );
         this.saveConfiguration();
     }
@@ -308,6 +308,17 @@ public class SecurityXmlUserManager
     private SecuritySystem getSecuritySystem()
     {
         return this.securitySystem;
+    }
+    
+    private String hashPassword( String clearPassword )
+    {
+        // set the password if its not null
+        if ( clearPassword != null && clearPassword.trim().length() > 0 )
+        {
+            return this.passwordService.encryptPassword(clearPassword);
+        }
+        
+        return clearPassword;
     }
     
     public void setUsersRoles( String userId, String userSource, Set<RoleIdentifier> roleIdentifiers )
