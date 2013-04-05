@@ -283,36 +283,40 @@ public abstract class AbstractArtifactPlexusResource
 
         return null;
     }
-
+    
+    // ==
+    
+    /**
+     * Method accepting artifact uploads in special form (HTTP POST multipart requests). This resource processes uploads
+     * in a special way, unlike the content and other related resources does in Nexus (where an "upload" is basically a
+     * HTTP PUT with URL containing the targeted path and with body carrying the content being uploaded). Description of
+     * upload to this resource follows.
+     * <p>
+     * Every file selected for upload will generate a SEPARATE upload HTTP POST request that is multipart form upload
+     * basically. Each upload request has form like: (params, file1, [file2]). we have two cases, either POM is present
+     * for upload too, or user filled in GAVP fields in upload form and wants us to generate a POM for him. Params
+     * ALWAYS have param "r"=repoId as first element (unless we talk about staging, where this is NOT the case)
+     * <p>
+     * First case, when POM is present (POM file is selected), file1 is always POM and file2 is the (main or classified)
+     * artifact (UI does not validate, but cases when packaging=pom, or user error when packaging=jar but no main
+     * artifact selected are possible!) params are then "r", "hasPom"=TRUE, "c"=C, "e"=E Interestingly, subsequent
+     * requests (those for "extra" artifacts with classifiers follows the "second case" pattern below, as they get GAV
+     * from ArtifactCoordinate response. The "c" param if null means file2 is classified artifact or main artifact. The
+     * "e" param might be null, if pom is the only upload (ie. packaging=pom) Still, in case POM.packaging=pom plus one
+     * classified artifact, parameters "c" and "e" will belong to the classified artifact!
+     * <p>
+     * Second case, when POM is not present (we need to generate it), user has to fill in the GAVP fields in form on UI.
+     * In that case, nibble is always in form of (params, file1), so it will strictly have only one file appended as
+     * last content part of multipart form upload, where params will contain "extra" fields: "r"=repoId, "g"=G, "a"=A,
+     * "v"=V, "p"=P, "c"=C, "e"=E
+     * <p>
+     * This resource will lay the content on proper paths nased on the GAV coordinates it gets in corresponding
+     * repository (either sent as parameter, or got by some other means).
+     */
     @Override
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
-        // Every file selected for upload will generate a SEPARATE upload HTTP POST request
-        // that is multipart form upload basically.
-        // Each upload request has form like: (params, file1, [file2]).
-        // we have two cases, either POM is present for upload too, or user filled in GAVP
-        // fields in upload form and wants us to generate a POM for him.
-        // Params ALWAYS have param "r"=repoId as first element (unless we talk about staging, where this is NOT the
-        // case)
-
-        // First case, when POM is present (POM file is selected), file1 is always POM
-        // and file2 is the (main or classified) artifact (UI does not validate, but cases when packaging=pom,
-        // or user error when packaging=jar but no main artifact selected are possible!)
-        // params are then "r", "hasPom"=TRUE, "c"=C, "e"=E
-        // Interestingly, subsequent requests (those for "extra" artifacts with classifiers
-        // follows the "second case" pattern below, as they get GAV from ArtifactCoordinate response.
-        // The "c" param if null means file2 is classified artifact or main artifact.
-        // The "e" param might be null, if pom is the only upload (ie. packaging=pom)
-        // Still, in case POM.packaging=pom plus one classified artifact, parameters
-        // "c" and "e" will belong to the classified artifact!
-
-        // Second case, when POM is not present (we need to generate it), user has to
-        // fill in the GAVP fields in form on UI. In that case, nibble is always in form of
-        // (params, file1), so it will strictly have only one file appended as last content part
-        // of multipart form upload, where params will contain "extra" fields:
-        // "r"=repoId, "g"=G, "a"=A, "v"=V, "p"=P, "c"=C, "e"=E
-
         final PomArtifactManager pomManager =
             new PomArtifactManager( getNexus().getNexusConfiguration().getTemporaryDirectory() );
 
@@ -622,6 +626,8 @@ public abstract class AbstractArtifactPlexusResource
     {
         // nop
     }
+    
+    // ==
 
     protected String buildUploadFailedHtmlResponse( Throwable t, Request request, Response response )
     {
