@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginEquals;
+import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginPrefixAndNameEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,8 +88,9 @@ public class AddPluginOperation
         {
             if ( p.getArtifactId().equals( plugin.getArtifactId() ) )
             {
-                if ( isPluginEquals( p, plugin ) )
+                if ( isPluginPrefixAndNameEquals( p, plugin ) )
                 {
+                    p.setName( plugin.getName() );
                     // plugin already enlisted
                     return false;
                 }
