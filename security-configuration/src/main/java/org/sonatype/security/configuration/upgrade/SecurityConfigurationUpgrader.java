@@ -20,7 +20,7 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  * This is only used if an old version is detected and needs to be upgraded
  * 
  * @author Steve Carlucci
- * @since 2.5
+ * @since 3.1
  */
 public interface SecurityConfigurationUpgrader
     extends ConfigurationUpgrader<SecurityConfiguration>

@@ -34,7 +34,7 @@ import org.sonatype.security.configuration.SecurityConfigurationManager;
  * This class is just a wrapper around DefaultPasswordService to apply Nexus-specific hashing policy,
  * and provide backward compatibility with legacy Nexus passwords
  * 
- * @since 2.5
+ * @since 3.1
  */
 @Singleton
 @Typed( PasswordService.class )

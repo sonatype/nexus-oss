@@ -24,7 +24,7 @@ import org.apache.shiro.crypto.hash.format.HexFormat;
 /*
  * PasswordService for handling legacy passwords (SHA-1 and MD5)
  * 
- * @since 2.5
+ * @since 3.1
  */
 @Singleton
 @Typed( PasswordService.class )
