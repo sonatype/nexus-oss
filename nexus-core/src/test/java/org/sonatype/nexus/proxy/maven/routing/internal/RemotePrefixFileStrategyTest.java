@@ -296,7 +296,7 @@ public class RemotePrefixFileStrategyTest
                 Behaviours.content( prefixFile1( true ) ) ).start();
         try
         {
-            // setting the policy to String, and note that server set up above publishes
+            // setting the policy to STRICT, and note that server set up above publishes
             // the prefix file only, no checksums!
             final MavenProxyRepository mavenProxyRepository =
                 getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID, MavenProxyRepository.class );
