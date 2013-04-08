@@ -14,7 +14,6 @@ package org.sonatype.security.model.upgrade;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
@@ -24,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -76,7 +76,7 @@ public class DefaultSecurityConfigurationUpgrader
 
         try
         {
-            Reader r = new BufferedReader(new FileReader( file ));
+            Reader r = new BufferedReader(ReaderFactory.newXmlReader(file));
 
             Xpp3Dom dom = Xpp3DomBuilder.build( r );
 

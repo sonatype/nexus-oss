@@ -14,7 +14,6 @@ package org.sonatype.security.configuration.upgrade;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -22,6 +21,7 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class Upgrade203to204
         try
         {
             // reading without interpolation to preserve user settings as variables
-            r = new BufferedReader(new FileReader( file ));
+            r = new BufferedReader(ReaderFactory.newXmlReader(file));
 
             SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
 
