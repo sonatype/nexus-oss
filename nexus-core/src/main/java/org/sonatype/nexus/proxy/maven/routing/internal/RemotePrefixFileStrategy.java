@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
@@ -147,8 +148,14 @@ public class RemotePrefixFileStrategy
         throws IOException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         request.setRequestRemoteOnly( true );
+        request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
+        if ( ChecksumPolicy.STRICT == mavenProxyRepository.getChecksumPolicy() )
+        {
+            // NXCM-5188: Relax checksum policy for prefix file request, if needed
+            request.getRequestContext().put( ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY,
+                ChecksumPolicy.STRICT_IF_EXISTS );
+        }
 
         // check for remote presence, as fetching with setRequestRemoteOnly has a side effect of
         // DELETING the file from local cache if not present remotely. In this case, prefix
