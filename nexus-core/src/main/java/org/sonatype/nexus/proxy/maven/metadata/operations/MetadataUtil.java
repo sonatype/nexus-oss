@@ -47,24 +47,14 @@ public class MetadataUtil
             p2.setName( "" );
         }
 
-        if ( StringUtils.equals( p1.getArtifactId(), p2.getArtifactId() )
-            && StringUtils.equals( p1.getPrefix(), p2.getPrefix() ) && StringUtils.equals( p1.getName(), p2.getName() ) )
-        {
-            return true;
-        }
-
-        return false;
+        return StringUtils.equals( p1.getArtifactId(), p2.getArtifactId() )
+            && StringUtils.equals( p1.getPrefix(), p2.getPrefix() ) && StringUtils.equals( p1.getName(), p2.getName() );
     }
 
     public static boolean isPluginPrefixAndArtifactIdEquals( Plugin p1, Plugin p2 )
     {
-        if ( StringUtils.equals( p1.getArtifactId(), p2.getArtifactId() )
-            && StringUtils.equals( p1.getPrefix(), p2.getPrefix() ) )
-        {
-            return true;
-        }
-
-        return false;
+        return StringUtils.equals( p1.getArtifactId(), p2.getArtifactId() )
+            && StringUtils.equals( p1.getPrefix(), p2.getPrefix() );
     }
 
 }
