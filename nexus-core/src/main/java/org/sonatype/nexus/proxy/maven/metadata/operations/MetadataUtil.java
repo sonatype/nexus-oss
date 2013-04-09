@@ -56,7 +56,7 @@ public class MetadataUtil
         return false;
     }
 
-    public static boolean isPluginPrefixAndNameEquals( Plugin p1, Plugin p2 )
+    public static boolean isPluginPrefixAndArtifactIdEquals( Plugin p1, Plugin p2 )
     {
         if ( StringUtils.equals( p1.getArtifactId(), p2.getArtifactId() )
             && StringUtils.equals( p1.getPrefix(), p2.getPrefix() ) )
