@@ -39,7 +39,7 @@ public class AuthorizationExceptionMapper
 
     public static final String AUTH_REALM_KEY = "auth.realm";
 
-    private static final String ANONYMOUS_LOGIN = "nexus.anonynmous";
+    private static final String ANONYMOUS_LOGIN = "nexus.anonymous";
 
     private static final String AUTHENTICATE_HEADER = "WWW-Authenticate";
 
