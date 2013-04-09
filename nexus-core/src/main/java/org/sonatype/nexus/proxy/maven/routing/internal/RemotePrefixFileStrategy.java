@@ -125,7 +125,7 @@ public class RemotePrefixFileStrategy
                 if ( prefixFileAgeInDays < 1 )
                 {
                     return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
-                                               prefixSource, true );
+                        prefixSource, true );
                 }
                 else
                 {
@@ -150,12 +150,8 @@ public class RemotePrefixFileStrategy
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
         request.setRequestRemoteOnly( true );
         request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
-        if ( ChecksumPolicy.STRICT == mavenProxyRepository.getChecksumPolicy() )
-        {
-            // NXCM-5188: Relax checksum policy for prefix file request, if needed
-            request.getRequestContext().put( ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY,
-                ChecksumPolicy.STRICT_IF_EXISTS );
-        }
+        // NXCM-5188: Disable checksum policy for prefix file request, it will be processed and checked anyway
+        request.getRequestContext().put( ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY, ChecksumPolicy.IGNORE );
 
         // check for remote presence, as fetching with setRequestRemoteOnly has a side effect of
         // DELETING the file from local cache if not present remotely. In this case, prefix
