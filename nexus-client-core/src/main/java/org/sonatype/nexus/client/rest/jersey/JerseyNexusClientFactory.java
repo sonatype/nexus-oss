@@ -14,6 +14,7 @@ package org.sonatype.nexus.client.rest.jersey;
 
 import java.net.URI;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -24,7 +25,6 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.CoreProtocolPNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +34,11 @@ import org.sonatype.nexus.client.internal.rest.AbstractNexusClientFactory;
 import org.sonatype.nexus.client.internal.rest.NexusXStreamFactory;
 import org.sonatype.nexus.client.internal.rest.XStreamXmlProvider;
 import org.sonatype.nexus.client.internal.util.Template;
+import org.sonatype.nexus.client.internal.util.Version;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.json.JSONConfiguration;
@@ -110,7 +112,7 @@ public class JerseyNexusClientFactory
 
         // set UA
         client.getClientHandler().getHttpClient().getParams().setParameter( CoreProtocolPNames.USER_AGENT,
-                                                                            "Nexus-Client/1.0" );
+            "Nexus-Client/" + discoverClientVersion() );
 
         // NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
         enforceProxyUri( config, client );
@@ -121,6 +123,11 @@ public class JerseyNexusClientFactory
         }
 
         return client;
+    }
+
+    protected String discoverClientVersion()
+    {
+        return Version.readVersion( "META-INF/maven/org.sonatype.nexus.client/nexus-client-core/pom.properties", "unknown" );
     }
 
     // ==

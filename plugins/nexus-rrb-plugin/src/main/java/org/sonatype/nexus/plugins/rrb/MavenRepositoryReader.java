@@ -23,8 +23,10 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.protocol.BasicHttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.plugins.rrb.parsers.ArtifactoryRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
@@ -233,7 +235,12 @@ public class MavenRepositoryReader
         HttpGet method = new HttpGet(url);
         try {
             logger.debug("Requesting: {}", method);
-            HttpResponse response = client.execute(method);
+
+            final BasicHttpContext httpContext = new BasicHttpContext();
+            httpContext.setAttribute( Hc4Provider.HTTP_CTX_KEY_REPOSITORY, proxyRepository );
+
+            HttpResponse response = client.execute(method,httpContext);
+
             int statusCode = response.getStatusLine().getStatusCode();
             logger.debug("Status code: {}", statusCode);
 

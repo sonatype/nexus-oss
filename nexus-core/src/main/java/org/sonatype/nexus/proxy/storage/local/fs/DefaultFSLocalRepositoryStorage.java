@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,9 +24,9 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -45,16 +47,18 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
+
+import com.google.common.base.Strings;
 
 /**
  * LocalRepositoryStorage that uses plain File System (relies on {@link File}) to implement it's functionality.
  * 
  * @author cstamas
  */
-@Component( role = LocalRepositoryStorage.class, hint = DefaultFSLocalRepositoryStorage.PROVIDER_STRING )
+@Singleton
+@Named( DefaultFSLocalRepositoryStorage.PROVIDER_STRING )
 public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
 {
@@ -63,11 +67,11 @@ public class DefaultFSLocalRepositoryStorage
     private FSPeer fsPeer;
 
     @Inject
-    public DefaultFSLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister,
-                                            MimeSupport mimeSupport, FSPeer fsPeer )
+    public DefaultFSLocalRepositoryStorage( final Wastebasket wastebasket, final LinkPersister linkPersister,
+                                            final MimeSupport mimeSupport, final FSPeer fsPeer )
     {
         super( wastebasket, linkPersister, mimeSupport );
-        this.fsPeer = fsPeer;
+        this.fsPeer = checkNotNull( fsPeer );
     }
 
     protected FSPeer getFSPeer()
@@ -215,7 +219,7 @@ public class DefaultFSLocalRepositoryStorage
             path = path.substring( 0, path.length() - 1 );
         }
 
-        if ( StringUtils.isEmpty( path ) )
+        if ( Strings.isNullOrEmpty( path ) )
         {
             path = RepositoryItemUid.PATH_ROOT;
         }
