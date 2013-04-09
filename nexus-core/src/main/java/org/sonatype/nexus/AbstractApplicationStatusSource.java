@@ -75,15 +75,28 @@ public abstract class AbstractApplicationStatusSource
      */
     public SystemStatus getSystemStatus()
     {
-        return doGetSystemStatus(false);
+        updateSystemStatusIfNeeded( false );
+
+        Lock lock = getLock().readLock();
+
+        lock.lock();
+
+        try
+        {
+            return getSystemStatusInternal();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     /**
-     * Returns the SystemStatus, forcing an update of possibly cached information, and guaranteeing its consistent state.
+     * Force an update of SystemStatus.
      */
-    public SystemStatus getUpdatedSystemStatus()
+    public void updateSystemStatus()
     {
-        return doGetSystemStatus( true );
+        updateSystemStatusIfNeeded( true );
     }
 
     public boolean setState( SystemState state )
@@ -97,24 +110,6 @@ public abstract class AbstractApplicationStatusSource
             getSystemStatusInternal().setState( state );
 
             return true;
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    private SystemStatus doGetSystemStatus(boolean force)
-    {
-        updateSystemStatusIfNeeded( force );
-
-        Lock lock = getLock().readLock();
-
-        lock.lock();
-
-        try
-        {
-            return getSystemStatusInternal();
         }
         finally
         {
