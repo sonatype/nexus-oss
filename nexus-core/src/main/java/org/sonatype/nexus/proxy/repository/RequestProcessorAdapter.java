@@ -12,22 +12,21 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A helper that adapts deprecated {@link RequestProcessor} to new {@link RequestProcessor2} API.
  * 
  * @author cstamas
- * @since 2.4
+ * @since 2.5
  */
 public class RequestProcessorAdapter
     implements RequestProcessor2
@@ -45,7 +44,7 @@ public class RequestProcessorAdapter
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason process( final Repository repository, final ResourceStoreRequest request,
+    public ItemNotFoundInRepositoryReason onHandle( final Repository repository, final ResourceStoreRequest request,
                                                    final Action action )
     {
         if ( requestProcessor.process( repository, request, action ) )
@@ -60,7 +59,7 @@ public class RequestProcessorAdapter
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason shouldRetrieve( final Repository repository,
+    public ItemNotFoundInRepositoryReason onServing( final Repository repository,
                                                           final ResourceStoreRequest request, final StorageItem item )
     {
         try
@@ -92,7 +91,7 @@ public class RequestProcessorAdapter
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason shouldProxy( final ProxyRepository repository,
+    public ItemNotFoundInRepositoryReason onRemoteAccess( final ProxyRepository repository,
                                                        final ResourceStoreRequest request )
     {
         if ( requestProcessor.shouldProxy( repository, request ) )
@@ -104,11 +103,5 @@ public class RequestProcessorAdapter
             return ItemNotFoundException.reasonFor( request, repository, "Proxying prevented by RequestProcessor %s",
                 requestProcessor.getClass().getName() );
         }
-    }
-
-    @Override
-    public boolean shouldCache( final ProxyRepository repository, final AbstractStorageItem item )
-    {
-        return requestProcessor.shouldCache( repository, item );
     }
 }

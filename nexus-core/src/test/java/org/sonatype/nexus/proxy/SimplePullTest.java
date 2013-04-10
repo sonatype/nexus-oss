@@ -639,10 +639,10 @@ public class SimplePullTest
         }
 
         @Override
-        public ItemNotFoundInRepositoryReason process( Repository repository, ResourceStoreRequest request, Action action )
+        public ItemNotFoundInRepositoryReason onHandle( Repository repository, ResourceStoreRequest request, Action action )
         {
             referredCount++;
-            return super.process( repository, request, action );
+            return super.onHandle( repository, request, action );
         }
     }
 }

@@ -1293,7 +1293,7 @@ public abstract class AbstractRepository
         {
             for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                final ItemNotFoundInRepositoryReason reason = processor.process( this, request, action );
+                final ItemNotFoundInRepositoryReason reason = processor.onHandle( this, request, action );
                 if ( reason != null )
                 {
                     // let's not state anything about reason, and allow processor say why it rejected
@@ -1313,7 +1313,7 @@ public abstract class AbstractRepository
         {
             for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                final ItemNotFoundInRepositoryReason reason = processor.shouldRetrieve( this, request, item );
+                final ItemNotFoundInRepositoryReason reason = processor.onServing( this, request, item );
                 if ( reason != null )
                 {
                     // let's not state anything about reason, and allow processor say why it rejected

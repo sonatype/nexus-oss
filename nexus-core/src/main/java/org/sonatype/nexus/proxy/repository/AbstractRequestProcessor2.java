@@ -15,39 +15,33 @@ package org.sonatype.nexus.proxy.repository;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * A helper base class that makes it easier to create processors.
  * 
  * @author cstamas
- * @since 2.4
+ * @since 2.5
  */
 public abstract class AbstractRequestProcessor2
     implements RequestProcessor2
 {
-    public ItemNotFoundInRepositoryReason process( Repository repository, ResourceStoreRequest request, Action action )
+    @Override
+    public ItemNotFoundInRepositoryReason onHandle( Repository repository, ResourceStoreRequest request, Action action )
     {
         return null;
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason shouldRetrieve( final Repository repository,
+    public ItemNotFoundInRepositoryReason onServing( final Repository repository,
                                                           final ResourceStoreRequest request, final StorageItem item )
     {
         return null;
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason shouldProxy( ProxyRepository proxy, ResourceStoreRequest request )
+    public ItemNotFoundInRepositoryReason onRemoteAccess( ProxyRepository proxy, ResourceStoreRequest request )
     {
         return null;
-    }
-
-    @Override
-    public boolean shouldCache( ProxyRepository proxy, AbstractStorageItem item )
-    {
-        return true;
     }
 }

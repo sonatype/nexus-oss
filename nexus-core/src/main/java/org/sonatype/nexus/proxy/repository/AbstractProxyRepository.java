@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +33,7 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
@@ -43,7 +42,6 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
@@ -76,6 +74,8 @@ import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -976,19 +976,6 @@ public abstract class AbstractProxyRepository
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws LocalStorageException
     {
-        boolean shouldCache = true;
-
-        // ask request processors too
-        for ( RequestProcessor2 processor : getRequestProcessors().values() )
-        {
-            shouldCache = processor.shouldCache( this, item );
-
-            if ( !shouldCache )
-            {
-                return item;
-            }
-        }
-
         AbstractStorageItem result = null;
 
         try
@@ -1188,7 +1175,7 @@ public abstract class AbstractProxyRepository
             // let's ask RequestProcessor
             for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                notFoundReason = processor.shouldProxy( this, request );
+                notFoundReason = processor.onRemoteAccess( this, request );
 
                 if ( notFoundReason != null )
                 {

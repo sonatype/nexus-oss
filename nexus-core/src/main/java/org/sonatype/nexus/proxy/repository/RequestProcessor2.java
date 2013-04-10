@@ -15,20 +15,18 @@ package org.sonatype.nexus.proxy.repository;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * A Request Processor that is able to process/modify the request before Nexus will serve it.
  * 
  * @author cstamas
- * @since 2.4
+ * @since 2.5
  */
 public interface RequestProcessor2
 {
     /**
-     * A method that is able to modify the request after it is authorized, but before it is executed. If the method
+     * A method that is able to modify the request after it is authorized, but before it is handled. If the method
      * wants to completely stop/prevent the execution of this request, it should return non-null reason why. Otherwise,
      * {@code null} should be returned.
      * 
@@ -39,7 +37,7 @@ public interface RequestProcessor2
      *         case a {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown using reasoning returned
      *         here.
      */
-    ItemNotFoundInRepositoryReason process( Repository repository, ResourceStoreRequest request, Action action );
+    ItemNotFoundInRepositoryReason onHandle( Repository repository, ResourceStoreRequest request, Action action );
 
     /**
      * Should the item be retrieved, served up? If the method wants to prevent serving of this item, it should return
@@ -52,7 +50,7 @@ public interface RequestProcessor2
      *         case a {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown using reasoning returned
      *         here.
      */
-    ItemNotFoundInRepositoryReason shouldRetrieve( Repository repository, ResourceStoreRequest request, StorageItem item );
+    ItemNotFoundInRepositoryReason onServing( Repository repository, ResourceStoreRequest request, StorageItem item );
 
     /**
      * Request processor is able to override generic behavior of Repositories in aspect of proxying. Invocation of this
@@ -65,19 +63,5 @@ public interface RequestProcessor2
      * @return {@code null} if item is allowed to be proxied, non-null reason if request should be blocked. In this case
      *         a {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown using reasoning returned here.
      */
-    ItemNotFoundInRepositoryReason shouldProxy( ProxyRepository repository, ResourceStoreRequest request );
-
-    /**
-     * Request processor is able to override generic behavior of Repository in aspect of caching. This is vastly
-     * different of method above, here, item is present and got from remote. This method merely prevents it to get into
-     * cache, and will be served downstream as-is. This also means, that item being served up will probably have
-     * {@link StorageFileItem#isReusableStream()} {@code false}, as the items body will be originated directly from
-     * remote peer response body (but does not have to be the case, it should be explicitly checked!). Whatever this
-     * method returns, it does NOT affect serving up the response, in a way other methods may do.
-     * 
-     * @param repository
-     * @param item
-     * @return {@code true} if repository may cache the item.
-     */
-    boolean shouldCache( ProxyRepository repository, AbstractStorageItem item );
+    ItemNotFoundInRepositoryReason onRemoteAccess( ProxyRepository repository, ResourceStoreRequest request );
 }
