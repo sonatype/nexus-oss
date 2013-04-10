@@ -340,7 +340,7 @@ public abstract class AbstractArtifactPlexusResource
 
                     ArtifactStoreRequest gavRequest = null;
 
-                    if ( uploadContext.isHasPom() )
+                    if ( uploadContext.isPomAvailable() )
                     {
                         if ( isPom )
                         {
@@ -427,7 +427,7 @@ public abstract class AbstractArtifactPlexusResource
                     }
                     else
                     {
-                        if ( uploadContext.isHasPom() )
+                        if ( uploadContext.isPomAvailable() )
                         {
                             helper.storeArtifact( gavRequest, is, null );
                         }
@@ -445,7 +445,7 @@ public abstract class AbstractArtifactPlexusResource
         }
         finally
         {
-            if ( uploadContext.isHasPom() )
+            if ( uploadContext.isPomAvailable() )
             {
                 pomManager.removeTempPomFile();
             }
@@ -466,7 +466,7 @@ public abstract class AbstractArtifactPlexusResource
     {
         private String repositoryId = null;
 
-        private boolean hasPom = false;
+        private boolean pomAvailable = false;
 
         private String extension = null;
 
@@ -490,14 +490,14 @@ public abstract class AbstractArtifactPlexusResource
             this.repositoryId = repositoryId;
         }
 
-        public boolean isHasPom()
+        public boolean isPomAvailable()
         {
-            return hasPom;
+            return pomAvailable;
         }
 
-        public void setHasPom( boolean hasPom )
+        public void setPomAvailable( boolean pomAvailable )
         {
-            this.hasPom = hasPom;
+            this.pomAvailable = pomAvailable;
         }
 
         public String getExtension()
@@ -612,7 +612,7 @@ public abstract class AbstractArtifactPlexusResource
         }
         else if ( "hasPom".equals( fi.getFieldName() ) )
         {
-            uploadContext.setHasPom( Boolean.parseBoolean( fi.getString() ) );
+            uploadContext.setPomAvailable( Boolean.parseBoolean( fi.getString() ) );
         }
     }
 
