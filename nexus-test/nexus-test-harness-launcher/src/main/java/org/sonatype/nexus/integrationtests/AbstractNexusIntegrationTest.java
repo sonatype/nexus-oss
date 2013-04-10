@@ -164,6 +164,7 @@ public abstract class AbstractNexusIntegrationTest
 
         // guice finalizer turned OFF
         System.setProperty( "guice.executor.class", "NONE" );
+        System.setProperty( "java.net.preferIPv4Stack", "true" );
     }
 
     static
