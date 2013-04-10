@@ -596,12 +596,33 @@ public abstract class LayoutConverterShadowRepository
 
             for ( String transformedPath : transformedPaths )
             {
-                // delegate the call to the master
-                request.pushRequestPath( transformedPath );
-
                 try
                 {
+                    // delegate the call to the master
+                    request.pushRequestPath( transformedPath );
+
                     result = doRetrieveItemFromMaster( request );
+
+                    // try to create link on the fly
+                    try
+                    {
+                        StorageLinkItem link = createLink( result );
+
+                        if ( link != null )
+                        {
+                            return link;
+                        }
+                        else
+                        {
+                            // fallback to result, but will not happen, see above
+                            return result;
+                        }
+                    }
+                    catch ( Exception e1 )
+                    {
+                        // fallback to result, but will not happen, see above
+                        return result;
+                    }
                 }
                 catch ( ItemNotFoundException ex )
                 {
@@ -610,27 +631,6 @@ public abstract class LayoutConverterShadowRepository
                 finally
                 {
                     request.popRequestPath();
-                }
-
-                // try to create link on the fly
-                try
-                {
-                    StorageLinkItem link = createLink( result );
-
-                    if ( link != null )
-                    {
-                        return link;
-                    }
-                    else
-                    {
-                        // fallback to result, but will not happen, see above
-                        return result;
-                    }
-                }
-                catch ( Exception e1 )
-                {
-                    // fallback to result, but will not happen, see above
-                    return result;
                 }
             }
 
