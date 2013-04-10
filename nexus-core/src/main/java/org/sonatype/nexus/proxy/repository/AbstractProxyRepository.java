@@ -33,7 +33,6 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
@@ -1168,17 +1167,20 @@ public abstract class AbstractProxyRepository
         // proxyMode and request.localOnly decides 1st
         boolean shouldProxy = shouldTryRemote( request );
 
-        ItemNotFoundInRepositoryReason notFoundReason = null;
+        ItemNotFoundException requestProcessorReason = null;
 
         if ( shouldProxy )
         {
             // let's ask RequestProcessor
             for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                notFoundReason = processor.onRemoteAccess( this, request );
-
-                if ( notFoundReason != null )
+                try
                 {
+                    processor.onRemoteAccess( this, request );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    requestProcessorReason = e;
                     shouldProxy = false;
                     // escape
                     break;
@@ -1383,9 +1385,10 @@ public abstract class AbstractProxyRepository
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
-                if ( notFoundReason != null )
+                if ( requestProcessorReason != null )
                 {
-                    throw new ItemNotFoundException( notFoundReason );
+                    throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                        "Request processor prevented remote access" ), requestProcessorReason );
                 }
                 else
                 {

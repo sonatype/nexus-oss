@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -38,7 +36,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -87,6 +84,8 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
+
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
  * <p>
@@ -653,11 +652,7 @@ public abstract class AbstractRepository
                 RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
-        final ItemNotFoundInRepositoryReason notFoundReason = checkPostConditions( request, item );
-        if ( notFoundReason != null )
-        {
-            throw new ItemNotFoundException( notFoundReason );
-        }
+        checkPostConditions( request, item );
 
         return item;
     }
@@ -1279,50 +1274,31 @@ public abstract class AbstractRepository
         getAccessManager().decide( this, request, action );
         // }
 
-        final ItemNotFoundInRepositoryReason itemNotFoundInRepositoryReason = checkRequestProcessors( request, action );
-        if ( itemNotFoundInRepositoryReason != null )
-        {
-            throw new ItemNotFoundException( itemNotFoundInRepositoryReason );
-        }
+        checkRequestProcessors( request, action );
     }
 
-    protected ItemNotFoundInRepositoryReason checkRequestProcessors( final ResourceStoreRequest request,
-                                                                     final Action action )
+    protected void checkRequestProcessors( final ResourceStoreRequest request, final Action action )
+        throws ItemNotFoundException, IllegalOperationException
     {
         if ( getRequestProcessors().size() > 0 )
         {
             for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                final ItemNotFoundInRepositoryReason reason = processor.onHandle( this, request, action );
-                if ( reason != null )
-                {
-                    // let's not state anything about reason, and allow processor say why it rejected
-                    return reason;
-                }
+                processor.onHandle( this, request, action );
             }
         }
-
-        return null;
     }
 
-    protected ItemNotFoundInRepositoryReason checkPostConditions( final ResourceStoreRequest request,
-                                                                  final StorageItem item )
-        throws IllegalOperationException, ItemNotFoundException, AccessDeniedException
+    protected void checkPostConditions( final ResourceStoreRequest request, final StorageItem item )
+        throws IllegalOperationException, ItemNotFoundException
     {
         if ( getRequestProcessors().size() > 0 )
         {
             for ( RequestProcessor2 processor : getRequestProcessors().values() )
             {
-                final ItemNotFoundInRepositoryReason reason = processor.onServing( this, request, item );
-                if ( reason != null )
-                {
-                    // let's not state anything about reason, and allow processor say why it rejected
-                    return reason;
-                }
+                processor.onServing( this, request, item );
             }
         }
-
-        return null;
     }
 
     protected void enforceWritePolicy( ResourceStoreRequest request, Action action )

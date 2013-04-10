@@ -12,7 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -26,42 +27,53 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public interface RequestProcessor2
 {
     /**
-     * A method that is able to modify the request after it is authorized, but before it is handled. If the method
-     * wants to completely stop/prevent the execution of this request, it should return non-null reason why. Otherwise,
-     * {@code null} should be returned.
+     * A method that is able to modify the request after it is authorized, but before it is handled by Nexus Core at
+     * all. If the method wants to completely stop/prevent the execution of this request, it should throw some exception
+     * with reason why. Otherwise, a clean return from the method is needed.
      * 
      * @param repository from which the item is about to be attempted retrieval (not null)
      * @param request retrieval request (not null)
      * @param action
-     * @return {@code null} if item is allowed to be processed, non-null reason if request should be blocked. In this
-     *         case a {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown using reasoning returned
-     *         here.
+     * @throws ItemNotFoundException
+     * @throws IllegalOperationException
      */
-    ItemNotFoundInRepositoryReason onHandle( Repository repository, ResourceStoreRequest request, Action action );
+    void onHandle( Repository repository, ResourceStoreRequest request, Action action )
+        throws ItemNotFoundException, IllegalOperationException;
 
     /**
-     * Should the item be retrieved, served up? If the method wants to prevent serving of this item, it should return
-     * non-null reasoning why. Otherwise {@code null} should be returned.
+     * Should the item be retrieved, served up? This method is called for
+     * {@link Repository#retrieveItem(boolean, ResourceStoreRequest)} as very last step, after the item is got by any
+     * means (from local storage, from valid cache or proxied). If the method wants to prevent serving of this item, it
+     * should throw some exception with reason why. Otherwise, a clean return from the method is needed.
      * 
      * @param repository from which the item is retrieved (not null)
      * @param request retrieval request (not null)
      * @param item item to be retrieved (not null)
-     * @return {@code null} if item is allowed to be processed, non-null reason if request should be blocked. In this
-     *         case a {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown using reasoning returned
-     *         here.
+     * @throws ItemNotFoundException
+     * @throws IllegalOperationException
      */
-    ItemNotFoundInRepositoryReason onServing( Repository repository, ResourceStoreRequest request, StorageItem item );
+    void onServing( Repository repository, ResourceStoreRequest request, StorageItem item )
+        throws ItemNotFoundException, IllegalOperationException;
 
     /**
-     * Request processor is able to override generic behavior of Repositories in aspect of proxying. Invocation of this
-     * request processor method means that requested item is either not present in local cache or that it's stale (or
-     * request otherwise forces remote request like remoteOnly=true or such).
+     * Request processor is able to override generic behavior of Repositories in aspect of proxying. This method is
+     * called when a proxy repository concludes it must go remote to fetch an item (either because it's not in cache or
+     * is in cache but is stale). Invocation of this request processor method means that requested item is either not
+     * present in local cache or that it's stale (or request otherwise forces remote request like remoteOnly=true or
+     * such). To prevent Proxy repository to go remote, an exception with reason should be thrown. Otherwise, a clean
+     * return from the method is needed. Note: if {@link ItemNotFoundException} is thrown from this method, it does not
+     * mean that the current request will end with "not found" response, as it still depends on actual conditions. For
+     * example, if item is present in cache but is stale, and this method prevents remote access (by throwing an
+     * {@link ItemNotFoundException}), Nexus will still serve up the stale item from the cache, as this is how it's
+     * behavior is defined. Any other (than {@link ItemNotFoundException}) exception thrown here will stop handling of
+     * current request.
      * 
      * @param repository
      * @param request
      * @param context
-     * @return {@code null} if item is allowed to be proxied, non-null reason if request should be blocked. In this case
-     *         a {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown using reasoning returned here.
+     * @throws ItemNotFoundException
+     * @throws IllegalOperationException
      */
-    ItemNotFoundInRepositoryReason onRemoteAccess( ProxyRepository repository, ResourceStoreRequest request );
+    void onRemoteAccess( ProxyRepository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, IllegalOperationException;
 }

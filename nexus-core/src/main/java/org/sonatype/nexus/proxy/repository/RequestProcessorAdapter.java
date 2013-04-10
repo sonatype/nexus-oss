@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.repository;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -44,64 +43,44 @@ public class RequestProcessorAdapter
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason onHandle( final Repository repository, final ResourceStoreRequest request,
-                                                   final Action action )
+    public void onHandle( final Repository repository, final ResourceStoreRequest request, final Action action )
+        throws ItemNotFoundException
     {
-        if ( requestProcessor.process( repository, request, action ) )
+        if ( !requestProcessor.process( repository, request, action ) )
         {
-            return null;
-        }
-        else
-        {
-            return ItemNotFoundException.reasonFor( request, repository,
-                "Request processing prevented by RequestProcessor %s", requestProcessor.getClass().getName() );
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, repository,
+                "Request processing prevented by RequestProcessor %s", requestProcessor.getClass().getName() ) );
         }
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason onServing( final Repository repository,
-                                                          final ResourceStoreRequest request, final StorageItem item )
+    public void onServing( final Repository repository, final ResourceStoreRequest request, final StorageItem item )
+        throws ItemNotFoundException, IllegalOperationException
     {
         try
         {
-            if ( requestProcessor.shouldRetrieve( repository, request, item ) )
+            if ( !requestProcessor.shouldRetrieve( repository, request, item ) )
             {
-                return null;
+                throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, repository,
+                    "Retrieval prevented by RequestProcessor %s", requestProcessor.getClass().getName() ) );
             }
-            else
-            {
-                return ItemNotFoundException.reasonFor( request, repository,
-                    "Retrieval prevented by RequestProcessor %s", requestProcessor.getClass().getName() );
-            }
-        }
-        catch ( ItemNotFoundException e )
-        {
-            return ItemNotFoundException.reasonFor( request, repository, e.getReason().getMessage() );
         }
         catch ( AccessDeniedException e )
         {
-            return ItemNotFoundException.reasonFor( request, repository,
-                "Retrieval prevented by RequestProcessor %s: %s", requestProcessor.getClass().getName(), e.getMessage() );
-        }
-        catch ( IllegalOperationException e )
-        {
-            return ItemNotFoundException.reasonFor( request, repository,
-                "Retrieval prevented by RequestProcessor %s: %s", requestProcessor.getClass().getName(), e.getMessage() );
+            throw new ItemNotFoundException(
+                ItemNotFoundException.reasonFor( request, repository, "Retrieval prevented by RequestProcessor %s: %s",
+                    requestProcessor.getClass().getName(), e.getMessage() ) );
         }
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason onRemoteAccess( final ProxyRepository repository,
-                                                       final ResourceStoreRequest request )
+    public void onRemoteAccess( final ProxyRepository repository, final ResourceStoreRequest request )
+        throws ItemNotFoundException
     {
-        if ( requestProcessor.shouldProxy( repository, request ) )
+        if ( !requestProcessor.shouldProxy( repository, request ) )
         {
-            return null;
-        }
-        else
-        {
-            return ItemNotFoundException.reasonFor( request, repository, "Proxying prevented by RequestProcessor %s",
-                requestProcessor.getClass().getName() );
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, repository,
+                "Proxying prevented by RequestProcessor %s", requestProcessor.getClass().getName() ) );
         }
     }
 }

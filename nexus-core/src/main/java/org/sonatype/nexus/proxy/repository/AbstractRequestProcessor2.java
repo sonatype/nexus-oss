@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -27,21 +26,20 @@ public abstract class AbstractRequestProcessor2
     implements RequestProcessor2
 {
     @Override
-    public ItemNotFoundInRepositoryReason onHandle( Repository repository, ResourceStoreRequest request, Action action )
+    public void onHandle( Repository repository, ResourceStoreRequest request, Action action )
     {
-        return null;
+        // nop
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason onServing( final Repository repository,
-                                                          final ResourceStoreRequest request, final StorageItem item )
+    public void onServing( final Repository repository, final ResourceStoreRequest request, final StorageItem item )
     {
-        return null;
+        // nop
     }
 
     @Override
-    public ItemNotFoundInRepositoryReason onRemoteAccess( ProxyRepository proxy, ResourceStoreRequest request )
+    public void onRemoteAccess( ProxyRepository proxy, ResourceStoreRequest request )
     {
-        return null;
+        // nop
     }
 }
