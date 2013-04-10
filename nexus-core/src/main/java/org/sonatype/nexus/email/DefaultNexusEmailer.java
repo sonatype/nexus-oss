@@ -14,6 +14,7 @@ package org.sonatype.nexus.email;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
@@ -23,6 +24,7 @@ import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
 import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.MailRequestStatus;
+import org.sonatype.micromailer.MailType;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
@@ -30,6 +32,7 @@ import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguration;
 
@@ -50,6 +53,9 @@ public class DefaultNexusEmailer
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
+
+    @Requirement
+    private GlobalRestApiSettings globalRestApiSettings;
 
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
@@ -105,8 +111,46 @@ public class DefaultNexusEmailer
         {
             request.setFrom( getSMTPSystemEmailAddress() );
         }
+
+        prependNexusBaseUrl( request );
         
         return eMailer.sendMail( request );
+    }
+
+    /**
+     * Prepend to message body a link to this Nexus instance (base server URL).
+     */
+    private void prependNexusBaseUrl( final MailRequest request )
+    {
+        final String baseNexusUrl = globalRestApiSettings.getBaseUrl();
+        final MailType mailType = eMailer.getMailTypeSource().getMailType( request.getMailTypeId() );
+
+        final StringBuilder messageBody = new StringBuilder().append( "Message from: " );
+
+        if ( mailType != null && mailType.isBodyIsHtml() )
+        {
+            messageBody
+                .append(
+                    StringUtils.isNotBlank( baseNexusUrl )
+                        ? String.format( "<a href=\"%s\"/>", baseNexusUrl )
+                        : "<i>(Set the Base URL parameter in Nexus Server Administration to include in future emails)</i>"
+                )
+                .append( "<br><br>" );
+        }
+        else
+        {
+            messageBody
+                .append(
+                    StringUtils.isNotBlank( baseNexusUrl )
+                        ? baseNexusUrl
+                        : "(Set the Base URL parameter in Nexus Server Administration to include in future emails)"
+                )
+                .append( "\n\n" );
+        }
+
+        messageBody.append( request.getBodyContext().get( DefaultMailType.BODY_KEY ) );
+
+        request.getBodyContext().put( DefaultMailType.BODY_KEY, messageBody.toString() );
     }
 
     // ==
