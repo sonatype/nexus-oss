@@ -89,7 +89,7 @@
 
                 function errorCallback(error) {
                     if (Nexus.error !== undefined) {
-                        Nexus.error.handle([new Error(error.requireType + ': ' + error.requireModules)]);
+                        Nexus.error.handle(new Error(error.requireType + ': ' + error.requireModules));
                     } else if (console !== undefined) {
                         console.log(new Error(error.requireType + ': ' + error.requireModules));
                     }
