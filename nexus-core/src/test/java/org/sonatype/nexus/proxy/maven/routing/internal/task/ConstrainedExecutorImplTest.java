@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.task.executor;
+package org.sonatype.nexus.proxy.maven.routing.internal.task;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -20,8 +20,10 @@ import static org.hamcrest.Matchers.is;
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
-import org.sonatype.nexus.util.task.CancelableRunnableSupport;
-import org.sonatype.nexus.util.task.CancelableUtil;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnableSupport;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.ConstrainedExecutor;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.ConstrainedExecutorImpl;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class ConstrainedExecutorImplTest

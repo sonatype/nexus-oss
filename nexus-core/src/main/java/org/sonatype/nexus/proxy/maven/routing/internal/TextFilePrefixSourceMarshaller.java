@@ -17,6 +17,7 @@ import static org.sonatype.nexus.util.PathUtils.elementsOf;
 import static org.sonatype.nexus.util.PathUtils.pathFrom;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -24,6 +25,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -46,16 +48,44 @@ public class TextFilePrefixSourceMarshaller
 
     protected static final Charset CHARSET = Charset.forName( "UTF-8" );
 
+    /**
+     * Directive that indicates that automatic routing is not supported for the repository. Must be the first line of
+     * the prefix file.
+     */
+    protected static final String UNSUPPORTED = "@ unsupported";
+
     private final int prefixFileMaxSize;
 
     private final int prefixFileMaxLineLength;
 
     private final int prefixFileMaxEntryCount;
 
+    public interface Result
+    {
+        boolean supported();
+
+        List<String> entries();
+    }
+
+    private static final Result RESULT_UNSUPPORTED = new Result()
+    {
+        @Override
+        public boolean supported()
+        {
+            return false;
+        }
+
+        @Override
+        public List<String> entries()
+        {
+            return Collections.emptyList();
+        }
+    };
+
     /**
      * Constructor.
      * 
-     * @param config the WL config.
+     * @param config the autorouting config.
      */
     public TextFilePrefixSourceMarshaller( final Config config )
     {
@@ -97,7 +127,7 @@ public class TextFilePrefixSourceMarshaller
      * @throws InvalidInputException
      * @throws IOException
      */
-    public final List<String> read( final StorageFileItem file )
+    public final Result read( final StorageFileItem file )
         throws InvalidInputException, IOException
     {
         if ( file.getLength() > prefixFileMaxSize )
@@ -111,6 +141,12 @@ public class TextFilePrefixSourceMarshaller
             final ArrayList<String> entries = new ArrayList<String>();
             reader = new BufferedReader( new InputStreamReader( file.getInputStream(), CHARSET ) );
             String line = reader.readLine();
+
+            if ( UNSUPPORTED.equals( line ) )
+            {
+                return RESULT_UNSUPPORTED;
+            }
+
             while ( line != null )
             {
                 // trim
@@ -127,7 +163,7 @@ public class TextFilePrefixSourceMarshaller
                     if ( !CharMatcher.ASCII.matchesAllOf( line ) )
                     {
                         throw new InvalidInputException(
-                            "Prefix file contains non-ASCII characters, refusing to load the file." );
+                                                         "Prefix file contains non-ASCII characters, refusing to load the file." );
                     }
                     // Igor's find command makes path like "./org/apache/"
                     while ( line.startsWith( "." ) )
@@ -148,11 +184,35 @@ public class TextFilePrefixSourceMarshaller
                         + prefixFileMaxEntryCount + "), refusing to load it." );
                 }
             }
-            return entries;
+            return new Result()
+            {
+                @Override
+                public boolean supported()
+                {
+                    return true;
+                }
+
+                @Override
+                public List<String> entries()
+                {
+                    return entries;
+                }
+            };
         }
         finally
         {
             Closeables.closeQuietly( reader );
         }
+    }
+
+    public void writeUnsupported( ByteArrayOutputStream outputStream )
+    {
+        final PrintWriter printWriter = new PrintWriter( new OutputStreamWriter( outputStream, CHARSET ) );
+        printWriter.println( UNSUPPORTED );
+        for ( String header : HEADERS )
+        {
+            printWriter.println( header );
+        }
+        printWriter.flush();
     }
 }

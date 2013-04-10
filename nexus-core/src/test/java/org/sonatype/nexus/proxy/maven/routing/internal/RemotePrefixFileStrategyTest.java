@@ -224,7 +224,7 @@ public class RemotePrefixFileStrategyTest
                 equalTo( "Remote publishes prefix file (is less than a day old), using it." ) );
 
             final PrefixSource entrySource = result.getPrefixSource();
-            assertThat( entrySource.exists(), is( true ) );
+            assertThat( entrySource.supported(), is( true ) );
             assertThat( entrySource.readEntries(), contains( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite" ) );
             assertThat( entrySource.readEntries().size(), equalTo( 3 ) );
         }
@@ -265,7 +265,51 @@ public class RemotePrefixFileStrategyTest
                 equalTo( "Remote publishes prefix file (is less than a day old), using it." ) );
 
             final PrefixSource entrySource = result.getPrefixSource();
-            assertThat( entrySource.exists(), is( true ) );
+            assertThat( entrySource.supported(), is( true ) );
+            assertThat( entrySource.readEntries(), contains( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite" ) );
+            assertThat( entrySource.readEntries().size(), equalTo( 3 ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    /**
+     * https://issues.sonatype.org/browse/NXCM-5188 Strict Checksum enforcement breaks Automatic Routing
+     * <p>
+     * Prefix file retrieval uses plain Proxy transport to get the file from remote peer. This causes problems (actually
+     * prevents happening it) if following conditions are met: Proxy repository has STRICT checksum policy and remote
+     * prefix file has no checksum published. In this case, relaxing the policy for this request only is okay to do,
+     * since "this" Nexus will properly process the prefix file anyway, detecting any problems with it, thus protecting
+     * downstream clients too.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void discoverPlaintextPrefixFileWithoutChecksumsWithStrictChecksumPolicy()
+        throws Exception
+    {
+        server.stop();
+        server =
+            Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                Behaviours.content( prefixFile1( true ) ) ).start();
+        try
+        {
+            // setting the policy to STRICT, and note that server set up above publishes
+            // the prefix file only, no checksums!
+            final MavenProxyRepository mavenProxyRepository =
+                getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID, MavenProxyRepository.class );
+            mavenProxyRepository.setChecksumPolicy( ChecksumPolicy.STRICT );
+            getApplicationConfiguration().saveConfiguration();
+
+            final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
+            final StrategyResult result = subject.discover( mavenProxyRepository );
+            assertThat( result.getMessage(),
+                equalTo( "Remote publishes prefix file (is less than a day old), using it." ) );
+
+            final PrefixSource entrySource = result.getPrefixSource();
+            assertThat( entrySource.supported(), is( true ) );
             assertThat( entrySource.readEntries(), contains( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite" ) );
             assertThat( entrySource.readEntries().size(), equalTo( 3 ) );
         }

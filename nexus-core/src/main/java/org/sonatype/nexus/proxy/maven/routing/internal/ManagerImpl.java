@@ -31,17 +31,12 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -49,35 +44,34 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryConfig;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus;
-import org.sonatype.nexus.proxy.maven.routing.Manager;
-import org.sonatype.nexus.proxy.maven.routing.PublishingStatus;
-import org.sonatype.nexus.proxy.maven.routing.RoutingStatus;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus.DStatus;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
+import org.sonatype.nexus.proxy.maven.routing.PublishingStatus;
 import org.sonatype.nexus.proxy.maven.routing.PublishingStatus.PStatus;
+import org.sonatype.nexus.proxy.maven.routing.RoutingStatus;
 import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult;
+import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.routing.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
-import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFilePublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFileUnpublishedRepositoryEvent;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.LoggingProgressListener;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.ConstrainedExecutor;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.ConstrainedExecutorImpl;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.executor.Statistics;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.NexusThreadFactory;
-import org.sonatype.nexus.util.task.LoggingProgressListener;
-import org.sonatype.nexus.util.task.executor.ConstrainedExecutor;
-import org.sonatype.nexus.util.task.executor.ConstrainedExecutorImpl;
-import org.sonatype.nexus.util.task.executor.Statistics;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -87,6 +81,25 @@ import com.google.common.eventbus.Subscribe;
 
 /**
  * Default implementation.
+ * <p>
+ * Notes on synchronization. As of 2.4,
+ * <ul>
+ * <li>periodic autorouting metadata updates are performed without holding any locks on path prefix file (i.e.
+ * .meta/prefixes.txt). Instead, ConstrainedExecutor is used to avoid multiple concurrent execution of periodic
+ * autorouting metadata updates. If new periodic update is requested while the previous one is already running, which is
+ * theoretically possible if update takes longer than update check period (1 hour as of 2.4), ConstrainedExecutor will
+ * prevent second concurrent execution.</li>
+ * <li>during period update existing metadata, if any, is kept available throughout update and is changed as one
+ * relatively short prefix file update performed while holding write, i.e. exclusive, lock on the prefix file.</li>
+ * <li>contents of the prefix file is cached in memory on first request and the cache is refreshed on each change to the
+ * prefix file. reading of the prefix file into the memory cache is performed while holding read, i.e. shared, lock,
+ * which is necessary to prevent reading prefix file partially written by concurrently running prefix file update.</li>
+ * <li>during repository deploy/delete operations, prefix file contents is first read while holding read lock, then, if
+ * the operation results in changes to the prefix file, the prefix file is read-updated-written while holding write
+ * long. This allows concurrent execution of multiple repository deploy/delete operations that do not require changes to
+ * the contents of the prefix file.</li>
+ * </ul>
+ * </p>
  * 
  * @author cstamas
  * @since 2.4
@@ -117,9 +130,9 @@ public class ManagerImpl
 
     /**
      * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
-     * periodic remote WL update, but also executes background "force" updates (initiated by user over REST or when
-     * repository is added). But, as background threads are bounded by presence of proxy repositories, and introduce
-     * hard limit of possible max executions, it protects this instance that is basically unbounded.
+     * periodic remote prefix list update, but also executes background "force" updates (initiated by user over REST or
+     * when repository is added). But, as background threads are bounded by presence of proxy repositories, and
+     * introduce hard limit of possible max executions, it protects this instance that is basically unbounded.
      */
     private final ScheduledExecutorService executor;
 
@@ -128,12 +141,6 @@ public class ManagerImpl
      * repository.
      */
     private final ConstrainedExecutor constrainedExecutor;
-
-    /**
-     * Flag that marks that "boot sequence" is finished. If {@code true}, all the "boot initialization" already
-     * happened. Still, depending on {@link WLConfig#isFeatureActive()} what actually was done during this.
-     */
-    private volatile boolean bootSequenceDone;
 
     /**
      * Da constructor.
@@ -175,124 +182,63 @@ public class ManagerImpl
     @Override
     public void startup()
     {
-        bootSequenceDone = false;
-
         if ( config.isFeatureActive() )
         {
-            // init WLs of repositories on boot. In first "flight" we do not do any update
-            // only ack existing WLs or in case of non-existent (upgrade), we just mark those
-            // reposes as noscrape. First the hosted+proxy reposes are processed, and they
-            // are gathered into a list that we know they need-update (have no WL at all)
-            // 2nd pass is for groups, but they are NOT collected for updates.
-            // Finally, those collected for update will get update bg jobs spawned.
-
-            // All this is important for 1st boot only, as on subsequent boot WLs will be already
-            // present and just event will be published.
-            // hosted + proxies get inited first, collect those needing update
-            // those will be all on upgrade, and none on subsequent boots
-            final ArrayList<MavenRepository> needUpdateRepositories = new ArrayList<MavenRepository>();
+            // Send events about repositories with existing PrefixSource synchronously as part of #startup method
+            // This allows proper initialization of components that need to track state of automatic routing
+            for ( MavenRepository mavenRepository : repositoryRegistry.getRepositoriesWithFacet( MavenRepository.class ) )
             {
-                final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
-                initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
-                initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
-                for ( MavenRepository mavenRepository : initableRepositories )
+                if ( isMavenRepositorySupported( mavenRepository )
+                    && mavenRepository.getLocalStatus().shouldServiceRequest() )
                 {
-                    if ( isMavenRepositorySupported( mavenRepository )
-                        && mavenRepository.getLocalStatus().shouldServiceRequest() )
+                    final FilePrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
+                    if ( prefixSource.exists() )
                     {
-                        if ( doInitializePrefixFileOnStartup( mavenRepository ) )
+                        getLogger().debug( "Initializing prefix file of {}", mavenRepository );
+                        if ( prefixSource.supported() )
                         {
-                            // collect those marked as need-update
-                            needUpdateRepositories.add( mavenRepository );
+                            eventBus.post( new PrefixFilePublishedRepositoryEvent( mavenRepository, prefixSource ) );
+                        }
+                        else
+                        {
+                            eventBus.post( new PrefixFileUnpublishedRepositoryEvent( mavenRepository ) );
                         }
                     }
                 }
             }
-            // groups get inited next, this mostly means they will be marked as noscrape on upgraded instances,
-            // and just a published event will be fired on consequent boots
-            {
-                final ArrayList<MavenRepository> initableGroupRepositories = new ArrayList<MavenRepository>();
-                initableGroupRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenGroupRepository.class ) );
-                for ( MavenRepository mavenRepository : initableGroupRepositories )
-                {
-                    if ( isMavenRepositorySupported( mavenRepository )
-                        && mavenRepository.getLocalStatus().shouldServiceRequest() )
-                    {
-                        // groups will not be collected to needs-update list
-                        doInitializePrefixFileOnStartup( mavenRepository );
-                    }
-                }
-            }
 
-            // schedule runnable to perform boot-sequence, that as last step schedules updater that ping hourly the
-            // mayUpdateProxyWhitelist method
-            // boot-sequence will run and handle on-boot-updates for repositories collected into list above.
-            // This all happens in periodicUpdater to not defer boot sequence in case
-            // when upgrade happens on larger instance (as then potentially many hosted/proxy reposes
-            // will need prefix file to be built)
-            executor.execute( new Runnable()
+            executor.scheduleAtFixedRate( new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    // perform possible updates, create prefix files for hosted and proxy reposes
-                    try
+                    if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
                     {
-                        for ( MavenRepository mavenRepository : needUpdateRepositories )
-                        {
-                            try
-                            {
-                                updatePrefixFile( mavenRepository );
-                            }
-                            catch ( Exception e )
-                            {
-                                getLogger().warn( "Could not perform initial WL build or repository {}",
-                                    mavenRepository, e );
-                            }
-                        }
-
-                        // after that, schedule a new "updater" runnable that with
-                        // periodically perform updates to proxy reposes only
-                        executor.scheduleAtFixedRate( new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
-                                {
-                                    // this might happen on periodic call AFTER nexus shutdown was commenced
-                                    // or BEFORE nexus booted, if some other plugin/subsystem delays boot for some
-                                    // reason.
-                                    // None of those is a problem, in latter case we will do what we need in next tick.
-                                    // In former case,
-                                    // we should not do anything anyway, we are being shut down.
-                                    getLogger().debug( "Nexus not yet started, bailing out" );
-                                    return;
-                                }
-                                mayUpdateAllProxyPrefixFiles();
-                            }
-                        }, TimeUnit.HOURS.toMillis( 1 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
+                        // this might happen on periodic call AFTER nexus shutdown was commenced
+                        // or BEFORE nexus booted, if some other plugin/subsystem delays boot for some
+                        // reason.
+                        // None of those is a problem, in latter case we will do what we need in next tick.
+                        // In former case,
+                        // we should not do anything anyway, we are being shut down.
+                        getLogger().debug( "Nexus not yet started, bailing out" );
+                        return;
                     }
-                    finally
-                    {
-                        bootSequenceDone = true;
-                    }
+                    mayUpdateAllProxyPrefixFiles();
                 }
-            } );
+            }, 0L /*no initial delay*/, TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
 
             // register event dispatcher, to start receiving events
             eventBus.register( eventDispatcher );
-        }
-        else
-        {
-            bootSequenceDone = true;
         }
     }
 
     @Override
     public void shutdown()
     {
-        eventBus.unregister( eventDispatcher );
+        if ( config.isFeatureActive() )
+        {
+            eventBus.unregister( eventDispatcher );
+        }
         executor.shutdown();
         constrainedExecutor.cancelAllJobs();
         try
@@ -314,8 +260,6 @@ public class ManagerImpl
         getLogger().debug( "Initializing prefix file of newly added {}", mavenRepository );
         try
         {
-            // mark it for noscrape if not marked yet
-            unpublish( mavenRepository );
             // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
             // and publish
             updatePrefixFile( mavenRepository );
@@ -338,88 +282,54 @@ public class ManagerImpl
     }
 
     /**
-     * Initializes maven repository WL on startup. Signals with returning {@code true} if the repository needs update of
-     * WL.
-     * 
-     * @param mavenRepository
-     * @return {@code true} if repository needs update.
-     */
-    protected boolean doInitializePrefixFileOnStartup( final MavenRepository mavenRepository )
-    {
-        getLogger().debug( "Initializing prefix file of {}", mavenRepository );
-        final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
-        try
-        {
-            if ( prefixSource.exists() )
-            {
-                // good, we assume is up to date, which should be unless user tampered with it
-                // in that case, just delete it + update and should be fixed.
-                publish( mavenRepository, prefixSource, false );
-                getLogger().info( "Existing prefix file of {} initialized",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-            }
-            else
-            {
-                // mark it for noscrape if not marked yet
-                // this is mainly important on 1st boot or newly added reposes
-                unpublish( mavenRepository, false );
-                getLogger().info( "Initializing non-existing prefix file of {}",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                return true;
-            }
-        }
-        catch ( Exception e )
-        {
-            getLogger().warn( "Problem during prefix file initialisation of {}",
-                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-            try
-            {
-                unpublish( mavenRepository, false );
-            }
-            catch ( IOException ioe )
-            {
-                // silently
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of WL update period in
-     * hours too), and will perform WL update only on those proxy repositories that needs it.
+     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of prefix list update
+     * period in hours too), and will perform prefix list update only on those proxy repositories that needs it.
      */
     protected void mayUpdateAllProxyPrefixFiles()
     {
         getLogger().trace( "mayUpdateAllProxyPrefixFiles started" );
-        final List<MavenProxyRepository> mavenProxyRepositories =
-            repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class );
-        for ( MavenProxyRepository mavenProxyRepository : mavenProxyRepositories )
+        for ( MavenRepository mavenRepository : repositoryRegistry.getRepositoriesWithFacet( MavenRepository.class ) )
         {
             try
             {
-                mayUpdateProxyPrefixFile( mavenProxyRepository );
+                final FilePrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
+                if ( !prefixSource.exists() )
+                {
+                    // automatic routing has not been initialized for this repository yet, for initialization.
+                    doUpdatePrefixFileAsync( true, mavenRepository );
+                }
+                else
+                {
+                    MavenProxyRepository mavenProxyRepository =
+                        mavenRepository.adaptToFacet( MavenProxyRepository.class );
+                    if ( mavenProxyRepository != null )
+                    {
+                        mayUpdateProxyPrefixFile( mavenProxyRepository );
+                    }
+                }
             }
             catch ( IllegalStateException e )
             {
                 // just neglect it and continue, this one might be auto blocked if proxy or put out of service
-                getLogger().trace( "Proxy repository {} is not in state to be updated", mavenProxyRepository );
+                getLogger().trace( "Repository {} is not in state to be updated", mavenRepository );
             }
             catch ( Exception e )
             {
                 // just neglect it and continue, but do log it
-                getLogger().warn( "Problem during prefix file update of proxy repository {}",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), e );
+                getLogger().warn( "Problem during prefix file update of repository {}",
+                                  RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             }
         }
     }
 
     /**
-     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of WL update period in
-     * hours too), and will perform WL update on proxy repository only if needed (WL is stale, or does not exists).
+     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of prefix list update
+     * period in hours too), and will perform prefix list update on proxy repository only if needed (prefix list is
+     * stale, or does not exists).
      * 
      * @param mavenProxyRepository
-     * @return {@code true} if update has been spawned, {@code false} if no update needed (WL is up to date or remote
-     *         discovery is disable for repository).
+     * @return {@code true} if update has been spawned, {@code false} if no update needed (prefix list is up to date or
+     *         remote discovery is disable for repository).
      */
     protected boolean mayUpdateProxyPrefixFile( final MavenProxyRepository mavenProxyRepository )
     {
@@ -428,7 +338,7 @@ public class ManagerImpl
         {
             // only update if any of these below are true:
             // status is ERROR or ENABLED_NOT_POSSIBLE (hit an error during last discovery)
-            // status is anything else and WL update period is here
+            // status is anything else and prefix list update period is here
             final DiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
             if ( discoveryStatus.getStatus() == DStatus.ERROR
                 || discoveryStatus.getStatus() == DStatus.ENABLED_NOT_POSSIBLE
@@ -501,7 +411,7 @@ public class ManagerImpl
             constrainedExecutor.cancelRunningWithKey( mavenProxyRepository.getId() );
             final PrefixSource prefixSource =
                 updateProxyPrefixFile( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
-            if ( prefixSource != null )
+            if ( prefixSource != null && prefixSource.supported() )
             {
                 getLogger().info( "Updated and published prefix file of {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
@@ -614,17 +524,12 @@ public class ManagerImpl
     @VisibleForTesting
     public boolean isUpdatePrefixFileJobRunning()
     {
-        if ( !bootSequenceDone )
-        {
-            getLogger().debug( "Boot update sequence not done yet" );
-            return true;
-        }
         final Statistics statistics = constrainedExecutor.getStatistics();
         getLogger().debug( "Running update jobs for {}", statistics.getCurrentlyRunningJobKeys() );
         return !statistics.getCurrentlyRunningJobKeys().isEmpty();
     }
 
-    protected void updateAndPublishPrefixFile( final MavenRepository mavenRepository, final boolean notify )
+    protected void updateAndPublishPrefixFile( final MavenRepository mavenRepository )
         throws IOException
     {
         getLogger().debug( "Updating prefix file of {}", mavenRepository );
@@ -649,22 +554,16 @@ public class ManagerImpl
                     RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
                 return;
             }
-            if ( prefixSource != null )
+            if ( prefixSource != null && prefixSource.supported() )
             {
-                if ( notify )
-                {
-                    getLogger().info( "Updated and published prefix file of {}",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
+                getLogger().info( "Updated and published prefix file of {}",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 publish( mavenRepository, prefixSource );
             }
             else
             {
-                if ( notify )
-                {
-                    getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
+                getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 unpublish( mavenRepository );
             }
         }
@@ -773,7 +672,7 @@ public class ManagerImpl
     {
         checkUpdateConditions( mavenGroupRepository );
         PrefixSource prefixSource = null;
-        // save merged WL into group's local storage (if all members has WL)
+        // save merged prefix list into group's local storage (if all members has prefix list)
         boolean allMembersHavePublished = true;
         final LinkedHashSet<String> entries = new LinkedHashSet<String>();
         for ( Repository member : mavenGroupRepository.getMemberRepositories() )
@@ -790,7 +689,7 @@ public class ManagerImpl
                     lock.lock( Action.read );
                     try
                     {
-                        if ( !memberEntrySource.exists() )
+                        if ( !memberEntrySource.supported() )
                         {
                             allMembersHavePublished = false;
                             break;
@@ -833,7 +732,7 @@ public class ManagerImpl
 
         // publish status
         final FilePrefixSource publishedEntrySource = getPrefixSourceFor( mavenRepository );
-        if ( !publishedEntrySource.exists() )
+        if ( !publishedEntrySource.supported() )
         {
             final String message;
             if ( isMavenRepositorySupported( mavenRepository ) )
@@ -849,7 +748,7 @@ public class ManagerImpl
                         if ( null != memberMavenRepository )
                         {
                             final PrefixSource ps = getPrefixSourceFor( memberMavenRepository );
-                            if ( !ps.exists() )
+                            if ( !ps.supported() )
                             {
                                 membersWithoutPrefixFiles.add( memberMavenRepository.getName() );
                             }
@@ -994,15 +893,18 @@ public class ManagerImpl
     {
         if ( constrainedExecutor.hasRunningWithKey( mavenHostedRepository.getId() ) )
         {
-            forceUpdatePrefixFile( mavenHostedRepository );
-            return true;
+            // as of 2.4 this is only possible during initial autorouting configuration of hosted repositories
+            // any changes to prefix list performed here will be incomplete, i.e. list single path prefix
+            // and it will be overwritten when initial autorouting configuration completes
+            // although not 100% bulletproof, this logic reduces the risk of this happening
+            return false;
         }
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
         lock.lock( Action.read );
         try
         {
-            if ( !prefixSource.exists() )
+            if ( !prefixSource.supported() )
             {
                 return false;
             }
@@ -1043,15 +945,18 @@ public class ManagerImpl
     {
         if ( constrainedExecutor.hasRunningWithKey( mavenHostedRepository.getId() ) )
         {
-            forceUpdatePrefixFile( mavenHostedRepository );
-            return true;
+            // as of 2.4 this is only possible during initial autorouting configuration of hosted repositories
+            // any changes to prefix list performed here will be incomplete, i.e. list single path prefix
+            // and it will be overwritten when initial autorouting configuration completes
+            // although not 100% bulletproof, this logic reduces the risk of this happening
+            return false;
         }
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
         lock.lock( Action.read );
         try
         {
-            if ( !prefixSource.exists() )
+            if ( !prefixSource.supported() )
             {
                 return false;
             }
@@ -1092,13 +997,6 @@ public class ManagerImpl
     public void publish( final MavenRepository mavenRepository, final PrefixSource prefixSource )
         throws IOException
     {
-        publish( mavenRepository, prefixSource, true );
-    }
-
-    protected void publish( final MavenRepository mavenRepository, final PrefixSource prefixSource,
-                            final boolean propagate )
-        throws IOException
-    {
         // publish prefix file
         final FilePrefixSource prefixesFile = getPrefixSourceFor( mavenRepository );
         try
@@ -1111,50 +1009,24 @@ public class ManagerImpl
             throw e;
         }
 
-        // unset noscrape flag
-        removeNoscrapeFlag( mavenRepository );
-
         // event
         eventBus.post( new PrefixFilePublishedRepositoryEvent( mavenRepository, prefixesFile ) );
 
-        if ( propagate )
-        {
-            // propagate
-            propagatePrefixFileUpdateOf( mavenRepository );
-        }
+        // propagate
+        propagatePrefixFileUpdateOf( mavenRepository );
     }
 
     @Override
     public void unpublish( final MavenRepository mavenRepository )
         throws IOException
     {
-        unpublish( mavenRepository, true );
-    }
-
-    protected void unpublish( final MavenRepository mavenRepository, final boolean propagate )
-        throws IOException
-    {
-        // delete (if any) published files, even those that user might manually put there
-        getPrefixSourceFor( mavenRepository ).delete();
-
-        // TODO: We do this due to RemotePrefixFileStrategy, but this is now scattered (that one may write these file,
-        // and here we are cleaning them)
-        for ( String path : config.getRemotePrefixFilePaths() )
-        {
-            new FilePrefixSource( mavenRepository, path, config ).delete();
-        }
-
-        // set noscrape flag
-        addNoscrapeFlag( mavenRepository );
+        getPrefixSourceFor( mavenRepository ).writeUnsupported();
 
         // event
         eventBus.post( new PrefixFileUnpublishedRepositoryEvent( mavenRepository ) );
 
-        if ( propagate )
-        {
-            // propagate
-            propagatePrefixFileUpdateOf( mavenRepository );
-        }
+        // propagate
+        propagatePrefixFileUpdateOf( mavenRepository );
     }
 
     protected void propagatePrefixFileUpdateOf( final MavenRepository mavenRepository )
@@ -1166,69 +1038,11 @@ public class ManagerImpl
             containingGroupRepository = groupRepository.adaptToFacet( MavenGroupRepository.class );
             if ( mavenRepository != null )
             {
-                try
-                {
-                    // this is a group, so we go with sync method as this is quick
-                    updateAndPublishPrefixFile( containingGroupRepository, false );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn(
-                        "Problem while cascading prefix file update to group repository {} from it's member {}",
-                        RepositoryStringUtils.getHumanizedNameString( containingGroupRepository ),
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-                }
+                // this method is invoked while holding write lock on mavenRepository prefix file
+                // groupRepository prefix file calculation will need read locks on all members prefix files
+                // to avoid deadlocks we push group prefix file update to another thread
+                doUpdatePrefixFileAsync( true, containingGroupRepository );
             }
-        }
-    }
-
-    // ==
-
-    protected void addNoscrapeFlag( final MavenRepository mavenRepository )
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        final DefaultStorageFileItem file =
-            new DefaultStorageFileItem( mavenRepository, new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() ),
-                true, true, new StringContentLocator( "noscrape" ) );
-        try
-        {
-            mavenRepository.storeItem( true, file );
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
-        }
-    }
-
-    @SuppressWarnings( "deprecation" )
-    protected void removeNoscrapeFlag( final MavenRepository mavenRepository )
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        try
-        {
-            mavenRepository.deleteItem( true, request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
         }
     }
 

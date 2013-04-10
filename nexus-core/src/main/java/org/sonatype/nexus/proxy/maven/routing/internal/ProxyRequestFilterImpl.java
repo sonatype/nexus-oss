@@ -55,15 +55,15 @@ public class ProxyRequestFilterImpl
      * 
      * @param eventBus
      * @param applicationStatusSource
-     * @param wlManager
+     * @param manager
      */
     @Inject
     public ProxyRequestFilterImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
-                                   final Manager wlManager )
+                                   final Manager manager )
     {
         checkNotNull( eventBus );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
-        this.manager = checkNotNull( wlManager );
+        this.manager = checkNotNull( manager );
         eventBus.register( this );
     }
 
@@ -108,7 +108,7 @@ public class ProxyRequestFilterImpl
         try
         {
             final PrefixSource prefixSource = manager.getPrefixSourceFor( mavenProxyRepository );
-            if ( prefixSource.exists() )
+            if ( prefixSource.supported() )
             {
                 final PathMatcher pathMatcher = new PathMatcher( prefixSource.readEntries(), Integer.MAX_VALUE );
                 pathMatchers.put( mavenProxyRepository.getId(), pathMatcher );

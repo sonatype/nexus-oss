@@ -134,7 +134,7 @@ public class TextFilePrefixSourceMarshallerTest
     {
         when( storageFileItem.getInputStream() ).thenReturn(
             new ByteArrayInputStream( prefixFile1( true ).getBytes( UTF8 ) ) );
-        final List<String> entries = m.read( storageFileItem );
+        final List<String> entries = m.read( storageFileItem ).entries();
         assertThat( entries, is( notNullValue() ) );
         assertThat( entries.size(), is( 3 ) );
 
@@ -153,7 +153,7 @@ public class TextFilePrefixSourceMarshallerTest
         // prefixFile2 is "find created" like, see CENTRAL-515
         when( storageFileItem.getInputStream() ).thenReturn(
             new ByteArrayInputStream( prefixFile2( true ).getBytes( UTF8 ) ) );
-        final List<String> entries = m.read( storageFileItem );
+        final List<String> entries = m.read( storageFileItem ).entries();
         assertThat( entries, is( notNullValue() ) );
         assertThat( entries.size(), is( 3 ) );
 
@@ -175,7 +175,7 @@ public class TextFilePrefixSourceMarshallerTest
         // prefixFile2 is "find created" like, see CENTRAL-515
         when( storageFileItem.getInputStream() ).thenReturn(
             new ByteArrayInputStream( prefixFile3( true ).getBytes( UTF8 ) ) );
-        final List<String> entries = m.read( storageFileItem );
+        final List<String> entries = m.read( storageFileItem ).entries();
         assertThat( entries, is( notNullValue() ) );
         assertThat( entries.size(), is( 1 ) );
 
@@ -197,7 +197,7 @@ public class TextFilePrefixSourceMarshallerTest
         // prefixFile2 is "find created" like, see CENTRAL-515
         when( storageFileItem.getInputStream() ).thenReturn(
             new ByteArrayInputStream( prefixFile4( true, false ).getBytes( UTF8 ) ) );
-        final List<String> entries = m.read( storageFileItem );
+        final List<String> entries = m.read( storageFileItem ).entries();
         assertThat( entries, is( notNullValue() ) );
         assertThat( entries.size(), is( 3 ) );
 

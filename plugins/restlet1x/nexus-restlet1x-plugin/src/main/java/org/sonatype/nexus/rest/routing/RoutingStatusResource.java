@@ -49,7 +49,7 @@ import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
 /**
- * WL Status REST resource.
+ * Autorouting Status REST resource.
  * 
  * @author cstamas
  * @since 2.4
@@ -178,8 +178,8 @@ public class RoutingStatusResource
     }
 
     /**
-     * Force updates WL for given repository. If invoked for non-Maven repository, or a Maven Group repository, response
-     * is Bad Request.
+     * Force updates prefix list for given repository. If invoked for non-Maven repository, or a Maven Group repository,
+     * response is Bad Request.
      */
     @Override
     @DELETE

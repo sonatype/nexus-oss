@@ -462,7 +462,7 @@ public abstract class AbstractMavenRepository
         {
             return false;
         }
-        // apply WLFilter to "normal" requests only, not hidden (which is meta or plain hidden)
+        // apply autorouting filter to "normal" requests only, not hidden (which is meta or plain hidden)
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
@@ -593,7 +593,7 @@ public abstract class AbstractMavenRepository
     }
 
     /**
-     * Beside original behavior, only add to NFC when it's not WL that rejected remote access.
+     * Beside original behavior, only add to NFC when remote access is not rejected by autorouting.
      * 
      * @since 2.4
      */
@@ -605,7 +605,7 @@ public abstract class AbstractMavenRepository
         {
             // TODO: should we un-flag the request?
             shouldAddToNFC = false;
-            getLogger().debug( "Maven proxy repository {} WL rejected this request, not adding path {} to NFC.",
+            getLogger().debug( "Maven proxy repository {} autorouting rejected this request, not adding path {} to NFC.",
                 RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() );
         }
         return shouldAddToNFC;

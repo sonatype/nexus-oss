@@ -25,7 +25,7 @@ import org.sonatype.nexus.util.PathUtils;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * A path matcher, that performs "path matching" using the WL prefix entries. Implemented using {@link ParentOMatic},
+ * A path matcher, that performs "path matching" using the prefix list entries. Implemented using {@link ParentOMatic},
  * and performs matching by building a maximized (capped) tree in memory out of path entries.
  * 
  * @author cstamas

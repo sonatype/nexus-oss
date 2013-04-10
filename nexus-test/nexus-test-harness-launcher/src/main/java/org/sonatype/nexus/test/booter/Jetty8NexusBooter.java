@@ -157,11 +157,11 @@ public class Jetty8NexusBooter
         // sort of "try-wait-try-failAfterSomeRetries" the search operation itself.
         System.setProperty( "mavenIndexerBlockingCommits", Boolean.TRUE.toString() );
         
-        // Note: WL initialization prevented
+        // Note: autorouting initialization prevented
         // Presence breaks many ITs, especially those that either listen for proxy requests (will be more coz of prefix file
-        // and scrape discovery), or because remote proxy setup happens after nexus boot, and WL discovery makes proxies autoblock.
-        // In either case, IT working with WL should explicitly enable it.
-        // As "legacy" ITs are coming anyway from pre-WL era, they will have WL disabled ALWAYS
+        // and scrape discovery), or because remote proxy setup happens after nexus boot, and autorouting discovery makes proxies autoblock.
+        // In either case, IT working with autorouting should explicitly enable it.
+        // As "legacy" ITs are coming anyway from pre-WL era, they will have autorouting disabled ALWAYS
         // To write IT covering WL you'd use anyway the "new" IT infrastructure instead of this.
         System.setProperty( ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString() );
 

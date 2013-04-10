@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,13 +29,15 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
+import org.sonatype.nexus.proxy.maven.routing.internal.TextFilePrefixSourceMarshaller.Result;
 
 /**
  * Remote prefix file strategy.
@@ -47,6 +50,35 @@ public class RemotePrefixFileStrategy
     extends AbstractRemoteStrategy
     implements RemoteStrategy
 {
+    private static final PrefixSource UNSUPPORTED_PREFIXSOURCE = new PrefixSource()
+    {
+        @Override
+        public boolean exists()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean supported()
+        {
+            return false;
+        }
+
+        @Override
+        public List<String> readEntries()
+            throws IOException
+        {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public long getLostModifiedTimestamp()
+        {
+            return 0;
+        }
+
+    };
+
     protected static final String ID = "prefix-file";
 
     private final Config config;
@@ -68,76 +100,58 @@ public class RemotePrefixFileStrategy
         throws StrategyFailedException, IOException
     {
         StorageFileItem item;
-        final List<String> remoteFilePath = config.getRemotePrefixFilePaths();
-        for ( String path : remoteFilePath )
+        String path = config.getRemotePrefixFilePath();
+        getLogger().debug( "Looking for remote prefix on {} at path {}", mavenProxyRepository, path );
+        // we keep exclusive lock on UID during discovery to prevent other threads grabbing this file
+        // prematurely. We release the lock only when file is present locally, and is validated.
+        // in that moment it's not published yet, but the content is correct and it will be
+        // the same that will get published.
+        final RepositoryItemUid uid = mavenProxyRepository.createUid( path );
+        uid.getLock().lock( Action.update );
+        try
         {
-            getLogger().debug( "Looking for remote prefix on {} at path {}", mavenProxyRepository, path );
-            // we keep exclusive lock on UID during discovery to prevent other WL threads grabbing this file
-            // prematurely. We release the lock only when file is present locally, and is validated.
-            // in that moment it's not published yet, but the content is correct and it will be
-            // the same that will get published.
-            final RepositoryItemUid uid = mavenProxyRepository.createUid( path );
-            uid.getLock().lock( Action.update );
-            try
+            item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
+            if ( item != null )
             {
-                item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
-                if ( item != null )
+                getLogger().debug( "Remote prefix on {} at path {} found!", mavenProxyRepository, path );
+                long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
+                Result unmarshalled = new TextFilePrefixSourceMarshaller( config ).read( item );
+                if ( !unmarshalled.supported() )
                 {
-                    getLogger().debug( "Remote prefix on {} at path {} found!", mavenProxyRepository, path );
-                    long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
-                    final PrefixSource prefixSource = createPrefixSource( mavenProxyRepository, path );
-                    if ( prefixSource != null )
-                    {
-                        if ( prefixFileAgeInDays < 1 )
-                        {
-                            return new StrategyResult(
-                                "Remote publishes prefix file (is less than a day old), using it.", prefixSource );
-                        }
-                        else
-                        {
-                            return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
-                                + " days old), using it.", prefixSource );
-                        }
-                    }
-                    else
-                    {
-                        getLogger().info( "Prefix file retrieved from {} is corrupt, skipping it.", item.getRemoteUrl() );
-                    }
+                    return new StrategyResult( "Remote disabled automatic routing", UNSUPPORTED_PREFIXSOURCE, false );
+                }
+
+                final PrefixSource prefixSource = new ArrayListPrefixSource( unmarshalled.entries() );
+                if ( prefixFileAgeInDays < 1 )
+                {
+                    return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
+                        prefixSource, true );
+                }
+                else
+                {
+                    return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
+                        + " days old), using it.", prefixSource, true );
                 }
             }
-            finally
-            {
-                uid.getLock().unlock();
-            }
         }
-        throw new StrategyFailedException( "Remote does not publish prefix files on paths " + remoteFilePath );
+        finally
+        {
+            uid.getLock().unlock();
+        }
+        throw new StrategyFailedException( "Remote does not publish prefix files on path " + path );
     }
 
     // ==
-
-    protected FilePrefixSource createPrefixSource( final MavenProxyRepository mavenProxyRepository, final String path )
-        throws IOException
-    {
-        final FilePrefixSource result = new FilePrefixSource( mavenProxyRepository, path, config );
-        try
-        {
-            result.readEntries();
-        }
-        catch ( InvalidInputException e )
-        {
-            result.delete();
-            throw e;
-        }
-        return result;
-    }
 
     protected StorageFileItem retrieveFromRemoteIfExists( final MavenProxyRepository mavenProxyRepository,
                                                           final String path )
         throws IOException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         request.setRequestRemoteOnly( true );
+        request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
+        // NXCM-5188: Disable checksum policy for prefix file request, it will be processed and checked anyway
+        request.getRequestContext().put( ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY, ChecksumPolicy.IGNORE );
 
         // check for remote presence, as fetching with setRequestRemoteOnly has a side effect of
         // DELETING the file from local cache if not present remotely. In this case, prefix

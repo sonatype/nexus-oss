@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -36,8 +33,8 @@ public class ConfigImpl
     implements Config
 {
     /**
-     * System property key that is used to read up boolean value controlling is WL feature active or not. Main use case
-     * is to disable this in "legacy" UTs and ITs, but might serve too as troubleshooting in some cases. Event
+     * System property key that is used to read up boolean value controlling if autorouting feature active or not. Main
+     * use case is to disable this in "legacy" UTs and ITs, but might serve too as troubleshooting in some cases. Event
      * dispatcher is active by default, to deactivate it, specify a system property like this:
      * 
      * <pre>
@@ -46,21 +43,13 @@ public class ConfigImpl
      * 
      * Note: This does NOT REMOVE the Feature itself! The feature will be still present and working but remote content
      * discovery will be completely disabled, hence, all the proxies and groups having proxies as members will simply be
-     * marked for noscrape. Also, since no WL will be published, no "proxy optimization" will happen either. If neglect
-     * the noscape, Nexus will work as it was working before 2.4 release. Using system property with this key should be
-     * restricted to tests or some troubleshooting only.
+     * marked for noscrape. Also, since no prefix list will be published, no "proxy optimization" will happen either. If
+     * neglect the noscape, Nexus will work as it was working before 2.4 release. Using system property with this key
+     * should be restricted to tests or some troubleshooting only.
      */
     public static final String FEATURE_ACTIVE_KEY = Config.class.getName() + ".featureActive";
 
-    private static final String LOCAL_NO_SCRAPE_FLAG_PATH = "/.meta/noscrape.txt";
-
     private static final String LOCAL_PREFIX_FILE_PATH = "/.meta/prefixes.txt";
-
-    private static final String[] EXTRA_REMOTE_NO_SCRAPE_FLAG_PATHS =
-        SystemPropertiesHelper.getStringlist( Config.class.getName() + ".extraRemoteNoscrapeFlagPaths" );
-
-    private static final String[] EXTRA_REMOTE_PREFIX_FILE_PATHS =
-        SystemPropertiesHelper.getStringlist( Config.class.getName() + ".extraRemotePrefixFilePaths" );
 
     private static final int REMOTE_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( Config.class.getName()
         + ".remoteScrapeDepth", 2 );
@@ -104,45 +93,15 @@ public class ConfigImpl
     }
 
     @Override
-    public String getLocalNoScrapeFlagPath()
-    {
-        return LOCAL_NO_SCRAPE_FLAG_PATH;
-    }
-
-    @Override
     public String getLocalPrefixFilePath()
     {
         return LOCAL_PREFIX_FILE_PATH;
     }
 
     @Override
-    public List<String> getRemoteNoScrapeFlagPaths()
+    public String getRemotePrefixFilePath()
     {
-        final ArrayList<String> result = new ArrayList<String>();
-        result.add( LOCAL_NO_SCRAPE_FLAG_PATH );
-        for ( String extra : EXTRA_REMOTE_NO_SCRAPE_FLAG_PATHS )
-        {
-            if ( extra != null && extra.trim().length() > 0 )
-            {
-                result.add( extra );
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<String> getRemotePrefixFilePaths()
-    {
-        final ArrayList<String> result = new ArrayList<String>();
-        result.add( LOCAL_PREFIX_FILE_PATH );
-        for ( String extra : EXTRA_REMOTE_PREFIX_FILE_PATHS )
-        {
-            if ( extra != null && extra.trim().length() > 0 )
-            {
-                result.add( extra );
-            }
-        }
-        return result;
+        return LOCAL_PREFIX_FILE_PATH;
     }
 
     @Override

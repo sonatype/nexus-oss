@@ -32,9 +32,9 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.WritablePrefixSource;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -42,7 +42,7 @@ import com.google.common.base.Throwables;
 
 /**
  * {@link WritablePrefixSource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
- * Also serves as "the main" WL source. This is the only implementation of the {@link WritablePrefixSource}.
+ * Also serves as "the main" prefix list source. This is the only implementation of the {@link WritablePrefixSource}.
  * 
  * @author cstamas
  * @since 2.4
@@ -133,6 +133,33 @@ public class FilePrefixSource
     }
 
     @Override
+    public boolean supported()
+    {
+        try
+        {
+            return doReadProtected( new Callable<Boolean>()
+            {
+                @Override
+                public Boolean call()
+                    throws IOException
+                {
+                    StorageFileItem file = getFileItem();
+                    if ( file != null )
+                    {
+                        return getPrefixSourceMarshaller().read( file ).supported();
+                    }
+                    return false;
+                }
+            } );
+        }
+        catch ( IOException e )
+        {
+            // bam
+        }
+        return false;
+    }
+
+    @Override
     public long getLostModifiedTimestamp()
     {
         try
@@ -177,7 +204,7 @@ public class FilePrefixSource
                 {
                     return null;
                 }
-                return getPrefixSourceMarshaller().read( file );
+                return getPrefixSourceMarshaller().read( file ).entries();
             }
         } );
     }
@@ -186,11 +213,6 @@ public class FilePrefixSource
     public void writeEntries( final PrefixSource prefixSource )
         throws IOException
     {
-        if ( prefixSource instanceof FilePrefixSource && equals( (FilePrefixSource) prefixSource ) )
-        {
-            // we would read and then write to the same file, don't do it
-            return;
-        }
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         getPrefixSourceMarshaller().write( prefixSource.readEntries(), bos );
         putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
@@ -281,6 +303,12 @@ public class FilePrefixSource
             new DefaultStorageFileItem( getMavenRepository(), request, true, true, content );
         try
         {
+            // NXCM-5188: Remark to not get tempted to change these to storeItemWithChecksums() method:
+            // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
+            // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
+            // is published in Nexus, there is no need anymore to save checksums to disk, as they will
+            // be served up just fine. This is true for all items in Nexus storage, not just prefix
+            // file related ones!
             getMavenRepository().storeItem( true, file );
         }
         catch ( UnsupportedStorageOperationException e )
@@ -303,6 +331,12 @@ public class FilePrefixSource
         request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         try
         {
+            // NXCM-5188: Remark to not get tempted to change these to deleteItemWithChecksums() method:
+            // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
+            // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
+            // is published in Nexus, there is no need anymore to save checksums to disk, as they will
+            // be served up just fine. This is true for all items in Nexus storage, not just prefix
+            // file related ones!
             getMavenRepository().deleteItem( true, request );
         }
         catch ( ItemNotFoundException e )
@@ -317,5 +351,13 @@ public class FilePrefixSource
         {
             // ignore
         }
+    }
+
+    public void writeUnsupported()
+        throws IOException
+    {
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        getPrefixSourceMarshaller().writeUnsupported( bos );
+        putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
     }
 }

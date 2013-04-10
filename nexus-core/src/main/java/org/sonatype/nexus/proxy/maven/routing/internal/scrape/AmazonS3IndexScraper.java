@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
 import org.sonatype.nexus.util.PathUtils;
-import org.sonatype.nexus.util.task.CancelableUtil;
 
 /**
  * Scraper for remote AmazonS3 hosted repositories.

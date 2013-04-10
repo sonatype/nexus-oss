@@ -18,11 +18,11 @@ import java.util.List;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Page.UnexpectedPageResponse;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.task.CancelableUtil;
 
 import com.google.common.base.Throwables;
 

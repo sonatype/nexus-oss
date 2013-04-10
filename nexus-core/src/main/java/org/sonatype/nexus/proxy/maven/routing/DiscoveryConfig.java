@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.maven.routing;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Configuration properties of the WL.
+ * Configuration properties of the autorouting.
  * 
  * @author cstamas
  * @since 2.4

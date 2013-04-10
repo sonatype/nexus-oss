@@ -356,8 +356,8 @@ public class DefaultFSPeer
             }
             else
             {
-                getLogger().warn( "Cannot list directory in repository {}, path \"{}\"",
-                    RepositoryStringUtils.getHumanizedNameString( repository ), target.getAbsolutePath() );
+                throw new LocalStorageException( "Cannot list directory in repository " + repository + ", path "
+                    + target.getAbsolutePath() );
             }
 
             return result;

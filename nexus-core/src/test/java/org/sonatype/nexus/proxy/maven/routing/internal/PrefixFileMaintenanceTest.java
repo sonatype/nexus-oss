@@ -108,19 +108,19 @@ public class PrefixFileMaintenanceTest
         return true;
     }
 
-    protected Manager wlManager;
+    protected Manager manager;
 
     @Before
     public void prepare()
         throws Exception
     {
-        wlManager = lookup( Manager.class );
+        manager = lookup( Manager.class );
     }
 
     protected List<String> getEntriesOf( final MavenRepository mavenRepository )
         throws IOException
     {
-        final PrefixSource entrySource = wlManager.getPrefixSourceFor( mavenRepository );
+        final PrefixSource entrySource = manager.getPrefixSourceFor( mavenRepository );
         final ArrayList<String> result = new ArrayList<String>( entrySource.readEntries() );
         Collections.sort( result );
         return result;
@@ -148,13 +148,13 @@ public class PrefixFileMaintenanceTest
     }
 
     /**
-     * Test is WL maintained properly during content changes in hosted repository (only type where we maintain WL based
-     * on deploys or deletions). But, there is a trick: when you delete an artifact (by using "direct" full URL like the
-     * one you deployed it with), Nexus will leave parent directories empty. While when crawling this is handled (we
-     * crawl all way down to content, but "cut the tree" at needed level), with events in case of DELETE is not so
-     * simple. First, if you delete the given artifact only, Nexus will leave parent directories untouched even if they
-     * are empty, no events will be emitted. So, entry deletion only works in cases when: a) the given folder is deleted
-     * that is in the whitelist (see in test), OR, b) full update of given hosted repo is done.
+     * Test is prefix list maintained properly during content changes in hosted repository (only type where we maintain
+     * prefix list based on deploys or deletions). But, there is a trick: when you delete an artifact (by using "direct"
+     * full URL like the one you deployed it with), Nexus will leave parent directories empty. While when crawling this
+     * is handled (we crawl all way down to content, but "cut the tree" at needed level), with events in case of DELETE
+     * is not so simple. First, if you delete the given artifact only, Nexus will leave parent directories untouched
+     * even if they are empty, no events will be emitted. So, entry deletion only works in cases when: a) the given
+     * folder is deleted that is in the whitelist (see in test), OR, b) full update of given hosted repo is done.
      * 
      * @throws Exception
      */
@@ -165,7 +165,7 @@ public class PrefixFileMaintenanceTest
         final MavenHostedRepository mavenRepository =
             getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenHostedRepository.class );
 
-        // initially WL is empty
+        // initially prefix list is empty
         {
             final List<String> entries = getEntriesOf( mavenRepository );
             assertThat( entries, hasSize( 0 ) );
@@ -193,8 +193,9 @@ public class PrefixFileMaintenanceTest
                     "/com/sonatype", "/org/apache", "/org/sonatype" ) );
         }
 
-        // PATHS3 contains full paths, but WL contains "/org/sonatype" and nothing will emit event carrying that path!
-        // so, the WL remains unchanged!
+        // PATHS3 contains full paths, but prefix list contains "/org/sonatype" and nothing will emit event carrying
+        // that path!
+        // so, the prefix list remains unchanged!
         removeSomeContent( mavenRepository, PATHS3 );
 
         {
@@ -207,7 +208,7 @@ public class PrefixFileMaintenanceTest
         }
 
         // by deleting given folder, we will get the needed result.
-        // WL entry "/org/sonatype" should be removed as we deleted the "/org/sonatype" folder
+        // prefix list entry "/org/sonatype" should be removed as we deleted the "/org/sonatype" folder
         removeSomeContent( mavenRepository, Arrays.asList( "/org/sonatype" ) );
 
         {
@@ -220,7 +221,7 @@ public class PrefixFileMaintenanceTest
         }
 
         // by deleting a parent of the given folder, we will also get the needed result.
-        // WL entry "/com/sonatype" should be removed as we deleted the "/com" folder
+        // prefix list entry "/com/sonatype" should be removed as we deleted the "/com" folder
         removeSomeContent( mavenRepository, Arrays.asList( "/com" ) );
 
         {

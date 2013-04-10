@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.routing.discovery.LocalContentDiscoverer;
+import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -37,7 +38,6 @@ import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
-import org.sonatype.nexus.util.task.CancelableUtil;
 
 /**
  * Default {@link LocalContentDiscoverer} implementation.
