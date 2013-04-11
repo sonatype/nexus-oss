@@ -870,9 +870,21 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               formBind : true,
               scope : this,
               handler : function() {
-                var email = w.find('name', 'email')[0].getValue();
-                this.runStmpConfigCheck(email, data);
-                w.close();
+                var email = w.find('name', 'email')[0].getValue(),
+                    mask = new Ext.LoadMask(w.el, {
+                      msg : 'Validating SMTP settings...',
+                      removeMask : true
+                    });
+
+                mask.show();
+
+                this.runStmpConfigCheck(email, data, function(success) {
+                  mask.hide();
+
+                  if (success) {
+                    w.close();
+                  }
+                });
               }
             },
             {
@@ -891,7 +903,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
     w.show();
   },
 
-  runStmpConfigCheck : function(testEmail, data) {
+  runStmpConfigCheck : function(testEmail, data, callback) {
 
     data.testEmail = testEmail;
 
@@ -901,20 +913,19 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       jsonData : {
         data : data
       },
-      callback : function(options, success, response) {
-        this.el.unmask();
-
-        if (success) {
+      callback : function(options, success) {
+        callback(success);
+      },
+      success : function() {
           Sonatype.MessageBox.show({
             title : 'SMTP configuration',
             msg : 'SMTP configuration validated successfully, check your inbox!',
             buttons : Sonatype.MessageBox.OK,
             icon : Sonatype.MessageBox.INFO
           });
-        }
-        else {
-          Sonatype.utils.connectionError(response, 'Error on SMTP validation!');
-        }
+      },
+      failure : function(response) {
+        Sonatype.utils.connectionError(response, 'Error on SMTP validation!');
       },
       scope : this
     });
