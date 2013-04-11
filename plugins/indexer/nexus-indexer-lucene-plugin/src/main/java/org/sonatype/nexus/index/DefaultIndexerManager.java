@@ -87,6 +87,7 @@ import org.apache.maven.index.treeview.IndexTreeView;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.apache.maven.index.treeview.TreeViewRequest;
+import org.apache.maven.index.updater.IncrementalIndexUpdateException;
 import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
@@ -1078,18 +1079,35 @@ public class DefaultIndexerManager
                         }
                     }
                 };
-                if ( fullReindex )
+                
+                if ( !fullReindex )
                 {
-                    // delete published stuff too, as we are breaking incremental downstream chain
-                    deleteIndexItems( repository );
-                    // creates a temp ctx and finally replaces the "real" with temp
-                    temporary( repository, runnable );
+                    //Try incremental update first
+                    try
+                    {
+                        sharedSingle( repository, runnable );
+                    }
+                    catch(IOException e)
+                    {
+                        if(e instanceof IncrementalIndexUpdateException)
+                        {
+                            //This exception is an indication that an incremental
+                            //update is not possible, and a full update is necessary
+                            //Just log it and try full update
+                            logger.info( "Unable to incrementally update index for repository {}", repository.getId() );
+                        }
+                        else
+                        {
+                            throw e;
+                        }
+                    }
                 }
-                else
-                {
-                    // scans directly into "real" ctx
-                    sharedSingle( repository, runnable );
-                }
+                
+                //Perform full index update
+                // delete published stuff too, as we are breaking incremental downstream chain
+                deleteIndexItems( repository );
+                // creates a temp ctx and finally replaces the "real" with temp
+                temporary( repository, runnable );
 
                 logger.debug( "Reindexed repository {}", repository.getId() );
             }
@@ -1308,7 +1326,15 @@ public class DefaultIndexerManager
 
         try
         {
-            IndexUpdateResult result = indexUpdater.fetchAndUpdateIndex( updateRequest );
+            IndexUpdateResult result = null;
+            if( forceFullUpdate )
+            {
+                result = indexUpdater.fullUpdate(updateRequest);
+            }
+            else
+            {
+                result = indexUpdater.incrementalUpdate(updateRequest);
+            }
 
             boolean hasRemoteIndexUpdate = result.getTimestamp() != null;
 
