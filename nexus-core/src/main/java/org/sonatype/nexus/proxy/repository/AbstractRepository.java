@@ -1349,15 +1349,16 @@ public abstract class AbstractRepository
         getAccessManager().decide( this, request, action );
         // }
 
-        checkRequestProcessors( request, action );
+        checkRequestStrategies( request, action );
     }
 
-    protected void checkRequestProcessors( final ResourceStoreRequest request, final Action action )
+    protected void checkRequestStrategies( final ResourceStoreRequest request, final Action action )
         throws ItemNotFoundException, IllegalOperationException
     {
-        if ( getRequestProcessors().size() > 0 )
+        final Map<String, RequestStrategy> effectiveRequestStrategies = getEffectiveRequestStrategies();
+        if ( !effectiveRequestStrategies.isEmpty() )
         {
-            for ( RequestStrategy strategy : getEffectiveRequestStrategies().values() )
+            for ( RequestStrategy strategy : effectiveRequestStrategies.values() )
             {
                 strategy.onHandle( this, request, action );
             }
@@ -1367,9 +1368,10 @@ public abstract class AbstractRepository
     protected void checkPostConditions( final ResourceStoreRequest request, final StorageItem item )
         throws IllegalOperationException, ItemNotFoundException
     {
-        if ( getRequestProcessors().size() > 0 )
+        final Map<String, RequestStrategy> effectiveRequestStrategies = getEffectiveRequestStrategies();
+        if ( !effectiveRequestStrategies.isEmpty() )
         {
-            for ( RequestStrategy strategy : getEffectiveRequestStrategies().values() )
+            for ( RequestStrategy strategy : effectiveRequestStrategies.values() )
             {
                 strategy.onServing( this, request, item );
             }

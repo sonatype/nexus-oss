@@ -1171,7 +1171,6 @@ public abstract class AbstractProxyRepository
 
         if ( shouldProxy )
         {
-            // let's ask RequestProcessor
             for ( RequestStrategy strategy : getEffectiveRequestStrategies().values() )
             {
                 try
