@@ -95,7 +95,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${build.outputDirectory}/static/js</outputDirectory>
+              <outputDirectory>${project.build.outputDirectory}/static/js</outputDirectory>
               <resources>
                 <resource>
                   <directory>src/main/js-nx</directory>
