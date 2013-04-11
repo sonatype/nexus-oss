@@ -1050,62 +1050,32 @@ public class DefaultIndexerManager
             {
                 logger.debug( "Reindexing repository {} fromPath={} fullReindex={}", repository.getId(), fromPath,
                     fullReindex );
-
-                Runnable runnable = new Runnable()
-                {
-                    @Override
-                    public void run( final IndexingContext context )
-                        throws IOException
-                    {
-                        if ( ISPROXY( repository ) )
-                        {
-                            updateRemoteIndex( repository.adaptToFacet( ProxyRepository.class ), context, fullReindex );
-                        }
-
-                        TaskUtil.checkInterruption();
-
-                        // igorf, this needs be merged back to maven indexer, see MINDEXER-65
-                        final IndexSearcher contextIndexSearcher = context.acquireIndexSearcher();
-                        try
-                        {
-                            final NexusScanningListener scanListener =
-                                new NexusScanningListener( context, contextIndexSearcher, fullReindex,
-                                    ISPROXY( repository ) );
-                            scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
-                        }
-                        finally
-                        {
-                            context.releaseIndexSearcher( contextIndexSearcher );
-                        }
-                    }
-                };
                 
                 if ( !fullReindex )
                 {
                     //Try incremental update first
                     try
                     {
+                        Runnable runnable = new IndexUpdateRunnable(repository, fromPath, false);
                         sharedSingle( repository, runnable );
+                        logger.debug( "Reindexed repository {}", repository.getId() );
+                        return;
                     }
-                    catch(IOException e)
+                    catch(IncrementalIndexUpdateException e)
                     {
-                        if(e instanceof IncrementalIndexUpdateException)
-                        {
-                            //This exception is an indication that an incremental
-                            //update is not possible, and a full update is necessary
-                            //Just log it and try full update
-                            logger.info( "Unable to incrementally update index for repository {}", repository.getId() );
-                        }
-                        else
-                        {
-                            throw e;
-                        }
+                        //This exception is an indication that an incremental
+                        //update is not possible, and a full update is necessary
+                        //This exception has already been logged. Nothing to do here
+                        //except let execution continue on below to perform a full update
                     }
                 }
                 
                 //Perform full index update
+                Runnable runnable = new IndexUpdateRunnable(repository, fromPath, true);
+                
                 // delete published stuff too, as we are breaking incremental downstream chain
                 deleteIndexItems( repository );
+                
                 // creates a temp ctx and finally replaces the "real" with temp
                 temporary( repository, runnable );
 
@@ -1121,6 +1091,49 @@ public class DefaultIndexerManager
             logger.info(
                 "Repository '{}' is already in the process of being re-indexed. Skipping additional reindex requests.",
                 repository.getId() );
+        }
+    }
+    
+    /**
+     * Runnable implementation for updating an index
+     */
+    private class IndexUpdateRunnable implements Runnable
+    {
+        Repository repository;
+        String fromPath;
+        boolean fullReindex;
+        
+        IndexUpdateRunnable(Repository repository, String fromPath, boolean fullReindex)
+        {
+            this.repository = repository;
+            this.fromPath = fromPath;
+            this.fullReindex = fullReindex;
+        }
+        
+        @Override
+        public void run( final IndexingContext context )
+            throws IOException
+        {
+            if ( ISPROXY( this.repository ) )
+            {
+                updateRemoteIndex( this.repository.adaptToFacet( ProxyRepository.class ), context, this.fullReindex );
+            }
+
+            TaskUtil.checkInterruption();
+
+            // igorf, this needs be merged back to maven indexer, see MINDEXER-65
+            final IndexSearcher contextIndexSearcher = context.acquireIndexSearcher();
+            try
+            {
+                final NexusScanningListener scanListener =
+                    new NexusScanningListener( context, contextIndexSearcher, this.fullReindex,
+                        ISPROXY( this.repository ) );
+                scanner.scan( new ScanningRequest( context, scanListener, this.fromPath ) );
+            }
+            finally
+            {
+                context.releaseIndexSearcher( contextIndexSearcher );
+            }
         }
     }
 
@@ -1368,6 +1381,14 @@ public class DefaultIndexerManager
         {
             logger.warn( RepositoryStringUtils.getFormattedMessage(
                 "Cannot fetch remote index for repository %s, task cancelled.", repository ) );
+        }
+        catch ( IncrementalIndexUpdateException e )
+        {
+            //This is an indication that an incremental index update is not possible, and a full index
+            //update must be performed.
+            //Just log this, and pass this exception upstream so that it can be handled appropriately
+            logger.info( "Cannot incrementally update index for repository {}", repository.getId() );
+            throw e;
         }
         catch ( IOException e )
         {
