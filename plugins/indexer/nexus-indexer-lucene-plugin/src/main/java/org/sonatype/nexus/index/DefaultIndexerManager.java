@@ -87,7 +87,6 @@ import org.apache.maven.index.treeview.IndexTreeView;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.apache.maven.index.treeview.TreeViewRequest;
-import org.apache.maven.index.updater.IncrementalIndexUpdateException;
 import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
@@ -1065,8 +1064,9 @@ public class DefaultIndexerManager
                     {
                         //This exception is an indication that an incremental
                         //update is not possible, and a full update is necessary
-                        //This exception has already been logged. Nothing to do here
-                        //except let execution continue on below to perform a full update
+                        logger.info( "Unable to incrementally update index for repository {}. Trying full index update", repository.getId() );
+                        
+                        //Let execution continue to below to try full index update
                     }
                 }
                 
@@ -1328,7 +1328,17 @@ public class DefaultIndexerManager
             }
         } );
 
-        updateRequest.setForceFullUpdate( forceFullUpdate );
+        //Set request for either full or incremental-only update
+        if( forceFullUpdate )
+        {
+            updateRequest.setForceFullUpdate( true );
+            updateRequest.setIncrementalOnly( false );
+        }
+        else
+        {
+            updateRequest.setForceFullUpdate( false );
+            updateRequest.setIncrementalOnly( true );
+        }
 
         if ( repository instanceof MavenRepository )
         {
@@ -1339,16 +1349,16 @@ public class DefaultIndexerManager
 
         try
         {
-            IndexUpdateResult result = null;
-            if( forceFullUpdate )
-            {
-                result = indexUpdater.fullUpdate(updateRequest);
-            }
-            else
-            {
-                result = indexUpdater.incrementalUpdate(updateRequest);
-            }
+            IndexUpdateResult result = indexUpdater.fetchAndUpdateIndex( updateRequest );
 
+            //Check if successful
+            if( !result.isSuccessful() )
+            {
+                //This condition occurs when we have requested an incremental-only update,
+                //but it could not be completed. In this case, we need to request a full update
+                //This needs to be communicated upstream so that the proper locking can take place
+                throw new IncrementalIndexUpdateException("Cannot incrementally update index. Request a full update");
+            }
             boolean hasRemoteIndexUpdate = result.getTimestamp() != null;
 
             if ( hasRemoteIndexUpdate )
@@ -2834,5 +2844,15 @@ public class DefaultIndexerManager
     public IndexingContext getRepositoryIndexContext( String repositoryId )
     {
         return mavenIndexer.getIndexingContexts().get( getContextId( repositoryId ) );
+    }
+    
+    private class IncrementalIndexUpdateException extends IOException
+    {
+        private static final long serialVersionUID = 6444842181110866037L;
+        
+        public IncrementalIndexUpdateException(String message)
+        {
+            super(message);
+        }
     }
 }
