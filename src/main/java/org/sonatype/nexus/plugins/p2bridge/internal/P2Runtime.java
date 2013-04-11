@@ -96,43 +96,46 @@ class P2Runtime
             return;
         }
         final File p2BridgePluginDir = getP2BridgePluginDir();
-        final File p2BridgeTempDir = new File(
-            applicationConfiguration.getTemporaryDirectory(), "nexus-p2-bridge-plugin"
+        final File p2BridgeRuntimeDir = new File(
+            applicationConfiguration.getTemporaryDirectory(), "nexus-p2-bridge-plugin/runtime"
         );
-        final File eclipseDir = new File( p2BridgeTempDir, "eclipse" );
+        final File p2BridgeTempDir = new File(
+            applicationConfiguration.getTemporaryDirectory(), "nexus-p2-bridge-plugin/tmp"
+        );
+        final File eclipseDir = new File( p2BridgeRuntimeDir, "eclipse" );
 
         // if temporary plugin directory exists, remove it to avoid the fact that eclipse stores absolute paths to
         // installed bundles (see NXCM-4475)
-        if ( p2BridgeTempDir.exists() )
+        if ( p2BridgeRuntimeDir.exists() )
         {
             try
             {
-                FileUtils.deleteDirectory( p2BridgeTempDir );
-                if ( p2BridgeTempDir.exists() )
+                FileUtils.deleteDirectory( p2BridgeRuntimeDir );
+                if ( p2BridgeRuntimeDir.exists() )
                 {
                     throw new RuntimeException(
-                        "Cannot delete nexus-p2-bridge temporary directory " + p2BridgeTempDir.getAbsolutePath()
+                        "Cannot delete nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath()
                     );
                 }
             }
             catch ( IOException e )
             {
                 throw new RuntimeException(
-                    "Cannot delete nexus-p2-bridge temporary directory " + p2BridgeTempDir.getAbsolutePath(), e
+                    "Cannot delete nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath(), e
                 );
             }
         }
-        if ( !p2BridgeTempDir.exists() && !p2BridgeTempDir.mkdirs() )
+        if ( !p2BridgeRuntimeDir.exists() && !p2BridgeRuntimeDir.mkdirs() )
         {
             throw new RuntimeException(
-                "Cannot create nexus-p2-bridge temporary directory " + p2BridgeTempDir.getAbsolutePath()
+                "Cannot create nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath()
             );
         }
         // create a fresh eclipse instance
         try
         {
             unArchiver.setSourceFile( new File( p2BridgePluginDir, "p2-runtime/eclipse.zip" ) );
-            unArchiver.setDestDirectory( p2BridgeTempDir );
+            unArchiver.setDestDirectory( p2BridgeRuntimeDir );
             unArchiver.extract();
         }
         catch ( final Exception e )
@@ -160,7 +163,7 @@ class P2Runtime
                     new String[]{ "-eclipse.keyring", secureStorage.getAbsolutePath() }
                 );
             }
-            eclipse.start( initParams( p2BridgePluginDir, eclipseDir ) );
+            eclipse.start( initParams( p2BridgePluginDir, eclipseDir, p2BridgeTempDir ) );
             final File[] bundles = new File( p2BridgePluginDir, "p2-runtime/bundles" ).listFiles( new FilenameFilter()
             {
                 @Override
@@ -181,7 +184,8 @@ class P2Runtime
     }
 
     private Map<String, String> initParams( final File p2BridgePluginDir,
-                                            final File eclipseDir )
+                                            final File eclipseDir,
+                                            final File p2BridgeAgentsTempDir )
     {
         final Map<String, String> initParams = new HashMap<String, String>();
         initParams.put( "org.eclipse.equinox.simpleconfigurator.exclusiveInstallation", "false" );
@@ -195,6 +199,7 @@ class P2Runtime
         {
             initParams.put( "osgi.debug", new File( eclipseDir, ".options" ).getAbsolutePath() );
         }
+        initParams.put( EclipseInstance.TEMPDIR_PROPERTY, p2BridgeAgentsTempDir.getAbsolutePath() );
         return initParams;
     }
 
