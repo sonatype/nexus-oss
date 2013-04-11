@@ -22,13 +22,15 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A helper that adapts deprecated {@link RequestProcessor} to new {@link RequestProcessor2} API.
+ * A helper that adapts deprecated {@link RequestProcessor} to new {@link RequestStrategy} API. Note: the
+ * {@link RequestProcessor#shouldCache(ProxyRepository, org.sonatype.nexus.proxy.item.AbstractStorageItem)} unused
+ * method is simply neglected by this adapter.
  * 
  * @author cstamas
  * @since 2.5
  */
 public class RequestProcessorAdapter
-    implements RequestProcessor2
+    implements RequestStrategy
 {
     private final RequestProcessor requestProcessor;
 

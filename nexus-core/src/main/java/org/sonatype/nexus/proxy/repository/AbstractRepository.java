@@ -85,6 +85,10 @@ import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
@@ -152,8 +156,21 @@ public abstract class AbstractRepository
     /** The not found cache. */
     private PathCache notFoundCache;
 
-    /** Request processors list */
-    private Map<String, RequestProcessor2> requestProcessors;
+    /**
+     * Request processors map. Note: if this map contains {@link RequestProcessor} keyed with key present in
+     * {@link #requestStrategies} too, the latter will "win". The processor in this map will NOT be used.
+     * 
+     * @deprecated {@link RequestProcessor} is deprecated, use {@link RequestStrategy}s instead.
+     */
+    @Deprecated
+    private Map<String, RequestProcessor> requestProcessors;
+
+    /**
+     * Request strategies map. Supersedes {@link RequestProcessor}s and {@link #requestProcessors}.
+     * 
+     * @since 2.5
+     */
+    private final Map<String, RequestStrategy> requestStrategies = Maps.newHashMap();
 
     /** if local url changed, need special handling after save */
     private boolean localUrlChanged = false;
@@ -269,14 +286,72 @@ public abstract class AbstractRepository
             DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
-    public Map<String, RequestProcessor2> getRequestProcessors()
+    /**
+     * Returns the map of {@link RequestProcessor}s registered (and used by this repository instance).
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    public Map<String, RequestProcessor> getRequestProcessors()
     {
         if ( requestProcessors == null )
         {
-            requestProcessors = new HashMap<String, RequestProcessor2>();
+            requestProcessors = new HashMap<String, RequestProcessor>();
         }
 
         return requestProcessors;
+    }
+    
+    @Override
+    public RequestStrategy registerRequestStrategy( final String key, final RequestStrategy strategy )
+    {
+        checkNotNull( key );
+        checkNotNull( strategy );
+        synchronized ( requestStrategies )
+        {
+            return requestStrategies.put( key, strategy );
+        }
+    }
+
+    @Override
+    public RequestStrategy unregisterRequestStrategy( final String key )
+    {
+        checkNotNull( key );
+        synchronized ( requestStrategies )
+        {
+            return requestStrategies.remove( key );
+        }
+    }
+
+    @Override
+    public Map<String, RequestStrategy> getRegisteredStrategies()
+    {
+        synchronized ( requestStrategies )
+        {
+            return Maps.newHashMap( requestStrategies );
+        }
+    }
+
+    /**
+     * This method is used to get the map of {@link RequestStrategy}s to evaluate. Currently, it's main purpose is to
+     * provide backward compatibility and "sneak in" the deprecated {@link RequestProcessor} in adapted form too. Once
+     * {@link RequestProcessor} got removed completely, this method will become much simpler too.
+     * 
+     * @return
+     */
+    protected Map<String, RequestStrategy> getEffectiveRequestStrategies()
+    {
+        final Map<String, RequestStrategy> requestStrategies = getRegisteredStrategies();
+        final Map<String, RequestProcessor> requestProcessors = getRequestProcessors();
+        final Map<String, RequestStrategy> result =
+            Maps.newHashMapWithExpectedSize( requestStrategies.size() + requestProcessors.size() );
+        for ( Map.Entry<String, RequestProcessor> requestProcessorEntry : requestProcessors.entrySet() )
+        {
+            result.put( requestProcessorEntry.getKey(), new RequestProcessorAdapter( requestProcessorEntry.getValue() ) );
+        }
+        // strategies eventually stomp over existing processor, they win
+        result.putAll( requestStrategies );
+        return result;
     }
 
     /**
@@ -1282,9 +1357,9 @@ public abstract class AbstractRepository
     {
         if ( getRequestProcessors().size() > 0 )
         {
-            for ( RequestProcessor2 processor : getRequestProcessors().values() )
+            for ( RequestStrategy strategy : getEffectiveRequestStrategies().values() )
             {
-                processor.onHandle( this, request, action );
+                strategy.onHandle( this, request, action );
             }
         }
     }
@@ -1294,9 +1369,9 @@ public abstract class AbstractRepository
     {
         if ( getRequestProcessors().size() > 0 )
         {
-            for ( RequestProcessor2 processor : getRequestProcessors().values() )
+            for ( RequestStrategy strategy : getEffectiveRequestStrategies().values() )
             {
-                processor.onServing( this, request, item );
+                strategy.onServing( this, request, item );
             }
         }
     }

@@ -1172,11 +1172,11 @@ public abstract class AbstractProxyRepository
         if ( shouldProxy )
         {
             // let's ask RequestProcessor
-            for ( RequestProcessor2 processor : getRequestProcessors().values() )
+            for ( RequestStrategy strategy : getEffectiveRequestStrategies().values() )
             {
                 try
                 {
-                    processor.onRemoteAccess( this, request );
+                    strategy.onRemoteAccess( this, request );
                 }
                 catch ( ItemNotFoundException e )
                 {

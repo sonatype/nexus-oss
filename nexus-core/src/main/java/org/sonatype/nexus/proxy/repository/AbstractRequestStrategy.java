@@ -22,8 +22,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * @author cstamas
  * @since 2.5
  */
-public abstract class AbstractRequestProcessor2
-    implements RequestProcessor2
+public abstract class AbstractRequestStrategy
+    implements RequestStrategy
 {
     @Override
     public void onHandle( Repository repository, ResourceStoreRequest request, Action action )

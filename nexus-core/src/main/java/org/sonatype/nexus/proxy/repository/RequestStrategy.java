@@ -19,12 +19,12 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
- * A Request Processor that is able to process/modify the request before Nexus will serve it.
+ * A Request Strategy that is able to process/modify the request, and change how Nexus core handles the request.
  * 
  * @author cstamas
  * @since 2.5
  */
-public interface RequestProcessor2
+public interface RequestStrategy
 {
     /**
      * A method that is able to modify the request after it is authorized, but before it is handled by Nexus Core at
@@ -43,8 +43,8 @@ public interface RequestProcessor2
     /**
      * Should the item be retrieved, served up? This method is called for
      * {@link Repository#retrieveItem(boolean, ResourceStoreRequest)} as very last step, after the item is got by any
-     * means (from local storage, from valid cache or proxied). If the method wants to prevent serving of this item, it
-     * should throw some exception with reason why. Otherwise, a clean return from the method is needed.
+     * means (from local storage, from valid cache or proxied). If the method wants to prevent serving up this item to
+     * the client, it should throw some exception with reason why. Otherwise, a clean return from the method is needed.
      * 
      * @param repository from which the item is retrieved (not null)
      * @param request retrieval request (not null)
@@ -56,16 +56,17 @@ public interface RequestProcessor2
         throws ItemNotFoundException, IllegalOperationException;
 
     /**
-     * Request processor is able to override generic behavior of Repositories in aspect of proxying. This method is
-     * called when a proxy repository concludes it must go remote to fetch an item (either because it's not in cache or
-     * is in cache but is stale). Invocation of this request processor method means that requested item is either not
-     * present in local cache or that it's stale (or request otherwise forces remote request like remoteOnly=true or
-     * such). To prevent Proxy repository to go remote, an exception with reason should be thrown. Otherwise, a clean
-     * return from the method is needed. Note: if {@link ItemNotFoundException} is thrown from this method, it does not
-     * mean that the current request will end with "not found" response, as it still depends on actual conditions. For
-     * example, if item is present in cache but is stale, and this method prevents remote access (by throwing an
+     * Request strategy is able to override generic behavior of Repositories in aspect of proxying. This method is
+     * called when a proxy repository concludes it must go remote to fetch an item. Invocation of this method means that
+     * requested item is either not present in local cache, or that it's stale (or request otherwise forces remote
+     * request like remoteOnly=true or such). In short, Proxy repository is about to go remote. To prevent Proxy
+     * repository to go remote, an exception with reason should be thrown. Otherwise, a clean return from the method is
+     * needed. Note: if {@link ItemNotFoundException} is thrown from this method, it does not mean that the current
+     * request will end with "not found" response, as it still depends on actual conditions. For example, if item is
+     * present in cache but is stale, and this method prevents remote access (by throwing an
      * {@link ItemNotFoundException}), Nexus will still serve up the stale item from the cache, as this is how it's
-     * behavior is defined. Any other (than {@link ItemNotFoundException}) exception thrown here will stop handling of
+     * behavior is defined. The {@link ItemNotFoundException} thrown here will be used if local cache did not contain
+     * the request item. Any other (than {@link ItemNotFoundException}) exception thrown here will stop handling of
      * current request.
      * 
      * @param repository

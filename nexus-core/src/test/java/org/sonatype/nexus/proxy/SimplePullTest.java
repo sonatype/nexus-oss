@@ -12,12 +12,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -36,7 +30,6 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheCreate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheUpdate;
@@ -46,7 +39,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
-import org.sonatype.nexus.proxy.repository.AbstractRequestProcessor2;
+import org.sonatype.nexus.proxy.repository.AbstractRequestStrategy;
 import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -56,6 +49,13 @@ import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.base.Strings;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 public class SimplePullTest
     extends AbstractProxyTestEnvironment
@@ -358,11 +358,11 @@ public class SimplePullTest
         throws Exception
     {
         // create a simple "counter" request processor
-        CounterRequestProcessor crp = new CounterRequestProcessor();
+        CounterRequestStrategy crp = new CounterRequestStrategy();
 
         for ( Repository repo : getRepositoryRegistry().getRepositories() )
         {
-            repo.getRequestProcessors().put( CounterRequestProcessor.class.getName(), crp );
+            repo.registerRequestStrategy( CounterRequestStrategy.class.getName(), crp );
         }
 
         // get something from a group
@@ -628,8 +628,8 @@ public class SimplePullTest
         return sb.toString();
     }
 
-    public static class CounterRequestProcessor
-        extends AbstractRequestProcessor2
+    public static class CounterRequestStrategy
+        extends AbstractRequestStrategy
     {
         private int referredCount = 0;
 
