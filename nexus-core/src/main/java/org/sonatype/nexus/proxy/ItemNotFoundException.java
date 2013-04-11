@@ -39,7 +39,7 @@ public class ItemNotFoundException
      * @param message The reasoning message template (use {@code %s} as place holder). See {@link SimpleFormat}.
      * @param params The parameters to fill place holders in message with content. See {@link SimpleFormat}.
      * @return the newly created reason.
-     * @since 2.4
+     * @since 2.5
      */
     public static ItemNotFoundReason reasonFor( final ResourceStoreRequest request, final String message,
                                                 final Object... params )
@@ -55,7 +55,7 @@ public class ItemNotFoundException
      * @param message The reasoning message template (use {@code %s} as place holder). See {@link SimpleFormat}.
      * @param params The parameters to fill place holders in message with content. See {@link SimpleFormat}.
      * @return the newly created reason.
-     * @since 2.4
+     * @since 2.5
      */
     public static ItemNotFoundInRepositoryReason reasonFor( final ResourceStoreRequest request,
                                                             final Repository repository, final String message,
@@ -73,7 +73,7 @@ public class ItemNotFoundException
      * @param request
      * @param repository
      * @return reason.
-     * @since 2.4
+     * @since 2.5
      * @deprecated Used for legacy support, new code should NOT use this method. See other methods:
      *             {@link #reasonFor(ResourceStoreRequest, String, Object...)} and
      *             {@link #reasonFor(ResourceStoreRequest, Repository, String, Object...)}
@@ -99,7 +99,7 @@ public class ItemNotFoundException
      * {@link ItemNotFoundInRepositoryReason} instead. This one is used in places like {@link RepositoryRouter}, where
      * the "targeted" repository is still unknown or similar places.
      * 
-     * @since 2.4
+     * @since 2.5
      */
     public static class ItemNotFoundReason
     {
@@ -144,7 +144,7 @@ public class ItemNotFoundException
     /**
      * Reason of item not found that is triggered within a {@link Repository} instance.
      * 
-     * @since 2.4
+     * @since 2.5
      */
     public static class ItemNotFoundInRepositoryReason
         extends ItemNotFoundReason
@@ -183,7 +183,7 @@ public class ItemNotFoundException
      * Constructor.
      * 
      * @param reason (might not be {@code null}).
-     * @since 2.4
+     * @since 2.5
      */
     public ItemNotFoundException( final ItemNotFoundReason reason )
     {
@@ -196,7 +196,7 @@ public class ItemNotFoundException
      * @param reason (might not be {@code null}).
      * @param cause
      * @throws NullPointerException if passed in reason parameter is {@code null}.
-     * @since 2.4
+     * @since 2.5
      */
     public ItemNotFoundException( final ItemNotFoundReason reason, final Throwable cause )
     {
@@ -208,7 +208,7 @@ public class ItemNotFoundException
      * Returns the reason of the item not found exception (never {@code null}).
      * 
      * @return the reason, never {@code null}.
-     * @since 2.4
+     * @since 2.5
      */
     public ItemNotFoundReason getReason()
     {
