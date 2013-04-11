@@ -28,7 +28,7 @@
       <plugin>
         <groupId>org.sonatype.maven.plugins</groupId>
         <artifactId>maven-p2-bridge-plugin</artifactId>
-        <version>1.0.8</version>
+        <version>1.1.6-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
