@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.spice</groupId>
-    <artifactId>spice-parent</artifactId>
-    <version>20</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>32</version>
   </parent>
 
   <groupId>org.sonatype.appcontext</groupId>
@@ -25,12 +25,6 @@
     <connection>scm:git:git://github.com/sonatype/appcontext.git</connection>
     <developerConnection>scm:git:git@github.com:sonatype/appcontext.git</developerConnection>
   </scm>
-
-  <modules>
-    <module>appcontext</module>
-    <module>appcontext-guice</module>
-    <module>appcontext-servlet</module>
-  </modules>
 
   <dependencyManagement>
     <dependencies>
@@ -95,4 +89,11 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <modules>
+    <module>appcontext</module>
+    <module>appcontext-guice</module>
+    <module>appcontext-servlet</module>
+  </modules>
+
 </project>
