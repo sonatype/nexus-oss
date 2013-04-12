@@ -197,7 +197,7 @@ button.st-icon-refresh {
 
 .form-label-helpmark-combo {
     /* large margin needed to place helpmark next to combobox - the box is position:absolute, and helpmark was covered by dropdown arrow */
-    margin-left: 18px;
+    margin-left: 19px;
     height: 16px;
     width: 16px;
     vertical-align: middle;
