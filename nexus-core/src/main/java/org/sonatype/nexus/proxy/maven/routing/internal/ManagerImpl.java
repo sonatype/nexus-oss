@@ -179,6 +179,8 @@ public class ManagerImpl
         this.eventBus.register( this );
     }
 
+    private volatile boolean periodicUpdaterDidRunAtLeastOnce = false;
+
     @Override
     public void startup()
     {
@@ -224,6 +226,7 @@ public class ManagerImpl
                         return;
                     }
                     mayUpdateAllProxyPrefixFiles();
+                    periodicUpdaterDidRunAtLeastOnce = true;
                 }
             }, 0L /*no initial delay*/, TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
 
@@ -524,6 +527,11 @@ public class ManagerImpl
     @VisibleForTesting
     public boolean isUpdatePrefixFileJobRunning()
     {
+        if ( !periodicUpdaterDidRunAtLeastOnce )
+        {
+            getLogger().debug( "Boot process not done yet, periodic updater did not yet finish!" );
+            return true;
+        }
         final Statistics statistics = constrainedExecutor.getStatistics();
         getLogger().debug( "Running update jobs for {}", statistics.getCurrentlyRunningJobKeys() );
         return !statistics.getCurrentlyRunningJobKeys().isEmpty();
