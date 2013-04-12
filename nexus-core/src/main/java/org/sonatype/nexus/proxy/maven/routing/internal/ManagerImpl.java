@@ -527,7 +527,7 @@ public class ManagerImpl
     @VisibleForTesting
     public boolean isUpdatePrefixFileJobRunning()
     {
-        if ( !periodicUpdaterDidRunAtLeastOnce )
+        if ( config.isFeatureActive() && !periodicUpdaterDidRunAtLeastOnce )
         {
             getLogger().debug( "Boot process not done yet, periodic updater did not yet finish!" );
             return true;
