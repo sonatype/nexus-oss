@@ -121,7 +121,7 @@ public class RemotePrefixFileStrategy
                     return new StrategyResult( "Remote disabled automatic routing", UNSUPPORTED_PREFIXSOURCE, false );
                 }
 
-                final PrefixSource prefixSource = new ArrayListPrefixSource( unmarshalled.entries() );
+                final PrefixSource prefixSource = new FilePrefixSource( mavenProxyRepository, path, config );
                 if ( prefixFileAgeInDays < 1 )
                 {
                     return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
