@@ -69,9 +69,6 @@ public class NexusApplication
     @Requirement( hint = "enterLicenseTemplate", optional = true )
     private ManagedPlexusResource enterLicenseTemplateResource;
 
-    @Requirement( hint = "IndexRedirectingPlexusResource" )
-    private ManagedPlexusResource indexRedirectingResource;
-
     @Requirement( hint = "content" )
     private ManagedPlexusResource contentResource;
 
@@ -182,6 +179,7 @@ public class NexusApplication
         // ==========
         // INDEX.HTML and WAR contents
         // To redirect "uncaught" requests to indexTemplateResource
+        ManagedPlexusResource indexRedirectingResource = managedResources.get( "IndexRedirectingPlexusResource" );
         attach( root, true, "", new NexusPlexusResourceFinder( getContext(), indexRedirectingResource ) );
         attach( root, true, "/", new NexusPlexusResourceFinder( getContext(), indexRedirectingResource ) );
 

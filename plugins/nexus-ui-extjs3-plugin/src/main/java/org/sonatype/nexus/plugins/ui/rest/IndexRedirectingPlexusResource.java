@@ -10,35 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rest;
+package org.sonatype.nexus.plugins.ui.rest;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Resource to redirect to the absolute URI to the index.html.
  */
-@Component( role = ManagedPlexusResource.class, hint = "IndexRedirectingPlexusResource" )
+@Named( "IndexRedirectingPlexusResource" )
+@Singleton
 public class IndexRedirectingPlexusResource
     extends AbstractNexusPlexusResource
     implements ManagedPlexusResource
 {
 
-    @Requirement
-    private Nexus nexus;
+    private final ManagedPlexusResource indexTemplateResource;
 
-    @Requirement( hint = "indexTemplate" )
-    private ManagedPlexusResource indexTemplateResource;
+    @Inject
+    public IndexRedirectingPlexusResource( final IndexTemplatePlexusResource indexTemplateResource )
+    {
+        this.indexTemplateResource = indexTemplateResource;
+    }
 
     @Override
     public Object getPayloadInstance()
