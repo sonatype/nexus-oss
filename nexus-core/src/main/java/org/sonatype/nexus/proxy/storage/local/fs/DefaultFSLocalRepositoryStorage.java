@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.storage.local.fs;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,7 +41,6 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.LinkPersister;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -385,10 +385,9 @@ public class DefaultFSLocalRepositoryStorage
             // (typically those coming from RRS, as the content is actually wrapped HTTP response body, hence not reusable)
             // get closed irrelevant of the actual outcome. If all went right, stream was already closed,
             // and we will be "punished" by one extra (redundant) call to Closeable#close().
-            if ( originalContentLocator != null
-                && ( originalContentLocator instanceof PreparedContentLocator ) )
+            if ( originalContentLocator instanceof Closeable )
             {
-                Closeables.closeQuietly( ( (PreparedContentLocator) originalContentLocator ) );
+                Closeables.closeQuietly( (Closeable) originalContentLocator );
             }
         }
 

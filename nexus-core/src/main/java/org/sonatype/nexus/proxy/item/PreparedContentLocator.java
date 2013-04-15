@@ -60,6 +60,7 @@ public class PreparedContentLocator
      * @throws IOException if an I/O error occurs.
      * @since 2.5
      */
+    @Override
     public void close()
         throws IOException
     {
