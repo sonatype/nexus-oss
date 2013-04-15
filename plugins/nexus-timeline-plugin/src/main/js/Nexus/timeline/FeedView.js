@@ -13,7 +13,9 @@
 
 /*global NX,Nexus,Ext,Sonatype*/
 /**
- * FIXME This belongs to the timeline plugin and should be moved there.
+ * Inner view on selecting one feed.
+ *
+ * @since 2.5
  */
 NX.define('Nexus.timeline.FeedView', {
   extend : 'Ext.Panel',

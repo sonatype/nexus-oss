@@ -12,9 +12,11 @@
  */
 // must pass in feedUrl that's local to our domain
 // config: feedUrl required
-/*global define*/
+/*global NX, Ext*/
 /**
- * FIXME This belongs to the timeline plugin and should be moved there.
+ * The main view for all feeds.
+ *
+ * @since 2.5
  */
 NX.define('Nexus.timeline.FeedGrid', {
   extend : 'Ext.grid.GridPanel',
@@ -111,12 +113,18 @@ NX.define('Nexus.timeline.FeedGrid', {
     this.reloadFeed();
   },
 
+  /**
+   * Reload the feed store.
+   */
   reloadFeed : function() {
     if (this.feedUrl) {
       this.store.reload();
     }
   },
 
+  /**
+   * @private
+   */
   togglePreview : function(show) {
     this.view.showPreview = show;
     this.view.refresh();
@@ -132,7 +140,15 @@ NX.define('Nexus.timeline.FeedGrid', {
     return 'x-grid3-row-collapsed';
   },
 
-  formatDate : function(value, p, record, rowIndex, colIndex, store) {
+  /**
+   * Date formatter that prefers "Today" or a day name over a real date.
+   *
+   * @private
+   *
+   * @param value The time to format.
+   * @returns {String} The formatted date.
+   */
+  formatDate : function(value) {
     if (!value) {
       return '';
     }
@@ -155,7 +171,17 @@ NX.define('Nexus.timeline.FeedGrid', {
     return value.dateFormat('n/j g:i a');
   },
 
-  formatTitle : function(value, p, record, rowIndex, colIndex, store) {
+  /**
+   * Converts a record to HTML.
+   *
+   * @private
+   *
+   * @param value The title of the entry.
+   * @param p
+   * @param record The record of the entry. Used to add a link and author description.
+   * @returns {String} HTML-formatted feed entry title.
+   */
+  formatTitle : function(value, p, record) {
     return String.format('<div class="topic"><b><a href="{1}" target="_blank">{0}</a></b><span class="author">{2}</span></div>',
           value, record.data.link, record.data.author);
   }

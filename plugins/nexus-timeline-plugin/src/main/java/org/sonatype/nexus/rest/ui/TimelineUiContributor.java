@@ -22,7 +22,7 @@ import org.sonatype.nexus.plugins.rest.UiContributor;
 /**
  * UI contribution for the timeline plugin.
  *
- * @since 2.4
+ * @since 2.5
  */
 @Named
 @Singleton
