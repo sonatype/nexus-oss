@@ -153,6 +153,20 @@
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
+        <version>${nexus.version}</version>
+        <classifier>bundle</classifier>
+        <type>${nexus-plugin.type}</type>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+
     </dependencies>
   </dependencyManagement>
 
