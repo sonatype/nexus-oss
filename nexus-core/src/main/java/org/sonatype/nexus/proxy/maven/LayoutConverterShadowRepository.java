@@ -14,7 +14,6 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +47,8 @@ import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+
+import com.google.common.collect.Lists;
 
 /**
  * Base class for shadows that make "gateways" from M1 to M2 lauouts and vice versa.
@@ -449,13 +450,13 @@ public abstract class LayoutConverterShadowRepository
         {
             return null;
         }
-        final ArrayList<String> exts = new ArrayList<String>();
+        final List<String> exts = Lists.newArrayList();
         exts.add( gav.getExtension() + "s" );
         if ( extraFolders != null && !extraFolders.isEmpty() )
         {
             exts.addAll( extraFolders );
         }
-        final ArrayList<String> result = new ArrayList<String>( exts.size() );
+        final List<String> result = Lists.newArrayListWithCapacity( exts.size() );
         for ( String ext : exts )
         {
             // m1 repo is layouted as:
