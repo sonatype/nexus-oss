@@ -125,8 +125,10 @@ public class UiContributionBuilder
         {
             // always add css dependency, also needed when debug is requested
             maybeAddDefaultCssDependency();
-            // if (!debug ) // FIXME debug mode will only be available after reorganization of the js file locations (static vs. non-static)
-            withDefaultAggregateDependency();
+            if ( !debug )
+            {
+                withDefaultAggregateDependency();
+            }
         }
 
         return new UiContributor.UiContribution( module, dependencies, condition.isSatisfied() );
