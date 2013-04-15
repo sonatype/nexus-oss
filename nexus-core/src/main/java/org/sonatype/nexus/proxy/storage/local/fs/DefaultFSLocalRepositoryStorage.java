@@ -52,6 +52,7 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
 
 /**
  * LocalRepositoryStorage that uses plain File System (relies on {@link File}) to implement it's functionality.
@@ -387,7 +388,7 @@ public class DefaultFSLocalRepositoryStorage
             if ( originalContentLocator != null
                 && ( originalContentLocator instanceof PreparedContentLocator ) )
             {
-                ( (PreparedContentLocator) originalContentLocator ).closePreparedContent();
+                Closeables.closeQuietly( ( (PreparedContentLocator) originalContentLocator ) );
             }
         }
 
