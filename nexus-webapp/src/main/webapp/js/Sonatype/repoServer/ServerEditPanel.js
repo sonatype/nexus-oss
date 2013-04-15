@@ -11,6 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global Ext, Sonatype, Nexus*/
+/**
+ * The server settings view.
+ *
+ * @event serverConfigViewPostInit
+ * Global event for plugins to change the server settings view. (Uses Sonatype.Events.)
+ * @param {Ext.FormPanel} The form panel used as the server settings view.
+ */
 Ext.define('Sonatype.repoServer.ServerEditPanel', {
   extend : 'Ext.Panel',
   requires : 'Nexus.util.Strings',
@@ -80,12 +87,12 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       layoutConfig : {
         labelSeparator : ''
       },
-
       items : [
         {
           xtype : 'fieldset',
           checkboxToggle : false,
           title : 'SMTP Settings',
+          name : 'smtp-settings',
           anchor : Sonatype.view.FIELDSET_OFFSET,
           collapsible : true,
           autoHeight : true,
@@ -149,14 +156,17 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               anchor : Sonatype.view.FIELD_OFFSET,
               allowBlank : false,
               itemCls : 'required-field'
-            },
+            }
+          ],
+          buttons : [
             {
               xtype : 'button',
               scope : this,
               text : 'Test SMTP settings',
               handler : this.testSmtpBtnHandler
             }
-          ]
+          ],
+          buttonAlign : 'left'
         },
         {
           xtype : 'fieldset',
@@ -687,6 +697,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
 
     securityConfigField = this.formPanel.find('name', 'securityEnabled')[0];
     securityConfigField.on('select', this.securitySelectHandler, securityConfigField);
+
+    Sonatype.Events.fireEvent('serverConfigViewPostInit', this.formPanel);
   },
 
   optionalFieldsetExpandHandler : function(panel) {
@@ -870,9 +882,21 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               formBind : true,
               scope : this,
               handler : function() {
-                var email = w.find('name', 'email')[0].getValue();
-                this.runStmpConfigCheck(email, data);
-                w.close();
+                var email = w.find('name', 'email')[0].getValue(),
+                    mask = new Ext.LoadMask(w.el, {
+                      msg : 'Validating SMTP settings...',
+                      removeMask : true
+                    });
+
+                mask.show();
+
+                this.runStmpConfigCheck(email, data, function(success) {
+                  mask.hide();
+
+                  if (success) {
+                    w.close();
+                  }
+                });
               }
             },
             {
@@ -891,7 +915,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
     w.show();
   },
 
-  runStmpConfigCheck : function(testEmail, data) {
+  runStmpConfigCheck : function(testEmail, data, callback) {
 
     data.testEmail = testEmail;
 
@@ -901,20 +925,19 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       jsonData : {
         data : data
       },
-      callback : function(options, success, response) {
-        this.el.unmask();
-
-        if (success) {
+      callback : function(options, success) {
+        callback(success);
+      },
+      success : function() {
           Sonatype.MessageBox.show({
             title : 'SMTP configuration',
             msg : 'SMTP configuration validated successfully, check your inbox!',
             buttons : Sonatype.MessageBox.OK,
             icon : Sonatype.MessageBox.INFO
           });
-        }
-        else {
-          Sonatype.utils.connectionError(response, 'Error on SMTP validation!');
-        }
+      },
+      failure : function(response) {
+        Sonatype.utils.connectionError(response, 'Error on SMTP validation!');
       },
       scope : this
     });

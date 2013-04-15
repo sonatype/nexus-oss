@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.guice;
 
-import com.google.inject.AbstractModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
-import org.sonatype.nexus.timing.TimingModule;
+
+import com.google.inject.AbstractModule;
 
 /**
  * Nexus guice modules.
@@ -33,7 +33,6 @@ public class NexusModules
         @Override
         protected void configure() {
             install(new ShiroAopModule());
-            install(new TimingModule());
         }
     }
 

@@ -164,6 +164,8 @@ public abstract class AbstractNexusIntegrationTest
 
         // guice finalizer turned OFF
         System.setProperty( "guice.executor.class", "NONE" );
+        // NEXUS-5660 test with ipv4 as app runs with this set now
+        System.setProperty( "java.net.preferIPv4Stack", "true" );
     }
 
     static

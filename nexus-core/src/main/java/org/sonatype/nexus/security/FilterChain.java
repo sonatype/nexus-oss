@@ -10,27 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timing;
+package org.sonatype.nexus.security;
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.guice.AbstractInterceptorModule;
-
-import com.google.inject.matcher.Matchers;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Adds support for {@link Timed} method invocations.
+ * A Shiro filter chain (mapping between a path pattern and a filter expression).
  *
- * @see TimedInterceptor
- *
- * @since 2.4
+ * @since 2.5
  */
-@Named
-public class TimingModule
-    extends AbstractInterceptorModule
+public class FilterChain
 {
-    @Override
-    protected void configure() {
-        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Timed.class), new TimedInterceptor());
+
+    private final String pathPattern;
+
+    private final String filterExpression;
+
+    public FilterChain( final String pathPattern, final String filterExpression )
+    {
+        this.pathPattern = checkNotNull( pathPattern );
+        this.filterExpression = checkNotNull( filterExpression );
     }
+
+    public String getPathPattern()
+    {
+        return pathPattern;
+    }
+
+    public String getFilterExpression()
+    {
+        return filterExpression;
+    }
+
 }

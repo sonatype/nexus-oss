@@ -18,12 +18,14 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
@@ -66,7 +68,8 @@ public class DefaultNexusPluginManagerTest
     {
         final DefaultNexusPluginManager underTest = new DefaultNexusPluginManager(
             repositoryTypeRegistry, eventBus, pluginRepositoryManager,
-            new DefaultPlexusContainer(), mimeSupport, new HashMap<String, String>()
+            new DefaultPlexusContainer(), mimeSupport, new HashMap<String, String>(),
+            Collections.<AbstractInterceptorModule>emptyList()
         )
         {
             @Override

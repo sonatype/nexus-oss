@@ -40,6 +40,14 @@ public abstract class AbstractChecksumContentValidator
             return true;
         }
 
+        final ChecksumPolicy requestChecksumPolicy =
+            (ChecksumPolicy) req.getRequestContext().get( ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY );
+        if ( requestChecksumPolicy != null )
+        {
+            // found, it overrides the repository-set checksum policy then
+            checksumPolicy = requestChecksumPolicy;
+        }
+
         RemoteHashResponse remoteHash = retrieveRemoteHash( item, proxy, baseUrl );
 
         // let compiler make sure I did not forget to populate validation results

@@ -75,7 +75,7 @@ public class ChecksumContentValidator
     protected void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
         throws LocalStorageException
     {
-        if ( !contentValid && remoteHash.getHashItem() != null )
+        if ( !contentValid && remoteHash != null && remoteHash.getHashItem() != null )
         {
             // TODO should we remove bad checksum if policy==WARN?
             try

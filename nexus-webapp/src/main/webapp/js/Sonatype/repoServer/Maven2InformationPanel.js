@@ -13,6 +13,7 @@
 /*global NX, Sonatype, Ext*/
 NX.define('Sonatype.repoServer.Maven2InformationPanel', {
   extend : 'Ext.form.FormPanel',
+  requirejs : ['Sonatype/init'],
 
   constructor : function(config) {
     Ext.apply(this, config || {}, {

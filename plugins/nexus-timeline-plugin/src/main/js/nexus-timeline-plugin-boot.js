@@ -10,27 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timing;
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.guice.AbstractInterceptorModule;
-
-import com.google.inject.matcher.Matchers;
-
-/**
- * Adds support for {@link Timed} method invocations.
- *
- * @see TimedInterceptor
- *
- * @since 2.4
- */
-@Named
-public class TimingModule
-    extends AbstractInterceptorModule
-{
-    @Override
-    protected void configure() {
-        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Timed.class), new TimedInterceptor());
-    }
-}
+/*global NX*/
+NX.define('nexus-timeline-plugin-boot', {
+  requires : ['Nexus.timeline.FeedView']
+}, function() {
+  NX.log.debug('Timeline plugin loaded');
+});
