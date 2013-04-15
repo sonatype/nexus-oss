@@ -3,7 +3,7 @@ package org.sonatype.nexus.client.core.subsystem.repository;
 /**
  * Base class for hosted/proxy repositories.
  *
- * @since 2.4
+ * @since 2.5
  */
 interface BaseRepository<T extends Repository, S extends RepositoryStatus>
     extends Repository<T, S>

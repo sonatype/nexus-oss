@@ -58,7 +58,7 @@ public interface ProxyRepository<T extends ProxyRepository>
 
     /**
      * @return {@code true} if auto-blocking is enabled, {@code false} otherwise.
-     * @since 2.4
+     * @since 2.5
      */
     boolean isAutoBlocking();
 
@@ -94,7 +94,7 @@ public interface ProxyRepository<T extends ProxyRepository>
 
     /**
      * @return the repository's max item age.
-     * @since 2.4
+     * @since 2.5
      */
     int itemMaxAge();
 }
