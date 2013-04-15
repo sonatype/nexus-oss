@@ -35,7 +35,9 @@ Ext.applyIf(String.prototype, {
             intIndexOfMatch = strText.indexOf(strTarget);
         }
 
-        return (strText);
+        // return new String, because returning "this" here without a #replace inbetween returns a char array,
+        // not a String (seen in chrome).
+        return String(strText);
     }
 });
 
