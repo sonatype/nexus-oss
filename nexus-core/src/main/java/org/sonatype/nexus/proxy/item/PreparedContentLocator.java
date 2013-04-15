@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.item;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.google.common.io.Closeables;
+
 /**
  * A content locator that emits a prepared InputStream. Not reusable.
  * 
@@ -50,5 +52,17 @@ public class PreparedContentLocator
     public boolean isReusable()
     {
         return false;
+    }
+
+    /**
+     * Cleans up, closes the underlying prepared content. To be used in cases when you actually don't need the stream
+     * (as some error cropped up), and you never requested the stream instance using {@link #getContent()}. This method
+     * will suppress any eventual {@link IOException}.
+     * 
+     * @since 2.5
+     */
+    public void closePreparedContent()
+    {
+        Closeables.closeQuietly( content );
     }
 }

@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.LinkPersister;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -328,42 +329,67 @@ public class DefaultFSLocalRepositoryStorage
     public void storeItem( Repository repository, StorageItem item )
         throws UnsupportedStorageOperationException, LocalStorageException
     {
-        // set some sanity stuff
-        item.setStoredLocally( System.currentTimeMillis() );
-        item.setRemoteChecked( item.getStoredLocally() );
-        item.setExpired( false );
-
-        File target = getFileFromBase( repository, item.getResourceStoreRequest() );
-
-        ContentLocator cl = null;
-
+        final File target;
+        final ContentLocator originalContentLocator;
         if ( item instanceof StorageFileItem )
         {
-            StorageFileItem fItem = (StorageFileItem) item;
-
-            prepareStorageFileItemForStore( fItem );
-
-            cl = fItem.getContentLocator();
+            originalContentLocator = ( (StorageFileItem) item ).getContentLocator();
         }
-        else if ( item instanceof StorageLinkItem )
+        else
         {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-            try
-            {
-                getLinkPersister().writeLinkContent( (StorageLinkItem) item, bos );
-            }
-            catch ( IOException e )
-            {
-                // should not happen, look at implementation
-                // we will handle here two byte array backed streams!
-                throw new LocalStorageException( "Problem ", e );
-            }
-
-            cl = new ByteArrayContentLocator( bos.toByteArray(), "text/xml" );
+            originalContentLocator = null;
         }
+        try 
+        {
+            // set some sanity stuff
+            item.setStoredLocally( System.currentTimeMillis() );
+            item.setRemoteChecked( item.getStoredLocally() );
+            item.setExpired( false );
 
-        getFSPeer().storeItem( repository, getBaseDir( repository, item.getResourceStoreRequest() ), item, target, cl );
+            ContentLocator cl = null;
+
+            if ( item instanceof StorageFileItem )
+            {
+                StorageFileItem fItem = (StorageFileItem) item;
+
+                prepareStorageFileItemForStore( fItem );
+
+                cl = fItem.getContentLocator();
+            }
+            else if ( item instanceof StorageLinkItem )
+            {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+                try
+                {
+                    getLinkPersister().writeLinkContent( (StorageLinkItem) item, bos );
+                }
+                catch ( IOException e )
+                {
+                    // should not happen, look at implementation
+                    // we will handle here two byte array backed streams!
+                    throw new LocalStorageException( "Problem ", e );
+                }
+
+                cl = new ByteArrayContentLocator( bos.toByteArray(), "text/xml" );
+            }
+
+            target = getFileFromBase( repository, item.getResourceStoreRequest() );
+
+            getFSPeer().storeItem( repository, getBaseDir( repository, item.getResourceStoreRequest() ), item, target, cl );
+        } 
+        finally
+        {
+            // NEXUS-5468: Ensure that in case of file item with prepared content
+            // (typically those coming from RRS, as the content is actually wrapped HTTP response body, hence not reusable)
+            // get closed irrelevant of the actual outcome. If all went right, stream was already closed,
+            // and we will be "punished" by one extra (redundant) call to Closeable#close().
+            if ( originalContentLocator != null
+                && ( originalContentLocator instanceof PreparedContentLocator ) )
+            {
+                ( (PreparedContentLocator) originalContentLocator ).closePreparedContent();
+            }
+        }
 
         if ( item instanceof StorageFileItem )
         {
