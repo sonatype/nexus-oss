@@ -320,8 +320,8 @@
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.0.0</version>
           <configuration>
-            <!-- 
-               yuicompressor warns when code is not in a shape that's optimized for minifying. 
+            <!--
+               yuicompressor warns when code is not in a shape that's optimized for minifying.
                ATM this only pollutes the log (~9400 warnings)
             -->
             <jswarn>false</jswarn>
@@ -381,6 +381,31 @@
             <releaseProfiles>release,optimize-js</releaseProfiles>
           </configuration>
         </plugin>
+
+        <!-- Copy javascript files to /static/js -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
+          <executions>
+            <execution>
+              <id>copy-js</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.outputDirectory}/static/js</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>src/main/js</directory>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
       </plugins>
     </pluginManagement>
 
