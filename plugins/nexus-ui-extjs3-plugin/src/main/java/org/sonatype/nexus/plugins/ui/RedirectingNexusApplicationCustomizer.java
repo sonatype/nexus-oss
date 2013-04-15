@@ -50,6 +50,13 @@ public class RedirectingNexusApplicationCustomizer
         @Override
         protected int beforeHandle( final Request request, final Response response )
         {
+            int state = super.beforeHandle( request, response );
+
+            if ( response.getStatus().getCode() != 404 )
+            {
+                return state;
+            }
+
             final String path = request.getResourceRef().getPath();
             final String ctxPath = request.getResourceRef().getBaseRef().getPath();
 
@@ -58,7 +65,7 @@ public class RedirectingNexusApplicationCustomizer
                 return STOP;
             }
 
-            return super.beforeHandle( request, response );
+            return state;
         }
     }
 }
