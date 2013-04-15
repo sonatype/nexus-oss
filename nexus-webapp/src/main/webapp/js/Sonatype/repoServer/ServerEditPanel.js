@@ -11,6 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global Ext, Sonatype, Nexus*/
+/**
+ * The server settings view.
+ *
+ * @event serverConfigViewPostInit
+ * Global event for plugins to change the server settings view. (Uses Sonatype.Events.)
+ * @param {Ext.FormPanel} The form panel used as the server settings view.
+ */
 Ext.define('Sonatype.repoServer.ServerEditPanel', {
   extend : 'Ext.Panel',
   requires : 'Nexus.util.Strings',
@@ -80,12 +87,12 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       layoutConfig : {
         labelSeparator : ''
       },
-
       items : [
         {
           xtype : 'fieldset',
           checkboxToggle : false,
           title : 'SMTP Settings',
+          name : 'smtp-settings',
           anchor : Sonatype.view.FIELDSET_OFFSET,
           collapsible : true,
           autoHeight : true,
@@ -149,14 +156,17 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               anchor : Sonatype.view.FIELD_OFFSET,
               allowBlank : false,
               itemCls : 'required-field'
-            },
+            }
+          ],
+          buttons : [
             {
               xtype : 'button',
               scope : this,
               text : 'Test SMTP settings',
               handler : this.testSmtpBtnHandler
             }
-          ]
+          ],
+          buttonAlign : 'left'
         },
         {
           xtype : 'fieldset',
@@ -687,6 +697,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
 
     securityConfigField = this.formPanel.find('name', 'securityEnabled')[0];
     securityConfigField.on('select', this.securitySelectHandler, securityConfigField);
+
+    Sonatype.Events.fireEvent('serverConfigViewPostInit', this.formPanel);
   },
 
   optionalFieldsetExpandHandler : function(panel) {

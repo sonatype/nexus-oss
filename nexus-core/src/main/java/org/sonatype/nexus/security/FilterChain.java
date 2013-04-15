@@ -10,12 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('Nexus/ext',
-      [
-        'Nexus/ext/FormPanel',
-        'Nexus/ext/TextEntryList',
-        'Nexus/ext/linkbutton',
-        'Nexus/ext/twinpanelcontroller'
-      ],
-      function() {});
+package org.sonatype.nexus.security;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * A Shiro filter chain (mapping between a path pattern and a filter expression).
+ *
+ * @since 2.5
+ */
+public class FilterChain
+{
+
+    private final String pathPattern;
+
+    private final String filterExpression;
+
+    public FilterChain( final String pathPattern, final String filterExpression )
+    {
+        this.pathPattern = checkNotNull( pathPattern );
+        this.filterExpression = checkNotNull( filterExpression );
+    }
+
+    public String getPathPattern()
+    {
+        return pathPattern;
+    }
+
+    public String getFilterExpression()
+    {
+        return filterExpression;
+    }
+
+}
