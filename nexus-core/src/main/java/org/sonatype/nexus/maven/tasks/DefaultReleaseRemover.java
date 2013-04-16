@@ -333,7 +333,6 @@ public class DefaultReleaseRemover
         public void afterWalk( final WalkerContext context )
             throws Exception
         {
-            getLogger().debug( "Processing and possibly deleting release versions" );
             for ( Map.Entry<Gav, Map<Version, List<StorageFileItem>>> gavListEntry : gas.entrySet() )
             {
                 Map<Version, List<StorageFileItem>> versions = gavListEntry.getValue();
@@ -348,12 +347,11 @@ public class DefaultReleaseRemover
                     Collections.sort( sortedVersions );
                     List<Version> toDelete =
                         sortedVersions.subList( 0, versions.size() - request.getNumberOfVersionsToKeep() );
-                    getLogger().debug( "Will delete these versions: {}", toDelete );
+                    getLogger().debug( "Will delete these specific versions: {}", toDelete );
                     for ( Version version : toDelete )
                     {
                         for ( StorageFileItem storageFileItem : versions.get( version ) )
                         {
-                            getLogger().debug( "Deleting item: {}", storageFileItem );
                             repository.deleteItem( createResourceStoreRequest( storageFileItem, context ) );
                             deletedFiles++;
                         }
@@ -391,11 +389,9 @@ public class DefaultReleaseRemover
         @Override
         protected boolean shouldProcessItem( final StorageItem item )
         {
-            boolean b = super.shouldProcessItem( item ) &&
+            return super.shouldProcessItem( item ) &&
                 repositoryTarget.isPathContained(
                     item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item.getPath() );
-            getLogger().error( "Processing item {} = {}", item.getPath(), b );
-            return b;
         }
 
         @Override
