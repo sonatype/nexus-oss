@@ -24,7 +24,7 @@ import org.sonatype.security.web.guice.SecurityWebFilter;
 /**
  * <a href="http://metrics.codahale.com">Yammer Metrics</a> guice configuration.
  *
- * Installs metrics endpoints:
+ * Installs servlet endpoints:
  *
  * <ul>
  *     <li>/internal/ping</li>
@@ -33,7 +33,7 @@ import org.sonatype.security.web.guice.SecurityWebFilter;
  *     <li>/internal/healthcheck</li>
  * </ul>
  *
- * Protected by {@code metrics-endpoints} permission.
+ * Protected by {@code nexus:metrics-endpoints} permission.
  *
  * @since 2.5
  */
@@ -94,14 +94,13 @@ public class MetricsModule
             }
         });
 
+        // require permission to use endpoints
         install(new FilterChainModule()
         {
             @Override
             protected void configure() {
-                addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
-
-                // FIXME: This does not work, unsure why...
-                //addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,perms[metrics-endpoints]");
+                // FIXME: This is working slighlty better now, but still not working properly :-(
+                addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,perms[nexus:metrics-endpoints]");
             }
         });
 
