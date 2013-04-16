@@ -46,7 +46,6 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 import org.sonatype.scheduling.TaskUtil;
-import sun.plugin.dom.exception.InvalidStateException;
 
 /**
  * @since 2.5
@@ -162,7 +161,7 @@ public class DefaultReleaseRemover
     }
 
     private class ReleaseRemovalWalkerProcessor
-        extends AbstractWalkerProcessor
+        extends AbstractFileDeletingWalkerProcessor
     {
 
         private static final String POSSIBLY_EMPTY_COLLECTIONS = "possiblyEmptyCollections";
@@ -274,7 +273,7 @@ public class DefaultReleaseRemover
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new InvalidStateException( "Unable to determine version for " + gav.getVersion() +
+                throw new IllegalStateException( "Unable to determine version for " + gav.getVersion() +
                                                      ", cannot proceed with deletion of releases unless"
                                                      + "all version information can be parsed into major.minor.incremental version." );
             }
@@ -320,59 +319,10 @@ public class DefaultReleaseRemover
                         for ( StorageCollectionItem coll : (List<StorageCollectionItem>) context.getContext().get(
                             POSSIBLY_EMPTY_COLLECTIONS ) )
                         {
-                            removeDirectoryIfEmpty( coll );
+                            removeDirectoryIfEmpty( repository, coll );
                         }
                     }
                 }
-            }
-        }
-
-        //TODO - KR reuse with DefaultSnapshotRemover
-        private ResourceStoreRequest createResourceStoreRequest( final StorageItem item, final WalkerContext ctx )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-
-            if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
-            {
-                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY,
-                                                 ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY ) );
-            }
-
-            return request;
-        }
-
-        //TODO - KR reuse with DefaultSnapshotRemover
-        private ResourceStoreRequest createResourceStoreRequest( final StorageCollectionItem item,
-                                                                 final DeleteOperation operation )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-            request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
-            return request;
-        }
-
-        //TODO - KR reuse with DefaultSnapshotRemover, need to handle repository variable
-        private void removeDirectoryIfEmpty( StorageCollectionItem coll )
-            throws StorageException, IllegalOperationException, UnsupportedStorageOperationException
-        {
-            try
-            {
-                if ( repository.list( false, coll ).size() > 0 )
-                {
-                    return;
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
-                }
-
-                // directory is empty, never move to trash
-                repository.deleteItem( false, createResourceStoreRequest( coll, DeleteOperation.DELETE_PERMANENTLY ) );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // silent, this happens if whole GAV is removed and the dir is removed too
             }
         }
     }
