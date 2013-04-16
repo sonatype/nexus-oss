@@ -87,6 +87,7 @@ public class DefaultReleaseRemover
             throw new IllegalArgumentException( "The repository with ID=" + repository.getId() + " is not valid for "
                                                     + ID );
         }
+        getLogger().debug( "Results of {} are: {}", ReleaseRemovalTaskDescriptor.ID, result );
         return result;
     }
 
@@ -125,15 +126,15 @@ public class DefaultReleaseRemover
             return false;
         }
 
-        result.setResult( removeReleasesFromMavenRepository( mavenRepository, request ) );
+        removeReleasesFromMavenRepository( mavenRepository, request, result );
         return true;
     }
 
     public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                   final ReleaseRemovalRequest request )
+                                                                   final ReleaseRemovalRequest request,
+                                                                   final ReleaseRemovalResult result )
     {
         TaskUtil.checkInterruption();
-        ReleaseRemovalResult result = new ReleaseRemovalResult( repository.getId() );
 
         if ( !repository.getLocalStatus().shouldServiceRequest() )
         {
@@ -149,7 +150,7 @@ public class DefaultReleaseRemover
 
         ctxMain.getContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, DeleteOperation.MOVE_TO_TRASH );
 
-        ctxMain.getProcessors().add( new ReleaseRemovalWalkerProcessor( repository, request ) );
+        ctxMain.getProcessors().add( new ReleaseRemovalWalkerProcessor( repository, request, result ) );
 
         walker.walk( ctxMain );
 
@@ -176,13 +177,16 @@ public class DefaultReleaseRemover
         private final Map<Gav, Map<Version, List<StorageFileItem>>> gas =
             new HashMap<Gav, Map<Version, List<StorageFileItem>>>();
 
+        private final ReleaseRemovalResult result;
+
         private int deletedFiles = 0;
 
         private ReleaseRemovalWalkerProcessor( final MavenRepository repository,
-                                               final ReleaseRemovalRequest request )
+                                               final ReleaseRemovalRequest request, final ReleaseRemovalResult result )
         {
             this.repository = repository;
             this.request = request;
+            this.result = result;
         }
 
         @Override
@@ -230,8 +234,6 @@ public class DefaultReleaseRemover
             }
             if ( null != gav )
             {
-                getLogger().debug( "Adding these files to consider for deletion: {}",
-                                   deletableVersionsAndFiles.toString() );
                 addVersionsToGas( gas, deletableVersionsAndFiles, gav );
             }
         }
@@ -324,6 +326,8 @@ public class DefaultReleaseRemover
                     }
                 }
             }
+            result.setDeletedFileCount( deletedFiles );
+            result.setSuccessful( true );
         }
     }
 }

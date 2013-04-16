@@ -23,6 +23,9 @@ import org.sonatype.nexus.proxy.walker.Walker;
  */
 public class DefaultReleaseRemoverTest
 {
+
+    public static final String REPO_ID = "foo-proxy";
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -35,7 +38,7 @@ public class DefaultReleaseRemoverTest
         final Repository proxyRepository = mock( Repository.class );
         final RepositoryKind proxyRepositoryKind = mock( RepositoryKind.class );
 
-        when( repositoryRegistry.getRepository( "foo-proxy" ) ).thenReturn( proxyRepository );
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( proxyRepository );
         when( proxyRepository.getRepositoryContentClass() ).thenReturn( maven2ContentClass );
         when( proxyRepository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( proxyRepository.getRepositoryKind() ).thenReturn( proxyRepositoryKind );
@@ -46,12 +49,13 @@ public class DefaultReleaseRemoverTest
         {
             @Override
             public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request )
+                                                                           final ReleaseRemovalRequest request,
+                                                                           final ReleaseRemovalResult result )
             {
                 return new ReleaseRemovalResult( repository.getId() );
             }
         }.removeReleases(
-            new ReleaseRemovalRequest( "foo-proxy", 1)
+            new ReleaseRemovalRequest( REPO_ID, 1)
         );
     }
 
@@ -64,7 +68,7 @@ public class DefaultReleaseRemoverTest
     final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
     final Repository repository = mock( Repository.class );
 
-    when( repositoryRegistry.getRepository( "foo-proxy" ) ).thenReturn( repository );
+    when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
     when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
 
     thrown.expect( IllegalArgumentException.class );
@@ -72,12 +76,13 @@ public class DefaultReleaseRemoverTest
     {
         @Override
         public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                       final ReleaseRemovalRequest request )
+                                                                       final ReleaseRemovalRequest request,
+                                                                       final ReleaseRemovalResult result )
         {
             return new ReleaseRemovalResult( repository.getId() );
         }
     }.removeReleases(
-        new ReleaseRemovalRequest( "foo-proxy", 1)
+        new ReleaseRemovalRequest( REPO_ID, 1)
     );
 }
 
@@ -89,7 +94,7 @@ public class DefaultReleaseRemoverTest
         final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
         final Repository repository = mock( Repository.class );
 
-        when( repositoryRegistry.getRepository( "foo-proxy" ) ).thenReturn( repository );
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
         when( repository.getRepositoryContentClass() ).thenReturn( maven2ContentClass );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
 
@@ -98,12 +103,13 @@ public class DefaultReleaseRemoverTest
         {
             @Override
             public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request )
+                                                                           final ReleaseRemovalRequest request,
+                                                                           final ReleaseRemovalResult result )
             {
                 return new ReleaseRemovalResult( repository.getId() );
             }
         }.removeReleases(
-            new ReleaseRemovalRequest( "foo-proxy", 1)
+            new ReleaseRemovalRequest( REPO_ID, 1)
         );
     }
 
@@ -118,7 +124,7 @@ public class DefaultReleaseRemoverTest
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
 
 
-        when( repositoryRegistry.getRepository( "foo-proxy" ) ).thenReturn( repository );
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
         when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
@@ -129,12 +135,13 @@ public class DefaultReleaseRemoverTest
         {
             @Override
             public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request )
+                                                                           final ReleaseRemovalRequest request,
+                                                                           final ReleaseRemovalResult result )
             {
                 return new ReleaseRemovalResult( repository.getId() );
             }
         }.removeReleases(
-            new ReleaseRemovalRequest( "foo-proxy", 1)
+            new ReleaseRemovalRequest( REPO_ID, 1)
         );
     }
 
@@ -149,7 +156,7 @@ public class DefaultReleaseRemoverTest
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
         final MavenRepository mavenRepository = mock( MavenRepository.class);
 
-        when( repositoryRegistry.getRepository( "foo-proxy" ) ).thenReturn( repository );
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
         when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
@@ -162,12 +169,13 @@ public class DefaultReleaseRemoverTest
         {
             @Override
             public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request )
+                                                                           final ReleaseRemovalRequest request,
+                                                                           final ReleaseRemovalResult result )
             {
                 return new ReleaseRemovalResult( repository.getId() );
             }
         }.removeReleases(
-            new ReleaseRemovalRequest( "foo-proxy", 1)
+            new ReleaseRemovalRequest( REPO_ID, 1)
         );
     }
 
@@ -182,7 +190,7 @@ public class DefaultReleaseRemoverTest
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
         final MavenRepository mavenRepository = mock( MavenRepository.class);
 
-        when( repositoryRegistry.getRepository( "foo-proxy" ) ).thenReturn( repository );
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
         when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
@@ -195,12 +203,13 @@ public class DefaultReleaseRemoverTest
         {
             @Override
             public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request )
+                                                                           final ReleaseRemovalRequest request,
+                                                                           final ReleaseRemovalResult result )
             {
                 return new ReleaseRemovalResult( repository.getId() );
             }
         }.removeReleases(
-            new ReleaseRemovalRequest( "foo-proxy", 1)
+            new ReleaseRemovalRequest( REPO_ID, 1)
         );
     }
 }

@@ -11,9 +11,7 @@ public class ReleaseRemovalResult
 
     private int deletedFileCount;
 
-    private boolean isSuccessful;
-
-    private ReleaseRemovalResult result;
+    private boolean isSuccessful = false;
 
     public ReleaseRemovalResult( final String repoId )
     {
@@ -45,13 +43,13 @@ public class ReleaseRemovalResult
         isSuccessful = successful;
     }
 
-    public ReleaseRemovalResult getResult()
+    @Override
+    public String toString()
     {
-        return result;
-    }
-
-    public void setResult( final ReleaseRemovalResult result )
-    {
-        this.result = result;
+        return "ReleaseRemovalResult{" +
+            "repoId='" + repoId + '\'' +
+            ", deletedFileCount=" + deletedFileCount +
+            ", isSuccessful=" + isSuccessful +
+            '}';
     }
 }
