@@ -12,10 +12,12 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -284,6 +286,114 @@ public class DefaultSnapshotRemoverIT
         expecting.put(
             "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
             Boolean.TRUE );
+
+        validateResults( snapshots, expecting );
+    }
+
+
+    @Test
+    public void snapshotsNotRemovedIfReleasedBeforeGracePeriod()
+        throws Exception
+    {
+        fillInRepo();
+
+        // XXX: the test stuff is published on sonatype, so put the real central out of service for test
+        repositoryRegistry.getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        nexusConfiguration.saveConfiguration();
+
+        SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest(
+            snapshots.getId(), 1, 0, true, 2, false
+        );
+
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
+
+        assertThat( result.getProcessedRepositories().size(), is( 1 ) );
+        assertThat( result.isSuccessful(), is( true ) );
+
+        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
+
+        // 1.0-beta-4-SNAPSHOT should not be removed because even if the release (1.4-beta-4) is present, the grace
+        // period of two days did not yet pass
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/maven-metadata.xml",
+            Boolean.TRUE
+        );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/maven-metadata.xml.sha1",
+            Boolean.TRUE
+        );
+
+        validateResults( snapshots, expecting );
+    }
+
+    @Test
+    public void snapshotsRemovedIfReleasedAfterGracePeriod()
+        throws Exception
+    {
+        fillInRepo();
+
+        // XXX: the test stuff is published on sonatype, so put the real central out of service for test
+        repositoryRegistry.getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        nexusConfiguration.saveConfiguration();
+
+        SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest(
+            snapshots.getId(), 1, 0, true, 2, false
+        );
+
+        final File released = new File(
+            new File( new URL( releases.getLocalUrl() ).toURI() ),
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4/nexus-indexer-1.0-beta-4.pom"
+        );
+
+        // set the creation time 3 days ago, to simulate that grace period had passed
+        released.setLastModified( System.currentTimeMillis() - 3 * 86400000L );
+
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
+
+        assertThat( result.getProcessedRepositories().size(), is( 1 ) );
+        assertThat( result.isSuccessful(), is( true ) );
+
+        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
+
+        // 1.0-beta-4-SNAPSHOT should be nuked
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/maven-metadata.xml",
+            Boolean.FALSE
+        );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/maven-metadata.xml.sha1",
+            Boolean.FALSE
+        );
 
         validateResults( snapshots, expecting );
     }
