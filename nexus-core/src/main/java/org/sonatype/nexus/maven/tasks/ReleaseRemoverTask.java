@@ -15,6 +15,7 @@ package org.sonatype.nexus.maven.tasks;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
@@ -24,19 +25,8 @@ import org.sonatype.scheduling.SchedulerTask;
 /**
  * @since 2.5
  */
-//@Named(ReleaseRemovalTaskDescriptor.ID)
-//public class ReleaseRemoverTask
-//    extends AbstractNexusRepositoriesTask<ReleaseRemovalResult>
-//{
-//
-//    private final Provider<ReleaseRemover> releaseRemoverProvider;
-//
-//    @Inject
-//    public ReleaseRemoverTask( final Provider<ReleaseRemover> releaseRemoverProvider )
-//    {
-//        this.releaseRemoverProvider = checkNotNull( releaseRemoverProvider );
-//    }
 @Component( role = SchedulerTask.class, hint = ReleaseRemovalTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
+//@Named( ReleaseRemovalTaskDescriptor.ID )     // TODO - KR Figure out why this style the task gets schedule but never appears to run???
 public class ReleaseRemoverTask extends AbstractNexusRepositoriesTask<ReleaseRemovalResult>
 {
     private static final String ACTION = "REMOVERELEASES";
