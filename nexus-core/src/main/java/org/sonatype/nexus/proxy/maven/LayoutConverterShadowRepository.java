@@ -500,56 +500,67 @@ public abstract class LayoutConverterShadowRepository
 
             request.getRequestContext().putAll( item.getItemContext() );
 
-            deleteItem( false, request );
-
-            // we need to clean up empty shadow parent directories
-            String parentPath =
-                request.getRequestPath().substring( 0, request.getRequestPath().lastIndexOf( item.getName() ) );
-            ResourceStoreRequest parentRequest = new ResourceStoreRequest( parentPath );
-
-            while ( parentRequest != null )
+            try
             {
-                StorageItem parentItem = null;
-                parentItem = this.retrieveItem( false, parentRequest );
+                deleteItem( false, request );
 
-                // this should be a collection Item
-                if ( StorageCollectionItem.class.isInstance( parentItem ) )
+                // we need to clean up empty shadow parent directories
+                String parentPath =
+                    request.getRequestPath().substring( 0, request.getRequestPath().lastIndexOf( item.getName() ) );
+                ResourceStoreRequest parentRequest = new ResourceStoreRequest( parentPath );
+
+                while ( parentRequest != null )
                 {
-                    StorageCollectionItem parentCollectionItem = (StorageCollectionItem) parentItem;
-                    try
+                    StorageItem parentItem = null;
+                    parentItem = this.retrieveItem( false, parentRequest );
+
+                    // this should be a collection Item
+                    if ( StorageCollectionItem.class.isInstance( parentItem ) )
                     {
-                        if ( parentCollectionItem.list().size() == 0 )
+                        StorageCollectionItem parentCollectionItem = (StorageCollectionItem) parentItem;
+                        try
                         {
-                            deleteItem( false, parentRequest );
-                            parentRequest = new ResourceStoreRequest( parentCollectionItem.getParentPath() );
+                            if ( parentCollectionItem.list().size() == 0 )
+                            {
+                                deleteItem( false, parentRequest );
+                                parentRequest = new ResourceStoreRequest( parentCollectionItem.getParentPath() );
+                            }
+                            else
+                            {
+                                // exit loop
+                                parentRequest = null;
+                            }
                         }
-                        else
+                        catch ( AccessDeniedException e )
                         {
+                            this.getLogger().debug(
+                                "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
+                                    + " Access Denied", e );
+                            // exit loop
+                            parentRequest = null;
+                        }
+                        catch ( NoSuchResourceStoreException e )
+                        {
+                            this.getLogger().debug(
+                                "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
+                                    + " does not exist", e );
                             // exit loop
                             parentRequest = null;
                         }
                     }
-                    catch ( AccessDeniedException e )
+                    else
                     {
                         this.getLogger().debug(
-                            "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
-                                + " Access Denied", e );
-                        // exit loop
-                        parentRequest = null;
-                    }
-                    catch ( NoSuchResourceStoreException e )
-                    {
-                        this.getLogger().debug(
-                            "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
-                                + " does not exist", e );
-                        // exit loop
-                        parentRequest = null;
+                            "ExpectedCollectionItem, found: " + parentItem.getClass() + ", ignoring." );
                     }
                 }
-                else
-                {
-                    this.getLogger().debug( "ExpectedCollectionItem, found: " + parentItem.getClass() + ", ignoring." );
-                }
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // just ignore it silently, this might happen when
+                // a) link to be deleted was not found in shadow
+                // b) due to concurrent deleteLink invocations on some directory tree (subpaths with same parent for example) while cleaning up parents
+                // simply ignoring this is okay, as our initial goal is to lessen log spam
             }
         }
     }
