@@ -57,13 +57,13 @@ public interface MavenProxyRepository
 
     /**
      * @return the repository's max artifact age.
-     * @since 2.4
+     * @since 2.5
      */
     int artifactMaxAge();
 
     /**
      * @return the repository's max metadata age.
-     * @since 2.4
+     * @since 2.5
      */
     int metadataMaxAge();
 }
