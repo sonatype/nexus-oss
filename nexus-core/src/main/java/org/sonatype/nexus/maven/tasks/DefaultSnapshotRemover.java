@@ -473,8 +473,8 @@ public class DefaultSnapshotRemover
                             {
                                 getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
 
-                                // if dateTreshold is not used (zero days) OR
-                                // if itemTimestamp is less then dateTreshold (NB: both are positive!)
+                                // if dateThreshold is not used (zero days) OR
+                                // if itemTimestamp is less then dateThreshold (NB: both are positive!)
                                 // below will the retentionCount overrule if needed this
                                 if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
                                 {
@@ -614,6 +614,7 @@ public class DefaultSnapshotRemover
 
         }
 
+        //TODO KR consider extracting this method out to an interface for reuse
         private void updateMetadataIfNecessary( WalkerContext context, StorageCollectionItem coll )
             throws Exception
         {
