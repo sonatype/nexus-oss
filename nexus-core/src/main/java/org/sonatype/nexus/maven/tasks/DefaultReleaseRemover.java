@@ -119,9 +119,9 @@ public class DefaultReleaseRemover
 
         MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
 
-        if ( RepositoryPolicy.SNAPSHOT.equals( mavenRepository.getRepositoryPolicy() ) )
+        if ( !RepositoryPolicy.RELEASE.equals( mavenRepository.getRepositoryPolicy() ) )
         {
-            getLogger().debug( "Skipping '{}' because it is a snapshot repository", repository.getId() );
+            getLogger().debug( "Skipping '{}' because it is a snapshot or mixed repository", repository.getId() );
             return false;
         }
 
@@ -129,8 +129,8 @@ public class DefaultReleaseRemover
         return true;
     }
 
-    private ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                    final ReleaseRemovalRequest request )
+    public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
+                                                                   final ReleaseRemovalRequest request )
     {
         TaskUtil.checkInterruption();
         ReleaseRemovalResult result = new ReleaseRemovalResult( repository.getId() );
