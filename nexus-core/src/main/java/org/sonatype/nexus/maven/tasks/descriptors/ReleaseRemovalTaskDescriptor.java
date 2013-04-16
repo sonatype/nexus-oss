@@ -23,6 +23,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoComboFormField;
+import org.sonatype.nexus.formfields.RepoTargetComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
@@ -45,12 +46,12 @@ public class ReleaseRemovalTaskDescriptor
     public static final String REPOSITORY_TARGET_FIELD_ID = "repositoryTarget";
 
     private final List<FormField> formFields = ImmutableList.<FormField>of(
-        //TODO - KR add label and helpText?
         new RepoComboFormField( REPOSITORY_FIELD_ID, FormField.MANDATORY ),
         new NumberTextFormField(
             NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID, "Number to keep", "The number of versions for each GA to keep",
             FormField.MANDATORY ),
-        new StringTextFormField( REPOSITORY_TARGET_FIELD_ID, "Repository Target", "TODO - KR", FormField.OPTIONAL )
+        new RepoTargetComboFormField( REPOSITORY_TARGET_FIELD_ID, "Repository Target",
+                                      "Select a repository target to apply", FormField.OPTIONAL )
     );
 
     public String getId()
