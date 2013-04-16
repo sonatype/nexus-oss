@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -50,12 +50,14 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
+import org.sonatype.nexus.proxy.target.Target;
+import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.proxy.target.TargetStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 import org.sonatype.scheduling.TaskUtil;
 
@@ -69,19 +71,23 @@ public class DefaultReleaseRemover
     implements ReleaseRemover
 {
 
-    private RepositoryRegistry repositoryRegistry;
+    private final RepositoryRegistry repositoryRegistry;
 
-    private Walker walker;
+    private final TargetRegistry targetRegistry;
 
-    private ContentClass maven2ContentClass;
+    private final Walker walker;
 
-    private VersionParser versionScheme = new GenericVersionParser();
+    private final ContentClass maven2ContentClass;
+
+    private final VersionParser versionScheme = new GenericVersionParser();
 
     @Inject
-    public DefaultReleaseRemover( final RepositoryRegistry repositoryRegistry, final Walker walker,
+    public DefaultReleaseRemover( final RepositoryRegistry repositoryRegistry, final TargetRegistry targetRegistry,
+                                  final Walker walker,
                                   final @Named( "maven2" ) ContentClass maven2ContentClass )
     {
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
+        this.targetRegistry = targetRegistry;
         this.walker = checkNotNull( walker );
         this.maven2ContentClass = checkNotNull( maven2ContentClass );
     }
@@ -94,7 +100,16 @@ public class DefaultReleaseRemover
         ReleaseRemovalResult result = new ReleaseRemovalResult( request.getRepositoryId() );
 
         Repository repository = repositoryRegistry.getRepository( request.getRepositoryId() );
-        if ( !process( request, result, repository ) )
+        Target repositoryTarget = targetRegistry.getRepositoryTarget( request.getTargetId() );
+
+        if ( StringUtils.isNotBlank( request.getTargetId() ) && repositoryTarget == null )
+        {
+            throw new IllegalStateException(
+                "The specified repository target does not exist. Perhaps it has been deleted since this repository target was configured? Target id = "
+                    + request.getTargetId() );
+        }
+
+        if ( !process( request, result, repository, repositoryTarget ) )
         {
             throw new IllegalArgumentException( "The repository with ID=" + repository.getId() + " is not valid for "
                                                     + ID );
@@ -104,7 +119,7 @@ public class DefaultReleaseRemover
     }
 
     private boolean process( final ReleaseRemovalRequest request, final ReleaseRemovalResult result,
-                             final Repository repository )
+                             final Repository repository, final Target repositoryTarget )
     {
         if ( !repository.getRepositoryContentClass().isCompatible( maven2ContentClass ) )
         {
@@ -138,13 +153,14 @@ public class DefaultReleaseRemover
             return false;
         }
 
-        removeReleasesFromMavenRepository( mavenRepository, request, result );
+        removeReleasesFromMavenRepository( mavenRepository, request, result, repositoryTarget );
         return true;
     }
 
     public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
                                                                    final ReleaseRemovalRequest request,
-                                                                   final ReleaseRemovalResult result )
+                                                                   final ReleaseRemovalResult result,
+                                                                   final Target repositoryTarget )
     {
         TaskUtil.checkInterruption();
 
@@ -154,11 +170,12 @@ public class DefaultReleaseRemover
         }
 
         getLogger().debug(
-            "Collecting deletable releases on repository " + repository.getId() + " from storage directory "
+            "Collecting deletable releases on repository '" + repository.getId() + "' from storage directory "
                 + repository.getLocalUrl() );
 
         DefaultWalkerContext ctxMain =
-            new DefaultWalkerContext( repository, new ResourceStoreRequest( "/" ), new DottedStoreWalkerFilter() );
+            new DefaultWalkerContext( repository, new ResourceStoreRequest( "/" ),
+                                      determineFilter( repositoryTarget ) );
 
         ctxMain.getContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, DeleteOperation.MOVE_TO_TRASH );
 
@@ -171,6 +188,18 @@ public class DefaultReleaseRemover
             result.setSuccessful( false );
         }
         return result;
+    }
+
+    /**
+     * Create an appropriate filter based on the repositoryTarget
+     */
+    private WalkerFilter determineFilter( final Target repositoryTarget )
+    {
+        if ( repositoryTarget == null )
+        {
+            return new DottedStoreWalkerFilter();
+        }
+        return new DottedTargetStoreWalkerFilter( repositoryTarget );
     }
 
     private class ReleaseRemovalWalkerProcessor
@@ -324,6 +353,7 @@ public class DefaultReleaseRemover
                     {
                         for ( StorageFileItem storageFileItem : versions.get( version ) )
                         {
+                            getLogger().debug( "Deleting item: {}", storageFileItem );
                             repository.deleteItem( createResourceStoreRequest( storageFileItem, context ) );
                             deletedFiles++;
                         }
@@ -340,6 +370,38 @@ public class DefaultReleaseRemover
             }
             result.setDeletedFileCount( deletedFiles );
             result.setSuccessful( true );
+        }
+    }
+
+    /**
+     * In addition to ignoring dotted files, will also check that files match the target.
+     */
+    private class DottedTargetStoreWalkerFilter
+        extends DottedStoreWalkerFilter
+    {
+
+        private final Target repositoryTarget;
+
+        public DottedTargetStoreWalkerFilter(
+            final Target repositoryTarget )
+        {
+            this.repositoryTarget = repositoryTarget;
+        }
+
+        @Override
+        protected boolean shouldProcessItem( final StorageItem item )
+        {
+            boolean b = super.shouldProcessItem( item ) &&
+                repositoryTarget.isPathContained(
+                    item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item.getPath() );
+            getLogger().error( "Processing item {} = {}", item.getPath(), b );
+            return b;
+        }
+
+        @Override
+        public boolean shouldProcessRecursively( final WalkerContext ctx, final StorageCollectionItem coll )
+        {
+            return super.shouldProcessItem( coll );
         }
     }
 }

@@ -21,10 +21,13 @@ public class ReleaseRemovalRequest
 
     private final int numberOfVersionsToKeep;
 
-    public ReleaseRemovalRequest( final String repositoryId, final int numberOfVersionsToKeep )
+    private final String targetId;
+
+    public ReleaseRemovalRequest( final String repositoryId, final int numberOfVersionsToKeep, final String targetId )
     {
         this.repositoryId = repositoryId;
         this.numberOfVersionsToKeep = numberOfVersionsToKeep;
+        this.targetId = targetId;
     }
 
     public String getRepositoryId()
@@ -35,5 +38,10 @@ public class ReleaseRemovalRequest
     public int getNumberOfVersionsToKeep()
     {
         return numberOfVersionsToKeep;
+    }
+
+    public String getTargetId()
+    {
+        return targetId;
     }
 }

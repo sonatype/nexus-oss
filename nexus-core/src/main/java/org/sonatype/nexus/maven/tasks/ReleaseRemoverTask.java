@@ -15,8 +15,6 @@ package org.sonatype.nexus.maven.tasks;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
@@ -63,8 +61,9 @@ public class ReleaseRemoverTask extends AbstractNexusRepositoriesTask<ReleaseRem
     {
         int numberOfVersionsToKeep = Integer.parseInt(
             getParameter( ReleaseRemovalTaskDescriptor.NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID ) );
+        String targetId = getParameter( ReleaseRemovalTaskDescriptor.REPOSITORY_TARGET_FIELD_ID );
         return releaseRemover.removeReleases(
-            new ReleaseRemovalRequest( getRepositoryId(), numberOfVersionsToKeep ) );
+            new ReleaseRemovalRequest( getRepositoryId(), numberOfVersionsToKeep, targetId ) );
     }
 
     @Override
