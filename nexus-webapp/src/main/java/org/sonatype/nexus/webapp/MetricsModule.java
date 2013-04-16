@@ -16,47 +16,67 @@ import com.yammer.metrics.reporting.PingServlet;
 import com.yammer.metrics.reporting.ThreadDumpServlet;
 import com.yammer.metrics.util.DeadlockHealthCheck;
 import com.yammer.metrics.web.DefaultWebappMetricsFilter;
-
-import javax.inject.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.security.web.guice.SecurityWebFilter;
 
 /**
- * ???
+ * <a href="http://metrics.codahale.com">Yammer Metrics</a> guice configuration.
  *
- * @since 2.4
+ * Installs metrics endpoints:
+ *
+ * <ul>
+ *     <li>/internal/ping</li>
+ *     <li>/internal/threads</li>
+ *     <li>/internal/metrics</li>
+ *     <li>/internal/healthcheck</li>
+ * </ul>
+ *
+ * Protected by {@code metrics-endpoints} permission.
+ *
+ * @since 2.5
  */
 public class MetricsModule
     extends AbstractModule
 {
+    private static final Logger log = LoggerFactory.getLogger(MetricsModule.class);
+
+    private static final String MOUNT_POINT = "/internal";
+
     @Override
     protected void configure() {
         // NOTE: AdminServletModule (metrics-guice intgegration) generates invalid links, so wire up servlets ourselves
+
+        final Clock clock = Clock.defaultClock();
+        bind(Clock.class).toInstance(clock);
+
+        final VirtualMachineMetrics virtualMachineMetrics = VirtualMachineMetrics.getInstance();
+        bind(VirtualMachineMetrics.class).toInstance(virtualMachineMetrics);
+
+        final HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
+        bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
+
+        healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
+
+        final MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
+        bind(MetricsRegistry.class).toInstance(metricsRegistry);
+
+        final JsonFactory jsonFactory = new JsonFactory(new ObjectMapper());
+        bind(JsonFactory.class).toInstance(jsonFactory);
+
+        // FIXME: Sort out if we need to do this.  Its noted in SiestaModule, may be needed here too :-(
+        //bind(SecurityWebFilter.class);
 
         install(new ServletModule()
         {
             @Override
             protected void configureServlets() {
-                Clock clock = Clock.defaultClock();
-                bind(Clock.class).toInstance(clock);
+                serve(MOUNT_POINT + "/ping").with(new PingServlet());
 
-                VirtualMachineMetrics virtualMachineMetrics = VirtualMachineMetrics.getInstance();
-                bind(VirtualMachineMetrics.class).toInstance(virtualMachineMetrics);
+                serve(MOUNT_POINT + "/threads").with(new ThreadDumpServlet(virtualMachineMetrics));
 
-                JsonFactory jsonFactory = new JsonFactory(new ObjectMapper());
-                bind(JsonFactory.class).toInstance(jsonFactory);
-
-                HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
-                bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
-
-                healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
-
-                MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
-                bind(MetricsRegistry.class).toInstance(metricsRegistry);
-
-                serve("/internal/ping").with(new PingServlet());
-
-                serve("/internal/threads").with(new ThreadDumpServlet(virtualMachineMetrics));
-
-                serve("/internal/metrics").with(new MetricsServlet(
+                serve(MOUNT_POINT + "/metrics").with(new MetricsServlet(
                     clock,
                     virtualMachineMetrics,
                     metricsRegistry,
@@ -64,10 +84,27 @@ public class MetricsModule
                     true
                 ));
 
-                serve("/internal/healthcheck").with(new HealthCheckServlet(healthCheckRegistry));
+                serve(MOUNT_POINT + "/healthcheck").with(new HealthCheckServlet(healthCheckRegistry));
 
+                // record metrics for all webapp access
                 filter("/*").through(new DefaultWebappMetricsFilter());
+
+                // configure security
+                filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
             }
         });
+
+        install(new FilterChainModule()
+        {
+            @Override
+            protected void configure() {
+                addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
+
+                // FIXME: This does not work, unsure why...
+                //addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,perms[metrics-endpoints]");
+            }
+        });
+
+        log.info("Metrics support configured");
     }
 }
