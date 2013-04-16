@@ -71,7 +71,7 @@ public abstract class AbstractApplicationStatusSource
     // ==
 
     /**
-     * Returns the SystemStatus, guaranteeing it's consistent state.
+     * Returns the SystemStatus, guaranteeing its consistent state.
      */
     public SystemStatus getSystemStatus()
     {
@@ -89,6 +89,14 @@ public abstract class AbstractApplicationStatusSource
         {
             lock.unlock();
         }
+    }
+
+    /**
+     * Force an update of SystemStatus.
+     */
+    public void updateSystemStatus()
+    {
+        updateSystemStatusIfNeeded( true );
     }
 
     public boolean setState( SystemState state )

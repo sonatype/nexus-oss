@@ -19,10 +19,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.basic.StringConverter;
@@ -35,6 +39,7 @@ import org.restlet.data.Status;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -321,35 +326,44 @@ public abstract class AbstractSecurityPlexusResource
         xstream.registerLocalConverter( UserResource.class, "userId", new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( RoleAndPrivilegeListResource.class, "id", new HtmlUnescapeStringConverter( true) );
 
-        xstream.registerLocalConverter( UserResource.class, "roles", new HtmlUnescapeStringCollectionConverter( xstream ) );
-        xstream.registerLocalConverter( RoleResource.class, "roles", new HtmlUnescapeStringCollectionConverter( xstream ) );
-        xstream.registerLocalConverter( RoleResource.class, "privileges", new HtmlUnescapeStringCollectionConverter( xstream ) );
-        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedRoleIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
-        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedPrivilegeIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
-        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenRoleIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
-        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenPrivilegeIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
+        xstream.registerLocalConverter( UserResource.class, "roles", new HtmlUnescapeStringCollectionConverter( "role" ) );
+        xstream.registerLocalConverter( RoleResource.class, "roles", new HtmlUnescapeStringCollectionConverter( "role" ) );
+        xstream.registerLocalConverter( RoleResource.class, "privileges", new HtmlUnescapeStringCollectionConverter( "privilege" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedRoleIds", new HtmlUnescapeStringCollectionConverter( "selectedRoleId" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedPrivilegeIds",
+                                        new HtmlUnescapeStringCollectionConverter( "selectedPrivilegeId" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenRoleIds", new HtmlUnescapeStringCollectionConverter( "hiddenRoleId" ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenPrivilegeIds", new HtmlUnescapeStringCollectionConverter( "hiddenPrivilegeId" ) );
     }
 
     private static class HtmlUnescapeStringCollectionConverter
-        extends CollectionConverter
+        extends AliasingListConverter
     {
 
-        public HtmlUnescapeStringCollectionConverter( final XStream xstream )
+        public HtmlUnescapeStringCollectionConverter(String alias)
         {
-            super( xstream.getMapper() );
+            super( String.class, alias );
         }
 
         @Override
-        protected void addCurrentElementToCollection( final HierarchicalStreamReader reader,
-                                                      final UnmarshallingContext context,
-                                                      final Collection collection, final Collection target )
+        public Object unmarshal( final HierarchicalStreamReader reader, final UnmarshallingContext context )
         {
-            Object item = readItem(reader, context, collection);
-            if ( item instanceof String )
-            {
-                item = StringEscapeUtils.unescapeHtml( (String) item );
-            }
-            target.add(item);
+            final List<Object> unmarshal = (List<Object>) super.unmarshal( reader, context );
+
+            // return value needs to be a "real" List
+            return Lists.newArrayList( Collections2.transform( unmarshal, new Function() {
+                @Nullable
+                @Override
+                public Object apply( @Nullable final Object input )
+                {
+                    if ( input instanceof String )
+                    {
+                        return StringEscapeUtils.unescapeHtml( (String) input );
+                    }
+
+                    return input;
+                }
+            } ));
         }
     }
 

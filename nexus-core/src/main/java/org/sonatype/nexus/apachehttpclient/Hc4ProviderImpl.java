@@ -126,8 +126,6 @@ public class Hc4ProviderImpl
     private final PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
     /**
-     * Constructor.
-     *
      * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}, must not be {@code null}.
      * @param userAgentBuilder         UA builder component, must not be {@code null}.
      * @param eventBus                 the event bus, must not be {@code null}.
@@ -150,17 +148,19 @@ public class Hc4ProviderImpl
         this.eventBus.register( this );
         this.jmxInstaller.register( sharedConnectionManager );
         getLogger().info(
-            "{} started (connectionPoolMaxSize {}, connectionPoolSize {}, connectionPoolIdleTime {} ms, connectionPoolTimeout {} ms, keepAliveMaxDuration {} ms)",
-            getClass().getSimpleName(), getConnectionPoolMaxSize(), getConnectionPoolSize(),
-            getConnectionPoolIdleTime(), getConnectionPoolTimeout(), getKeepAliveMaxDuration() );
+            "Started (connectionPoolMaxSize {}, connectionPoolSize {}, connectionPoolIdleTime {} ms, connectionPoolTimeout {} ms, keepAliveMaxDuration {} ms)",
+            getConnectionPoolMaxSize(),
+            getConnectionPoolSize(),
+            getConnectionPoolIdleTime(),
+            getConnectionPoolTimeout(),
+            getKeepAliveMaxDuration()
+        );
     }
 
     // configuration
 
     /**
      * Returns the pool max size.
-     *
-     * @return pool max size
      */
     protected int getConnectionPoolMaxSize()
     {
@@ -169,8 +169,6 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool size per route.
-     *
-     * @return pool per route size
      */
     protected int getConnectionPoolSize()
     {
@@ -179,8 +177,6 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the connection pool idle (idle as unused but pooled) time in milliseconds.
-     *
-     * @return idle time in milliseconds.
      */
     protected long getConnectionPoolIdleTime()
     {
@@ -189,8 +185,6 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool timeout in milliseconds.
-     *
-     * @return pool timeout in milliseconds.
      */
     protected long getConnectionPoolTimeout()
     {
@@ -209,7 +203,7 @@ public class Hc4ProviderImpl
         jmxInstaller.unregister();
         sharedConnectionManager.shutdown();
         eventBus.unregister( this );
-        getLogger().info( "{} stopped.", getClass().getSimpleName() );
+        getLogger().info( "Stopped" );
     }
 
     @Subscribe

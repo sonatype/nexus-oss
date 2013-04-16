@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.apachehttpclient;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +21,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
@@ -81,8 +81,6 @@ public class Hc4ProviderBase
     private final UserAgentBuilder userAgentBuilder;
 
     /**
-     * Constructor.
-     *
      * @param userAgentBuilder UA builder component, must not be {@code null}.
      */
     @Inject
@@ -128,8 +126,6 @@ public class Hc4ProviderBase
 
     /**
      * Returns the maximum Keep-Alive duration in milliseconds.
-     *
-     * @return default Keep-Alive duration in milliseconds.
      */
     protected long getKeepAliveMaxDuration()
     {
@@ -138,9 +134,6 @@ public class Hc4ProviderBase
 
     /**
      * Returns the connection timeout in milliseconds. The timeout until connection is established.
-     *
-     * @param context
-     * @return the connection timeout in milliseconds.
      */
     protected int getConnectionTimeout( final RemoteStorageContext context )
     {
@@ -157,9 +150,6 @@ public class Hc4ProviderBase
 
     /**
      * Returns the SO_SOCKET timeout in milliseconds. The timeout for waiting for data on established connection.
-     *
-     * @param context
-     * @return the SO_SOCKET timeout in milliseconds.
      */
     protected int getSoTimeout( final RemoteStorageContext context )
     {
@@ -181,7 +171,7 @@ public class Hc4ProviderBase
                 authScope = proxyHost.toHostString() + " proxy";
             }
 
-            List<String> authorisationPreference = new ArrayList<String>( 2 );
+            List<String> authorisationPreference = Lists.newArrayListWithExpectedSize(3);
             authorisationPreference.add( AuthPolicy.DIGEST );
             authorisationPreference.add( AuthPolicy.BASIC );
             Credentials credentials = null;
@@ -194,7 +184,7 @@ public class Hc4ProviderBase
                 final NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
                 // Using NTLM auth, adding it as first in policies
                 authorisationPreference.add( 0, AuthPolicy.NTLM );
-                getLogger().info( "... {} authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain() );
+                getLogger().debug("{} authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain());
                 credentials = new NTCredentials(
                     nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
                 );
@@ -203,8 +193,8 @@ public class Hc4ProviderBase
             {
                 final UsernamePasswordRemoteAuthenticationSettings uras =
                     (UsernamePasswordRemoteAuthenticationSettings) ras;
-                getLogger().info( "... {} authentication setup for remote storage with username '{}'", authScope,
-                                  uras.getUsername() );
+                getLogger().debug("{} authentication setup for remote storage with username '{}'", authScope,
+                    uras.getUsername());
                 credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
             }
 
@@ -228,7 +218,7 @@ public class Hc4ProviderBase
     {
         if ( remoteProxySettings.isEnabled() )
         {
-            getLogger().info( "... proxy setup with host '{}'", remoteProxySettings.getHostname() );
+            getLogger().debug("proxy setup with host '{}'", remoteProxySettings.getHostname());
 
             final HttpHost proxy = new HttpHost( remoteProxySettings.getHostname(), remoteProxySettings.getPort() );
             httpClient.getParams().setParameter( ConnRoutePNames.DEFAULT_PROXY, proxy );
@@ -236,7 +226,7 @@ public class Hc4ProviderBase
             // check if we have non-proxy hosts
             if ( remoteProxySettings.getNonProxyHosts() != null && !remoteProxySettings.getNonProxyHosts().isEmpty() )
             {
-                final Set<Pattern> nonProxyHostPatterns = new HashSet<Pattern>(
+                final Set<Pattern> nonProxyHostPatterns = Sets.newHashSetWithExpectedSize(
                     remoteProxySettings.getNonProxyHosts().size()
                 );
                 for ( String nonProxyHostRegex : remoteProxySettings.getNonProxyHosts() )

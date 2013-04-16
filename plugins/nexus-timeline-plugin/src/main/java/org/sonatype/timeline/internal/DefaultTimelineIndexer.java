@@ -12,6 +12,7 @@
  */
 package org.sonatype.timeline.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -43,6 +44,9 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
@@ -62,6 +66,8 @@ public class DefaultTimelineIndexer
 
     // ==
 
+    private final String luceneFSDirectoryType;
+
     private Directory directory;
 
     private IndexWriter indexWriter;
@@ -69,6 +75,24 @@ public class DefaultTimelineIndexer
     private SearcherManager searcherManager;
 
     private int generation = 0;
+
+    /**
+     * Constructor. The {@code luceneFSDirectoryType} is copied from nexus-indexer-lucene-plugin's DefaultIndexerManager
+     * as part of fix for NEXUS-5658:
+     * <p>
+     * As of 3.6.1, Lucene provides three FSDirectory implementations, all with there pros and cons.
+     * <ul>
+     * <li>mmap -- {@link MMapDirectory}</li>
+     * <li>nio -- {@link NIOFSDirectory}</li>
+     * <li>simple -- {@link SimpleFSDirectory}</li>
+     * </ul>
+     * By default, Lucene selects FSDirectory implementation based on specifics of the operating system and JRE used,
+     * but this configuration parameter allows override.
+     */
+    public DefaultTimelineIndexer( final String luceneFSDirectoryType )
+    {
+        this.luceneFSDirectoryType = luceneFSDirectoryType;
+    }
 
     // ==
     // Public API
@@ -81,7 +105,7 @@ public class DefaultTimelineIndexer
         {
             directory.close();
         }
-        directory = FSDirectory.open( configuration.getIndexDirectory() );
+        directory = openFSDirectory( configuration.getIndexDirectory() );
         if ( IndexReader.indexExists( directory ) )
         {
             if ( IndexWriter.isLocked( directory ) )
@@ -99,6 +123,35 @@ public class DefaultTimelineIndexer
 
         searcherManager = new SearcherManager( indexWriter, false, new SearcherFactory() );
         generation = generation + 1;
+    }
+
+    private FSDirectory openFSDirectory( final File location )
+        throws IOException
+    {
+        if ( luceneFSDirectoryType == null )
+        {
+            // let Lucene select implementation
+            return FSDirectory.open( location );
+        }
+        else if ( "mmap".equals( luceneFSDirectoryType ) )
+        {
+            return new MMapDirectory( location );
+        }
+        else if ( "nio".equals( luceneFSDirectoryType ) )
+        {
+            return new NIOFSDirectory( location );
+        }
+        else if ( "simple".equals( luceneFSDirectoryType ) )
+        {
+            return new SimpleFSDirectory( location );
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                "''"
+                    + luceneFSDirectoryType
+                    + "'' is not valid/supported Lucene FSDirectory type. Only ''mmap'', ''nio'' and ''simple'' are allowed" );
+        }
     }
 
     protected void stop()
@@ -146,8 +199,8 @@ public class DefaultTimelineIndexer
     }
 
     protected void retrieve( final long fromTime, final long toTime, final Set<String> types,
-        final Set<String> subTypes,
-        int from, int count, final TimelineFilter filter, final TimelineCallback callback )
+                             final Set<String> subTypes, int from, int count, final TimelineFilter filter,
+                             final TimelineCallback callback )
         throws IOException
     {
         if ( count == 0 )
@@ -178,7 +231,7 @@ public class DefaultTimelineIndexer
                 // return
                 topDocs =
                     searcher.search( buildQuery( fromTime, toTime, types, subTypes ), null, Integer.MAX_VALUE,
-                                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                        new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
             }
             if ( topDocs.scoreDocs.length == 0 )
             {
@@ -240,7 +293,7 @@ public class DefaultTimelineIndexer
             // just to know how many will we delete, will not actually load 'em up
             final TopFieldDocs topDocs =
                 searcher.search( q, null, searcher.maxDoc(),
-                                 new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                    new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
             if ( topDocs.scoreDocs.length == 0 )
             {
                 // nothing matched to be purged
@@ -279,7 +332,7 @@ public class DefaultTimelineIndexer
     {
         final Document doc = new Document();
         doc.add( new Field( TIMESTAMP, DateTools.timeToString( record.getTimestamp(), TIMELINE_RESOLUTION ),
-                            Field.Store.YES, Field.Index.NOT_ANALYZED ) );
+            Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         doc.add( new Field( TYPE, record.getType(), Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         doc.add( new Field( SUBTYPE, record.getSubType(), Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         for ( Map.Entry<String, String> dataEntry : record.getData().entrySet() )
@@ -294,14 +347,14 @@ public class DefaultTimelineIndexer
         if ( isEmptySet( types ) && isEmptySet( subTypes ) )
         {
             return new TermRangeQuery( TIMESTAMP, DateTools.timeToString( from, TIMELINE_RESOLUTION ),
-                                       DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true );
+                DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true );
         }
         else
         {
             final BooleanQuery result = new BooleanQuery();
             result.add(
                 new TermRangeQuery( TIMESTAMP, DateTools.timeToString( from, TIMELINE_RESOLUTION ),
-                                    DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true ), Occur.MUST );
+                    DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true ), Occur.MUST );
             if ( !isEmptySet( types ) )
             {
                 final BooleanQuery typeQ = new BooleanQuery();

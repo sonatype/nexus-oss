@@ -41,6 +41,7 @@ import org.sonatype.guice.nexus.binders.NexusAnnotatedBeanModule;
 import org.sonatype.guice.plexus.binders.PlexusXmlBeanModule;
 import org.sonatype.guice.plexus.config.PlexusBeanModule;
 import org.sonatype.inject.Parameters;
+import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.guice.NexusModules.PluginModule;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
@@ -92,6 +93,8 @@ public class DefaultNexusPluginManager
 
     private final Map<String, String> variables;
 
+    private final List<AbstractInterceptorModule> interceptorModules;
+
     private final Map<GAVCoordinate, PluginDescriptor> activePlugins = new HashMap<GAVCoordinate, PluginDescriptor>();
 
     private final Map<GAVCoordinate, PluginResponse> pluginResponses = new HashMap<GAVCoordinate, PluginResponse>();
@@ -104,7 +107,8 @@ public class DefaultNexusPluginManager
                                       final PluginRepositoryManager repositoryManager,
                                       final DefaultPlexusContainer container,
                                       final MimeSupport mimeSupport,
-                                      final @Parameters Map<String, String> variables )
+                                      final @Parameters Map<String, String> variables,
+                                      final List<AbstractInterceptorModule> interceptorModules )
     {
         this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
         this.eventBus = checkNotNull( eventBus );
@@ -112,6 +116,7 @@ public class DefaultNexusPluginManager
         this.container = checkNotNull( container );
         this.mimeSupport = checkNotNull( mimeSupport );
         this.variables = checkNotNull( variables );
+        this.interceptorModules = checkNotNull( interceptorModules );
     }
 
     // ----------------------------------------------------------------------
@@ -464,12 +469,12 @@ public class DefaultNexusPluginManager
         final ClassSpace annSpace = new URLClassSpace( pluginRealm, scanList.toArray( new URL[scanList.size()] ) );
         beanModules.add( new NexusAnnotatedBeanModule( annSpace, variables, exportedClassNames, repositoryTypes ) );
 
-        final Module[] modules = {
-            resourceModule,
-            new PluginModule()
-        };
+        final List<Module> modules = new ArrayList<Module>();
+        modules.add( resourceModule );
+        modules.add( new PluginModule() );
+        modules.addAll( interceptorModules );
 
-        container.addPlexusInjector( beanModules, modules );
+        container.addPlexusInjector( beanModules, modules.toArray( new Module[modules.size()] ) );
 
         for ( final RepositoryTypeDescriptor r : repositoryTypes )
         {

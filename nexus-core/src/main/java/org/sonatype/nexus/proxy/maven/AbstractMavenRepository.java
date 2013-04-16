@@ -47,8 +47,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
-import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -459,17 +459,17 @@ public abstract class AbstractMavenRepository
         {
             return false;
         }
-        // apply WLFilter to "normal" requests only, not hidden (which is meta or plain hidden)
+        // apply autorouting filter to "normal" requests only, not hidden (which is meta or plain hidden)
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
             // but filter it only if request is not marked as NFS
-            if ( !request.getRequestContext().containsKey( WLManager.WL_REQUEST_NFS_FLAG_KEY ) )
+            if ( !request.getRequestContext().containsKey( Manager.ROUTING_REQUEST_NFS_FLAG_KEY ) )
             {
-                final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
-                if ( !whitelistMatched )
+                final boolean proxyFilterAllowed = getProxyRequestFilter().allowed( this, request );
+                if ( !proxyFilterAllowed )
                 {
-                    getLogger().debug( "WL filter rejected remote request for path {} in {}.",
+                    getLogger().debug( "Automatic routing filter rejected remote request for path {} in {}.",
                         request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) );
                     return false;
                 }
@@ -590,7 +590,7 @@ public abstract class AbstractMavenRepository
     }
 
     /**
-     * Beside original behavior, only add to NFC when it's not WL that rejected remote access.
+     * Beside original behavior, only add to NFC when remote access is not rejected by autorouting.
      * 
      * @since 2.4
      */
@@ -598,11 +598,11 @@ public abstract class AbstractMavenRepository
     protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
     {
         boolean shouldAddToNFC = super.shouldAddToNotFoundCache( request );
-        if ( shouldAddToNFC && request.getRequestContext().containsKey( WLManager.WL_REQUEST_REJECTED_FLAG_KEY ) )
+        if ( shouldAddToNFC && request.getRequestContext().containsKey( Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY ) )
         {
             // TODO: should we un-flag the request?
             shouldAddToNFC = false;
-            getLogger().debug( "Maven proxy repository {} WL rejected this request, not adding path {} to NFC.",
+            getLogger().debug( "Maven proxy repository {} autorouting rejected this request, not adding path {} to NFC.",
                 RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() );
         }
         return shouldAddToNFC;
