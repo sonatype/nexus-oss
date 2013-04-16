@@ -3,6 +3,8 @@ package org.sonatype.nexus.maven.tasks;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * Simple struct for consolidating results of ReleaseRemoval task.
+ *
  * @since 2.5
  */
 public class ReleaseRemovalResult
