@@ -14,7 +14,7 @@
 define('repoServer',
   [
     'Nexus/repository/AbstractRepoPanel',
-    'repoServer/FeedViewPanel',
+    'Sonatype/repoServer/ArtifactContainer',
     'repoServer/PrivilegeEditPanel',
     'repoServer/RepoEditPanel',
     'repoServer/RepoMaintPanel',
