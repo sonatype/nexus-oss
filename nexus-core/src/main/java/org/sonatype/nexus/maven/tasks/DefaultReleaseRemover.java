@@ -87,7 +87,7 @@ public class DefaultReleaseRemover
                                   final @Named( "maven2" ) ContentClass maven2ContentClass )
     {
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
-        this.targetRegistry = targetRegistry;
+        this.targetRegistry = checkNotNull(targetRegistry);
         this.walker = checkNotNull( walker );
         this.maven2ContentClass = checkNotNull( maven2ContentClass );
     }
