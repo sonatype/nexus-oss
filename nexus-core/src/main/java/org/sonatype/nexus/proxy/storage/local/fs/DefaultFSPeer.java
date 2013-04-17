@@ -119,7 +119,8 @@ public class DefaultFSPeer
 
                 os.flush();
             }
-            catch ( EOFException e ) // NXCM-4852: Upload premature end (thrown by Jetty org.eclipse.jetty.io.EofException)
+            catch ( EOFException e ) // NXCM-4852: Upload premature end (thrown by Jetty
+                                     // org.eclipse.jetty.io.EofException)
             {
                 if ( hiddenTarget != null )
                 {
@@ -130,7 +131,8 @@ public class DefaultFSPeer
                     "EOF during storing on path \"%s\" (while writing to hiddenTarget: \"%s\")",
                     item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath() ), e );
             }
-            catch ( RemoteStorageEOFException e ) // NXCM-4852: Proxy remote peer response premature end (should be translated by RRS)
+            catch ( RemoteStorageEOFException e ) // NXCM-4852: Proxy remote peer response premature end (should be
+                                                  // translated by RRS)
             {
                 if ( hiddenTarget != null )
                 {
