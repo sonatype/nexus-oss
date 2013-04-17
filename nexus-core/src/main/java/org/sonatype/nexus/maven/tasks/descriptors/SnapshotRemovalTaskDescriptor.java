@@ -44,14 +44,15 @@ public class SnapshotRemovalTaskDescriptor
 
     private final NumberTextFormField minToKeepField =
         new NumberTextFormField( MIN_TO_KEEP_FIELD_ID, "Minimum snapshot count",
-                                 "Minimum number of snapshots to keep for one GAV.", FormField.OPTIONAL );
+                                 "Minimum number of snapshots to keep for one GAV.",
+                                 FormField.MANDATORY );
 
     private final NumberTextFormField keepDaysField =
         new NumberTextFormField(
                                  KEEP_DAYS_FIELD_ID,
                                  "Snapshot retention (days)",
                                  "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep.",
-                                 FormField.OPTIONAL );
+                                 FormField.MANDATORY );
 
     private final CheckboxFormField removeWhenReleasedField =
         new CheckboxFormField(

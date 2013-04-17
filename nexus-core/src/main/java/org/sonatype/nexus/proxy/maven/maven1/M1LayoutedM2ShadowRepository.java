@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -89,13 +91,13 @@ public class M1LayoutedM2ShadowRepository
     }
 
     @Override
-    protected String transformMaster2Shadow( final String path )
+    protected List<String> transformMaster2Shadow( final String path )
     {
-        return transformM2toM1( path );
+        return transformM2toM1( path, null );
     }
 
     @Override
-    protected String transformShadow2Master( final String path )
+    protected List<String> transformShadow2Master( final String path )
     {
         return transformM1toM2( path );
     }

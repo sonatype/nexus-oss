@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,7 +23,7 @@ import java.io.InputStream;
  * @author cstamas
  */
 public abstract class AbstractWrappingContentLocator
-    implements ContentLocator
+    implements ContentLocator, Closeable
 {
     private final ContentLocator contentLocator;
 
@@ -53,5 +54,23 @@ public abstract class AbstractWrappingContentLocator
     public boolean isReusable()
     {
         return getTarget().isReusable();
+    }
+
+    /**
+     * Cleans up, closes the wrapped content locator, if it is instance of {@link Closeable}. To be used in cases when
+     * you actually don't need the stream (as some error cropped up), and you never requested the stream instance using
+     * {@link #getContent()}.
+     * 
+     * @throws IOException if an I/O error occurs.
+     * @since 2.5
+     */
+    @Override
+    public void close()
+        throws IOException
+    {
+        if ( contentLocator instanceof Closeable )
+        {
+            ( (Closeable) contentLocator ).close();
+        }
     }
 }
