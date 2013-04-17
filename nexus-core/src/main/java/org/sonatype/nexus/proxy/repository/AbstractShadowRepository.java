@@ -130,6 +130,7 @@ public abstract class AbstractShadowRepository
     @Override
     public void onRepositoryItemEvent( final RepositoryItemEvent ievt )
     {
+		// NEXUS-5673: do we need to act on event at all?
         if ( !getLocalStatus().shouldServiceRequest() )
         {
             return;
@@ -150,6 +151,7 @@ public abstract class AbstractShadowRepository
             }
             catch ( UnsupportedStorageOperationException e )
             {
+				// NEXUS-5673
                 // this should be a bug? Could happen in case when master instructs shadow to create a link for a
                 // release artifact, while this shadow has a snapshot repository policy. Then, how was this shapshot
                 // made a shadow of release repository?
@@ -157,12 +159,14 @@ public abstract class AbstractShadowRepository
             }
             catch ( IllegalOperationException e )
             {
+				// NEXUS-5673
                 // repo out of service should be handled above
                 // maybe a ReadOnly shadow?
                 getLogger().debug( "Shadow {} refuses to maintain links, ignoring event {}", this, ievt, e );
             }
             catch ( ItemNotFoundException e )
             {
+				// NEXUS-5673
                 // happens regularly for parents, as those are not transformed and just pollutes the log
                 // similar for M2 checksum files
                 getLogger().debug( "Corresponding item in {} for master path not found, ignoring event {}", this, ievt );

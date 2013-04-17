@@ -506,7 +506,7 @@ public abstract class LayoutConverterShadowRepository
             }
             catch ( ItemNotFoundException e )
             {
-                // just ignore it silently, this might happen when
+                // NEXUS-5673: just ignore it silently, this might happen when
                 // link to be deleted was not found in shadow (like a parent folder was deleted
                 // or M2 checksum file in master)
                 // simply ignoring this is okay, as our initial goal is to lessen log spam.
