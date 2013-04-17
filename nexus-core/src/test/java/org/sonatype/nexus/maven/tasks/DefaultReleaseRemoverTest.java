@@ -38,205 +38,150 @@ import org.sonatype.nexus.proxy.walker.Walker;
 public class DefaultReleaseRemoverTest
 {
 
-    public static final String REPO_ID = "foo-proxy";
+    public static final String REPO_ID = "foo";
+
+    private static final String TARGET_ID = "foo-target";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    public static final Maven2ContentClass MAVEN_2_CONTENT_CLASS = new Maven2ContentClass();
+
+    public static final Maven1ContentClass MAVEN_1_CONTENT_CLASS = new Maven1ContentClass();
 
     @Test
     public void shouldFailOnProxyRepositories()
         throws Exception
     {
-        final Maven2ContentClass maven2ContentClass = new Maven2ContentClass();
         final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
         final TargetRegistry targetRegistry = mock( TargetRegistry.class );
         final Repository proxyRepository = mock( Repository.class );
         final RepositoryKind proxyRepositoryKind = mock( RepositoryKind.class );
 
         when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( proxyRepository );
-        when( proxyRepository.getRepositoryContentClass() ).thenReturn( maven2ContentClass );
+        when( proxyRepository.getRepositoryContentClass() ).thenReturn( MAVEN_2_CONTENT_CLASS );
         when( proxyRepository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( proxyRepository.getRepositoryKind() ).thenReturn( proxyRepositoryKind );
         when( proxyRepositoryKind.isFacetAvailable( ProxyRepository.class ) ).thenReturn( true );
 
         thrown.expect( IllegalArgumentException.class );
-        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), maven2ContentClass )
-        {
-            @Override
-            public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request,
-                                                                           final ReleaseRemovalResult result,
-                                                                           final Target repositoryTarget )
-            {
-                return new ReleaseRemovalResult( repository.getId() );
-            }
-        }.removeReleases(
-            new ReleaseRemovalRequest( REPO_ID, 1, null)
-        );
+        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+            .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, null ) );
     }
 
     @Test
-         public void shouldFailOnNonMaven2Repositories()
-    throws Exception
-{
-    final Maven1ContentClass maven1ContentClass = new Maven1ContentClass();
-    final Maven2ContentClass maven2ContentClass = new Maven2ContentClass();
-    final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
-    final TargetRegistry targetRegistry = mock( TargetRegistry.class );
-    final Repository repository = mock( Repository.class );
-
-    when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
-    when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
-
-    thrown.expect( IllegalArgumentException.class );
-    new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), maven2ContentClass )
+    public void shouldFailOnNonMaven2Repositories()
+        throws Exception
     {
-        @Override
-        public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                       final ReleaseRemovalRequest request,
-                                                                       final ReleaseRemovalResult result,
-                                                                       final Target repositoryTarget )
-        {
-            return new ReleaseRemovalResult( repository.getId() );
-        }
-    }.removeReleases(
-        new ReleaseRemovalRequest( REPO_ID, 1, null)
-    );
-}
+        final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
+        final TargetRegistry targetRegistry = mock( TargetRegistry.class );
+        final Repository repository = mock( Repository.class );
+
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
+        when( repository.getRepositoryContentClass() ).thenReturn( MAVEN_1_CONTENT_CLASS );
+
+        thrown.expect( IllegalArgumentException.class );
+        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+            .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, null ) );
+    }
 
     @Test
     public void shouldFailOnOutOfServiceRepositories()
         throws Exception
     {
-        final Maven2ContentClass maven2ContentClass = new Maven2ContentClass();
         final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
         final TargetRegistry targetRegistry = mock( TargetRegistry.class );
 
         final Repository repository = mock( Repository.class );
 
         when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
-        when( repository.getRepositoryContentClass() ).thenReturn( maven2ContentClass );
+        when( repository.getRepositoryContentClass() ).thenReturn( MAVEN_2_CONTENT_CLASS );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
 
         thrown.expect( IllegalArgumentException.class );
-        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), maven2ContentClass )
-        {
-            @Override
-            public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request,
-                                                                           final ReleaseRemovalResult result,
-                                                                           final Target repositoryTarget )
-            {
-                return new ReleaseRemovalResult( repository.getId() );
-            }
-        }.removeReleases(
-            new ReleaseRemovalRequest( REPO_ID, 1, null)
-        );
+        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+            .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, null ) );
     }
 
     @Test
     public void shouldFailOnGroupRepositories()
         throws Exception
     {
-        final Maven1ContentClass maven1ContentClass = new Maven1ContentClass();
-        final Maven2ContentClass maven2ContentClass = new Maven2ContentClass();
         final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
         final TargetRegistry targetRegistry = mock( TargetRegistry.class );
         final Repository repository = mock( Repository.class );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
 
-
         when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
-        when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
+        when( repository.getRepositoryContentClass() ).thenReturn( MAVEN_2_CONTENT_CLASS );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
         when( repositoryKind.isFacetAvailable( GroupRepository.class ) ).thenReturn( true );
 
         thrown.expect( IllegalArgumentException.class );
-        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), maven2ContentClass )
-        {
-            @Override
-            public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request,
-                                                                           final ReleaseRemovalResult result,
-                                                                           final Target repositoryTarget )
-            {
-                return new ReleaseRemovalResult( repository.getId() );
-            }
-        }.removeReleases(
-            new ReleaseRemovalRequest( REPO_ID, 1, null)
-        );
+        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+            .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, null ) );
     }
 
     @Test
     public void shouldFailOnSnapshotRepositories()
         throws Exception
     {
-        final Maven1ContentClass maven1ContentClass = new Maven1ContentClass();
-        final Maven2ContentClass maven2ContentClass = new Maven2ContentClass();
         final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
         final TargetRegistry targetRegistry = mock( TargetRegistry.class );
         final Repository repository = mock( Repository.class );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
-        final MavenRepository mavenRepository = mock( MavenRepository.class);
+        final MavenRepository mavenRepository = mock( MavenRepository.class );
 
         when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
-        when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
+        when( repository.getRepositoryContentClass() ).thenReturn( MAVEN_2_CONTENT_CLASS );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
         when( repositoryKind.isFacetAvailable( GroupRepository.class ) ).thenReturn( false );
-        when( repository.adaptToFacet( MavenRepository.class )).thenReturn( mavenRepository );
-        when( mavenRepository.getRepositoryPolicy()).thenReturn( RepositoryPolicy.SNAPSHOT );
+        when( repository.adaptToFacet( MavenRepository.class ) ).thenReturn( mavenRepository );
+        when( mavenRepository.getRepositoryPolicy() ).thenReturn( RepositoryPolicy.SNAPSHOT );
 
         thrown.expect( IllegalArgumentException.class );
-        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), maven2ContentClass )
-        {
-            @Override
-            public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request,
-                                                                           final ReleaseRemovalResult result,
-                                                                           final Target repositoryTarget )
-            {
-                return new ReleaseRemovalResult( repository.getId() );
-            }
-        }.removeReleases(
-            new ReleaseRemovalRequest( REPO_ID, 1, null)
-        );
+        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+            .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, null ) );
     }
 
     @Test
     public void shouldFailOnMixedRepositories()
         throws Exception
     {
-        final Maven1ContentClass maven1ContentClass = new Maven1ContentClass();
-        final Maven2ContentClass maven2ContentClass = new Maven2ContentClass();
         final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
         final TargetRegistry targetRegistry = mock( TargetRegistry.class );
         final Repository repository = mock( Repository.class );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
-        final MavenRepository mavenRepository = mock( MavenRepository.class);
+        final MavenRepository mavenRepository = mock( MavenRepository.class );
 
         when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
-        when( repository.getRepositoryContentClass() ).thenReturn( maven1ContentClass );
+        when( repository.getRepositoryContentClass() ).thenReturn( MAVEN_1_CONTENT_CLASS );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
         when( repositoryKind.isFacetAvailable( GroupRepository.class ) ).thenReturn( false );
-        when( repository.adaptToFacet( MavenRepository.class )).thenReturn( mavenRepository );
-        when( mavenRepository.getRepositoryPolicy()).thenReturn( RepositoryPolicy.MIXED );
+        when( repository.adaptToFacet( MavenRepository.class ) ).thenReturn( mavenRepository );
+        when( mavenRepository.getRepositoryPolicy() ).thenReturn( RepositoryPolicy.MIXED );
 
         thrown.expect( IllegalArgumentException.class );
-        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), maven2ContentClass )
-        {
-            @Override
-            public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
-                                                                           final ReleaseRemovalRequest request,
-                                                                           final ReleaseRemovalResult result,
-                                                                           final Target repositoryTarget )
-            {
-                return new ReleaseRemovalResult( repository.getId() );
-            }
-        }.removeReleases(
-            new ReleaseRemovalRequest( REPO_ID, 1, null)
-        );
+        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+            .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, null ) );
+    }
+
+    @Test
+    public void shouldFailOnMissingTarget()
+        throws Exception
+    {
+        final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
+        final TargetRegistry targetRegistry = mock( TargetRegistry.class );
+        final Repository repository = mock( Repository.class );
+
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
+        when( targetRegistry.getRepositoryTarget( TARGET_ID ) ).thenReturn( null );
+
+        thrown.expect( IllegalStateException.class );
+        new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+            .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, TARGET_ID ) );
     }
 }
