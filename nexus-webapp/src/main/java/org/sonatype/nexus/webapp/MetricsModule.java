@@ -57,6 +57,8 @@ public class MetricsModule
         final HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
         bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
 
+        // TODO: Consider making a component which can mediate (via sisu) adding/removing healthcheck components to/from the registry
+        // TODO: For now new instances must be explicitly registered, like this one:
         healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
 
         final MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
