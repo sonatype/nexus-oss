@@ -737,7 +737,6 @@ public class DefaultSnapshotRemover
                 }
             }
 
-            getLogger().info( "--------- {} {} {} {}", snapshotGav.getName(), new Date(releaseTimestamp), new Date(startTime), new Date(releaseTimestamp + gracePeriodInMillis) );
             return releaseTimestamp == 0  // 0 when item creation day is unknown
                 || ( releaseTimestamp > 0 && startTime > releaseTimestamp + gracePeriodInMillis );
         }
