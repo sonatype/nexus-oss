@@ -47,7 +47,7 @@ public class ResourceStoreRequest
 
     /**
      * Constructor.
-     *
+     * 
      * @param requestPath the request path.
      * @param localOnly See {@link RequestContext#CTX_LOCAL_ONLY_FLAG}.
      * @param remoteOnly See {@link RequestContext#CTX_REMOTE_ONLY_FLAG}.
@@ -65,7 +65,7 @@ public class ResourceStoreRequest
 
     /**
      * Shortcut constructor.
-     *
+     * 
      * @param requestPath
      * @param localOnly
      * @deprecated use {@link #ResourceStoreRequest(String, boolean, boolean)} instead.
@@ -77,7 +77,7 @@ public class ResourceStoreRequest
 
     /**
      * Shortcut constructor.
-     *
+     * 
      * @param requestPath
      */
     public ResourceStoreRequest( String requestPath )
@@ -266,7 +266,7 @@ public class ResourceStoreRequest
      */
     public List<String> getProcessedRepositories()
     {
-        return Collections.unmodifiableList( processedRepositories);
+        return Collections.unmodifiableList( processedRepositories );
     }
 
     /**
@@ -396,12 +396,8 @@ public class ResourceStoreRequest
     @Override
     public String toString()
     {
-        return "ResourceStoreRequest{" +
-            "requestPath='" + requestPath + '\'' +
-            ", requestContext=" + requestContext +
-            ", pathStack=" + pathStack +
-            ", processedRepositories=" + processedRepositories +
-            ", appliedMappings=" + appliedMappings +
-            '}';
+        return "ResourceStoreRequest{" + "requestPath='" + requestPath + '\'' + ", requestContext=" + requestContext
+            + ", pathStack=" + pathStack + ", processedRepositories=" + processedRepositories + ", appliedMappings="
+            + appliedMappings + '}';
     }
 }

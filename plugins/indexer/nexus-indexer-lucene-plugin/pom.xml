@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.nexus.indexer-lucene</groupId>
     <artifactId>nexus-indexer-lucene</artifactId>
-    <version>2.4-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -31,7 +31,7 @@
     <pluginName>Nexus Indexer Lucene Plugin</pluginName>
     <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
 
-    <mavenIndexer.version>5.1.1</mavenIndexer.version>
+    <mavenIndexer.version>5.1.2-c65990c</mavenIndexer.version>
     <aether.version>1.13.1</aether.version>
   </properties>
 

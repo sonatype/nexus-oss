@@ -52,7 +52,7 @@ public class TransitioningAttributeStorage
     public Attributes getAttributes( final RepositoryItemUid uid )
         throws IOException
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.read );
 
@@ -82,7 +82,7 @@ public class TransitioningAttributeStorage
     public void putAttributes( final RepositoryItemUid uid, final Attributes item )
         throws IOException
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.create );
 
@@ -118,7 +118,7 @@ public class TransitioningAttributeStorage
     public boolean deleteAttributes( final RepositoryItemUid uid )
         throws IOException
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.delete );
 

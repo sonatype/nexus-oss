@@ -14,6 +14,7 @@ package org.sonatype.nexus.client.core.subsystem.content;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @since 2.1
@@ -36,6 +37,12 @@ public interface Content
 
     void downloadWith( Location location, Directive directive, File target )
         throws IOException;
+
+    /**
+     * @since 2.4 
+     */
+    void downloadWith( Location location, Directive directive, OutputStream target )
+                    throws IOException;
 
     void upload( Location location, File target )
         throws IOException;

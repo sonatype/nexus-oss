@@ -12,7 +12,10 @@
  */
 package org.sonatype.nexus.timing;
 
-import com.google.inject.AbstractModule;
+import javax.inject.Named;
+
+import org.sonatype.nexus.guice.AbstractInterceptorModule;
+
 import com.google.inject.matcher.Matchers;
 
 /**
@@ -22,8 +25,9 @@ import com.google.inject.matcher.Matchers;
  *
  * @since 2.4
  */
+@Named
 public class TimingModule
-    extends AbstractModule
+    extends AbstractInterceptorModule
 {
     @Override
     protected void configure() {

@@ -93,11 +93,27 @@ NX.define('Nexus.util.IconContainer', {
     ],
 
     /**
+     * Array of styles (Strings) for each defined icon.
+     *
+     * @private
+     * @type {Array}
+     */
+    styles: undefined,
+
+    /**
+     * Reference to installed stylesheet.
+     *
+     * @private
+     * @type {Stylesheet}
+     */
+    stylesheet: undefined,
+
+    /**
      * Defined icons.
      *
      * @private
      */
-    icons: {},
+    icons: undefined,
 
     /**
      * Base-path for images.
@@ -124,7 +140,8 @@ NX.define('Nexus.util.IconContainer', {
             config = config || {},
             icons;
 
-        // if we don't do that, all instances will use the same object from this prototype
+        // assign values to fields to avoid using the prototype's storage
+        self.styles = [];
         self.icons = {};
 
         // apply defaults to configuration
@@ -146,6 +163,11 @@ NX.define('Nexus.util.IconContainer', {
         Ext.iterate(icons, function (key, value, obj) {
             self.loadIcon(key, value);
         });
+
+        // TODO: Need to optimize this further, so that there is a shared stylesheet to avoid >31 limitation on IE{8,9,?}
+
+        // Install all icons styles into a single stylesheet for this container
+        self.stylesheet = Ext.util.CSS.createStyleSheet(self.styles.join(' '));
 
         // TODO: Pre-load all icons into browser
 
@@ -262,11 +284,8 @@ NX.define('Nexus.util.IconContainer', {
 
             self.logDebug('Defining icon:', name, 'cls:', cls, 'path:', iconPath);
 
-            // install stylesheet for icon
-            Ext.util.CSS.createStyleSheet(
-                '.' + cls + ' { background: url(' + iconPath + ') no-repeat !important; }',
-                cls // use class as id
-            );
+            // append style for icon, will be appended to icon containers stylesheet
+            self.styles.push('.' + cls + ' { background: url(' + iconPath + ') no-repeat !important; }');
 
             /**
              * Icon.

@@ -74,7 +74,7 @@ public class DefaultLSAttributeStorage
     public boolean deleteAttributes( final RepositoryItemUid uid )
         throws IOException
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.delete );
 
@@ -116,7 +116,7 @@ public class DefaultLSAttributeStorage
     public Attributes getAttributes( final RepositoryItemUid uid )
         throws IOException
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.read );
 
@@ -138,7 +138,7 @@ public class DefaultLSAttributeStorage
     public void putAttributes( final RepositoryItemUid uid, Attributes attributes )
         throws IOException
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.create );
 

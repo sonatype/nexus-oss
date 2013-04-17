@@ -18,8 +18,8 @@ import java.util.Map;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
-import org.sonatype.nexus.proxy.maven.wl.WLConfig;
-import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
+import org.sonatype.nexus.proxy.maven.routing.Config;
+import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -51,12 +51,12 @@ public abstract class NexusAppTestSupport
             @Override
             public void configure( final Binder binder )
             {
-                binder.bind( WLConfig.class ).toInstance( new WLConfigImpl( enableWLFeature() ) );
+                binder.bind( Config.class ).toInstance( new ConfigImpl( enableAutomaticRoutingFeature() ) );
             }
         } );
     }
 
-    protected boolean enableWLFeature()
+    protected boolean enableAutomaticRoutingFeature()
     {
         return false;
     }

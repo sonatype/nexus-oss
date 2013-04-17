@@ -24,7 +24,6 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -54,12 +53,12 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.charger.CallableExecutor;
 import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
 import org.sonatype.sisu.charger.internal.FirstArrivedInOrderChargeStrategy;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.Subscribe;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractGroupRepository
@@ -116,7 +115,7 @@ public abstract class AbstractGroupRepository
             membersChanged =
                 getCurrentCoreConfiguration().isDirty()
                     && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
-                    getExternalConfiguration( true ).getMemberRepositoryIds() );
+                        getExternalConfiguration( true ).getMemberRepositoryIds() );
 
             // we have to "remember" these before commit happens in super.onEvent
             // but ONLY if we are dirty and we do have "member changes" (see membersChanged above)
@@ -505,7 +504,7 @@ public abstract class AbstractGroupRepository
                 {
                     this.getLogger().warn( "Could not find repository '{}' while iterating members", repoId );
                 }
-                // XXX throw new StorageException( e )  ;
+                // XXX throw new StorageException( e ) ;
             }
         }
 

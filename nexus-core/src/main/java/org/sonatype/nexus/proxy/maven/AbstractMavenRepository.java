@@ -12,11 +12,22 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_MD5;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_SHA1;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.SUFFIX_MD5;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.SUFFIX_SHA1;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.doRetrieveMD5;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.doRetrieveSHA1;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.doStoreMD5;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.doStoreSHA1;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.newHashItem;
+
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -24,22 +35,20 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
-import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -61,6 +70,7 @@ public abstract class AbstractMavenRepository
     extends AbstractProxyRepository
     implements MavenRepository, MavenHostedRepository, MavenProxyRepository
 {
+
     /**
      * Metadata manager.
      */
@@ -404,7 +414,40 @@ public abstract class AbstractMavenRepository
             throw new ItemNotFoundException( request, this );
         }
 
+        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class )
+            && !request.getRequestPath().startsWith( "/." ) )
+        {
+            if ( request.getRequestPath().endsWith( SUFFIX_SHA1 ) )
+            {
+                return doRetrieveSHA1( this, request, doRetrieveArtifactItem( request, SUFFIX_SHA1 ) ).getHashItem();
+            }
+
+            if ( request.getRequestPath().endsWith( SUFFIX_MD5 ) )
+            {
+                return doRetrieveMD5( this, request, doRetrieveArtifactItem( request, SUFFIX_MD5 ) ).getHashItem();
+            }
+        }
+
         return super.doRetrieveItem( request );
+    }
+
+    /**
+     * Retrieves artifact corresponding to .sha1/.md5 request (or any request suffix).
+     */
+    private StorageItem doRetrieveArtifactItem( ResourceStoreRequest hashRequest, String suffix )
+        throws ItemNotFoundException, StorageException, IllegalOperationException
+    {
+        final String hashPath = hashRequest.getRequestPath();
+        final String itemPath = hashPath.substring( 0, hashPath.length() - suffix.length() );
+        hashRequest.pushRequestPath( itemPath );
+        try
+        {
+            return super.doRetrieveItem( hashRequest );
+        }
+        finally
+        {
+            hashRequest.popRequestPath();
+        }
     }
 
     @Override
@@ -416,17 +459,17 @@ public abstract class AbstractMavenRepository
         {
             return false;
         }
-        // apply WLFilter to "normal" requests only, not hidden (which is meta or plain hidden)
+        // apply autorouting filter to "normal" requests only, not hidden (which is meta or plain hidden)
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
             // but filter it only if request is not marked as NFS
-            if ( !request.getRequestContext().containsKey( WLManager.WL_REQUEST_NFS_FLAG_KEY ) )
+            if ( !request.getRequestContext().containsKey( Manager.ROUTING_REQUEST_NFS_FLAG_KEY ) )
             {
-                final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
-                if ( !whitelistMatched )
+                final boolean proxyFilterAllowed = getProxyRequestFilter().allowed( this, request );
+                if ( !proxyFilterAllowed )
                 {
-                    getLogger().debug( "WL filter rejected remote request for path {} in {}.",
+                    getLogger().debug( "Automatic routing filter rejected remote request for path {} in {}.",
                         request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) );
                     return false;
                 }
@@ -439,9 +482,38 @@ public abstract class AbstractMavenRepository
     public void storeItem( boolean fromTask, StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
-        if ( shouldServeByPolicies( new ResourceStoreRequest( item ) ) )
+        final ResourceStoreRequest request = new ResourceStoreRequest( item ); // this is local only request
+        if ( shouldServeByPolicies( request ) )
         {
-            super.storeItem( fromTask, item );
+            if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) && item instanceof StorageFileItem
+                && !item.getPath().startsWith( "/." ) )
+            {
+                try
+                {
+                    if ( item.getPath().endsWith( SUFFIX_SHA1 ) )
+                    {
+                        doStoreSHA1( this, doRetrieveArtifactItem( request, SUFFIX_SHA1 ), (StorageFileItem) item );
+                    }
+                    else if ( item.getPath().endsWith( SUFFIX_MD5 ) )
+                    {
+                        doStoreMD5( this, doRetrieveArtifactItem( request, SUFFIX_MD5 ), (StorageFileItem) item );
+                    }
+                    else
+                    {
+                        super.storeItem( fromTask, item );
+                    }
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // ignore storeItem request
+                    // this is a maven2 proxy repository, it is requested to store .sha1/.md5 file
+                    // and not there is not corresponding artifact
+                }
+            }
+            else
+            {
+                super.storeItem( fromTask, item );
+            }
         }
         else
         {
@@ -472,84 +544,53 @@ public abstract class AbstractMavenRepository
     // DefaultRepository customizations
 
     @Override
-    protected AbstractStorageItem doRetrieveRemoteItem( ResourceStoreRequest request )
-        throws ItemNotFoundException, RemoteAccessException, StorageException
+    protected Collection<StorageItem> doListItems( ResourceStoreRequest request )
+        throws ItemNotFoundException, StorageException
     {
-        String path = request.getRequestPath();
-
-        if ( !path.endsWith( ".sha1" ) && !path.endsWith( ".md5" ) )
+        Collection<StorageItem> items = super.doListItems( request );
+        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            // we are about to download an artifact from remote repository
-            // lets clean any existing (stale) checksum files
-            removeLocalChecksum( request );
-        }
+            Map<String, StorageItem> result = new TreeMap<String, StorageItem>();
+            for ( StorageItem item : items )
+            {
+                putChecksumItem( result, request, item, ATTR_REMOTE_SHA1, SUFFIX_SHA1 );
+                putChecksumItem( result, request, item, ATTR_REMOTE_MD5, SUFFIX_MD5 );
+            }
 
-        return super.doRetrieveRemoteItem( request );
+            for ( StorageItem item : items )
+            {
+                if ( !result.containsKey( item.getPath() ) )
+                {
+                    result.put( item.getPath(), item );
+                }
+            }
+
+            items = result.values();
+        }
+        return items;
     }
 
-    private void removeLocalChecksum( ResourceStoreRequest request )
-        throws StorageException
+    private void putChecksumItem( Map<String, StorageItem> checksums, ResourceStoreRequest request,
+                                  StorageItem artifact, String attrname, String suffix )
     {
-        try
+        String hash = artifact.getRepositoryItemAttributes().get( attrname );
+        if ( hash != null )
         {
-            String sha1path = request.getRequestPath() + ".sha1";
-            RepositoryItemUidLock sha1lock = createUid( sha1path ).getLock();
-            sha1lock.lock( Action.delete );
+            String hashPath = artifact.getPath() + suffix;
+            request.pushRequestPath( hashPath );
             try
             {
-                request.pushRequestPath( sha1path );
-
-                try
-                {
-                    getLocalStorage().deleteItem( this, request );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // this is exactly what we're trying to achieve
-                }
-                finally
-                {
-                    request.popRequestPath();
-                }
+                checksums.put( hashPath, newHashItem( this, request, artifact, hash ) );
             }
             finally
             {
-                sha1lock.unlock();
+                request.popRequestPath();
             }
-
-            String md5path = request.getRequestPath() + ".md5";
-            RepositoryItemUidLock md5lock = createUid( md5path ).getLock();
-            md5lock.lock( Action.delete );
-            try
-            {
-                request.pushRequestPath( md5path );
-
-                try
-                {
-                    getLocalStorage().deleteItem( this, request );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // this is exactly what we're trying to achieve
-                }
-                finally
-                {
-                    request.popRequestPath();
-                }
-            }
-            finally
-            {
-                md5lock.unlock();
-            }
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // huh?
         }
     }
 
     /**
-     * Beside original behavior, only add to NFC when it's not WL that rejected remote access.
+     * Beside original behavior, only add to NFC when remote access is not rejected by autorouting.
      * 
      * @since 2.4
      */
@@ -557,11 +598,11 @@ public abstract class AbstractMavenRepository
     protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
     {
         boolean shouldAddToNFC = super.shouldAddToNotFoundCache( request );
-        if ( shouldAddToNFC && request.getRequestContext().containsKey( WLManager.WL_REQUEST_REJECTED_FLAG_KEY ) )
+        if ( shouldAddToNFC && request.getRequestContext().containsKey( Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY ) )
         {
             // TODO: should we un-flag the request?
             shouldAddToNFC = false;
-            getLogger().debug( "Maven proxy repository {} WL rejected this request, not adding path {} to NFC.",
+            getLogger().debug( "Maven proxy repository {} autorouting rejected this request, not adding path {} to NFC.",
                 RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() );
         }
         return shouldAddToNFC;

@@ -246,6 +246,12 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
         rec.set('repoType', receivedData.repoType);
         rec.set('format', receivedData.format);
         rec.set('repoPolicy', Strings.upperFirstCharLowerRest(receivedData.repoPolicy));
+
+        // give subclasses the opportunity to update data as well (ATM only for proxy repo URLs)
+        if (this.updateRecord) {
+          this.updateRecord(rec, receivedData);
+        }
+
         rec.commit();
         rec.endEdit();
 
@@ -1188,6 +1194,10 @@ Ext.extend(Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstra
           // until we find a better solution for procurement repos
           this.buttons[0].disable();
         }
+      },
+
+      updateRecord : function(rec, receivedData) {
+        rec.set('remoteUri', receivedData.remoteStorage.remoteStorageUrl);
       }
 
     });

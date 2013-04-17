@@ -40,7 +40,7 @@ class EvictingThread
     EvictingThread( final ClientConnectionManager clientConnectionManager, final long idleTimeMillis, final long delay )
     {
         super( "HC4x-EvictingThread" );
-        Preconditions.checkArgument( idleTimeMillis > -1, "Keep alive period in milliseconds cannot be negative." );
+        Preconditions.checkArgument( idleTimeMillis > -1, "Keep alive period in milliseconds cannot be negative" );
         this.clientConnectionManager = Preconditions.checkNotNull( clientConnectionManager );
         this.idleTimeMillis = idleTimeMillis;
         this.delay = delay;
@@ -87,6 +87,6 @@ class EvictingThread
         {
             // bye bye
         }
-        LOGGER.debug( "Stopped '{}'", getName(), delay );
+        LOGGER.debug( "Stopped '{}'", getName() );
     }
 }

@@ -54,11 +54,11 @@ define('Nexus/error/ErrorHandler', ['extjs', 'nexus', 'Nexus/log'], function(Ext
           bodyStyle : {padding : 5},
           height : 150,
           html : this.getFormattedMessage(args).replace(/\n/g, "<br />").replace(/\t/g, " &nbsp; &nbsp;"),
-          modal : true,
           title : "An error has occurred",
           width : 400
         });
         errWindow.show();
+        errWindow.alignTo(Ext.getCmp('st-main-tab-panel').el, 'tr-tr');
       },
       handleError : function() {
         var args = [];

@@ -15,6 +15,9 @@ package org.sonatype.timeline.internal;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -43,12 +46,20 @@ public class DefaultTimeline
 
     private final ReentrantReadWriteLock timelineLock;
 
-    public DefaultTimeline()
+    /**
+     * Constructor. See {@link DefaultTimelineIndexer} constructor for meaning of {@code luceneFSDirectoryType}. Note:
+     * The {@code luceneFSDirectoryType} is copied from nexus-indexer-lucene-plugin's DefaultIndexerManager as part of
+     * fix for NEXUS-5658, hence, the key used here must be kept in sync with the one used in DefaultIndexerManager!
+     * 
+     * @param luceneFSDirectoryType
+     */
+    @Inject
+    public DefaultTimeline( @Nullable @Named( "${lucene.fsdirectory.type}" ) final String luceneFSDirectoryType )
     {
         this.logger = LoggerFactory.getLogger( getClass() );
         this.started = false;
         this.persistor = new DefaultTimelinePersistor();
-        this.indexer = new DefaultTimelineIndexer();
+        this.indexer = new DefaultTimelineIndexer( luceneFSDirectoryType );
         this.timelineLock = new ReentrantReadWriteLock();
     }
 
@@ -187,8 +198,8 @@ public class DefaultTimeline
     }
 
     @Override
-    public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter
-        filter, TimelineCallback callback )
+    public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
+                          TimelineCallback callback )
     {
         if ( !started )
         {
@@ -199,7 +210,7 @@ public class DefaultTimeline
 
     @Override
     public void retrieve( long fromTime, long toTime, int from, int count, Set<String> types, Set<String> subTypes,
-        TimelineFilter filter, TimelineCallback callback )
+                          TimelineFilter filter, TimelineCallback callback )
     {
         if ( !started )
         {
@@ -225,7 +236,7 @@ public class DefaultTimeline
     }
 
     protected int purgeFromIndexer( final long timestamp, final Set<String> types, final Set<String> subTypes,
-        final TimelineFilter filter )
+                                    final TimelineFilter filter )
     {
         return doShared( new Work<Integer>()
         {
@@ -239,8 +250,8 @@ public class DefaultTimeline
     }
 
     protected void retrieveFromIndexer( final long fromTime, final long toTime, final int from, final int count,
-        final Set<String> types, final Set<String> subTypes, final TimelineFilter filter,
-        final TimelineCallback callback )
+                                        final Set<String> types, final Set<String> subTypes,
+                                        final TimelineFilter filter, final TimelineCallback callback )
     {
         doShared( new Work<Void>()
         {
@@ -254,7 +265,7 @@ public class DefaultTimeline
         } );
     }
 
-// ==
+    // ==
 
     protected static interface Work<E>
     {

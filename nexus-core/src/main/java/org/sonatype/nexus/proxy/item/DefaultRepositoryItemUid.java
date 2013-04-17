@@ -86,17 +86,6 @@ public class DefaultRepositoryItemUid
 
         return lock;
     }
-    
-    @Override
-    public synchronized RepositoryItemUidLock getAttributeLock()
-    {
-        if ( lock == null )
-        {
-            lock = factory.createUidAttributeLock( this );
-        }
-
-        return lock;
-    }
 
     @Override
     public <A extends Attribute<?>> A getAttribute( Class<A> attrClass )

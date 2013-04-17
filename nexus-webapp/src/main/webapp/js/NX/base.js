@@ -46,12 +46,14 @@ define('NX/base', ['require'], function(require) {
        */
       obj: function (path) {
           var context = NX.global;
-          Ext.each(path.split('.'), function (part) {
-              context = context[part];
-              if (context === undefined) {
-                  throw new Error('No object at path: ' + path + '; part is undefined: ' + part);
-              }
-          });
+          if (typeof path === 'string') {
+            Ext.each(path.split('.'), function (part) {
+                context = context[part];
+                if (context === undefined) {
+                    throw new Error('No object at path: ' + path + '; part is undefined: ' + part);
+                }
+            });
+          }
           return context;
       },
 

@@ -57,7 +57,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.plugin.nexus2810.PluginConsoleMessageUtil;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
-import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
+import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
@@ -121,7 +121,7 @@ public abstract class AbstractCargoIT
             // WL for now here.
 
             final HashMap<String, String> sysProps = new HashMap<String, String>();
-            sysProps.put( WLConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString() );
+            sysProps.put( ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString() );
             container.setSystemProperties( sysProps );
 
             container.setTimeout( 5 * 60 * 1000 );// 5 minutes

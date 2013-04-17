@@ -177,8 +177,8 @@ public class HttpClientRemoteStorage
             InputStream is;
             try
             {
-                is = new InterruptableInputStream( method, httpResponse.getEntity().getContent() );
-
+                is = new Hc4InputStream( repository, new InterruptableInputStream( method, httpResponse.getEntity().getContent() ) );
+                 
                 String mimeType = ContentType.getOrDefault( httpResponse.getEntity() ).getMimeType();
                 if ( mimeType == null )
                 {

@@ -13,7 +13,6 @@
 /*global define*/
 define('Nexus/ext',
       [
-        'Nexus/ext/feedgrid',
         'Nexus/ext/FormPanel',
         'Nexus/ext/TextEntryList',
         'Nexus/ext/linkbutton',

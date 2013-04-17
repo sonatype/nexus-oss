@@ -80,9 +80,12 @@ public class ArtifactStoreHelper
                     RepositoryStringUtils.getHumanizedNameString( getMavenRepository() ), request ), e );
             }
 
-            // NXCM-4861: Doing "local only" lookup, same code should be used as in org.sonatype.nexus.proxy.repository.AbstractProxyRepository#doCacheItem
-            // Note: ResourceStoreRequest( ResourceStoreRequest ) creates a "subordinate" request from passed with same path but localOnly=true
-            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem( false, new ResourceStoreRequest( request ) );
+            // NXCM-4861: Doing "local only" lookup, same code should be used as in
+            // org.sonatype.nexus.proxy.repository.AbstractProxyRepository#doCacheItem
+            // Note: ResourceStoreRequest( ResourceStoreRequest ) creates a "subordinate" request from passed with same
+            // path but localOnly=true
+            StorageFileItem storedFile =
+                (StorageFileItem) getMavenRepository().retrieveItem( false, new ResourceStoreRequest( request ) );
 
             String sha1Hash = storedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 

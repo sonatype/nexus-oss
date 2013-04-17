@@ -12,8 +12,11 @@
  */
 package org.sonatype.nexus.plugins.siesta;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.apache.shiro.authz.AuthorizationException;
@@ -21,7 +24,8 @@ import org.sonatype.sisu.siesta.common.error.ErrorXO;
 import org.sonatype.sisu.siesta.server.ErrorExceptionMapperSupport;
 
 /**
- * Maps {@link AuthorizationException} to 403 with a {@link ErrorXO} body.
+ * Maps {@link AuthorizationException} to 403 with a {@link ErrorXO} body in case that a user is logged in or to an
+ * 401 in case that no user is authenticated.
  *
  * @since 2.4
  */
@@ -30,6 +34,38 @@ import org.sonatype.sisu.siesta.server.ErrorExceptionMapperSupport;
 public class AuthorizationExceptionMapper
     extends ErrorExceptionMapperSupport<AuthorizationException>
 {
+
+    private static final String AUTH_SCHEME_KEY = "auth.scheme";
+
+    public static final String AUTH_REALM_KEY = "auth.realm";
+
+    private static final String ANONYMOUS_LOGIN = "nexus.anonymous";
+
+    private static final String AUTHENTICATE_HEADER = "WWW-Authenticate";
+
+    @Inject
+    private Provider<HttpServletRequest> httpServletRequestProvider;
+
+    /**
+     * @since 2.5.0
+     */
+    @Override
+    protected Response convert( final AuthorizationException exception, final String id )
+    {
+        final Response.ResponseBuilder builder = Response.fromResponse( super.convert( exception, id ) );
+
+        final HttpServletRequest servletRequest = httpServletRequestProvider.get();
+        if ( servletRequest.getAttribute( ANONYMOUS_LOGIN ) != null )
+        {
+            String scheme = (String) servletRequest.getAttribute( AUTH_SCHEME_KEY );
+            String realm = (String) servletRequest.getAttribute( AUTH_REALM_KEY );
+
+            builder
+                .status( Response.Status.UNAUTHORIZED )
+                .header( AUTHENTICATE_HEADER, scheme + " realm=\"" + realm + "" );
+        }
+        return builder.build();
+    }
 
     @Override
     protected int getStatusCode( final AuthorizationException exception )

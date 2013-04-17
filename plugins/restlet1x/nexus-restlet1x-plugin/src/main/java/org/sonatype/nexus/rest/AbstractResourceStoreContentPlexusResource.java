@@ -50,7 +50,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LocalStorageEofException;
+import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
@@ -878,7 +878,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             {
                 throw (ResourceException) t;
             }
-            else if ( t instanceof LocalStorageEofException )
+            else if ( t instanceof LocalStorageEOFException )
             {
                 // in case client drops connection, this makes not much sense, as he will not
                 // receive this response, but we have to end it somehow.

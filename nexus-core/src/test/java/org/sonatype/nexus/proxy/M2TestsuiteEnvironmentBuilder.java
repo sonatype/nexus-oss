@@ -89,7 +89,7 @@ public class M2TestsuiteEnvironmentBuilder
                 exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
             }
             exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-            exConf.setWLDiscoveryEnabled( false );
+            exConf.setRoutingDiscoveryEnabled( false );
 
             repoConf.setRemoteStorage( new CRemoteStorage() );
             repoConf.getRemoteStorage().setProvider( env.getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
