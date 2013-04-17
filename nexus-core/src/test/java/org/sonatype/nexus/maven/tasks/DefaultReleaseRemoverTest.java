@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -183,5 +185,35 @@ public class DefaultReleaseRemoverTest
         thrown.expect( IllegalStateException.class );
         new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
             .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, TARGET_ID ) );
+    }
+
+    @Test
+    public void testOnEmptyRepo()
+        throws Exception
+    {
+        final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
+        final TargetRegistry targetRegistry = mock( TargetRegistry.class );
+        final Repository repository = mock( Repository.class );
+        final RepositoryKind repositoryKind = mock( RepositoryKind.class );
+        final MavenRepository mavenRepository = mock( MavenRepository.class );
+
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
+        when( targetRegistry.getRepositoryTarget( TARGET_ID ) ).thenReturn( null );
+        when( repositoryRegistry.getRepository( REPO_ID ) ).thenReturn( repository );
+        when( repository.getRepositoryContentClass() ).thenReturn( MAVEN_2_CONTENT_CLASS );
+        when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
+        when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
+        when( repositoryKind.isFacetAvailable( ProxyRepository.class ) ).thenReturn( false );
+        when( repository.adaptToFacet( MavenRepository.class ) ).thenReturn( mavenRepository );
+        when( mavenRepository.getRepositoryPolicy() ).thenReturn( RepositoryPolicy.RELEASE );
+
+        when( mavenRepository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
+
+        ReleaseRemovalResult releaseRemovalResult =
+            new DefaultReleaseRemover( repositoryRegistry, targetRegistry, mock( Walker.class ), MAVEN_2_CONTENT_CLASS )
+                .removeReleases( new ReleaseRemovalRequest( REPO_ID, 1, "" ) );
+        assertThat( "Default state until after a 'real' walk should be failed", releaseRemovalResult.isSuccessful(),
+                    is( false ) );
+        assertThat( releaseRemovalResult.getDeletedFileCount(), is( 0 ) );
     }
 }
