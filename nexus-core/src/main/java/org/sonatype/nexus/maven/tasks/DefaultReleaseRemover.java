@@ -53,6 +53,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetStoreWalkerFilter;
+import org.sonatype.nexus.proxy.walker.ConjunctionWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.Walker;
@@ -199,7 +200,8 @@ public class DefaultReleaseRemover
         {
             return new DottedStoreWalkerFilter();
         }
-        return new DottedTargetStoreWalkerFilter( repositoryTarget );
+        return ConjunctionWalkerFilter.satisfiesAllOf( new DottedStoreWalkerFilter(),
+                                                       new TargetStoreWalkerFilter( repositoryTarget ) );
     }
 
     private class ReleaseRemovalWalkerProcessor
@@ -368,36 +370,6 @@ public class DefaultReleaseRemover
             }
             result.setDeletedFileCount( deletedFiles );
             result.setSuccessful( true );
-        }
-    }
-
-    /**
-     * In addition to ignoring dotted files, will also check that files match the target.
-     */
-    private class DottedTargetStoreWalkerFilter
-        extends DottedStoreWalkerFilter
-    {
-
-        private final Target repositoryTarget;
-
-        public DottedTargetStoreWalkerFilter(
-            final Target repositoryTarget )
-        {
-            this.repositoryTarget = repositoryTarget;
-        }
-
-        @Override
-        protected boolean shouldProcessItem( final StorageItem item )
-        {
-            return super.shouldProcessItem( item ) &&
-                repositoryTarget.isPathContained(
-                    item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item.getPath() );
-        }
-
-        @Override
-        public boolean shouldProcessRecursively( final WalkerContext ctx, final StorageCollectionItem coll )
-        {
-            return super.shouldProcessItem( coll );
         }
     }
 }
