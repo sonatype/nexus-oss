@@ -357,16 +357,6 @@ public interface Repository
     // Behaviour
 
     /**
-     * Returns the list of defined request processors.
-     * 
-     * @return Modifiable map of RequestProcessors. Modifying the map actually modifies the processors used by this
-     *         repository.
-     * @deprecated Use {@link RequestStrategy} related methods instead.
-     */
-    @Deprecated
-    Map<String, RequestProcessor> getRequestProcessors();
-
-    /**
      * Registers a {@link RequestStrategy} with this repository.
      * 
      * @param key must not be {@code null}.
