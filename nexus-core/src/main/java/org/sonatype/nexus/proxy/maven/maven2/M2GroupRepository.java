@@ -278,19 +278,15 @@ public class M2GroupRepository
                     ops.add( new NexusMergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
                 }
 
-                final Collection<MetadataException> metadataExceptions = MetadataBuilder.changeMetadataIgnoringFailures(
-                    result, ops
-                );
+                final Collection<MetadataException> metadataExceptions =
+                    MetadataBuilder.changeMetadataIgnoringFailures( result, ops );
                 if ( metadataExceptions != null && !metadataExceptions.isEmpty() )
                 {
                     for ( final MetadataException metadataException : metadataExceptions )
                     {
                         getLogger().warn(
-                            "Ignored exception during M2 metadata merging: "
-                                + metadataException.getMessage()
-                            + " (request " + request.getRequestPath() + ")",
-                            metadataException
-                        );
+                            "Ignored exception during M2 metadata merging: " + metadataException.getMessage()
+                                + " (request " + request.getRequestPath() + ")", metadataException );
                     }
                 }
             }

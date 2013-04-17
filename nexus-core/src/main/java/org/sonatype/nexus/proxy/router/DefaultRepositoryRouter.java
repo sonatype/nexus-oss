@@ -66,7 +66,7 @@ public class DefaultRepositoryRouter
     extends AbstractConfigurable
     implements RepositoryRouter
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -255,7 +255,8 @@ public class DefaultRepositoryRouter
                     }
                     else if ( item instanceof StorageCollectionItem )
                     {
-                        toRoute.getTargetedRepository().createCollection( to, item.getRepositoryItemAttributes().asMap() );
+                        toRoute.getTargetedRepository().createCollection( to,
+                            item.getRepositoryItemAttributes().asMap() );
                     }
                     else
                     {
@@ -743,8 +744,8 @@ public class DefaultRepositoryRouter
         catch ( ItemNotFoundException e )
         {
             // ignore it, do nothing
-            
-            // cstamas says: above is untrue. It means that user should get 404, but there is no 
+
+            // cstamas says: above is untrue. It means that user should get 404, but there is no
             // proper solution to do it from this method! The culprit is that "view privilege" piggybacks
             // on the getRequestRouteForRequest() method that is not meant for this, it does it's job
             // well for routing....

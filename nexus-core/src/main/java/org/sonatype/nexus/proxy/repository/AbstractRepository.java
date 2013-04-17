@@ -99,14 +99,14 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * </ul>
  * <p>
  * The subclasses only needs to implement the abstract method focusing on item retrieaval and other "basic" functions.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractRepository
     extends ConfigurableRepository
     implements Repository
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -279,7 +279,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the cache manager.
-     *
+     * 
      * @return the cache manager
      */
     protected CacheManager getCacheManager()
@@ -289,7 +289,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the cache manager.
-     *
+     * 
      * @param cacheManager the new cache manager
      */
     protected void setCacheManager( CacheManager cacheManager )
@@ -299,7 +299,7 @@ public abstract class AbstractRepository
 
     /**
      * Returns the repository Item Uid Factory.
-     *
+     * 
      * @return
      */
     protected RepositoryItemUidFactory getRepositoryItemUidFactory()
@@ -309,7 +309,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the not found cache.
-     *
+     * 
      * @return the not found cache
      */
     public PathCache getNotFoundCache()
@@ -325,7 +325,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the not found cache.
-     *
+     * 
      * @param notFoundcache the new not found cache
      */
     public void setNotFoundCache( PathCache notFoundcache )
@@ -537,10 +537,8 @@ public abstract class AbstractRepository
         }
 
         eventBus().post(
-            new RepositoryEventExpireNotFoundCaches(
-                this, request.getRequestPath(), request.getRequestContext().flatten(), cacheAltered
-            )
-        );
+            new RepositoryEventExpireNotFoundCaches( this, request.getRequestPath(),
+                request.getRequestContext().flatten(), cacheAltered ) );
 
         return cacheAltered;
     }
@@ -1176,7 +1174,7 @@ public abstract class AbstractRepository
     // Inner stuff
     /**
      * Maintains not found cache.
-     *
+     * 
      * @throws ItemNotFoundException the item not found exception
      */
     public void maintainNotFoundCache( ResourceStoreRequest request )
@@ -1257,7 +1255,7 @@ public abstract class AbstractRepository
 
     /**
      * Check conditions, such as availability, permissions, etc.
-     *
+     * 
      * @param request the request
      * @return false, if the request should not be processed with response appropriate for current method, or true is
      *         execution should continue as usual.
@@ -1413,7 +1411,7 @@ public abstract class AbstractRepository
 
     /**
      * Whether or not the requested path should be added to NFC. Item will be added to NFC if is not local/remote only.
-     *
+     * 
      * @param request resource store request
      * @return true if requested path should be added to NFC
      * @since 2.0
