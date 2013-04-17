@@ -608,6 +608,12 @@ public abstract class AbstractMavenRepository
         return shouldAddToNFC;
     }
 
+    /**
+     * Deletes item and regenerates Maven metadata, if repository is a hosted repository and maven-metadata.xml file is
+     * present.
+     *
+     * @since 2.5
+     */
     @Override
     protected void doDeleteItem( final ResourceStoreRequest request )
         throws UnsupportedStorageOperationException, ItemNotFoundException, StorageException
