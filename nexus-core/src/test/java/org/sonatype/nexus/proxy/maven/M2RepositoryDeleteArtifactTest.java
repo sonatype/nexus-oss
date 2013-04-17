@@ -37,7 +37,7 @@ public class M2RepositoryDeleteArtifactTest
      * NEXUS-2834: Verify that maven metadata is recreated after artifacts are deleted.
      */
     @Test
-    public void delete()
+    public void mavenMetadataIsRegeneratedWhenItemIsRemoved()
         throws Exception
     {
         fillInRepo();
