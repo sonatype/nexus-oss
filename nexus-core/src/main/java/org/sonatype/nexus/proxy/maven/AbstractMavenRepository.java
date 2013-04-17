@@ -607,4 +607,30 @@ public abstract class AbstractMavenRepository
         }
         return shouldAddToNFC;
     }
+
+    @Override
+    protected void doDeleteItem( final ResourceStoreRequest request )
+        throws UnsupportedStorageOperationException, ItemNotFoundException, StorageException
+    {
+        super.doDeleteItem( request );
+        // regenerate maven metadata for parent of this item if is a hosted maven repo and it contains maven-metadata.xml
+        if ( getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
+        {
+            String parentPath = request.getRequestPath();
+            parentPath = parentPath.substring( 0, parentPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
+            final String parentMetadataPath = parentPath + "/maven-metadata.xml";
+            try
+            {
+                if ( getLocalStorage().containsItem( this, new ResourceStoreRequest( parentMetadataPath ) ) )
+                {
+                    recreateMavenMetadata( new ResourceStoreRequest( parentPath ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn( "Could not determine if Maven metadata should be rebuild", e );
+            }
+        }
+    }
+
 }
