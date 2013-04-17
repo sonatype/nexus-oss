@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugins.ui.contribution;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,9 +20,9 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 /**
- * Helper to build HTML snippets for use in {@link NexusIndexHtmlCustomizer} implementations.
+ * Helper to build HTML snippets for use in {@link org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer} implementations.
  *
- * @since 2.4
+ * @since 2.5
  */
 public class IndexHtmlSnippetBuilder
     extends AbstractUiContributionBuilder<String>

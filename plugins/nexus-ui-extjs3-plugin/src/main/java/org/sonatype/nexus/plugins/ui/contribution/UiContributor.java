@@ -10,16 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.rest;
-
-import java.util.List;
+package org.sonatype.nexus.plugins.ui.contribution;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.List;
 
 /**
  * Used to look up plugins contributing proper require.js UI code.
  *
- * @since 2.4
+ * @since 2.5
  */
 public interface UiContributor
 {
@@ -29,7 +29,7 @@ public interface UiContributor
      * @param debug true if debug code should be delivered; false otherwise.
      * @return An object containing information about what to load for the UI.
      */
-    UiContribution contribute(boolean debug);
+    UiContribution contribute( boolean debug );
 
     /**
      * Contains dependencies to load and the base module to use, for example:
@@ -41,7 +41,7 @@ public interface UiContributor
      * where plugin-all.js contains require.js module definitions (e.g. `define("Nexus/plugin/bootstrap", ["Nexus/plugin/dep1"], function() {}` ).
      *
      * @since 2.4
-     * @see UiContributionBuilder
+     * @see org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder
      */
     class UiContribution
     {
@@ -52,7 +52,7 @@ public interface UiContributor
         private boolean enabled;
 
         /**
-         * @see UiContributionBuilder
+         * @see org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder
          */
         public UiContribution( final String module, final List<String> dependencies, final boolean enabled )
         {

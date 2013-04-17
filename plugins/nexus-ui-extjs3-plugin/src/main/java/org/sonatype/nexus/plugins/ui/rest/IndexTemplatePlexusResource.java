@@ -18,13 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.google.common.collect.Lists;
-
 import org.apache.velocity.VelocityContext;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsoup.Jsoup;
@@ -40,10 +38,10 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
-import org.sonatype.nexus.plugins.rest.UiContributor;
-import org.sonatype.nexus.plugins.rest.UiContributor.UiContribution;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
 import org.sonatype.nexus.plugins.ui.BuildNumberService;
+import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;

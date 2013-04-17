@@ -10,15 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugins.ui.contribution;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.Object;
-import java.lang.String;
 import java.net.URL;
 import java.util.Properties;
 
@@ -27,9 +25,9 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 /**
  * Base class for UI contribution builders
  *
- * @see UiContributionBuilder
- * @see IndexHtmlSnippetBuilder
- * @since 2.4
+ * @see org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder
+ * @see org.sonatype.nexus.plugins.ui.contribution.IndexHtmlSnippetBuilder
+ * @since 2.5
  */
 public abstract class AbstractUiContributionBuilder<T>
     extends AbstractLoggingComponent

@@ -213,6 +213,16 @@
         <type>${nexus-plugin.type}</type>
         <version>${nexus.version}</version>
       </dependency>
+      
+      <!--
+      Required for plugins which contribute UI
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ui-extjs3-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
 
       <!-- ******************** TESTING ******************** -->
 
@@ -254,6 +264,7 @@
         <artifactId>nexus-test-harness-launcher</artifactId>
         <version>${nexus.version}</version>
       </dependency>
+
 
     </dependencies>
   </dependencyManagement>

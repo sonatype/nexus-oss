@@ -16,8 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.rest.UiContributionBuilder;
-import org.sonatype.nexus.plugins.rest.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
 /**
  * UI contribution for the timeline plugin.

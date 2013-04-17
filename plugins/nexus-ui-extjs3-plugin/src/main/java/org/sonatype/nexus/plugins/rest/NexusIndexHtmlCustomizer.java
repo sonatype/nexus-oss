@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugins.rest;
 
 import java.util.Map;
-
 import javax.inject.Singleton;
 
 import org.sonatype.plugin.ExtensionPoint;
@@ -42,7 +41,7 @@ import org.sonatype.plugin.ExtensionPoint;
  * 
  * @author cstamas
  *
- * @deprecated since 2.4. Use {@link UiContributor} instead.
+ * @deprecated since 2.4. Use {@link org.sonatype.nexus.plugins.ui.contribution.UiContributor} instead.
  */
 @ExtensionPoint
 @Singleton
