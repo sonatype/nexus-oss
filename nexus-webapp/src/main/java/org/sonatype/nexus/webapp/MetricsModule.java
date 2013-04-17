@@ -101,7 +101,6 @@ public class MetricsModule
         {
             @Override
             protected void configure() {
-                // FIXME: This is working slighlty better now, but still not working properly :-(
                 addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,perms[nexus:metrics-endpoints]");
             }
         });
