@@ -44,6 +44,7 @@ import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.ResourceStoreUtils;
+
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -168,9 +169,6 @@ public class DefaultRequestRepositoryMapper
             reposIdSet.add( resolvedRepositorty.getId() );
         }
 
-        // for tracking what is applied
-        ArrayList<RepositoryPathMapping> appliedMappings = new ArrayList<RepositoryPathMapping>();
-
         // if include found, add it to the list.
         boolean firstAdd = true;
 
@@ -184,9 +182,14 @@ public class DefaultRequestRepositoryMapper
                         "The request path [" + request.toString() + "] is blocked by rule " + mapping.toString() );
                 }
 
+                request.addAppliedMappingsList( repository, Collections.singletonList( mapping.toString() ) );
+
                 return Collections.emptyList();
             }
         }
+
+        // for tracking what is applied
+        ArrayList<RepositoryPathMapping> appliedMappings = new ArrayList<RepositoryPathMapping>();
 
         // include, if found a match
         // NEXUS-2852: watch to not add multiple times same repository
