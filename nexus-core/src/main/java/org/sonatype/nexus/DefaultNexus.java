@@ -36,6 +36,9 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.index.events.ReindexRepositoriesEvent;
 import org.sonatype.nexus.index.events.ReindexRepositoriesRequest;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.maven.tasks.ReleaseRemovalRequest;
+import org.sonatype.nexus.maven.tasks.ReleaseRemovalResult;
+import org.sonatype.nexus.maven.tasks.ReleaseRemover;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
@@ -111,6 +114,9 @@ public class DefaultNexus
      */
     @Requirement
     private SnapshotRemover snapshotRemover;
+
+    @Requirement
+    private ReleaseRemover releaseRemover;
 
     /**
      * The SecurityConfiguration component.
@@ -332,6 +338,12 @@ public class DefaultNexus
         throws NoSuchRepositoryException, IllegalArgumentException
     {
         return snapshotRemover.removeSnapshots( request );
+    }
+
+    public ReleaseRemovalResult removeReleases( ReleaseRemovalRequest request )
+        throws NoSuchRepositoryException
+    {
+        return releaseRemover.removeReleases( request );
     }
 
     public Map<String, String> getConfigurationFiles()
