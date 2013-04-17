@@ -43,11 +43,6 @@ public abstract class AbstractKenaiRealmTest
 
     protected static final String AUTH_APP_NAME = "auth_app";
 
-    protected int getTotalNumberOfProjects()
-    {
-        return 10;
-    }
-
     public void configure( final Binder binder )
     {
         super.configure( binder );
@@ -76,39 +71,11 @@ public abstract class AbstractKenaiRealmTest
         servletInfoAuthc.setServletClass( KenaiMockAuthcServlet.class.getName() );
         servletInfoAuthc.setParameters( new Properties() );
 
-        ServletInfo servletInfoAuthz = new ServletInfo();
-        servletInfoAuthz.setName( "authz" );
-        servletInfoAuthz.setMapping( "/api/projects" );
-        servletInfoAuthz.setServletClass( KenaiMockAuthzServlet.class.getName() );
-        Properties params = new Properties();
-        params.setProperty( KenaiMockAuthzServlet.TOTAL_PROJECTS_KEY, Integer.toString( getTotalNumberOfProjects() ) );
-        servletInfoAuthz.setParameters( params );
-        params.put( "resourceBase", getSmarterBasedir() + "/target/test-classes/data/" );
-
-        webapp.setServletInfos( Arrays.asList( servletInfoAuthc, servletInfoAuthz ) );
+        webapp.setServletInfos( Arrays.asList( servletInfoAuthc ) );
 
         server.initialize();
 
         return server;
-    }
-
-    public String getSmarterBasedir()
-    {
-        String classFileName = "/" + getClass().getName().replaceAll( "\\.", "/" ) + ".class";
-        URL classUrl = this.getClass().getResource( classFileName );
-
-        String filename = classUrl.getFile().substring( 0, classUrl.getFile().indexOf( classFileName ) );
-        File baseDir = new File( filename ).getParentFile().getParentFile(); // this should give us the directory above
-                                                                             // /target
-
-        if ( baseDir.exists() )
-        {
-            return baseDir.getAbsolutePath();
-        }
-        else
-        {
-            return getBasedir();
-        }
     }
 
     @Override
@@ -124,7 +91,7 @@ public abstract class AbstractKenaiRealmTest
         KenaiRealmConfiguration kenaiRealmConfiguration = lookup( KenaiRealmConfiguration.class );
         Configuration configuration = kenaiRealmConfiguration.getConfiguration();
         configuration.setDefaultRole( DEFAULT_ROLE );
-        configuration.setEmailDomain( "sonateyp.org" );
+        configuration.setEmailDomain( "sonatype.org" );
         configuration.setBaseUrl( server.getUrl( AUTH_APP_NAME ) + "/" ); // add the '/' to the end
         // kenaiRealmConfiguration.updateConfiguration( configuration );
     }

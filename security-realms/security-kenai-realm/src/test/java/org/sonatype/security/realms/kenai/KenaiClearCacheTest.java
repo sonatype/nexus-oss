@@ -35,17 +35,17 @@ public class KenaiClearCacheTest
         // now log the user in
         Subject subject1 = securitySystem.login( new UsernamePasswordToken( username, password ) );
         // check authz
-        subject1.checkRole( "project-1" );
+        subject1.checkRole( DEFAULT_ROLE );
 
         // clear the cache
         KenaiRealm realm = (KenaiRealm) this.lookup( Realm.class, "kenai" );
         realm.getAuthorizationCache().clear();
 
         // user should still have the role
-        subject1.checkRole( "project-1" );
+        subject1.checkRole( DEFAULT_ROLE );
 
         // the user should be able to login again as well
         Subject subject2 = securitySystem.login( new UsernamePasswordToken( username, password ) );
-        subject2.checkRole( "project-1" );
+        subject2.checkRole( DEFAULT_ROLE );
     }
 }
