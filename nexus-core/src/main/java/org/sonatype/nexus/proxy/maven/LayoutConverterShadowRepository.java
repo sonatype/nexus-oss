@@ -500,7 +500,19 @@ public abstract class LayoutConverterShadowRepository
 
             request.getRequestContext().putAll( item.getItemContext() );
 
-            deleteItem( false, request );
+            try
+            {
+                deleteItem( false, request );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // NEXUS-5673: just ignore it silently, this might happen when
+                // link to be deleted was not found in shadow (like a parent folder was deleted
+                // or M2 checksum file in master)
+                // simply ignoring this is okay, as our initial goal is to lessen log spam.
+                // If parent cleanup fails below, thats fine too, superclass with handle the
+                // exception. This catch here is merely to logic continue with empty parent cleanup
+            }
 
             // we need to clean up empty shadow parent directories
             String parentPath =
