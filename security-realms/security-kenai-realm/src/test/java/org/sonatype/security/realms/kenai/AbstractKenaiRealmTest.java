@@ -35,7 +35,7 @@ public abstract class AbstractKenaiRealmTest
 
     protected final String username = "test-user";
 
-    protected final String password = "password123";
+    protected final String password = "test-user123";
 
     private ServletServer server;
 
@@ -69,12 +69,6 @@ public abstract class AbstractKenaiRealmTest
         server.setWebappContexts( Arrays.asList( webapp ) );
 
         webapp.setName( "auth_app" );
-        org.sonatype.jettytestsuite.AuthenticationInfo authInfo = new org.sonatype.jettytestsuite.AuthenticationInfo();
-        webapp.setAuthenticationInfo( authInfo );
-
-        authInfo.setAuthMethod( "BASIC" );
-        authInfo.setCredentialsFilePath( getSmarterBasedir() + "/target/test-classes/credentials.properties" );
-        authInfo.setAuthPathSpec( "/api/login/*" );
 
         ServletInfo servletInfoAuthc = new ServletInfo();
         servletInfoAuthc.setName( "authc" );
@@ -127,7 +121,7 @@ public abstract class AbstractKenaiRealmTest
         // start the server
         server.start();
 
-        KenaiRealmConfiguration kenaiRealmConfiguration = this.lookup( KenaiRealmConfiguration.class );
+        KenaiRealmConfiguration kenaiRealmConfiguration = lookup( KenaiRealmConfiguration.class );
         Configuration configuration = kenaiRealmConfiguration.getConfiguration();
         configuration.setDefaultRole( DEFAULT_ROLE );
         configuration.setEmailDomain( "sonateyp.org" );

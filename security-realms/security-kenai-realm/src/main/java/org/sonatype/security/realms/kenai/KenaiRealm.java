@@ -17,22 +17,28 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.http.Consts;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -54,6 +60,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.inject.Description;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
+
+import com.google.common.collect.Lists;
 
 /**
  * A Realm that connects to a java.net kenai API.
@@ -126,12 +134,17 @@ public class KenaiRealm
 
     private boolean authenticateViaUrl( final UsernamePasswordToken usernamePasswordToken )
     {
-        final HttpClient client = getHttpClient( usernamePasswordToken );
+        final HttpClient client = getHttpClient( null );
 
         try
         {
             final String url = kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/login/authenticate.json";
-            final HttpResponse response = client.execute( new HttpGet( url ) );
+            final List<NameValuePair> nameValuePairs = Lists.newArrayListWithCapacity( 2 );
+            nameValuePairs.add( new BasicNameValuePair( "username", usernamePasswordToken.getUsername() ) );
+            nameValuePairs.add( new BasicNameValuePair( "password", new String( usernamePasswordToken.getPassword() ) ) );
+            final HttpPost post = new HttpPost( url );
+            post.setEntity( new UrlEncodedFormEntity( nameValuePairs, Consts.UTF_8 ) );
+            final HttpResponse response = client.execute( post );
 
             try
             {
