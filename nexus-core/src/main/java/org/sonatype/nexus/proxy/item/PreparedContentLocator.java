@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,7 +22,7 @@ import java.io.InputStream;
  * @author cstamas
  */
 public class PreparedContentLocator
-    implements ContentLocator
+    implements ContentLocator, Closeable
 {
     private final InputStream content;
 
@@ -50,5 +51,19 @@ public class PreparedContentLocator
     public boolean isReusable()
     {
         return false;
+    }
+
+    /**
+     * Cleans up, closes the underlying prepared content. To be used in cases when you actually don't need the stream
+     * (as some error cropped up), and you never requested the stream instance using {@link #getContent()}.
+     * 
+     * @throws IOException if an I/O error occurs.
+     * @since 2.5
+     */
+    @Override
+    public void close()
+        throws IOException
+    {
+        content.close();
     }
 }
