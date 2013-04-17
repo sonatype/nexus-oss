@@ -331,7 +331,11 @@
             <properties>
                 <property>
                     <key>method</key>
-                    <value>read</value>
+                    <value>*</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:metrics-endpoints</value>
                 </property>
             </properties>
         </privilege>
