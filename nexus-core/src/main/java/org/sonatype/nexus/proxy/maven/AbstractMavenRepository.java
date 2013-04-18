@@ -634,7 +634,7 @@ public abstract class AbstractMavenRepository
             }
             catch ( Exception e )
             {
-                getLogger().warn( "Could not determine if Maven metadata should be rebuild", e );
+                getLogger().warn( "Could not maintain Maven metadata '{}'", parentMetadataPath, e );
             }
         }
     }
