@@ -50,7 +50,7 @@ public class DefaultScheduledTask<T>
 
     private Future<T> future;
 
-    private Throwable throwable;
+    private Throwable brokenCause;
 
     private boolean enabled;
 
@@ -160,7 +160,7 @@ public class DefaultScheduledTask<T>
 
     protected void setBrokenCause( Throwable e )
     {
-        this.throwable = e;
+        this.brokenCause = e;
     }
 
     protected Callable<T> getCallable()
@@ -281,7 +281,7 @@ public class DefaultScheduledTask<T>
 
     public Throwable getBrokenCause()
     {
-        return throwable;
+        return brokenCause;
     }
 
     public T get()
@@ -508,7 +508,7 @@ public class DefaultScheduledTask<T>
                         setFuture( doSchedule( nextMillis ) );
                     }
 
-                    if ( Exception.class.isAssignableFrom( e.getClass() ) )
+                    if ( e instanceof Exception )
                     {
                         // this is an exception, pass it further
                         throw (Exception) e;
