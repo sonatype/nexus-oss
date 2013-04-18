@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -86,10 +88,6 @@ import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
 import com.google.common.collect.Maps;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
  * <p>
