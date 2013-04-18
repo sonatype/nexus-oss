@@ -181,7 +181,6 @@
             </goals>
             <configuration>
               <includes>
-                <!-- relative to src/main/js -->
                 <include>nexus/**</include>
                 <include>${project.artifactId}.js</include>
               </includes>

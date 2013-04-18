@@ -340,6 +340,7 @@
             <nomunge>${maven.yuicompressor.nomunge}</nomunge>
             <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
             <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
+            <sourceDirectory>${project.build.sourceDirectory}/../resources/static</sourceDirectory>
           </configuration>
           <executions>
             <execution>
@@ -349,6 +350,7 @@
               </goals>
               <configuration>
                 <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/js</sourceDirectory>
               </configuration>
             </execution>
             <execution>
@@ -358,6 +360,7 @@
               </goals>
               <configuration>
                 <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/css</sourceDirectory>
                 <required>false</required>
               </configuration>
             </execution>
@@ -391,30 +394,6 @@
           <configuration>
             <releaseProfiles>release,optimize-js</releaseProfiles>
           </configuration>
-        </plugin>
-
-        <!-- Copy javascript files to /static/js -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
-          <executions>
-            <execution>
-              <id>copy-js</id>
-              <phase>process-resources</phase>
-              <goals>
-                <goal>copy-resources</goal>
-              </goals>
-              <configuration>
-                <outputDirectory>${project.build.outputDirectory}/static/js</outputDirectory>
-                <resources>
-                  <resource>
-                    <directory>src/main/js</directory>
-                  </resource>
-                </resources>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
 
       </plugins>

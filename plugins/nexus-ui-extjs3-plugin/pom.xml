@@ -63,32 +63,21 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-js-nx</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}/static/js</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/main/js-nx</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
         <executions>
-          <!-- default js/css aggregation is inherited from parent -->
+          <!-- override default js/css aggregation is inherited from parent to exclude NX -->
+          <execution>
+            <id>js</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>js/NX/**/*.js</exclude>
+              </excludes>
+            </configuration>
+          </execution>
 
           <!-- prerequisite libraries -->
           <execution>
@@ -116,9 +105,8 @@
             </goals>
             <configuration>
               <output>${project.build.outputDirectory}/static/js/nx-all.js</output>
-              <sourceDirectory>src/main/js-nx</sourceDirectory>
               <includes>
-                <include>NX/**/*.js</include>
+                <include>js/NX/**/*.js</include>
               </includes>
             </configuration>
           </execution>
@@ -129,7 +117,7 @@
               <goal>jslint</goal>
             </goals>
             <configuration>
-              <sourceDirectory>src/main</sourceDirectory>
+              <sourceDirectory>src/main/resources/static</sourceDirectory>
               <!-- do not fail the build, new version of jslint used by sonatype yuicompress plugin is too thorough -->
               <fail>false</fail>
               <jslintOptions>
@@ -139,7 +127,6 @@
               <includes>
                 <include>js/nexus/**/*.js</include>
                 <include>js/ext/**/*.js</include>
-                <include>js-nx/**/*.js</include>
               </includes>
               <excludes>
                 <!-- do not check third party extensions -->
