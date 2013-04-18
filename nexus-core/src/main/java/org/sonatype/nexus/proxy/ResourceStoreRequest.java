@@ -400,6 +400,7 @@ public class ResourceStoreRequest
      * result new "detached" instance that captures the snapshot of the request in a moment when the clone was created.
      * 
      * @return the clone of this request, detached from any outgoing relations.
+     * @since 2.5
      */
     public ResourceStoreRequest cloneAndDetach()
     {

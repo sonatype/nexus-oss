@@ -42,7 +42,7 @@ public abstract class AbstractRequestStrategy
     }
 
     @Override
-    public void onRemoteAccess( ProxyRepository proxy, ResourceStoreRequest request )
+    public void onRemoteAccess( ProxyRepository proxy, ResourceStoreRequest request, StorageItem item )
         throws ItemNotFoundException, IllegalOperationException
     {
         // nop

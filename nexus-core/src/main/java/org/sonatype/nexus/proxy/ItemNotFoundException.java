@@ -108,8 +108,6 @@ public class ItemNotFoundException
         private final ResourceStoreRequest resourceStoreRequest;
 
         /**
-         * Constructor.
-         * 
          * @param message reason message (might not be {@code null}).
          * @param resourceStoreRequest request (might not be {@code null}).
          */
@@ -152,8 +150,6 @@ public class ItemNotFoundException
         private final Repository repository;
 
         /**
-         * Constructor.
-         * 
          * @param message reason message (might not be {@code null}).
          * @param resourceStoreRequest request (might not be {@code null}).
          * @param repository repository (might not be {@code null}).
@@ -180,9 +176,10 @@ public class ItemNotFoundException
     private final ItemNotFoundReason reason;
 
     /**
-     * Constructor.
+     * Constructor with reason.
      * 
      * @param reason (might not be {@code null}).
+     * @throws NullPointerException if passed in reason parameter is {@code null}.
      * @since 2.5
      */
     public ItemNotFoundException( final ItemNotFoundReason reason )
@@ -191,7 +188,7 @@ public class ItemNotFoundException
     }
 
     /**
-     * Constructor with cause.
+     * Constructor with reason and cause.
      * 
      * @param reason (might not be {@code null}).
      * @param cause

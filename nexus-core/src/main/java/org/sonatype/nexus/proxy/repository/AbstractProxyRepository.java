@@ -1171,11 +1171,11 @@ public abstract class AbstractProxyRepository
 
         if ( shouldProxy )
         {
-            for ( RequestStrategy strategy : getEffectiveRequestStrategies().values() )
+            for ( RequestStrategy strategy : getRegisteredStrategies().values() )
             {
                 try
                 {
-                    strategy.onRemoteAccess( this, request );
+                    strategy.onRemoteAccess( this, request, localItem );
                 }
                 catch ( ItemNotFoundException e )
                 {

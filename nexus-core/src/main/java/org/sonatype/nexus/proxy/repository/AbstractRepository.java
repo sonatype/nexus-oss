@@ -306,16 +306,6 @@ public abstract class AbstractRepository
     }
 
     /**
-     * This method is used to get the map of {@link RequestStrategy}s to evaluate.
-     * 
-     * @return
-     */
-    protected Map<String, RequestStrategy> getEffectiveRequestStrategies()
-    {
-        return getRegisteredStrategies();
-    }
-
-    /**
      * Gets the cache manager.
      * 
      * @return the cache manager
@@ -1316,26 +1306,20 @@ public abstract class AbstractRepository
     protected void checkRequestStrategies( final ResourceStoreRequest request, final Action action )
         throws ItemNotFoundException, IllegalOperationException
     {
-        final Map<String, RequestStrategy> effectiveRequestStrategies = getEffectiveRequestStrategies();
-        if ( !effectiveRequestStrategies.isEmpty() )
+        final Map<String, RequestStrategy> effectiveRequestStrategies = getRegisteredStrategies();
+        for ( RequestStrategy strategy : effectiveRequestStrategies.values() )
         {
-            for ( RequestStrategy strategy : effectiveRequestStrategies.values() )
-            {
-                strategy.onHandle( this, request, action );
-            }
+            strategy.onHandle( this, request, action );
         }
     }
 
     protected void checkPostConditions( final ResourceStoreRequest request, final StorageItem item )
         throws IllegalOperationException, ItemNotFoundException
     {
-        final Map<String, RequestStrategy> effectiveRequestStrategies = getEffectiveRequestStrategies();
-        if ( !effectiveRequestStrategies.isEmpty() )
+        final Map<String, RequestStrategy> effectiveRequestStrategies = getRegisteredStrategies();
+        for ( RequestStrategy strategy : effectiveRequestStrategies.values() )
         {
-            for ( RequestStrategy strategy : effectiveRequestStrategies.values() )
-            {
-                strategy.onServing( this, request, item );
-            }
+            strategy.onServing( this, request, item );
         }
     }
 
