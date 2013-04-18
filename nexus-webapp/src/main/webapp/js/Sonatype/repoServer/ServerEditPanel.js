@@ -937,10 +937,10 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
           });
       },
       failure : function(response) {
-        var options = {
-          hideErrorStatus : true
-        };
-        Sonatype.utils.connectionError(response, 'Error on SMTP validation!', null, options);
+        Sonatype.utils.connectionError(response, 'Error on SMTP validation!', false, {
+          hideErrorStatus : true,
+          decodeErrorResponse : true
+        });
       },
       scope : this
     });

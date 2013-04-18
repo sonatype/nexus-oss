@@ -39,6 +39,7 @@ import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * The Smtp settings validation resource.
@@ -118,10 +119,9 @@ public class SmtpSettingsValidationPlexusResource
         }
         catch ( EmailerException e )
         {
-            throw new ResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Failed to send validation e-mail: " + parseReason( e ),
-                e
+            throw new PlexusResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST, e,
+                getNexusErrorResponse( "*", "Failed to send validation e-mail: " + parseReason( e ))
             );
         }
 
