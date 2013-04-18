@@ -32,11 +32,11 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-public class SteadyLinksRequestProcessorTest
+public class SteadyLinksRequestStrategyTest
     extends TestSupport
 {
 
-    private SteadyLinksRequestProcessor underTest;
+    private SteadyLinksRequestStrategy underTest;
 
     @Mock
     private Repository repository;
@@ -55,13 +55,13 @@ public class SteadyLinksRequestProcessorTest
     {
         final ResourceStoreRequest request = mock( ResourceStoreRequest.class );
 
-        new SteadyLinksRequestProcessor().process(
+        new SteadyLinksRequestStrategy().onHandle(
             mock( Repository.class ), request, Action.create
         );
-        new SteadyLinksRequestProcessor().process(
+        new SteadyLinksRequestStrategy().onHandle(
             mock( Repository.class ), request, Action.update
         );
-        new SteadyLinksRequestProcessor().process(
+        new SteadyLinksRequestStrategy().onHandle(
             mock( Repository.class ), request, Action.delete
         );
 
@@ -76,7 +76,7 @@ public class SteadyLinksRequestProcessorTest
         when( request.getRequestContext() ).thenReturn( context );
         when( request.getRequestPath() ).thenReturn( "/repodata/primary.xml.gz" );
 
-        new SteadyLinksRequestProcessor()
+        new SteadyLinksRequestStrategy()
         {
             @Override
             String matchRequestPath( final String requestPath, final InputStream repomd )
@@ -84,13 +84,13 @@ public class SteadyLinksRequestProcessorTest
                 assertThat( requestPath, is( "/repodata/primary.xml.gz" ) );
                 return "/repodata/XYZ-primary.xml.gz";
             }
-        }.process(
+        }.onHandle(
             repository, request, Action.read
         );
 
         verify( request ).pushRequestPath( "/repodata/XYZ-primary.xml.gz" );
-        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_ORIGINAL, "/repodata/primary.xml.gz" );
-        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_NEW, "/repodata/XYZ-primary.xml.gz" );
+        verify( context ).put( SteadyLinksRequestStrategy.REQUEST_PATH_ORIGINAL, "/repodata/primary.xml.gz" );
+        verify( context ).put( SteadyLinksRequestStrategy.REQUEST_PATH_NEW, "/repodata/XYZ-primary.xml.gz" );
     }
 
     @Test
@@ -101,7 +101,7 @@ public class SteadyLinksRequestProcessorTest
         when( request.getRequestContext() ).thenReturn( context );
         when( request.getRequestPath() ).thenReturn( "/foo/repodata/primary.xml.gz" );
 
-        new SteadyLinksRequestProcessor()
+        new SteadyLinksRequestStrategy()
         {
             @Override
             String matchRequestPath( final String requestPath, final InputStream repomd )
@@ -109,13 +109,13 @@ public class SteadyLinksRequestProcessorTest
                 assertThat( requestPath, is( "/foo/repodata/primary.xml.gz" ) );
                 return "/foo/repodata/XYZ-primary.xml.gz";
             }
-        }.process(
+        }.onHandle(
             repository, request, Action.read
         );
 
         verify( request ).pushRequestPath( "/foo/repodata/XYZ-primary.xml.gz" );
-        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_ORIGINAL, "/foo/repodata/primary.xml.gz" );
-        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_NEW, "/foo/repodata/XYZ-primary.xml.gz" );
+        verify( context ).put( SteadyLinksRequestStrategy.REQUEST_PATH_ORIGINAL, "/foo/repodata/primary.xml.gz" );
+        verify( context ).put( SteadyLinksRequestStrategy.REQUEST_PATH_NEW, "/foo/repodata/XYZ-primary.xml.gz" );
     }
 
     @Test
@@ -126,7 +126,7 @@ public class SteadyLinksRequestProcessorTest
         when( request.getRequestContext() ).thenReturn( context );
         when( request.getRequestPath() ).thenReturn( "/repodata/primary.xml.gz" );
 
-        new SteadyLinksRequestProcessor()
+        new SteadyLinksRequestStrategy()
         {
             @Override
             String matchRequestPath( final String requestPath, final InputStream repomd )
@@ -134,7 +134,7 @@ public class SteadyLinksRequestProcessorTest
                 assertThat( requestPath, is( "/repodata/primary.xml.gz" ) );
                 return null;
             }
-        }.process(
+        }.onHandle(
             repository, request, Action.read
         );
 

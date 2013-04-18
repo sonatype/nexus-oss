@@ -53,15 +53,15 @@ public class EventsRouter
 
     private final Provider<NexusScheduler> nexusScheduler;
 
-    private final Provider<SteadyLinksRequestProcessor> steadyLinksProcessor;
+    private final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy;
 
     @Inject
     public EventsRouter( final Provider<RepositoryRegistry> repositoryRegistry,
                          final Provider<YumRegistry> yumRegistryProvider,
                          final Provider<NexusScheduler> nexusScheduler,
-                         final Provider<SteadyLinksRequestProcessor> steadyLinksProcessor )
+                         final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy )
     {
-        this.steadyLinksProcessor = checkNotNull( steadyLinksProcessor );
+        this.steadyLinksStrategy = checkNotNull( steadyLinksStrategy );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.yumRegistryProvider = checkNotNull( yumRegistryProvider );
         this.nexusScheduler = checkNotNull( nexusScheduler );
@@ -71,8 +71,8 @@ public class EventsRouter
     @Subscribe
     public void on( final RepositoryRegistryEventAdd event )
     {
-        event.getRepository().getRequestProcessors().put(
-            SteadyLinksRequestProcessor.class.getName(), steadyLinksProcessor.get()
+        event.getRepository().registerRequestStrategy( 
+            SteadyLinksRequestStrategy.class.getName(), steadyLinksStrategy.get()
         );
     }
 
@@ -80,8 +80,8 @@ public class EventsRouter
     @Subscribe
     public void on( final RepositoryRegistryEventRemove event )
     {
-        event.getRepository().getRequestProcessors().remove(
-            SteadyLinksRequestProcessor.class.getName()
+        event.getRepository().unregisterRequestStrategy( 
+            SteadyLinksRequestStrategy.class.getName()
         );
     }
 
