@@ -640,6 +640,7 @@ public class SimplePullTest
 
         @Override
         public void onHandle( Repository repository, ResourceStoreRequest request, Action action )
+            throws ItemNotFoundException, IllegalOperationException
         {
             referredCount++;
             super.onHandle( repository, request, action );
