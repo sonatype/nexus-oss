@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -27,18 +29,21 @@ public abstract class AbstractRequestStrategy
 {
     @Override
     public void onHandle( Repository repository, ResourceStoreRequest request, Action action )
+        throws ItemNotFoundException, IllegalOperationException
     {
         // nop
     }
 
     @Override
     public void onServing( final Repository repository, final ResourceStoreRequest request, final StorageItem item )
+        throws ItemNotFoundException, IllegalOperationException
     {
         // nop
     }
 
     @Override
     public void onRemoteAccess( ProxyRepository proxy, ResourceStoreRequest request )
+        throws ItemNotFoundException, IllegalOperationException
     {
         // nop
     }
