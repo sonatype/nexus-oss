@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -311,6 +312,8 @@ public class DefaultSnapshotRemover
         extends AbstractWalkerProcessor
     {
 
+        private static final long MILLIS_IN_A_DAY = 86400000L;
+
         private final MavenRepository repository;
 
         private final SnapshotRemovalRequest request;
@@ -324,6 +327,10 @@ public class DefaultSnapshotRemover
         private final ParentOMatic collectionNodes;
 
         private final long dateThreshold;
+
+        private final long startTime;
+
+        private final long gracePeriodInMillis;
 
         private boolean shouldProcessCollection;
 
@@ -340,16 +347,20 @@ public class DefaultSnapshotRemover
             this.request = request;
             this.collectionNodes = collectionNodes;
 
+            this.startTime = System.currentTimeMillis();
+
             int days = request.getRemoveSnapshotsOlderThanDays();
 
             if ( days > 0 )
             {
-                this.dateThreshold = System.currentTimeMillis() - ( days * 86400000L );
+                this.dateThreshold = startTime - ( days * MILLIS_IN_A_DAY );
             }
             else
             {
                 this.dateThreshold = -1;
             }
+
+            gracePeriodInMillis = Math.max( 0, request.getGraceDaysAfterRelease() ) * MILLIS_IN_A_DAY;
         }
 
         protected void addStorageFileItemToMap( Map<Version, List<StorageFileItem>> map, Gav gav, StorageFileItem item )
@@ -655,6 +666,8 @@ public class DefaultSnapshotRemover
 
         public boolean releaseExistsForSnapshot( Gav snapshotGav, Map<String, Object> context )
         {
+            long releaseTimestamp = -1;
+
             for ( Repository repository : repositoryRegistry.getRepositories() )
             {
                 // we need to filter for:
@@ -705,9 +718,11 @@ public class DefaultSnapshotRemover
                             getLogger().debug( "Checking for release counterpart in repository '{}' and path '{}'",
                                 mrepository.getId(), req.toString() );
 
-                            mrepository.retrieveItem( false, req );
+                            final StorageItem item = mrepository.retrieveItem( false, req );
 
-                            return true;
+                            releaseTimestamp = item.getCreated();
+
+                            break;
                         }
                         catch ( ItemNotFoundException e )
                         {
@@ -722,7 +737,8 @@ public class DefaultSnapshotRemover
                 }
             }
 
-            return false;
+            return releaseTimestamp == 0  // 0 when item creation day is unknown
+                || ( releaseTimestamp > 0 && startTime > releaseTimestamp + gracePeriodInMillis );
         }
 
         private ResourceStoreRequest createResourceStoreRequest( final StorageItem item, final WalkerContext ctx )
