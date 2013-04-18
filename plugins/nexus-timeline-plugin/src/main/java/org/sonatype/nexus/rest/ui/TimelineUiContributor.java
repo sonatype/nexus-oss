@@ -34,17 +34,9 @@ public class TimelineUiContributor
 
     public static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
-    private final UiContributionBuilder builder;
-
-    @Inject
-    public TimelineUiContributor()
-    {
-        this.builder = new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID );
-    }
-
     @Override
     public UiContribution contribute( final boolean debug )
     {
-        return builder.build( debug );
+        return new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID ).build( debug );
     }
 }
