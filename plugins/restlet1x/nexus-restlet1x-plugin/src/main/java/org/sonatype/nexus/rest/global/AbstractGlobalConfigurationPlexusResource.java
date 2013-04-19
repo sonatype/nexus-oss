@@ -20,6 +20,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalHttpsProxySettings;
+import org.sonatype.nexus.configuration.application.GlobalProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
@@ -235,7 +236,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
      * 
      * @param resource
      */
-    public static RemoteHttpProxySettings convert( GlobalHttpProxySettings settings )
+    public static RemoteHttpProxySettings convert( GlobalProxySettings settings )
     {
         if ( settings == null || !settings.isEnabled() )
         {
@@ -255,28 +256,6 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         return result;
     }
 
-    /**
-     * @since 2.5
-     */
-    public static RemoteHttpProxySettings convert( GlobalHttpsProxySettings settings )
-    {
-        if ( settings == null || !settings.isEnabled() )
-        {
-            return null;
-        }
-
-        RemoteHttpProxySettings result = new RemoteHttpProxySettings();
-
-        result.setProxyHostname( settings.getHostname() );
-
-        result.setProxyPort( settings.getPort() );
-
-        result.setAuthentication( convert( settings.getProxyAuthentication() ) );
-
-        result.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
-
-        return result;
-    }
 
     public static RestApiSettings convert( GlobalRestApiSettings settings )
     {
