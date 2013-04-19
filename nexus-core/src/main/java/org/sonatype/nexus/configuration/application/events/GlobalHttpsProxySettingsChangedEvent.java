@@ -10,27 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.configuration.application;
+package org.sonatype.nexus.configuration.application.events;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.application.GlobalHttpsProxySettings;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
-@Component( role = GlobalHttpProxySettings.class )
-public class DefaultGlobalHttpProxySettings
-    extends AbstractGlobalProxySettings
-    implements GlobalHttpProxySettings
+/**
+ * Event fired when global HTTPS Proxy settings are changed (within configuration change). The settings carried in
+ * this event will reflect the NEW values, but if you have the {@link GlobalHttpsProxySettings} component, you can
+ * query it too <em>after</em> you received this event .
+ *
+ * @since 2.5
+ */
+public class GlobalHttpsProxySettingsChangedEvent
+    extends AbstractEvent<GlobalHttpsProxySettings>
 {
 
-    public String getName()
+    public GlobalHttpsProxySettingsChangedEvent( GlobalHttpsProxySettings settings )
     {
-        return "Global Http Proxy Settings";
+        super( settings );
     }
 
-    @Override
-    protected AbstractEvent createGlobalProxySettingsChangedEvent()
+    public GlobalHttpsProxySettings getGlobalHttpsProxySettings()
     {
-        return new GlobalHttpProxySettingsChangedEvent( this );
+        return getEventSender();
     }
 
 }

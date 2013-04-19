@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.RemoteHttpsProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.AbstractStorageContext;
 import org.sonatype.nexus.proxy.storage.StorageContext;
@@ -139,6 +140,78 @@ public class DefaultRemoteStorageContext
     public void removeRemoteProxySettings()
     {
         removeContextObject( RemoteProxySettings.class.getName() );
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    public boolean hasRemoteHttpsProxySettings()
+    {
+        return hasContextObject( RemoteHttpsProxySettings.class.getName() );
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    public RemoteProxySettings getRemoteHttpsProxySettings()
+    {
+        // we have a special case here, need to track blockInheritance flag
+        // so, a little code duplication happens
+        // three cases:
+        // 1. we have _no_ proxy settings in this context, fallback to original code
+        // 2. we have proxy settings with no proxyHost set, then obey the blockInheritance
+        // 3. we have proxy settings with set proxyHost, then return it
+
+        final String key = RemoteHttpsProxySettings.class.getName();
+
+        if ( !hasContextObject( key ) )
+        {
+            // case 1
+            return (RemoteProxySettings) getContextObject( key );
+        }
+        else
+        {
+            RemoteProxySettings remoteProxySettings = (RemoteProxySettings) getContextObject( key, false );
+
+            if ( StringUtils.isBlank( remoteProxySettings.getHostname() ) )
+            {
+                // case 2
+                if ( !remoteProxySettings.isBlockInheritance() )
+                {
+                    return (RemoteProxySettings) getContextObject( key );
+                }
+                else
+                {
+                    // no proxy on this level, and do _not_ inherit
+                    return null;
+                }
+            }
+            else
+            {
+                // case 3
+                return remoteProxySettings;
+            }
+        }
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    public void setRemoteHttpsProxySettings( RemoteProxySettings settings )
+    {
+        putContextObject( RemoteHttpsProxySettings.class.getName(), settings );
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    public void removeRemoteHttpsProxySettings()
+    {
+        removeContextObject( RemoteHttpsProxySettings.class.getName() );
     }
 
     // ==

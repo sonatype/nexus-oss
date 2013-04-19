@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.apachehttpclient;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -46,14 +48,25 @@ class NonProxyHostsAwareHttpRoutePlanner
      */
     private final Set<Pattern> nonProxyHostPatterns;
 
+    /**
+     * Proxy to be used.
+     */
+    private final HttpHost proxy;
+
     // ----------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------
 
-    NonProxyHostsAwareHttpRoutePlanner( final SchemeRegistry schemeRegistry, final Set<Pattern> nonProxyHostPatterns )
+    /**
+     * @since 2.5
+     */
+    NonProxyHostsAwareHttpRoutePlanner( final HttpHost proxy,
+                                        final SchemeRegistry schemeRegistry,
+                                        final Set<Pattern> nonProxyHostPatterns )
     {
         super( schemeRegistry );
-        this.nonProxyHostPatterns = Preconditions.checkNotNull( nonProxyHostPatterns );
+        this.proxy = checkNotNull( proxy );
+        this.nonProxyHostPatterns = checkNotNull( nonProxyHostPatterns );
     }
 
     // ----------------------------------------------------------------------
@@ -65,12 +78,21 @@ class NonProxyHostsAwareHttpRoutePlanner
     {
         if ( request.getParams() instanceof ClientParamsStack )
         {
-            request.setParams( new NonProxyHostParamsStack( (ClientParamsStack) request.getParams(),
-                noProxyFor( target.getHostName() ) ) );
+            request.setParams(
+                new NonProxyHostParamsStack(
+                    (ClientParamsStack) request.getParams(),
+                    noProxyFor( target.getHostName() ) ? null : proxy
+                )
+            );
         }
         else
         {
-            request.setParams( new NonProxyHostParamsStack( request.getParams(), noProxyFor( target.getHostName() ) ) );
+            request.setParams(
+                new NonProxyHostParamsStack(
+                    request.getParams(),
+                    noProxyFor( target.getHostName() ) ? null : proxy
+                )
+            );
         }
 
         return super.determineRoute( target, request, context );
@@ -96,35 +118,37 @@ class NonProxyHostsAwareHttpRoutePlanner
         extends ClientParamsStack
     {
 
-        private final boolean filterProxy;
+        private final HttpHost proxy;
 
         /**
          * @param stack the parameter stack to delegate to
-         * @param filterProxy if {@code true}, always return null on
-         *            {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+         * @param proxy proxy to be returned on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
          */
-        public NonProxyHostParamsStack( final ClientParamsStack stack, final boolean filterProxy )
+        public NonProxyHostParamsStack( final ClientParamsStack stack, final HttpHost proxy )
         {
             super( stack.getApplicationParams(), stack.getClientParams(), stack.getRequestParams(),
                 stack.getOverrideParams() );
-            this.filterProxy = filterProxy;
+            this.proxy = proxy;
         }
 
         /**
          * @param params the parameters instance to delegate to
-         * @param filterProxy if {@code true}, always return null on
-         *            {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+         * @param @param proxy proxy to be returned on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
          */
-        public NonProxyHostParamsStack( final HttpParams params, final boolean filterProxy )
+        public NonProxyHostParamsStack( final HttpParams params, final HttpHost proxy )
         {
             super( null, null, params, null );
-            this.filterProxy = filterProxy;
+            this.proxy = proxy;
         }
 
         @Override
         public Object getParameter( final String name )
         {
-            return filterProxy && ConnRouteParams.DEFAULT_PROXY.equals( name ) ? null : super.getParameter( name );
+            if ( ConnRouteParams.DEFAULT_PROXY.equals( name ) )
+            {
+                return proxy;
+            }
+            return super.getParameter( name );
         }
     }
 }

@@ -48,4 +48,24 @@ public interface RemoteStorageContext
     void setRemoteProxySettings( RemoteProxySettings settings );
 
     void removeRemoteProxySettings();
+
+    /**
+     * @since 2.5
+     */
+    boolean hasRemoteHttpsProxySettings();
+
+    /**
+     * @since 2.5
+     */
+    RemoteProxySettings getRemoteHttpsProxySettings();
+
+    /**
+     * @since 2.5
+     */
+    void setRemoteHttpsProxySettings( RemoteProxySettings settings );
+
+    /**
+     * @since 2.5
+     */
+    void removeRemoteHttpsProxySettings();
 }

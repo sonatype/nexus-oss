@@ -12,25 +12,23 @@
  */
 package org.sonatype.nexus.configuration.application;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 
-@Component( role = GlobalHttpProxySettings.class )
-public class DefaultGlobalHttpProxySettings
-    extends AbstractGlobalProxySettings
-    implements GlobalHttpProxySettings
+/**
+ * @since 2.5
+ */
+public interface GlobalProxySettings
+    extends Configurable, RemoteProxySettings
 {
+    RemoteProxySettings convertAndValidateFromModel( CRemoteHttpProxySettings model )
+        throws ConfigurationException;
 
-    public String getName()
-    {
-        return "Global Http Proxy Settings";
-    }
-
-    @Override
-    protected AbstractEvent createGlobalProxySettingsChangedEvent()
-    {
-        return new GlobalHttpProxySettingsChangedEvent( this );
-    }
-
+    CRemoteHttpProxySettings convertToModel( RemoteProxySettings settings );
+    
+    // ==
+    
+    void disable();
 }

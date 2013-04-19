@@ -13,6 +13,7 @@
 package org.sonatype.nexus.apachehttpclient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -22,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpVersion;
@@ -34,6 +36,7 @@ import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.params.HttpConnectionParams;
@@ -100,7 +103,7 @@ public class Hc4ProviderBase
             clientConnectionManager, createHttpParams( context )
         );
         configureAuthentication( httpClient, context.getRemoteAuthenticationSettings(), null );
-        configureProxy( httpClient, context.getRemoteProxySettings() );
+        configureProxy( httpClient, context.getRemoteProxySettings(), context.getRemoteHttpsProxySettings() );
         // obey the given retries count and apply it to client.
         final int retries =
             context.getRemoteConnectionSettings() != null
@@ -214,41 +217,70 @@ public class Hc4ProviderBase
         }
     }
 
-    protected void configureProxy( final DefaultHttpClient httpClient, final RemoteProxySettings remoteProxySettings )
+    /**
+     * @since 2.5
+     */
+    protected void configureProxy( final DefaultHttpClient httpClient, 
+                                   final RemoteProxySettings httpProxySettings,
+                                   final RemoteProxySettings httpsProxySettings)
     {
-        if ( remoteProxySettings.isEnabled() )
+        if ( httpProxySettings != null && httpProxySettings.isEnabled() )
         {
-            getLogger().debug("proxy setup with host '{}'", remoteProxySettings.getHostname());
-
-            final HttpHost proxy = new HttpHost( remoteProxySettings.getHostname(), remoteProxySettings.getPort() );
-            httpClient.getParams().setParameter( ConnRoutePNames.DEFAULT_PROXY, proxy );
-
-            // check if we have non-proxy hosts
-            if ( remoteProxySettings.getNonProxyHosts() != null && !remoteProxySettings.getNonProxyHosts().isEmpty() )
+            if ( httpsProxySettings != null && httpsProxySettings.isEnabled() )
             {
-                final Set<Pattern> nonProxyHostPatterns = Sets.newHashSetWithExpectedSize(
-                    remoteProxySettings.getNonProxyHosts().size()
-                );
-                for ( String nonProxyHostRegex : remoteProxySettings.getNonProxyHosts() )
-                {
-                    try
-                    {
-                        nonProxyHostPatterns.add( Pattern.compile( nonProxyHostRegex, Pattern.CASE_INSENSITIVE ) );
-                    }
-                    catch ( PatternSyntaxException e )
-                    {
-                        getLogger().warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
-                    }
-                }
+                final Map<String, HttpRoutePlanner> routePlanners = Maps.newHashMap();
+
+                getLogger().debug( "http proxy setup with host '{}'", httpProxySettings.getHostname() );
+                routePlanners.put( "http", configureProxy( httpClient, httpProxySettings ) );
+
+                getLogger().debug( "https proxy setup with host '{}'", httpsProxySettings.getHostname() );
+                routePlanners.put( "https", configureProxy( httpClient, httpsProxySettings ) );
+
                 httpClient.setRoutePlanner(
-                    new NonProxyHostsAwareHttpRoutePlanner(
-                        httpClient.getConnectionManager().getSchemeRegistry(), nonProxyHostPatterns
+                    new UrlSchemeAwareHttpRoutePlanner(
+                        httpClient.getConnectionManager().getSchemeRegistry(),
+                        routePlanners
                     )
                 );
             }
-
-            configureAuthentication( httpClient, remoteProxySettings.getProxyAuthentication(), proxy );
+            else
+            {
+                getLogger().debug( "http/https proxy setup with host '{}'", httpProxySettings.getHostname() );
+                httpClient.setRoutePlanner(
+                    configureProxy( httpClient, httpProxySettings )
+                );
+            }
         }
+    }
+
+    private NonProxyHostsAwareHttpRoutePlanner configureProxy( final DefaultHttpClient httpClient,
+                                                               final RemoteProxySettings remoteProxySettings )
+    {
+        final HttpHost proxy = new HttpHost( remoteProxySettings.getHostname(), remoteProxySettings.getPort() );
+
+        configureAuthentication( httpClient, remoteProxySettings.getProxyAuthentication(), proxy );
+
+        // check if we have non-proxy hosts
+
+        final Set<Pattern> nonProxyHostPatterns = Sets.newHashSet();
+        if ( remoteProxySettings.getNonProxyHosts() != null && !remoteProxySettings.getNonProxyHosts().isEmpty() )
+        {
+            for ( String nonProxyHostRegex : remoteProxySettings.getNonProxyHosts() )
+            {
+                try
+                {
+                    nonProxyHostPatterns.add( Pattern.compile( nonProxyHostRegex, Pattern.CASE_INSENSITIVE ) );
+                }
+                catch ( PatternSyntaxException e )
+                {
+                    getLogger().warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
+                }
+            }
+        }
+
+        return new NonProxyHostsAwareHttpRoutePlanner(
+            proxy, httpClient.getConnectionManager().getSchemeRegistry(), nonProxyHostPatterns
+        );
     }
 
     /**
