@@ -132,7 +132,7 @@ public class DefaultNexusEmailer
             messageBody
                 .append(
                     StringUtils.isNotBlank( baseNexusUrl )
-                        ? String.format( "<a href=\"%s\"/>", baseNexusUrl )
+                        ? String.format( "<a href=\"%s\">%s</a>", baseNexusUrl, baseNexusUrl )
                         : "<i>(Set the Base URL parameter in Nexus Server Administration to include in future emails)</i>"
                 )
                 .append( "<br><br>" );
