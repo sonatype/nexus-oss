@@ -498,7 +498,7 @@ public class GlobalConfigurationPlexusResource
                         ( (UsernamePasswordRemoteAuthenticationSettings) globalProxySettings.getProxyAuthentication() ).getPassword();
                 }
 
-                auth.setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
+                auth.setPassword( this.getActualPassword( remoteHttpProxySettings.getAuthentication().getPassword(), oldPassword ) );
 
                 auth.setNtlmDomain( remoteHttpProxySettings.getAuthentication().getNtlmDomain() );
 
