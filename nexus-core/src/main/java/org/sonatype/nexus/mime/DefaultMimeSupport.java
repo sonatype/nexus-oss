@@ -16,7 +16,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -26,12 +25,9 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
 import eu.medsea.mimeutil.MimeType;
