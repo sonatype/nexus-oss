@@ -84,6 +84,18 @@
           <required>false</required>
         </field>
         <field>
+          <name>globalHttpsProxySettings</name>
+          <version>2.5.0+</version>
+          <description>
+            The global HTTPS Proxy settings are settings applied across Nexus. These can be overridden by
+            per-repository HTTP Proxy
+            settings.</description>
+          <association>
+            <type>CRemoteHttpProxySettings</type>
+          </association>
+          <required>false</required>
+        </field>
+        <field>
           <name>restApi</name>
           <version>1.4.0+</version>
           <description>The Nexus REST settings.</description>
@@ -256,6 +268,12 @@
           <version>2.2.0</version>
           <code><![CDATA[
     public static final String MODEL_VERSION = "2.2.0";
+]]></code>
+        </codeSegment>
+        <codeSegment>
+          <version>2.5.0</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "2.5.0";
 ]]></code>
         </codeSegment>
       </codeSegments>

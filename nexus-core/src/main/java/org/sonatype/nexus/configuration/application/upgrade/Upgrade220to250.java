@@ -17,22 +17,21 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.v2_2_0.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.v2_2_0.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.v2_5_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
- * Upgrades configuration model from version 2.0.0 to 2.2.0.
- * 
- * @author cstamas
+ * Upgrades configuration model from version 2.2.0 to 2.5.0.
+ *
+ * @since 2.5
  */
-@Component( role = SingleVersionUpgrader.class, hint = "2.0.0" )
-public class Upgrade200to220
+@Component( role = SingleVersionUpgrader.class, hint = "2.2.0" )
+public class Upgrade220to250
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
@@ -42,15 +41,15 @@ public class Upgrade200to220
     {
         FileReader fr = null;
 
-        org.sonatype.nexus.configuration.model.v2_0_0.Configuration conf = null;
+        org.sonatype.nexus.configuration.model.v2_2_0.Configuration conf = null;
 
         try
         {
             // reading without interpolation to preserve user settings as variables
             fr = new FileReader( file );
 
-            org.sonatype.nexus.configuration.model.v2_0_0.io.xpp3.NexusConfigurationXpp3Reader reader =
-                new org.sonatype.nexus.configuration.model.v2_0_0.io.xpp3.NexusConfigurationXpp3Reader();
+            org.sonatype.nexus.configuration.model.v2_2_0.io.xpp3.NexusConfigurationXpp3Reader reader =
+                new org.sonatype.nexus.configuration.model.v2_2_0.io.xpp3.NexusConfigurationXpp3Reader();
 
             conf = reader.read( fr );
         }
@@ -72,34 +71,15 @@ public class Upgrade200to220
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.nexus.configuration.model.v2_0_0.Configuration oldc =
-            (org.sonatype.nexus.configuration.model.v2_0_0.Configuration) message.getConfiguration();
+        org.sonatype.nexus.configuration.model.v2_2_0.Configuration oldc =
+            (org.sonatype.nexus.configuration.model.v2_2_0.Configuration) message.getConfiguration();
 
-        BasicVersionUpgrade versionConverter = new BasicVersionUpgrade()
-        {
-            @Override
-            public CRemoteStorage upgradeCRemoteStorage( org.sonatype.nexus.configuration.model.v2_0_0.CRemoteStorage cRemoteStorage )
-            {
-                final CRemoteStorage remoteStorage = super.upgradeCRemoteStorage( cRemoteStorage );
-                if ( remoteStorage != null )
-                {
-                    if ( StringUtils.equals( remoteStorage.getProvider(), "apacheHttpClient3x" ) )
-                    {
-                        // nullify the provider IF: it is set, and is set to the "old" HttpClient3x only
-                        // as in nullified case, the
-                        // org.sonatype.nexus.proxy.storage.remote.DefaultRemoteProviderHintFactory will kick in as we
-                        // want
-                        remoteStorage.setProvider( null );
-                    }
-                }
-                return remoteStorage;
-            }
-        };
+        BasicVersionUpgrade versionConverter = new BasicVersionUpgrade();
 
-        org.sonatype.nexus.configuration.model.v2_2_0.Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.v2_2_0.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.v2_2_0.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 }
