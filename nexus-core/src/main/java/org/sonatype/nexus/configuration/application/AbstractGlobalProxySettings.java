@@ -22,7 +22,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.model.CGlobalHttpProxySettingsCoreConfiguration;
+import org.sonatype.nexus.configuration.model.AbstractCGlobalProxySettingsCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -36,6 +36,7 @@ public abstract class AbstractGlobalProxySettings
     extends AbstractConfigurable
     implements GlobalProxySettings
 {
+
     @Requirement
     private AuthenticationInfoConverter authenticationInfoConverter;
 
@@ -54,7 +55,7 @@ public abstract class AbstractGlobalProxySettings
     @Override
     protected CRemoteHttpProxySettings getCurrentConfiguration( boolean forWrite )
     {
-        return ( (CGlobalHttpProxySettingsCoreConfiguration) getCurrentCoreConfiguration() )
+        return ( (AbstractCGlobalProxySettingsCoreConfiguration) getCurrentCoreConfiguration() )
             .getConfiguration( forWrite );
     }
 
@@ -64,13 +65,13 @@ public abstract class AbstractGlobalProxySettings
     {
         if ( configuration instanceof ApplicationConfiguration )
         {
-            return new CGlobalHttpProxySettingsCoreConfiguration( (ApplicationConfiguration) configuration );
+            return wrapConfiguration( (ApplicationConfiguration) configuration );
         }
         else
         {
             throw new ConfigurationException( "The passed configuration object is of class \""
-                + configuration.getClass().getName() + "\" and not the required \""
-                + ApplicationConfiguration.class.getName() + "\"!" );
+                                                  + configuration.getClass().getName() + "\" and not the required \""
+                                                  + ApplicationConfiguration.class.getName() + "\"!" );
         }
     }
 
@@ -82,7 +83,7 @@ public abstract class AbstractGlobalProxySettings
         {
             return getCurrentConfiguration( false ).isBlockInheritance();
         }
-        
+
         return false;
     }
 
@@ -102,7 +103,7 @@ public abstract class AbstractGlobalProxySettings
         {
             return getCurrentConfiguration( false ).getProxyHostname();
         }
-        
+
         return null;
     }
 
@@ -122,7 +123,7 @@ public abstract class AbstractGlobalProxySettings
         {
             return getCurrentConfiguration( false ).getProxyPort();
         }
-        
+
         return -1;
     }
 
@@ -143,18 +144,18 @@ public abstract class AbstractGlobalProxySettings
             try
             {
                 return authenticationInfoConverter.convertAndValidateFromModel( getCurrentConfiguration( false )
-                    .getAuthentication() );
+                                                                                    .getAuthentication() );
             }
             catch ( ConfigurationException e )
             {
                 // FIXME: what here??
-    
+
                 setProxyAuthentication( null );
-    
+
                 return null;
             }
         }
-        
+
         return null;
     }
 
@@ -166,14 +167,14 @@ public abstract class AbstractGlobalProxySettings
         }
 
         getCurrentConfiguration( true ).setAuthentication(
-                                                           authenticationInfoConverter
-                                                               .convertToModel( proxyAuthentication ) );
+            authenticationInfoConverter
+                .convertToModel( proxyAuthentication ) );
     }
 
     public RemoteProxySettings convertAndValidateFromModel( CRemoteHttpProxySettings model )
         throws ConfigurationException
     {
-        ( (CGlobalHttpProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).doValidateChanges( model );
+        ( (AbstractCGlobalProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).doValidateChanges( model );
 
         if ( model != null )
         {
@@ -191,8 +192,8 @@ public abstract class AbstractGlobalProxySettings
             remoteProxySettings.setPort( model.getProxyPort() );
 
             remoteProxySettings.setProxyAuthentication( authenticationInfoConverter.convertAndValidateFromModel( model
-                .getAuthentication() ) );
-            
+                                                                                                                     .getAuthentication() ) );
+
             remoteProxySettings.setNonProxyHosts( new HashSet<String>( model.getNonProxyHosts() ) );
 
             return remoteProxySettings;
@@ -220,8 +221,8 @@ public abstract class AbstractGlobalProxySettings
             model.setProxyPort( settings.getPort() );
 
             model.setAuthentication( authenticationInfoConverter.convertToModel( settings.getProxyAuthentication() ) );
-            
-            model.setNonProxyHosts( new ArrayList<String>(settings.getNonProxyHosts() ) );
+
+            model.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
 
             return model;
         }
@@ -231,17 +232,17 @@ public abstract class AbstractGlobalProxySettings
 
     public void disable()
     {
-        ( (CGlobalHttpProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).nullifyConfig();
+        ( (AbstractCGlobalProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).nullifyConfig();
     }
 
     public boolean isEnabled()
     {
         return getCurrentConfiguration( false ) != null;
     }
-    
+
     protected void initConfig()
     {
-        ( (CGlobalHttpProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).initConfig();
+        ( (AbstractCGlobalProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).initConfig();
     }
 
     public Set<String> getNonProxyHosts()
@@ -250,7 +251,7 @@ public abstract class AbstractGlobalProxySettings
         {
             return new HashSet<String>( getCurrentConfiguration( false ).getNonProxyHosts() );
         }
-        
+
         return Collections.emptySet();
     }
 
@@ -278,9 +279,10 @@ public abstract class AbstractGlobalProxySettings
         return wasDirty;
     }
 
-    /**
-     * @since 2.5
-     */
     protected abstract AbstractEvent createGlobalProxySettingsChangedEvent();
+
+    protected abstract AbstractCGlobalProxySettingsCoreConfiguration wrapConfiguration(
+        final ApplicationConfiguration configuration
+    );
 
 }

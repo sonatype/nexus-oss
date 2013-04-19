@@ -14,29 +14,26 @@ package org.sonatype.nexus.configuration.model;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
-public class CGlobalHttpProxySettingsCoreConfiguration
+/**
+ * @since 2.5
+ */
+public class CGlobalHttpsProxySettingsCoreConfiguration
     extends AbstractCGlobalProxySettingsCoreConfiguration
 {
 
-    public CGlobalHttpProxySettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
+    public CGlobalHttpsProxySettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
     {
         super( applicationConfiguration );
     }
 
-    /**
-     * @since 2.5
-     */
     protected CRemoteHttpProxySettings getGlobalProxySettings( final Configuration configuration )
     {
-        return configuration.getGlobalHttpProxySettings();
+        return configuration.getGlobalHttpsProxySettings();
     }
 
-    /**
-     * @since 2.5
-     */
     protected void setGlobalProxySettings( final CRemoteHttpProxySettings newProxy )
     {
-        getApplicationConfiguration().getConfigurationModel().setGlobalHttpProxySettings( newProxy );
+        getApplicationConfiguration().getConfigurationModel().setGlobalHttpsProxySettings( newProxy );
     }
 
 }

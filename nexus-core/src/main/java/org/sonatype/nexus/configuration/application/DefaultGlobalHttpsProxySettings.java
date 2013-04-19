@@ -14,6 +14,7 @@ package org.sonatype.nexus.configuration.application;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.application.events.GlobalHttpsProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.model.CGlobalHttpsProxySettingsCoreConfiguration;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
@@ -34,6 +35,12 @@ public class DefaultGlobalHttpsProxySettings
     protected AbstractEvent createGlobalProxySettingsChangedEvent()
     {
         return new GlobalHttpsProxySettingsChangedEvent( this );
+    }
+
+    protected CGlobalHttpsProxySettingsCoreConfiguration wrapConfiguration(
+        final ApplicationConfiguration configuration )
+    {
+        return new CGlobalHttpsProxySettingsCoreConfiguration( configuration );
     }
 
 }
