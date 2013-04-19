@@ -39,6 +39,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.micromailer.Address;
+import org.sonatype.nexus.configuration.application.GlobalProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -135,6 +136,14 @@ public class GlobalConfigurationPlexusResource
     public CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings()
     {
         return configurationSource.getConfiguration().getGlobalHttpProxySettings();
+    }
+
+    /**
+     * @since 2.5
+     */
+    public CRemoteHttpProxySettings readDefaultGlobalRemoteHttpsProxySettings()
+    {
+        return configurationSource.getConfiguration().getGlobalHttpsProxySettings();
     }
 
     public CRestApiSettings readDefaultRestApiSettings()
@@ -303,70 +312,8 @@ public class GlobalConfigurationPlexusResource
                         getGlobalRemoteConnectionSettings().setUserAgentCustomizationString( s.getUserAgentString() );
                     }
 
-                    if ( resource.getGlobalHttpProxySettings() != null
-                        && !StringUtils.isEmpty( resource.getGlobalHttpProxySettings().getProxyHostname() ) )
-                    {
-                        RemoteHttpProxySettings s = resource.getGlobalHttpProxySettings();
-
-                        getGlobalHttpProxySettings().setHostname( s.getProxyHostname() );
-
-                        getGlobalHttpProxySettings().setPort( s.getProxyPort() );
-
-                        List<String> nonProxyHosts = resource.getGlobalHttpProxySettings().getNonProxyHosts();
-                        if ( nonProxyHosts != null && !nonProxyHosts.isEmpty() )
-                        {
-                            // removing nulls and empty strings
-                            HashSet<String> cleanNonProxyHosts = new HashSet<String>();
-                            for ( String host : nonProxyHosts )
-                            {
-                                if ( StringUtils.isNotEmpty( host ) )
-                                {
-                                    cleanNonProxyHosts.add( host );
-                                }
-                            }
-                            getGlobalHttpProxySettings().setNonProxyHosts( cleanNonProxyHosts );
-                        }
-                        else
-                        {
-                            // clear it out
-                            getGlobalHttpProxySettings().setNonProxyHosts( new HashSet<String>( 0 ) );
-                        }
-
-                        if ( s.getAuthentication() != null )
-                        {
-                            CRemoteAuthentication auth = new CRemoteAuthentication();
-
-                            auth.setUsername( s.getAuthentication().getUsername() );
-
-                            String oldPassword = null;
-                            if ( getGlobalHttpProxySettings().getProxyAuthentication() != null )
-                            {
-                                oldPassword =
-                                    ( (UsernamePasswordRemoteAuthenticationSettings) getGlobalHttpProxySettings().getProxyAuthentication() ).getPassword();
-                            }
-
-                            auth.setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
-
-                            auth.setNtlmDomain( s.getAuthentication().getNtlmDomain() );
-
-                            auth.setNtlmHost( s.getAuthentication().getNtlmHost() );
-
-                            // auth.setPrivateKey( s.getAuthentication().getPrivateKey() );
-
-                            // auth.setPassphrase( s.getAuthentication().getPassphrase() );
-
-                            getGlobalHttpProxySettings().setProxyAuthentication(
-                                getAuthenticationInfoConverter().convertAndValidateFromModel( auth ) );
-                        }
-                        else
-                        {
-                            getGlobalHttpProxySettings().setProxyAuthentication( null );
-                        }
-                    }
-                    else
-                    {
-                        getGlobalHttpProxySettings().disable();
-                    }
+                    setGlobalProxySettings( resource.getGlobalHttpProxySettings(), getGlobalHttpProxySettings() );
+                    setGlobalProxySettings( resource.getGlobalHttpsProxySettings(), getGlobalHttpsProxySettings() );
 
                     getNexusConfiguration().setRealms( resource.getSecurityRealms() );
                     getNexusConfiguration().setSecurityEnabled( resource.isSecurityEnabled() );
@@ -455,6 +402,8 @@ public class GlobalConfigurationPlexusResource
 
                     boolean remoteHttpProxySettingsIsDirty = getGlobalHttpProxySettings().isDirty();
 
+                    boolean remoteHttpsProxySettingsIsDirty = getGlobalHttpsProxySettings().isDirty();
+
                     getNexusConfiguration().saveConfiguration();
 
                     // NEXUS-3064: to "inform" global remote storage context (and hence, all affected proxy
@@ -471,6 +420,12 @@ public class GlobalConfigurationPlexusResource
                     {
                         getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteProxySettings(
                             getGlobalHttpProxySettings() );
+                    }
+
+                    if ( remoteHttpsProxySettingsIsDirty )
+                    {
+                        getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteHttpsProxySettings(
+                            getGlobalHttpsProxySettings() );
                     }
                 }
                 catch ( IOException e )
@@ -499,6 +454,74 @@ public class GlobalConfigurationPlexusResource
         return null;
     }
 
+    private void setGlobalProxySettings( final RemoteHttpProxySettings remoteHttpProxySettings,
+                                         final GlobalProxySettings globalProxySettings )
+        throws ConfigurationException
+    {
+        if ( remoteHttpProxySettings != null
+            && !StringUtils.isEmpty( remoteHttpProxySettings.getProxyHostname() ) )
+        {
+            globalProxySettings.setHostname( remoteHttpProxySettings.getProxyHostname() );
+
+            globalProxySettings.setPort( remoteHttpProxySettings.getProxyPort() );
+
+            List<String> nonProxyHosts = remoteHttpProxySettings.getNonProxyHosts();
+            if ( nonProxyHosts != null && !nonProxyHosts.isEmpty() )
+            {
+                // removing nulls and empty strings
+                HashSet<String> cleanNonProxyHosts = new HashSet<String>();
+                for ( String host : nonProxyHosts )
+                {
+                    if ( StringUtils.isNotEmpty( host ) )
+                    {
+                        cleanNonProxyHosts.add( host );
+                    }
+                }
+                globalProxySettings.setNonProxyHosts( cleanNonProxyHosts );
+            }
+            else
+            {
+                // clear it out
+                globalProxySettings.setNonProxyHosts( new HashSet<String>( 0 ) );
+            }
+
+            if ( remoteHttpProxySettings.getAuthentication() != null )
+            {
+                CRemoteAuthentication auth = new CRemoteAuthentication();
+
+                auth.setUsername( remoteHttpProxySettings.getAuthentication().getUsername() );
+
+                String oldPassword = null;
+                if ( globalProxySettings.getProxyAuthentication() != null )
+                {
+                    oldPassword =
+                        ( (UsernamePasswordRemoteAuthenticationSettings) globalProxySettings.getProxyAuthentication() ).getPassword();
+                }
+
+                auth.setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
+
+                auth.setNtlmDomain( remoteHttpProxySettings.getAuthentication().getNtlmDomain() );
+
+                auth.setNtlmHost( remoteHttpProxySettings.getAuthentication().getNtlmHost() );
+
+                // auth.setPrivateKey( remoteHttpProxySettings.getAuthentication().getPrivateKey() );
+
+                // auth.setPassphrase( remoteHttpProxySettings.getAuthentication().getPassphrase() );
+
+                globalProxySettings.setProxyAuthentication(
+                    getAuthenticationInfoConverter().convertAndValidateFromModel( auth ) );
+            }
+            else
+            {
+                globalProxySettings.setProxyAuthentication( null );
+            }
+        }
+        else
+        {
+            globalProxySettings.disable();
+        }
+    }
+
     /**
      * Externalized Nexus object to DTO's conversion, using default Nexus configuration.
      * 
@@ -519,6 +542,8 @@ public class GlobalConfigurationPlexusResource
         resource.setGlobalConnectionSettings( convert( readDefaultGlobalRemoteConnectionSettings() ) );
 
         resource.setGlobalHttpProxySettings( convert( readDefaultGlobalRemoteHttpProxySettings() ) );
+
+        resource.setGlobalHttpsProxySettings( convert( readDefaultGlobalRemoteHttpsProxySettings() ) );
 
         RestApiSettings restApiSettings = convert( readDefaultRestApiSettings() );
         if ( restApiSettings != null )
@@ -550,6 +575,8 @@ public class GlobalConfigurationPlexusResource
         resource.setGlobalConnectionSettings( convert( getGlobalRemoteConnectionSettings() ) );
 
         resource.setGlobalHttpProxySettings( convert( getGlobalHttpProxySettings() ) );
+
+        resource.setGlobalHttpsProxySettings( convert( getGlobalHttpsProxySettings() ) );
 
         RestApiSettings restApiSettings = convert( getGlobalRestApiSettings() );
         if ( restApiSettings != null && StringUtils.isEmpty( restApiSettings.getBaseUrl() ) )

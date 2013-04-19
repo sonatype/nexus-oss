@@ -434,6 +434,15 @@
           <description>Global HTTP Proxy Settings (will be applied to all repositories by default).</description>
         </field>
         <field>
+          <name>globalHttpsProxySettings</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>RemoteHttpProxySettings</type>
+          </association>
+          <required>false</required>
+          <description>Global HTTPS Proxy Settings (will be applied to all repositories by default).</description>
+        </field>
+        <field>
           <name>globalRestApiSettings</name>
           <version>1.0.0+</version>
           <association>
