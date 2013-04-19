@@ -137,8 +137,8 @@ public class Nexus4579OptionalTrashForSnapshotsIT
         files = FileUtils.listFiles( groupFolder, null, true );
         assertThat( files, empty );
 
-        assertThat( "removed snapshots and metadata did go into trash: " + Arrays.toString( trashGroupIdFolder.list() ),
-                    trashGroupIdFolder.list(), nullValue() );
+        files = FileUtils.listFiles( trashArtifactFolder, null, true );
+        assertThat( "Files in trash folder", files, empty );
     }
 
     protected void runSnapshotRemover( String name,

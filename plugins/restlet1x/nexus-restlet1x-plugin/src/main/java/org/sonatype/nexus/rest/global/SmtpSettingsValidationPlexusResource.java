@@ -12,8 +12,11 @@
  */
 package org.sonatype.nexus.rest.global;
 
+import java.net.UnknownHostException;
+import java.security.cert.CertPathBuilderException;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -36,6 +39,7 @@ import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * The Smtp settings validation resource.
@@ -115,8 +119,10 @@ public class SmtpSettingsValidationPlexusResource
         }
         catch ( EmailerException e )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Failed to send validation e-mail: "
-                + e.getMessage(), e );
+            throw new PlexusResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST, e,
+                getNexusErrorResponse( "*", "Failed to send validation e-mail: " + parseReason( e ))
+            );
         }
 
         if ( status )
@@ -129,6 +135,29 @@ public class SmtpSettingsValidationPlexusResource
         }
 
         return null;
+    }
+
+    private String parseReason( final EmailerException e )
+    {
+        // first let's go to the top in exception chain
+        Throwable top = e;
+        while ( top.getCause() != null )
+        {
+            top = top.getCause();
+        }
+        if ( top instanceof SSLPeerUnverifiedException)
+        {
+            return "Untrusted Remote";
+        }
+        if( top instanceof CertPathBuilderException )
+        {
+            return "Untrusted Remote (" + top.getMessage() + ")";
+        }
+        if ( top instanceof UnknownHostException )
+        {
+            return "Unknown host '" + top.getMessage() + "'";
+        }
+        return top.getMessage();
     }
 
     static void validateEmail( final String email )

@@ -34,6 +34,8 @@ public class SnapshotRemoverTask
 
     public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 
+    public static final int DEFAULT_GRACE_DAYS_AFTER_RELEASE = 0;
+
     @Requirement
     private SnapshotRemover snapshotRemover;
 
@@ -88,6 +90,18 @@ public class SnapshotRemoverTask
                              Boolean.toString( removeIfReleaseExists ) );
     }
 
+    public int getGraceDaysAfterRelease()
+    {
+        String param = getParameters().get( SnapshotRemovalTaskDescriptor.GRACE_DAYS_AFTER_RELEASE_FIELD_ID );
+
+        if ( StringUtils.isEmpty( param ) )
+        {
+            return DEFAULT_GRACE_DAYS_AFTER_RELEASE;
+        }
+
+        return Integer.parseInt( param );
+    }
+
     public boolean isDeleteImmediately()
     {
         return Boolean.parseBoolean( getParameters().get( SnapshotRemovalTaskDescriptor.DELETE_IMMEDIATELY ) );
@@ -104,7 +118,7 @@ public class SnapshotRemoverTask
     {
         SnapshotRemovalRequest req =
             new SnapshotRemovalRequest( getRepositoryId(), getMinSnapshotsToKeep(), getRemoveOlderThanDays(),
-                isRemoveIfReleaseExists(), isDeleteImmediately());
+                isRemoveIfReleaseExists(), getGraceDaysAfterRelease(), isDeleteImmediately() );
 
         return snapshotRemover.removeSnapshots( req );
     }
