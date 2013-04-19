@@ -97,7 +97,7 @@ public class DefaultReleaseRemover
     public ReleaseRemovalResult removeReleases( final ReleaseRemovalRequest request )
         throws NoSuchRepositoryException
     {
-        getLogger().debug( "Removing releases from repository: {}", request.getRepositoryId() );
+        logDetails( request );
         ReleaseRemovalResult result = new ReleaseRemovalResult( request.getRepositoryId() );
 
         Repository repository = repositoryRegistry.getRepository( request.getRepositoryId() );
@@ -158,7 +158,7 @@ public class DefaultReleaseRemover
         return true;
     }
 
-    public ReleaseRemovalResult removeReleasesFromMavenRepository( final MavenRepository repository,
+    public void removeReleasesFromMavenRepository( final MavenRepository repository,
                                                                    final ReleaseRemovalRequest request,
                                                                    final ReleaseRemovalResult result,
                                                                    final Target repositoryTarget )
@@ -167,7 +167,7 @@ public class DefaultReleaseRemover
 
         if ( !repository.getLocalStatus().shouldServiceRequest() )
         {
-            return result;
+            return;
         }
 
         getLogger().debug(
@@ -188,7 +188,6 @@ public class DefaultReleaseRemover
         {
             result.setSuccessful( false );
         }
-        return result;
     }
 
     /**
@@ -202,6 +201,17 @@ public class DefaultReleaseRemover
         }
         return ConjunctionWalkerFilter.satisfiesAllOf( new DottedStoreWalkerFilter(),
                                                        new TargetStoreWalkerFilter( repositoryTarget ) );
+    }
+
+    private void logDetails( final ReleaseRemovalRequest request )
+    {
+        getLogger().info( "Removing older releases from repository: {}", request.getRepositoryId() );
+        if(getLogger().isDebugEnabled())
+        {
+            getLogger().debug( "With parameters: " );
+            getLogger().debug( "    NumberOfVersionsToKeep: {}", request.getNumberOfVersionsToKeep() );
+            getLogger().debug( "    RepositoryTarget applied: {}", request.getTargetId() );
+        }
     }
 
     private class ReleaseRemovalWalkerProcessor
@@ -275,6 +285,7 @@ public class DefaultReleaseRemover
                     }
                 }
             }
+            // if a gav can be calculated, it should be shared by all files in the collection
             if ( null != gav )
             {
                 addVersionsToGas( gas, deletableVersionsAndFiles, gav );

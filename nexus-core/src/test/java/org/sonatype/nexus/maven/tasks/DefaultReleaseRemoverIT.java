@@ -100,7 +100,7 @@ public class DefaultReleaseRemoverIT
         }
         catch ( ItemNotFoundException e )
         {
-            Assert.fail();
+            Assert.fail("Files should not have been deleted, but we can't find them now");
         }
     }
 
