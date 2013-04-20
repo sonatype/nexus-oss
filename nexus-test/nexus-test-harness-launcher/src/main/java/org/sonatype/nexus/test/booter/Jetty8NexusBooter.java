@@ -450,7 +450,7 @@ public class Jetty8NexusBooter
         // tamperJarsForSharedClasspath( basedir, sharedLibs, "slf4j-*.jar" );
         // tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
 
-        // move jetty (actualy, all that is level up in real bundle too) level up, it is isolated anyway in real bundle
+        // move jetty (actually, all that is level up in real bundle too) level up, it is isolated anyway in real bundle
         tamperJarsForSharedClasspath( basedir, sharedLibs, "jetty-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "javax.servlet-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "sisu-jetty8-*.jar" );
@@ -461,6 +461,7 @@ public class Jetty8NexusBooter
         tamperJarsForSharedClasspath( basedir, sharedLibs, "slf4j-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "nexus-logging-extras-appender-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-*.jar" );
     }
 
     /**
