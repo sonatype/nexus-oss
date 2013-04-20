@@ -613,7 +613,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
           collapsed : true,
           id : formId + '_' + 'globalHttpsProxySettings',
           name : 'globalHttpsProxySettings',
-          title : 'Default HTTPS Proxy Settings (optional)',
+          title : 'Default HTTPS Proxy Settings (optional, defaults to HTTP Proxy Settings )',
           anchor : Sonatype.view.FIELDSET_OFFSET,
           autoHeight : true,
           layoutConfig : {
