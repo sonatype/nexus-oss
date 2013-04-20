@@ -606,7 +606,129 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
             } // end auth fieldset
           ]
         },
-        // end proxy settings
+        // end http proxy settings
+        {
+          xtype : 'fieldset',
+          checkboxToggle : true,
+          collapsed : true,
+          id : formId + '_' + 'globalHttpsProxySettings',
+          name : 'globalHttpsProxySettings',
+          title : 'Default HTTPS Proxy Settings (optional)',
+          anchor : Sonatype.view.FIELDSET_OFFSET,
+          autoHeight : true,
+          layoutConfig : {
+            labelSeparator : ''
+          },
+          listeners : {
+            'expand' : {
+              fn : this.optionalFieldsetExpandHandler,
+              scope : this
+            },
+            'collapse' : {
+              fn : this.optionalFieldsetCollapseHandler,
+              scope : this,
+              delay : 100
+            }
+          },
+
+          items : [
+            {
+              xtype : 'textfield',
+              fieldLabel : 'Proxy Host',
+              helpText : ht.proxyHostname,
+              name : 'globalHttpsProxySettings.proxyHostname',
+              anchor : Sonatype.view.FIELD_OFFSET,
+              itemCls : 'required-field',
+              allowBlank : true,
+              validator : function(v) {
+                if (v.search(/:\//) === -1) {
+                  return true;
+                }
+
+                return 'Specify hostname without the protocol, example "my.host.com"';
+              }
+            },
+            {
+              xtype : 'numberfield',
+              fieldLabel : 'Proxy Port',
+              helpText : ht.proxyPort,
+              name : 'globalHttpsProxySettings.proxyPort',
+              width : 50,
+              itemCls : 'required-field',
+              allowBlank : true,
+              allowDecimals : false,
+              allowNegative : false,
+              maxValue : 65535
+            },
+            {
+              xtype : 'textentrylist',
+              name : 'nonProxyHostsHttps',
+              entryHelpText : ht.nonProxyHosts,
+              entryLabel : 'Non Proxy Host',
+              listLabel : 'Non Proxy Hosts'
+            },
+            {
+              xtype : 'fieldset',
+              checkboxToggle : true,
+              collapsed : true,
+              id : formId + '_' + 'globalHttpsProxySettings.authentication',
+              name : 'globalHttpsProxySettings.authentication',
+              title : 'Authentication (optional)',
+              anchor : Sonatype.view.FIELDSET_OFFSET,
+              autoHeight : true,
+              layoutConfig : {
+                labelSeparator : ''
+              },
+              listeners : {
+                'expand' : {
+                  fn : this.optionalFieldsetExpandHandler,
+                  scope : this
+                },
+                'collapse' : {
+                  fn : this.optionalFieldsetCollapseHandler,
+                  scope : this,
+                  delay : 100
+                }
+              },
+              items : [
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'Username',
+                  helpText : ht.username,
+                  name : 'globalHttpsProxySettings.authentication.username',
+                  width : 100,
+                  allowBlank : true
+                },
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'Password',
+                  helpText : ht.password,
+                  inputType : 'password',
+                  name : 'globalHttpsProxySettings.authentication.password',
+                  width : 100,
+                  allowBlank : true
+                },
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'NT LAN Host',
+                  helpText : ht.ntlmHost,
+                  name : 'globalHttpsProxySettings.authentication.ntlmHost',
+                  anchor : Sonatype.view.FIELD_OFFSET,
+                  allowBlank : true
+                },
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'NT LAN Manager Domain',
+                  helpText : ht.ntlmDomain,
+                  name : 'globalHttpsProxySettings.authentication.ntlmDomain',
+                  anchor : Sonatype.view.FIELD_OFFSET,
+                  allowBlank : true
+                }
+              ]
+            } // end auth fieldset
+          ]
+        },
+        // end https proxy settings
         {
           xtype : 'fieldset',
           checkboxToggle : false,
@@ -758,6 +880,9 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         },
         "globalHttpProxySettings.nonProxyHosts" : function(val, fpanel) {
           return fpanel.find('name', 'nonProxyHosts')[0].getEntries();
+        },
+        "globalHttpsProxySettings.nonProxyHosts" : function(val, fpanel) {
+          return fpanel.find('name', 'nonProxyHostsHttps')[0].getEntries();
         }
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState,
@@ -827,6 +952,9 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         },
         "globalHttpProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
           fpanel.find('name', 'nonProxyHosts')[0].setEntries(arr);
+        },
+        "globalHttpsProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
+          fpanel.find('name', 'nonProxyHostsHttps')[0].setEntries(arr);
         }
       }
     });
