@@ -66,7 +66,7 @@ public class SnapshotRemovalTaskDescriptor
     private final NumberTextFormField graceDaysAfterReleaseField = new NumberTextFormField(
             GRACE_DAYS_AFTER_RELEASE_FIELD_ID,
             "Grace period after release (days)",
-            "The grace period of time (in days) that the job will not purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT).",
+            "The grace period (in days) that the task will not purge all snapshots that have a corresponding released artifact.",
             FormField.OPTIONAL
     );
 
