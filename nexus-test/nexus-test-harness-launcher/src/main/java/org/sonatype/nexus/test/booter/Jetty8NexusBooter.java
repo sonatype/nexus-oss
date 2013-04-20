@@ -461,7 +461,9 @@ public class Jetty8NexusBooter
         tamperJarsForSharedClasspath( basedir, sharedLibs, "slf4j-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "nexus-logging-extras-appender-*.jar" );
-        tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-core-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-jetty-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-logback-*.jar" );
     }
 
     /**
