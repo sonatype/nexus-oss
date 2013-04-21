@@ -17,6 +17,7 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retri
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.getP2Type;
 
 import java.io.File;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -29,8 +30,8 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -44,14 +45,10 @@ public class JarsEventsInspector
 
     private final Provider<P2MetadataGenerator> p2MetadataGenerator;
 
-    private final Provider<RepositoryRegistry> repositories;
-
     @Inject
-    public JarsEventsInspector( final Provider<P2MetadataGenerator> p2MetadataGenerator,
-                                final Provider<RepositoryRegistry> repositories )
+    public JarsEventsInspector( final Provider<P2MetadataGenerator> p2MetadataGenerator )
     {
         this.p2MetadataGenerator = checkNotNull( p2MetadataGenerator );
-        this.repositories = checkNotNull( repositories );
     }
 
     @Subscribe
@@ -94,7 +91,7 @@ public class JarsEventsInspector
         try
         {
             final File file = retrieveFile(
-                repositories.get().getRepository( item.getRepositoryId() ), item.getPath()
+                item.getRepositoryItemUid().getRepository(), item.getPath()
             );
             return getP2Type( file ) != null;
         }
