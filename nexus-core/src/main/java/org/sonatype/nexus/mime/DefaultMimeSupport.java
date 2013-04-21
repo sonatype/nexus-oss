@@ -25,6 +25,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -142,7 +143,9 @@ public class DefaultMimeSupport
         }
         catch ( ExecutionException e )
         {
-            throw new RuntimeException( e );
+            Throwables.propagate( e );
+            // only to make compiler happy, execution will never get here
+            return null;
         }
     }
 
