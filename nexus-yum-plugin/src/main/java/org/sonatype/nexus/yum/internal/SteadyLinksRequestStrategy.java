@@ -29,9 +29,10 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.AbstractRequestProcessor;
+import org.sonatype.nexus.proxy.repository.AbstractRequestStrategy;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RequestProcessor;
+import org.sonatype.nexus.proxy.repository.RequestStrategy;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Closeables;
 
@@ -40,23 +41,23 @@ import com.google.common.io.Closeables;
  */
 @Named
 @Singleton
-public class SteadyLinksRequestProcessor
-    extends AbstractRequestProcessor
-    implements RequestProcessor
+public class SteadyLinksRequestStrategy
+    extends AbstractRequestStrategy
+    implements RequestStrategy
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( YumRegistryImpl.class );
 
     @VisibleForTesting
     static final String REQUEST_PATH_ORIGINAL =
-        SteadyLinksRequestProcessor.class.getName() + ".originalRequestPath";
+        SteadyLinksRequestStrategy.class.getName() + ".originalRequestPath";
 
     @VisibleForTesting
     static final String REQUEST_PATH_NEW =
-        SteadyLinksRequestProcessor.class.getName() + ".newRequestPath";
+        SteadyLinksRequestStrategy.class.getName() + ".newRequestPath";
 
     @Override
-    public boolean process( final Repository repository, final ResourceStoreRequest request, final Action action )
+    public void onHandle( final Repository repository, final ResourceStoreRequest request, final Action action )
     {
         if ( Action.read.equals( action ) )
         {
@@ -113,13 +114,11 @@ public class SteadyLinksRequestProcessor
                 }
             }
         }
-        return true;
     }
 
     @Override
-    public boolean shouldRetrieve( final Repository repository, final ResourceStoreRequest request,
+    public void onServing( final Repository repository, final ResourceStoreRequest request,
                                    final StorageItem item )
-        throws IllegalOperationException, ItemNotFoundException, AccessDeniedException
     {
         final Object originalRequestPath = request.getRequestContext().get( REQUEST_PATH_ORIGINAL );
         final Object newRequestPath = request.getRequestContext().get( REQUEST_PATH_NEW );
@@ -132,8 +131,6 @@ public class SteadyLinksRequestProcessor
             request.getRequestContext().remove( REQUEST_PATH_ORIGINAL );
             request.getRequestContext().remove( REQUEST_PATH_NEW );
         }
-
-        return true;
     }
 
     @VisibleForTesting
