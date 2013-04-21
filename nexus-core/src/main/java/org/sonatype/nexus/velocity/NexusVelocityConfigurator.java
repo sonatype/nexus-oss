@@ -20,11 +20,9 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.sonatype.sisu.velocity.internal.VelocityConfigurator;
 
 /**
- * Nexus specific {@link VelocityConfigurator} implementation, that configures {@link VelocityEngine} for Nexus, and
- * supports "development" or "production" mode, depending on configuration (system property
- * {@code nexus.velocity.production} that defaults to {@code true}). By default, it configures the "production" mode,
- * which is basically turning template caching on without modification check (as Nexus uses JARred templates that are
- * not changing at runtime).
+ * Nexus specific {@link VelocityConfigurator} implementation, that configures {@link VelocityEngine} for Nexus. It
+ * configures the "production" mode, which is basically turning template caching on without modification check (as Nexus
+ * uses JARred templates that are not changing at runtime).
  * 
  * @author cstamas
  * @since 2.5
