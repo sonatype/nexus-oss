@@ -393,6 +393,28 @@ public class ResourceStoreRequest
         return appliedMappings;
     }
 
+    // ==
+
+    /**
+     * Creates a clone of this request, but also "detaches" it from any parent context relationship, effectively making
+     * result new "detached" instance that captures the snapshot of the request in a moment when the clone was created.
+     * 
+     * @return the clone of this request, detached from any outgoing relations.
+     * @since 2.5
+     */
+    public ResourceStoreRequest cloneAndDetach()
+    {
+        final ResourceStoreRequest result = new ResourceStoreRequest( getRequestPath() );
+        result.requestContext.setParentContext( null );
+        result.requestContext.putAll( requestContext.flatten() );
+        result.pathStack.clear();
+        result.processedRepositories.clear();
+        result.processedRepositories.addAll( processedRepositories );
+        result.appliedMappings.clear();
+        result.appliedMappings.putAll( appliedMappings );
+        return result;
+    }
+
     @Override
     public String toString()
     {

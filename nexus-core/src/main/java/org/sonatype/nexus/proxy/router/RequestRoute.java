@@ -98,4 +98,14 @@ public class RequestRoute
     {
         this.resourceStoreRequest = resourceStoreRequest;
     }
+
+    // ==
+
+    @Override
+    public String toString()
+    {
+        return "RequestRoute [targetedRepository=" + targetedRepository + ", repositoryPath=" + repositoryPath
+            + ", strippedPrefix=" + strippedPrefix + ", originalRequestPath=" + originalRequestPath + ", requestDepth="
+            + requestDepth + ", resourceStoreRequest=" + resourceStoreRequest + "]";
+    }
 }

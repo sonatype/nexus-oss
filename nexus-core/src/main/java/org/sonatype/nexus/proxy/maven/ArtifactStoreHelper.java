@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -328,7 +330,9 @@ public class ArtifactStoreHelper
 
             if ( gav == null )
             {
-                throw new ItemNotFoundException( gavRequest, repository );
+                throw new ItemNotFoundException( reasonFor( gavRequest, repository,
+                    "Request %s is not resolvable in repository %s", gavRequest.getRequestPath(),
+                    RepositoryStringUtils.getHumanizedNameString( repository ) ) );
             }
 
             return gav;

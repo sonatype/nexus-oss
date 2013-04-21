@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -29,6 +31,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
@@ -246,7 +249,9 @@ public abstract class AbstractShadowRepository
         catch ( AccessDeniedException e )
         {
             // if client has no access to content over shadow, we just hide the fact
-            throw new ItemNotFoundException( request, this, e );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Path %s not found in repository %s",
+                RepositoryStringUtils.getHumanizedNameString( this ) ), e );
         }
     }
 }

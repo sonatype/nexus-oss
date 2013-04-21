@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -604,7 +606,8 @@ public abstract class LayoutConverterShadowRepository
 
             if ( transformedPaths == null || transformedPaths.isEmpty() )
             {
-                throw new ItemNotFoundException( request, this );
+                throw new ItemNotFoundException( reasonFor( request, this,
+                    "Request path %s is not transformable to master.", request.getRequestPath() ) );
             }
 
             for ( String transformedPath : transformedPaths )

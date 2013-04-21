@@ -71,7 +71,7 @@ public class HttpClientRemoteStorageTest
                 mock( MimeSupport.class ), mock( QueryStringBuilder.class ), mock( HttpClientManager.class ) );
 
         thrown.expect( RemoteItemNotFoundException.class );
-        thrown.expectMessage( "The remoteURL we got to looks like is a collection" );
+        thrown.expectMessage( "not found in remote storage of repository" );
 
         underTest.retrieveItem( mock( ProxyRepository.class ), new ResourceStoreRequest( "bar/" ), "http://foo.com" );
     }
@@ -89,7 +89,7 @@ public class HttpClientRemoteStorageTest
                 mock( MimeSupport.class ), mock( QueryStringBuilder.class ), mock( HttpClientManager.class ) );
 
         thrown.expect( RemoteItemNotFoundException.class );
-        thrown.expectMessage( "The remoteURL we got to looks like is a collection" );
+        thrown.expectMessage( "not found in remote storage of repository" );
 
         underTest.retrieveItem( mock( ProxyRepository.class ), new ResourceStoreRequest( "bar/?param=x/" ),
             "http://foo.com" );
@@ -108,7 +108,7 @@ public class HttpClientRemoteStorageTest
                 mock( MimeSupport.class ), mock( QueryStringBuilder.class ), mock( HttpClientManager.class ) );
 
         thrown.expect( RemoteItemNotFoundException.class );
-        thrown.expectMessage( "The remoteURL we got to looks like is a collection" );
+        thrown.expectMessage( "not found in remote storage of repository" );
 
         underTest.retrieveItem( mock( ProxyRepository.class ), new ResourceStoreRequest( "bar/?param=x" ),
             "http://foo.com" );

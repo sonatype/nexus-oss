@@ -357,12 +357,37 @@ public interface Repository
     // Behaviour
 
     /**
-     * Returns the list of defined request processors.
+     * Registers a {@link RequestStrategy} with this repository.
      * 
-     * @return
+     * @param key must not be {@code null}.
+     * @param strategy must not be {@code null}.
+     * @return the strategy that was already registered under this key (might be same instance if method invoked with
+     *         same instance!), or {@code null} if there was no strategy registered under this key. In short, the
+     *         replaced strategy or {@code null}.
+     * @since 2.5
      */
-    Map<String, RequestProcessor> getRequestProcessors();
+    RequestStrategy registerRequestStrategy( String key, RequestStrategy strategy );
 
+    /**
+     * Unregisters a {@link RequestStrategy} from this repository.
+     * 
+     * @param key must not be {@code null}.
+     * @return the strategy that was registered under this key, or {@code null} if there was no strategy registered
+     *         under this key. In short, the unregistered strategy or {@code null}.
+     * @since 2.5
+     */
+    RequestStrategy unregisterRequestStrategy( String key );
+    
+    /**
+     * Returns a detached (a copy made in the moment of invocation of this method) map containing all the registered
+     * {@link RequestStrategy}. Modifications to returned map are possible, but does not affect the originating
+     * repository (this repository).
+     * 
+     * @return map of registered {@link RequestStrategy}.
+     * @since 2.5
+     */
+    Map<String, RequestStrategy> getRegisteredStrategies();
+    
     /**
      * If is user managed, the nexus core and nexus core UI handles the store. Thus, for reposes, users are allowed to
      * edit/drop the repository.

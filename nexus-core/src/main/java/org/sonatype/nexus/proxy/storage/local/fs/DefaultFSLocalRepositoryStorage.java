@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -48,6 +49,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
 
@@ -268,7 +270,9 @@ public class DefaultFSLocalRepositoryStorage
 
                         target.delete();
 
-                        throw new ItemNotFoundException( request, repository, e );
+                        throw new ItemNotFoundException( reasonFor( request, repository,
+                            "Path %s not found in local storage of repository %s", request.getRequestPath(),
+                            RepositoryStringUtils.getHumanizedNameString( repository ) ), e );
                     }
                 }
                 else
@@ -292,7 +296,9 @@ public class DefaultFSLocalRepositoryStorage
                 // this could have been an external process
                 // See: https://issues.sonatype.org/browse/NEXUS-4570
                 getLogger().debug( "File '{}' removed before finished processing the directory listing", target, e );
-                throw new ItemNotFoundException( request, repository, e );
+                throw new ItemNotFoundException( reasonFor( request, repository,
+                    "Path %s not found in local storage of repository %s", request.getRequestPath(),
+                    RepositoryStringUtils.getHumanizedNameString( repository ) ), e );
             }
             catch ( IOException e )
             {
@@ -301,7 +307,9 @@ public class DefaultFSLocalRepositoryStorage
         }
         else
         {
-            throw new ItemNotFoundException( request, repository );
+            throw new ItemNotFoundException( reasonFor( request, repository,
+                "Path %s not found in local storage of repository %s", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( repository ) ) );
         }
 
         return result;

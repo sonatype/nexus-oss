@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 import java.io.EOFException;
 import java.io.File;
@@ -258,7 +259,9 @@ public class DefaultFSPeer
         }
         else
         {
-            throw new ItemNotFoundException( request, repository );
+            throw new ItemNotFoundException( reasonFor( request, repository,
+                "Path %s not found in local storage of repository %s", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( repository ) ) );
         }
     }
 
@@ -313,7 +316,9 @@ public class DefaultFSPeer
         }
         else
         {
-            throw new ItemNotFoundException( from, repository );
+            throw new ItemNotFoundException( reasonFor( from, repository,
+                "Path %s not found in local storage of repository %s", from.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( repository ) ) );
         }
     }
 
@@ -365,7 +370,9 @@ public class DefaultFSPeer
         }
         else
         {
-            throw new ItemNotFoundException( request, repository );
+            throw new ItemNotFoundException( reasonFor( request, repository,
+                "Path %s not found in local storage of repository %s", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( repository ) ) );
         }
     }
 
@@ -480,8 +487,8 @@ public class DefaultFSPeer
         // if retries enabled go ahead and start the retry process
         for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
-            getLogger().debug( "Rename operation attempt {} failed on {} --> {}, will wait {} ms and try again",
-                new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), getRenameRetryDelay() } );
+            getLogger().debug( "Rename operation attempt {} failed on {} --> {}, will wait {} ms and try again", i,
+                hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), getRenameRetryDelay() );
 
             try
             {
@@ -502,8 +509,8 @@ public class DefaultFSPeer
 
             if ( success )
             {
-                getLogger().info( "Rename operation succeeded after {} retries on {} --> {}",
-                    new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath() } );
+                getLogger().info( "Rename operation succeeded after {} retries on {} --> {}", i,
+                    hiddenTarget.getAbsolutePath(), target.getAbsolutePath() );
             }
         }
 
@@ -515,10 +522,9 @@ public class DefaultFSPeer
             }
             catch ( IOException e )
             {
-                getLogger().error(
-                    "Rename operation failed after {} retries in {} ms intervals {} --> {}",
-                    new Object[] { getRenameRetryCount(), getRenameRetryDelay(), hiddenTarget.getAbsolutePath(),
-                        target.getAbsolutePath() } );
+                getLogger().error( "Rename operation failed after {} retries in {} ms intervals {} --> {}",
+                    getRenameRetryCount(), getRenameRetryDelay(), hiddenTarget.getAbsolutePath(),
+                    target.getAbsolutePath() );
 
                 throw new IOException( String.format( "Cannot rename file \"%s\" to \"%s\"! Message: %s",
                     hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), e.getMessage() ), e );
