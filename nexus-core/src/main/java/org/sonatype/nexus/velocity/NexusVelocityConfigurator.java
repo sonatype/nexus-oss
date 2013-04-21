@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.velocity;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -35,49 +34,17 @@ import org.sonatype.sisu.velocity.internal.VelocityConfigurator;
 public class NexusVelocityConfigurator
     implements VelocityConfigurator
 {
-    private final boolean production;
-
-    @Inject
-    public NexusVelocityConfigurator( @Named( "${nexus.velocity.production:-true}" ) final boolean production )
-    {
-        super();
-        this.production = production;
-    }
-
     @Override
     public void configure( final VelocityEngine engine )
     {
         engine.setProperty( RuntimeConstants.RESOURCE_LOADER, "class" );
         engine.setProperty( "class.resource.loader.class",
             "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader" );
-
-        if ( production )
-        {
-            configureForProduction( engine );
-        }
-        else
-        {
-            configureForDevelopment( engine );
-        }
-    }
-
-    // ==
-
-    protected void configureForProduction( final VelocityEngine engine )
-    {
         // caching ON
         engine.setProperty( "class.resource.loader.cache", "true" );
         // never check for template modification (they are JARred)
         engine.setProperty( "class.resource.loader.modificationCheckInterval", "0" );
         // strict mode OFF
         engine.setProperty( "runtime.references.strict", "false" );
-    }
-
-    protected void configureForDevelopment( final VelocityEngine engine )
-    {
-        // caching OFF
-        engine.setProperty( "class.resource.loader.cache", "false" );
-        // strict mode ON for early error detection
-        engine.setProperty( "runtime.references.strict", "true" );
     }
 }
