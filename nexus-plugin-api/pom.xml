@@ -78,6 +78,27 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-velocity</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-common</artifactId>
+      <exclusions>
+        <!-- Excluding except slf4j-api and guava that are already declared above -->
+        <exclusion>
+          <groupId>org.sonatype.gossip</groupId>
+          <artifactId>gossip-support</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.intellij</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
   </dependencies>
 
   <build>

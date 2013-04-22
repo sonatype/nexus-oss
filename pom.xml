@@ -179,7 +179,7 @@
     <plexus-security.version>3.0.3-SNAPSHOT</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
-    <goodies.version>1.6</goodies.version>
+    <goodies.version>1.6.1</goodies.version>
     <metrics.version>2.2.0</metrics.version>
 
     <!-- See 'idea' profile. -->
