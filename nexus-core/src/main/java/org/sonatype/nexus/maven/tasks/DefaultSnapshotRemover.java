@@ -554,7 +554,7 @@ public class DefaultSnapshotRemover
 
                 for ( String classifier : deletableByClassifier.keySet() )
                 {
-                    getLogger().debug( "Processing deletes for classifier: {}", classifier );
+                    getLogger().debug( "Processing deletes for classifier: {}", isNotEmpty(classifier) ? classifier : "-NONE-" );
                     //if there are no files remaining for a classifier, introduce an empty map for processing
                     if(!remainingByClassifier.containsKey( classifier ))
                     {
