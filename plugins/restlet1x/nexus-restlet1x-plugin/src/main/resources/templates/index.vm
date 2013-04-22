@@ -79,6 +79,10 @@
                         }
                         alreadyDone = true;
 
+                        if (Ext.isIE6 || Ext.isIE7) {
+                            Ext.MessageBox.alert('Unsupported Browser', 'You are using a version of Internet Explorer that is not supported.<br/>See the <a href="http://links.sonatype.com/products/nexus/oss/docs/browsers">knowledge base article</a> for details.')
+                        }
+
                         Nexus.Log.debug('Initializing UI...');
                         Sonatype.init();
                         Sonatype.view.init();
