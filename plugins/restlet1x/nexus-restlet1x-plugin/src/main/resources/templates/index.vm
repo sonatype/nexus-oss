@@ -20,7 +20,7 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-  <link rel="icon" type="image/png" href="favicon.png"><!-- Major Browsers -->
+  <link rel="icon" type="image/png" href="favicon.png"/><!-- Major Browsers -->
   <!--[if IE]><link rel="SHORTCUT ICON" href="favicon.ico"/><![endif]--><!-- Internet Explorer-->
 
   <link rel="search" type="application/opensearchdescription+xml" href="$serviceBase/opensearch" title="Nexus" />
@@ -31,10 +31,9 @@
   #end
   ## Plugin pre HEAD contributions ends here
 
-  <link rel="stylesheet" href="ext-3.4.1.1/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="ext-3.4.1.1/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="style/$buildQualifier/sonatype-all.css" type="text/css" media="screen" title="no title" charset="utf-8">
-
+  <link rel="stylesheet" href="ext-3.4.1.1/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8"/>
+  <link rel="stylesheet" href="ext-3.4.1.1/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8"/>
+  <link rel="stylesheet" href="style/$buildQualifier/sonatype-all.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
 
   #if ($debug)
       <script src="ext-3.4.1.1/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
@@ -174,7 +173,7 @@
 
 <div id="header">
   <div id="branding" class="left-side">
-    <image src="images/header_branding.png"/>
+    <img src="images/header_branding.png" alt="Sonatype Nexus"/>
   </div>
   <div class="right-side">
     <div><span id="head-link-l" class="head-link"></span><span id="head-link-m" class="head-link"></span><span id="head-link-r" class="head-link"></span></div>
