@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.guice;
 
-import org.apache.shiro.guice.aop.ShiroAopModule;
-
 import com.google.inject.AbstractModule;
+import com.yammer.metrics.guice.InstrumentationModule;
+import org.apache.shiro.guice.aop.ShiroAopModule;
 
 /**
  * Nexus guice modules.
@@ -33,6 +33,7 @@ public class NexusModules
         @Override
         protected void configure() {
             install(new ShiroAopModule());
+            install(new InstrumentationModule());
         }
     }
 

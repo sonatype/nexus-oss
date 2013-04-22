@@ -73,6 +73,16 @@
     </dependency>
 
     <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-servlet</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-web</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-edition</artifactId>
     </dependency>

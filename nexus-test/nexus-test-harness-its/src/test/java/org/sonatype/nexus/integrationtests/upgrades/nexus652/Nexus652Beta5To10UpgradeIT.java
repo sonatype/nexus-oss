@@ -87,6 +87,8 @@ public class Nexus652Beta5To10UpgradeIT
     public void checkSecurityConfig()
         throws IOException
     {
+        // FIXME: This is a pretty shitty integration test... not sure this is worth the ~30 seconds it takes to run this
+
         org.sonatype.security.model.Configuration secConfig = getSecurityConfigUtil().getSecurityConfig();
 
         Assert.assertEquals( "User Count:", secConfig.getUsers().size(), 7 );
@@ -95,7 +97,7 @@ public class Nexus652Beta5To10UpgradeIT
         {
             roleIds.add( role.getId() );
         }
-        Assert.assertEquals( "Roles Count differs, expected: 29, found: " + roleIds, secConfig.getRoles().size(), 29 );
+        Assert.assertEquals( "Roles Count differs, expected: 30, found: " + roleIds, secConfig.getRoles().size(), 30 );
 
         // again, everything should have been upgraded.
     }

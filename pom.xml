@@ -176,10 +176,11 @@
     <aether.version>1.13.1</aether.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <plexus-security.version>3.0.2</plexus-security.version>
+    <plexus-security.version>3.0.3-SNAPSHOT</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.6</goodies.version>
+    <metrics.version>2.2.0</metrics.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -831,9 +832,51 @@
       </dependency>
 
       <dependency>
-        <groupId>org.javasimon</groupId>
-        <artifactId>javasimon-core</artifactId>
-        <version>3.3.0</version>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-guice</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-servlet</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-jersey</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-jetty</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-httpclient</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-logback</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-web</artifactId>
+        <version>${metrics.version}</version>
       </dependency>
 
       <!-- INTERNAL -->
