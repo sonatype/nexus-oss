@@ -28,7 +28,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       autoScroll : true
     });
 
-    var
+    var   self = this,
           securityConfigField,
           ht = Sonatype.repoServer.resources.help.server,
           formId = Ext.id(),
@@ -499,11 +499,20 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
           },
           listeners : {
             'expand' : {
-              fn : this.optionalFieldsetExpandHandler,
+              fn : Ext.createSequence(this.optionalFieldsetExpandHandler, function() {
+                var fieldset = self.find('name', 'globalHttpsProxySettings')[0];
+                // we need to use the DOM here because the 'checkboxToggle' is not a real Ext component
+                fieldset.checkbox.dom.disabled = false;
+              }),
               scope : this
             },
             'collapse' : {
-              fn : this.optionalFieldsetCollapseHandler,
+              fn : Ext.createSequence(this.optionalFieldsetCollapseHandler, function() {
+                var fieldset = self.find('name', 'globalHttpsProxySettings')[0];
+                fieldset.collapse();
+                // we need to use the DOM here because the 'checkboxToggle' is not a real Ext component
+                fieldset.checkbox.dom.disabled = true;
+              }),
               scope : this,
               delay : 100
             }
