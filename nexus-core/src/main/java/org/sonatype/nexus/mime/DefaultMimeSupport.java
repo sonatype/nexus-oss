@@ -143,9 +143,7 @@ public class DefaultMimeSupport
         }
         catch ( ExecutionException e )
         {
-            Throwables.propagate( e );
-            // only to make compiler happy, execution will never get here
-            return null;
+            throw Throwables.propagate( e );
         }
     }
 
