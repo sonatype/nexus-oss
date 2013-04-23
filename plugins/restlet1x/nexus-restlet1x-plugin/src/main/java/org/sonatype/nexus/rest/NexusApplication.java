@@ -13,6 +13,7 @@
 package org.sonatype.nexus.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.shiro.util.AntPathMatcher;
 import org.codehaus.plexus.component.annotations.Component;
@@ -53,8 +54,14 @@ public class NexusApplication
     @Requirement
     private ProtectedPathManager protectedPathManager;
 
-    @Requirement( hint = "indexTemplate" )
-    private ManagedPlexusResource indexTemplateResource;
+    /**
+     * HACK directly injecting indexTemplate managed resource broke Nexus startup here, wasn't resolvable. It's only
+     * available in the collection later. This should be generalized for all "ManagedPlexusResource" (all resources that
+     * are bound from /,  not /service/local) but we need a little bit of order here to have resources being able to
+     * override the default UI. (e.g. licensing)
+     */
+    @Requirement
+    private Map<String, ManagedPlexusResource> managedResources;
 
     @Requirement( hint = "licenseTemplate", optional = true )
     private ManagedPlexusResource licenseTemplateResource;
@@ -179,7 +186,7 @@ public class NexusApplication
         attach( root, true, "/", new NexusPlexusResourceFinder( getContext(), indexRedirectingResource ) );
 
         // the indexTemplateResource
-        attach( root, false, indexTemplateResource );
+        attach( root, false, managedResources.get( "indexTemplate" ) );
         if( licenseTemplateResource != null )
         {
             attach( root, false, licenseTemplateResource );

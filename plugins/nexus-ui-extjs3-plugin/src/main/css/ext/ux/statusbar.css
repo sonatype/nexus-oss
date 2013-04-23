@@ -86,7 +86,7 @@
 /* StatusBar - visual */
 
 .x-statusbar .x-status-busy {
-    background-image: url(../../images/loading.gif);
+    background-image: url(../../static/images/loading.gif);
 }
 .x-statusbar .x-status-text-panel {
     border-color: #99bbe8 #fff #fff #99bbe8;
@@ -98,20 +98,20 @@
     color: #777;
 }
 #word-status .x-status-busy {
-    background-image: url(../../images/saving.gif);
+    background-image: url(../../static/images/saving.gif);
 }
 #word-status .x-status-saved {
-    background-image: url(../../images/saved.png);
+    background-image: url(../../static/images/saved.png);
 }
 
 /* StatusBar form validation example styles */
 
 .x-statusbar .x-status-error {
     color: #C33;
-    background-image: url(../../images/exclamation.gif);
+    background-image: url(../../static/images/exclamation.gif);
 }
 .x-statusbar .x-status-valid {
-    background-image: url(../../images/accept.png);
+    background-image: url(../../static/images/accept.png);
 }
 .x-status-error-list {
     border-color: #C33;

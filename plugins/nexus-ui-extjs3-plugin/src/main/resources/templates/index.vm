@@ -31,17 +31,17 @@
   #end
   ## Plugin pre HEAD contributions ends here
 
-  <link rel="stylesheet" href="ext-3.4.1.1/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8"/>
-  <link rel="stylesheet" href="ext-3.4.1.1/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8"/>
+  <link rel="stylesheet" href="static/ext-3.4.1.1/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8"/>
+  <link rel="stylesheet" href="static/ext-3.4.1.1/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8"/>
   <link rel="stylesheet" href="style/$buildQualifier/sonatype-all.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
 
   #if ($debug)
-      <script src="ext-3.4.1.1/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
-      <script src="ext-3.4.1.1/ext-all-debug.js" type="text/javascript" charset="utf-8"></script>
+      <script src="static/ext-3.4.1.1/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
+      <script src="static/ext-3.4.1.1/ext-all-debug.js" type="text/javascript" charset="utf-8"></script>
   #else
       ## load aggregated/minified files
-      <script src="ext-3.4.1.1/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
-      <script src="ext-3.4.1.1/ext-all.js" type="text/javascript" charset="utf-8"></script>
+      <script src="static/ext-3.4.1.1/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
+      <script src="static/ext-3.4.1.1/ext-all.js" type="text/javascript" charset="utf-8"></script>
   #end
 
     <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
@@ -49,10 +49,10 @@
 
     <script type="text/javascript" charset="utf-8">
         requirejs.config({
-            baseUrl : 'js',
+            baseUrl : 'static/js',
             paths : {
                 // css modules need to escape from js base url
-                'static/css' : '../static/css'
+                'static/css' : '../css'
             },
             urlArgs : "nexusVersion=$nexusVersion"
         });

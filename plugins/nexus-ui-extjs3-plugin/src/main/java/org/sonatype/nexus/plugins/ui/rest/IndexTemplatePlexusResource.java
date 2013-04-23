@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rest;
+package org.sonatype.nexus.plugins.ui.rest;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.rest.UiContributor;
 import org.sonatype.nexus.plugins.rest.UiContributor.UiContribution;
-import org.sonatype.nexus.plugins.restlet1x.BuildNumberService;
+import org.sonatype.nexus.plugins.ui.BuildNumberService;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;

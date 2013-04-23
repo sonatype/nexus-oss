@@ -498,7 +498,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
           }
         };
 
-        var welcomeMsg = '<p style="text-align:center;"><a href="http://nexus.sonatype.org" target="new">' + '<img src="images/nexus200x50.png" border="0" alt="Welcome to the Sonatype Nexus Maven Repository Manager"></a>' + '</p>';
+        var welcomeMsg = '<p style="text-align:center;"><a href="http://nexus.sonatype.org" target="new">' + '<img src="static/images/nexus200x50.png" border="0" alt="Welcome to the Sonatype Nexus Maven Repository Manager"></a>' + '</p>';
 
         var statusEnabled = sp.checkPermission('nexus:status', sp.READ);
         if (Sonatype.utils.anonDisabled && (!Sonatype.user.curr.isLoggedIn)) {

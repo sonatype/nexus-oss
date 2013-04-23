@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.restlet1x;
+package org.sonatype.nexus.plugins.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,15 +45,15 @@ public class NexusWebappResourceBundle
 
         List<StaticResource> result = new ArrayList<StaticResource>();
 
-        result.add( new DefaultStaticResource( this.getClass().getResource( "/js/sonatype-all.js" ),
+        result.add( new DefaultStaticResource( this.getClass().getResource( "/static/js/nexus-ui-extjs3-plugin-all.js" ),
                                                "/js/" + prefix + "/sonatype-all.js", "text/javascript" ));
-        result.add( new DefaultStaticResource( this.getClass().getResource( "/js/nx-all.js" ),
+        result.add( new DefaultStaticResource( this.getClass().getResource( "/static/js/nx-all.js" ),
                                                "/js/" + prefix + "/nx-all.js", "text/javascript" ));
-        result.add( new DefaultStaticResource( this.getClass().getResource( "/js/sonatype-lib.js" ),
+        result.add( new DefaultStaticResource( this.getClass().getResource( "/static/js/sonatype-lib.js" ),
                                                "/js/" + prefix + "/sonatype-lib.js", "text/javascript" ));
-        result.add( new DefaultStaticResource( this.getClass().getResource( "/style/sonatype-all.css" ),
+        result.add( new DefaultStaticResource( this.getClass().getResource( "/static/css/nexus-ui-extjs3-plugin-all.css" ),
                                                "/style/" + prefix + "/sonatype-all.css", "text/css" ));
-        result.add( new DefaultStaticResource( this.getClass().getResource( "/style/sonatype-all.css" ),
+        result.add( new DefaultStaticResource( this.getClass().getResource( "/static/css/nexus-ui-extjs3-plugin-all.css" ),
                                                "/style/sonatype-all.css", "text/css" ));
 
         return result;
