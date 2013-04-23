@@ -73,6 +73,16 @@
     </dependency>
 
     <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-servlet</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-web</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-edition</artifactId>
     </dependency>
@@ -408,13 +418,13 @@
         <configuration>
           <warSourceIncludes>
             *,
-            ext-3.4.1/adapter/ext/ext-base-debug.js,
-            ext-3.4.1/ext-all-debug.js,
-            ext-3.4.1/adapter/ext/ext-base.js,
-            ext-3.4.1/ext-all.js,
-            ext-3.4.1/resources/css/ext-all.css,
-            ext-3.4.1/resources/css/xtheme-gray.css,
-            ext-3.4.1/resources/images/**,
+            ext-3.4.1.1/adapter/ext/ext-base-debug.js,
+            ext-3.4.1.1/ext-all-debug.js,
+            ext-3.4.1.1/adapter/ext/ext-base.js,
+            ext-3.4.1.1/ext-all.js,
+            ext-3.4.1.1/resources/css/ext-all.css,
+            ext-3.4.1.1/resources/css/xtheme-gray.css,
+            ext-3.4.1.1/resources/images/**,
             images/**,
             WEB-INF/*,
             style/sonatype-all.css

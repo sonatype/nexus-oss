@@ -287,9 +287,8 @@ public class Hc4ProviderBase
      * Sub-classed here to customize the http processor and to keep a sane logger name.
      */
     private static class DefaultHttpClientImpl
-        extends DefaultHttpClient
+        extends InstrumentedHttpClient
     {
-
         private DefaultHttpClientImpl( final ClientConnectionManager conman, final HttpParams params )
         {
             super( conman, params );

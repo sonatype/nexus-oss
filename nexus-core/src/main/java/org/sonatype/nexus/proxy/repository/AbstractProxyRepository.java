@@ -74,6 +74,8 @@ import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
  * So, this implementation is used in both "simple" repository cases: hosted and proxy, but in 1st case there is no
@@ -973,19 +975,6 @@ public abstract class AbstractProxyRepository
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws LocalStorageException
     {
-        boolean shouldCache = true;
-
-        // ask request processors too
-        for ( RequestProcessor processor : getRequestProcessors().values() )
-        {
-            shouldCache = processor.shouldCache( this, item );
-
-            if ( !shouldCache )
-            {
-                return item;
-            }
-        }
-
         AbstractStorageItem result = null;
 
         try
@@ -1178,15 +1167,20 @@ public abstract class AbstractProxyRepository
         // proxyMode and request.localOnly decides 1st
         boolean shouldProxy = shouldTryRemote( request );
 
+        ItemNotFoundException requestProcessorReason = null;
+
         if ( shouldProxy )
         {
-            // let's ask RequestProcessor
-            for ( RequestProcessor processor : getRequestProcessors().values() )
+            for ( RequestStrategy strategy : getRegisteredStrategies().values() )
             {
-                shouldProxy = processor.shouldProxy( this, request );
-
-                if ( !shouldProxy )
+                try
                 {
+                    strategy.onRemoteAccess( this, request, localItem );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    requestProcessorReason = e;
+                    shouldProxy = false;
                     // escape
                     break;
                 }
@@ -1343,7 +1337,9 @@ public abstract class AbstractProxyRepository
                             + " does not exist in local or remote storage, throwing ItemNotFoundException." );
                 }
 
-                throw new ItemNotFoundException( request, this );
+                throw new ItemNotFoundException( reasonFor( request, this,
+                    "Path %s not found in local nor in remote storage of %s repository.", request.getRequestPath(),
+                    RepositoryStringUtils.getHumanizedNameString( this ) ) );
             }
             else if ( localItem != null && remoteItem == null )
             {
@@ -1388,7 +1384,18 @@ public abstract class AbstractProxyRepository
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
-                throw new ItemNotFoundException( request, this );
+                if ( requestProcessorReason != null )
+                {
+                    throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                        "Request processor prevented remote access" ), requestProcessorReason );
+                }
+                else
+                {
+                    // a generic one
+                    throw new ItemNotFoundException( reasonFor( request, this,
+                        "Path %s not found in local storage and remote storage access is prevented of %s repository.",
+                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                }
             }
         }
 
@@ -1726,7 +1733,9 @@ public abstract class AbstractProxyRepository
             }
 
             // validation failed, I guess.
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Path %s fetched from remote but failed validation in %s.", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
         finally
         {
@@ -1818,8 +1827,11 @@ public abstract class AbstractProxyRepository
                 {
                     if ( !getProxyMode().shouldCheckRemoteStatus() )
                     {
-                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request,
-                            AbstractProxyRepository.this ) );
+                        setRemoteStatus(
+                            RemoteStatus.UNAVAILABLE,
+                            new ItemNotFoundException( reasonFor( request, AbstractProxyRepository.this,
+                                "Proxy mode %s or repository %s forbids remote storage use.", getProxyMode(),
+                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
                     }
                     else
                     {
@@ -1829,7 +1841,9 @@ public abstract class AbstractProxyRepository
                         }
                         else
                         {
-                            autoBlockProxying( new ItemNotFoundException( request, AbstractProxyRepository.this ) );
+                            autoBlockProxying( new ItemNotFoundException( reasonFor( request,
+                                AbstractProxyRepository.this, "Remote peer of repository %s detected as unavailable.",
+                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
                         }
                     }
                 }

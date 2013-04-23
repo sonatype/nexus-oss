@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -29,10 +31,13 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * The Class ShadowRepository.
@@ -45,6 +50,12 @@ public abstract class AbstractShadowRepository
 {
     @Requirement
     private RepositoryRegistry repositoryRegistry;
+
+    /**
+     * The cached instance of master Repository, to not have it look up at every {@link #getMasterRepository()}
+     * invocation from registry. This instance changes as master ID in configuration changes.
+     */
+    private volatile Repository masterRepository;
 
     protected RepositoryRegistry getRepositoryRegistry()
     {
@@ -82,24 +93,15 @@ public abstract class AbstractShadowRepository
     public void setMasterRepositoryId( final String repositoryId )
         throws IncompatibleMasterRepositoryException, NoSuchRepositoryException
     {
+        // look it up and delegate to "real" method
         setMasterRepository( getRepositoryRegistry().getRepository( repositoryId ) );
     }
 
     @Override
     public Repository getMasterRepository()
     {
-        try
-        {
-            return getRepositoryRegistry().getRepository( getExternalConfiguration( false ).getMasterRepositoryId() );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().warn(
-                "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
-                    + getExternalConfiguration( false ).getMasterRepositoryId() + "'!", e );
-
-            return null;
-        }
+        // return the cached instance
+        return masterRepository;
     }
 
     @Override
@@ -108,7 +110,10 @@ public abstract class AbstractShadowRepository
     {
         if ( getMasterRepositoryContentClass().getId().equals( masterRepository.getRepositoryContentClass().getId() ) )
         {
+            // set master ID in configuration
             getExternalConfiguration( true ).setMasterRepositoryId( masterRepository.getId() );
+            // cache the instance
+            this.masterRepository = masterRepository;
         }
         else
         {
@@ -128,6 +133,7 @@ public abstract class AbstractShadowRepository
     }
 
     @Override
+    @Subscribe
     public void onRepositoryItemEvent( final RepositoryItemEvent ievt )
     {
         // NEXUS-5673: do we need to act on event at all?
@@ -246,7 +252,9 @@ public abstract class AbstractShadowRepository
         catch ( AccessDeniedException e )
         {
             // if client has no access to content over shadow, we just hide the fact
-            throw new ItemNotFoundException( request, this, e );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Path %s not found in repository %s",
+                RepositoryStringUtils.getHumanizedNameString( this ) ), e );
         }
     }
 }

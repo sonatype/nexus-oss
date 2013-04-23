@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_MD5;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_SHA1;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.SUFFIX_MD5;
@@ -411,7 +412,9 @@ public abstract class AbstractMavenRepository
                     "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
             }
 
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Retrieval of %s from %s is forbidden by repository policy %s.", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( this ), getRepositoryPolicy() ) );
         }
 
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class )

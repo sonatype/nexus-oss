@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven.maven2;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +58,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.NexusMergeOperation;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.DigesterUtils;
 
 @Component( role = GroupRepository.class, hint = M2GroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
@@ -213,7 +216,9 @@ public class M2GroupRepository
 
         if ( items.isEmpty() )
         {
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Metadata %s not found in any of the members of %s.", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
         if ( !isMergeMetadata() )
@@ -263,7 +268,9 @@ public class M2GroupRepository
 
             if ( existingMetadatas.isEmpty() )
             {
-                throw new ItemNotFoundException( request, this );
+                throw new ItemNotFoundException( reasonFor( request, this,
+                    "Metadata %s not parseable in any of the members of %s.", request.getRequestPath(),
+                    RepositoryStringUtils.getHumanizedNameString( this ) ) );
             }
 
             Metadata result = existingMetadatas.get( 0 );

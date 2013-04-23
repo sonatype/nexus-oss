@@ -197,7 +197,10 @@ NX.define('Sonatype.panels.GridViewer', {
       // sortInfo: { field: 'name', direction: "ASC"},
       loadMask : true,
       deferredRender : false,
-      columns : columns,
+      colModel : new Ext.grid.ColumnModel({
+        defaultSortable : true,
+        columns : columns
+      }),
       autoExpandColumn : this.autoExpandColumn,
       disableSelection : false,
 
