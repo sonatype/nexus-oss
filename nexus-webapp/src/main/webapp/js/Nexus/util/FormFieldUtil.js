@@ -16,7 +16,7 @@ define('Nexus/util/FormFieldUtil',['extjs', 'Sonatype/view', 'nexus'], function(
 Ext.namespace('Nexus.util');
 Nexus.util.FormFieldUtil = {
   generateForm : function(panelId, fieldSetName, fieldNamePrefix, typeStore, repoStore, groupStore, repoOrGroupStore,
-        customTypes, width) {
+        customTypes, width, repoTargetStore) {
     var allTypes = [];
 
     if (!width) {
@@ -132,6 +132,31 @@ Nexus.util.FormFieldUtil = {
               helpText : curRec.helpText,
               name : fieldNamePrefix + curRec.id,
               store : repoStore,
+              displayField : 'name',
+              valueField : 'id',
+              editable : false,
+              forceSelection : true,
+              mode : 'local',
+              triggerAction : 'all',
+              emptyText : 'Select...',
+              selectOnFocus : true,
+              allowBlank : curRec.required ? false : true,
+              disabled : true,
+              width : width,
+              minListWidth : width
+            };
+            if (curRec.initialValue) {
+              items[j].value = curRec.initialValue;
+            }
+          }
+          else if (curRec.type === 'repo-target') {
+            items[j] = {
+              xtype : 'combo',
+              fieldLabel : curRec.label,
+              itemCls : curRec.required ? 'required-field' : '',
+              helpText : curRec.helpText,
+              name : fieldNamePrefix + curRec.id,
+              store : repoTargetStore,
               displayField : 'name',
               valueField : 'id',
               editable : false,
