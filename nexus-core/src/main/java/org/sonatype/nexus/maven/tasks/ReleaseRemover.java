@@ -15,11 +15,14 @@ package org.sonatype.nexus.maven.tasks;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
- * @since 20.5
+ * @since 2.5.0
  */
 public interface ReleaseRemover
 {
 
+    /**
+     * Conditionally remove released artifacts from a repository based on the request.
+     */
     ReleaseRemovalResult removeReleases( ReleaseRemovalRequest request )
         throws NoSuchRepositoryException;
 }

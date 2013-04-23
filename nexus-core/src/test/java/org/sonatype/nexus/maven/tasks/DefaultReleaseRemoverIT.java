@@ -40,6 +40,17 @@ public class DefaultReleaseRemoverIT
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    private ReleaseRemover releaseRemover;
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        releaseRemover = lookup( ReleaseRemover.class );
+    }
+    
     @Test
     public void testDeletionOfReleases()
         throws Exception
@@ -47,7 +58,7 @@ public class DefaultReleaseRemoverIT
         fillInRepo();
         releases.setAccessManager( new OpenAccessManager() );
         ReleaseRemovalResult releaseRemovalResult =
-            defaultNexus.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "" ) );
+            releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "" ) );
         // pom + jar + sha1 for both
         assertThat( releaseRemovalResult.getDeletedFileCount(), is( 4 ) );
         assertThat( releaseRemovalResult.isSuccessful(), is( true ) );
@@ -76,7 +87,7 @@ public class DefaultReleaseRemoverIT
             new Target( "test", "test", new Maven2ContentClass(), Lists.newArrayList( ".*/org/sonatype/.*" ) ) );
         targetRegistry.commitChanges();
         ReleaseRemovalResult releaseRemovalResult =
-            defaultNexus.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
+            releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
         assertThat( releaseRemovalResult.getDeletedFileCount(), is( 4 ) );
         assertThat( releaseRemovalResult.isSuccessful(), is( true ) );
     }
@@ -91,7 +102,7 @@ public class DefaultReleaseRemoverIT
             new Target( "test", "test", new Maven2ContentClass(), Lists.newArrayList( ".*/com/sonatype/.*" ) ) );
         targetRegistry.commitChanges();
         ReleaseRemovalResult releaseRemovalResult =
-            defaultNexus.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
+            releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
         assertThat( releaseRemovalResult.getDeletedFileCount(), is( 0 ) );
         assertThat( releaseRemovalResult.isSuccessful(), is( true ) );
         try
@@ -109,6 +120,6 @@ public class DefaultReleaseRemoverIT
         throws Exception
     {
         thrown.expect( IllegalStateException.class );
-        defaultNexus.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
+        releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
     }
 }

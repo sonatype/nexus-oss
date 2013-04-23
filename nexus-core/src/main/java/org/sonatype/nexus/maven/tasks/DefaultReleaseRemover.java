@@ -25,9 +25,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -103,7 +103,7 @@ public class DefaultReleaseRemover
         Repository repository = repositoryRegistry.getRepository( request.getRepositoryId() );
         Target repositoryTarget = targetRegistry.getRepositoryTarget( request.getTargetId() );
 
-        if ( StringUtils.isNotBlank( request.getTargetId() ) && repositoryTarget == null )
+        if ( !Strings.isNullOrEmpty( request.getTargetId() ) && repositoryTarget == null )
         {
             throw new IllegalStateException(
                 "The specified repository target does not exist. Perhaps it has been deleted since this repository target was configured? Target id = "
@@ -148,6 +148,12 @@ public class DefaultReleaseRemover
 
         MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
 
+        if(mavenRepository == null)
+        {
+            getLogger().debug( "Skipping '{}' because it could not be adapted to MavenRepository", repository.getId() );
+            return false;
+        }
+
         if ( !RepositoryPolicy.RELEASE.equals( mavenRepository.getRepositoryPolicy() ) )
         {
             getLogger().debug( "Skipping '{}' because it is a snapshot or mixed repository", repository.getId() );
@@ -158,7 +164,7 @@ public class DefaultReleaseRemover
         return true;
     }
 
-    public void removeReleasesFromMavenRepository( final MavenRepository repository,
+    private void removeReleasesFromMavenRepository( final MavenRepository repository,
                                                                    final ReleaseRemovalRequest request,
                                                                    final ReleaseRemovalResult result,
                                                                    final Target repositoryTarget )
@@ -288,7 +294,7 @@ public class DefaultReleaseRemover
             // if a gav can be calculated, it should be shared by all files in the collection
             if ( null != gav )
             {
-                addVersionsToGas( groupArtifactToVersions, deletableVersionsAndFiles, gav );
+                groupVersions( groupArtifactToVersions, deletableVersionsAndFiles, gav );
             }
         }
 
@@ -307,17 +313,17 @@ public class DefaultReleaseRemover
         /**
          * Map Group + Artifact to each version with those GA coordinates
          */
-        private void addVersionsToGas( final Map<Gav, Map<Version, List<StorageFileItem>>> gas,
-                                       final Map<Version, List<StorageFileItem>> versionsAndFiles,
-                                       final Gav gav )
+        private void groupVersions( final Map<Gav, Map<Version, List<StorageFileItem>>> groupArtifactToVersions,
+                                    final Map<Version, List<StorageFileItem>> versionsAndFiles,
+                                    final Gav gav )
         {
             //ga only coordinates
             Gav ga = new Gav( gav.getGroupId(), gav.getArtifactId(), "" );
-            if ( !gas.containsKey( ga ) )
+            if ( !groupArtifactToVersions.containsKey( ga ) )
             {
-                gas.put( ga, Maps.newHashMap( versionsAndFiles ) );
+                groupArtifactToVersions.put( ga, Maps.newHashMap( versionsAndFiles ) );
             }
-            gas.get( ga ).putAll( versionsAndFiles );
+            groupArtifactToVersions.get( ga ).putAll( versionsAndFiles );
         }
 
         protected void addStorageFileItemToMap( Map<Version, List<StorageFileItem>> map, Gav gav, StorageFileItem item )

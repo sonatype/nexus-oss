@@ -115,9 +115,6 @@ public class DefaultNexus
     @Requirement
     private SnapshotRemover snapshotRemover;
 
-    @Requirement
-    private ReleaseRemover releaseRemover;
-
     /**
      * The SecurityConfiguration component.
      */
@@ -338,12 +335,6 @@ public class DefaultNexus
         throws NoSuchRepositoryException, IllegalArgumentException
     {
         return snapshotRemover.removeSnapshots( request );
-    }
-
-    public ReleaseRemovalResult removeReleases( ReleaseRemovalRequest request )
-        throws NoSuchRepositoryException
-    {
-        return releaseRemover.removeReleases( request );
     }
 
     public Map<String, String> getConfigurationFiles()

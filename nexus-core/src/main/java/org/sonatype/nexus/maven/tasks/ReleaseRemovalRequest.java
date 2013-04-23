@@ -12,7 +12,11 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
+ * Encapsulate parameters to {@link ReleaseRemover}
+ *
  * @since 2.5
  */
 public class ReleaseRemovalRequest
@@ -23,10 +27,16 @@ public class ReleaseRemovalRequest
 
     private final String targetId;
 
+    /**
+     *
+     * @param repositoryId  the repository to target
+     * @param numberOfVersionsToKeep    the number of released versions to keep for Group/Artifact in the repository
+     * @param targetId    (optional) Repository Target id to be applied
+     */
     public ReleaseRemovalRequest( final String repositoryId, final int numberOfVersionsToKeep, final String targetId )
     {
-        this.repositoryId = repositoryId;
-        this.numberOfVersionsToKeep = numberOfVersionsToKeep;
+        this.repositoryId = checkNotNull(repositoryId);
+        this.numberOfVersionsToKeep = checkNotNull(numberOfVersionsToKeep);
         this.targetId = targetId;
     }
 
