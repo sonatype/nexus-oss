@@ -227,7 +227,7 @@ public class DefaultReleaseRemover
         private final Map<Version, List<StorageFileItem>> deletableVersionsAndFiles =
             new HashMap<Version, List<StorageFileItem>>();
 
-        private final Map<Gav, Map<Version, List<StorageFileItem>>> gas =
+        private final Map<Gav, Map<Version, List<StorageFileItem>>> groupArtifactToVersions =
             new HashMap<Gav, Map<Version, List<StorageFileItem>>>();
 
         private final ReleaseRemovalResult result;
@@ -288,7 +288,7 @@ public class DefaultReleaseRemover
             // if a gav can be calculated, it should be shared by all files in the collection
             if ( null != gav )
             {
-                addVersionsToGas( gas, deletableVersionsAndFiles, gav );
+                addVersionsToGas( groupArtifactToVersions, deletableVersionsAndFiles, gav );
             }
         }
 
@@ -346,12 +346,12 @@ public class DefaultReleaseRemover
         public void afterWalk( final WalkerContext context )
             throws Exception
         {
-            for ( Map.Entry<Gav, Map<Version, List<StorageFileItem>>> gavListEntry : gas.entrySet() )
+            for ( Map.Entry<Gav, Map<Version, List<StorageFileItem>>> gavListEntry : groupArtifactToVersions.entrySet() )
             {
                 Map<Version, List<StorageFileItem>> versions = gavListEntry.getValue();
                 if ( versions.size() > request.getNumberOfVersionsToKeep() )
                 {
-                    getLogger().debug( "{} will delete {} versions of artifact with g={} a ={}",
+                    getLogger().debug( "{} will delete {} versions of artifact with g={} a={}",
                                        ReleaseRemovalTaskDescriptor.ID,
                                        versions.size() - request.getNumberOfVersionsToKeep(),
                                        gavListEntry.getKey().getGroupId(), gavListEntry.getKey().getArtifactId() );

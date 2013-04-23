@@ -13,6 +13,8 @@
 package org.sonatype.nexus.formfields;
 
 /**
+ * The model for a combo field allowing for selection of Repository Targets.
+ *
  * @since 2.5
  */
 public class RepoTargetComboFormField
