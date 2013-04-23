@@ -16,7 +16,7 @@ define('ext/all',
         'ext/layout', 'ext/lib', 'ext/tree', 'ext/component',
         'ext/tooltip', 'ext/util', 'ext/element' ],
       function(Ext) {
-        Ext.BLANK_IMAGE_URL = "ext-3.4.1/resources/images/default/s.gif";
+        Ext.BLANK_IMAGE_URL = "ext-3.4.1.1/resources/images/default/s.gif";
         return Ext;
       }
 );
