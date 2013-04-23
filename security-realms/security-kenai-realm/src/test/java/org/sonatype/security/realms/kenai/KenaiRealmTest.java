@@ -23,12 +23,6 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 public class KenaiRealmTest
     extends AbstractKenaiRealmTest
 {
-
-    protected int getTotalNumberOfProjects()
-    {
-        return 302;
-    }
-
     private KenaiRealm getRealm()
         throws Exception
     {
@@ -49,13 +43,7 @@ public class KenaiRealmTest
         throws Exception
     {
         KenaiRealm kenaiRealm = this.getRealm();
-
-        // check all roles
-        for ( int ii = 0; ii < getTotalNumberOfProjects(); ii++ )
-        {
-            kenaiRealm.checkRole( new SimplePrincipalCollection( username, kenaiRealm.getName() ), "project-" + ii );
-        }
-
+        kenaiRealm.checkRole( new SimplePrincipalCollection( username, kenaiRealm.getName() ), DEFAULT_ROLE );
     }
 
     public void testAuthFail()

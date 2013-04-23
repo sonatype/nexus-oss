@@ -24,11 +24,22 @@ public class KenaiMockAuthcServlet
 {
 
     @Override
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp )
+    protected void doPost( HttpServletRequest req, HttpServletResponse resp )
         throws ServletException, IOException
     {
-        String output = "NOT USED";
-        resp.getOutputStream().write( output.getBytes() );
+        final String username = req.getParameter( "username" );
+        final String password = req.getParameter( "password" );
+
+        if ( username != null && password != null && ( username + "123" ).equals( password ) )
+        {
+            // we are fine
+            resp.setStatus( 200 );
+            return;
+        }
+        else
+        {
+            resp.sendError( 401 );
+        }
     }
 
 }
