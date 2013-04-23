@@ -173,7 +173,7 @@
 
 <div id="header">
   <div id="branding" class="left-side">
-    <img src="images/header_branding.png" alt="Sonatype Nexus"/>
+    <img src="static/images/header_branding.png" alt="Sonatype Nexus"/>
   </div>
   <div class="right-side">
     <div><span id="head-link-l" class="head-link"></span><span id="head-link-m" class="head-link"></span><span id="head-link-r" class="head-link"></span></div>

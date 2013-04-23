@@ -110,7 +110,7 @@ NX.define('Sonatype.repoServer.LogsViewPanel', {
 
     this.fetchMoreButton = new Ext.SplitButton({
       text : 'Fetch Next 100Kb',
-      icon : Sonatype.config.resourcePath + '/images/icons/search.gif',
+      icon : Sonatype.config.resourcePath + '/static/images/icons/search.gif',
       cls : 'x-btn-text-icon',
       value : '100',
       handler : this.fetchMore,
@@ -164,14 +164,14 @@ NX.define('Sonatype.repoServer.LogsViewPanel', {
           tooltip : {
             text : 'Reloads the current document'
           },
-          icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+          iconCls : 'st-icon-refresh',
           cls : 'x-btn-text-icon',
           handler : this.reloadAllFiles,
           scope : this
         },
         {
           text : 'Download',
-          icon : Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
+          icon : Sonatype.config.resourcePath + '/static/images/icons/page_white_put.png',
           cls : 'x-btn-text-icon',
           scope : this,
           handler : function() {
@@ -183,7 +183,7 @@ NX.define('Sonatype.repoServer.LogsViewPanel', {
         {
           id : 'log-btn',
           text : 'Select a document...',
-          icon : Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+          icon : Sonatype.config.resourcePath + '/static/images/icons/page_white_stack.png',
           cls : 'x-btn-text-icon',
           tooltip : {
             text : 'Select the file to display'

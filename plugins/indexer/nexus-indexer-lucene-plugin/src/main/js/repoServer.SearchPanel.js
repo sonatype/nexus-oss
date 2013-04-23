@@ -719,7 +719,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
                 }, {
                   xtype : 'tbspacer'
                 }, {
-                  icon : Sonatype.config.resourcePath + '/images/icons/search.gif',
+                  icon : Sonatype.config.resourcePath + '/static/images/icons/search.gif',
                   cls : 'x-btn-icon',
                   scope : panel,
                   handler : function() {

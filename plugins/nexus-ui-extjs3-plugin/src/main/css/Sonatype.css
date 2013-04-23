@@ -32,7 +32,7 @@ body {
 #header {
     font-family: verdana, "Trebuchet MS", lucida, arial, helvetica, sans-serif;
     background-color: black;
-    background-image: url("../../images/header_bg.gif");
+    background-image: url("../../static/images/header_bg.gif");
     background-repeat: repeat-x;
     height: 60px; /* needs to match the height of the background image */
 }
@@ -72,7 +72,7 @@ a:link, a:visited, a:hover, a:active {
 }
 
 .head-link-logged-in {
-    background: url("../../images/icons/btn-arrow-headlink.gif") no-repeat scroll 88% -30% transparent;
+    background: url("../../static/images/icons/btn-arrow-headlink.gif") no-repeat scroll 88% -30% transparent;
     padding-left: 10px;
     padding-right: 20px !important;
 }
@@ -137,7 +137,7 @@ a:link, a:visited, a:hover, a:active {
 
 /* Sonatype Icons */
 button.st-icon-refresh {
-    background-image: url(../../images/icons/arrow_refresh.png);
+    background-image: url(../../static/images/icons/arrow_refresh.png);
 }
 
 /* Ext theme overrides */
@@ -157,7 +157,7 @@ button.st-icon-refresh {
 
 .loading-indicator{
   font-size:11px;
-    background-image:url(../../ext-3.4.1.1/resources/images/default/grid/loading.gif);
+    background-image:url(../../static/ext-3.4.1.1/resources/images/default/grid/loading.gif);
     background-repeat:no-repeat;
     background-position:3px center;
     padding-left:22px;
@@ -178,16 +178,16 @@ button.st-icon-refresh {
 
 .required-field .x-tip-body {
     padding-left: 16px;
-    background: transparent url(../../images/icons/bullet_star.png) no-repeat scroll left;
+    background: transparent url(../../static/images/icons/bullet_star.png) no-repeat scroll left;
 }
 
 .required-field .x-form-item-label {
-    background: transparent url(../../images/icons/bullet_star.png) no-repeat right;
+    background: transparent url(../../static/images/icons/bullet_star.png) no-repeat right;
 }
 
 .required-field .x-panel-header-text {
     padding-right: 16px;
-    background: transparent url(../../images/icons/bullet_star.png) no-repeat scroll right;
+    background: transparent url(../../static/images/icons/bullet_star.png) no-repeat scroll right;
 }
 
 .form-label-helpmark {
@@ -318,7 +318,7 @@ button.st-icon-refresh {
 }
 
 .x-form-field-wrap .x-form-folder-trigger {
-    background-image: url(../../images/icons/folder-trigger.png);
+    background-image: url(../../static/images/icons/folder-trigger.png);
     cursor: pointer;
 }
 
@@ -334,15 +334,15 @@ button.st-icon-refresh {
 }
 
 .x-tree-node-expanded .x-tree-node-nexus-icon {
-    background-image: url(../../images/icons/folder-open-nexus.png);
+    background-image: url(../../static/images/icons/folder-open-nexus.png);
 }
 
 .x-tree-node-leaf .x-tree-node-nexus-icon {
-    background-image: url(../../images/icons/leaf-nexus.png);
+    background-image: url(../../static/images/icons/leaf-nexus.png);
 }
 
 .x-tree-node-collapsed .x-tree-node-nexus-icon {
-    background-image: url(../../images/icons/folder-nexus.png);
+    background-image: url(../../static/images/icons/folder-nexus.png);
 }
 
 .x-tree-node-collapsed .x-tree-node-nexus-icon, .x-tree-node-expanded .x-tree-node-nexus-icon, .x-tree-node-leaf .x-tree-node-nexus-icon {
@@ -362,7 +362,7 @@ button.st-icon-refresh {
 
 .ext-mb-input {
     padding: 1px 3px;
-    background: #fff url(../../ext-3.4.1.1/resources/images/default/form/text-bg.gif) repeat-x 0 0;
+    background: #fff url(../../static/ext-3.4.1.1/resources/images/default/form/text-bg.gif) repeat-x 0 0;
     border: 1px solid #B5B8C8;
 }
 
@@ -405,7 +405,7 @@ button.st-icon-refresh {
 .x-statusbar-warning {
     color: #EE0000;
     font-weight: normal;
-    background: transparent url(../../ext-3.4.1.1/resources/images/default/shared/warning.gif) no-repeat 3px 3px;
+    background: transparent url(../../static/ext-3.4.1.1/resources/images/default/shared/warning.gif) no-repeat 3px 3px;
 }
 
 .x-statusbar .x-status-text {
@@ -413,7 +413,7 @@ button.st-icon-refresh {
 }
 
 .x-toolbar-warning {
-    background: transparent url(../../ext-3.4.1.1/resources/images/default/shared/warning.gif) no-repeat scroll 0 2px;
+    background: transparent url(../../static/ext-3.4.1.1/resources/images/default/shared/warning.gif) no-repeat scroll 0 2px;
     color: #EE0000;
     padding: 2px 2px 2px 18px;
     font-weight: normal;
@@ -425,7 +425,7 @@ button.st-icon-refresh {
     border-width: 0 0 1px 0;
     display: block;
     padding: 2px;
-    background: #d0def0 url(../../ext-3.4.1.1/resources/images/gray/toolbar/bg.gif) repeat-x top left;
+    background: #d0def0 url(../../static/ext-3.4.1.1/resources/images/gray/toolbar/bg.gif) repeat-x top left;
     position: relative;
     zoom: 1;
 }
@@ -447,56 +447,56 @@ button.st-icon-refresh {
     left: 48%;
     height: 5px;
     width: 35px;
-    background-image: url(../../images/icons/mini-top.gif);
+    background-image: url(../../static/images/icons/mini-top.gif);
 }
 
 .x-layout-split-south .x-layout-mini {
     left: 48%;
     height: 5px;
     width: 35px;
-    background-image: url(../../images/icons/mini-bottom.gif);
+    background-image: url(../../static/images/icons/mini-bottom.gif);
 }
 
 .x-layout-split-west .x-layout-mini {
     top: 48%;
-    background-image: url(../../images/icons/mini-left.gif);
+    background-image: url(../../static/images/icons/mini-left.gif);
 }
 
 .x-layout-split-east .x-layout-mini {
     top: 48%;
-    background-image: url(../../images/icons/mini-right.gif);
+    background-image: url(../../static/images/icons/mini-right.gif);
 }
 
 .x-layout-cmini-north .x-layout-mini {
     left: 48%;
     height: 5px;
     width: 35px;
-    background-image: url(../../images/icons/mini-bottom.gif);
+    background-image: url(../../static/images/icons/mini-bottom.gif);
 }
 
 .x-layout-cmini-south .x-layout-mini {
     left: 48%;
     height: 5px;
     width: 35px;
-    background-image: url(../../images/icons/mini-top.gif);
+    background-image: url(../../static/images/icons/mini-top.gif);
 }
 
 .x-layout-cmini-west .x-layout-mini {
     top: 48%;
-    background-image: url(../../images/icons/mini-right.gif);
+    background-image: url(../../static/images/icons/mini-right.gif);
 }
 
 .x-layout-cmini-east .x-layout-mini {
     top: 48%;
-    background-image: url(../../images/icons/mini-left.gif);
+    background-image: url(../../static/images/icons/mini-left.gif);
 }
 
 .roleRow {
-    background: url(../../ext-3.4.1.1/resources/images/default/tree/folder.gif) left no-repeat;
+    background: url(../../static/ext-3.4.1.1/resources/images/default/tree/folder.gif) left no-repeat;
 }
 
 .privilegeRow {
-    background: url(../../ext-3.4.1.1/resources/images/default/tree/leaf.gif) left no-repeat;
+    background: url(../../static/ext-3.4.1.1/resources/images/default/tree/leaf.gif) left no-repeat;
 }
 
 .placeholder {

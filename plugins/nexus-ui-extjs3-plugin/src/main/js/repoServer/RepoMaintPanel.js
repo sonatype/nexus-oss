@@ -47,7 +47,7 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
 
   this.browseTypeButton = new Ext.Button({
         text : 'User Managed Repositories',
-        icon : Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+        icon : Sonatype.config.resourcePath + '/static/images/icons/page_white_stack.png',
         cls : 'x-btn-text-icon',
         value : 'user',
         tooltip : 'Click to browse other types of repositories.',
@@ -141,7 +141,7 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
     toolbar.push({
           id : 'repo-trash-btn',
           text : 'Trash...',
-          icon : Sonatype.config.resourcePath + '/images/icons/user-trash.png',
+          icon : Sonatype.config.resourcePath + '/static/images/icons/user-trash.png',
           cls : 'x-btn-text-icon',
           tooltip : {
             title : 'Trash',
@@ -626,7 +626,7 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
         enableDD : false,
         tbar : [{
               text : 'Refresh',
-              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+              iconCls : 'st-icon-refresh',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.refreshHandler

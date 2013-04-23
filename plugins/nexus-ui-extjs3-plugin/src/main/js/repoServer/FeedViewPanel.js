@@ -71,7 +71,7 @@ define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid
       tbar : [
         {
           text : 'Refresh',
-          icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+          iconCls : 'st-icon-refresh',
           cls : 'x-btn-text-icon',
           scope : this,
           handler : function() {
@@ -81,7 +81,7 @@ define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid
         },
         {
           text : 'Subscribe',
-          icon : Sonatype.config.resourcePath + '/images/icons/feed.png',
+          icon : Sonatype.config.resourcePath + '/static/images/icons/feed.png',
           cls : 'x-btn-text-icon',
           scope : this,
           handler : function() {

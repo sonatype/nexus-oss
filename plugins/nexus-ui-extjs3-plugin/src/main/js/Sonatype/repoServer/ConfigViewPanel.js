@@ -40,7 +40,7 @@ NX.define('Sonatype.repoServer.ConfigViewPanel', {
       tbar : [
         {
           text : 'Refresh',
-          icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+          iconCls : 'st-icon-refresh',
           cls : 'x-btn-text-icon',
           tooltip : {
             text : 'Reloads the config file'
@@ -50,7 +50,7 @@ NX.define('Sonatype.repoServer.ConfigViewPanel', {
         },
         {
           text : 'Download Config',
-          icon : Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
+          icon : Sonatype.config.resourcePath + '/static/images/icons/page_white_put.png',
           cls : 'x-btn-text-icon',
           scope : this,
           handler : function() {

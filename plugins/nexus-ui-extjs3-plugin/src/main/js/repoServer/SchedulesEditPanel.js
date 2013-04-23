@@ -39,7 +39,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   this.stopButton = new Ext.Button({
     id : 'schedule-stop-btn',
     text : 'Cancel',
-    icon : Sonatype.config.resourcePath + '/images/icons/time_delete.png',
+    icon : Sonatype.config.resourcePath + '/static/images/icons/time_delete.png',
     cls : 'x-btn-text-icon',
     scope : this,
     handler : this.stopHandler,
@@ -49,7 +49,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   this.runButton = new Ext.Button({
         id : 'schedule-run-btn',
         text : 'Run',
-        icon : Sonatype.config.resourcePath + '/images/icons/time_go.png',
+        icon : Sonatype.config.resourcePath + '/static/images/icons/time_go.png',
         cls : 'x-btn-text-icon',
         scope : this,
         handler : this.runHandler,
@@ -59,7 +59,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   this.deleteButton = new Ext.Button({
         id : 'schedule-delete-btn',
         text : 'Delete',
-        icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
+        icon : Sonatype.config.resourcePath + '/static/images/icons/delete.png',
         cls : 'x-btn-text-icon',
         scope : this,
         handler : this.deleteHandler,
@@ -877,14 +877,14 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         tbar : [{
               id : 'schedule-refresh-btn',
               text : 'Refresh',
-              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+              iconCls : 'st-icon-refresh',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.reloadAll
             }, {
               id : 'schedule-add-btn',
               text : 'Add',
-              icon : Sonatype.config.resourcePath + '/images/icons/add.png',
+              icon : Sonatype.config.resourcePath + '/static/images/icons/add.png',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.addResourceHandler,

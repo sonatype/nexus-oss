@@ -257,14 +257,14 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
         tbar : [{
               id : 'repoTarget-refresh-btn',
               text : 'Refresh',
-              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+              iconCls : 'st-icon-refresh',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.reloadAll
             }, {
               id : 'repoTarget-add-btn',
               text : 'Add',
-              icon : Sonatype.config.resourcePath + '/images/icons/add.png',
+              icon : Sonatype.config.resourcePath + '/static/images/icons/add.png',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.addResourceHandler,
@@ -272,7 +272,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
             }, {
               id : 'repoTarget-delete-btn',
               text : 'Delete',
-              icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
+              icon : Sonatype.config.resourcePath + '/static/images/icons/delete.png',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.deleteHandler,

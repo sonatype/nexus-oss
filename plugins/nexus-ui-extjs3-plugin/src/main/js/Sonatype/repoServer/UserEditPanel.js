@@ -49,7 +49,7 @@ NX.define('Sonatype.repoServer.UserEditPanel', {
 
     this.displaySelector = new Ext.Button({
       text : 'All Configured Users',
-      icon : Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+      icon : Sonatype.config.resourcePath + '/static/images/icons/page_white_stack.png',
       cls : 'x-btn-text-icon',
       value : 'allConfigured',
       menu : {

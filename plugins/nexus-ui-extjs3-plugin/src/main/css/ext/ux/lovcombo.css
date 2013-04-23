@@ -24,9 +24,9 @@
 }
 
 .ux-lovcombo-icon-checked {
-	background: transparent url(../../ext-3.4.1.1/resources/images/default/menu/checked.gif);
+	background: transparent url(../../static/ext-3.4.1.1/resources/images/default/menu/checked.gif);
 }
 
 .ux-lovcombo-icon-unchecked {
-	background: transparent url(../../ext-3.4.1.1/resources/images/default/menu/unchecked.gif);
+	background: transparent url(../../static/ext-3.4.1.1/resources/images/default/menu/unchecked.gif);
 }

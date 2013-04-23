@@ -238,7 +238,7 @@ NX.define('Sonatype.panels.GridViewer', {
 
     this.refreshButton = new Ext.Button({
       text : 'Refresh',
-      icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+      iconCls : 'st-icon-refresh',
       cls : 'x-btn-text-icon',
       scope : this,
       handler : this.refreshHandler
@@ -399,7 +399,7 @@ NX.define('Sonatype.panels.GridViewer', {
 
       this.toolbarAddButton = new Ext.Button({
         text : 'Add...',
-        icon : Sonatype.config.resourcePath + '/images/icons/add.png',
+        icon : Sonatype.config.resourcePath + '/static/images/icons/add.png',
         cls : 'x-btn-text-icon',
         menu : menu
       });
@@ -507,7 +507,7 @@ NX.define('Sonatype.panels.GridViewer', {
     if (this.deleteButton) {
       this.toolbarDeleteButton = new Ext.Button({
         text : 'Delete',
-        icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
+        icon : Sonatype.config.resourcePath + '/static/images/icons/delete.png',
         cls : 'x-btn-text-icon',
         handler : this.deleteActionHandler,
         scope : this

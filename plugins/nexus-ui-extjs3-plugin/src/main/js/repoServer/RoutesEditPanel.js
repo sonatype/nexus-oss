@@ -250,14 +250,14 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
         tbar : [{
               id : 'route-refresh-btn',
               text : 'Refresh',
-              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+              iconCls : 'st-icon-refresh',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.reloadAll
             }, {
               id : 'route-add-btn',
               text : 'Add',
-              icon : Sonatype.config.resourcePath + '/images/icons/add.png',
+              icon : Sonatype.config.resourcePath + '/static/images/icons/add.png',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.addResourceHandler,
@@ -265,7 +265,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
             }, {
               id : 'route-delete-btn',
               text : 'Delete',
-              icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
+              icon : Sonatype.config.resourcePath + '/static/images/icons/delete.png',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.deleteResourceHandler,

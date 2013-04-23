@@ -138,7 +138,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 
   this.clearButton = new Ext.Button({
         text : 'Clear Results',
-        icon : Sonatype.config.resourcePath + '/images/icons/clear.gif',
+        icon : Sonatype.config.resourcePath + '/static/images/icons/clear.gif',
         cls : 'x-btn-text-icon',
         handler : this.clearResults,
         disabled : true,

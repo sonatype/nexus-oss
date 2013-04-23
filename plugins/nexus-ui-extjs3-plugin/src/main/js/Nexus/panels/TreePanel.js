@@ -36,7 +36,7 @@ ns.TreePanel = function(cfg) {
 
   this.tbar = [{
     text : 'Refresh',
-    icon : Config.resourcePath + '/images/icons/arrow_refresh.png',
+    iconCls : 'st-icon-refresh',
     cls : 'x-btn-text-icon',
     scope : this,
     handler : this.refreshHandler

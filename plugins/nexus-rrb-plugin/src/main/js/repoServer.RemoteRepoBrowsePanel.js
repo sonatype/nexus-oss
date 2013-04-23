@@ -56,7 +56,7 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 	    tbar: [
 	      {
 	        text: 'Refresh',
-	        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+	        icon: Sonatype.config.resourcePath + '/static/images/icons/arrow_refresh.png',
 	        cls: 'x-btn-text-icon',
 	        scope: this,
 	        handler: this.refreshHandler

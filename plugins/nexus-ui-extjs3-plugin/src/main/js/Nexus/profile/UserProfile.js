@@ -124,7 +124,7 @@ Nexus.profile.UserProfile = function(cfg) {
   this.refreshButton = new Ext.Button({
     tooltip : 'Refresh',
     style : 'position: absolute; right:25px; top:25px;',
-    icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+    iconCls : 'st-icon-refresh',
     cls : 'x-btn-icon',
     scope : this,
     handler : this.refreshContent,

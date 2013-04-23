@@ -66,7 +66,7 @@ Sonatype.repoServer.UserBrowsePanel = function(config) {
             }),
         tbar : [{
               text : 'Refresh',
-              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+              iconCls : 'st-icon-refresh',
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.refreshHandler
