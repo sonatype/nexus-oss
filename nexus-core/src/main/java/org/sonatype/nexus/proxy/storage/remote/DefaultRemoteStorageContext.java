@@ -159,17 +159,27 @@ public class DefaultRemoteStorageContext
     {
         // we have a special case here, need to track blockInheritance flag
         // so, a little code duplication happens
-        // three cases:
-        // 1. we have _no_ proxy settings in this context, fallback to original code
-        // 2. we have proxy settings with no proxyHost set, then obey the blockInheritance
-        // 3. we have proxy settings with set proxyHost, then return it
+        // four cases:
+        // 1. we have NO HTTPS proxy settings in this context but we have HTTP proxy settings, use HTTP proxy settings
+        // 2. we have NO HTTPS proxy settings in this context, fallback to original code
+        // 3. we have HTTPS proxy settings with no proxyHost set, then obey the blockInheritance
+        // 4. we have HTTPS proxy settings with set proxyHost, then return it
 
         final String key = RemoteHttpsProxySettings.class.getName();
 
         if ( !hasContextObject( key ) )
         {
-            // case 1
-            return (RemoteProxySettings) getContextObject( key );
+            final String keyHttp = RemoteProxySettings.class.getName();
+            if ( hasContextObject( keyHttp ) )
+            {
+                // case 1
+                return (RemoteProxySettings) getContextObject( keyHttp );
+            }
+            else
+            {
+                // case 2
+                return (RemoteProxySettings) getContextObject( key );
+            }
         }
         else
         {
@@ -177,7 +187,7 @@ public class DefaultRemoteStorageContext
 
             if ( StringUtils.isBlank( remoteProxySettings.getHostname() ) )
             {
-                // case 2
+                // case 3
                 if ( !remoteProxySettings.isBlockInheritance() )
                 {
                     return (RemoteProxySettings) getContextObject( key );
@@ -190,7 +200,7 @@ public class DefaultRemoteStorageContext
             }
             else
             {
-                // case 3
+                // case 4
                 return remoteProxySettings;
             }
         }
