@@ -41,7 +41,7 @@ import org.sonatype.plugin.ExtensionPoint;
  * 
  * @author cstamas
  *
- * @deprecated since 2.4. Use {@link org.sonatype.nexus.plugins.ui.contribution.UiContributor} instead.
+ * @deprecated since 2.4. Use org.sonatype.nexus.plugins.ui.contribution.UiContributor from nexus-ui-extjs3-plugin instead.
  */
 @ExtensionPoint
 @Singleton

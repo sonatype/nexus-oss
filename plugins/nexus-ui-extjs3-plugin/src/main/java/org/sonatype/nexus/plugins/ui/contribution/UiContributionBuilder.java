@@ -16,6 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
+import org.sonatype.nexus.util.Condition;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -145,11 +147,4 @@ public class UiContributionBuilder
         return this;
     }
 
-    /**
-     * @see #withCondition(Condition)
-     */
-    public static interface Condition
-    {
-        boolean isSatisfied();
-    }
 }
