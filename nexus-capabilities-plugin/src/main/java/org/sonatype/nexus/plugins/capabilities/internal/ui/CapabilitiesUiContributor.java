@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.ui;
 
-import org.sonatype.nexus.plugins.rest.UiContributionBuilder;
-import org.sonatype.nexus.plugins.rest.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
