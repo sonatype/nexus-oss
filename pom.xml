@@ -1240,8 +1240,8 @@
               <exclude>**/nb-configuration.xml</exclude>
               <!-- IntelliJ IDEA files-->
               <exclude>**/atlassian-ide-plugin.xml</exclude>
-              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/js/ext/ux/**</exclude>
-              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/css/ext/ux/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
               <exclude>plugins/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
             </excludes>
           </configuration>
