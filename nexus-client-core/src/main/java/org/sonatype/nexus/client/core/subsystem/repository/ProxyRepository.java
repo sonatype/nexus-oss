@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.client.core.subsystem.repository;
 
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+
 /**
  * A Nexus proxy {@link Repository}.
  *
@@ -25,6 +27,12 @@ public interface ProxyRepository<T extends ProxyRepository>
      * @return proxied URI
      */
     String proxyUri();
+
+    /**
+     * @return configured web proxy settings
+     * @since 2.5
+     */
+    RemoteHttpProxySettings webProxy();
 
     /**
      * Configures repository policy (RELEASES/SNAPSHOTS/MIXED).
@@ -85,5 +93,15 @@ public interface ProxyRepository<T extends ProxyRepository>
      * @return itself, for fluent api usage
      */
     T withItemMaxAge( int minutes );
+
+    /**
+     * Configures web proxy settings.
+     *
+     * @param httpProxySettings to be used
+     * @return itself, for fluent api usage
+     * @since 2.5
+     */
+    T withWebProxy(RemoteHttpProxySettings httpProxySettings);
+
 
 }

@@ -15,6 +15,7 @@ package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository;
 import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepositoryStatus;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
@@ -98,6 +99,20 @@ public class JerseyProxyRepository<T extends ProxyRepository>
         return remoteStorage.getRemoteStorageUrl();
     }
 
+    /**
+     * @since 2.5
+     */
+    @Override
+    public RemoteHttpProxySettings webProxy()
+    {
+        final RepositoryResourceRemoteStorage remoteStorage = settings().getRemoteStorage();
+        if ( remoteStorage == null )
+        {
+            return null;
+        }
+        return remoteStorage.getHttpProxySettings();
+    }
+
     @Override
     public T withRepoPolicy( final String policy )
     {
@@ -161,6 +176,22 @@ public class JerseyProxyRepository<T extends ProxyRepository>
         final RepositoryStatusResource newStatus = doGetStatus();
         newStatus.setProxyMode( "ALLOW" );
         doUpdateStatus( newStatus );
+        return me();
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    public T withWebProxy( final RemoteHttpProxySettings httpProxySettings )
+    {
+        RepositoryResourceRemoteStorage remoteStorage = settings().getRemoteStorage();
+        if ( remoteStorage == null )
+        {
+            remoteStorage = new RepositoryResourceRemoteStorage();
+            settings().setRemoteStorage( remoteStorage );
+        }
+        remoteStorage.setHttpProxySettings( httpProxySettings );
         return me();
     }
 
