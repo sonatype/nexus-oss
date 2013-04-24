@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.target.TargetRegistry;
 
 /**
  * Tests that needs some repo content and are Maven related.
@@ -50,6 +51,8 @@ public abstract class AbstractMavenRepoContentTests
 
     protected MavenProxyRepository central;
 
+    protected TargetRegistry targetRegistry;
+
     @Override
     protected void setUp()
         throws Exception
@@ -63,6 +66,8 @@ public abstract class AbstractMavenRepoContentTests
         nexusConfiguration = lookup( NexusConfiguration.class );
 
         repositoryRegistry = lookup( RepositoryRegistry.class );
+
+        targetRegistry = lookup( TargetRegistry.class );
 
         // get a snapshots hosted repo
         snapshots = (MavenRepository) repositoryRegistry.getRepository( "snapshots" );
