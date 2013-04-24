@@ -10,4 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.kenai;
+package org.sonatype.security.realms.kenai.config;
+
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+
+import com.sonatype.security.realms.kenai.config.model.Configuration;
+
+public interface KenaiRealmConfiguration
+{
+    Configuration getConfiguration();
+
+    void save()
+        throws ConfigurationException;
+
+    void updateConfiguration( Configuration configuration )
+        throws InvalidConfigurationException, ConfigurationException;
+}
