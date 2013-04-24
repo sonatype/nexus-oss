@@ -257,6 +257,10 @@ public class XStreamConfiguratorLightweight
         xstream.processAnnotations( UserResourceRequest.class );
         xstream.processAnnotations( UserForgotPasswordRequest.class );
         xstream.processAnnotations( UserChangePasswordRequest.class );
+
+        //NEXUS-5037 decode passwords that might have been urlencoded
+        xstream.registerLocalConverter( UserResource.class, "password",  new HtmlUnescapeStringConverter( true ) );
+
         xstream.registerLocalConverter( UserResource.class, "roles", new AliasingListConverter( String.class, "role" ) );
         xstream.registerLocalConverter( UserListResourceResponse.class, "data", new AliasingListConverter(
             UserResource.class, "users-list-item" ) );
