@@ -48,9 +48,9 @@ public class RedirectingNexusApplicationCustomizer
         }
 
         @Override
-        protected int beforeHandle( final Request request, final Response response )
+        protected int doHandle( final Request request, final Response response )
         {
-            int state = super.beforeHandle( request, response );
+            int state = super.doHandle( request, response );
 
             if ( response.getStatus().getCode() != 404 )
             {
@@ -60,8 +60,8 @@ public class RedirectingNexusApplicationCustomizer
             final String path = request.getResourceRef().getPath();
             final String ctxPath = request.getResourceRef().getBaseRef().getPath();
 
-            if (path.startsWith( ctxPath + "/images/" )) {
-                response.redirectPermanent( path.replace( ctxPath + "/images/", ctxPath + "/static/images/" ));
+            if (path.startsWith( ctxPath + "images/" )) {
+                response.redirectPermanent( path.replace( ctxPath + "images/", ctxPath + "static/images/" ));
                 return STOP;
             }
 
