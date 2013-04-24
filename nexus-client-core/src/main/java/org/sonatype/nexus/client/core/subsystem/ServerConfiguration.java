@@ -24,7 +24,21 @@ public interface ServerConfiguration
 
     /**
      * @return Http Proxy configuration segment.
+     * @deprecated use {@link #httpProxySettings()}
      */
+    @Deprecated
     HttpProxy proxySettings();
+
+    /**
+     * @return Http Proxy configuration segment.
+     * @since 2.5
+     */
+    HttpProxy httpProxySettings();
+
+    /**
+     * @return Https Proxy configuration segment.
+     * @since 2.5
+     */
+    HttpProxy httpsProxySettings();
 
 }
