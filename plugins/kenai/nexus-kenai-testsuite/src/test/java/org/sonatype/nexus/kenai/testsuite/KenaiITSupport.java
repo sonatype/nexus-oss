@@ -16,12 +16,20 @@ import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Str
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.filetasks.builder.FileRef.file;
+import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.inject.Inject;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
@@ -29,6 +37,8 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+import org.sonatype.sisu.filetasks.FileTaskBuilder;
+import org.sonatype.tests.http.server.fluent.Server;
 
 /**
  * Support for LDAP integration tests.
@@ -39,6 +49,8 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 public class KenaiITSupport
     extends NexusRunningParametrizedITSupport
 {
+    @Inject
+    private FileTaskBuilder fileTaskBuilder;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data()
@@ -58,9 +70,31 @@ public class KenaiITSupport
     @Override
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
-        return configuration.setLogLevel( "org.sonatype.nexus.plugins.kenai", "DEBUG" ).addPlugins(
+        return super.configureNexus( configuration ).setLogLevel( "org.sonatype.security.realms.kenai", "DEBUG" ).addPlugins(
             artifactResolver().resolvePluginFromDependencyManagement( "org.sonatype.nexus.plugins",
-                "nexus-kenai-plugin" ) );
+                "nexus-kenai-plugin" ) ).addOverlays(
+            fileTaskBuilder.copy().directory( file( testData().resolveFile( "preset-nexus" ) ) ).filterUsing(
+                "mock-kenai-port", String.valueOf( server.getPort() ) ).to().directory(
+                path( "sonatype-work/nexus/conf" ) ) );
+    }
+
+    private static Server server;
+
+    @BeforeClass
+    public static void startMockKenaiServer()
+        throws Exception
+    {
+        server = Server.withPort( 0 ).serve( "/*" ).withBehaviours( new KenaiAuthcBehaviour() ).start();
+    }
+
+    @AfterClass
+    public static void stopMockKenaiServer()
+        throws Exception
+    {
+        if ( server != null )
+        {
+            server.stop();
+        }
     }
 
     public static String uniqueName( final String prefix )

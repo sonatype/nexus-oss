@@ -12,8 +12,26 @@
  */
 package org.sonatype.nexus.kenai.testsuite;
 
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 
+import java.util.Collection;
+
+import org.junit.Test;
+import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
+import org.sonatype.nexus.client.core.exception.NexusClientResponseException;
+import org.sonatype.nexus.client.core.subsystem.security.Role;
+import org.sonatype.nexus.client.core.subsystem.security.Roles;
+
+/**
+ * This is a codified version of "smoke testing Kenai Realm", see below the wiki link.
+ * 
+ * @author cstamas
+ * @see <a href="https://docs.sonatype.com/display/Nexus/Testing+Kenai+%28java.net%29+Security+Realm">Testing Kenai
+ *      Realm</a> wiki page
+ */
 public class KenaiIT
     extends KenaiITSupport
 {
@@ -23,10 +41,42 @@ public class KenaiIT
         super( nexusBundleCoordinates );
     }
 
+    protected void createKenaiBaseRoleIfNeeded()
+    {
+        final Roles roles = client().getSubsystem( Roles.class );
+        try
+        {
+            roles.get( "kenai-base-role" );
+        }
+        catch ( NexusClientNotFoundException e )
+        {
+            roles.create( "kenai-base-role" ).withName( "Kenai Base Role" ).withDescription( "Kenai Base Role" ).withRole(
+                "nx-admin" ).save();
+        }
+    }
+
     @Test
-    public void smoke()
+    public void kenaiLogsInWithGoodCredentials()
         throws Exception
     {
-        // do something
+        createKenaiBaseRoleIfNeeded();
+        // see KenaiAuthcBehaviour: "authenticated" users are those having password = username + "123"
+        final NexusClient kenaiAuthenticatedClient = createNexusClient( nexus(), "kenaiuser", "kenaiuser123" );
+        final Roles kenaiAuthenticatedRoles = kenaiAuthenticatedClient.getSubsystem( Roles.class );
+        final Collection<Role> existingRoles = kenaiAuthenticatedRoles.get();
+        // most likely redundant, as it all this above would not work, a NexusClientResponseException 401 would be
+        // thrown at kenaiAuthenticatedRoles.get();
+        assertThat( existingRoles, not( empty() ) );
+    }
+
+    @Test( expected = NexusClientResponseException.class )
+    public void kenaiNotLogsInWithBadCredentials()
+        throws Exception
+    {
+        createKenaiBaseRoleIfNeeded();
+        // see KenaiAuthcBehaviour: "authenticated" users are those having password = username + "123"
+        // this user below will have BAD credentials
+        final NexusClient kenaiAuthenticatedClient = createNexusClient( nexus(), "kenaiuser", "kenaiuserABC" );
+        assertThat( "Line above should throw NexusClientResponseException with 401 response!", false );
     }
 }

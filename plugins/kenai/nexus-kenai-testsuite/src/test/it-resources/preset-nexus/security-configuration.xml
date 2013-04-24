@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -13,21 +13,16 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<configuration debug="false">
-
-  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <target>System.out</target>
-    <encoder>
-      <pattern>%level [%thread%X{DC}] %logger - %msg%n</pattern>
-    </encoder>
-  </appender>
-
-  <logger name="org.sonatype.security.realms.kenai" level="DEBUG"/>
-  <logger name="org.apache.http" level="DEBUG"/>
-  <logger name="Sisu" level="INFO"/>
-
-  <root level="${test.log.level:-INFO}">
-    <appender-ref ref="CONSOLE"/>
-  </root>
-
-</configuration>
+<security-configuration>
+  <version>2.0.3</version>
+  <enabled>true</enabled>
+  <anonymousAccessEnabled>true</anonymousAccessEnabled>
+  <anonymousUsername>anonymous</anonymousUsername>
+  <anonymousPassword>{hT1o9Jl84rkHyX/l1KbhFlogB5aYFGpmeuy8dG+inRo=}</anonymousPassword>
+  <realms>
+    <realm>XmlAuthenticatingRealm</realm>
+    <realm>XmlAuthorizingRealm</realm>
+    <realm>kenai</realm>
+  </realms>
+  <securityManager>default</securityManager>
+</security-configuration>

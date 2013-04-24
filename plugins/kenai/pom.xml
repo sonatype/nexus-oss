@@ -37,5 +37,16 @@
     <module>nexus-kenai-plugin</module>
     <module>nexus-kenai-testsuite</module>
   </modules>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-kenai-plugin</artifactId>
+        <version>${project.version}</version>
+        <type>nexus-plugin</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 </project>
