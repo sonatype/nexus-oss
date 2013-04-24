@@ -26,9 +26,7 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -41,9 +39,9 @@ import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.tests.http.server.fluent.Server;
 
 /**
- * Support for LDAP integration tests.
+ * Support for Kenai integration tests.
  * 
- * @since 2.4
+ * @since 2.5
  */
 @NexusStartAndStopStrategy( EACH_TEST )
 public class KenaiITSupport

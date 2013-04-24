@@ -20,10 +20,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.tests.http.server.api.Behaviour;
 
+/**
+ * {@link Behaviour} implementation that mocks Kenai AuthAPI.
+ * 
+ * @author cstamas
+ * @see <a href="https://kenai.com/projects/kenaiapis/pages/AuthAPI">Kenai AuthAPI</a>
+ */
 public class KenaiAuthcBehaviour
     implements Behaviour
 {
-
     @Override
     public boolean execute( final HttpServletRequest request, final HttpServletResponse response,
                             final Map<Object, Object> context )
