@@ -41,7 +41,8 @@ public class KenaiAuthcBehaviour
         try
         {
 
-            if ( username != null && password != null && ( username + "123" ).equals( password ) )
+            if ( "POST".equals( request.getMethod() ) && username != null && password != null
+                && ( username + "123" ).equals( password ) )
             {
                 // we are fine
                 response.setStatus( 200 );
