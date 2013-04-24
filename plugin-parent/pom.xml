@@ -223,6 +223,11 @@
         <type>${nexus-plugin.type}</type>
         <version>${nexus.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ui-extjs3-plugin</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
 
       <!-- ******************** TESTING ******************** -->
 
