@@ -53,6 +53,7 @@
         <module>nexus-rrb-plugin</module>
         <module>nexus-archetype-plugin</module>
         <module>nexus-maven-bridge-plugin</module>
+        <module>nexus-ui-extjs3-plugin</module>
       </modules>
     </profile>
   </profiles>
