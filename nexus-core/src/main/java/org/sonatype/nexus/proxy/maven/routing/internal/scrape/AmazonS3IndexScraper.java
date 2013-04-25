@@ -80,6 +80,7 @@ public class AmazonS3IndexScraper
     {
         String prefix = null;
         Page initialPage = page;
+        String initialPageUrl = page.getUrl();
         if ( initialPage.getHttpResponse().getStatusLine().getStatusCode() != 200 )
         {
             // we probably have the NoSuchKey response from S3, usually when repo root is not in bucket root
@@ -93,16 +94,16 @@ public class AmazonS3IndexScraper
                 return null;
             }
             // repo.remoteUrl does not have query parameters...
-            String fixedUrl =
+            initialPageUrl =
                 context.getRemoteRepositoryRootUrl().substring( 0,
                     context.getRemoteRepositoryRootUrl().length() - prefix.length() );
-            getLogger().debug( "Retrying URL {} to scrape Amazon S3 hosted repository on remote URL {}", fixedUrl,
+            getLogger().debug( "Retrying URL {} to scrape Amazon S3 hosted repository on remote URL {}", initialPageUrl,
                 context.getRemoteRepositoryRootUrl() );
-            initialPage = Page.getPageFor( context, fixedUrl + "?prefix=" + prefix );
+            initialPage = Page.getPageFor( context, initialPageUrl + "?prefix=" + prefix );
         }
 
         final HashSet<String> entries = new HashSet<String>();
-        diveIn( context, initialPage, initialPage.getUrl(), prefix, entries );
+        diveIn( context, initialPage, initialPageUrl, prefix, entries );
         return new ArrayList<String>( entries );
     }
 
