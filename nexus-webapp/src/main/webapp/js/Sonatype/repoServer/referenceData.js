@@ -145,16 +145,6 @@ NX.define('Sonatype.repoServer.referenceData', {
           retrievalRetryCount : 0,
           queryString : "",
           userAgentString : ""
-        },
-        httpProxySettings : {
-          proxyHostname : "",
-          proxyPort : 0,
-          authentication : {
-            username : "",
-            password : "",
-            ntlmHost : "",
-            ntlmDomain : ""
-          }
         }
       }
     } // end repositoryProxyState
