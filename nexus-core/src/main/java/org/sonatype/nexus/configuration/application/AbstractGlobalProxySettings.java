@@ -77,26 +77,6 @@ public abstract class AbstractGlobalProxySettings
 
     // ==
 
-    public boolean isBlockInheritance()
-    {
-        if ( isEnabled() )
-        {
-            return getCurrentConfiguration( false ).isBlockInheritance();
-        }
-
-        return false;
-    }
-
-    public void setBlockInheritance( boolean val )
-    {
-        if ( !isEnabled() )
-        {
-            initConfig();
-        }
-
-        getCurrentConfiguration( true ).setBlockInheritance( val );
-    }
-
     public String getHostname()
     {
         if ( isEnabled() )
@@ -180,13 +160,6 @@ public abstract class AbstractGlobalProxySettings
         {
             RemoteProxySettings remoteProxySettings = new DefaultRemoteProxySettings();
 
-            remoteProxySettings.setBlockInheritance( model.isBlockInheritance() );
-
-            if ( remoteProxySettings.isBlockInheritance() )
-            {
-                return remoteProxySettings;
-            }
-
             remoteProxySettings.setHostname( model.getProxyHostname() );
 
             remoteProxySettings.setPort( model.getProxyPort() );
@@ -213,8 +186,6 @@ public abstract class AbstractGlobalProxySettings
         else
         {
             CRemoteHttpProxySettings model = new CRemoteHttpProxySettings();
-
-            model.setBlockInheritance( settings.isBlockInheritance() );
 
             model.setProxyHostname( settings.getHostname() );
 

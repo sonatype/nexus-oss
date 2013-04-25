@@ -101,18 +101,7 @@ public class HttpClientProxyUtilTest
         }
 
         @Override
-        public void setBlockInheritance( boolean val )
-        {
-        }
-
-        @Override
         public boolean isEnabled()
-        {
-            return false;
-        }
-
-        @Override
-        public boolean isBlockInheritance()
         {
             return false;
         }

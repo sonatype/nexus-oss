@@ -17,10 +17,6 @@ import java.util.Set;
 public interface RemoteProxySettings
 {
     boolean isEnabled();
-    
-    boolean isBlockInheritance();
-
-    void setBlockInheritance( boolean val );
 
     String getHostname();
 

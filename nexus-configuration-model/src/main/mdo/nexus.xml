@@ -322,7 +322,7 @@
       <fields>
         <field>
           <name>blockInheritance</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.2.0</version>
           <type>boolean</type>
           <description>Set to true if you want to block inheritance.</description>
           <required>true</required>
