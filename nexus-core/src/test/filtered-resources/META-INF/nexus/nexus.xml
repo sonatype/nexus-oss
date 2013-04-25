@@ -16,7 +16,7 @@
 <!-- Note: This is a copy of the default OSS config, but it should NOT be changed (unless model change requires is)
     as some UTs/ITs are depending on things like repo existence or defined repo count. -->
 <nexusConfiguration>
-  <version>2.5.0</version>
+  <version>${nexus.configuration.version}</version>
   <nexusVersion>${project.version}</nexusVersion>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>

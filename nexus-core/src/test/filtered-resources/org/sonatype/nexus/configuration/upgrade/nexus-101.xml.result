@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>2.5.0</version>
+  <version>${nexus.configuration.version}</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -636,30 +636,6 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
-  <tasks>
-    <task>
-      <id>1</id>
-      <name>weekly_task</name>
-      <enabled>true</enabled>
-      <type>UpdateIndexTask</type>
-      <status>SUBMITTED</status>
-      <nextRun>1229291340000</nextRun>
-      <schedule>
-        <type>weekly</type>
-        <startDate>1229032140000</startDate>
-        <daysOfWeek>
-          <daysOfWeek>1</daysOfWeek>
-          <daysOfWeek>2</daysOfWeek>
-        </daysOfWeek>
-      </schedule>
-      <properties>
-        <property>
-          <key>repositoryId</key>
-          <value>all_repo</value>
-        </property>
-      </properties>
-    </task>
-  </tasks>
   <smtpConfiguration>
     <hostname>smtp-host</hostname>
     <port>25</port>

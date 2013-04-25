@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>2.5.0</version>
+  <version>${nexus.configuration.version}</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -638,25 +638,21 @@
   </repositoryTargets>
   <tasks>
     <task>
-      <id>2</id>
-      <name>weekly</name>
+      <id>1</id>
+      <name>weekly_task</name>
       <enabled>true</enabled>
-      <type>ExpireCacheTask</type>
+      <type>UpdateIndexTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1225168020000</nextRun>
+      <nextRun>1229291340000</nextRun>
       <schedule>
         <type>weekly</type>
-        <startDate>1225081620000</startDate>
+        <startDate>1229032140000</startDate>
         <daysOfWeek>
+          <daysOfWeek>1</daysOfWeek>
           <daysOfWeek>2</daysOfWeek>
-          <daysOfWeek>4</daysOfWeek>
         </daysOfWeek>
       </schedule>
       <properties>
-        <property>
-          <key>resourceStorePath</key>
-          <value></value>
-        </property>
         <property>
           <key>repositoryId</key>
           <value>all_repo</value>
