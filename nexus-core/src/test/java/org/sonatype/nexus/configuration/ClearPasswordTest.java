@@ -88,14 +88,8 @@ public class ClearPasswordTest
         central.getRemoteStorage().setAuthentication( new CRemoteAuthentication() );
         central.getRemoteStorage().getAuthentication().setPassword( password );
 
-        // repo proxy pass
-        central.getRemoteStorage().setHttpProxySettings( new CRemoteHttpProxySettings() );
-        central.getRemoteStorage().getHttpProxySettings().setAuthentication( new CRemoteAuthentication() );
-        central.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassword( password );
-
         // now we need to make the file valid....
         config.getGlobalHttpProxySettings().setProxyPort( 1234 );
-        central.getRemoteStorage().getHttpProxySettings().setProxyPort( 1234 );
 
         // save it
         source.storeConfiguration();
@@ -120,9 +114,6 @@ public class ClearPasswordTest
 
         central = this.getCentralRepo( newConfig );
         Assert.assertEquals( password, central.getRemoteStorage().getAuthentication().getPassword() );
-        Assert.assertEquals( password, central
-            .getRemoteStorage().getHttpProxySettings().getAuthentication().getPassword() );
-
     }
 
     private CRepository getCentralRepo( Configuration config )

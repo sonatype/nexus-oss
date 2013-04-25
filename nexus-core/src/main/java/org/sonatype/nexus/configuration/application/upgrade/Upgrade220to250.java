@@ -21,9 +21,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.v2_5_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import com.google.common.io.Closeables;
 
 /**
  * Upgrades configuration model from version 2.2.0 to 2.5.0.
@@ -59,10 +59,7 @@ public class Upgrade220to250
         }
         finally
         {
-            if ( fr != null )
-            {
-                fr.close();
-            }
+            Closeables.closeQuietly( fr );
         }
 
         return conf;
@@ -76,10 +73,11 @@ public class Upgrade220to250
 
         BasicVersionUpgrade versionConverter = new BasicVersionUpgrade();
 
-        Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
+
 }

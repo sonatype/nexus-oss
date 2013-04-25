@@ -329,10 +329,6 @@ public class RepositoryListPlexusResource
             // connection settings
             target.getRemoteStorage().setConnectionSettings(
                 this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ) );
-
-            // http proxy settings
-            target.getRemoteStorage().setHttpProxySettings(
-                this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), null ) );
         }
 
         return target;

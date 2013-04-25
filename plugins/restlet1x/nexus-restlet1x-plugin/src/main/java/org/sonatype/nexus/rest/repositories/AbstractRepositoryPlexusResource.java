@@ -369,10 +369,6 @@ public abstract class AbstractRepositoryPlexusResource
             AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration( repository )
                 .getRemoteStorage().getConnectionSettings() ) );
 
-        resource.getRemoteStorage().setHttpProxySettings(
-            AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration( repository )
-                .getRemoteStorage().getHttpProxySettings() ) );
-
         // set auto block
         resource.setAutoBlockActive( repository.isAutoBlockActive() );
         

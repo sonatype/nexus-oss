@@ -106,16 +106,6 @@ public class DefaultConfigurationHelper
                 CRemoteAuthentication auth = repo.getRemoteStorage().getAuthentication();
                 auth.setPassword( encryptDecryptPassword( auth.getPassword(), encrypt, mask ) );
             }
-
-            // proxy auth
-            if ( repo.getRemoteStorage() != null
-                && repo.getRemoteStorage().getHttpProxySettings() != null
-                && repo.getRemoteStorage().getHttpProxySettings().getAuthentication() != null
-                && StringUtils.isNotEmpty( repo.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassword() ) )
-            {
-                CRemoteAuthentication auth = repo.getRemoteStorage().getHttpProxySettings().getAuthentication();
-                auth.setPassword( encryptDecryptPassword( auth.getPassword(), encrypt, mask ) );
-            }
         }
     }
 

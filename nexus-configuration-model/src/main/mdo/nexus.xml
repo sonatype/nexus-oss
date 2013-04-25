@@ -777,14 +777,14 @@
         </field>
         <field>
           <name>inheritHttpProxySettings</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.2.0</version>
           <type>boolean</type>
           <description>Should this remote storage inherit the global settings? If true, it will inherit, if false, the proxy defined or none will be used.</description>
           <required>true</required>
         </field>
         <field>
           <name>httpProxySettings</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.2.0</version>
           <description>
             The specific HTTP Proxy settings to use when connecting to this repository.
           </description>
