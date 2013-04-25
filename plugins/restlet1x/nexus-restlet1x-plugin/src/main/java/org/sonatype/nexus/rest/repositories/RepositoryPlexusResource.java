@@ -204,18 +204,6 @@ public class RepositoryPlexusResource
                                         .getRemoteAuthenticationSettings() ).getPassword();
                             }
 
-                            String oldPasswordForProxy = null;
-                            if ( proxyRepo.getRemoteProxySettings() != null
-                                && proxyRepo.getRemoteProxySettings().isEnabled()
-                                && proxyRepo.getRemoteProxySettings().getProxyAuthentication() != null
-                                && UsernamePasswordRemoteAuthenticationSettings.class.isInstance( proxyRepo
-                                    .getRemoteAuthenticationSettings() ) )
-                            {
-                                oldPasswordForProxy =
-                                    ( (UsernamePasswordRemoteAuthenticationSettings) proxyRepo.getRemoteProxySettings()
-                                        .getProxyAuthentication() ).getPassword();
-                            }
-
                             RemoteAuthenticationSettings remoteAuth =
                                 getAuthenticationInfoConverter().convertAndValidateFromModel(
                                     this.convertAuthentication( model.getRemoteStorage().getAuthentication(),

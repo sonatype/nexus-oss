@@ -50,25 +50,6 @@ public class RemoteStorageSettingsInheritanceTest
     }
 
     @Test
-    public void testNEXUS3064PerRepo()
-        throws Exception
-    {
-        int rscChange = aProxyRepository.getRemoteStorageContext().getGeneration();
-
-        RemoteProxySettings proxy = aProxyRepository.getRemoteProxySettings();
-        assertThat( "Should no proxy be set!", !proxy.isEnabled() );
-        proxy.setHostname( "192.168.1.1" );
-        proxy.setPort( 1234 );
-        // TODO: this is the spurious part!!! Make it not needed! Config framework DOES know it changed!
-        // If you remove this, test will fail
-        aProxyRepository.setRemoteProxySettings( proxy );
-        applicationConfiguration.saveConfiguration();
-
-        assertThat( "The change should be detected", aProxyRepository.getRemoteStorageContext().getGeneration(),
-            greaterThan( rscChange ) );
-    }
-
-    @Test
     public void testNEXUS3064Global()
         throws Exception
     {

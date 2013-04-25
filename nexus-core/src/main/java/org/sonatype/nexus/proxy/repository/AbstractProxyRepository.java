@@ -147,11 +147,6 @@ public abstract class AbstractProxyRepository
     private RemoteStorageContext remoteStorageContext;
 
     /**
-     * Proxy selector, if set
-     */
-    private ProxySelector proxySelector;
-
-    /**
      * Download mirrors
      */
     private DownloadMirrors dMirrors;
@@ -914,21 +909,6 @@ public abstract class AbstractProxyRepository
             // perm changes? retry if autoBlocked
             setProxyMode( ProxyMode.ALLOW );
         }
-    }
-
-    public ProxySelector getProxySelector()
-    {
-        if ( proxySelector == null )
-        {
-            proxySelector = new DefaultProxySelector();
-        }
-
-        return proxySelector;
-    }
-
-    public void setProxySelector( ProxySelector selector )
-    {
-        this.proxySelector = selector;
     }
 
     public RemoteRepositoryStorage getRemoteStorage()
