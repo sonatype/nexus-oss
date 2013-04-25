@@ -269,7 +269,7 @@ public class DefaultNexusBundleConfiguration
                 fileTaskBuilder.replace()
                     .inFile( path( "nexus/conf/jetty.xml" ) )
                     .replace(
-                        "com.yammer.metrics.jetty.InstrumentedSelectChannelConnector",
+                        "org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector",
                         "org.eclipse.jetty.server.nio.BlockingChannelConnector"
                     )
                     .failIfFileDoesNotExist()

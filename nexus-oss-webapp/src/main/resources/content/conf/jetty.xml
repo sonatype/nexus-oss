@@ -28,10 +28,9 @@
     </Set>
     <Call name="addConnector">
         <Arg>
-            <New class="com.yammer.metrics.jetty.InstrumentedSelectChannelConnector">
-              <!-- metrics integration needs port on ctor invocation -->
-              <Arg type="int">${application-port}</Arg>
+            <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
               <Set name="host">${application-host}</Set>
+              <Set name="port">${application-port}</Set>
             </New>
         </Arg>
     </Call>
