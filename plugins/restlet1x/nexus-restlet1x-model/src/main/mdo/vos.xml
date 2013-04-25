@@ -1016,15 +1016,6 @@
           <required>false</required>
           <description>The connection settings for the remote connection.</description>
         </field>
-        <field>
-          <name>httpProxySettings</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>RemoteHttpProxySettings</type>
-          </association>
-          <required>false</required>
-          <description>Repository specific proxy server settings for the remote connection (overrides the global proxy server configuration).</description>
-        </field>
       </fields>
     </class>
 

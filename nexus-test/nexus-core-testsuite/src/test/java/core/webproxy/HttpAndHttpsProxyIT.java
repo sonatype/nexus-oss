@@ -53,13 +53,9 @@ public class HttpAndHttpsProxyIT
     @Inject
     private PortReservationService portReservationService;
 
-    private int repoProxyPort;
-
     private int globalHttpProxyPort;
 
     private int globalHttpsProxyPort;
-
-    private ProxyServerWithHttpsTunneling repoProxy;
 
     private ProxyServerWithHttpsTunneling globalHttpProxy;
 
@@ -95,10 +91,6 @@ public class HttpAndHttpsProxyIT
     public void initWebProxiesAndRemoteServer()
         throws Exception
     {
-        repoProxy = new ProxyServerWithHttpsTunneling();
-        repoProxy.setPort( repoProxyPort = portReservationService.reservePort() );
-        repoProxy.initialize();
-
         globalHttpProxy = new ProxyServerWithHttpsTunneling();
         globalHttpProxy.setPort( globalHttpProxyPort = portReservationService.reservePort() );
         globalHttpProxy.initialize();
@@ -123,11 +115,6 @@ public class HttpAndHttpsProxyIT
     public void stopWebProxies()
         throws Exception
     {
-        if ( repoProxy != null )
-        {
-            repoProxy.stop();
-            portReservationService.cancelPort( repoProxyPort );
-        }
         if ( globalHttpProxy != null )
         {
             globalHttpProxy.stop();
@@ -146,45 +133,6 @@ public class HttpAndHttpsProxyIT
         {
             httpsRemoteServer.stop();
         }
-    }
-
-    /**
-     * Given:
-     * - no global HTTP proxy
-     * - no global HTTPS proxy
-     * - repo proxy
-     * <p/>
-     * Verify that repository level configured proxy is used for an HTTP url.
-     */
-    @Test
-    public void rProxy_httpUrl()
-        throws Exception
-    {
-        repoProxy.start();
-        disableGlobalHttpProxy();
-        disableGlobalHttpsProxy();
-        final MavenProxyRepository repository = createMavenProxyRepository( httpRemoteServer );
-        downloadArtifact( repository.id() );
-    }
-
-    /**
-     * Given:
-     * - no global HTTP proxy
-     * - no global HTTPS proxy
-     * - repo proxy
-     * <p/>
-     * Verify that repository level configured proxy is used for an HTTPS url.
-     */
-    @Test
-    public void rProxy_httpsUrl()
-        throws Exception
-    {
-        repoProxy.start();
-        disableGlobalHttpProxy();
-        disableGlobalHttpsProxy();
-        final MavenProxyRepository repository = createMavenProxyRepository( httpsRemoteServer );
-        enableRepositoryProxy( repository );
-        downloadArtifact( repository.id() );
     }
 
     /**
@@ -264,86 +212,6 @@ public class HttpAndHttpsProxyIT
     /**
      * Given:
      * - global HTTP proxy
-     * - no global HTTPS proxy
-     * - repo proxy
-     * <p/>
-     * Verify that repo HTTP proxy is used for an HTTP url.
-     */
-    @Test
-    public void gHttp_rProxy_httpUrl()
-        throws Exception
-    {
-        repoProxy.start();
-        enableGlobalHttpProxy();
-        disableGlobalHttpsProxy();
-        final MavenProxyRepository repository = createMavenProxyRepository( httpRemoteServer );
-        enableRepositoryProxy( repository );
-        downloadArtifact( repository.id() );
-    }
-
-    /**
-     * Given:
-     * - global HTTP proxy
-     * - no global HTTPS proxy
-     * - repo proxy
-     * <p/>
-     * Verify that repo HTTP proxy is used for an HTTPS url.
-     */
-    @Test
-    public void gHttp_rProxy_httpsUrl()
-        throws Exception
-    {
-        repoProxy.start();
-        enableGlobalHttpProxy();
-        disableGlobalHttpsProxy();
-        final MavenProxyRepository repository = createMavenProxyRepository( httpsRemoteServer );
-        enableRepositoryProxy( repository );
-        downloadArtifact( repository.id() );
-    }
-
-    /**
-     * Given:
-     * - global HTTP proxy
-     * - global HTTPS proxy
-     * - repo proxy
-     * <p/>
-     * Verify that repo HTTP proxy is used for an HTTP url.
-     */
-    @Test
-    public void gHttp_gHttps_rProxy_httpUrl()
-        throws Exception
-    {
-        repoProxy.start();
-        enableGlobalHttpProxy();
-        enableGlobalHttpsProxy();
-        final MavenProxyRepository repository = createMavenProxyRepository( httpRemoteServer );
-        enableRepositoryProxy( repository );
-        downloadArtifact( repository.id() );
-    }
-
-    /**
-     * Given:
-     * - global HTTP proxy
-     * - global HTTPS proxy
-     * - repo proxy
-     * <p/>
-     * Verify that repo HTTP proxy is used for an HTTPS url.
-     */
-    @Test
-    public void gHttp_gHttps_rProxy_httpsUrl()
-        throws Exception
-    {
-        repoProxy.start();
-        enableGlobalHttpProxy();
-        enableGlobalHttpsProxy();
-        final MavenProxyRepository repository = createMavenProxyRepository( httpsRemoteServer );
-        enableRepositoryProxy( repository );
-        downloadArtifact( repository.id() );
-    }
-
-    /**
-     * Given:
-     * - global HTTP proxy
      * - global HTTPS proxy
      * - no repo proxy
      * <p/>
@@ -411,14 +279,6 @@ public class HttpAndHttpsProxyIT
         throws IOException
     {
         config().httpsProxySettings().disable();
-    }
-
-    private void enableRepositoryProxy( final MavenProxyRepository repository )
-    {
-        final RemoteHttpProxySettings httpProxySettings = new RemoteHttpProxySettings();
-        httpProxySettings.setProxyHostname( "localhost" );
-        httpProxySettings.setProxyPort( repoProxyPort );
-        repository.withWebProxy( httpProxySettings ).save();
     }
 
     private void downloadArtifact( final String repositoryId )

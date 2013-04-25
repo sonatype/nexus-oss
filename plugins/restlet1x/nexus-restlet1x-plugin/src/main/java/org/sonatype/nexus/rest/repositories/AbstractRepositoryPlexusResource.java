@@ -455,26 +455,6 @@ public abstract class AbstractRepositoryPlexusResource
         return appModelSettings;
     }
 
-    protected CRemoteHttpProxySettings convertHttpProxySettings( RemoteHttpProxySettings remoteHttpProxySettings,
-                                                                 String oldPassword )
-    {
-        if ( remoteHttpProxySettings == null )
-        {
-            return null;
-        }
-
-        CRemoteHttpProxySettings httpProxySettings = new CRemoteHttpProxySettings();
-
-        httpProxySettings.setProxyHostname( remoteHttpProxySettings.getProxyHostname() );
-
-        httpProxySettings.setProxyPort( remoteHttpProxySettings.getProxyPort() );
-
-        httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication(),
-            oldPassword ) );
-
-        return httpProxySettings;
-    }
-
     protected CRemoteConnectionSettings convertRemoteConnectionSettings(
                                                                          RemoteConnectionSettings remoteConnectionSettings )
     {

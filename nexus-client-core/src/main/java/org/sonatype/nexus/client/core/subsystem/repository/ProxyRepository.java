@@ -29,12 +29,6 @@ public interface ProxyRepository<T extends ProxyRepository>
     String proxyUri();
 
     /**
-     * @return configured web proxy settings
-     * @since 2.5
-     */
-    RemoteHttpProxySettings webProxy();
-
-    /**
      * Configures repository policy (RELEASES/SNAPSHOTS/MIXED).
      *
      * @param policy repository policy
@@ -93,15 +87,5 @@ public interface ProxyRepository<T extends ProxyRepository>
      * @return itself, for fluent api usage
      */
     T withItemMaxAge( int minutes );
-
-    /**
-     * Configures web proxy settings.
-     *
-     * @param httpProxySettings to be used
-     * @return itself, for fluent api usage
-     * @since 2.5
-     */
-    T withWebProxy(RemoteHttpProxySettings httpProxySettings);
-
 
 }

@@ -347,13 +347,6 @@ public class TestMarshalUnmarchal
 
         remoteStorage.setConnectionSettings( connection );
 
-        RemoteHttpProxySettings proxy = new RemoteHttpProxySettings();
-        proxy.setAuthentication( auth );
-        proxy.setProxyHostname( "proxyhost" );
-        proxy.setProxyPort( 55 );
-
-        remoteStorage.setHttpProxySettings( proxy );
-
         repo.setRemoteStorage( remoteStorage );
 
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
@@ -431,13 +424,6 @@ public class TestMarshalUnmarchal
         connection.setUserAgentString( "useragent" );
 
         remoteStorage.setConnectionSettings( connection );
-
-        RemoteHttpProxySettings proxy = new RemoteHttpProxySettings();
-        proxy.setAuthentication( auth );
-        proxy.setProxyHostname( "proxyhost" );
-        proxy.setProxyPort( 55 );
-
-        remoteStorage.setHttpProxySettings( proxy );
 
         repo.setRemoteStorage( remoteStorage );
 

@@ -28,7 +28,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
@@ -101,18 +100,6 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( 321, resultCon.getRetrievalRetryCount() );
         Assert.assertEquals( "userAgentString", resultCon.getUserAgentString() );
 
-        Assert.assertEquals( "proxyHostname", result.getRemoteStorage().getHttpProxySettings().getProxyHostname() );
-        Assert.assertEquals( 999, result.getRemoteStorage().getHttpProxySettings().getProxyPort() );
-
-        AuthenticationSettings resultAuth2 = result.getRemoteStorage().getHttpProxySettings().getAuthentication();
-
-        Assert.assertEquals( "ntlmDomain2", resultAuth2.getNtlmDomain() );
-        Assert.assertEquals( "ntlmHost2", resultAuth2.getNtlmHost() );
-        // Assert.assertEquals( "passphrase2", resultAuth2.getPassphrase() );
-        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
-        // Assert.assertEquals( "privateKey2", resultAuth2.getPrivateKey() );
-        Assert.assertEquals( "username2", resultAuth2.getUsername() );
-
         // NEXUS-1994 override local storage should be null
         Assert.assertNull( result.getOverrideLocalStorageUrl() );
         Assert.assertTrue( StringUtils.isNotEmpty( result.getDefaultLocalStorageUrl() ) );
@@ -138,17 +125,6 @@ public class RepositoryCreateUpdateTest
         connectionSettings.setQueryString( "queryString-new" );
         connectionSettings.setRetrievalRetryCount( 3212 );
         connectionSettings.setUserAgentString( "userAgentString-new" );
-
-        RemoteHttpProxySettings httpProxySettings = originalResource.getRemoteStorage().getHttpProxySettings();
-        httpProxySettings.setProxyHostname( "proxyHostname-new" );
-        httpProxySettings.setProxyPort( 9991 );
-
-        AuthenticationSettings proxyAuthSettings = new AuthenticationSettings();
-        httpProxySettings.setAuthentication( proxyAuthSettings );
-        proxyAuthSettings.setNtlmDomain( "ntlmDomain2-new" );
-        proxyAuthSettings.setNtlmHost( "ntlmHost2-new" );
-        proxyAuthSettings.setPassword( "password2-new" );
-        proxyAuthSettings.setUsername( "username2-new" );
 
         RepositoryPlexusResource plexusResource =
             (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
@@ -205,17 +181,6 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( 3212, resultCon.getRetrievalRetryCount() );
         Assert.assertEquals( "userAgentString-new", resultCon.getUserAgentString() );
 
-        Assert.assertEquals( "proxyHostname-new", result.getRemoteStorage().getHttpProxySettings().getProxyHostname() );
-        Assert.assertEquals( 9991, result.getRemoteStorage().getHttpProxySettings().getProxyPort() );
-
-        AuthenticationSettings resultAuth2 = result.getRemoteStorage().getHttpProxySettings().getAuthentication();
-
-        Assert.assertEquals( "ntlmDomain2-new", resultAuth2.getNtlmDomain() );
-        Assert.assertEquals( "ntlmHost2-new", resultAuth2.getNtlmHost() );
-        // Assert.assertEquals( "passphrase2-new", resultAuth2.getPassphrase() );
-        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
-        // Assert.assertEquals( "privateKey2-new", resultAuth2.getPrivateKey() );
-        Assert.assertEquals( "username2-new", resultAuth2.getUsername() );
         // NEXUS-1994 override local storage should be null
         Assert.assertNull( result.getOverrideLocalStorageUrl() );
         Assert.assertTrue( StringUtils.isNotEmpty( result.getDefaultLocalStorageUrl() ) );
@@ -266,18 +231,6 @@ public class RepositoryCreateUpdateTest
         connectionSettings.setQueryString( "queryString" );
         connectionSettings.setRetrievalRetryCount( 321 );
         connectionSettings.setUserAgentString( "userAgentString" );
-
-        RemoteHttpProxySettings httpProxySettings = new RemoteHttpProxySettings();
-        remoteStorage.setHttpProxySettings( httpProxySettings );
-        httpProxySettings.setProxyHostname( "proxyHostname" );
-        httpProxySettings.setProxyPort( 999 );
-
-        AuthenticationSettings proxyAuthSettings = new AuthenticationSettings();
-        httpProxySettings.setAuthentication( proxyAuthSettings );
-        proxyAuthSettings.setNtlmDomain( "ntlmDomain2" );
-        proxyAuthSettings.setNtlmHost( "ntlmHost2" );
-        proxyAuthSettings.setPassword( "password2" );
-        proxyAuthSettings.setUsername( "username2" );
 
         RepositoryListPlexusResource plexusResource =
             (RepositoryListPlexusResource) this.lookup( PlexusResource.class, "RepositoryListPlexusResource" );
@@ -342,12 +295,6 @@ public class RepositoryCreateUpdateTest
             (RepositoryResourceResponse) plexusResource.post( null, request, response, repoRequest );
         RepositoryProxyResource result = (RepositoryProxyResource) repoResponse.getData();
 
-        //
-        // make sure proxy is null
-        //
-
-        Assert.assertNull( result.getRemoteStorage().getHttpProxySettings() );
-
         // now do an update and test again
         RepositoryPlexusResource updateResource =
             (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
@@ -356,12 +303,6 @@ public class RepositoryCreateUpdateTest
 
         repoResponse = (RepositoryResourceResponse) updateResource.put( null, request, response, repoResponse );
         result = (RepositoryProxyResource) repoResponse.getData();
-
-        //
-        // make sure proxy is null
-        //
-
-        Assert.assertNull( result.getRemoteStorage().getHttpProxySettings() );
 
         // NEXUS-1994 override local storage should be null
         Assert.assertNull( result.getOverrideLocalStorageUrl() );
