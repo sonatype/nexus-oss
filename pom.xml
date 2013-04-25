@@ -170,7 +170,6 @@
 
     <!-- version properties -->
     <nexus.version>${project.version}</nexus.version>
-    <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>
@@ -1240,9 +1239,9 @@
               <exclude>**/nb-configuration.xml</exclude>
               <!-- IntelliJ IDEA files-->
               <exclude>**/atlassian-ide-plugin.xml</exclude>
-              <exclude>nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
-              <exclude>nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
-              <exclude>nexus-webapp/src/main/webapp/js/lib/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
             </excludes>
           </configuration>
         </plugin>
