@@ -276,6 +276,13 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
           }
         }
       });
+  this.repositoryTargetDataStore = new Ext.data.JsonStore({
+    url : Sonatype.config.repos.urls.repoTargets,
+    root : 'data',
+    id : 'id',
+    fields : ['id', 'name', 'resourceURI', 'contentClass'],
+    autoLoad: true
+  });
 
   // Reader and datastore that queries the server for the list of repository
   // groups
@@ -995,6 +1002,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         this.schedulesDataStore.reload();
         this.repoOrGroupDataStore.removeAll();
         this.repositoryDataStore.reload();
+        this.repositoryTargetDataStore.reload();
         this.repositoryGroupDataStore.reload();
         this.serviceTypeDataStore.reload();
         this.formCards.items.each(function(item, i, len) {
@@ -1118,7 +1126,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               id : id
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Task Settings', 'serviceProperties_', this.serviceTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customTypes, this.COMBO_WIDTH));
+        Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Task Settings', 'serviceProperties_', this.serviceTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customTypes, this.COMBO_WIDTH, this.repositoryTargetDataStore));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -1603,7 +1611,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Task Settings', 'serviceProperties_', this.serviceTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customTypes, this.COMBO_WIDTH));
+          Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Task Settings', 'serviceProperties_', this.serviceTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customTypes, this.COMBO_WIDTH, this.repositoryTargetDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);

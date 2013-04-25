@@ -55,12 +55,12 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
  * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks
  * within nexus.xml file.
  */
-@Component ( role = TaskConfigManager.class )
+@Component( role = TaskConfigManager.class )
 public class DefaultTaskConfigManager
     extends AbstractConfigurable
     implements TaskConfigManager
 {
-    private final Logger logger = LoggerFactory.getLogger(  getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     /**
      * The app config holding tasks.
@@ -119,9 +119,8 @@ public class DefaultTaskConfigManager
         else
         {
             throw new ConfigurationException( "The passed configuration object is of class \""
-                                              + configuration.getClass().getName() + "\" and not the required \""
-                                              + ApplicationConfiguration.class.getName() + "\"!"
-            );
+                + configuration.getClass().getName() + "\" and not the required \""
+                + ApplicationConfiguration.class.getName() + "\"!" );
         }
     }
 
@@ -156,10 +155,10 @@ public class DefaultTaskConfigManager
                     TaskUtils.setId( nexusTask, task.getId() );
                     TaskUtils.setName( nexusTask, task.getName() );
 
-                    DefaultScheduledTask<?> scheduledTask = (DefaultScheduledTask<?>) scheduler.initialize( task
-                        .getId(), task.getName(), task.getType(), nexusTask, translateFrom(
-                        task.getSchedule(),
-                        new Date( task.getNextRun() ) ), task.isEnabled() );
+                    DefaultScheduledTask<?> scheduledTask =
+                        (DefaultScheduledTask<?>) scheduler.initialize( task.getId(), task.getName(), task.getType(),
+                            nexusTask, translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ),
+                            task.isEnabled() );
 
                     // since the default schedules task appends 20 ms to the last run time, we don't want
                     // set the value if it is 0, otherwise will give appearance that task did run, since
@@ -173,10 +172,8 @@ public class DefaultTaskConfigManager
                 {
                     // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
                     // name
-                    logger.warn(
-                        "Unable to initialize task " + task.getName() + ", couldn't load service class "
-                        + task.getId(), e
-                    );
+                    logger.warn( "Unable to initialize task " + task.getName() + ", couldn't load service class "
+                        + task.getId(), e );
                 }
             }
         }
@@ -204,20 +201,26 @@ public class DefaultTaskConfigManager
                 if ( foundTask != null )
                 {
                     tasks.remove( foundTask );
-                    
+
                     storeableTask.setLastRun( foundTask.getLastRun() );
                 }
 
                 tasks.add( storeableTask );
+            }
 
-                try
-                {
-                    applicationConfiguration.saveConfiguration();
-                }
-                catch ( IOException e )
-                {
-                    logger.warn( "Could not save task changes!", e );
-                }
+            if ( logger.isTraceEnabled() )
+            {
+                logger.trace( "Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
+                    : "is NOT", new Exception( "This is an exception only to provide caller backtrace" ) );
+            }
+
+            try
+            {
+                applicationConfiguration.saveConfiguration();
+            }
+            catch ( IOException e )
+            {
+                logger.warn( "Could not save task changes!", e );
             }
         }
     }
@@ -233,15 +236,21 @@ public class DefaultTaskConfigManager
             if ( foundTask != null )
             {
                 tasks.remove( foundTask );
+            }
 
-                try
-                {
-                    applicationConfiguration.saveConfiguration();
-                }
-                catch ( IOException e )
-                {
-                    logger.warn( "Could not save task changes!", e );
-                }
+            if ( logger.isTraceEnabled() )
+            {
+                logger.trace( "Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS"
+                    : "is NOT", new Exception( "This is an exception only to provide caller backtrace" ) );
+            }
+
+            try
+            {
+                applicationConfiguration.saveConfiguration();
+            }
+            catch ( IOException e )
+            {
+                logger.warn( "Could not save task changes!", e );
             }
         }
 
@@ -251,42 +260,51 @@ public class DefaultTaskConfigManager
     public SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
-        try {
-            return lookupTask(taskType);
+        try
+        {
+            return lookupTask( taskType );
         }
-        catch (ComponentLookupException e) {
-            this.logger.debug("Failed to load Schedule Task: " + taskType, e);
+        catch ( ComponentLookupException e )
+        {
             throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
         }
     }
 
-    private SchedulerTask<?> lookupTask(final String taskType) throws ComponentLookupException {
-        logger.debug("Looking up task for: " + taskType);
+    private SchedulerTask<?> lookupTask( final String taskType )
+        throws ComponentLookupException
+    {
+        logger.debug( "Looking up task for: " + taskType );
 
-        try {
-            return (SchedulerTask<?>) getPlexusContainer().lookup(SchedulerTask.class, taskType);
+        try
+        {
+            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.class, taskType );
         }
-        catch (ComponentLookupException ignore) {
-            return (SchedulerTask<?>) getPlexusContainer().lookup(NexusTask.class, taskType);
+        catch ( ComponentLookupException ignore )
+        {
+            return (SchedulerTask<?>) getPlexusContainer().lookup( NexusTask.class, taskType );
         }
     }
 
     public <T> T createTaskInstance( final Class<T> taskType )
         throws IllegalArgumentException
     {
-        logger.debug("Creating task: {}", taskType);
+        logger.debug( "Creating task: {}", taskType );
 
-        try {
+        try
+        {
             // first try a full class name lookup (modern sisu-style)
-            return (T) lookupTask(taskType.getCanonicalName());
+            return (T) lookupTask( taskType.getCanonicalName() );
         }
-        catch (ComponentLookupException e) {
-            try {
+        catch ( ComponentLookupException e )
+        {
+            try
+            {
                 // fallback to old plexus hint style
-                return (T) lookupTask(taskType.getSimpleName());
+                return (T) lookupTask( taskType.getSimpleName() );
             }
-            catch (ComponentLookupException x) {
-                throw new IllegalArgumentException("Could not create task of type: " + taskType, e);
+            catch ( ComponentLookupException x )
+            {
+                throw new IllegalArgumentException( "Could not create task of type: " + taskType, e );
             }
         }
     }
@@ -331,12 +349,12 @@ public class DefaultTaskConfigManager
 
         Date startDate = null;
         Date endDate = null;
-        
+
         if ( modelSchedule.getStartDate() > 0 )
         {
             startDate = new Date( modelSchedule.getStartDate() );
         }
-        
+
         if ( modelSchedule.getEndDate() > 0 )
         {
             endDate = new Date( modelSchedule.getEndDate() );

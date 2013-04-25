@@ -309,7 +309,7 @@ public class DefaultSnapshotRemover
     }
 
     private class SnapshotRemoverWalkerProcessor
-        extends AbstractWalkerProcessor
+        extends AbstractFileDeletingWalkerProcessor
     {
 
         private static final long MILLIS_IN_A_DAY = 86400000L;
@@ -484,8 +484,8 @@ public class DefaultSnapshotRemover
                             {
                                 getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
 
-                                // if dateTreshold is not used (zero days) OR
-                                // if itemTimestamp is less then dateTreshold (NB: both are positive!)
+                                // if dateThreshold is not used (zero days) OR
+                                // if itemTimestamp is less then dateThreshold (NB: both are positive!)
                                 // below will the retentionCount overrule if needed this
                                 if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
                                 {
@@ -619,7 +619,7 @@ public class DefaultSnapshotRemover
                 }
             }
 
-            removeDirectoryIfEmpty( coll );
+            removeDirectoryIfEmpty( repository, coll );
 
             updateMetadataIfNecessary( context, coll );
 
@@ -636,31 +636,6 @@ public class DefaultSnapshotRemover
             else
             {
                 collectionNodes.addAndMarkPath( coll.getPath() );
-            }
-        }
-
-        private void removeDirectoryIfEmpty( StorageCollectionItem coll )
-            throws StorageException, IllegalOperationException, UnsupportedStorageOperationException
-        {
-            try
-            {
-                if ( repository.list( false, coll ).size() > 0 )
-                {
-                    return;
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
-                }
-
-                // directory is empty, never move to trash
-                repository.deleteItem( false, createResourceStoreRequest( coll, DeleteOperation.DELETE_PERMANENTLY ) );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // silent, this happens if whole GAV is removed and the dir is removed too
             }
         }
 
@@ -739,27 +714,6 @@ public class DefaultSnapshotRemover
 
             return releaseTimestamp == 0  // 0 when item creation day is unknown
                 || ( releaseTimestamp > 0 && startTime > releaseTimestamp + gracePeriodInMillis );
-        }
-
-        private ResourceStoreRequest createResourceStoreRequest( final StorageItem item, final WalkerContext ctx )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-
-            if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
-            {
-                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY,
-                    ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY ) );
-            }
-
-            return request;
-        }
-
-        private ResourceStoreRequest createResourceStoreRequest( final StorageCollectionItem item,
-                                                                 final DeleteOperation operation )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-            request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
-            return request;
         }
 
         public int getDeletedSnapshots()
