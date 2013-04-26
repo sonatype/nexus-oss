@@ -47,7 +47,7 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 @Singleton
 @Typed( ConfigurationManager.class )
-@Named( "default" )
+@Named( "legacydefault" )
 public class DefaultConfigurationManager
     extends AbstractConfigurationManager
 {
@@ -76,6 +76,20 @@ public class DefaultConfigurationManager
         this.validator = validator;
         this.configurationSource = configurationSource;
         this.privilegeDescriptors = privilegeDescriptors;
+    }
+    
+    public <X1 extends Exception, X2 extends Exception> void runRead(ConfigurationManagerAction action)
+        throws X1, X2
+    {
+        //No support for this
+        throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
+    }
+
+    public <X1 extends Exception, X2 extends Exception> void runWrite(ConfigurationManagerAction action)
+        throws X1, X2
+    {
+        //No support for this
+        throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
     }
 
     public List<CPrivilege> listPrivileges()

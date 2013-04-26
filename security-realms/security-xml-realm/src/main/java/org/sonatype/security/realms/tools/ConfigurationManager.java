@@ -30,10 +30,38 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * The ConfigurationManager is a facade in front of the security modello model. It supports CRUD operations for
  * users/roles/privileges and user to role mappings.
  * 
+ * Any direct calls to write-based ConfigurationManager methods will throw an IllegalStateException, as they
+ * cannot be used directly in a thread-safe manner
+ * 
+ * Direct calls to read-based ConfigurationManager methods can be called in a thread-safe manner. However, operations
+ * that require multiple read-based calls should be encapsulated into an action and executed via the runRead method
+ * 
  * @author Brian Demers
  */
 public interface ConfigurationManager
 {
+    /*
+     * Runs the provided action in a thread-safe way. Any read-based operations requiring multiple
+     * ConfigurationManager calls should be executed in an action via a call to this method.
+     * 
+     * The type parameters represent the exceptions that can be thrown by the ConfigurationManager calls in the provided
+     * action. If one or both are not needed, specify RuntimeException.
+     * 
+     * @since 3.1
+     */
+    <X1 extends Exception, X2 extends Exception> void runRead(ConfigurationManagerAction action) throws X1, X2;
+    
+    /*
+     * Runs the provided action in a thread-safe way. Any write-based ConfigurationManager calls must be executed
+     * in an action via a call to this method.
+     * 
+     * The type parameters represent the exceptions that can be thrown by the ConfigurationManager calls in the provided
+     * action. If one or both are not needed, specify RuntimeException.
+     * 
+     * @since 3.1
+     */
+    <X1 extends Exception, X2 extends Exception> void runWrite(ConfigurationManagerAction action) throws X1, X2;
+    
     /**
      * Retrieve all users
      * 

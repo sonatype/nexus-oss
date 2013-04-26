@@ -13,11 +13,9 @@
 package org.sonatype.security.realms.tools;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.enterprise.inject.Typed;
@@ -37,52 +35,68 @@ import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
- * Default implementation of the ConcurrentConfigurationManager interface. Intended to
+ * Default implementation of the ConfigurationManager interface. Intended to
  * provide a way to access the ConfigurationManager in a thread-safe manner.
  * 
- * This implementation simply wraps a ConfigurationManager instance, providing an interface
- * for users to use it in a thread-safe manner
+ * The old implementations (DefaultConfigurationManager and ResourceMergingConfigurationManager), should not
+ * be used directly, as they cannot be used in a thread-safe manner. Instead, this implementation should be used.
+ * It wraps ResourceMergingConfigurationManager, which wraps DefaultConfigurationManager.
  * 
  * @author Steve Carlucci
  *
  */
 @Singleton
-@Typed( ConcurrentConfigurationManager.class )
+@Typed( ConfigurationManager.class )
 @Named( "default" )
-public class DefaultConcurrentConfigurationManager implements ConcurrentConfigurationManager
+public class DefaultConcurrentConfigurationManager implements ConfigurationManager
 {
     private final ConfigurationManager configurationManager;
     
-    private final ReadWriteLock readWriteLock;
+    private final ReentrantReadWriteLock readWriteLock;
     
     private final Lock readLock;
     
     private final Lock writeLock;
     
-    private final Map<Long, ConfigurationManagerActionType> threadLocks;
+    private final Long lockTimeout;
     
     @Inject
-    public DefaultConcurrentConfigurationManager(@Named("resourceMerging") ConfigurationManager configurationManager)
+    public DefaultConcurrentConfigurationManager(@Named("resourceMerging") ConfigurationManager configurationManager,
+                                                 @Named("${security.configmgr.locktimeout:-60}") Long lockTimeout)
     {
         this.configurationManager = configurationManager;
         
         this.readWriteLock = new ReentrantReadWriteLock();
         this.readLock = this.readWriteLock.readLock();
         this.writeLock = this.readWriteLock.writeLock();
-        this.threadLocks = new ConcurrentHashMap<Long, ConfigurationManagerActionType>();
+        this.lockTimeout = lockTimeout != null ? lockTimeout : new Long(60);
     }
-    
+
     @Override
-    public <X1 extends Exception, X2 extends Exception> void run(ConfigurationManagerAction action) throws X1, X2
+    public <X1 extends Exception, X2 extends Exception> void runRead(ConfigurationManagerAction action) throws X1, X2
     {
-        Lock lock = this.acquireLock(action.getActionType());
+        acquireLock(readLock);
         try
         {
             action.<X1, X2>run();
         }
         finally
         {
-            this.releaseLock(lock);
+            releaseLock(readLock);
+        }
+    }
+    
+    @Override
+    public <X1 extends Exception, X2 extends Exception> void runWrite(ConfigurationManagerAction action) throws X1, X2
+    {
+        acquireLock(writeLock);
+        try
+        {
+            action.<X1, X2>run();
+        }
+        finally
+        {
+            releaseLock(writeLock);
         }
     }
 
@@ -90,7 +104,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void deleteUserRoleMapping(String userId, String source)
         throws NoSuchRoleMappingException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.deleteUserRoleMapping(userId, source);
     }
 
@@ -98,7 +112,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void deleteUser(String id)
         throws UserNotFoundException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.deleteUser(id);
     }
 
@@ -106,7 +120,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void deleteRole(String id)
         throws NoSuchRoleException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.deleteRole(id);
     }
 
@@ -114,7 +128,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void deletePrivilege(String id)
         throws NoSuchPrivilegeException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.deletePrivilege(id);
     }
 
@@ -136,28 +150,28 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     @Override
     public void clearCache()
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.clearCache();
     }
 
     @Override
     public void save()
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.save();
     }
 
     @Override
     public void cleanRemovedRole(String roleId)
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.cleanRemovedRole(roleId);
     }
 
     @Override
     public void cleanRemovedPrivilege(String privilegeId)
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.cleanRemovedPrivilege(privilegeId);
     }
 
@@ -221,7 +235,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createUser(CUser user, Set<String> roles)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createUser(user, roles);
     }
 
@@ -229,7 +243,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createUser(CUser user, String password, Set<String> roles)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createUser(user, password, roles);
     }
 
@@ -237,7 +251,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createUser(CUser user, Set<String> roles, SecurityValidationContext context)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createUser(user, roles, context);
     }
 
@@ -245,7 +259,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createUser(CUser user, String password, Set<String> roles, SecurityValidationContext context)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createUser(user, password, roles, context);
     }
 
@@ -253,7 +267,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createRole(CRole role)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createRole(role);
     }
 
@@ -261,7 +275,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createRole(CRole role, SecurityValidationContext context)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createRole(role, context);
     }
 
@@ -269,7 +283,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createPrivilege(CPrivilege privilege)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createPrivilege(privilege);
     }
 
@@ -277,7 +291,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createPrivilege(CPrivilege privilege, SecurityValidationContext context)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createPrivilege(privilege, context);
     }
 
@@ -330,7 +344,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updateUser(CUser user, Set<String> roles)
         throws InvalidConfigurationException, UserNotFoundException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updateUser(user, roles);
     }
 
@@ -338,7 +352,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updateUser(CUser user, Set<String> roles, SecurityValidationContext context)
         throws InvalidConfigurationException, UserNotFoundException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updateUser(user, roles, context);
     }
 
@@ -346,7 +360,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updateRole(CRole role)
         throws InvalidConfigurationException, NoSuchRoleException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updateRole(role);
     }
 
@@ -354,7 +368,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updateRole(CRole role, SecurityValidationContext context)
         throws InvalidConfigurationException, NoSuchRoleException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updateRole(role, context);
     }
 
@@ -362,7 +376,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createUserRoleMapping(CUserRoleMapping userRoleMapping)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createUserRoleMapping(userRoleMapping);
     }
 
@@ -370,7 +384,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
         throws InvalidConfigurationException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.createUserRoleMapping(userRoleMapping, context);
     }
 
@@ -378,7 +392,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updateUserRoleMapping(CUserRoleMapping userRoleMapping)
         throws InvalidConfigurationException, NoSuchRoleMappingException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updateUserRoleMapping(userRoleMapping);
     }
 
@@ -386,7 +400,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updateUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
         throws InvalidConfigurationException, NoSuchRoleMappingException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updateUserRoleMapping(userRoleMapping, context);
     }
 
@@ -423,7 +437,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updatePrivilege(CPrivilege privilege)
         throws InvalidConfigurationException, NoSuchPrivilegeException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updatePrivilege(privilege);
     }
 
@@ -431,7 +445,7 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     public void updatePrivilege(CPrivilege privilege, SecurityValidationContext context)
         throws InvalidConfigurationException, NoSuchPrivilegeException
     {
-        checkLock(ConfigurationManagerActionType.WRITE);
+        checkWriteLock();
         configurationManager.updatePrivilege(privilege, context);
     }
 
@@ -464,61 +478,47 @@ public class DefaultConcurrentConfigurationManager implements ConcurrentConfigur
     }
     
     /**
-     * Acquire appropriate lock based on provided action type, and track
-     * that the currently executing thread has acquired this lock
+     * Attempt to acquire specified lock
      * 
-     * @param actionType lock type to acquire
-     * @return the acquired lock
+     * @param lock the lock to acquire
+     * @throws IllegalStateException if lock could not be acquired
      */
-    private Lock acquireLock(ConfigurationManagerActionType actionType)
+    private void acquireLock(Lock lock)
     {
-        Lock lock = actionType == ConfigurationManagerActionType.READ ? this.readLock : this.writeLock;
-        lock.lock();
-        
         try
         {
-            //Track the type of lock that this thread has acquired
-            this.threadLocks.put(Thread.currentThread().getId(), actionType);
+            if(!lock.tryLock(lockTimeout, TimeUnit.SECONDS))
+            {
+                //Unable to acquire lock
+                throw new IllegalStateException("Unable to acquire lock");
+            }
         }
-        catch(RuntimeException e)
+        catch(InterruptedException e)
         {
-            lock.unlock();
-            throw e;
+            throw new IllegalStateException("Unable to acquire lock", e);
         }
-        
-        return lock;
     }
     
     /**
-     * Release specified lock, and remove thread-specific lock record
+     * Release specified lock
+     * 
      * @param lock lock to unlock
      */
     private void releaseLock(Lock lock)
     {
-        try
-        {
-            //Remove thread from our tracking map
-            this.threadLocks.remove(Thread.currentThread().getId());
-        }
-        finally
-        {
-            lock.unlock();
-        }
+        lock.unlock();
     }
     
     /**
-     * Checks that the currently executing thread has the appropriate lock
+     * Checks that the currently executing thread holds a write lock
      * 
-     * @param actionType the type of lock to check (e.g. read/write)
-     * @throws UnsupportedOperationException if thread does not have appropriate lock
+     * @throws IllegalStateException if thread does not hold a write lock
      */
-    private void checkLock(ConfigurationManagerActionType actionType)
+    private void checkWriteLock()
     {
-        ConfigurationManagerActionType type = this.threadLocks.get(Thread.currentThread().getId());
-        if(type == null || (actionType == ConfigurationManagerActionType.WRITE && type == ConfigurationManagerActionType.READ) )
+        if(readWriteLock.getWriteHoldCount() == 0)
         {
-            throw new UnsupportedOperationException("Method called without proper locking");
+            throw new IllegalStateException("Method called without proper locking");
         }
     }
-
 }

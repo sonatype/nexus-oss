@@ -57,12 +57,26 @@ public class ResourceMergingConfigurationManager
 
     @Inject
     public ResourceMergingConfigurationManager( List<DynamicSecurityResource> dynamicResources,
-                                                @Named( "default" ) ConfigurationManager manager,
+                                                @Named( "legacydefault" ) ConfigurationManager manager,
                                                 List<StaticSecurityResource> staticResources )
     {
         this.dynamicResources = dynamicResources;
         this.manager = manager;
         this.staticResources = staticResources;
+    }
+    
+    public <X1 extends Exception, X2 extends Exception> void runRead(ConfigurationManagerAction action)
+        throws X1, X2
+    {
+        //No support for this
+        throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
+    }
+
+    public <X1 extends Exception, X2 extends Exception> void runWrite(ConfigurationManagerAction action)
+        throws X1, X2
+    {
+        //No support for this
+        throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
     }
 
     public synchronized void clearCache()

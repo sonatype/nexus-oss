@@ -15,26 +15,22 @@ package org.sonatype.security.realms.tools;
 /**
  * Defines an interface for a ConfigurationManager action. These actions
  * are intended to encapsulate higher-level operations that require multiple calls
- * to the ConfigurationManager to complete. These actions are used by the ConcurrentConfigurationManager
- * to provide a way for users to use the ConfigurationManager in a thread-safe manner
+ * to the ConfigurationManager to complete. These actions provide a way for users to use the ConfigurationManager
+ * in a thread-safe manner. Must be used in conjunction with an implementation of ConfigurationManager that supports
+ * the runRead and runWrite methods
  * 
  * @author Steve Carlucci
- * @since 3.0.3
+ * @since 3.1
  */
 public interface ConfigurationManagerAction
 {
     /**
-     * Access the type of this action (e.g. read/write)
-     * 
-     * @return the action type
-     */
-    ConfigurationManagerActionType getActionType();
-    
-    /**
      * Run the action
      * 
-     * The type parameters allow for different exception types based on
-     * the ConfigurationManager methods that are called in the action
+     * The type parameters represent the exceptions that can be thrown by the ConfigurationManager calls in this
+     * action. This solution is a little odd, and in general should not be followed. This was used as it was the 
+     * cleanest solution to deal with the various exceptions that can be thrown, while minimizing the changes needed
+     * in client code using this interface
      */
     <X1 extends Exception, X2 extends Exception> void run() throws X1, X2;
 }
