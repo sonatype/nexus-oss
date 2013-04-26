@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -12,48 +13,29 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus</artifactId>
+    <groupId>org.sonatype.nexus.plugins.kenai</groupId>
+    <artifactId>nexus-kenai</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-bootstrap</artifactId>
+  <artifactId>nexus-kenai-testsuite</artifactId>
 
   <dependencies>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.appcontext</groupId>
-      <artifactId>appcontext</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-jetty8</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.yammer.metrics</groupId>
-      <artifactId>metrics-jetty</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>tanukisoft</groupId>
-      <artifactId>wrapper</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
+      <artifactId>nexus-testsuite-support</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
+      <version>0.7</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
