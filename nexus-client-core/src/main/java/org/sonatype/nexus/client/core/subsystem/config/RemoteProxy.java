@@ -10,33 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.configuration.model;
+package org.sonatype.nexus.client.core.subsystem.config;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 
-public class CGlobalHttpProxySettingsCoreConfiguration
-    extends AbstractCGlobalProxySettingsCoreConfiguration
+/**
+ * Remote Proxy configuration segment.
+ *
+ * @since 2.5
+ */
+public interface RemoteProxy
+    extends Segment<RemoteProxy, RemoteProxySettingsDTO>
 {
 
-    public CGlobalHttpProxySettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
-    {
-        super( applicationConfiguration );
-    }
+    /**
+     * Disables http proxy.
+     */
+    RemoteProxy disableHttpProxy();
 
     /**
-     * @since 2.5
+     * Disables https proxy.
      */
-    protected CRemoteHttpProxySettings getGlobalProxySettings( final Configuration configuration )
-    {
-        return configuration.getGlobalHttpProxySettings();
-    }
-
-    /**
-     * @since 2.5
-     */
-    protected void setGlobalProxySettings( final CRemoteHttpProxySettings newProxy )
-    {
-        getApplicationConfiguration().getConfigurationModel().setGlobalHttpProxySettings( newProxy );
-    }
+    RemoteProxy disableHttpsProxy();
 
 }

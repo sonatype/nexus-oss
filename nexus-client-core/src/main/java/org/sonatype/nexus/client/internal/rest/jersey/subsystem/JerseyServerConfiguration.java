@@ -14,9 +14,8 @@ package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
-import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyHttpProxy;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyHttpsProxy;
+import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
+import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyRemoteProxy;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
@@ -31,50 +30,30 @@ public class JerseyServerConfiguration
      * Http Proxy configuration segment.
      * Lazy initialized on first request.
      */
-    private HttpProxy httpProxy;
+    private RemoteProxy remoteProxy;
 
     /**
      * Https Proxy configuration segment.
      * Lazy initialized on first request.
      */
-    private HttpProxy httpsProxy;
+    private RemoteProxy httpsProxy;
 
     public JerseyServerConfiguration( final JerseyNexusClient nexusClient )
     {
         super( nexusClient );
     }
 
-    @Deprecated
-    @Override
-    public HttpProxy proxySettings()
-    {
-        return httpProxySettings();
-    }
-
     /**
      * @since 2.5
      */
     @Override
-    public HttpProxy httpProxySettings()
+    public RemoteProxy remoteProxySettings()
     {
-        if ( httpProxy == null )
+        if ( remoteProxy == null )
         {
-            httpProxy = new JerseyHttpProxy( getNexusClient() );
+            remoteProxy = new JerseyRemoteProxy( getNexusClient() );
         }
-        return httpProxy;
-    }
-
-    /**
-     * @since 2.5
-     */
-    @Override
-    public HttpProxy httpsProxySettings()
-    {
-        if ( httpsProxy == null )
-        {
-            httpsProxy = new JerseyHttpsProxy( getNexusClient() );
-        }
-        return httpsProxy;
+        return remoteProxy;
     }
 
 }

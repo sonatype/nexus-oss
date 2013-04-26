@@ -33,7 +33,8 @@ import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
+import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
@@ -250,35 +251,37 @@ public class HttpAndHttpsProxyIT
     private void enableGlobalHttpProxy()
         throws IOException
     {
-        final RemoteHttpProxySettings settings = config().httpProxySettings().settings();
+        final RemoteProxySettingsDTO settings = config().remoteProxySettings().settings();
 
-        settings.setProxyHostname( "localhost" );
-        settings.setProxyPort( globalHttpProxy.getPort() );
+        settings.setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
+        settings.getHttpProxySettings().setProxyHostname( "localhost" );
+        settings.getHttpProxySettings().setProxyPort( globalHttpProxy.getPort() );
 
-        config().httpProxySettings().save();
+        config().remoteProxySettings().save();
     }
 
     private void disableGlobalHttpProxy()
         throws IOException
     {
-        config().httpProxySettings().disable();
+        config().remoteProxySettings().disableHttpProxy();
     }
 
     private void enableGlobalHttpsProxy()
         throws IOException
     {
-        final RemoteHttpProxySettings settings = config().httpsProxySettings().settings();
+        final RemoteProxySettingsDTO settings = config().remoteProxySettings().settings();
 
-        settings.setProxyHostname( "localhost" );
-        settings.setProxyPort( globalHttpsProxy.getPort() );
+        settings.setHttpsProxySettings( new RemoteHttpProxySettingsDTO() );
+        settings.getHttpsProxySettings().setProxyHostname( "localhost" );
+        settings.getHttpsProxySettings().setProxyPort( globalHttpsProxy.getPort() );
 
-        config().httpsProxySettings().save();
+        config().remoteProxySettings().save();
     }
 
     private void disableGlobalHttpsProxy()
         throws IOException
     {
-        config().httpsProxySettings().disable();
+        config().remoteProxySettings().disableHttpsProxy();
     }
 
     private void downloadArtifact( final String repositoryId )

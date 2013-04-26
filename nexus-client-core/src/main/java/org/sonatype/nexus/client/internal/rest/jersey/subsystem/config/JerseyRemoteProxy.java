@@ -12,54 +12,55 @@
  */
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.config;
 
-import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
+import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 
 /**
  * @since 2.5
  */
-public class JerseyHttpsProxy
-    extends JerseyOptionalSegmentSupport<HttpProxy, RemoteHttpProxySettings>
-    implements HttpProxy
+public class JerseyRemoteProxy
+    extends JerseySegmentSupport<RemoteProxy, RemoteProxySettingsDTO>
+    implements RemoteProxy
 {
 
-    public JerseyHttpsProxy( final JerseyNexusClient nexusClient )
+    public JerseyRemoteProxy( final JerseyNexusClient nexusClient )
     {
         super( nexusClient );
     }
 
     @Override
-    protected void onDisable( final RemoteHttpProxySettings settings )
+    protected RemoteProxySettingsDTO getSettingsFrom( final GlobalConfigurationResource configuration )
     {
-        settings.setProxyHostname( null );
+        return configuration.getRemoteProxySettings();
     }
 
     @Override
-    protected RemoteHttpProxySettings getSettingsFrom( final GlobalConfigurationResource configuration )
-    {
-        return configuration.getGlobalHttpsProxySettings();
-    }
-
-    @Override
-    protected void setSettingsIn( final RemoteHttpProxySettings settings,
+    protected void setSettingsIn( final RemoteProxySettingsDTO settings,
                                   final GlobalConfigurationResource configuration )
     {
-        if ( settings.getProxyHostname() == null )
-        {
-            configuration.setGlobalHttpsProxySettings( null );
-        }
-        else
-        {
-            configuration.setGlobalHttpsProxySettings( settings );
-        }
+        configuration.setRemoteProxySettings( settings );
     }
 
     @Override
-    protected RemoteHttpProxySettings createSettings()
+    protected RemoteProxySettingsDTO createSettings()
     {
-        return new RemoteHttpProxySettings();
+        return new RemoteProxySettingsDTO();
+    }
+
+    @Override
+    public RemoteProxy disableHttpProxy()
+    {
+        settings().setHttpProxySettings( null );
+        return me();
+    }
+
+    @Override
+    public RemoteProxy disableHttpsProxy()
+    {
+        settings().setHttpsProxySettings( null );
+        return me();
     }
 
 }

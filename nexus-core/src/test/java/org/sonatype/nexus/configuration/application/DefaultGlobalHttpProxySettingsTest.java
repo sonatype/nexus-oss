@@ -15,10 +15,9 @@ package org.sonatype.nexus.configuration.application;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
@@ -34,26 +33,30 @@ public class DefaultGlobalHttpProxySettingsTest
         NexusConfiguration cfg = lookup( NexusConfiguration.class );
         cfg.loadConfiguration();
 
-        final Event<GlobalHttpProxySettings>[] event = new Event[1];
+        final Event<GlobalRemoteProxySettings>[] event = new Event[1];
         lookup( EventBus.class ).register( new Object()
         {
             @Subscribe
-            public void onEvent( GlobalHttpProxySettingsChangedEvent evt )
+            public void onEvent( GlobalRemoteProxySettingsChangedEvent evt )
             {
                     event[0] = evt;
             }
         } );
 
-        GlobalHttpProxySettings settings = lookup( GlobalHttpProxySettings.class );
+        GlobalRemoteProxySettings settings = lookup( GlobalRemoteProxySettings.class );
 
-        settings.setHostname( "foo.bar.com" );
-        settings.setPort( 1234 );
+        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+        httpProxySettings.setHostname( "foo.bar.com" );
+        httpProxySettings.setPort( 1234 );
+
+        settings.setHttpProxySettings( httpProxySettings );
+
         cfg.saveConfiguration();
 
         Assert.assertNotNull( event[0].getEventSender() );
         Assert.assertEquals( settings, event[0].getEventSender() );
-        Assert.assertEquals( "foo.bar.com", event[0].getEventSender().getHostname() );
-        Assert.assertEquals( 1234, event[0].getEventSender().getPort() );
+        Assert.assertEquals( "foo.bar.com", event[0].getEventSender().getHttpProxySettings().getHostname() );
+        Assert.assertEquals( 1234, event[0].getEventSender().getHttpProxySettings().getPort() );
 
     }
 }

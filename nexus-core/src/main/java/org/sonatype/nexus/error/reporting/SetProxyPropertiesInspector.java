@@ -20,15 +20,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
-import org.sonatype.nexus.configuration.application.GlobalHttpsProxySettings;
-import org.sonatype.nexus.configuration.application.GlobalProxySettings;
-import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
-import org.sonatype.nexus.configuration.application.events.GlobalHttpsProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.plexus.appevents.Event;
 import com.google.common.base.Joiner;
@@ -44,23 +42,18 @@ public class SetProxyPropertiesInspector
     implements EventInspector
 {
 
-    private final GlobalHttpProxySettings globalHttpProxySettings;
-
-    private final GlobalHttpsProxySettings globalHttpsProxySettings;
+    private final GlobalRemoteProxySettings remoteProxySettings;
 
     @Inject
-    public SetProxyPropertiesInspector( final GlobalHttpProxySettings globalHttpProxySettings,
-                                        final GlobalHttpsProxySettings globalHttpsProxySettings )
+    public SetProxyPropertiesInspector( final GlobalRemoteProxySettings remoteProxySettings )
     {
-        this.globalHttpProxySettings = checkNotNull( globalHttpProxySettings );
-        this.globalHttpsProxySettings = checkNotNull( globalHttpsProxySettings );
+        this.remoteProxySettings = checkNotNull( remoteProxySettings );
     }
 
     @Override
     public boolean accepts( final Event<?> evt )
     {
-        return evt instanceof GlobalHttpProxySettingsChangedEvent
-            || evt instanceof GlobalHttpsProxySettingsChangedEvent
+        return evt instanceof GlobalRemoteProxySettingsChangedEvent
             || evt instanceof NexusStartedEvent;
     }
 
@@ -72,16 +65,18 @@ public class SetProxyPropertiesInspector
             return;
         }
 
-        if ( globalHttpProxySettings.isEnabled() )
+        if ( remoteProxySettings.getHttpProxySettings() != null
+            && remoteProxySettings.getHttpProxySettings().isEnabled() )
         {
-            setProperties( globalHttpProxySettings, "http" );
-            if ( globalHttpsProxySettings.isEnabled() )
+            setProperties( remoteProxySettings.getHttpProxySettings(), "http" );
+            if ( remoteProxySettings.getHttpsProxySettings() != null
+                && remoteProxySettings.getHttpsProxySettings().isEnabled() )
             {
-                setProperties( globalHttpsProxySettings, "https" );
+                setProperties( remoteProxySettings.getHttpsProxySettings(), "https" );
             }
             else
             {
-                setProperties( globalHttpProxySettings, "https" );
+                setProperties( remoteProxySettings.getHttpProxySettings(), "https" );
             }
         }
         else
@@ -94,13 +89,13 @@ public class SetProxyPropertiesInspector
         }
     }
 
-    private void setProperties( final GlobalProxySettings globalProxySettings,
+    private void setProperties( final RemoteHttpProxySettings remoteHttpProxySettings,
                                 final String scheme )
     {
         String username = null;
         String password = null;
 
-        final RemoteAuthenticationSettings authentication = globalProxySettings.getProxyAuthentication();
+        final RemoteAuthenticationSettings authentication = remoteHttpProxySettings.getProxyAuthentication();
 
         if ( authentication != null
             && UsernamePasswordRemoteAuthenticationSettings.class.isAssignableFrom( authentication.getClass() ) )
@@ -109,9 +104,9 @@ public class SetProxyPropertiesInspector
             password = ( (UsernamePasswordRemoteAuthenticationSettings) authentication ).getPassword();
         }
 
-        final String hostname = globalProxySettings.getHostname();
-        final int port = globalProxySettings.getPort();
-        final Set<String> nonProxyHosts = globalProxySettings.getNonProxyHosts();
+        final String hostname = remoteHttpProxySettings.getHostname();
+        final int port = remoteHttpProxySettings.getPort();
+        final Set<String> nonProxyHosts = remoteProxySettings.getNonProxyHosts();
 
         getLogger().debug(
             "Configure proxy using global {} proxy settings: hostname={}, port={}, username={}, nonProxyHosts={}",

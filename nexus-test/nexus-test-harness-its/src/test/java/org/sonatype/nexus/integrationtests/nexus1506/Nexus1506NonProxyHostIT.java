@@ -14,10 +14,11 @@ package org.sonatype.nexus.integrationtests.nexus1506;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
+import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
 public class Nexus1506NonProxyHostIT
@@ -29,18 +30,19 @@ extends AbstractNexusIntegrationTest
     {
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
 
-        settings.setGlobalHttpProxySettings( new RemoteHttpProxySettings() );
-        settings.getGlobalHttpProxySettings().setProxyHostname( "proxyHost" );
-        settings.getGlobalHttpProxySettings().setProxyPort( 3211 );
-        settings.getGlobalHttpProxySettings().addNonProxyHost( "foo" );
-        settings.getGlobalHttpProxySettings().addNonProxyHost( "bar" );
+        settings.setRemoteProxySettings( new RemoteProxySettingsDTO() );
+        settings.getRemoteProxySettings().setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
+        settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname( "proxyHost" );
+        settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort( 3211 );
+        settings.getRemoteProxySettings().addNonProxyHost( "foo" );
+        settings.getRemoteProxySettings().addNonProxyHost( "bar" );
         
         Assert.assertEquals( 204, SettingsMessageUtil.save( settings ).getCode() );
         
         settings = SettingsMessageUtil.getCurrentSettings();
-        Assert.assertEquals( 2, settings.getGlobalHttpProxySettings().getNonProxyHosts().size() );
+        Assert.assertEquals( 2, settings.getRemoteProxySettings().getNonProxyHosts().size() );
         
-        CRemoteHttpProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getGlobalHttpProxySettings();
+        CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
         Assert.assertEquals( proxySettings.getNonProxyHosts().get( 0 ), "foo" );
         Assert.assertEquals( proxySettings.getNonProxyHosts().get( 1 ), "bar" );
         Assert.assertEquals( 2, proxySettings.getNonProxyHosts().size() );
@@ -52,19 +54,20 @@ extends AbstractNexusIntegrationTest
     {
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
 
-        settings.setGlobalHttpProxySettings( new RemoteHttpProxySettings() );
-        settings.getGlobalHttpProxySettings().setProxyHostname( "proxyHost" );
-        settings.getGlobalHttpProxySettings().setProxyPort( 3211 );
-        settings.getGlobalHttpProxySettings().addNonProxyHost( "" );
-        settings.getGlobalHttpProxySettings().addNonProxyHost( "foo" );
-        settings.getGlobalHttpProxySettings().addNonProxyHost( null );
+        settings.setRemoteProxySettings( new RemoteProxySettingsDTO() );
+        settings.getRemoteProxySettings().setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
+        settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname( "proxyHost" );
+        settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort( 3211 );
+        settings.getRemoteProxySettings().addNonProxyHost( "" );
+        settings.getRemoteProxySettings().addNonProxyHost( "foo" );
+        settings.getRemoteProxySettings().addNonProxyHost( null );
         
         Assert.assertEquals( 204, SettingsMessageUtil.save( settings ).getCode() );
         
         settings = SettingsMessageUtil.getCurrentSettings();
-        Assert.assertEquals( 1, settings.getGlobalHttpProxySettings().getNonProxyHosts().size() );
+        Assert.assertEquals( 1, settings.getRemoteProxySettings().getNonProxyHosts().size() );
         
-        CRemoteHttpProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getGlobalHttpProxySettings();
+        CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
         Assert.assertEquals( proxySettings.getNonProxyHosts().get( 0 ), "foo" );
         Assert.assertEquals( 1, proxySettings.getNonProxyHosts().size() );
     }
@@ -75,17 +78,18 @@ extends AbstractNexusIntegrationTest
     {
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
 
-        settings.setGlobalHttpProxySettings( new RemoteHttpProxySettings() );
-        settings.getGlobalHttpProxySettings().setProxyHostname( "proxyHost" );
-        settings.getGlobalHttpProxySettings().setProxyPort( 3211 );
-        settings.getGlobalHttpProxySettings().getNonProxyHosts().clear();
+        settings.setRemoteProxySettings( new RemoteProxySettingsDTO() );
+        settings.getRemoteProxySettings().setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
+        settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname( "proxyHost" );
+        settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort( 3211 );
+        settings.getRemoteProxySettings().getNonProxyHosts().clear();
         
         Assert.assertEquals( 204, SettingsMessageUtil.save( settings ).getCode() );
         
         settings = SettingsMessageUtil.getCurrentSettings();
-        Assert.assertEquals( 0, settings.getGlobalHttpProxySettings().getNonProxyHosts().size() );
+        Assert.assertEquals( 0, settings.getRemoteProxySettings().getNonProxyHosts().size() );
         
-        CRemoteHttpProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getGlobalHttpProxySettings();
+        CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
         Assert.assertEquals( 0, proxySettings.getNonProxyHosts().size() );
     }
 }

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -128,94 +129,100 @@ public class HttpClientProxyUtil
             httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
         }
 
-        RemoteProxySettings rps = ctx.getRemoteProxySettings();
-
         boolean isProxyUsed = false;
 
-        if ( rps.isEnabled() )
+        final RemoteProxySettings rps = ctx.getRemoteProxySettings();
+        if ( rps != null )
         {
-            isProxyUsed = true;
+            final RemoteHttpProxySettings rhps = rps.getHttpProxySettings();
 
-            logger( logger ).info( "... proxy setup with host '{}'", rps.getHostname() );
-
-            httpConfiguration.setProxy( rps.getHostname(), rps.getPort() );
-
-            // check if we have non-proxy hosts
-            if ( rps.getNonProxyHosts() != null && !rps.getNonProxyHosts().isEmpty() )
+            if ( rhps != null && rhps.isEnabled() )
             {
-                Set<Pattern> nonProxyHostPatterns = new HashSet<Pattern>( rps.getNonProxyHosts().size() );
-                for ( String nonProxyHostRegex : rps.getNonProxyHosts() )
+                isProxyUsed = true;
+
+                logger( logger ).info( "... proxy setup with host '{}'", rhps.getHostname() );
+
+                httpConfiguration.setProxy( rhps.getHostname(), rhps.getPort() );
+
+                // check if we have non-proxy hosts
+                if ( rps.getNonProxyHosts() != null && !rps.getNonProxyHosts().isEmpty() )
                 {
-                    try
+                    Set<Pattern> nonProxyHostPatterns = new HashSet<Pattern>( rps.getNonProxyHosts().size() );
+                    for ( String nonProxyHostRegex : rps.getNonProxyHosts() )
                     {
-                        nonProxyHostPatterns.add( Pattern.compile( nonProxyHostRegex, Pattern.CASE_INSENSITIVE ) );
+                        try
+                        {
+                            nonProxyHostPatterns.add( Pattern.compile( nonProxyHostRegex, Pattern.CASE_INSENSITIVE ) );
+                        }
+                        catch ( PatternSyntaxException e )
+                        {
+                            logger( logger ).warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
+                        }
                     }
-                    catch ( PatternSyntaxException e )
+                    httpConfiguration.getParams().setParameter(
+                        CustomMultiThreadedHttpConnectionManager.NON_PROXY_HOSTS_PATTERNS_KEY, nonProxyHostPatterns );
+                }
+
+                if ( rhps.getProxyAuthentication() != null )
+                {
+                    ras = rhps.getProxyAuthentication();
+
+                    List<String> authPrefs = new ArrayList<String>( 2 );
+                    authPrefs.add( AuthPolicy.DIGEST );
+                    authPrefs.add( AuthPolicy.BASIC );
+
+                    if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
                     {
-                        logger( logger ).warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
+                        // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
+
+                        // TODO - implement this
                     }
-                }
-                httpConfiguration.getParams().setParameter(
-                    CustomMultiThreadedHttpConnectionManager.NON_PROXY_HOSTS_PATTERNS_KEY, nonProxyHostPatterns );
-            }
-
-            if ( rps.getProxyAuthentication() != null )
-            {
-                ras = rps.getProxyAuthentication();
-
-                List<String> authPrefs = new ArrayList<String>( 2 );
-                authPrefs.add( AuthPolicy.DIGEST );
-                authPrefs.add( AuthPolicy.BASIC );
-
-                if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
-                {
-                    // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
-
-                    // TODO - implement this
-                }
-                else if ( ras instanceof NtlmRemoteAuthenticationSettings )
-                {
-                    NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
-
-                    // Using NTLM auth, adding it as first in policies
-                    authPrefs.add( 0, AuthPolicy.NTLM );
-
-                    if ( ctx.getRemoteAuthenticationSettings() != null
-                        && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
+                    else if ( ras instanceof NtlmRemoteAuthenticationSettings )
                     {
-                        logger( logger ).warn(
-                            "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
-                                + " for BOTH server side and proxy side authentication!\n"
-                                + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
-                                + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                                + " *** SERVER SIDE AUTH OVERRIDDEN" );
+                        NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
+
+                        // Using NTLM auth, adding it as first in policies
+                        authPrefs.add( 0, AuthPolicy.NTLM );
+
+                        if ( ctx.getRemoteAuthenticationSettings() != null
+                            && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
+                        {
+                            logger( logger ).warn(
+                                "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
+                                    + " for BOTH server side and proxy side authentication!\n"
+                                    + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
+                                    + " if you have to use NTLM proxy, otherwise it will not work!\n"
+                                    + " *** SERVER SIDE AUTH OVERRIDDEN" );
+                        }
+
+                        logger( logger ).info( "... proxy authentication setup for NTLM domain '{}'",
+                                               nras.getNtlmDomain() );
+
+                        httpConfiguration.setHost( nras.getNtlmHost() );
+
+                        httpClient.getState().setProxyCredentials(
+                            AuthScope.ANY,
+                            new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
+                                               nras.getNtlmDomain() ) );
+
+                        isNtlmUsed = true;
+                    }
+                    else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
+                    {
+                        UsernamePasswordRemoteAuthenticationSettings uras =
+                            (UsernamePasswordRemoteAuthenticationSettings) ras;
+
+                        // Using Username/Pwd auth, will not add NTLM
+                        logger( logger ).info( "... proxy authentication setup for remote storage with username '{}'",
+                                               uras.getUsername() );
+
+                        httpClient.getState().setProxyCredentials( AuthScope.ANY,
+                                                                   new UsernamePasswordCredentials( uras.getUsername(),
+                                                                                                    uras.getPassword() ) );
                     }
 
-                    logger( logger ).info( "... proxy authentication setup for NTLM domain '{}'", nras.getNtlmDomain() );
-
-                    httpConfiguration.setHost( nras.getNtlmHost() );
-
-                    httpClient.getState().setProxyCredentials(
-                        AuthScope.ANY,
-                        new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
-                            nras.getNtlmDomain() ) );
-
-                    isNtlmUsed = true;
+                    httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
                 }
-                else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
-                {
-                    UsernamePasswordRemoteAuthenticationSettings uras =
-                        (UsernamePasswordRemoteAuthenticationSettings) ras;
-
-                    // Using Username/Pwd auth, will not add NTLM
-                    logger( logger ).info( "... proxy authentication setup for remote storage with username '{}'",
-                        uras.getUsername() );
-
-                    httpClient.getState().setProxyCredentials( AuthScope.ANY,
-                        new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
-                }
-
-                httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
             }
         }
 

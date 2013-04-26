@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.storage.StorageContext;
 
 /**
  * The remote storage settings and context.
- * 
+ *
  * @author cstamas
  */
 public interface RemoteStorageContext
@@ -49,23 +49,4 @@ public interface RemoteStorageContext
 
     void removeRemoteProxySettings();
 
-    /**
-     * @since 2.5
-     */
-    boolean hasRemoteHttpsProxySettings();
-
-    /**
-     * @since 2.5
-     */
-    RemoteProxySettings getRemoteHttpsProxySettings();
-
-    /**
-     * @since 2.5
-     */
-    void setRemoteHttpsProxySettings( RemoteProxySettings settings );
-
-    /**
-     * @since 2.5
-     */
-    void removeRemoteHttpsProxySettings();
 }

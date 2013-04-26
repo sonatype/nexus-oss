@@ -24,9 +24,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
-import org.sonatype.nexus.configuration.application.GlobalHttpsProxySettings;
-import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -38,13 +38,16 @@ public class SetProxyPropertiesInspectorTest
 {
 
     @Mock
-    private GlobalHttpProxySettings globalHttpProxySettings;
+    private GlobalRemoteProxySettings remoteProxySettings;
 
     @Mock
-    private GlobalHttpsProxySettings globalHttpsProxySettings;
+    private RemoteHttpProxySettings httpProxySettings;
 
     @Mock
-    private GlobalHttpProxySettingsChangedEvent evt;
+    private RemoteHttpProxySettings httpsProxySettings;
+
+    @Mock
+    private GlobalRemoteProxySettingsChangedEvent evt;
 
     @Mock
     private UsernamePasswordRemoteAuthenticationSettings auth;
@@ -56,7 +59,9 @@ public class SetProxyPropertiesInspectorTest
     @Before
     public void setup()
     {
-        underTest = new SetProxyPropertiesInspector( globalHttpProxySettings, globalHttpsProxySettings );
+        when( remoteProxySettings.getHttpProxySettings() ).thenReturn( httpProxySettings );
+        when( remoteProxySettings.getHttpsProxySettings() ).thenReturn( httpsProxySettings );
+        underTest = new SetProxyPropertiesInspector( remoteProxySettings );
     }
 
     @Before
@@ -81,9 +86,9 @@ public class SetProxyPropertiesInspectorTest
     @Test
     public void testBasicSettings()
     {
-        when( globalHttpProxySettings.isEnabled() ).thenReturn( true );
-        when( globalHttpProxySettings.getHostname() ).thenReturn( "host" );
-        when( globalHttpProxySettings.getPort() ).thenReturn( 1234 );
+        when( httpProxySettings.isEnabled() ).thenReturn( true );
+        when( httpProxySettings.getHostname() ).thenReturn( "host" );
+        when( httpProxySettings.getPort() ).thenReturn( 1234 );
 
         underTest.inspect( evt );
 
@@ -95,10 +100,13 @@ public class SetProxyPropertiesInspectorTest
     @Test
     public void testNoProxyHosts()
     {
-        when( globalHttpProxySettings.isEnabled() ).thenReturn( true );
-        when( globalHttpProxySettings.getHostname() ).thenReturn( "host" );
-        when( globalHttpProxySettings.getPort() ).thenReturn( 1234 );
-        when( globalHttpProxySettings.getNonProxyHosts() ).thenReturn( Sets.newTreeSet( Sets.newHashSet( "host1", "host2" ) ) );
+        when( remoteProxySettings.getNonProxyHosts() ).thenReturn(
+            Sets.newTreeSet( Sets.newHashSet( "host1", "host2" ) )
+        );
+
+        when( httpProxySettings.isEnabled() ).thenReturn( true );
+        when( httpProxySettings.getHostname() ).thenReturn( "host" );
+        when( httpProxySettings.getPort() ).thenReturn( 1234 );
 
         underTest.inspect( evt );
 
@@ -110,10 +118,10 @@ public class SetProxyPropertiesInspectorTest
     @Test
     public void testAuth()
     {
-        when( globalHttpProxySettings.isEnabled() ).thenReturn( true );
-        when( globalHttpProxySettings.getHostname() ).thenReturn( "host" );
-        when( globalHttpProxySettings.getPort() ).thenReturn( 1234 );
-        when( globalHttpProxySettings.getProxyAuthentication() ).thenReturn( auth );
+        when( httpProxySettings.isEnabled() ).thenReturn( true );
+        when( httpProxySettings.getHostname() ).thenReturn( "host" );
+        when( httpProxySettings.getPort() ).thenReturn( 1234 );
+        when( httpProxySettings.getProxyAuthentication() ).thenReturn( auth );
         when( auth.getUsername() ).thenReturn( "user" );
         when( auth.getPassword() ).thenReturn( "password" );
 
@@ -132,17 +140,19 @@ public class SetProxyPropertiesInspectorTest
         when( auth.getUsername() ).thenReturn( "user" );
         when( auth.getPassword() ).thenReturn( "password" );
 
-        when( globalHttpProxySettings.isEnabled() ).thenReturn( true );
-        when( globalHttpProxySettings.getHostname() ).thenReturn( "host1" );
-        when( globalHttpProxySettings.getPort() ).thenReturn( 1234 );
-        when( globalHttpProxySettings.getProxyAuthentication() ).thenReturn( auth );
-        when( globalHttpProxySettings.getNonProxyHosts() ).thenReturn( Sets.newTreeSet( Sets.newHashSet( "host1", "host2" ) ) );
+        when( remoteProxySettings.getNonProxyHosts() ).thenReturn(
+            Sets.newTreeSet( Sets.newHashSet( "host1", "host2" ) )
+        );
 
-        when( globalHttpsProxySettings.isEnabled() ).thenReturn( true );
-        when( globalHttpsProxySettings.getHostname() ).thenReturn( "host2" );
-        when( globalHttpsProxySettings.getPort() ).thenReturn( 4321 );
-        when( globalHttpsProxySettings.getProxyAuthentication() ).thenReturn( auth );
-        when( globalHttpsProxySettings.getNonProxyHosts() ).thenReturn( Sets.newTreeSet( Sets.newHashSet( "host3", "host4" ) ) );
+        when( httpProxySettings.isEnabled() ).thenReturn( true );
+        when( httpProxySettings.getHostname() ).thenReturn( "host1" );
+        when( httpProxySettings.getPort() ).thenReturn( 1234 );
+        when( httpProxySettings.getProxyAuthentication() ).thenReturn( auth );
+
+        when( httpsProxySettings.isEnabled() ).thenReturn( true );
+        when( httpsProxySettings.getHostname() ).thenReturn( "host2" );
+        when( httpsProxySettings.getPort() ).thenReturn( 4321 );
+        when( httpsProxySettings.getProxyAuthentication() ).thenReturn( auth );
 
         underTest.inspect( evt );
 
@@ -151,13 +161,13 @@ public class SetProxyPropertiesInspectorTest
         assertThat( System.getProperty( "http.proxyUser" ), is( "user" ) );
         assertThat( System.getProperty( "http.proxyUserName" ), is( "user" ) );
         assertThat( System.getProperty( "http.proxyPassword" ), is( "password" ) );
-        assertThat( System.getProperty( "http.nonProxyHosts" ), is( "host1|host2" ) );
 
         assertThat( System.getProperty( "https.proxyHost" ), is( "host2" ) );
         assertThat( System.getProperty( "https.proxyPort" ), is( "4321" ) );
         assertThat( System.getProperty( "https.proxyUser" ), is( "user" ) );
         assertThat( System.getProperty( "https.proxyUserName" ), is( "user" ) );
         assertThat( System.getProperty( "https.proxyPassword" ), is( "password" ) );
-        assertThat( System.getProperty( "https.nonProxyHosts" ), is( "host3|host4" ) );
+
+        assertThat( System.getProperty( "http.nonProxyHosts" ), is( "host1|host2" ) );
     }
 }

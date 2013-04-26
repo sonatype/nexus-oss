@@ -21,8 +21,8 @@ import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
@@ -41,9 +41,6 @@ public abstract class AbstractProxyRepositoryConfigurator
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
     @Requirement
-    private GlobalHttpProxySettings globalHttpProxySettings;
-
-    @Requirement
     private RemoteProviderHintFactory remoteProviderHintFactory;
 
     /**
@@ -55,12 +52,10 @@ public abstract class AbstractProxyRepositoryConfigurator
 
     @VisibleForTesting
     AbstractProxyRepositoryConfigurator( final AuthenticationInfoConverter authenticationInfoConverter,
-                                                   final GlobalHttpProxySettings globalHttpProxySettings,
-                                                   final GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
-                                                   final RemoteProviderHintFactory remoteProviderHintFactory )
+                                         final GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
+                                         final RemoteProviderHintFactory remoteProviderHintFactory )
     {
         this.authenticationInfoConverter = authenticationInfoConverter;
-        this.globalHttpProxySettings = globalHttpProxySettings;
         this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
         this.remoteProviderHintFactory = remoteProviderHintFactory;
     }

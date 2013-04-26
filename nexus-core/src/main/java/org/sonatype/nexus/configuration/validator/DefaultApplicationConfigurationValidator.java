@@ -30,6 +30,7 @@ import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
+import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
@@ -87,10 +88,18 @@ public class DefaultApplicationConfigurationValidator
             response.setModified( true );
         }
 
-        // global httpproxy settings (optional)
-        if ( model.getGlobalHttpProxySettings() != null )
+        // remote proxy settings (optional)
+        final CRemoteProxySettings rps = model.getRemoteProxySettings();
+        if ( rps != null )
         {
-            response.append( validateRemoteHttpProxySettings( context, model.getGlobalHttpProxySettings() ) );
+            if ( rps.getHttpProxySettings() != null )
+            {
+                response.append( validateRemoteHttpProxySettings( context, rps.getHttpProxySettings() ) );
+            }
+            if ( rps.getHttpsProxySettings() != null )
+            {
+                response.append( validateRemoteHttpProxySettings( context, rps.getHttpsProxySettings() ) );
+            }
         }
 
         // rest api

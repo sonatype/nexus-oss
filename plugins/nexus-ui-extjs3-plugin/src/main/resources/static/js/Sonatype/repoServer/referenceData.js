@@ -48,27 +48,28 @@ NX.define('Sonatype.repoServer.referenceData', {
       queryString : "",
       userAgentString : ""
     },
-    globalHttpProxySettings : {
-      proxyHostname : "",
-      proxyPort : 0,
-      nonProxyHosts : [],
-      authentication : {
-        username : "",
-        password : "",
-        ntlmHost : "",
-        ntlmDomain : ""
-      }
-    },
-    globalHttpsProxySettings : {
-      proxyHostname : "",
-      proxyPort : 0,
-      nonProxyHosts : [],
-      authentication : {
-        username : "",
-        password : "",
-        ntlmHost : "",
-        ntlmDomain : ""
-      }
+    remoteProxySettings : {
+      httpProxySettings : {
+        proxyHostname : "",
+        proxyPort : 0,
+        authentication : {
+          username : "",
+          password : "",
+          ntlmHost : "",
+          ntlmDomain : ""
+        }
+      },
+      httpsProxySettings : {
+        proxyHostname : "",
+        proxyPort : 0,
+        authentication : {
+          username : "",
+          password : "",
+          ntlmHost : "",
+          ntlmDomain : ""
+        }
+      },
+      nonProxyHosts : []
     },
     globalRestApiSettings : {
       baseUrl : "",

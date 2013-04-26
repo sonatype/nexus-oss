@@ -22,8 +22,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 
@@ -80,15 +80,7 @@ public class HttpClientProxyUtilTest
 
     private final RemoteProxySettings remoteProxySettings = new RemoteProxySettings()
     {
-        @Override
-        public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )
-        {
-        }
 
-        @Override
-        public void setPort( int port )
-        {
-        }
 
         @Override
         public void setNonProxyHosts( Set<String> nonProxyHosts )
@@ -96,26 +88,25 @@ public class HttpClientProxyUtilTest
         }
 
         @Override
-        public void setHostname( String hostname )
-        {
-        }
-
-        @Override
-        public boolean isEnabled()
-        {
-            return false;
-        }
-
-        @Override
-        public RemoteAuthenticationSettings getProxyAuthentication()
+        public RemoteHttpProxySettings getHttpProxySettings()
         {
             return null;
         }
 
         @Override
-        public int getPort()
+        public void setHttpProxySettings( final RemoteHttpProxySettings settings )
         {
-            return 0;
+        }
+
+        @Override
+        public RemoteHttpProxySettings getHttpsProxySettings()
+        {
+            return null;
+        }
+
+        @Override
+        public void setHttpsProxySettings( final RemoteHttpProxySettings settings )
+        {
         }
 
         @Override
@@ -124,11 +115,6 @@ public class HttpClientProxyUtilTest
             return null;
         }
 
-        @Override
-        public String getHostname()
-        {
-            return null;
-        }
     };
 
     @Test

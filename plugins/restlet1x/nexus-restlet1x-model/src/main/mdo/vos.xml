@@ -223,7 +223,48 @@
     </class>
 
     <class>
-      <name>RemoteHttpProxySettings</name>
+      <name>RemoteProxySettingsDTO</name>
+      <version>1.0.0+</version>
+      <description>The Remote Proxy defines proxies used to access the internet.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "remote-proxy-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>httpProxySettings</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>RemoteHttpProxySettingsDTO</type>
+          </association>
+          <required>false</required>
+          <description>HTTP proxy settings.</description>
+        </field>
+        <field>
+          <name>httpsProxySettings</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>RemoteHttpProxySettingsDTO</type>
+          </association>
+          <required>false</required>
+          <description>HTTPS proxy settings.</description>
+        </field>
+        <field>
+          <name>nonProxyHosts</name>
+          <version>1.0.0+</version>
+          <description>
+            List of addresses that can ignore the proxy settings.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>RemoteHttpProxySettingsDTO</name>
       <version>1.0.0+</version>
       <description>The HTTP Proxy defines proxies used to access the internet.</description>
       <annotations>
@@ -253,17 +294,6 @@
           </association>
           <required>false</required>
           <description>Authentication used to connect with proxy server.</description>
-        </field>
-        <field>
-          <name>nonProxyHosts</name>
-          <version>1.0.0+</version>
-          <description>
-            List of addresses that can ignore the proxy settings.</description>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>false</required>
         </field>
       </fields>
     </class>
@@ -425,22 +455,13 @@
           <description>SMTP settings for email notifications that Nexus generates.</description>
         </field>
         <field>
-          <name>globalHttpProxySettings</name>
+          <name>remoteProxySettings</name>
           <version>1.0.0+</version>
           <association>
-            <type>RemoteHttpProxySettings</type>
+            <type>RemoteProxySettingsDTO</type>
           </association>
           <required>false</required>
-          <description>Global HTTP Proxy Settings (will be applied to all repositories by default).</description>
-        </field>
-        <field>
-          <name>globalHttpsProxySettings</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>RemoteHttpProxySettings</type>
-          </association>
-          <required>false</required>
-          <description>Global HTTPS Proxy Settings (will be applied to all repositories by default).</description>
+          <description>Remote Proxy Settings.</description>
         </field>
         <field>
           <name>globalRestApiSettings</name>

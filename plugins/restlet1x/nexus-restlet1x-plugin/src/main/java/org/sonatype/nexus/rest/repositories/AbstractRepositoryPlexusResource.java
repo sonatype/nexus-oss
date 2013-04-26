@@ -24,11 +24,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -50,7 +48,6 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
@@ -73,9 +70,6 @@ public abstract class AbstractRepositoryPlexusResource
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
     @Requirement
-    private GlobalHttpProxySettings globalHttpProxySettings;
-
-    @Requirement
     private ApplicationConfiguration applicationConfiguration;
     
     @Requirement(hint="RestletRepositoryUrlBuilder")
@@ -89,11 +83,6 @@ public abstract class AbstractRepositoryPlexusResource
     protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
     {
         return globalRemoteConnectionSettings;
-    }
-
-    protected GlobalHttpProxySettings getGlobalHttpProxySettings()
-    {
-        return globalHttpProxySettings;
     }
 
     protected ApplicationConfiguration getApplicationConfiguration()

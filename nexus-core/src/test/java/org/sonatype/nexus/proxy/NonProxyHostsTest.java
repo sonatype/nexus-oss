@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -103,9 +104,13 @@ public class NonProxyHostsTest
     {
         ApplicationConfiguration nexusConfig = this.lookup( ApplicationConfiguration.class );
 
-        RemoteProxySettings rps = new DefaultRemoteProxySettings();
-        rps.setHostname( "localhost" );
-        rps.setPort( this.proxyServer.getPort() );
+        final DefaultRemoteHttpProxySettings rhps = new DefaultRemoteHttpProxySettings();
+        rhps.setHostname( "localhost" );
+        rhps.setPort( this.proxyServer.getPort() );
+
+        final RemoteProxySettings rps = new DefaultRemoteProxySettings();
+        rps.setHttpProxySettings( rhps );
+
         nexusConfig.getGlobalRemoteStorageContext().setRemoteProxySettings( rps );
 
         // now we need to manually setup a http client;
@@ -128,10 +133,14 @@ public class NonProxyHostsTest
     {
         ApplicationConfiguration nexusConfig = this.lookup( ApplicationConfiguration.class );
 
-        RemoteProxySettings rps = new DefaultRemoteProxySettings();
-        rps.setHostname( "localhost" );
-        rps.setPort( this.proxyServer.getPort() );
+        final DefaultRemoteHttpProxySettings rhps = new DefaultRemoteHttpProxySettings();
+        rhps.setHostname( "localhost" );
+        rhps.setPort( this.proxyServer.getPort() );
+
+        final RemoteProxySettings rps = new DefaultRemoteProxySettings();
+        rps.setHttpProxySettings( rhps );
         rps.getNonProxyHosts().add( "localhost" );
+
         nexusConfig.getGlobalRemoteStorageContext().setRemoteProxySettings( rps );
 
         // now we need to manually setup a http client;
@@ -151,10 +160,14 @@ public class NonProxyHostsTest
     {
         ApplicationConfiguration nexusConfig = this.lookup( ApplicationConfiguration.class );
 
-        RemoteProxySettings rps = new DefaultRemoteProxySettings();
-        rps.setHostname( "localhost" );
-        rps.setPort( this.proxyServer.getPort() );
+        final DefaultRemoteHttpProxySettings rhps = new DefaultRemoteHttpProxySettings();
+        rhps.setHostname( "localhost" );
+        rhps.setPort( this.proxyServer.getPort() );
+
+        final RemoteProxySettings rps = new DefaultRemoteProxySettings();
         rps.getNonProxyHosts().add( ".*host" );
+        rps.setHttpProxySettings( rhps );
+
         nexusConfig.getGlobalRemoteStorageContext().setRemoteProxySettings( rps );
 
         // now we need to manually setup a http client;
@@ -201,10 +214,14 @@ public class NonProxyHostsTest
     {
         ApplicationConfiguration nexusConfig = this.lookup( ApplicationConfiguration.class );
 
-        RemoteProxySettings rps = new DefaultRemoteProxySettings();
-        rps.setHostname( "localhost" );
-        rps.setPort( this.proxyServer.getPort() );
+        final DefaultRemoteHttpProxySettings rhps = new DefaultRemoteHttpProxySettings();
+        rhps.setHostname( "localhost" );
+        rhps.setPort( this.proxyServer.getPort() );
+
+        final RemoteProxySettings rps = new DefaultRemoteProxySettings();
+        rps.setHttpProxySettings( rhps );
         rps.getNonProxyHosts().add( ".*host" );
+
         nexusConfig.getGlobalRemoteStorageContext().setRemoteProxySettings( rps );
 
         ProxyRepository repo = (ProxyRepository) getRepositoryRegistry().getRepository( "remote" );

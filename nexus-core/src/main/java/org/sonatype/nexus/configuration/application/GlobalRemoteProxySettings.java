@@ -12,11 +12,21 @@
  */
 package org.sonatype.nexus.configuration.application;
 
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+
 /**
  * @since 2.5
  */
-public interface GlobalHttpsProxySettings
-    extends GlobalProxySettings
+public interface GlobalRemoteProxySettings
+    extends Configurable, RemoteProxySettings
 {
+
+    RemoteProxySettings convertAndValidateFromModel( CRemoteProxySettings model )
+        throws ConfigurationException;
+
+    CRemoteProxySettings convertToModel( RemoteProxySettings settings );
 
 }

@@ -6,10 +6,12 @@
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-  <globalHttpProxySettings>
-    <proxyHostname>proxyhost</proxyHostname>
-    <proxyPort>8080</proxyPort>
-  </globalHttpProxySettings>
+  <remoteProxySettings>
+    <httpProxySettings>
+      <proxyHostname>proxyhost</proxyHostname>
+      <proxyPort>8080</proxyPort>
+    </httpProxySettings>
+  </remoteProxySettings>
   <restApi>
     <uiTimeout>60000</uiTimeout>
   </restApi>

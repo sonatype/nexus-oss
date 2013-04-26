@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
@@ -75,9 +76,23 @@ public class ClearPasswordTest
         config.getSmtpConfiguration().setPassword( password );
 
         // global proxy
-        config.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
-        config.getGlobalHttpProxySettings().setAuthentication( new CRemoteAuthentication() );
-        config.getGlobalHttpProxySettings().getAuthentication().setPassword( password );
+        config.setRemoteProxySettings( new CRemoteProxySettings() );
+
+        final CRemoteHttpProxySettings httpProxySettings = new CRemoteHttpProxySettings();
+        httpProxySettings.setProxyHostname( "localhost" );
+        httpProxySettings.setProxyPort( 1234 );
+        httpProxySettings.setAuthentication( new CRemoteAuthentication() );
+        httpProxySettings.getAuthentication().setPassword( password );
+
+        final CRemoteHttpProxySettings httpsProxySettings = new CRemoteHttpProxySettings();
+        httpsProxySettings.setProxyHostname( "localhost" );
+        httpsProxySettings.setProxyPort( 1234 );
+        httpsProxySettings.setAuthentication( new CRemoteAuthentication() );
+        httpsProxySettings.getAuthentication().setPassword( password );
+
+        config.getRemoteProxySettings().setHttpProxySettings( httpProxySettings );
+        config.getRemoteProxySettings().setHttpsProxySettings( httpsProxySettings );
+
 //        config.getSecurity().setAnonymousPassword( password );
 //
 //        // anon username
@@ -89,7 +104,7 @@ public class ClearPasswordTest
         central.getRemoteStorage().getAuthentication().setPassword( password );
 
         // now we need to make the file valid....
-        config.getGlobalHttpProxySettings().setProxyPort( 1234 );
+        config.getRemoteProxySettings().getHttpProxySettings().setProxyPort( 1234 );
 
         // save it
         source.storeConfiguration();
@@ -109,7 +124,12 @@ public class ClearPasswordTest
         // now load it again and make sure the password is clear text
         Configuration newConfig = source.loadConfiguration();
         Assert.assertEquals( password, newConfig.getSmtpConfiguration().getPassword() );
-        Assert.assertEquals( password, newConfig.getGlobalHttpProxySettings().getAuthentication().getPassword() );
+        Assert.assertEquals(
+            password, newConfig.getRemoteProxySettings().getHttpProxySettings().getAuthentication().getPassword()
+        );
+        Assert.assertEquals(
+            password, newConfig.getRemoteProxySettings().getHttpsProxySettings().getAuthentication().getPassword()
+        );
 //        Assert.assertEquals( password, newConfig.getSecurity().getAnonymousPassword() );
 
         central = this.getCentralRepo( newConfig );

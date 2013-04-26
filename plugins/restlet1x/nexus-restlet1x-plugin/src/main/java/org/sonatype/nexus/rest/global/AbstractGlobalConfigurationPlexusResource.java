@@ -13,19 +13,20 @@
 package org.sonatype.nexus.rest.global;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
-import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
-import org.sonatype.nexus.configuration.application.GlobalHttpsProxySettings;
-import org.sonatype.nexus.configuration.application.GlobalProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.email.NexusEmailer;
@@ -34,18 +35,19 @@ import org.sonatype.nexus.notification.NotificationCheat;
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationTarget;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
-import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
+import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
-import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SystemNotificationSettings;
 
 /**
@@ -66,10 +68,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     private NexusEmailer nexusEmailer;
 
     @Requirement
-    private GlobalHttpProxySettings globalHttpProxySettings;
-
-    @Requirement
-    private GlobalHttpsProxySettings globalHttpsProxySettings;
+    private GlobalRemoteProxySettings globalRemoteProxySettings;
 
     @Requirement
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
@@ -88,17 +87,9 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         return nexusEmailer;
     }
 
-    protected GlobalHttpProxySettings getGlobalHttpProxySettings()
+    protected GlobalRemoteProxySettings getGlobalRemoteProxySettings()
     {
-        return globalHttpProxySettings;
-    }
-
-    /**
-     * @since 2.5
-     */
-    protected GlobalHttpsProxySettings getGlobalHttpsProxySettings()
-    {
-        return globalHttpsProxySettings;
+        return globalRemoteProxySettings;
     }
 
     protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
@@ -233,25 +224,42 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
     /**
      * Externalized Nexus object to DTO's conversion.
-     * 
-     * @param resource
      */
-    public static RemoteHttpProxySettings convert( GlobalProxySettings settings )
+    public static RemoteProxySettingsDTO convert( GlobalRemoteProxySettings settings )
     {
-        if ( settings == null || !settings.isEnabled() )
+        if ( settings == null )
         {
             return null;
         }
 
-        RemoteHttpProxySettings result = new RemoteHttpProxySettings();
+        RemoteProxySettingsDTO result = new RemoteProxySettingsDTO();
+
+        result.setHttpProxySettings( convert( settings.getHttpProxySettings() ) );
+
+        result.setHttpsProxySettings( convert( settings.getHttpsProxySettings() ) );
+
+        result.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
+
+        return result;
+    }
+
+    /**
+     * Externalized Nexus object to DTO's conversion.
+     */
+    public static RemoteHttpProxySettingsDTO convert( RemoteHttpProxySettings settings )
+    {
+        if ( settings == null )
+        {
+            return null;
+        }
+
+        final RemoteHttpProxySettingsDTO result = new RemoteHttpProxySettingsDTO();
 
         result.setProxyHostname( settings.getHostname() );
 
         result.setProxyPort( settings.getPort() );
 
         result.setAuthentication( convert( settings.getProxyAuthentication() ) );
-
-        result.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
 
         return result;
     }
@@ -347,25 +355,42 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
     /**
      * Externalized Nexus object to DTO's conversion.
-     * 
-     * @param resource
      */
-    public static RemoteHttpProxySettings convert( CRemoteHttpProxySettings settings )
+    public static RemoteProxySettingsDTO convert( CRemoteProxySettings settings )
     {
         if ( settings == null )
         {
             return null;
         }
 
-        RemoteHttpProxySettings result = new RemoteHttpProxySettings();
+        final RemoteProxySettingsDTO result = new RemoteProxySettingsDTO();
+
+        result.setHttpProxySettings( convert( settings.getHttpProxySettings() ) );
+
+        result.setHttpsProxySettings( convert( settings.getHttpsProxySettings() ) );
+
+        result.setNonProxyHosts( settings.getNonProxyHosts() );
+
+        return result;
+    }
+
+    /**
+     * Externalized Nexus object to DTO's conversion.
+     */
+    public static RemoteHttpProxySettingsDTO convert( CRemoteHttpProxySettings settings )
+    {
+        if ( settings == null )
+        {
+            return null;
+        }
+
+        final RemoteHttpProxySettingsDTO result = new RemoteHttpProxySettingsDTO();
 
         result.setProxyHostname( settings.getProxyHostname() );
 
         result.setProxyPort( settings.getProxyPort() );
 
         result.setAuthentication( convert( settings.getAuthentication() ) );
-
-        result.setNonProxyHosts( settings.getNonProxyHosts() );
 
         return result;
     }
@@ -439,6 +464,43 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setTlsEnabled( settings.isTlsEnabled() );
 
         result.setUsername( settings.getUsername() );
+
+        return result;
+    }
+
+    public RemoteHttpProxySettings convert( final RemoteHttpProxySettingsDTO settings,
+                                            final String oldPassword )
+        throws ConfigurationException
+    {
+        if ( settings == null || StringUtils.isEmpty( settings.getProxyHostname() ) )
+        {
+            return null;
+        }
+
+        final RemoteHttpProxySettings result = new DefaultRemoteHttpProxySettings();
+
+        result.setHostname( settings.getProxyHostname() );
+        result.setPort( settings.getProxyPort() );
+
+        if ( settings.getAuthentication() != null )
+        {
+            CRemoteAuthentication auth = new CRemoteAuthentication();
+
+            auth.setUsername( settings.getAuthentication().getUsername() );
+
+            auth.setPassword( getActualPassword( settings.getAuthentication().getPassword(), oldPassword ) );
+
+            auth.setNtlmDomain( settings.getAuthentication().getNtlmDomain() );
+
+            auth.setNtlmHost( settings.getAuthentication().getNtlmHost() );
+
+            result.setProxyAuthentication(
+                getAuthenticationInfoConverter().convertAndValidateFromModel( auth ) );
+        }
+        else
+        {
+            result.setProxyAuthentication( null );
+        }
 
         return result;
     }

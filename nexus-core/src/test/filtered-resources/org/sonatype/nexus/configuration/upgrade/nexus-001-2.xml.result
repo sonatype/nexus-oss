@@ -6,14 +6,16 @@
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-  <globalHttpProxySettings>
-    <proxyHostname>proxyhost</proxyHostname>
-    <proxyPort>8080</proxyPort>
-    <authentication>
-      <username></username>
-      <password></password>
-    </authentication>
-  </globalHttpProxySettings>
+  <remoteProxySettings>
+    <httpProxySettings>
+      <proxyHostname>proxyhost</proxyHostname>
+      <proxyPort>8080</proxyPort>
+      <authentication>
+        <username></username>
+        <password></password>
+      </authentication>
+    </httpProxySettings>
+  </remoteProxySettings>
   <restApi>
     <uiTimeout>60000</uiTimeout>
   </restApi>

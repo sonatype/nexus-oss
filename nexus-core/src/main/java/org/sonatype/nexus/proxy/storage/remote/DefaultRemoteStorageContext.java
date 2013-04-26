@@ -14,7 +14,6 @@ package org.sonatype.nexus.proxy.storage.remote;
 
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.RemoteHttpsProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.AbstractStorageContext;
 import org.sonatype.nexus.proxy.storage.StorageContext;
@@ -103,48 +102,6 @@ public class DefaultRemoteStorageContext
     public void removeRemoteProxySettings()
     {
         removeContextObject( RemoteProxySettings.class.getName() );
-    }
-
-    /**
-     * @since 2.5
-     */
-    @Override
-    public boolean hasRemoteHttpsProxySettings()
-    {
-        return hasContextObject( RemoteHttpsProxySettings.class.getName() );
-    }
-
-    /**
-     * @since 2.5
-     */
-    @Override
-    public RemoteProxySettings getRemoteHttpsProxySettings()
-    {
-        // default https ot http proxy settings if http ones are available in same context
-        if ( !hasContextObject( RemoteHttpsProxySettings.class.getName() )
-            && hasContextObject( RemoteProxySettings.class.getName() ) )
-        {
-            return (RemoteProxySettings) getContextObject( RemoteProxySettings.class.getName() );
-        }
-        return (RemoteProxySettings) getContextObject( RemoteHttpsProxySettings.class.getName() );
-    }
-
-    /**
-     * @since 2.5
-     */
-    @Override
-    public void setRemoteHttpsProxySettings( RemoteProxySettings settings )
-    {
-        putContextObject( RemoteHttpsProxySettings.class.getName(), settings );
-    }
-
-    /**
-     * @since 2.5
-     */
-    @Override
-    public void removeRemoteHttpsProxySettings()
-    {
-        removeContextObject( RemoteHttpsProxySettings.class.getName() );
     }
 
     // ==

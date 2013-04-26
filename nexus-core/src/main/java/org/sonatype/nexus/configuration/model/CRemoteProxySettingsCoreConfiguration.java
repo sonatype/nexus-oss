@@ -19,33 +19,33 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 /**
  * @since 2.5
  */
-public abstract class AbstractCGlobalProxySettingsCoreConfiguration
+public class CRemoteProxySettingsCoreConfiguration
     extends AbstractCoreConfiguration
 {
     private boolean nullified;
 
-    public AbstractCGlobalProxySettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
+    public CRemoteProxySettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
     {
         super( applicationConfiguration );
     }
 
     @Override
-    public CRemoteHttpProxySettings getConfiguration( boolean forWrite )
+    public CRemoteProxySettings getConfiguration( boolean forWrite )
     {
-        return (CRemoteHttpProxySettings) super.getConfiguration( forWrite );
+        return (CRemoteProxySettings) super.getConfiguration( forWrite );
     }
 
     @Override
-    protected CRemoteHttpProxySettings extractConfiguration( Configuration configuration )
+    protected CRemoteProxySettings extractConfiguration( Configuration configuration )
     {
-        return getGlobalProxySettings( configuration );
+        return configuration.getRemoteProxySettings();
     }
 
     public void initConfig()
     {
-        CRemoteHttpProxySettings newProxy = new CRemoteHttpProxySettings();
+        CRemoteProxySettings newProxy = new CRemoteProxySettings();
 
-        setGlobalProxySettings( newProxy );
+        getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings( newProxy );
 
         setOriginalConfiguration( newProxy );
     }
@@ -78,7 +78,7 @@ public abstract class AbstractCGlobalProxySettingsCoreConfiguration
         if ( nullified )
         {
             // nullified, nothing to validate and the super.commitChanges() will not work
-            setGlobalProxySettings( null );
+            getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings( null );
         }
         else
         {
@@ -101,16 +101,16 @@ public abstract class AbstractCGlobalProxySettingsCoreConfiguration
     {
         super.copyTransients( source, destination );
 
-        // we need to manually set the authentication to null here, because of flawed overlay, where null objects do NOT
+        // we need to manually set the http/https to null here, because of flawed overlay, where null objects do NOT
         // overwrite non-null objects
-        if ( ( (CRemoteHttpProxySettings) source ).getAuthentication() == null )
+        if ( ( (CRemoteProxySettings) source ).getHttpProxySettings() == null )
         {
-            ( (CRemoteHttpProxySettings) destination ).setAuthentication( null );
+            ( (CRemoteProxySettings) destination ).setHttpProxySettings( null );
+        }
+        if ( ( (CRemoteProxySettings) source ).getHttpsProxySettings() == null )
+        {
+            ( (CRemoteProxySettings) destination ).setHttpsProxySettings( null );
         }
     }
-
-    protected abstract CRemoteHttpProxySettings getGlobalProxySettings( final Configuration configuration );
-
-    protected abstract void setGlobalProxySettings( final CRemoteHttpProxySettings newProxy );
 
 }

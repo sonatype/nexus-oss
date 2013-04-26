@@ -10,10 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.configuration.application;
+package org.sonatype.nexus.proxy.repository;
 
-public interface GlobalHttpProxySettings
-    extends GlobalProxySettings
+/**
+ * @since 2.5
+ */
+public interface RemoteHttpProxySettings
 {
+
+    boolean isEnabled();
+
+    String getHostname();
+
+    void setHostname( String hostname );
+
+    int getPort();
+
+    void setPort( int port );
+
+    RemoteAuthenticationSettings getProxyAuthentication();
+
+    void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication );
 
 }

@@ -20,6 +20,7 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 
@@ -57,9 +58,13 @@ public class RemoteStorageSettingsInheritanceTest
 
         // and the problem now
         // change the global proxy
+        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+        httpProxySettings.setHostname( "192.168.1.1" );
+        httpProxySettings.setPort( 1234 );
+
         RemoteProxySettings proxy = applicationConfiguration.getGlobalRemoteStorageContext().getRemoteProxySettings();
-        proxy.setHostname( "192.168.1.1" );
-        proxy.setPort( 1234 );
+        proxy.setHttpProxySettings( httpProxySettings );
+
         // TODO: this is the spurious part!!! Make it not needed! Config framework DOES know it changed!
         // If you remove this, test will fail
         applicationConfiguration.getGlobalRemoteStorageContext().setRemoteProxySettings( proxy );

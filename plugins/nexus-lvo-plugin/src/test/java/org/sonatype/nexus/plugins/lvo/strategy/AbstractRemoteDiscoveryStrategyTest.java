@@ -37,6 +37,7 @@ import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -136,9 +137,12 @@ public class AbstractRemoteDiscoveryStrategyTest
     {
         server = Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( content( content ) ).start();
 
+        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+        httpProxySettings.setHostname( "localhost" );
+        httpProxySettings.setPort( server.getPort() );
+
         RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
-        remoteCfg.setHostname( "localhost" );
-        remoteCfg.setPort( server.getPort() );
+        remoteCfg.setHttpProxySettings( httpProxySettings );
 
         AbstractRemoteDiscoveryStrategy underTest = create();
 
@@ -169,9 +173,12 @@ public class AbstractRemoteDiscoveryStrategyTest
     {
         server = Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( error( 404 ) ).start();
 
-        RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
-        remoteCfg.setHostname( "localhost" );
-        remoteCfg.setPort( server.getPort() );
+        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+        httpProxySettings.setHostname( "localhost" );
+        httpProxySettings.setPort( server.getPort() );
+
+        final RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
+        remoteCfg.setHttpProxySettings( httpProxySettings );
 
         AbstractRemoteDiscoveryStrategy underTest = create();
 
@@ -207,9 +214,12 @@ public class AbstractRemoteDiscoveryStrategyTest
             Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( redirect( "/redirect/test.properties", 301 ) ).serve(
                 "/redirect/test.properties" ).withBehaviours( content( content ) ).start();
 
-        RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
-        remoteCfg.setHostname( "localhost" );
-        remoteCfg.setPort( server.getPort() );
+        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+        httpProxySettings.setHostname( "localhost" );
+        httpProxySettings.setPort( server.getPort() );
+
+        final RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
+        remoteCfg.setHttpProxySettings( httpProxySettings );
 
         AbstractRemoteDiscoveryStrategy underTest = create();
 

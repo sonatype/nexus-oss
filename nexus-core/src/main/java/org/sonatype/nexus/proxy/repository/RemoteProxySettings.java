@@ -16,21 +16,29 @@ import java.util.Set;
 
 public interface RemoteProxySettings
 {
-    boolean isEnabled();
 
-    String getHostname();
+    /**
+     * @since 2.5
+     */
+    RemoteHttpProxySettings getHttpProxySettings();
 
-    void setHostname( String hostname );
+    /**
+     * @since 2.5
+     */
+    void setHttpProxySettings( RemoteHttpProxySettings settings );
 
-    int getPort();
+    /**
+     * @since 2.5
+     */
+    RemoteHttpProxySettings getHttpsProxySettings();
 
-    void setPort( int port );
-
-    RemoteAuthenticationSettings getProxyAuthentication();
-
-    void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication );
+    /**
+     * @since 2.5
+     */
+    void setHttpsProxySettings( RemoteHttpProxySettings settings );
     
     public Set<String> getNonProxyHosts();
 
     public void setNonProxyHosts( Set<String> nonProxyHosts );
+
 }

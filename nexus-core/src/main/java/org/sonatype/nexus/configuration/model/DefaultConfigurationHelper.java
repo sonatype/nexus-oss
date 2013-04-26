@@ -88,12 +88,23 @@ public class DefaultConfigurationHelper
         }
 
         // global proxy
-        if ( config.getGlobalHttpProxySettings() != null
-            && config.getGlobalHttpProxySettings().getAuthentication() != null
-            && StringUtils.isNotEmpty( config.getGlobalHttpProxySettings().getAuthentication().getPassword() ) )
+        final CRemoteProxySettings rps = config.getRemoteProxySettings();
+        if ( rps != null )
         {
-            CRemoteAuthentication auth = config.getGlobalHttpProxySettings().getAuthentication();
-            auth.setPassword( encryptDecryptPassword( auth.getPassword(), encrypt, mask ) );
+            if ( rps.getHttpProxySettings() != null
+                && rps.getHttpProxySettings().getAuthentication() != null
+                && StringUtils.isNotEmpty( rps.getHttpProxySettings().getAuthentication().getPassword() ) )
+            {
+                CRemoteAuthentication auth = rps.getHttpProxySettings().getAuthentication();
+                auth.setPassword( encryptDecryptPassword( auth.getPassword(), encrypt, mask ) );
+            }
+            if ( rps.getHttpsProxySettings() != null
+                && rps.getHttpsProxySettings().getAuthentication() != null
+                && StringUtils.isNotEmpty( rps.getHttpsProxySettings().getAuthentication().getPassword() ) )
+            {
+                CRemoteAuthentication auth = rps.getHttpsProxySettings().getAuthentication();
+                auth.setPassword( encryptDecryptPassword( auth.getPassword(), encrypt, mask ) );
+            }
         }
 
         // each repo
