@@ -32,6 +32,7 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeD
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
@@ -196,7 +197,7 @@ public class EmptyRoleTest
         priv.addProperty( permissionProp );
         priv.addProperty( methodProp );
 
-        this.lookup( ConfigurationManager.class ).createPrivilege( priv );
+        this.lookup( DefaultConfigurationManager.class ).createPrivilege( priv );
 
         return priv.getId();
     }

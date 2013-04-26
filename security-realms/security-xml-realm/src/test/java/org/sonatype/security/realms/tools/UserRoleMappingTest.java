@@ -31,7 +31,7 @@ public class UserRoleMappingTest
     public ConfigurationManager getConfigManager()
         throws Exception
     {
-        return (ConfigurationManager) this.lookup( ConfigurationManager.class );
+        return (ConfigurationManager) this.lookup( DefaultConfigurationManager.class );
     }
 
     public void testGetUser()
