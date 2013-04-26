@@ -18,10 +18,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,6 +34,12 @@ import org.mockito.Mock;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+/**
+ * Tests that would go remotely for real. Usable for some manual testing or debugging, left here only as reference but
+ * these should actually never be run by CI or such, hence the whole class is ignored.
+ * 
+ * @author cstamas
+ */
 @Ignore( "This test really goes remotely and would try to scrape Springsource external repository." )
 public class AmazonS3LiveIndexScraperTest
     extends TestSupport
@@ -48,11 +59,9 @@ public class AmazonS3LiveIndexScraperTest
     /**
      * This test will go remote for true and scrape Springsource External bundles repository, that should take about 20+
      * "paged" request (every page is 1000 entries limited by S3), and will take about a minute to execute.
-     * 
-     * @throws Exception
      */
     @Test
-    public void springExternalRepository()
+    public void realS3Repository1()
         throws Exception
     {
         final HttpClient httpClient = new DefaultHttpClient();
@@ -68,4 +77,39 @@ public class AmazonS3LiveIndexScraperTest
         assertThat( entries, notNullValue() );
         assertThat( entries.size(), equalTo( 152 ) );
     }
+
+    /**
+     * This test will go remote for true and scrape Springsource roo repository.
+     */
+    @Test
+    public void realS3Repository2()
+        throws IOException
+    {
+        final HttpClient httpClient = new DefaultHttpClient();
+        final String remoteUrl = "http://spring-roo-repository.springsource.org/release/";
+        final HttpGet get = new HttpGet( remoteUrl );
+        final HttpResponse response = httpClient.execute( get );
+        final Document document = Jsoup.parse( response.getEntity().getContent(), null, remoteUrl );
+        when( mavenProxyRepository.getRemoteUrl() ).thenReturn( remoteUrl );
+        final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
+        final Page page = new Page( remoteUrl, response, document );
+        s3scraper.scrape( context, page );
+
+        if ( context.isSuccessful() )
+        {
+            System.out.println( context.getPrefixSource().readEntries() );
+        }
+        else
+        {
+            if ( context.isStopped() )
+            {
+                System.out.println( context.getMessage() );
+            }
+            else
+            {
+                System.out.println( "Huh?" );
+            }
+        }
+    }
+
 }
