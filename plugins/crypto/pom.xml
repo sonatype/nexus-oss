@@ -29,7 +29,7 @@
   <properties>
      <pluginName>Nexus Crypto Provider Plugin</pluginName>
      <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
-     <bouncycastle.version>1.47</bouncycastle.version>
+     <bouncycastle.version>1.48</bouncycastle.version>
   </properties>
 
   <dependencies>
