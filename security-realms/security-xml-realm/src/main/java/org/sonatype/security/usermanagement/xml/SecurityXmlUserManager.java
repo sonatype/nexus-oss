@@ -30,9 +30,8 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.realms.tools.AbstractConfigurationManagerAction;
-import org.sonatype.security.realms.tools.ConcurrentConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerActionType;
+import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -63,12 +62,12 @@ public class SecurityXmlUserManager
 
     public static final String SOURCE = "default";
 
-    private final ConcurrentConfigurationManager configuration;
+    private final ConfigurationManager configuration;
 
     private final SecuritySystem securitySystem;
 
     @Inject
-    public SecurityXmlUserManager( @Named( "default" ) ConcurrentConfigurationManager configuration,
+    public SecurityXmlUserManager( @Named( "default" ) ConfigurationManager configuration,
                                    SecuritySystem securitySystem )
     {
         this.configuration = configuration;
@@ -192,7 +191,7 @@ public class SecurityXmlUserManager
         final CUser secUser = this.toUser( user );
         secUser.setPassword( this.hashPassword( password ) );
         
-        this.configuration.<InvalidConfigurationException, RuntimeException>run(new AbstractConfigurationManagerAction(ConfigurationManagerActionType.WRITE)
+        this.configuration.<InvalidConfigurationException, RuntimeException>runWrite(new ConfigurationManagerAction()
         {
             public void run() throws InvalidConfigurationException
             {
@@ -208,7 +207,7 @@ public class SecurityXmlUserManager
     public void changePassword( final String userId, final String newPassword )
         throws UserNotFoundException, InvalidConfigurationException
     {
-        this.configuration.<UserNotFoundException, InvalidConfigurationException>run(new AbstractConfigurationManagerAction(ConfigurationManagerActionType.WRITE)
+        this.configuration.<UserNotFoundException, InvalidConfigurationException>runWrite(new ConfigurationManagerAction()
         {
             @Override
             public void run() throws UserNotFoundException, InvalidConfigurationException
@@ -236,7 +235,7 @@ public class SecurityXmlUserManager
     public User updateUser( final User user )
         throws UserNotFoundException, InvalidConfigurationException
     {
-        this.configuration.<UserNotFoundException, InvalidConfigurationException>run(new AbstractConfigurationManagerAction(ConfigurationManagerActionType.WRITE)
+        this.configuration.<UserNotFoundException, InvalidConfigurationException>runWrite(new ConfigurationManagerAction()
         {
             @Override
             public void run() throws UserNotFoundException, InvalidConfigurationException
@@ -256,7 +255,7 @@ public class SecurityXmlUserManager
     public void deleteUser( final String userId )
         throws UserNotFoundException
     {
-        this.configuration.<UserNotFoundException, RuntimeException>run(new AbstractConfigurationManagerAction(ConfigurationManagerActionType.WRITE)
+        this.configuration.<UserNotFoundException, RuntimeException>runWrite(new ConfigurationManagerAction()
         {
             @Override
             public void run() throws UserNotFoundException
@@ -272,7 +271,7 @@ public class SecurityXmlUserManager
     {
         final Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
 
-        this.configuration.<UserNotFoundException, RuntimeException>run(new AbstractConfigurationManagerAction(ConfigurationManagerActionType.READ)
+        this.configuration.<UserNotFoundException, RuntimeException>runRead(new ConfigurationManagerAction()
         {
             @Override
             public void run() throws UserNotFoundException
@@ -313,7 +312,7 @@ public class SecurityXmlUserManager
     {
         final Set<User> users = new HashSet<User>();
         
-        this.configuration.<RuntimeException, RuntimeException>run(new AbstractConfigurationManagerAction(ConfigurationManagerActionType.READ)
+        this.configuration.<RuntimeException, RuntimeException>runRead(new ConfigurationManagerAction()
         {
             @Override
             public void run()
@@ -374,7 +373,7 @@ public class SecurityXmlUserManager
     public void setUsersRoles( final String userId, final String userSource, final Set<RoleIdentifier> roleIdentifiers )
         throws UserNotFoundException, InvalidConfigurationException
     {
-        this.configuration.<UserNotFoundException, InvalidConfigurationException>run(new AbstractConfigurationManagerAction(ConfigurationManagerActionType.WRITE)
+        this.configuration.<UserNotFoundException, InvalidConfigurationException>runWrite(new ConfigurationManagerAction()
         {
             @Override
             public void run() throws UserNotFoundException, InvalidConfigurationException

@@ -58,7 +58,7 @@ public class URLUserManager
     private final List<UserManager> userLocators;
 
     @Inject
-    public URLUserManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
+    public URLUserManager( @Named( "default" ) ConfigurationManager configuration,
                            List<UserManager> userLocators, UrlRealmConfiguration urlRealmConfiguration )
     {
         this.configuration = configuration;

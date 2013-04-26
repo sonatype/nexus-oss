@@ -61,7 +61,7 @@ public class ConfiguredUsersUserManager
 
     @Inject
     public ConfiguredUsersUserManager( SecuritySystem securitySystem,
-                                       @Named( "resourceMerging" ) ConfigurationManager configuration )
+                                       @Named( "default" ) ConfigurationManager configuration )
     {
         this.securitySystem = securitySystem;
         this.configuration = configuration;

@@ -34,6 +34,7 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
@@ -54,7 +55,7 @@ public class SecurityXmlAuthorizationManager
     private final EventBus eventBus;
 
     @Inject
-    public SecurityXmlAuthorizationManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
+    public SecurityXmlAuthorizationManager( @Named( "default" ) ConfigurationManager configuration,
                                             PrivilegeInheritanceManager privInheritance,
                                             EventBus eventBus )
     {
@@ -184,10 +185,20 @@ public class SecurityXmlAuthorizationManager
         throws InvalidConfigurationException
     {
         // the roleId of the secRole might change, so we need to keep the reference
-        CRole secRole = this.toRole( role );
+        final CRole secRole = this.toRole( role );
 
-        this.configuration.createRole( secRole );
-        this.saveConfiguration();
+        this.configuration.<InvalidConfigurationException, RuntimeException>runWrite(new ConfigurationManagerAction()
+        {
+            @Override
+            public void run() throws InvalidConfigurationException
+            {
+                SecurityXmlAuthorizationManager.this.configuration.createRole( secRole );
+                SecurityXmlAuthorizationManager.this.configuration.save();
+            }
+        });
+        
+        // notify any listeners that the config changed
+        this.fireAuthorizationChangedEvent();
 
         return this.toRole( secRole );
     }
@@ -195,19 +206,39 @@ public class SecurityXmlAuthorizationManager
     public Role updateRole( Role role )
         throws NoSuchRoleException, InvalidConfigurationException
     {
-        CRole secRole = this.toRole( role );
-
-        this.configuration.updateRole( secRole );
-        this.saveConfiguration();
+        final CRole secRole = this.toRole( role );
+        
+        this.configuration.<NoSuchRoleException, InvalidConfigurationException>runWrite(new ConfigurationManagerAction()
+        {
+            @Override
+            public void run() throws NoSuchRoleException, InvalidConfigurationException
+            {
+                SecurityXmlAuthorizationManager.this.configuration.updateRole( secRole );
+                SecurityXmlAuthorizationManager.this.configuration.save();
+            }
+        });
+        
+        // notify any listeners that the config changed
+        this.fireAuthorizationChangedEvent();
 
         return this.toRole( secRole );
     }
 
-    public void deleteRole( String roleId )
+    public void deleteRole( final String roleId )
         throws NoSuchRoleException
     {
-        this.configuration.deleteRole( roleId );
-        this.saveConfiguration();
+        this.configuration.<NoSuchRoleException, RuntimeException>runWrite(new ConfigurationManagerAction()
+        {
+            @Override
+            public void run() throws NoSuchRoleException
+            {
+                SecurityXmlAuthorizationManager.this.configuration.deleteRole( roleId );
+                SecurityXmlAuthorizationManager.this.configuration.save();
+            }
+        });
+        
+        // notify any listeners that the config changed
+        this.fireAuthorizationChangedEvent();
     }
 
     // //
@@ -236,12 +267,22 @@ public class SecurityXmlAuthorizationManager
     public Privilege addPrivilege( Privilege privilege )
         throws InvalidConfigurationException
     {
-        CPrivilege secPriv = this.toPrivilege( privilege );
+        final CPrivilege secPriv = this.toPrivilege( privilege );
         // create implies read, so we need to add logic for that
         addInheritedPrivileges( secPriv );
-
-        this.configuration.createPrivilege( secPriv );
-        this.saveConfiguration();
+        
+        this.configuration.<InvalidConfigurationException, RuntimeException>runWrite(new ConfigurationManagerAction()
+        {
+            @Override
+            public void run() throws InvalidConfigurationException
+            {
+                SecurityXmlAuthorizationManager.this.configuration.createPrivilege( secPriv );
+                SecurityXmlAuthorizationManager.this.configuration.save();
+            }
+        });
+        
+        // notify any listeners that the config changed
+        this.fireAuthorizationChangedEvent();
 
         return this.toPrivilege( secPriv );
     }
@@ -249,24 +290,37 @@ public class SecurityXmlAuthorizationManager
     public Privilege updatePrivilege( Privilege privilege )
         throws NoSuchPrivilegeException, InvalidConfigurationException
     {
-        CPrivilege secPriv = this.toPrivilege( privilege );
-        this.configuration.updatePrivilege( secPriv );
-        this.saveConfiguration();
-
+        final CPrivilege secPriv = this.toPrivilege( privilege );
+        
+        this.configuration.<NoSuchPrivilegeException, InvalidConfigurationException>runWrite(new ConfigurationManagerAction()
+        {
+            @Override
+            public void run() throws NoSuchPrivilegeException, InvalidConfigurationException
+            {
+                SecurityXmlAuthorizationManager.this.configuration.updatePrivilege( secPriv );
+                SecurityXmlAuthorizationManager.this.configuration.save();
+            }
+        });
+        
+        // notify any listeners that the config changed
+        this.fireAuthorizationChangedEvent();
+        
         return this.toPrivilege( secPriv );
     }
 
-    public void deletePrivilege( String privilegeId )
+    public void deletePrivilege( final String privilegeId )
         throws NoSuchPrivilegeException
     {
-        this.configuration.deletePrivilege( privilegeId );
-        this.saveConfiguration();
-    }
-
-    private void saveConfiguration()
-    {
-        this.configuration.save();
-
+        this.configuration.<NoSuchPrivilegeException, RuntimeException>runWrite(new ConfigurationManagerAction()
+        {
+            @Override
+            public void run() throws NoSuchPrivilegeException
+            {
+                SecurityXmlAuthorizationManager.this.configuration.deletePrivilege( privilegeId );
+                SecurityXmlAuthorizationManager.this.configuration.save();
+            }
+        });
+        
         // notify any listeners that the config changed
         this.fireAuthorizationChangedEvent();
     }
