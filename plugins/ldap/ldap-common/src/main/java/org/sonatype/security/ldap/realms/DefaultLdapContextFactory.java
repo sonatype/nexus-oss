@@ -45,16 +45,6 @@ import org.apache.shiro.realm.ldap.LdapContextFactory;
 public class DefaultLdapContextFactory implements LdapContextFactory {
 
     /*--------------------------------------------
-    |             C O N S T A N T S             |
-    ============================================*/
-    /**
-     * The Sun LDAP property used to enable connection pooling.  This is used in the default implementation
-     * to enable LDAP connection pooling.
-     */
-    protected static final String SUN_CONNECTION_POOLING_PROPERTY = "com.sun.jndi.ldap.connect.pool";
-    protected static final String SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY = "com.sun.jndi.ldap.connect.pool.protocol";
-
-    /*--------------------------------------------
     |    I N S T A N C E   V A R I A B L E S    |
     ============================================*/
 
@@ -169,17 +159,18 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
     }
 
     /**
-     * Determines whether or not LdapContext pooling is enabled for connections made using the system
-     * user account.  In the default implementation, this simply
-     * sets the <tt>com.sun.jndi.ldap.connect.pool</tt> property to true and
-     * <tt>com.sun.jndi.ldap.connect.pool.protocol</tt> to "plain ssl" in the LDAP context environment.  If you use a
-     * LDAP Context Factory that is not Sun's default implementation, you will need to override the
-     * default behavior to use this setting in whatever way your underlying LDAP ContextFactory
-     * supports.  By default, pooling is enabled.
-     *
+     * Determines whether or not LdapContext pooling is enabled for connections made using the system user account. In
+     * the default implementation, this is implemented as NOP operation, as Sun default implementation controls pooling
+     * globally, and using system properties only (you can control it by setting <tt>com.sun.jndi.ldap.connect.pool</tt>
+     * property to "true" and <tt>com.sun.jndi.ldap.connect.pool.protocol</tt> to "plain ssl" in JVM System properties.
+     * If you use a LDAP Context Factory that is not Sun's default implementation, you will need to override the default
+     * behavior to use this setting in whatever way your underlying LDAP ContextFactory supports. By default, pooling is
+     * enabled.
+     * 
      * @param usePooling true to enable pooling, or false to disable it.
      */
     public void setUsePooling(boolean usePooling) {
+        // NXCM-5067: This method is basically nop, as this flag is nowhere used, read javadoc above
         this.usePooling = usePooling;
     }
 
@@ -271,16 +262,6 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
         env.put( Context.INITIAL_CONTEXT_FACTORY, contextFactoryClassName );
         env.put( Context.PROVIDER_URL, url );
         env.put( Context.REFERRAL, referral );
-
-        // Only pool connections for system contexts
-        if ( usePooling && username != null && systemContext )
-        {
-            // Enable connection pooling
-            env.put(SUN_CONNECTION_POOLING_PROPERTY, "true");
-            // Enable pooling for plain and ssl connections
-            env.put( SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY, "plain ssl" );
-        }
-
 
         if ( log.isDebugEnabled() )
         {
