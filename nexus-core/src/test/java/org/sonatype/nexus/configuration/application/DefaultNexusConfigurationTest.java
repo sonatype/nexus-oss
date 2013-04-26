@@ -39,7 +39,7 @@ public class DefaultNexusConfigurationTest
 
     protected NexusEmailer nexusEmailer;
 
-    protected GlobalRemoteProxySettings remoteProxySettings;
+    protected RemoteProxySettingsConfiguration remoteProxySettingsConfiguration;
 
     protected void setUp()
         throws Exception
@@ -54,7 +54,7 @@ public class DefaultNexusConfigurationTest
 
         nexusEmailer = lookup( NexusEmailer.class );
 
-        remoteProxySettings = lookup( GlobalRemoteProxySettings.class );
+        remoteProxySettingsConfiguration = lookup( RemoteProxySettingsConfiguration.class );
     }
 
     protected void tearDown()
@@ -103,8 +103,8 @@ public class DefaultNexusConfigurationTest
         httpsProxySettings.setHostname( "https.proxy.com" );
         httpsProxySettings.setPort( 4321 );
 
-        remoteProxySettings.setHttpProxySettings( httpProxySettings );
-        remoteProxySettings.setHttpsProxySettings( httpsProxySettings );
+        remoteProxySettingsConfiguration.setHttpProxySettings( httpProxySettings );
+        remoteProxySettingsConfiguration.setHttpsProxySettings( httpsProxySettings );
 
         nexusConfiguration.saveConfiguration();
 

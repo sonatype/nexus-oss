@@ -13,15 +13,13 @@
 package org.sonatype.nexus.rest.global;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
+import org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -68,7 +66,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     private NexusEmailer nexusEmailer;
 
     @Requirement
-    private GlobalRemoteProxySettings globalRemoteProxySettings;
+    private RemoteProxySettingsConfiguration remoteProxySettingsConfiguration;
 
     @Requirement
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
@@ -87,9 +85,9 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         return nexusEmailer;
     }
 
-    protected GlobalRemoteProxySettings getGlobalRemoteProxySettings()
+    protected RemoteProxySettingsConfiguration getRemoteProxySettingsConfiguration()
     {
-        return globalRemoteProxySettings;
+        return remoteProxySettingsConfiguration;
     }
 
     protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
@@ -225,7 +223,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     /**
      * Externalized Nexus object to DTO's conversion.
      */
-    public static RemoteProxySettingsDTO convert( GlobalRemoteProxySettings settings )
+    public static RemoteProxySettingsDTO convert( RemoteProxySettingsConfiguration settings )
     {
         if ( settings == null )
         {

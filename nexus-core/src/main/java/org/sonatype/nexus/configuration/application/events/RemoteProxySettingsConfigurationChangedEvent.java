@@ -12,28 +12,24 @@
  */
 package org.sonatype.nexus.configuration.application.events;
 
-import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
+import org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * Event fired when global remote Proxy settings are changed (within configuration change). The settings carried in
- * this event will reflect the NEW values, but if you have the {@link GlobalRemoteProxySettings} component, you can
+ * this event will reflect the NEW values, but if you have the {@link org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration} component, you can
  * query it too <em>after</em> you received this event .
  *
  * @since 2.5
  */
-public class GlobalRemoteProxySettingsChangedEvent
-    extends AbstractEvent<GlobalRemoteProxySettings>
+public class RemoteProxySettingsConfigurationChangedEvent
+    extends AbstractEvent<RemoteProxySettingsConfiguration>
 {
 
-    public GlobalRemoteProxySettingsChangedEvent( GlobalRemoteProxySettings settings )
+    public RemoteProxySettingsConfigurationChangedEvent(
+        final RemoteProxySettingsConfiguration remoteProxySettingsConfiguration )
     {
-        super( settings );
-    }
-
-    public GlobalRemoteProxySettings getGlobalHttpProxySettings()
-    {
-        return getEventSender();
+        super( remoteProxySettingsConfiguration );
     }
 
 }

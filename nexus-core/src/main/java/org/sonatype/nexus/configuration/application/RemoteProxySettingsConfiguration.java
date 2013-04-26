@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 /**
  * @since 2.5
  */
-public interface GlobalRemoteProxySettings
+public interface RemoteProxySettingsConfiguration
     extends Configurable, RemoteProxySettings
 {
 

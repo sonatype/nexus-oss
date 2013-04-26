@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -26,7 +23,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.application.events.RemoteProxySettingsConfigurationChangedEvent;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettingsCoreConfiguration;
@@ -35,15 +32,14 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 
 /**
  * @since 2.5
  */
-@Component( role = GlobalRemoteProxySettings.class )
-public class DefaultGlobalRemoteProxySettings
+@Component( role = RemoteProxySettingsConfiguration.class )
+public class DefaultRemoteProxySettingsConfiguration
     extends AbstractConfigurable
-    implements GlobalRemoteProxySettings
+    implements RemoteProxySettingsConfiguration
 {
 
     @Requirement
@@ -260,7 +256,7 @@ public class DefaultGlobalRemoteProxySettings
 
         if ( wasDirty )
         {
-            eventBus().post( new GlobalRemoteProxySettingsChangedEvent( this ) );
+            eventBus().post( new RemoteProxySettingsConfigurationChangedEvent( this ) );
         }
 
         return wasDirty;
