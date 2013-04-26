@@ -409,7 +409,7 @@ public class Jetty8NexusBooter
             if ( System.getProperty( "os.name" ).toLowerCase().contains( "windows" ) )
             {
                 jettyXmlString =
-                    jettyXmlString.replace( "org.eclipse.jetty.server.nio.SelectChannelConnector",
+                    jettyXmlString.replace( "org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector",
                                             "org.eclipse.jetty.server.nio.BlockingChannelConnector" );
             }
 
@@ -464,6 +464,7 @@ public class Jetty8NexusBooter
         tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-core-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-jetty-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "metrics-logback-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "nexus-bootstrap-*.jar" );
     }
 
     /**
