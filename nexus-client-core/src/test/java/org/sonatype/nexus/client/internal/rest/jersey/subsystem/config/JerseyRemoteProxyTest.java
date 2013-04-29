@@ -27,6 +27,9 @@ import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
 import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+/**
+ * @since 2.5
+ */
 public class JerseyRemoteProxyTest
     extends TestSupport
 {

@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.repository;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
+ * Default {@link RemoteHttpProxySettings} implementation.
+ *
  * @since 2.5
  */
 public class DefaultRemoteHttpProxySettings

@@ -14,31 +14,44 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.Set;
 
+/**
+ * Remote proxy settings.
+ */
 public interface RemoteProxySettings
 {
 
     /**
+     * @return HTTP proxy settings. When null, no HTTP proxy should be used
      * @since 2.5
      */
     RemoteHttpProxySettings getHttpProxySettings();
 
     /**
+     * @param settings HTTP proxy settings. When null, will no proxy will be used for HTTP
      * @since 2.5
      */
     void setHttpProxySettings( RemoteHttpProxySettings settings );
 
     /**
+     * @return HTTPS proxy settings. When null, HTTP proxy settings should be used
      * @since 2.5
      */
     RemoteHttpProxySettings getHttpsProxySettings();
 
     /**
+     * @param settings HTTPS proxy settings. When null, will default to HTTP proxy settings
      * @since 2.5
      */
     void setHttpsProxySettings( RemoteHttpProxySettings settings );
-    
+
+    /**
+     * @return set of hosts for which proxy should not be used
+     */
     public Set<String> getNonProxyHosts();
 
+    /**
+     * @param nonProxyHosts set of hosts for which proxy should not be used
+     */
     public void setNonProxyHosts( Set<String> nonProxyHosts );
 
 }

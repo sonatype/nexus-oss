@@ -18,7 +18,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 /**
- * @since 2.5
+ * Default {@link RemoteProxySettings} implementation.
  */
 public class DefaultRemoteProxySettings
     implements RemoteProxySettings
@@ -63,4 +63,5 @@ public class DefaultRemoteProxySettings
             this.nonProxyHosts.addAll( nonProxyHosts );
         }
     }
+
 }
