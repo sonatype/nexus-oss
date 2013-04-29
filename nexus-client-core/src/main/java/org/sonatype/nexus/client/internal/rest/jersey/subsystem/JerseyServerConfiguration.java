@@ -32,12 +32,6 @@ public class JerseyServerConfiguration
      */
     private RemoteProxy remoteProxy;
 
-    /**
-     * Https Proxy configuration segment.
-     * Lazy initialized on first request.
-     */
-    private RemoteProxy httpsProxy;
-
     public JerseyServerConfiguration( final JerseyNexusClient nexusClient )
     {
         super( nexusClient );
