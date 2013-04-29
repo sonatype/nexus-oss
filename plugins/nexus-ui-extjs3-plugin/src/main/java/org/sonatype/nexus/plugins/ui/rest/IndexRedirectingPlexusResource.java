@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugins.ui.rest;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,6 +31,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
  */
 @Named( "IndexRedirectingPlexusResource" )
 @Singleton
+@Typed( ManagedPlexusResource.class )
 public class IndexRedirectingPlexusResource
     extends AbstractNexusPlexusResource
     implements ManagedPlexusResource
