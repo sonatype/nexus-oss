@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.nexus.unpack</groupId>
     <artifactId>nexus-unpack</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
