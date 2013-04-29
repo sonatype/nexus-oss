@@ -3150,6 +3150,13 @@
           <required>true</required>
           <description>Flag that states if current installed license is a trial license.</description>
         </field>
+        <field>
+          <name>noSessionTimeout</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that enables or disables the UI 'pinging' the status resource.</description>
+        </field>
       </fields>
     </class>
 
