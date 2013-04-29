@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -51,6 +53,7 @@ import org.sonatype.sisu.velocity.Velocity;
 
 @Named("indexTemplate")
 @Singleton
+@Typed( ManagedPlexusResource.class )
 public class IndexTemplatePlexusResource
     extends AbstractPlexusResource
     implements ManagedPlexusResource
