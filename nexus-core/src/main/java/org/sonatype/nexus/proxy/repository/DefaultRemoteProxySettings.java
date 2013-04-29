@@ -55,8 +55,12 @@ public class DefaultRemoteProxySettings
         return nonProxyHosts;
     }
 
-    public void setNonProxyHosts( Set<String> nonProxyHosts )
+    public void setNonProxyHosts( final Set<String> nonProxyHosts )
     {
-        this.nonProxyHosts = nonProxyHosts;
+        this.nonProxyHosts.clear();
+        if ( nonProxyHosts != null && !nonProxyHosts.isEmpty() )
+        {
+            this.nonProxyHosts.addAll( nonProxyHosts );
+        }
     }
 }
