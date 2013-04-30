@@ -414,7 +414,7 @@ public abstract class AbstractMavenRepository
 
             throw new ItemNotFoundException( reasonFor( request, this,
                 "Retrieval of %s from %s is forbidden by repository policy %s.", request.getRequestPath(),
-                RepositoryStringUtils.getHumanizedNameString( this ), getRepositoryPolicy() ) );
+                this, getRepositoryPolicy() ) );
         }
 
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class )

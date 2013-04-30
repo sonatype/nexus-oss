@@ -260,7 +260,7 @@ public abstract class AbstractGroupRepository
             {
                 throw new GroupItemNotFoundException( reasonFor( request, this,
                     "The %s not found in local storage of group repository %s (no member processing happened).",
-                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+                    request.getRequestPath(), this ), memberThrowables );
             }
         }
 
@@ -417,7 +417,7 @@ public abstract class AbstractGroupRepository
             {
                 throw new GroupItemNotFoundException( reasonFor( request, this,
                     "The %s not found in local storage of group repository %s (no member processing happened).",
-                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+                    request.getRequestPath(), this ), memberThrowables );
             }
         }
         finally
@@ -666,7 +666,7 @@ public abstract class AbstractGroupRepository
             {
                 throw new GroupItemNotFoundException( reasonFor( request, this,
                     "The %s not found in local storage of group repository %s (no member processing happened).",
-                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+                    request.getRequestPath(), this ), memberThrowables );
             }
         }
 

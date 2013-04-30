@@ -1738,8 +1738,8 @@ public abstract class AbstractProxyRepository
 
             // validation failed, I guess.
             throw new ItemNotFoundException( reasonFor( request, this,
-                "Path %s fetched from remote but failed validation in %s.", request.getRequestPath(),
-                RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                "Path %s fetched from remote storage of %s but failed validation.", request.getRequestPath(),
+                this ) );
         }
         finally
         {
@@ -1835,7 +1835,7 @@ public abstract class AbstractProxyRepository
                             RemoteStatus.UNAVAILABLE,
                             new ItemNotFoundException( reasonFor( request, AbstractProxyRepository.this,
                                 "Proxy mode %s or repository %s forbids remote storage use.", getProxyMode(),
-                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
+                                AbstractProxyRepository.this ) ) );
                     }
                     else
                     {
@@ -1847,7 +1847,7 @@ public abstract class AbstractProxyRepository
                         {
                             autoBlockProxying( new ItemNotFoundException( reasonFor( request,
                                 AbstractProxyRepository.this, "Remote peer of repository %s detected as unavailable.",
-                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
+                                AbstractProxyRepository.this ) ) );
                         }
                     }
                 }

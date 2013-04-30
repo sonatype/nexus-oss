@@ -675,7 +675,7 @@ public abstract class AbstractRepository
                     + " but repository is not Browseable." );
 
             throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable.",
-                RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                this ) );
         }
 
         checkPostConditions( request, item );
@@ -772,7 +772,7 @@ public abstract class AbstractRepository
         }
         else
         {
-            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable!" ) );
+            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable!", this ) );
         }
 
         return items;
@@ -871,7 +871,8 @@ public abstract class AbstractRepository
                             RepositoryStringUtils.getHumanizedNameString( this ), uid.getPath(), key ) );
 
                     throw new ItemNotFoundException( reasonFor( request, this,
-                        "The generator for generated path %s not found!" ) );
+                        "The generator for generated path %s with key %s not found in %s", request.getRequestPath(),
+                        key, this ) );
                 }
             }
 
@@ -1142,7 +1143,7 @@ public abstract class AbstractRepository
         else
         {
             throw new ItemNotFoundException( reasonFor( request, this, "Path %s in repository %s is not a collection.",
-                request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                request.getRequestPath(), this ) );
         }
     }
 
