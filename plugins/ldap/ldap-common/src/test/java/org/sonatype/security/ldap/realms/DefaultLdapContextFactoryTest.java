@@ -64,14 +64,11 @@ public class DefaultLdapContextFactoryTest
     {
         underTest.setUrl( "ldap://localhost:439" );
         underTest.setUsePooling( true );
-
-        assertThat( underTest.getSetupEnvironment( "user", "pass", true ).get( DefaultLdapContextFactory.SUN_CONNECTION_POOLING_PROPERTY ), is( "true" ) );
-
+        assertThat( underTest.getSetupEnvironment( "user", "pass", true ).get( DefaultLdapContextFactory.SUN_CONNECTION_POOLING_ENV_PROPERTY ), is( "true" ) );
         // only pool for system context
-        assertThat( underTest.getSetupEnvironment( "user", "pass", false ).get( DefaultLdapContextFactory.SUN_CONNECTION_POOLING_PROPERTY ), nullValue() );
-
+        assertThat( underTest.getSetupEnvironment( "user", "pass", false ).get( DefaultLdapContextFactory.SUN_CONNECTION_POOLING_ENV_PROPERTY ), nullValue() );
         // only pool for auth necessary
-        assertThat( underTest.getSetupEnvironment( null, null, true ).get( DefaultLdapContextFactory.SUN_CONNECTION_POOLING_PROPERTY ), nullValue() );
+        assertThat( underTest.getSetupEnvironment( null, null, true ).get( DefaultLdapContextFactory.SUN_CONNECTION_POOLING_ENV_PROPERTY ), nullValue() );
     }
 
     @Test
