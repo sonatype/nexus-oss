@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginEquals;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +20,8 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
+
+import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginPrefixAndArtifactIdEquals;
 
 /**
  * adds new plugin to metadata
@@ -88,8 +88,9 @@ public class AddPluginOperation
         {
             if ( p.getArtifactId().equals( plugin.getArtifactId() ) )
             {
-                if ( isPluginEquals( p, plugin ) )
+                if ( isPluginPrefixAndArtifactIdEquals( p, plugin ) )
                 {
+                    p.setName( plugin.getName() );
                     // plugin already enlisted
                     return false;
                 }

@@ -311,9 +311,35 @@
                 <privilege>83</privilege>
             </privileges>
         </role>
+        <role>
+            <id>metrics-endpoints</id>
+            <name>Metrics Endpoints</name>
+            <description>Allows access to metrics endpoints.</description>
+            <sessionTimeout>60</sessionTimeout>
+            <privileges>
+                <privilege>metrics-endpoints</privilege>
+            </privileges>
+        </role>
     </roles>
     
     <privileges>
+        <privilege>
+            <id>metrics-endpoints</id>
+            <type>method</type>
+            <name>Metrics Endpoints</name>
+            <description>Allows access to metrics endpoints.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>*</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:metrics-endpoints</value>
+                </property>
+            </properties>
+        </privilege>
+
         <privilege>
             <id>T1</id>
             <type>target</type>

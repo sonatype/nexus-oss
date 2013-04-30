@@ -16,6 +16,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.web.MdcUserContextFilter;
+import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 import org.sonatype.sisu.siesta.common.Resource;
 import org.sonatype.sisu.siesta.jackson.SiestaJacksonModule;
@@ -82,7 +84,18 @@ public class SiestaModule
             protected void configureServlets() {
                 serve(MOUNT_POINT + "/*").with(SiestaServlet.class);
                 filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+                filter(MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
             }
         });
+
+        install( new FilterChainModule()
+        {
+            @Override
+            protected void configure()
+            {
+                addFilterChain( MOUNT_POINT + "/**", "noSessionCreation,authcBasic" );
+            }
+
+        } );
     }
 }

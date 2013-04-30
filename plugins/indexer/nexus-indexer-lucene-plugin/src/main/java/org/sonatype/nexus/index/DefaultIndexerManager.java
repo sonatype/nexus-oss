@@ -87,6 +87,7 @@ import org.apache.maven.index.treeview.IndexTreeView;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.apache.maven.index.treeview.TreeViewRequest;
+import org.apache.maven.index.updater.FSDirectoryFactory;
 import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
@@ -329,6 +330,16 @@ public class DefaultIndexerManager
     private File workingDirectory;
 
     private File tempDirectory;
+
+    private final FSDirectoryFactory luceneDirectoryFactory = new FSDirectoryFactory()
+    {
+        @Override
+        public FSDirectory open( File indexDir )
+            throws IOException
+        {
+            return openFSDirectory( indexDir );
+        }
+    };
 
     /**
      * Performs the same operation on all immediate members of a group repository. Exceptions thrown during processing
@@ -1339,6 +1350,8 @@ public class DefaultIndexerManager
             updateRequest.setForceFullUpdate( false );
             updateRequest.setIncrementalOnly( true );
         }
+		
+        updateRequest.setFSDirectoryFactory( luceneDirectoryFactory );
 
         if ( repository instanceof MavenRepository )
         {

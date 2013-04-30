@@ -58,6 +58,10 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-eventbus</artifactId>
     </dependency>
     <dependency>
@@ -253,8 +257,24 @@
     </dependency>
 
     <dependency>
-      <groupId>org.javasimon</groupId>
-      <artifactId>javasimon-core</artifactId>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-guice</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-httpclient</artifactId>
     </dependency>
 
     <!-- Testing -->

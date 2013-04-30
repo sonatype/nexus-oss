@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.router;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
@@ -66,7 +69,7 @@ public class DefaultRepositoryRouter
     extends AbstractConfigurable
     implements RepositoryRouter
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -255,7 +258,8 @@ public class DefaultRepositoryRouter
                     }
                     else if ( item instanceof StorageCollectionItem )
                     {
-                        toRoute.getTargetedRepository().createCollection( to, item.getRepositoryItemAttributes().asMap() );
+                        toRoute.getTargetedRepository().createCollection( to,
+                            item.getRepositoryItemAttributes().asMap() );
                     }
                     else
                     {
@@ -499,7 +503,11 @@ public class DefaultRepositoryRouter
             if ( kind == null )
             {
                 // unknown explodedPath[0]
-                throw new ItemNotFoundException( request );
+                throw new ItemNotFoundException(
+                    reasonFor(
+                        request,
+                        "BUG: Cannot deduce repository kind from request %s (this method should not be invoked with path having less than 2 segments)!",
+                        request.getRequestPath() ) );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0] ) );
@@ -519,13 +527,14 @@ public class DefaultRepositoryRouter
                 if ( !repository.isExposed() )
                 {
                     // this is not the main facet or the repo is not exposed
-                    throw new ItemNotFoundException( request );
+                    throw new ItemNotFoundException( reasonFor( request, "Repository %s exists but is not exposed.",
+                        RepositoryStringUtils.getHumanizedNameString( repository ) ) );
                 }
             }
             catch ( NoSuchRepositoryException e )
             {
                 // obviously, the repoId (explodedPath[1]) points to some nonexistent repoID
-                throw new ItemNotFoundException( request, e );
+                throw new ItemNotFoundException( reasonFor( request, e.getMessage() ), e );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0], explodedPath[1] ) );
@@ -649,7 +658,8 @@ public class DefaultRepositoryRouter
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
             {
-                throw new ItemNotFoundException( request );
+                throw new ItemNotFoundException( reasonFor( request,
+                    "No repositories found for given %s prefix!", route.getStrippedPrefix() ) );
             }
 
             // filter access to the repositories
@@ -691,7 +701,8 @@ public class DefaultRepositoryRouter
         }
         else
         {
-            throw new ItemNotFoundException( request );
+            throw new ItemNotFoundException( reasonFor( request,
+                "BUG: request depth is bigger than 1, route=%s", route ) );
         }
     }
 
@@ -743,8 +754,8 @@ public class DefaultRepositoryRouter
         catch ( ItemNotFoundException e )
         {
             // ignore it, do nothing
-            
-            // cstamas says: above is untrue. It means that user should get 404, but there is no 
+
+            // cstamas says: above is untrue. It means that user should get 404, but there is no
             // proper solution to do it from this method! The culprit is that "view privilege" piggybacks
             // on the getRequestRouteForRequest() method that is not meant for this, it does it's job
             // well for routing....

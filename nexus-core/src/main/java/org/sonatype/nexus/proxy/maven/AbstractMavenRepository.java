@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_MD5;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_SHA1;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.SUFFIX_MD5;
@@ -411,7 +412,9 @@ public abstract class AbstractMavenRepository
                     "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
             }
 
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Retrieval of %s from %s is forbidden by repository policy %s.", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( this ), getRepositoryPolicy() ) );
         }
 
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class )
@@ -607,4 +610,36 @@ public abstract class AbstractMavenRepository
         }
         return shouldAddToNFC;
     }
+
+    /**
+     * Deletes item and regenerates Maven metadata, if repository is a hosted repository and maven-metadata.xml file is
+     * present.
+     *
+     * @since 2.5
+     */
+    @Override
+    protected void doDeleteItem( final ResourceStoreRequest request )
+        throws UnsupportedStorageOperationException, ItemNotFoundException, StorageException
+    {
+        super.doDeleteItem( request );
+        // regenerate maven metadata for parent of this item if is a hosted maven repo and it contains maven-metadata.xml
+        if ( getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
+        {
+            String parentPath = request.getRequestPath();
+            parentPath = parentPath.substring( 0, parentPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
+            final String parentMetadataPath = parentPath + "/maven-metadata.xml";
+            try
+            {
+                if ( getLocalStorage().containsItem( this, new ResourceStoreRequest( parentMetadataPath ) ) )
+                {
+                    recreateMavenMetadata( new ResourceStoreRequest( parentPath ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn( "Could not maintain Maven metadata '{}'", parentMetadataPath, e );
+            }
+        }
+    }
+
 }

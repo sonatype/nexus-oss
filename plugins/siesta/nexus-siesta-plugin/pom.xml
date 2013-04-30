@@ -122,6 +122,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -174,7 +181,6 @@
             </goals>
             <configuration>
               <includes>
-                <!-- relative to src/main/js -->
                 <include>nexus/**</include>
                 <include>${project.artifactId}.js</include>
               </includes>

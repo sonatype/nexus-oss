@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.yammer.metrics.httpclient.InstrumentedClientConnManager;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.conn.ClientConnectionOperator;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -269,7 +270,7 @@ public class Hc4ProviderImpl
         schemeRegistry.register( new Scheme( "http", 80, PlainSocketFactory.getSocketFactory() ) );
         schemeRegistry.register( new Scheme( "https", 443, SSLSocketFactory.getSocketFactory() ) );
 
-        final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager( schemeRegistry )
+        final PoolingClientConnectionManager connManager = new InstrumentedClientConnManager( schemeRegistry )
         {
             @Override
             protected ClientConnectionOperator createConnectionOperator( final SchemeRegistry defaultSchemeRegistry )

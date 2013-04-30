@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +26,6 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -54,12 +55,12 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.charger.CallableExecutor;
 import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
 import org.sonatype.sisu.charger.internal.FirstArrivedInOrderChargeStrategy;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.Subscribe;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractGroupRepository
@@ -116,7 +117,7 @@ public abstract class AbstractGroupRepository
             membersChanged =
                 getCurrentCoreConfiguration().isDirty()
                     && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
-                    getExternalConfiguration( true ).getMemberRepositoryIds() );
+                        getExternalConfiguration( true ).getMemberRepositoryIds() );
 
             // we have to "remember" these before commit happens in super.onEvent
             // but ONLY if we are dirty and we do have "member changes" (see membersChanged above)
@@ -251,7 +252,16 @@ public abstract class AbstractGroupRepository
 
         if ( !found )
         {
-            throw new GroupItemNotFoundException( request, this, memberThrowables );
+            if ( !isRequestGroupLocalOnly )
+            {
+                throw new GroupItemNotFoundException( request, this, memberThrowables );
+            }
+            else
+            {
+                throw new GroupItemNotFoundException( reasonFor( request, this,
+                    "The %s not found in local storage of group repository %s (no member processing happened).",
+                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+            }
         }
 
         return result;
@@ -399,6 +409,16 @@ public abstract class AbstractGroupRepository
                     }
                 }
             }
+            if ( !isRequestGroupLocalOnly )
+            {
+                throw new GroupItemNotFoundException( request, this, memberThrowables );
+            }
+            else
+            {
+                throw new GroupItemNotFoundException( reasonFor( request, this,
+                    "The %s not found in local storage of group repository %s (no member processing happened).",
+                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+            }
         }
         finally
         {
@@ -407,8 +427,6 @@ public abstract class AbstractGroupRepository
                 request.getRequestContext().remove( AccessManager.REQUEST_AUTHORIZED );
             }
         }
-
-        throw new GroupItemNotFoundException( request, this, memberThrowables );
     }
 
     public List<String> getMemberRepositoryIds()
@@ -505,7 +523,7 @@ public abstract class AbstractGroupRepository
                 {
                     this.getLogger().warn( "Could not find repository '{}' while iterating members", repoId );
                 }
-                // XXX throw new StorageException( e )  ;
+                // XXX throw new StorageException( e ) ;
             }
         }
 
@@ -640,7 +658,16 @@ public abstract class AbstractGroupRepository
 
         if ( items.isEmpty() )
         {
-            throw new GroupItemNotFoundException( request, this, memberThrowables );
+            if ( !isRequestGroupLocalOnly )
+            {
+                throw new GroupItemNotFoundException( request, this, memberThrowables );
+            }
+            else
+            {
+                throw new GroupItemNotFoundException( reasonFor( request, this,
+                    "The %s not found in local storage of group repository %s (no member processing happened).",
+                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+            }
         }
 
         return items;

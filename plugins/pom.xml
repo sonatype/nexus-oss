@@ -47,12 +47,14 @@
         <module>indexer</module>
         <module>crypto</module>
         <module>ldap</module>
+        <module>kenai</module>
         <module>nexus-timeline-plugin</module>
         <module>nexus-lvo-plugin</module>
         <module>nexus-plugin-console-plugin</module>
         <module>nexus-rrb-plugin</module>
         <module>nexus-archetype-plugin</module>
         <module>nexus-maven-bridge-plugin</module>
+        <module>nexus-ui-extjs3-plugin</module>
       </modules>
     </profile>
   </profiles>

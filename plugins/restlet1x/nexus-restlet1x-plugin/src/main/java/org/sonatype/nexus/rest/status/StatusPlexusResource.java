@@ -19,6 +19,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import com.yammer.metrics.annotation.Timed;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -32,7 +33,7 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.timing.Timed;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
@@ -49,6 +50,8 @@ public class StatusPlexusResource
 
     @Requirement
     private Nexus nexus;
+
+    private boolean noSessionTimeout = SystemPropertiesHelper.getBoolean( "nexus.ui.noSessionTimeout", false );
 
     @Override
     public Object getPayloadInstance()
@@ -147,6 +150,8 @@ public class StatusPlexusResource
         resource.setLicenseExpired( status.isLicenseExpired() );
 
         resource.setTrialLicense( status.isTrialLicense() );
+
+        resource.setNoSessionTimeout( noSessionTimeout );
 
         StatusResourceResponse result = new StatusResourceResponse();
 

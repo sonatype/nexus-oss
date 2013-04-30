@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,9 +82,12 @@ public class ArtifactStoreHelper
                     RepositoryStringUtils.getHumanizedNameString( getMavenRepository() ), request ), e );
             }
 
-            // NXCM-4861: Doing "local only" lookup, same code should be used as in org.sonatype.nexus.proxy.repository.AbstractProxyRepository#doCacheItem
-            // Note: ResourceStoreRequest( ResourceStoreRequest ) creates a "subordinate" request from passed with same path but localOnly=true
-            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem( false, new ResourceStoreRequest( request ) );
+            // NXCM-4861: Doing "local only" lookup, same code should be used as in
+            // org.sonatype.nexus.proxy.repository.AbstractProxyRepository#doCacheItem
+            // Note: ResourceStoreRequest( ResourceStoreRequest ) creates a "subordinate" request from passed with same
+            // path but localOnly=true
+            StorageFileItem storedFile =
+                (StorageFileItem) getMavenRepository().retrieveItem( false, new ResourceStoreRequest( request ) );
 
             String sha1Hash = storedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -325,7 +330,9 @@ public class ArtifactStoreHelper
 
             if ( gav == null )
             {
-                throw new ItemNotFoundException( gavRequest, repository );
+                throw new ItemNotFoundException( reasonFor( gavRequest, repository,
+                    "Request %s is not resolvable in repository %s", gavRequest.getRequestPath(),
+                    RepositoryStringUtils.getHumanizedNameString( repository ) ) );
             }
 
             return gav;

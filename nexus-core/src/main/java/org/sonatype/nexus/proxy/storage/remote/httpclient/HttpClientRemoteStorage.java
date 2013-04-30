@@ -163,9 +163,7 @@ public class HttpClientRemoteStorage
             //
             // The usual case is that there is a request for a directory that is redirected to '/', see below behavior
             // for SC_MOVED_*
-            throw new RemoteItemNotFoundException(
-                "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
-                    + remoteURL.toString() + "\")", request, repository );
+            throw new RemoteItemNotFoundException( request, repository, "remoteIsCollection", remoteURL.toString() );
         }
 
         final HttpGet method = new HttpGet( url );
@@ -220,18 +218,14 @@ public class HttpClientRemoteStorage
             release( httpResponse );
             if ( httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND )
             {
-                throw new RemoteItemNotFoundException(
-                    "The remoteURL we requested does not exists on remote server (remoteUrl=\"" + remoteURL.toString()
-                        + "\", response code is 404)", request, repository );
+                throw new RemoteItemNotFoundException( request, repository, "NotFound", remoteURL.toString() );
             }
             else if ( httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY
                 || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY )
             {
                 // NEXUS-5125 unfollowed redirect means collection (path.endsWith("/"))
                 // see also HttpClientUtil#configure
-                throw new RemoteItemNotFoundException(
-                    "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
-                        + remoteURL.toString() + "\")", request, repository );
+                throw new RemoteItemNotFoundException( request, repository, "redirected", remoteURL.toString() );
             }
             else
             {

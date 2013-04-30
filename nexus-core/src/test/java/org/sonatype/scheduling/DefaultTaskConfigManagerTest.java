@@ -188,9 +188,10 @@ public class DefaultTaskConfigManagerTest
             defaultManager.addTask( task );
 
             // loadConfig();
-            
+
             assertThat( getTaskConfiguration().size(), equalTo( 1 ) );
-            assertThat( TaskState.valueOf( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getStatus() ), equalTo( TaskState.SUBMITTED ) );
+            assertThat( TaskState.valueOf( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getStatus() ),
+                equalTo( TaskState.SUBMITTED ) );
             assertThat( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getName(), equalTo( TASK_NAME ) );
 
             defaultManager.removeTask( task );

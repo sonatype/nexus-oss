@@ -25,6 +25,8 @@ public class SnapshotRemovalRequest
 
     private final boolean removeIfReleaseExists;
 
+    private final int graceDaysAfterRelease;
+
     private final Set<String> processedRepos;
 
     private final boolean deleteImmediately;
@@ -38,12 +40,12 @@ public class SnapshotRemovalRequest
                                    int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
     {
 
-        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays, removeIfReleaseExists, false );
+        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays, removeIfReleaseExists, 0, false );
     }
 
     public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
                                    int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
-                                   boolean deleteImmediately )
+                                   int graceDaysAfterRelease, boolean deleteImmediately )
     {
         this.repositoryId = repositoryId;
 
@@ -52,6 +54,8 @@ public class SnapshotRemovalRequest
         this.removeSnapshotsOlderThanDays = removeSnapshotsOlderThanDays;
 
         this.removeIfReleaseExists = removeIfReleaseExists;
+
+        this.graceDaysAfterRelease = graceDaysAfterRelease;
 
         this.processedRepos = new HashSet<String>();
 
@@ -76,6 +80,11 @@ public class SnapshotRemovalRequest
     public boolean isRemoveIfReleaseExists()
     {
         return removeIfReleaseExists;
+    }
+
+    public int getGraceDaysAfterRelease()
+    {
+        return graceDaysAfterRelease;
     }
 
     public void addProcessedRepo( String repoId )

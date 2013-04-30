@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -308,8 +309,10 @@ public class DefaultSnapshotRemover
     }
 
     private class SnapshotRemoverWalkerProcessor
-        extends AbstractWalkerProcessor
+        extends AbstractFileDeletingWalkerProcessor
     {
+
+        private static final long MILLIS_IN_A_DAY = 86400000L;
 
         private final MavenRepository repository;
 
@@ -324,6 +327,10 @@ public class DefaultSnapshotRemover
         private final ParentOMatic collectionNodes;
 
         private final long dateThreshold;
+
+        private final long startTime;
+
+        private final long gracePeriodInMillis;
 
         private boolean shouldProcessCollection;
 
@@ -340,16 +347,20 @@ public class DefaultSnapshotRemover
             this.request = request;
             this.collectionNodes = collectionNodes;
 
+            this.startTime = System.currentTimeMillis();
+
             int days = request.getRemoveSnapshotsOlderThanDays();
 
             if ( days > 0 )
             {
-                this.dateThreshold = System.currentTimeMillis() - ( days * 86400000L );
+                this.dateThreshold = startTime - ( days * MILLIS_IN_A_DAY );
             }
             else
             {
                 this.dateThreshold = -1;
             }
+
+            gracePeriodInMillis = Math.max( 0, request.getGraceDaysAfterRelease() ) * MILLIS_IN_A_DAY;
         }
 
         protected void addStorageFileItemToMap( Map<Version, List<StorageFileItem>> map, Gav gav, StorageFileItem item )
@@ -473,8 +484,8 @@ public class DefaultSnapshotRemover
                             {
                                 getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
 
-                                // if dateTreshold is not used (zero days) OR
-                                // if itemTimestamp is less then dateTreshold (NB: both are positive!)
+                                // if dateThreshold is not used (zero days) OR
+                                // if itemTimestamp is less then dateThreshold (NB: both are positive!)
                                 // below will the retentionCount overrule if needed this
                                 if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
                                 {
@@ -595,9 +606,12 @@ public class DefaultSnapshotRemover
                         }
                         catch ( ItemNotFoundException e )
                         {
-                            if ( getLogger().isDebugEnabled() )
+                            // NEXUS-5682 Since checksum files are no longer physically represented on the file system,
+                            // it is expected that they will generate ItemNotFoundException. Log at trace level only for
+                            // diagnostic purposes.
+                            if ( getLogger().isTraceEnabled() )
                             {
-                                getLogger().debug( "Could not delete file:", e );
+                                getLogger().trace( "Could not delete file:", e );
                             }
                         }
                         catch ( Exception e )
@@ -608,7 +622,7 @@ public class DefaultSnapshotRemover
                 }
             }
 
-            removeDirectoryIfEmpty( coll );
+            removeDirectoryIfEmpty( repository, coll );
 
             updateMetadataIfNecessary( context, coll );
 
@@ -628,33 +642,10 @@ public class DefaultSnapshotRemover
             }
         }
 
-        private void removeDirectoryIfEmpty( StorageCollectionItem coll )
-            throws StorageException, IllegalOperationException, UnsupportedStorageOperationException
-        {
-            try
-            {
-                if ( repository.list( false, coll ).size() > 0 )
-                {
-                    return;
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
-                }
-
-                // directory is empty, never move to trash
-                repository.deleteItem( false, createResourceStoreRequest( coll, DeleteOperation.DELETE_PERMANENTLY ) );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // silent, this happens if whole GAV is removed and the dir is removed too
-            }
-        }
-
         public boolean releaseExistsForSnapshot( Gav snapshotGav, Map<String, Object> context )
         {
+            long releaseTimestamp = -1;
+
             for ( Repository repository : repositoryRegistry.getRepositories() )
             {
                 // we need to filter for:
@@ -705,9 +696,11 @@ public class DefaultSnapshotRemover
                             getLogger().debug( "Checking for release counterpart in repository '{}' and path '{}'",
                                 mrepository.getId(), req.toString() );
 
-                            mrepository.retrieveItem( false, req );
+                            final StorageItem item = mrepository.retrieveItem( false, req );
 
-                            return true;
+                            releaseTimestamp = item.getCreated();
+
+                            break;
                         }
                         catch ( ItemNotFoundException e )
                         {
@@ -722,28 +715,8 @@ public class DefaultSnapshotRemover
                 }
             }
 
-            return false;
-        }
-
-        private ResourceStoreRequest createResourceStoreRequest( final StorageItem item, final WalkerContext ctx )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-
-            if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
-            {
-                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY,
-                    ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY ) );
-            }
-
-            return request;
-        }
-
-        private ResourceStoreRequest createResourceStoreRequest( final StorageCollectionItem item,
-                                                                 final DeleteOperation operation )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-            request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
-            return request;
+            return releaseTimestamp == 0  // 0 when item creation day is unknown
+                || ( releaseTimestamp > 0 && startTime > releaseTimestamp + gracePeriodInMillis );
         }
 
         public int getDeletedSnapshots()

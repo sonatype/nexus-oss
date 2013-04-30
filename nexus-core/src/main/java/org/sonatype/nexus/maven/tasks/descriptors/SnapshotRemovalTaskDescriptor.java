@@ -37,6 +37,8 @@ public class SnapshotRemovalTaskDescriptor
 
     public static final String REMOVE_WHEN_RELEASED_FIELD_ID = "removeIfReleaseExists";
 
+    public static final String GRACE_DAYS_AFTER_RELEASE_FIELD_ID = "graceDaysAfterRelease";
+
     public static final String DELETE_IMMEDIATELY = "deleteImmediately";
 
     private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
@@ -44,14 +46,15 @@ public class SnapshotRemovalTaskDescriptor
 
     private final NumberTextFormField minToKeepField =
         new NumberTextFormField( MIN_TO_KEEP_FIELD_ID, "Minimum snapshot count",
-                                 "Minimum number of snapshots to keep for one GAV.", FormField.OPTIONAL );
+                                 "Minimum number of snapshots to keep for one GAV.",
+                                 FormField.MANDATORY );
 
     private final NumberTextFormField keepDaysField =
         new NumberTextFormField(
                                  KEEP_DAYS_FIELD_ID,
                                  "Snapshot retention (days)",
                                  "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep.",
-                                 FormField.OPTIONAL );
+                                 FormField.MANDATORY );
 
     private final CheckboxFormField removeWhenReleasedField =
         new CheckboxFormField(
@@ -59,6 +62,13 @@ public class SnapshotRemovalTaskDescriptor
                                "Remove if released",
                                "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT).",
                                FormField.OPTIONAL );
+
+    private final NumberTextFormField graceDaysAfterReleaseField = new NumberTextFormField(
+            GRACE_DAYS_AFTER_RELEASE_FIELD_ID,
+            "Grace period after release (days)",
+            "The grace period (in days) that the task will not purge all snapshots that have a corresponding released artifact.",
+            FormField.OPTIONAL
+    );
 
     private final CheckboxFormField deleteImmediatelyField =
         new CheckboxFormField( DELETE_IMMEDIATELY, "Delete immediately", "The job will not move deleted items into the repository trash but delete immediately.", FormField.OPTIONAL );
@@ -82,6 +92,7 @@ public class SnapshotRemovalTaskDescriptor
         fields.add( minToKeepField );
         fields.add( keepDaysField );
         fields.add( removeWhenReleasedField );
+        fields.add( graceDaysAfterReleaseField );
         fields.add( deleteImmediatelyField );
 
         return fields;
