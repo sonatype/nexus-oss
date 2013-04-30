@@ -109,80 +109,88 @@ public class AmazonS3IndexScraper
 
     // ==
 
-    protected void diveIn( final ScrapeContext context, final Page page, final String rootUrl, final String prefix,
+    protected void diveIn( final ScrapeContext context, final Page firstPage, final String rootUrl, final String prefix,
                            final Set<String> entries )
         throws IOException
     {
-        // cancelation
-        CancelableUtil.checkInterruption();
-
-        // response should be 200 OK, if not, give up
-        if ( page.getHttpResponse().getStatusLine().getStatusCode() != 200 )
+        Page page = firstPage;
+        boolean truncated;
+        do
         {
-            context.stop( "Remote recognized as " + getTargetedServer()
-                + ", but cannot be scraped (unexpected response status " + page.getHttpResponse().getStatusLine() + ")" );
-            return;
-        }
+            // check for truncation (isTruncated elem, this means we need to "page" the bucket to get all entries)
+            truncated = isTruncated( page );
 
-        final Elements root = page.getDocument().getElementsByTag( "ListBucketResult" );
-        if ( root.size() != 1 || !root.get( 0 ).attr( "xmlns" ).equals( "http://s3.amazonaws.com/doc/2006-03-01/" ) )
-        {
-            context.stop( "Remote recognized as " + getTargetedServer()
-                + ", but unexpected response was received (not \"ListBucketResult\")." );
-            return;
-        }
-
-        getLogger().debug( "Processing S3 page response from URL {}", page.getUrl() );
-        String markerElement = null;
-        final Elements elements = page.getDocument().getElementsByTag( "Contents" );
-        for ( Element element : elements )
-        {
-            final Elements keyElements = element.getElementsByTag( "Key" );
-            if ( keyElements.isEmpty() )
-            {
-                continue; // skip it
-            }
-            final Elements sizeElements = element.getElementsByTag( "Size" );
-            if ( sizeElements.isEmpty() )
-            {
-                continue; // skip it
-            }
-            final String key = keyElements.get( 0 ).text();
-            if ( key.startsWith( "." ) || key.contains( "/." ) )
-            {
-                continue; // skip it, it's a ".dot" file
-            }
-            final long size = Long.parseLong( sizeElements.get( 0 ).text() );
-            if ( size > 0 )
-            {
-                markerElement = key;
-                // fix key with prefix
-                final String fixedKey = prefix != null ? key.substring( prefix.length() ) : key;
-                // we just need prefix from first few path elements (remote scrape depth)
-                final String normalizedPath =
-                    PathUtils.pathFrom( PathUtils.elementsOf( fixedKey ), context.getScrapeDepth() );
-                entries.add( normalizedPath );
-            }
-        }
-
-        if ( isTruncated( page ) )
-        {
             // cancelation
             CancelableUtil.checkInterruption();
 
-            final ArrayList<String> queryParams = new ArrayList<String>();
-            if ( prefix != null )
+            // response should be 200 OK, if not, give up
+            if ( page.getHttpResponse().getStatusLine().getStatusCode() != 200 )
             {
-                queryParams.add( "prefix=" + prefix );
+                context.stop( "Remote recognized as " + getTargetedServer()
+                    + ", but cannot be scraped (unexpected response status " + page.getHttpResponse().getStatusLine() + ")" );
+                return;
             }
-            if ( markerElement != null )
+
+            final Elements root = page.getDocument().getElementsByTag( "ListBucketResult" );
+            if ( root.size() != 1 || !root.get( 0 ).attr( "xmlns" ).equals( "http://s3.amazonaws.com/doc/2006-03-01/" ) )
             {
-                queryParams.add( "marker=" + markerElement );
+                context.stop( "Remote recognized as " + getTargetedServer()
+                    + ", but unexpected response was received (not \"ListBucketResult\")." );
+                return;
             }
-            final String url = appendParameters( rootUrl, queryParams );
-            final Page nextPage = Page.getPageFor( context, url );
-            diveIn( context, nextPage, rootUrl, prefix, entries );
+
+            getLogger().debug( "Processing S3 page response from URL {}", page.getUrl() );
+            String markerElement = null;
+            final Elements elements = page.getDocument().getElementsByTag( "Contents" );
+            for ( Element element : elements )
+            {
+                final Elements keyElements = element.getElementsByTag( "Key" );
+                if ( keyElements.isEmpty() )
+                {
+                    continue; // skip it
+                }
+                final Elements sizeElements = element.getElementsByTag( "Size" );
+                if ( sizeElements.isEmpty() )
+                {
+                    continue; // skip it
+                }
+                final String key = keyElements.get( 0 ).text();
+                if ( key.startsWith( "." ) || key.contains( "/." ) )
+                {
+                    continue; // skip it, it's a ".dot" file
+                }
+                final long size = Long.parseLong( sizeElements.get( 0 ).text() );
+                if ( size > 0 )
+                {
+                    markerElement = key;
+                    // fix key with prefix
+                    final String fixedKey = prefix != null ? key.substring( prefix.length() ) : key;
+                    // we just need prefix from first few path elements (remote scrape depth)
+                    final String normalizedPath =
+                        PathUtils.pathFrom( PathUtils.elementsOf( fixedKey ), context.getScrapeDepth() );
+                    entries.add( normalizedPath );
+                }
+            }
+
+            if ( truncated )
+            {
+                // cancelation
+                CancelableUtil.checkInterruption();
+
+                final ArrayList<String> queryParams = new ArrayList<String>();
+                if ( prefix != null )
+                {
+                    queryParams.add( "prefix=" + prefix );
+                }
+                if ( markerElement != null )
+                {
+                    queryParams.add( "marker=" + markerElement );
+                }
+                final String url = appendParameters( rootUrl, queryParams );
+                page = Page.getPageFor( context, url );
+            }
         }
+        while ( truncated );
     }
 
     protected String appendParameters( final String baseUrl, List<String> queryParams )
