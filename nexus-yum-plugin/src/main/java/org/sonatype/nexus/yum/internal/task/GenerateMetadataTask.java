@@ -53,6 +53,7 @@ import org.sonatype.nexus.yum.internal.RpmListWriter;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
@@ -250,7 +251,8 @@ public class GenerateMetadataTask
             for ( ScheduledTask<?> scheduledTask : activeTasks.get( ID ) )
             {
                 if ( isSubmitted( scheduledTask )
-                    && conflictsWith( (GenerateMetadataTask) scheduledTask.getTask() ) )
+                    && conflictsWith( (GenerateMetadataTask) scheduledTask.getTask() )
+                    && scheduledTask.getSchedule() instanceof RunNowSchedule )
                 {
                     throw new TaskAlreadyScheduledException( scheduledTask, "Found same task in scheduler queue." );
                 }
