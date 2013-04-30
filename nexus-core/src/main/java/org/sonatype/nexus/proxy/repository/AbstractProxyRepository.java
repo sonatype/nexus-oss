@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,8 +75,6 @@ import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-
-import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -1158,12 +1158,12 @@ public abstract class AbstractProxyRepository
         if ( request.isRequestLocalOnly() )
         {
             throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
-                "Request is marked as local-only, remote access not allowed" ) );
+                "Request is marked as local-only, remote access not allowed from %s", this ) );
         }
         if ( getProxyMode() != null && !getProxyMode().shouldProxy() )
         {
             throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
-                "Repository proxy-mode is %s, remote access not allowed", getProxyMode() ) );
+                "Repository proxy-mode is %s, remote access not allowed from %s", getProxyMode(), this ) );
         }
     }
 

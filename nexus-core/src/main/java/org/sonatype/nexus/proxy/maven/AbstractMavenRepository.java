@@ -48,8 +48,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -470,10 +470,8 @@ public abstract class AbstractMavenRepository
                 final boolean proxyFilterAllowed = getProxyRequestFilter().allowed( this, request );
                 if ( !proxyFilterAllowed )
                 {
-                    getLogger().debug( "Automatic routing filter rejected remote request for path {} in {}.",
-                        request.getRequestPath(), this );
                     throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
-                        "Automatic routing filter rejected remote request for path %s in %s", request.getRequestPath(),
+                        "Automatic routing filter rejected remote request for path %s from %s", request.getRequestPath(),
                         this ) );
                 }
             }
