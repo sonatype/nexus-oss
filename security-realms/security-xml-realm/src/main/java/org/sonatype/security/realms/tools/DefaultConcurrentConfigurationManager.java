@@ -23,6 +23,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
@@ -50,6 +52,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Named( "default" )
 public class DefaultConcurrentConfigurationManager implements ConfigurationManager
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    
     private final ConfigurationManager configurationManager;
     
     private final ReentrantReadWriteLock readWriteLock;
@@ -70,6 +74,7 @@ public class DefaultConcurrentConfigurationManager implements ConfigurationManag
         this.readLock = this.readWriteLock.readLock();
         this.writeLock = this.readWriteLock.writeLock();
         this.lockTimeout = lockTimeout;
+        logger.debug("Lock timeout: {} seconds", lockTimeout);
     }
 
     @Override
