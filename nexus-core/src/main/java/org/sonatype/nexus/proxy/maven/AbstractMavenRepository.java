@@ -454,14 +454,12 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+    protected void shouldTryRemote( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException
     {
-        final boolean shouldTryRemote = super.shouldTryRemote( request );
-        if ( !shouldTryRemote )
-        {
-            return false;
-        }
+        // do super first
+        super.shouldTryRemote( request );
+        // if here, super did not throw any exception, so let's continue
         // apply autorouting filter to "normal" requests only, not hidden (which is meta or plain hidden)
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
@@ -473,12 +471,13 @@ public abstract class AbstractMavenRepository
                 if ( !proxyFilterAllowed )
                 {
                     getLogger().debug( "Automatic routing filter rejected remote request for path {} in {}.",
-                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) );
-                    return false;
+                        request.getRequestPath(), this );
+                    throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                        "Automatic routing filter rejected remote request for path %s in %s", request.getRequestPath(),
+                        this ) );
                 }
             }
         }
-        return true;
     }
 
     @Override

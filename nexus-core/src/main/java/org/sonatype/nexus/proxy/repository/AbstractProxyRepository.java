@@ -1152,10 +1152,19 @@ public abstract class AbstractProxyRepository
         }
     }
 
-    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+    protected void shouldTryRemote( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException
     {
-        return !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
+        if ( request.isRequestLocalOnly() )
+        {
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                "Request is marked as local-only, remote access not allowed" ) );
+        }
+        if ( getProxyMode() != null && !getProxyMode().shouldProxy() )
+        {
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                "Repository proxy-mode is %s, remote access not allowed", getProxyMode() ) );
+        }
     }
 
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
@@ -1165,11 +1174,17 @@ public abstract class AbstractProxyRepository
         AbstractStorageItem remoteItem = null;
 
         // proxyMode and request.localOnly decides 1st
-        boolean shouldProxy = shouldTryRemote( request );
+        ItemNotFoundException noRemoteAccessReason = null;
+        try
+        {
+            shouldTryRemote( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            noRemoteAccessReason = e;
+        }
 
-        ItemNotFoundException requestProcessorReason = null;
-
-        if ( shouldProxy )
+        if ( noRemoteAccessReason == null )
         {
             for ( RequestStrategy strategy : getRegisteredStrategies().values() )
             {
@@ -1179,15 +1194,14 @@ public abstract class AbstractProxyRepository
                 }
                 catch ( ItemNotFoundException e )
                 {
-                    requestProcessorReason = e;
-                    shouldProxy = false;
+                    noRemoteAccessReason = e;
                     // escape
                     break;
                 }
             }
         }
 
-        if ( shouldProxy )
+        if ( noRemoteAccessReason == null )
         {
             // we are able to go remote
             if ( localItem == null || request.isRequestAsExpired() || isOld( localItem ) )
@@ -1384,18 +1398,8 @@ public abstract class AbstractProxyRepository
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
-                if ( requestProcessorReason != null )
-                {
-                    throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
-                        "Request processor prevented remote access" ), requestProcessorReason );
-                }
-                else
-                {
-                    // a generic one
-                    throw new ItemNotFoundException( reasonFor( request, this,
-                        "Path %s not found in local storage and remote storage access is prevented of %s repository.",
-                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
-                }
+                throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                    noRemoteAccessReason.getMessage() ), noRemoteAccessReason );
             }
         }
 
