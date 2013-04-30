@@ -674,7 +674,7 @@ public abstract class AbstractRepository
                 getId() + " retrieveItem() :: FOUND a collection on " + request.toString()
                     + " but repository is not Browseable." );
 
-            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable.",
+            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable",
                 this ) );
         }
 
@@ -772,7 +772,7 @@ public abstract class AbstractRepository
         }
         else
         {
-            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable!", this ) );
+            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable", this ) );
         }
 
         return items;
@@ -1142,7 +1142,7 @@ public abstract class AbstractRepository
         }
         else
         {
-            throw new ItemNotFoundException( reasonFor( request, this, "Path %s in repository %s is not a collection.",
+            throw new ItemNotFoundException( reasonFor( request, this, "Path %s in repository %s is not a collection",
                 request.getRequestPath(), this ) );
         }
     }
@@ -1216,7 +1216,7 @@ public abstract class AbstractRepository
                     }
 
                     throw new ItemNotFoundException( reasonFor( request, this,
-                        "The path %s is in NFC of repository %s.", request.getRequestPath(), this ) );
+                        "The path %s is still cached as not found for repository %s", request.getRequestPath(), this ) );
                 }
             }
         }
