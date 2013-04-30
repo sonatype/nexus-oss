@@ -12,10 +12,14 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
 
 import com.google.common.collect.Lists;
 import org.junit.Assert;
@@ -26,6 +30,7 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.OpenAccessManager;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.target.Target;
@@ -60,12 +65,12 @@ public class DefaultReleaseRemoverIT
         ReleaseRemovalResult releaseRemovalResult =
             releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "" ) );
         // pom + jar + sha1 for both
-        assertThat( releaseRemovalResult.getDeletedFileCount(), is( 4 ) );
+        assertThat( releaseRemovalResult.getDeletedFileCount(), is( 6 ) );
         assertThat( releaseRemovalResult.isSuccessful(), is( true ) );
         StorageItem item = null;
         try
         {
-            releases.retrieveItem( new ResourceStoreRequest( "org/sonatype/test/1.0" ) );
+            item = releases.retrieveItem( new ResourceStoreRequest( "org/sonatype/test/1.0" ) );
         }
         catch ( ItemNotFoundException e )
         {
@@ -88,7 +93,7 @@ public class DefaultReleaseRemoverIT
         targetRegistry.commitChanges();
         ReleaseRemovalResult releaseRemovalResult =
             releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
-        assertThat( releaseRemovalResult.getDeletedFileCount(), is( 4 ) );
+        assertThat( releaseRemovalResult.getDeletedFileCount(), is( 6 ) );
         assertThat( releaseRemovalResult.isSuccessful(), is( true ) );
     }
 
@@ -121,5 +126,31 @@ public class DefaultReleaseRemoverIT
     {
         thrown.expect( IllegalStateException.class );
         releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "test" ) );
+    }
+
+
+    @Test
+    public void testDeletionOfReleasesExceptForSources()
+        throws Exception
+    {
+        fillInRepo();
+        releases.setAccessManager( new OpenAccessManager() );
+        ReleaseRemovalResult releaseRemovalResult =
+            releaseRemover.removeReleases( new ReleaseRemovalRequest( releases.getId(), 2, "3" ) );
+        // pom + jar + sha1 for both, but sources jar and associated sha1 should be left alone
+        assertThat( releaseRemovalResult.getDeletedFileCount(), is( 4 ) );
+        assertThat( releaseRemovalResult.isSuccessful(), is( true ) );
+        StorageItem item = releases.retrieveItem( new ResourceStoreRequest( "org/sonatype/test/1.0" ) );
+        assertThat( item, notNullValue() );
+        StorageCollectionItem coll = (StorageCollectionItem) item;
+        Collection<StorageItem> storageItems = releases.list( false, coll );
+        assertThat(storageItems, hasSize(2));
+        for ( StorageItem storageItem : storageItems )
+        {
+            assertThat(storageItem.getName(), containsString( "sources" ));
+        }
+
+        item = releases.retrieveItem( new ResourceStoreRequest( "org/sonatype/test/1.0.1" ));
+        assertThat( item, notNullValue());
     }
 }

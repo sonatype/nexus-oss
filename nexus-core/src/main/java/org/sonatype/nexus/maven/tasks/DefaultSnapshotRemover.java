@@ -606,9 +606,12 @@ public class DefaultSnapshotRemover
                         }
                         catch ( ItemNotFoundException e )
                         {
-                            if ( getLogger().isDebugEnabled() )
+                            // NEXUS-5682 Since checksum files are no longer physically represented on the file system,
+                            // it is expected that they will generate ItemNotFoundException. Log at trace level only for
+                            // diagnostic purposes.
+                            if ( getLogger().isTraceEnabled() )
                             {
-                                getLogger().debug( "Could not delete file:", e );
+                                getLogger().trace( "Could not delete file:", e );
                             }
                         }
                         catch ( Exception e )
