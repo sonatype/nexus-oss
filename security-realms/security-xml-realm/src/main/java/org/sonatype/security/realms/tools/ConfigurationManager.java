@@ -44,27 +44,17 @@ public interface ConfigurationManager
      * Runs the provided action in a thread-safe way. Any read-based operations requiring multiple
      * ConfigurationManager calls should be executed in an action via a call to this method.
      * 
-     * The type parameters represent the exceptions that can be thrown by the ConfigurationManager calls in the provided
-     * action. If one or both are not needed, specify RuntimeException. This solution is a little odd, and in general
-     * should not be followed. This was used as it was the cleanest solution to deal with the various
-     * exceptions that can be thrown, while minimizing the changes needed in client code using this interface
-     * 
      * @since 3.1
      */
-    <X1 extends Exception, X2 extends Exception> void runRead(ConfigurationManagerAction action) throws X1, X2;
+    void runRead(ConfigurationManagerAction action) throws Exception;
     
     /*
      * Runs the provided action in a thread-safe way. Any write-based ConfigurationManager calls must be executed
      * in an action via a call to this method.
      * 
-     * The type parameters represent the exceptions that can be thrown by the ConfigurationManager calls in the provided
-     * action. If one or both are not needed, specify RuntimeException. This solution is a little odd, and in general
-     * should not be followed. This was used as it was the cleanest solution to deal with the various
-     * exceptions that can be thrown, while minimizing the changes needed in client code using this interface
-     * 
      * @since 3.1
      */
-    <X1 extends Exception, X2 extends Exception> void runWrite(ConfigurationManagerAction action) throws X1, X2;
+    void runWrite(ConfigurationManagerAction action) throws Exception;
     
     /**
      * Retrieve all users

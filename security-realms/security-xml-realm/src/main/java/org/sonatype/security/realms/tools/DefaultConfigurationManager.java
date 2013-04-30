@@ -78,15 +78,15 @@ public class DefaultConfigurationManager
         this.privilegeDescriptors = privilegeDescriptors;
     }
     
-    public <X1 extends Exception, X2 extends Exception> void runRead(ConfigurationManagerAction action)
-        throws X1, X2
+    public void runRead(ConfigurationManagerAction action)
+        throws Exception
     {
         //No support for this
         throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
     }
 
-    public <X1 extends Exception, X2 extends Exception> void runWrite(ConfigurationManagerAction action)
-        throws X1, X2
+    public void runWrite(ConfigurationManagerAction action)
+        throws Exception
     {
         //No support for this
         throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");

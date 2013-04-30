@@ -22,6 +22,8 @@ import java.util.concurrent.CountDownLatch;
 import org.junit.Assert;
 import org.sonatype.security.AbstractSecurityTestCase;
 
+import com.google.common.base.Throwables;
+
 public class DefaultConcurrentConfigurationManagerTest extends AbstractSecurityTestCase
 {
     private ConfigurationManager configMgr;
@@ -56,26 +58,34 @@ public class DefaultConcurrentConfigurationManagerTest extends AbstractSecurityT
                 @Override
                 public void run()
                 {
-                    DefaultConcurrentConfigurationManagerTest.this.configMgr.<RuntimeException, RuntimeException>runRead(new ConfigurationManagerAction()
+                    try
                     {
-
-                        @Override
-                        public <X1 extends Exception, X2 extends Exception> void run()
-                            throws X1, X2
+                        configMgr.runRead(new ConfigurationManagerAction()
                         {
-                            //We hold a read lock at this point
-                            try
+
+                            @Override
+                            public void run()
+                                throws Exception
                             {
-                                threadInitLatch.countDown();
-                                threadStopLatch.await();
+                                //We hold a read lock at this point
+                                try
+                                {
+                                    threadInitLatch.countDown();
+                                    threadStopLatch.await();
+                                }
+                                catch (InterruptedException e)
+                                {
+                                    throw new RuntimeException(e);
+                                }
                             }
-                            catch (InterruptedException e)
-                            {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                        
-                    });
+                            
+                        });
+                    }
+                    catch(Exception e)
+                    {
+                        throw Throwables.propagate(e);
+                    }
+                    
                 }
             });
             
@@ -85,11 +95,11 @@ public class DefaultConcurrentConfigurationManagerTest extends AbstractSecurityT
             threadInitLatch.await();
             
             //At this point, the thread is holding a read lock. Make sure that we can acquire another read lock
-            configMgr.<RuntimeException, RuntimeException>runRead(new ConfigurationManagerAction()
+            configMgr.runRead(new ConfigurationManagerAction()
             {
                 @Override
-                public <X1 extends Exception, X2 extends Exception> void run()
-                    throws X1, X2
+                public void run()
+                    throws Exception
                 {
                     //We were able to acquire read lock
                     threadStopLatch.countDown();
@@ -122,26 +132,33 @@ public class DefaultConcurrentConfigurationManagerTest extends AbstractSecurityT
                 @Override
                 public void run()
                 {
-                    DefaultConcurrentConfigurationManagerTest.this.configMgr.<RuntimeException, RuntimeException>runWrite(new ConfigurationManagerAction()
+                    try
                     {
-
-                        @Override
-                        public <X1 extends Exception, X2 extends Exception> void run()
-                            throws X1, X2
+                        configMgr.runWrite(new ConfigurationManagerAction()
                         {
-                            //We hold a write lock at this point
-                            try
+
+                            @Override
+                            public void run()
+                                throws Exception
                             {
-                                threadInitLatch.countDown();
-                                threadStopLatch.await();
+                                //We hold a write lock at this point
+                                try
+                                {
+                                    threadInitLatch.countDown();
+                                    threadStopLatch.await();
+                                }
+                                catch (InterruptedException e)
+                                {
+                                    throw new RuntimeException(e);
+                                }
                             }
-                            catch (InterruptedException e)
-                            {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                        
-                    });
+                            
+                        });
+                    }
+                    catch(Exception e)
+                    {
+                        throw Throwables.propagate(e);
+                    }
                 }
             });
             
@@ -151,11 +168,11 @@ public class DefaultConcurrentConfigurationManagerTest extends AbstractSecurityT
             threadInitLatch.await();
             
             //At this point, the thread is holding a write lock. Make sure we cannot acquire another write lock
-            configMgr.<RuntimeException, RuntimeException>runWrite(new ConfigurationManagerAction()
+            configMgr.runWrite(new ConfigurationManagerAction()
             {
                 @Override
-                public <X1 extends Exception, X2 extends Exception> void run()
-                    throws X1, X2
+                public void run()
+                    throws Exception
                 {
                     //We were able to acquire a 2nd write lock
                     threadStopLatch.countDown();
@@ -189,26 +206,33 @@ public class DefaultConcurrentConfigurationManagerTest extends AbstractSecurityT
                 @Override
                 public void run()
                 {
-                    DefaultConcurrentConfigurationManagerTest.this.configMgr.<RuntimeException, RuntimeException>runWrite(new ConfigurationManagerAction()
+                    try
                     {
-
-                        @Override
-                        public <X1 extends Exception, X2 extends Exception> void run()
-                            throws X1, X2
+                        configMgr.runWrite(new ConfigurationManagerAction()
                         {
-                            //We hold a write lock at this point
-                            try
+
+                            @Override
+                            public void run()
+                                throws Exception
                             {
-                                threadInitLatch.countDown();
-                                threadStopLatch.await();
+                                //We hold a write lock at this point
+                                try
+                                {
+                                    threadInitLatch.countDown();
+                                    threadStopLatch.await();
+                                }
+                                catch (InterruptedException e)
+                                {
+                                    throw new RuntimeException(e);
+                                }
                             }
-                            catch (InterruptedException e)
-                            {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                        
-                    });
+                            
+                        });
+                    }
+                    catch(Exception e)
+                    {
+                        throw Throwables.propagate(e);
+                    }
                 }
             });
             
@@ -219,11 +243,11 @@ public class DefaultConcurrentConfigurationManagerTest extends AbstractSecurityT
             
             //Try to acquire another write lock out. This should time out
             startTime = System.currentTimeMillis();
-            configMgr.<RuntimeException, RuntimeException>runWrite(new ConfigurationManagerAction()
+            configMgr.runWrite(new ConfigurationManagerAction()
             {
                 @Override
-                public <X1 extends Exception, X2 extends Exception> void run()
-                    throws X1, X2
+                public void run()
+                    throws Exception
                 {
                 }
             });

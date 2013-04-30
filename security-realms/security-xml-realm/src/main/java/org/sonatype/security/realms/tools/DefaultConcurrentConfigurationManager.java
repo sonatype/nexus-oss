@@ -58,27 +58,27 @@ public class DefaultConcurrentConfigurationManager implements ConfigurationManag
     
     private final Lock writeLock;
     
-    private final Long lockTimeout;
+    private final long lockTimeout;
     
     @Inject
     public DefaultConcurrentConfigurationManager(@Named("resourceMerging") ConfigurationManager configurationManager,
-                                                 @Named("${security.configmgr.locktimeout:-60}") Long lockTimeout)
+                                                 @Named("${security.configmgr.locktimeout:-60}") long lockTimeout)
     {
         this.configurationManager = configurationManager;
         
         this.readWriteLock = new ReentrantReadWriteLock();
         this.readLock = this.readWriteLock.readLock();
         this.writeLock = this.readWriteLock.writeLock();
-        this.lockTimeout = lockTimeout != null ? lockTimeout : new Long(60);
+        this.lockTimeout = lockTimeout;
     }
 
     @Override
-    public <X1 extends Exception, X2 extends Exception> void runRead(ConfigurationManagerAction action) throws X1, X2
+    public void runRead(ConfigurationManagerAction action) throws Exception
     {
         acquireLock(readLock);
         try
         {
-            action.<X1, X2>run();
+            action.run();
         }
         finally
         {
@@ -87,12 +87,12 @@ public class DefaultConcurrentConfigurationManager implements ConfigurationManag
     }
     
     @Override
-    public <X1 extends Exception, X2 extends Exception> void runWrite(ConfigurationManagerAction action) throws X1, X2
+    public void runWrite(ConfigurationManagerAction action) throws Exception
     {
         acquireLock(writeLock);
         try
         {
-            action.<X1, X2>run();
+            action.run();
         }
         finally
         {

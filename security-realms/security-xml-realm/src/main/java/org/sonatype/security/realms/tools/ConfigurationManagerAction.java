@@ -26,11 +26,6 @@ public interface ConfigurationManagerAction
 {
     /**
      * Run the action
-     * 
-     * The type parameters represent the exceptions that can be thrown by the ConfigurationManager calls in this
-     * action. This solution is a little odd, and in general should not be followed. This was used as it was the 
-     * cleanest solution to deal with the various exceptions that can be thrown, while minimizing the changes needed
-     * in client code using this interface
      */
-    <X1 extends Exception, X2 extends Exception> void run() throws X1, X2;
+    void run() throws Exception;
 }
