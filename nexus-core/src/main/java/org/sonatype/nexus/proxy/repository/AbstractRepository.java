@@ -1215,8 +1215,7 @@ public abstract class AbstractRepository
                     }
 
                     throw new ItemNotFoundException( reasonFor( request, this,
-                        "The path %s is in NFC of repository %s.", request.getRequestPath(),
-                        RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                        "The path %s is in NFC of repository %s.", request.getRequestPath(), this ) );
                 }
             }
         }

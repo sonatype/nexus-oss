@@ -1352,8 +1352,8 @@ public abstract class AbstractProxyRepository
                 }
 
                 throw new ItemNotFoundException( reasonFor( request, this,
-                    "Path %s not found in local nor in remote storage of %s repository.", request.getRequestPath(),
-                    RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                    "Path %s not found in local nor in remote storage of %s", request.getRequestPath(),
+                    this ) );
             }
             else if ( localItem != null && remoteItem == null )
             {
