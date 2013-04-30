@@ -48,8 +48,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -414,7 +414,7 @@ public abstract class AbstractMavenRepository
 
             throw new ItemNotFoundException( reasonFor( request, this,
                 "Retrieval of %s from %s is forbidden by repository policy %s.", request.getRequestPath(),
-                RepositoryStringUtils.getHumanizedNameString( this ), getRepositoryPolicy() ) );
+                this, getRepositoryPolicy() ) );
         }
 
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class )
@@ -454,14 +454,12 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+    protected void shouldTryRemote( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException
     {
-        final boolean shouldTryRemote = super.shouldTryRemote( request );
-        if ( !shouldTryRemote )
-        {
-            return false;
-        }
+        // do super first
+        super.shouldTryRemote( request );
+        // if here, super did not throw any exception, so let's continue
         // apply autorouting filter to "normal" requests only, not hidden (which is meta or plain hidden)
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
@@ -472,13 +470,12 @@ public abstract class AbstractMavenRepository
                 final boolean proxyFilterAllowed = getProxyRequestFilter().allowed( this, request );
                 if ( !proxyFilterAllowed )
                 {
-                    getLogger().debug( "Automatic routing filter rejected remote request for path {} in {}.",
-                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) );
-                    return false;
+                    throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                        "Automatic routing filter rejected remote request for path %s from %s", request.getRequestPath(),
+                        this ) );
                 }
             }
         }
-        return true;
     }
 
     @Override

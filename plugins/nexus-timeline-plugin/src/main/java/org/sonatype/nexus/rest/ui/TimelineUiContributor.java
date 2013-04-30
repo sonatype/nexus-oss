@@ -16,8 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.rest.UiContributionBuilder;
-import org.sonatype.nexus.plugins.rest.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
 /**
  * UI contribution for the timeline plugin.
@@ -34,17 +34,9 @@ public class TimelineUiContributor
 
     public static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
-    private final UiContributionBuilder builder;
-
-    @Inject
-    public TimelineUiContributor()
-    {
-        this.builder = new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID );
-    }
-
     @Override
     public UiContribution contribute( final boolean debug )
     {
-        return builder.build( debug );
+        return new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID ).build( debug );
     }
 }

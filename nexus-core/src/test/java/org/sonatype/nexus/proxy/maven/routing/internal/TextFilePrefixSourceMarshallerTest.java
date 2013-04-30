@@ -122,7 +122,7 @@ public class TextFilePrefixSourceMarshallerTest
 
         for ( String header : TextFilePrefixSourceMarshaller.HEADERS )
         {
-            sb.append( header ).append( "\n" );
+            sb.append( header ).append( System.getProperty("line.separator") );
         }
         sb.append( content );
         return sb.toString();

@@ -24,11 +24,11 @@
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
     <Set name="threadPool">
-        <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+        <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
     </Set>
     <Call name="addConnector">
         <Arg>
-            <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+            <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
               <Set name="host">${application-host}</Set>
               <Set name="port">${application-port}</Set>
             </New>

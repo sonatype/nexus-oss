@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>34</version>
+    <version>35</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -213,6 +213,21 @@
         <type>${nexus-plugin.type}</type>
         <version>${nexus.version}</version>
       </dependency>
+      
+      <!--
+      Required for plugins which contribute UI
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ui-extjs3-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ui-extjs3-plugin</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
 
       <!-- ******************** TESTING ******************** -->
 
@@ -254,6 +269,7 @@
         <artifactId>nexus-test-harness-launcher</artifactId>
         <version>${nexus.version}</version>
       </dependency>
+
 
     </dependencies>
   </dependencyManagement>
@@ -320,8 +336,8 @@
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.0.0</version>
           <configuration>
-            <!-- 
-               yuicompressor warns when code is not in a shape that's optimized for minifying. 
+            <!--
+               yuicompressor warns when code is not in a shape that's optimized for minifying.
                ATM this only pollutes the log (~9400 warnings)
             -->
             <jswarn>false</jswarn>
@@ -329,6 +345,7 @@
             <nomunge>${maven.yuicompressor.nomunge}</nomunge>
             <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
             <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
+            <sourceDirectory>${project.build.sourceDirectory}/../resources/static</sourceDirectory>
           </configuration>
           <executions>
             <execution>
@@ -338,6 +355,7 @@
               </goals>
               <configuration>
                 <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/js</sourceDirectory>
               </configuration>
             </execution>
             <execution>
@@ -347,6 +365,7 @@
               </goals>
               <configuration>
                 <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/css</sourceDirectory>
                 <required>false</required>
               </configuration>
             </execution>
@@ -381,6 +400,7 @@
             <releaseProfiles>release,optimize-js</releaseProfiles>
           </configuration>
         </plugin>
+
       </plugins>
     </pluginManagement>
 

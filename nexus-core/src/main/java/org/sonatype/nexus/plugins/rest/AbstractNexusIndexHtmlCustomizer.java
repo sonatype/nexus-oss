@@ -17,6 +17,9 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * @deprecated Use {@link org.sonatype.nexus.plugins.ui.contribution.UiContributor}
+ */
 public class AbstractNexusIndexHtmlCustomizer
     implements NexusIndexHtmlCustomizer
 {

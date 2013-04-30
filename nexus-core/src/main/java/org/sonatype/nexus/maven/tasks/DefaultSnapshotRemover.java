@@ -310,7 +310,7 @@ public class DefaultSnapshotRemover
     }
 
     private class SnapshotRemoverWalkerProcessor
-        extends AbstractWalkerProcessor
+        extends AbstractFileDeletingWalkerProcessor
     {
 
         private static final long MILLIS_IN_A_DAY = 86400000L;
@@ -567,7 +567,7 @@ public class DefaultSnapshotRemover
                 }
             }
 
-            removeDirectoryIfEmpty( coll );
+            removeDirectoryIfEmpty( repository, coll );
 
             updateMetadataIfNecessary( context, coll );
 
@@ -640,9 +640,12 @@ public class DefaultSnapshotRemover
                     }
                     catch ( ItemNotFoundException e )
                     {
-                        if ( getLogger().isDebugEnabled() )
+                        // NEXUS-5682 Since checksum files are no longer physically represented on the file system,
+                        // it is expected that they will generate ItemNotFoundException. Log at trace level only for
+                        // diagnostic purposes.
+                        if ( getLogger().isTraceEnabled() )
                         {
-                            getLogger().debug( "Could not delete file:", e );
+                            getLogger().trace( "Could not delete file:", e );
                         }
                     }
                     catch ( Exception e )
@@ -709,31 +712,6 @@ public class DefaultSnapshotRemover
             else
             {
                 collectionNodes.addAndMarkPath( coll.getPath() );
-            }
-        }
-
-        private void removeDirectoryIfEmpty( StorageCollectionItem coll )
-            throws StorageException, IllegalOperationException, UnsupportedStorageOperationException
-        {
-            try
-            {
-                if ( repository.list( false, coll ).size() > 0 )
-                {
-                    return;
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
-                }
-
-                // directory is empty, never move to trash
-                repository.deleteItem( false, createResourceStoreRequest( coll, DeleteOperation.DELETE_PERMANENTLY ) );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // silent, this happens if whole GAV is removed and the dir is removed too
             }
         }
 
@@ -812,27 +790,6 @@ public class DefaultSnapshotRemover
 
             return releaseTimestamp == 0  // 0 when item creation day is unknown
                 || ( releaseTimestamp > 0 && startTime > releaseTimestamp + gracePeriodInMillis );
-        }
-
-        private ResourceStoreRequest createResourceStoreRequest( final StorageItem item, final WalkerContext ctx )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-
-            if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
-            {
-                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY,
-                    ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY ) );
-            }
-
-            return request;
-        }
-
-        private ResourceStoreRequest createResourceStoreRequest( final StorageCollectionItem item,
-                                                                 final DeleteOperation operation )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
-            request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
-            return request;
         }
 
         public int getDeletedSnapshots()

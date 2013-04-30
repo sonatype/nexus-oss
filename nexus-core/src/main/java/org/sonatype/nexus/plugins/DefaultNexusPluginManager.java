@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.yammer.metrics.annotation.Timed;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -137,6 +138,7 @@ public class DefaultNexusPluginManager
         return new HashMap<GAVCoordinate, PluginResponse>( pluginResponses );
     }
 
+    @Timed
     public Collection<PluginManagerResponse> activateInstalledPlugins()
     {
         final List<PluginManagerResponse> result = new ArrayList<PluginManagerResponse>();
