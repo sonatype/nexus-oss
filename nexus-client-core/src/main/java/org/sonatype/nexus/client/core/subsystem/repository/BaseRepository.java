@@ -13,35 +13,30 @@
 package org.sonatype.nexus.client.core.subsystem.repository;
 
 /**
- * A Nexus hosted {@link Repository}.
+ * Base class for hosted/proxy repositories.
  *
- * @since 2.3
+ * @since 2.5
  */
-public interface HostedRepository<T extends HostedRepository>
-    extends BaseRepository<T, RepositoryStatus>
+interface BaseRepository<T extends Repository, S extends RepositoryStatus>
+    extends Repository<T, S>
 {
 
-    T withRepoPolicy( final String policy );
-
     /**
-     * Makes repository a read-only repository.
+     * Enable browsing (see content of repository)
      *
      * @return itself, for fluent api usage
      */
-    T readOnly();
+    T enableBrowsing();
 
     /**
-     * Allow redeploy of items into repository.
+     * Disable browsing (see content of repository).
      *
      * @return itself, for fluent api usage
      */
-    T allowRedeploy();
+    T disableBrowsing();
 
     /**
-     * Do not allow redeployment into repository (items cannot be updated)
-     *
-     * @return itself, for fluent api usage
+     * @return {@code true} if browsing is allowed for this repository, {@code false} otherwise.
      */
-    T disableRedeploy();
-
+    boolean isBrowsable();
 }
