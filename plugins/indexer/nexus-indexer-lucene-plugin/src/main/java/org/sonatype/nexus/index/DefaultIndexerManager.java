@@ -2859,7 +2859,7 @@ public class DefaultIndexerManager
         return mavenIndexer.getIndexingContexts().get( getContextId( repositoryId ) );
     }
     
-    private class IncrementalIndexUpdateException extends IOException
+    private static class IncrementalIndexUpdateException extends IOException
     {
         private static final long serialVersionUID = 6444842181110866037L;
         
