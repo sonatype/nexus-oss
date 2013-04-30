@@ -57,12 +57,6 @@
 
     <!-- These below are transitive deps but are in core already -->
     <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <version>${security.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>4.2.2</version>
