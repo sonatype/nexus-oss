@@ -586,7 +586,7 @@ public class DefaultConfigurationManager
         return getPrivilegeProperty( readPrivilege( id ), key );
     }
 
-    public synchronized void save()
+    public void save()
     {
         try
         {
