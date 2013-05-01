@@ -10,38 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core.subsystem.repository;
+package org.sonatype.nexus.restlet1x.nxcm5131;
 
-/**
- * A Nexus hosted {@link Repository}.
- *
- * @since 2.3
- */
-public interface HostedRepository<T extends HostedRepository>
-    extends BaseRepository<T, RepositoryStatus>
+import javax.inject.Named;
+
+import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
+
+@Named
+public class Nxcm5131RepositoryConfigurator
+    extends AbstractProxyRepositoryConfigurator
 {
-
-    T withRepoPolicy( final String policy );
-
-    /**
-     * Makes repository a read-only repository.
-     *
-     * @return itself, for fluent api usage
-     */
-    T readOnly();
-
-    /**
-     * Allow redeploy of items into repository.
-     *
-     * @return itself, for fluent api usage
-     */
-    T allowRedeploy();
-
-    /**
-     * Do not allow redeployment into repository (items cannot be updated)
-     *
-     * @return itself, for fluent api usage
-     */
-    T disableRedeploy();
 
 }

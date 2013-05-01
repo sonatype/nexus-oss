@@ -10,38 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core.subsystem.repository;
+package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.sonatype.tests.http.server.api.Behaviour;
 
 /**
- * A Nexus hosted {@link Repository}.
- *
- * @since 2.3
+ * Behavior that "mimics" S3 response by placing junk S3 headers. Works when only their presence is checked, like in
+ * case of S3 scraper.
+ * 
+ * @author cstamas
  */
-public interface HostedRepository<T extends HostedRepository>
-    extends BaseRepository<T, RepositoryStatus>
+public class S3ResponseHeadersBehaviour
+    implements Behaviour
 {
-
-    T withRepoPolicy( final String policy );
-
-    /**
-     * Makes repository a read-only repository.
-     *
-     * @return itself, for fluent api usage
-     */
-    T readOnly();
-
-    /**
-     * Allow redeploy of items into repository.
-     *
-     * @return itself, for fluent api usage
-     */
-    T allowRedeploy();
-
-    /**
-     * Do not allow redeployment into repository (items cannot be updated)
-     *
-     * @return itself, for fluent api usage
-     */
-    T disableRedeploy();
-
+    @Override
+    public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
+        throws Exception
+    {
+        response.addHeader( "Server", "AmazonS3" );
+        response.addHeader( "x-amz-request-id", "1234567890" );
+        return true;
+    }
 }

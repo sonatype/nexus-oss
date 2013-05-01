@@ -54,4 +54,16 @@ public interface MavenProxyRepository
      */
     MavenProxyRepository doNotDownloadRemoteIndexes();
 
+
+    /**
+     * @return the repository's max artifact age.
+     * @since 2.5
+     */
+    int artifactMaxAge();
+
+    /**
+     * @return the repository's max metadata age.
+     * @since 2.5
+     */
+    int metadataMaxAge();
 }
