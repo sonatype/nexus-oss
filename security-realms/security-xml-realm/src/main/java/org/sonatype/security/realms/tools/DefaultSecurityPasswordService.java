@@ -25,21 +25,20 @@ import org.apache.shiro.crypto.hash.Hash;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 
 /*
- * A PasswordService based on the current Nexus password policy, which is
- * also backward compatible with legacy Nexus passwords
+ * A PasswordService that provides a default password policy
  * 
  * The intent of the password service is to encapsulate all password handling
  * details, such as password comparisons, hashing algorithm, hash iterations, salting policy, etc.
  * 
- * This class is just a wrapper around DefaultPasswordService to apply Nexus-specific hashing policy,
- * and provide backward compatibility with legacy Nexus passwords
+ * This class is just a wrapper around DefaultPasswordService to apply the default password policy,
+ * and provide backward compatibility with legacy SHA1 and MD5 based passwords
  * 
  * @since 3.1
  */
 @Singleton
 @Typed( PasswordService.class )
 @Named( "default" )
-public class DefaultNexusPasswordService
+public class DefaultSecurityPasswordService
     implements HashingPasswordService
 {   
     private static final String DEFAULT_HASH_ALGORITHM = "SHA-512";
@@ -53,7 +52,7 @@ public class DefaultNexusPasswordService
     
     /**
      * Provides the actual implementation of PasswordService.
-     * We are just wrapping to apply Nexus policy
+     * We are just wrapping to apply default policy
      */
     private final DefaultPasswordService passwordService;
     
@@ -63,7 +62,7 @@ public class DefaultNexusPasswordService
     private final PasswordService legacyPasswordService;
     
     @Inject
-    public DefaultNexusPasswordService(SecurityConfigurationManager securityConfiguration,
+    public DefaultSecurityPasswordService(SecurityConfigurationManager securityConfiguration,
                                        @Named("legacy") PasswordService legacyPasswordService)
     {
         this.securityConfiguration = securityConfiguration;
