@@ -42,6 +42,7 @@ public class NexusServletModule
 
         filter("/service/local/*").through( SecurityWebFilter.class );
         filter("/content/*").through( SecurityWebFilter.class );
+        filter("/*").through( MdcUserContextFilter.class );
 
         /*
          * Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered

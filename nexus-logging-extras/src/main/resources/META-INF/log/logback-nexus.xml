@@ -23,6 +23,7 @@
       <pattern>${appender.pattern}</pattern>
     </encoder>
   </appender>
+
   <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <File>${appender.file}</File>
     <Append>true</Append>
@@ -33,6 +34,8 @@
       <fileNamePattern>${appender.file}.%d{yyyy-MM-dd}.gz</fileNamePattern>
     </rollingPolicy>
   </appender>
+
+  <appender name="metrics" class="com.yammer.metrics.logback.InstrumentedAppender"/>
 
   <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN" />
   <logger name="httpclient" level="INFO" />
@@ -47,6 +50,7 @@
   <root level="${root.level}">
     <appender-ref ref="console" />
     <appender-ref ref="logfile" />
+    <appender-ref ref="metrics" />
   </root>
   
 </included>

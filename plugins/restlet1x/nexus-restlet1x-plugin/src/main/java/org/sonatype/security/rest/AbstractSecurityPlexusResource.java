@@ -324,6 +324,7 @@ public abstract class AbstractSecurityPlexusResource
         xstream.registerLocalConverter( UserChangePasswordResource.class, "newPassword", new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( RoleResource.class, "id", new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( UserResource.class, "userId", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( UserResource.class, "password", new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( RoleAndPrivilegeListResource.class, "id", new HtmlUnescapeStringConverter( true) );
 
         xstream.registerLocalConverter( UserResource.class, "roles", new HtmlUnescapeStringCollectionConverter( "role" ) );

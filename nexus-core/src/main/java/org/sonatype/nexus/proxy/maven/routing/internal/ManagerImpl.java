@@ -179,6 +179,8 @@ public class ManagerImpl
         this.eventBus.register( this );
     }
 
+    private volatile boolean periodicUpdaterDidRunAtLeastOnce = false;
+
     @Override
     public void startup()
     {
@@ -224,6 +226,7 @@ public class ManagerImpl
                         return;
                     }
                     mayUpdateAllProxyPrefixFiles();
+                    periodicUpdaterDidRunAtLeastOnce = true;
                 }
             }, 0L /*no initial delay*/, TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
 
@@ -411,16 +414,28 @@ public class ManagerImpl
             constrainedExecutor.cancelRunningWithKey( mavenProxyRepository.getId() );
             final PrefixSource prefixSource =
                 updateProxyPrefixFile( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
+
+            // this is never null
+            final PrefixSource oldPrefixSource = getPrefixSourceFor( mavenProxyRepository );
+            // does repo goes from unpublished to published or other way around?
+            final boolean stateChanged =
+                ( oldPrefixSource.supported() ) != ( prefixSource != null && prefixSource.supported() );
             if ( prefixSource != null && prefixSource.supported() )
             {
-                getLogger().info( "Updated and published prefix file of {}",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                if ( stateChanged )
+                {
+                    getLogger().info( "Updated and published prefix file of {}",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                }
                 publish( mavenProxyRepository, prefixSource );
             }
             else
             {
-                getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                if ( stateChanged )
+                {
+                    getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                }
                 unpublish( mavenProxyRepository );
             }
         }
@@ -524,6 +539,11 @@ public class ManagerImpl
     @VisibleForTesting
     public boolean isUpdatePrefixFileJobRunning()
     {
+        if ( config.isFeatureActive() && !periodicUpdaterDidRunAtLeastOnce )
+        {
+            getLogger().debug( "Boot process not done yet, periodic updater did not yet finish!" );
+            return true;
+        }
         final Statistics statistics = constrainedExecutor.getStatistics();
         getLogger().debug( "Running update jobs for {}", statistics.getCurrentlyRunningJobKeys() );
         return !statistics.getCurrentlyRunningJobKeys().isEmpty();
@@ -550,27 +570,41 @@ public class ManagerImpl
             }
             else
             {
+                // we should not get here
                 getLogger().info( "Repository {} unsupported by automatic routing feature",
                     RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
                 return;
             }
+
+            // this is never null
+            final PrefixSource oldPrefixSource = getPrefixSourceFor( mavenRepository );
+            // does repo goes from unpublished to published or other way around?
+            final boolean stateChanged =
+                ( oldPrefixSource.supported() ) != ( prefixSource != null && prefixSource.supported() );
+
             if ( prefixSource != null && prefixSource.supported() )
             {
-                getLogger().info( "Updated and published prefix file of {}",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                if ( stateChanged )
+                {
+                    getLogger().info( "Updated and published prefix file of {}",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                }
                 publish( mavenRepository, prefixSource );
             }
             else
             {
-                getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                if ( stateChanged )
+                {
+                    getLogger().info( "Unpublished prefix file of {} (and is marked for noscrape)",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                }
                 unpublish( mavenRepository );
             }
         }
         catch ( IllegalStateException e )
         {
             // just ack it, log it and return peacefully
-            getLogger().info( e.getMessage() );
+            getLogger().info( "Maven repository {} not in state for prefix file update: {}", mavenRepository, e.getMessage() );
             return;
         }
     }

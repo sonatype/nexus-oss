@@ -68,7 +68,7 @@ public class CommonsHttpClientRemoteStorageTest
         };
 
         thrown.expect( RemoteItemNotFoundException.class );
-        thrown.expectMessage( "The remoteURL we got to looks like is a collection" );
+        thrown.expectMessage( "not found in remote storage of repository" );
 
         underTest.retrieveItem(
             mock( ProxyRepository.class ),
@@ -103,7 +103,7 @@ public class CommonsHttpClientRemoteStorageTest
         };
 
         thrown.expect( RemoteItemNotFoundException.class );
-        thrown.expectMessage( "The remoteURL we got to looks like is a collection" );
+        thrown.expectMessage( "not found in remote storage of repository" );
 
         underTest.retrieveItem(
             mock( ProxyRepository.class ),
@@ -138,7 +138,7 @@ public class CommonsHttpClientRemoteStorageTest
         };
 
         thrown.expect( RemoteItemNotFoundException.class );
-        thrown.expectMessage( "The remoteURL we got to looks like is a collection" );
+        thrown.expectMessage( "not found in remote storage of repository" );
 
         underTest.retrieveItem(
             mock( ProxyRepository.class ),

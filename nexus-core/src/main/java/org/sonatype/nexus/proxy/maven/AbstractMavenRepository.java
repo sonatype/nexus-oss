@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_MD5;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_SHA1;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.SUFFIX_MD5;
@@ -47,8 +48,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
+import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -411,7 +412,9 @@ public abstract class AbstractMavenRepository
                     "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
             }
 
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Retrieval of %s from %s is forbidden by repository policy %s.", request.getRequestPath(),
+                this, getRepositoryPolicy() ) );
         }
 
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class )
@@ -451,14 +454,12 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+    protected void shouldTryRemote( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException
     {
-        final boolean shouldTryRemote = super.shouldTryRemote( request );
-        if ( !shouldTryRemote )
-        {
-            return false;
-        }
+        // do super first
+        super.shouldTryRemote( request );
+        // if here, super did not throw any exception, so let's continue
         // apply autorouting filter to "normal" requests only, not hidden (which is meta or plain hidden)
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
@@ -469,13 +470,12 @@ public abstract class AbstractMavenRepository
                 final boolean proxyFilterAllowed = getProxyRequestFilter().allowed( this, request );
                 if ( !proxyFilterAllowed )
                 {
-                    getLogger().debug( "Automatic routing filter rejected remote request for path {} in {}.",
-                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) );
-                    return false;
+                    throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                        "Automatic routing filter rejected remote request for path %s from %s", request.getRequestPath(),
+                        this ) );
                 }
             }
         }
-        return true;
     }
 
     @Override
@@ -607,4 +607,36 @@ public abstract class AbstractMavenRepository
         }
         return shouldAddToNFC;
     }
+
+    /**
+     * Deletes item and regenerates Maven metadata, if repository is a hosted repository and maven-metadata.xml file is
+     * present.
+     *
+     * @since 2.5
+     */
+    @Override
+    protected void doDeleteItem( final ResourceStoreRequest request )
+        throws UnsupportedStorageOperationException, ItemNotFoundException, StorageException
+    {
+        super.doDeleteItem( request );
+        // regenerate maven metadata for parent of this item if is a hosted maven repo and it contains maven-metadata.xml
+        if ( getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
+        {
+            String parentPath = request.getRequestPath();
+            parentPath = parentPath.substring( 0, parentPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
+            final String parentMetadataPath = parentPath + "/maven-metadata.xml";
+            try
+            {
+                if ( getLocalStorage().containsItem( this, new ResourceStoreRequest( parentMetadataPath ) ) )
+                {
+                    recreateMavenMetadata( new ResourceStoreRequest( parentPath ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn( "Could not maintain Maven metadata '{}'", parentMetadataPath, e );
+            }
+        }
+    }
+
 }

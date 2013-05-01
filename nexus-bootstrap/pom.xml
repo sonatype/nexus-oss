@@ -41,6 +41,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-jetty</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
       <scope>provided</scope>

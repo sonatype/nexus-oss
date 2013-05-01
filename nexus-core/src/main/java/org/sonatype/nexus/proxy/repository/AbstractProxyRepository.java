@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,7 +80,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
  * So, this implementation is used in both "simple" repository cases: hosted and proxy, but in 1st case there is no
  * remote storage.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractProxyRepository
@@ -264,11 +266,8 @@ public abstract class AbstractProxyRepository
 
             // fire off the new event if crawling did end, so we did flip all the bits
             eventBus().post(
-                new RepositoryEventExpireProxyCaches(
-                    this, request.getRequestPath(), request.getRequestContext().flatten(),
-                    expireCacheWalkerProcessor.isCacheAltered()
-                )
-            );
+                new RepositoryEventExpireProxyCaches( this, request.getRequestPath(),
+                    request.getRequestContext().flatten(), expireCacheWalkerProcessor.isCacheAltered() ) );
 
             return expireCacheWalkerProcessor.isCacheAltered();
         }
@@ -459,7 +458,7 @@ public abstract class AbstractProxyRepository
     /**
      * ProxyMode is a persisted configuration property, hence it modifies configuration! It is the caller responsibility
      * to save configuration.
-     *
+     * 
      * @param proxyMode
      * @param sendNotification
      * @param cause
@@ -566,7 +565,7 @@ public abstract class AbstractProxyRepository
      * This method should be called by AbstractProxyRepository and it's descendants only. Since this method modifies the
      * ProxyMode property of this repository, and this property is part of configuration, this call will result in
      * configuration flush too (potentially saving any other unsaved changes)!
-     *
+     * 
      * @param cause
      */
     protected void autoBlockProxying( Throwable cause )
@@ -604,7 +603,7 @@ public abstract class AbstractProxyRepository
         }
 
         // invalidate remote status
-        final String unavailableReason = parseRemoteUnavailableReason(cause);
+        final String unavailableReason = parseRemoteUnavailableReason( cause );
         if ( unavailableReason == null )
         {
             setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
@@ -726,7 +725,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Best effort to extract reason why remote is not available.
-     *
+     * 
      * @param cause cause why the remote is not available (can be null)
      * @return parsed reason or null if reason could not be parsed
      */
@@ -806,7 +805,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Gets the item max age in (in minutes).
-     *
+     * 
      * @return the item max age in (in minutes)
      */
     public int getItemMaxAge()
@@ -816,7 +815,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Sets the item max age in (in minutes).
-     *
+     * 
      * @param itemMaxAge the new item max age in (in minutes).
      */
     public void setItemMaxAge( int itemMaxAge )
@@ -976,19 +975,6 @@ public abstract class AbstractProxyRepository
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws LocalStorageException
     {
-        boolean shouldCache = true;
-
-        // ask request processors too
-        for ( RequestProcessor processor : getRequestProcessors().values() )
-        {
-            shouldCache = processor.shouldCache( this, item );
-
-            if ( !shouldCache )
-            {
-                return item;
-            }
-        }
-
         AbstractStorageItem result = null;
 
         try
@@ -1138,7 +1124,7 @@ public abstract class AbstractProxyRepository
                         {
                             localItem = (AbstractStorageItem) super.doRetrieveItem( request );
 
-                            if ( localItem != null && !request.isRequestAsExpired() &&  !isOld( localItem ) )
+                            if ( localItem != null && !request.isRequestAsExpired() && !isOld( localItem ) )
                             {
                                 // local copy is just fine (downloaded by a thread holding us blocked on acquiring
                                 // exclusive lock)
@@ -1166,10 +1152,19 @@ public abstract class AbstractProxyRepository
         }
     }
 
-    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+    protected void shouldTryRemote( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException
     {
-        return !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
+        if ( request.isRequestLocalOnly() )
+        {
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                "Request is marked as local-only, remote access not allowed from %s", this ) );
+        }
+        if ( getProxyMode() != null && !getProxyMode().shouldProxy() )
+        {
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                "Repository proxy-mode is %s, remote access not allowed from %s", getProxyMode(), this ) );
+        }
     }
 
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
@@ -1179,24 +1174,34 @@ public abstract class AbstractProxyRepository
         AbstractStorageItem remoteItem = null;
 
         // proxyMode and request.localOnly decides 1st
-        boolean shouldProxy = shouldTryRemote( request );
-
-        if ( shouldProxy )
+        ItemNotFoundException noRemoteAccessReason = null;
+        try
         {
-            // let's ask RequestProcessor
-            for ( RequestProcessor processor : getRequestProcessors().values() )
-            {
-                shouldProxy = processor.shouldProxy( this, request );
+            shouldTryRemote( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            noRemoteAccessReason = e;
+        }
 
-                if ( !shouldProxy )
+        if ( noRemoteAccessReason == null )
+        {
+            for ( RequestStrategy strategy : getRegisteredStrategies().values() )
+            {
+                try
                 {
+                    strategy.onRemoteAccess( this, request, localItem );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    noRemoteAccessReason = e;
                     // escape
                     break;
                 }
             }
         }
 
-        if ( shouldProxy )
+        if ( noRemoteAccessReason == null )
         {
             // we are able to go remote
             if ( localItem == null || request.isRequestAsExpired() || isOld( localItem ) )
@@ -1294,7 +1299,8 @@ public abstract class AbstractProxyRepository
                                 autoBlockProxying( ex );
                             }
 
-                            if ( ex instanceof RemoteStorageTransportException || ex instanceof LocalStorageEOFException )
+                            if ( ex instanceof RemoteStorageTransportException
+                                || ex instanceof LocalStorageEOFException )
                             {
                                 throw ex;
                             }
@@ -1341,12 +1347,13 @@ public abstract class AbstractProxyRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Item "
-                            + request.toString()
+                        "Item " + request.toString()
                             + " does not exist in local or remote storage, throwing ItemNotFoundException." );
                 }
 
-                throw new ItemNotFoundException( request, this );
+                throw new ItemNotFoundException( reasonFor( request, this,
+                    "Path %s not found in local nor in remote storage of %s", request.getRequestPath(),
+                    this ) );
             }
             else if ( localItem != null && remoteItem == null )
             {
@@ -1391,7 +1398,8 @@ public abstract class AbstractProxyRepository
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
-                throw new ItemNotFoundException( request, this );
+                throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                    noRemoteAccessReason.getMessage() ), noRemoteAccessReason );
             }
         }
 
@@ -1464,7 +1472,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks for remote existence of local item.
-     *
+     * 
      * @param localItem
      * @param request
      * @return
@@ -1499,10 +1507,10 @@ public abstract class AbstractProxyRepository
      * The following matrix summarises retry/blacklist behaviour
      * <p/>
      * <p/>
-     *
+     * 
      * <pre>
      * Error condition      Retry?        Blacklist?
-     *
+     * 
      * InetNotFound         no            no
      * AccessDedied         no            yes
      * InvalidContent       no            no
@@ -1544,7 +1552,8 @@ public abstract class AbstractProxyRepository
                     if ( getRemoteStorageContext() != null )
                     {
                         RemoteConnectionSettings settings = getRemoteStorageContext().getRemoteConnectionSettings();
-                        if (settings != null) {
+                        if ( settings != null )
+                        {
                             retryCount = settings.getRetrievalRetryCount();
                         }
                     }
@@ -1728,7 +1737,9 @@ public abstract class AbstractProxyRepository
             }
 
             // validation failed, I guess.
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this,
+                "Path %s fetched from remote storage of %s but failed validation.", request.getRequestPath(),
+                this ) );
         }
         finally
         {
@@ -1747,7 +1758,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with "default" maxAge.
-     *
+     * 
      * @param item the item
      * @return true, if it is old
      */
@@ -1758,7 +1769,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with given maxAge.
-     *
+     * 
      * @param maxAge
      * @param item
      * @return
@@ -1820,8 +1831,11 @@ public abstract class AbstractProxyRepository
                 {
                     if ( !getProxyMode().shouldCheckRemoteStatus() )
                     {
-                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request,
-                            AbstractProxyRepository.this ) );
+                        setRemoteStatus(
+                            RemoteStatus.UNAVAILABLE,
+                            new ItemNotFoundException( reasonFor( request, AbstractProxyRepository.this,
+                                "Proxy mode %s or repository %s forbids remote storage use.", getProxyMode(),
+                                AbstractProxyRepository.this ) ) );
                     }
                     else
                     {
@@ -1831,7 +1845,9 @@ public abstract class AbstractProxyRepository
                         }
                         else
                         {
-                            autoBlockProxying( new ItemNotFoundException( request, AbstractProxyRepository.this ) );
+                            autoBlockProxying( new ItemNotFoundException( reasonFor( request,
+                                AbstractProxyRepository.this, "Remote peer of repository %s detected as unavailable.",
+                                AbstractProxyRepository.this ) ) );
                         }
                     }
                 }
@@ -1865,7 +1881,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Beside original behavior, only add to NFC when we are not in BLOCKED mode.
-     *
+     * 
      * @since 2.0
      */
     @Override

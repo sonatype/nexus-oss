@@ -47,7 +47,7 @@ public class PomArtifactManager
 
     private static final int STATE_FILE_STORED = 1;
 
-    private static final int STATE_GAV_GENERATED = 2;
+    private static final int STATE_GAV_PARSED = 2;
 
     private static final Random identifierGenerator = new Random();
 
@@ -108,7 +108,7 @@ public class PomArtifactManager
             throw new IllegalStateException( "The temporary POM file has not yet been stored" );
         }
 
-        if ( STATE_GAV_GENERATED == state )
+        if ( STATE_GAV_PARSED == state )
         {
             return artifactCoordinate;
         }
@@ -121,7 +121,7 @@ public class PomArtifactManager
 
             artifactCoordinate = parsePom( reader );
 
-            state = STATE_GAV_GENERATED;
+            state = STATE_GAV_PARSED;
         }
         finally
         {

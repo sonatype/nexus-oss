@@ -33,7 +33,8 @@ public interface RepositoryRegistry
     void addRepository( Repository repository );
 
     /**
-     * Removes single repository.
+     * Removes a single repository from the current registry. This does NOT permanently delete the repository. Use
+     * DefaultNexusConfiguration#deleteRepository , which calls this method internally, to do that.
      *
      * @param repoId the repo id
      * @throws NoSuchRepositoryException the no such repository exception

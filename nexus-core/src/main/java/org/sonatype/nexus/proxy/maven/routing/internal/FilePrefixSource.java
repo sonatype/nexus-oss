@@ -213,6 +213,14 @@ public class FilePrefixSource
     public void writeEntries( final PrefixSource prefixSource )
         throws IOException
     {
+        checkNotNull( prefixSource );
+        if ( prefixSource instanceof FilePrefixSource
+            && getRepositoryItemUid().equals( ( (FilePrefixSource) prefixSource ).getRepositoryItemUid() ) )
+        {
+            // we don't want to read and then write to same file
+            // as basically doing that operation would not change anything
+            return;
+        }
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         getPrefixSourceMarshaller().write( prefixSource.readEntries(), bos );
         putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
@@ -303,6 +311,12 @@ public class FilePrefixSource
             new DefaultStorageFileItem( getMavenRepository(), request, true, true, content );
         try
         {
+            // NXCM-5188: Remark to not get tempted to change these to storeItemWithChecksums() method:
+            // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
+            // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
+            // is published in Nexus, there is no need anymore to save checksums to disk, as they will
+            // be served up just fine. This is true for all items in Nexus storage, not just prefix
+            // file related ones!
             getMavenRepository().storeItem( true, file );
         }
         catch ( UnsupportedStorageOperationException e )
@@ -325,6 +339,12 @@ public class FilePrefixSource
         request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         try
         {
+            // NXCM-5188: Remark to not get tempted to change these to deleteItemWithChecksums() method:
+            // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
+            // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
+            // is published in Nexus, there is no need anymore to save checksums to disk, as they will
+            // be served up just fine. This is true for all items in Nexus storage, not just prefix
+            // file related ones!
             getMavenRepository().deleteItem( true, request );
         }
         catch ( ItemNotFoundException e )

@@ -183,7 +183,7 @@ public class SearchNGIndexPlexusResource
     @GET
     @ResourceMethodSignature( queryParams = { @QueryParam( "q" ), @QueryParam( "g" ), @QueryParam( "a" ),
         @QueryParam( "v" ), @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "cn" ), @QueryParam( "sha1" ),
-        @QueryParam( "from" ), @QueryParam( "count" ), @QueryParam( "repositoryId" ) }, output = SearchResponse.class )
+        @QueryParam( "from" ), @QueryParam( "count" ), @QueryParam( "repositoryId" ) }, output = SearchNGResponse.class )
     public SearchNGResponse get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

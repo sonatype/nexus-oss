@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>34</version>
+    <version>35</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -170,7 +170,6 @@
 
     <!-- version properties -->
     <nexus.version>${project.version}</nexus.version>
-    <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>
@@ -179,7 +178,8 @@
     <plexus-security.version>3.1-SNAPSHOT</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
-    <goodies.version>1.6</goodies.version>
+    <goodies.version>1.6.1</goodies.version>
+    <metrics.version>2.2.0</metrics.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -335,7 +335,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-task-scheduler</artifactId>
-        <version>1.7</version>
+        <version>1.8-SNAPSHOT</version>
       </dependency>
 
       <!--
@@ -702,7 +702,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>4.2.2</version>
+        <version>4.2.5</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -714,13 +714,13 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
-        <version>4.2.2</version>
+        <version>4.2.5</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
-        <version>4.2.2</version>
+        <version>4.2.4</version>
       </dependency>
 
       <!--
@@ -831,9 +831,51 @@
       </dependency>
 
       <dependency>
-        <groupId>org.javasimon</groupId>
-        <artifactId>javasimon-core</artifactId>
-        <version>3.3.0</version>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-guice</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-servlet</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-jersey</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-jetty</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-httpclient</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-logback</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.yammer.metrics</groupId>
+        <artifactId>metrics-web</artifactId>
+        <version>${metrics.version}</version>
       </dependency>
 
       <!-- INTERNAL -->
@@ -1178,7 +1220,7 @@
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/ldap-common/target/**</exclude>
               <exclude>plugin*/**/target/**</exclude>
-              <exclude>**/ext-3.4.1/**</exclude>
+              <exclude>**/ext-3.4.1.1/**</exclude>
               <exclude>**/js/filetree/**</exclude>
               <exclude>**/editarea_0_8_2/**</exclude>
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
@@ -1197,9 +1239,9 @@
               <exclude>**/nb-configuration.xml</exclude>
               <!-- IntelliJ IDEA files-->
               <exclude>**/atlassian-ide-plugin.xml</exclude>
-              <exclude>nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
-              <exclude>nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
-              <exclude>nexus-webapp/src/main/webapp/js/lib/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
+              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
             </excludes>
           </configuration>
         </plugin>

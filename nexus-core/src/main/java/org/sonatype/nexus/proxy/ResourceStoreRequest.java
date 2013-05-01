@@ -47,7 +47,7 @@ public class ResourceStoreRequest
 
     /**
      * Constructor.
-     *
+     * 
      * @param requestPath the request path.
      * @param localOnly See {@link RequestContext#CTX_LOCAL_ONLY_FLAG}.
      * @param remoteOnly See {@link RequestContext#CTX_REMOTE_ONLY_FLAG}.
@@ -65,7 +65,7 @@ public class ResourceStoreRequest
 
     /**
      * Shortcut constructor.
-     *
+     * 
      * @param requestPath
      * @param localOnly
      * @deprecated use {@link #ResourceStoreRequest(String, boolean, boolean)} instead.
@@ -77,7 +77,7 @@ public class ResourceStoreRequest
 
     /**
      * Shortcut constructor.
-     *
+     * 
      * @param requestPath
      */
     public ResourceStoreRequest( String requestPath )
@@ -266,7 +266,7 @@ public class ResourceStoreRequest
      */
     public List<String> getProcessedRepositories()
     {
-        return Collections.unmodifiableList( processedRepositories);
+        return Collections.unmodifiableList( processedRepositories );
     }
 
     /**
@@ -393,15 +393,33 @@ public class ResourceStoreRequest
         return appliedMappings;
     }
 
+    // ==
+
+    /**
+     * Creates a clone of this request, but also "detaches" it from any parent context relationship, effectively making
+     * result new "detached" instance that captures the snapshot of the request in a moment when the clone was created.
+     * 
+     * @return the clone of this request, detached from any outgoing relations.
+     * @since 2.5
+     */
+    public ResourceStoreRequest cloneAndDetach()
+    {
+        final ResourceStoreRequest result = new ResourceStoreRequest( getRequestPath() );
+        result.requestContext.setParentContext( null );
+        result.requestContext.putAll( requestContext.flatten() );
+        result.pathStack.clear();
+        result.processedRepositories.clear();
+        result.processedRepositories.addAll( processedRepositories );
+        result.appliedMappings.clear();
+        result.appliedMappings.putAll( appliedMappings );
+        return result;
+    }
+
     @Override
     public String toString()
     {
-        return "ResourceStoreRequest{" +
-            "requestPath='" + requestPath + '\'' +
-            ", requestContext=" + requestContext +
-            ", pathStack=" + pathStack +
-            ", processedRepositories=" + processedRepositories +
-            ", appliedMappings=" + appliedMappings +
-            '}';
+        return "ResourceStoreRequest{" + "requestPath='" + requestPath + '\'' + ", requestContext=" + requestContext
+            + ", pathStack=" + pathStack + ", processedRepositories=" + processedRepositories + ", appliedMappings="
+            + appliedMappings + '}';
     }
 }

@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Thrown by RemoteRepositoryStorage if the requested item is not found for some reason that is part of internal
@@ -29,22 +30,31 @@ public class RemoteItemNotFoundException
     private static final long serialVersionUID = 8422409141417737154L;
 
     /**
-     * Creates a "not found" exception with customized message, where RemoteRepositoryStorage may explain why it throw
-     * this exception.
+     * Constructor for group thrown "not found" exception providing information about whole tree being processed and
+     * reasons why the grand total result is "not found.
      * 
-     * @param message
      * @param request
      * @param repository
+     * @param reason
+     * @param remoteUrl
      */
-    public RemoteItemNotFoundException( final String message, final ResourceStoreRequest request,
-                                        final ProxyRepository repository )
+    public RemoteItemNotFoundException( final ResourceStoreRequest request, final ProxyRepository repository,
+                                        final String reason, final String remoteUrl )
     {
-        super( message, request, repository );
+        super( reasonFor( request, repository,
+            "Path %s not found in remote storage of repository %s (reason=%s, remoteUrl=%s).",
+            request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( repository ), reason, remoteUrl ) );
+    }
+
+    @Override
+    public ItemNotFoundInRepositoryReason getReason()
+    {
+        return (ItemNotFoundInRepositoryReason) super.getReason();
     }
 
     @Override
     public ProxyRepository getRepository()
     {
-        return (ProxyRepository) super.getRepository();
+        return (ProxyRepository) getReason().getRepository();
     }
 }

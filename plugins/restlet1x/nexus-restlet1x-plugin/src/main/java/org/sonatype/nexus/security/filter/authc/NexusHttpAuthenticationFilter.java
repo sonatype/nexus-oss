@@ -49,7 +49,7 @@ public class NexusHttpAuthenticationFilter
 
     public static final String FAKE_AUTH_SCHEME = "NxBASIC";
 
-    public static final String ANONYMOUS_LOGIN = "nexus.anonynmous";
+    public static final String ANONYMOUS_LOGIN = "nexus.anonymous";
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
