@@ -36,7 +36,10 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.inject.Description;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.usermanagement.UserNotFoundException;
+
+import com.google.common.base.Throwables;
 
 /**
  * An Authentication Realm backed by an XML file see the security-model-xml module. This model defines users, roles, and
@@ -141,23 +144,38 @@ public class XmlAuthenticatingRealm
      * @param user to update
      * @param password cleartext password to hash
      */
-    private void reHashPassword(CUser user, String password)    	
+    private void reHashPassword(final CUser user, final String password)    	
     {
-    	//Store current values to rollback if update fails
-    	String currentPasswordHash = user.getPassword();
-    	
-    	try
-    	{
-    	    user.setPassword(this.passwordService.encryptPassword(password));
-	    	this.configuration.updateUser(user);
-	    	this.configuration.save();
-    	}
-    	catch(Exception e)
-    	{
-    		//Update failed, rollback to previous values
-    		user.setPassword(currentPasswordHash);
-    		this.logger.error("Unable to update hash for user {}", user.getId());
-    	}
+        //Store current values to rollback if update fails
+        final String currentPasswordHash = user.getPassword();
+        
+        try
+        {
+            configuration.runWrite(new ConfigurationManagerAction()
+            {
+                @Override
+                public void run()
+                    throws Exception
+                {
+                    try
+                    {
+                        user.setPassword(passwordService.encryptPassword(password));
+                        configuration.updateUser(user);
+                        configuration.save();
+                    }
+                    catch(Exception e)
+                    {
+                        //Update failed, rollback to previous values
+                        user.setPassword(currentPasswordHash);
+                        logger.error("Unable to update hash for user {}", user.getId());
+                    }
+                }
+            });
+        }
+        catch(Exception e)
+        {
+            throw Throwables.propagate(e);
+        }
     }
     
     /*

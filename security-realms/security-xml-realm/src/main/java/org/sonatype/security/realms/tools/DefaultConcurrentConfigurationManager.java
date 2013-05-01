@@ -346,6 +346,14 @@ public class DefaultConcurrentConfigurationManager implements ConfigurationManag
     }
 
     @Override
+    public void updateUser(CUser user)
+        throws InvalidConfigurationException, UserNotFoundException
+    {
+        checkWriteLock();
+        configurationManager.updateUser(user);
+    }
+    
+    @Override
     public void updateUser(CUser user, Set<String> roles)
         throws InvalidConfigurationException, UserNotFoundException
     {
