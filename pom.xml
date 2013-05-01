@@ -17,14 +17,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>spice-parent</artifactId>
-        <version>18</version>
+      <groupId>org.sonatype.forge</groupId>
+      <artifactId>forge-parent</artifactId>
+      <version>35</version>
     </parent>
 
     <groupId>org.sonatype.sisu</groupId>
     <artifactId>sisu-task-scheduler</artifactId>
-    <version>1.9-SNAPSHOT</version>
+    <version>1.8.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Sisu Task Scheduler</name>
@@ -50,6 +50,7 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
+            <version>1</version>
             <optional>true</optional>
         </dependency>
 
@@ -74,37 +75,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!--
-            mvn license:format -N
-            If its a new year, update the year range in the header.txt file
-            -->
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.9.0</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <strictCheck>true</strictCheck>
-                    <header>${project.basedir}/header.txt</header>
-                    <useDefaultExcludes>false</useDefaultExcludes>
-                    <includes>
-                        <include>**/pom.xml</include>
-                        <include>**/*.xml</include>
-                        <include>**/*.properties</include>
-                        <include>**/*.java</include>
-                        <include>**/*.md</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/target/**</exclude>
-                        <exclude>**/.*/**</exclude>
-                    </excludes>
-                    <mapping>
-                        <md>XML_STYLE</md>
-                        <java>SLASHSTAR_STYLE</java>
-                    </mapping>
-                </configuration>
             </plugin>
         </plugins>
     </build>
