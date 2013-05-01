@@ -63,7 +63,7 @@ public class XmlAuthenticatingRealm
     private final int MAX_LEGACY_PASSWORD_LENGTH = 40;
 
     @Inject
-    public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration,
+	public XmlAuthenticatingRealm( @Named( "default" ) ConfigurationManager configuration,
                                    PasswordService passwordService)
     {
         this.configuration = configuration;

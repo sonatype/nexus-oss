@@ -55,7 +55,7 @@ public class XmlRolePermissionResolver
     private final PermissionFactory permissionFactory;
 
     @Inject
-    public XmlRolePermissionResolver( @Named( "resourceMerging" ) ConfigurationManager configuration,
+    public XmlRolePermissionResolver( @Named( "default" ) ConfigurationManager configuration,
                                       List<PrivilegeDescriptor> privilegeDescriptors,
                                       @Named( "caching" ) PermissionFactory permissionFactory )
     {

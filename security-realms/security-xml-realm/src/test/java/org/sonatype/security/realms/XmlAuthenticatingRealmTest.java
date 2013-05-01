@@ -70,7 +70,7 @@ public class XmlAuthenticatingRealmTest
 
         realm = (XmlAuthenticatingRealm) lookup( Realm.class, "XmlAuthenticatingRealm" );
 
-        configurationManager = (DefaultConfigurationManager) lookup( ConfigurationManager.class, "default" );
+        configurationManager = lookup( DefaultConfigurationManager.class);
 
         configurationManager.clearCache();
         

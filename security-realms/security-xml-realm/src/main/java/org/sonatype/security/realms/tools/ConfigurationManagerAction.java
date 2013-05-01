@@ -10,14 +10,22 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.realms.kenai;
+package org.sonatype.security.realms.tools;
 
-public class KenaiRealmZeroRolesTest
-    extends KenaiRealmTest
+/**
+ * Defines an interface for a ConfigurationManager action. These actions
+ * are intended to encapsulate higher-level operations that require multiple calls
+ * to the ConfigurationManager to complete. These actions provide a way for users to use the ConfigurationManager
+ * in a thread-safe manner. Must be used in conjunction with an implementation of ConfigurationManager that supports
+ * the runRead and runWrite methods
+ * 
+ * @author Steve Carlucci
+ * @since 3.1
+ */
+public interface ConfigurationManagerAction
 {
-    protected int getTotalNumberOfProjects()
-    {
-        return 0;
-    }
-
+    /**
+     * Run the action
+     */
+    void run() throws Exception;
 }
