@@ -13,10 +13,10 @@
 package org.sonatype.nexus.maven.tasks;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.commons.lang.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.google.common.collect.Maps;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -482,7 +483,7 @@ public class DefaultSnapshotRemover
                             }
                             else
                             {
-                                getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
+                                getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateThreshold=" + dateThreshold );
 
                                 // if dateThreshold is not used (zero days) OR
                                 // if itemTimestamp is less then dateThreshold (NB: both are positive!)
@@ -494,6 +495,7 @@ public class DefaultSnapshotRemover
                                 }
                                 else
                                 {
+                                    //do not delete if dateThreshold not met
                                     addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
                                 }
                             }
@@ -543,82 +545,25 @@ public class DefaultSnapshotRemover
             else
             {
                 // and now check some things
-                if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+
+                Map<String, Map<Version, List<StorageFileItem>>> remainingByClassifier =
+                    partitionFiles( remainingSnapshotsAndFiles );
+
+                Map<String, Map<Version, List<StorageFileItem>>> deletableByClassifier =
+                    partitionFiles( deletableSnapshotsAndFiles );
+
+                for ( String classifier : deletableByClassifier.keySet() )
                 {
-                    // do something
-                    if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                    getLogger().debug( "Processing deletes for classifier: {}", isNotEmpty(classifier) ? classifier : "-NONE-" );
+                    //if there are no files remaining for a classifier, introduce an empty map for processing
+                    if(!remainingByClassifier.containsKey( classifier ))
                     {
-                        // delete nothing, since there is less snapshots in total as allowed
-                        deletableSnapshotsAndFiles.clear();
+                        remainingByClassifier.put( classifier, Maps.<Version, List<StorageFileItem>>newHashMap() );
                     }
-                    else
-                    {
-                        TreeSet<Version> keys = new TreeSet<Version>( deletableSnapshotsAndFiles.keySet() );
-
-                        while ( !keys.isEmpty()
-                            && remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
-                        {
-                            Version keyToMove = keys.last();
-
-                            if ( remainingSnapshotsAndFiles.containsKey( keyToMove ) )
-                            {
-                                remainingSnapshotsAndFiles.get( keyToMove ).addAll(
-                                    deletableSnapshotsAndFiles.get( keyToMove ) );
-                            }
-                            else
-                            {
-                                remainingSnapshotsAndFiles.put( keyToMove, deletableSnapshotsAndFiles.get( keyToMove ) );
-                            }
-
-                            deletableSnapshotsAndFiles.remove( keyToMove );
-
-                            keys.remove( keyToMove );
-                        }
-
-                    }
-                }
-
-                // NEXUS-814: is this GAV have remaining artifacts?
-                boolean gavHasMoreTimestampedSnapshots = remainingSnapshotsAndFiles.size() > 0;
-
-                for ( Version key : deletableSnapshotsAndFiles.keySet() )
-                {
-
-                    List<StorageFileItem> files = deletableSnapshotsAndFiles.get( key );
-                    deletedSnapshots++;
-
-                    for ( StorageFileItem file : files )
-                    {
-                        try
-                        {
-                            // NEXUS-814: mark that we are deleting a TS snapshot, but there are still remaining
-                            // ones in repository.
-                            if ( gavHasMoreTimestampedSnapshots )
-                            {
-                                file.getItemContext().put( MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV, Boolean.TRUE );
-                            }
-
-                            gav = (Gav) file.getItemContext().get( Gav.class.getName() );
-
-                            repository.deleteItem( false, createResourceStoreRequest( file, context ) );
-
-                            deletedFiles++;
-                        }
-                        catch ( ItemNotFoundException e )
-                        {
-                            // NEXUS-5682 Since checksum files are no longer physically represented on the file system,
-                            // it is expected that they will generate ItemNotFoundException. Log at trace level only for
-                            // diagnostic purposes.
-                            if ( getLogger().isTraceEnabled() )
-                            {
-                                getLogger().trace( "Could not delete file:", e );
-                            }
-                        }
-                        catch ( Exception e )
-                        {
-                            getLogger().info( "Could not delete file:", e );
-                        }
-                    }
+                    reconcileDeletableFilesWithMinCount( remainingByClassifier.get( classifier ),
+                                                         deletableByClassifier.get( classifier ),
+                                                         request.getMinCountOfSnapshotsToKeep() );
+                    deleteFiles( context, deletableByClassifier.get( classifier ), remainingByClassifier.get( classifier ).size() );
                 }
             }
 
@@ -626,6 +571,134 @@ public class DefaultSnapshotRemover
 
             updateMetadataIfNecessary( context, coll );
 
+        }
+
+        private void reconcileDeletableFilesWithMinCount(
+            Map<Version, List<StorageFileItem>> remainingSnapshotsAndFiles,
+            Map<Version, List<StorageFileItem>> deletableSnapshotsAndFiles, int minCount )
+        {
+            if ( remainingSnapshotsAndFiles.size() < minCount )
+            {
+                // do something
+                if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < minCount )
+                {
+                    // delete nothing, since there is less snapshots in total as allowed
+                    deletableSnapshotsAndFiles.clear();
+                }
+                else
+                {
+                    TreeSet<Version> keys = new TreeSet<Version>( deletableSnapshotsAndFiles.keySet() );
+
+                    while ( !keys.isEmpty()
+                        && remainingSnapshotsAndFiles.size() < minCount )
+                    {
+                        Version keyToMove = keys.last();
+
+                        if ( remainingSnapshotsAndFiles.containsKey( keyToMove ) )
+                        {
+                            remainingSnapshotsAndFiles.get( keyToMove ).addAll(
+                                deletableSnapshotsAndFiles.get( keyToMove ) );
+                        }
+                        else
+                        {
+                            remainingSnapshotsAndFiles.put( keyToMove, deletableSnapshotsAndFiles.get( keyToMove ) );
+                        }
+
+                        deletableSnapshotsAndFiles.remove( keyToMove );
+
+                        keys.remove( keyToMove );
+                    }
+                }
+            }
+        }
+
+        private void deleteFiles( final WalkerContext context,
+                                  final Map<Version, List<StorageFileItem>> deletableVersionedFiles, final int size )
+        {
+            boolean gavHasMoreTimestampedSnapshots = size > 0;
+
+            for ( Version key : deletableVersionedFiles.keySet() )
+            {
+
+                List<StorageFileItem> files = deletableVersionedFiles.get( key );
+                deletedSnapshots++;
+
+                for ( StorageFileItem file : files )
+                {
+                    try
+                    {
+                        // NEXUS-814: mark that we are deleting a TS snapshot, but there are still remaining
+                        // ones in repository.
+                        if ( gavHasMoreTimestampedSnapshots )
+                        {
+                            file.getItemContext().put( MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV, Boolean.TRUE );
+                        }
+
+                        repository.deleteItem( false, createResourceStoreRequest( file, context ) );
+
+                        deletedFiles++;
+                    }
+                    catch ( ItemNotFoundException e )
+                    {
+                        // NEXUS-5682 Since checksum files are no longer physically represented on the file system,
+                        // it is expected that they will generate ItemNotFoundException. Log at trace level only for
+                        // diagnostic purposes.
+                        if ( getLogger().isTraceEnabled() )
+                        {
+                            getLogger().trace( "Could not delete file:", e );
+                        }
+                    }
+                    catch ( Exception e )
+                    {
+                        getLogger().info( "Could not delete file:", e );
+                    }
+                }
+            }
+        }
+
+        /**
+         * Partition by classifier of StorageFileItems.
+         */
+        private Map<String, Map<Version, List<StorageFileItem>>> partitionFiles(
+            final Map<Version, List<StorageFileItem>> versionedFiles )
+        {
+            Map<String, Map<Version, List<StorageFileItem>>> partitionedFiles = Maps.newHashMap();
+            for ( Map.Entry<Version, List<StorageFileItem>> versionListEntry : versionedFiles.entrySet() )
+            {
+                String classifier = determineClassifier( versionListEntry.getValue() );
+                if ( !partitionedFiles.containsKey( classifier ) )
+                {
+                    partitionedFiles.put( classifier, Maps.<Version, List<StorageFileItem>>newHashMap() );
+                }
+                partitionedFiles.get( classifier ).put( versionListEntry.getKey(), versionListEntry.getValue() );
+            }
+            return partitionedFiles;
+        }
+
+        /**
+         * Find a common classifier for group of files.
+         */
+        private String determineClassifier( final List<StorageFileItem> items )
+        {
+            String classifier = "";
+            for ( StorageFileItem item : items )
+            {
+                Gav gav = (Gav) item.getItemContext().get( Gav.class.getName() );
+                if ( isEmpty( classifier ) && isNotEmpty( gav.getClassifier() ) )
+                {
+                    classifier = gav.getClassifier();
+                }
+                else if ( isNotEmpty( classifier ) && isNotEmpty( gav.getClassifier() )
+                    && !classifier.equals( gav.getClassifier() ) )
+                {
+                    getLogger().warn(
+                        "Found more than one classifier in the same snapshot version. Encountered both '{}' and '{}'."
+                            + " These will be considered as having no classifier!",
+                        classifier, gav.getClassifier() );
+                    return "";
+                }
+            }
+            return classifier;
         }
 
         private void updateMetadataIfNecessary( WalkerContext context, StorageCollectionItem coll )
