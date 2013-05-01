@@ -300,7 +300,7 @@ public class SecurityXmlUserManager
         
         try
         {
-            this.configuration.runWrite(new ConfigurationManagerAction()
+            this.configuration.runRead(new ConfigurationManagerAction()
             {
                 public void run() throws Exception
                 {
@@ -347,7 +347,7 @@ public class SecurityXmlUserManager
         
         try
         {
-            this.configuration.runWrite(new ConfigurationManagerAction()
+            this.configuration.runRead(new ConfigurationManagerAction()
             {
                 public void run() throws Exception
                 {
