@@ -79,7 +79,7 @@ public class ResourceMergingConfigurationManager
         throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
     }
 
-    public synchronized void clearCache()
+    public void clearCache()
     {
         super.clearCache();
         manager.clearCache();
@@ -493,7 +493,7 @@ public class ResourceMergingConfigurationManager
 
     // ==
 
-    protected synchronized EnhancedConfiguration getConfiguration()
+    protected EnhancedConfiguration getConfiguration()
     {
         for ( DynamicSecurityResource resource : dynamicResources )
         {

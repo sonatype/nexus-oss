@@ -599,7 +599,7 @@ public class DefaultConfigurationManager
     }
 
     @Override
-    protected Configuration doGetConfiguration()
+    protected synchronized Configuration doGetConfiguration()
     {
         try
         {
