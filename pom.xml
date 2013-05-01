@@ -335,7 +335,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-task-scheduler</artifactId>
-        <version>1.8-SNAPSHOT</version>
+        <version>1.8.1</version>
       </dependency>
 
       <!--
