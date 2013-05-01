@@ -30,24 +30,23 @@ public abstract class AbstractConfigurationManager
 
     private volatile EnhancedConfiguration configuration = null;
 
-    public synchronized void clearCache()
+    public void clearCache()
     {
         configuration = null;
     }
 
-    protected synchronized EnhancedConfiguration getConfiguration()
+    protected EnhancedConfiguration getConfiguration()
     {
-        if ( configuration != null )
+        //Assign configuration to local variable first, as calls to clearCache
+        //can null it out at any time
+        EnhancedConfiguration config = configuration;
+        if(config == null)
         {
-            return configuration;
+            config = new EnhancedConfiguration(doGetConfiguration());
+            configuration = config;
         }
-
-        final Configuration newConfiguration = doGetConfiguration();
-
-        // enhancing it
-        this.configuration = new EnhancedConfiguration( newConfiguration );
-
-        return this.configuration;
+        
+        return config;
     }
 
     protected abstract Configuration doGetConfiguration();

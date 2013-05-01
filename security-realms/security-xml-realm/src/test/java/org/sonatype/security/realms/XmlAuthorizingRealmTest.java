@@ -67,7 +67,7 @@ public class XmlAuthorizingRealmTest
         realm = (XmlAuthorizingRealm) lookup( Realm.class, "XmlAuthorizingRealm" );
         realm.setRolePermissionResolver( this.lookup( RolePermissionResolver.class ) );
 
-        configurationManager = (DefaultConfigurationManager) lookup( ConfigurationManager.class );
+        configurationManager = lookup( DefaultConfigurationManager.class );
 
         configurationManager.clearCache();
 

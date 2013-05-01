@@ -47,7 +47,7 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 @Singleton
 @Typed( ConfigurationManager.class )
-@Named( "default" )
+@Named( "legacydefault" )
 public class DefaultConfigurationManager
     extends AbstractConfigurationManager
 {
@@ -76,6 +76,20 @@ public class DefaultConfigurationManager
         this.validator = validator;
         this.configurationSource = configurationSource;
         this.privilegeDescriptors = privilegeDescriptors;
+    }
+    
+    public void runRead(ConfigurationManagerAction action)
+        throws Exception
+    {
+        //No support for this
+        throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
+    }
+
+    public void runWrite(ConfigurationManagerAction action)
+        throws Exception
+    {
+        //No support for this
+        throw new UnsupportedOperationException("Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
     }
 
     public List<CPrivilege> listPrivileges()
@@ -572,7 +586,7 @@ public class DefaultConfigurationManager
         return getPrivilegeProperty( readPrivilege( id ), key );
     }
 
-    public synchronized void save()
+    public void save()
     {
         try
         {
@@ -585,7 +599,7 @@ public class DefaultConfigurationManager
     }
 
     @Override
-    protected Configuration doGetConfiguration()
+    protected synchronized Configuration doGetConfiguration()
     {
         try
         {
