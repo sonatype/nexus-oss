@@ -33,7 +33,6 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
@@ -50,8 +49,6 @@ public class StatusPlexusResource
 
     @Requirement
     private Nexus nexus;
-
-    private boolean noSessionTimeout = SystemPropertiesHelper.getBoolean( "nexus.ui.noSessionTimeout", false );
 
     @Override
     public Object getPayloadInstance()
@@ -150,8 +147,6 @@ public class StatusPlexusResource
         resource.setLicenseExpired( status.isLicenseExpired() );
 
         resource.setTrialLicense( status.isTrialLicense() );
-
-        resource.setNoSessionTimeout( noSessionTimeout );
 
         StatusResourceResponse result = new StatusResourceResponse();
 

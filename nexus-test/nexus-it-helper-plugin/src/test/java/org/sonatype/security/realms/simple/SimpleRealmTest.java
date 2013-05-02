@@ -57,7 +57,7 @@ public class SimpleRealmTest
         // copy the tests nexus.xml and security.xml to the correct location
         copyTestConfigToPlace();
         // restart security
-        lookup( ConfigurationManager.class ).clearCache();
+        lookup( ConfigurationManager.class, "legacydefault" ).clearCache();
         lookup( SecuritySystem.class ).start();
     }
 

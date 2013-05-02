@@ -729,7 +729,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
           }
         },
         start : function() {
-          if (running === null && !Sonatype.utils.noSessionTimeout) {
+          if (running === null) {
             running = Ext.TaskMgr.start(config);
           }
         }};
@@ -833,8 +833,6 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
 
                 ns.formattedAppName = Ext.namespace('Sonatype.utils').parseFormattedAppName(respObj.data.formattedAppName);
 
-                ns.noSessionTimeout = respObj.data.noSessionTimeout;
-
                 Ext.get('logo').update('<span>' + ns.formattedAppName + '</span>');
 
                 Sonatype.view.headerPanel.doLayout();
@@ -860,8 +858,6 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
                 Sonatype.user.curr.username = null;
                 Sonatype.user.curr.loggedInUserSource = null;
 
-                // nexusStatus REST call unsuccessful, so we just turn off the ping here
-                ns.noSessionTimeout = true;
               }
 
               var availSvrs = Sonatype.config.installedServers;
