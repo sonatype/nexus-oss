@@ -36,6 +36,7 @@ public class DefaultPasswordGenerator
         return min + next;
     }
 
+    @Override
     public String generatePassword( int minChars, int maxChars )
     {
         int length = getRandom( minChars, maxChars );
@@ -57,6 +58,7 @@ public class DefaultPasswordGenerator
         return new String( bytes );
     }
 
+    @Override
     public String hashPassword( String password )
     {
         return StringDigester.getSha1Digest( password );

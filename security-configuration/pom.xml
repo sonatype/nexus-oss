@@ -73,10 +73,13 @@
               <goal>xpp3-writer</goal>
             </goals>
             <configuration>
-              <version>2.0.3</version>
+              <version>2.0.4</version>
               <models>
                 <model>src/main/mdo/security-configuration.xml</model>
               </models>
+              <packagedVersions>
+                <packagedVersion>2.0.3</packagedVersion>
+              </packagedVersions>
             </configuration>
           </execution>
         </executions>
@@ -84,7 +87,76 @@
           <packageWithVersion>false</packageWithVersion>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <!-- TODO remove when upgrade generator is merged into modello -->
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>modello-plugin-upgrade</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>security-configuration-upgrade</id>
+            <goals>
+              <goal>upgrade</goal>
+            </goals>
+            <configuration>
+              <version>2.0.4</version>
+              <models>
+                <model>src/main/mdo/security-configuration.xml</model>
+              </models>
+              <packagedVersions>
+                <packagedVersion>2.0.3</packagedVersion>               
+              </packagedVersions>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>        
+      </plugin>
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>modello-plugin-upgrade</artifactId>
+                        <versionRange>[1.0,)</versionRange>
+                        <goals>
+                          <goal>upgrade</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

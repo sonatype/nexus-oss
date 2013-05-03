@@ -21,12 +21,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.shiro.authc.credential.PasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
@@ -36,9 +38,9 @@ import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
-import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -65,15 +67,21 @@ public class SecurityXmlUserManager
     public static final String SOURCE = "default";
 
     private final ConfigurationManager configuration;
+    
+    //private final SecurityConfigurationManager securityConfiguration;
 
     private final SecuritySystem securitySystem;
+    
+    private final PasswordService passwordService;
 
     @Inject
     public SecurityXmlUserManager( @Named( "default" ) ConfigurationManager configuration,
-                                   SecuritySystem securitySystem )
+                                   SecuritySystem securitySystem,                                   
+                                   PasswordService passwordService)
     {
         this.configuration = configuration;
         this.securitySystem = securitySystem;
+        this.passwordService = passwordService;
     }
 
     protected CUser toUser( User user )
@@ -224,20 +232,8 @@ public class SecurityXmlUserManager
                 public void run() throws Exception
                 {
                     final CUser secUser = configuration.readUser( userId );
-                    final Set<String> roles = new HashSet<String>();
-                    
-                    try
-                    {
-                        CUserRoleMapping userRoleMapping = configuration.readUserRoleMapping( userId, SOURCE );
-                        roles.addAll( userRoleMapping.getRoles() );
-                    }
-                    catch ( NoSuchRoleMappingException e )
-                    {
-                        logger.debug( "User: " + userId + " has no roles." );
-                    }
-                    
                     secUser.setPassword( hashPassword( newPassword ) );
-                    configuration.updateUser( secUser, new HashSet<String>( roles ) );
+                    configuration.updateUser( secUser );
                     saveConfiguration();
                 }
             });
@@ -401,18 +397,18 @@ public class SecurityXmlUserManager
     {
         return this.securitySystem;
     }
-
+    
     private String hashPassword( String clearPassword )
     {
         // set the password if its not null
         if ( clearPassword != null && clearPassword.trim().length() > 0 )
         {
-            return StringDigester.getSha1Digest( clearPassword );
+            return this.passwordService.encryptPassword(clearPassword);
         }
-
+        
         return clearPassword;
     }
-
+	
     public void setUsersRoles( final String userId, final String userSource, final Set<RoleIdentifier> roleIdentifiers )
         throws UserNotFoundException, InvalidConfigurationException
     {

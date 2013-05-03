@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
@@ -35,6 +37,7 @@ import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 /**
  * ConfigurationManager that aggregates {@link StaticSecurityResource}s and {@link DynamicSecurityResource}s with
@@ -48,6 +51,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 public class ResourceMergingConfigurationManager
     extends AbstractConfigurationManager
 {
+	private final Logger logger = LoggerFactory.getLogger( getClass() );
+	
     // This will handle all normal security.xml file loading/storing
     private final ConfigurationManager manager;
 
@@ -448,6 +453,22 @@ public class ResourceMergingConfigurationManager
 
         // The static config can't be updated, so delegate to xml file
         manager.updateRole( role, context );
+    }
+    
+    public void updateUser( CUser user )
+        throws InvalidConfigurationException, UserNotFoundException
+    {
+    	Set<String> roles = new HashSet<String>();
+        try
+        {
+            CUserRoleMapping userRoleMapping = this.readUserRoleMapping( user.getId(), SecurityXmlUserManager.SOURCE );
+            roles.addAll( userRoleMapping.getRoles() );
+        }
+        catch ( NoSuchRoleMappingException e )
+        {
+            this.logger.debug( "User: {} has no roles", user.getId());
+        }        
+    	this.updateUser(user, new HashSet<String>( roles ));
     }
 
     public void updateUser( CUser user, Set<String> roles )

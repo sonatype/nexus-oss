@@ -118,6 +118,11 @@ public class DefaultSecurityConfigurationManager
             throw new InvalidConfigurationException( vr );
         }
     }
+    
+    public int getHashIterations()
+    {
+    	return this.getConfiguration().getHashIterations();
+    }
 
     public List<String> getRealms()
     {

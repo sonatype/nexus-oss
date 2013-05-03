@@ -15,6 +15,7 @@ package org.sonatype.security.realms.tools;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.shiro.authc.credential.PasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
@@ -41,9 +43,10 @@ import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
-import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+
+import com.google.common.collect.Sets;
 
 @Singleton
 @Typed( ConfigurationManager.class )
@@ -63,19 +66,23 @@ public class DefaultConfigurationManager
     private final SecurityConfigurationCleaner configCleaner;
 
     private final List<SecurityConfigurationModifier> configurationModifiers;
+    
+    private final PasswordService passwordService;
 
     @Inject
     public DefaultConfigurationManager( List<SecurityConfigurationModifier> configurationModifiers,
                                         SecurityConfigurationCleaner configCleaner,
                                         SecurityConfigurationValidator validator,
                                         @Named( "file" ) SecurityModelConfigurationSource configurationSource,
-                                        List<PrivilegeDescriptor> privilegeDescriptors )
+                                        List<PrivilegeDescriptor> privilegeDescriptors,
+                                        PasswordService passwordService )
     {
         this.configurationModifiers = configurationModifiers;
         this.configCleaner = configCleaner;
         this.validator = validator;
         this.configurationSource = configurationSource;
         this.privilegeDescriptors = privilegeDescriptors;
+        this.passwordService = passwordService;
     }
     
     public void runRead(ConfigurationManagerAction action)
@@ -190,7 +197,7 @@ public class DefaultConfigurationManager
         // set the password if its not null
         if ( password != null && password.trim().length() > 0 )
         {
-            user.setPassword( StringDigester.getSha1Digest( password ) );
+            user.setPassword(this.passwordService.encryptPassword(password));
         }
 
         ValidationResponse vr = validator.validateUser( context, user, roles, false );
@@ -404,6 +411,22 @@ public class DefaultConfigurationManager
             throw new InvalidConfigurationException( vr );
         }
     }
+    
+    public void updateUser( CUser user )
+    	throws InvalidConfigurationException, UserNotFoundException
+	{    	
+        Set<String> roles = Sets.newHashSet();
+        try
+        {
+            CUserRoleMapping userRoleMapping = this.readUserRoleMapping( user.getId(), SecurityXmlUserManager.SOURCE );
+            roles.addAll( userRoleMapping.getRoles() );
+        }
+        catch ( NoSuchRoleMappingException e )
+        {
+            this.logger.debug( "User: {} has no roles", user.getId());
+        }        
+        this.updateUser( user, new HashSet<String>( roles ) );
+	}
 
     public void updateUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException, UserNotFoundException

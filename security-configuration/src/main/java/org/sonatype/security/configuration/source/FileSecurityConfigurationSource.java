@@ -29,6 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
 
 /**
  * The default configuration source powered by Modello. It will try to load configuration, upgrade if needed and
@@ -47,10 +48,10 @@ public class FileSecurityConfigurationSource
      */
     private File configurationFile;
 
-    // /**
-    // * The configuration upgrader.
-    // */
-    // private SecurityConfigurationUpgrader configurationUpgrader;
+    /**
+    * The configuration upgrader.
+    */
+    private SecurityConfigurationUpgrader configurationUpgrader;
 
     /**
      * The defaults configuration source.
@@ -65,11 +66,13 @@ public class FileSecurityConfigurationSource
     @Inject
     public FileSecurityConfigurationSource( @Named( "static" ) SecurityConfigurationSource securityDefaults,
                                             @Named( "${application-conf}/security-configuration.xml" ) File configurationFile,
-                                            PasswordHelper passwordHelper )
+                                            PasswordHelper passwordHelper,
+                                            SecurityConfigurationUpgrader configurationUpgrader )
     {
         this.securityDefaults = securityDefaults;
         this.configurationFile = configurationFile;
         this.passwordHelper = passwordHelper;
+        this.configurationUpgrader = configurationUpgrader;
     }
 
     /**
@@ -124,14 +127,13 @@ public class FileSecurityConfigurationSource
 
         loadConfiguration( getConfigurationFile() );
 
-        // TODO: handle upgrade
-        // // check for loaded model
-        // if ( getConfiguration() == null )
-        // {
-        // upgradeConfiguration( getConfigurationFile() );
-        //
-        // loadConfiguration( getConfigurationFile() );
-        // }
+        // check for loaded model
+        if ( getConfiguration() == null )
+        {
+            upgradeConfiguration( getConfigurationFile() );
+            
+            loadConfiguration( getConfigurationFile() );
+        }
 
         return getConfiguration();
     }
@@ -153,33 +155,33 @@ public class FileSecurityConfigurationSource
         return securityDefaults;
     }
 
-    // protected void upgradeConfiguration( File file )
-    // throws IOException,
-    // ConfigurationException
-    // {
-    // this.getLogger().info( "Trying to upgrade the configuration file " + file.getAbsolutePath() );
-    //
-    // setConfiguration( configurationUpgrader.loadOldConfiguration( file ) );
-    //
-    // // after all we should have a configuration
-    // if ( getConfiguration() == null )
-    // {
-    // throw new ConfigurationException( "Could not upgrade Security configuration! Please replace the "
-    // + file.getAbsolutePath() + " file with a valid Security configuration file." );
-    // }
-    //
-    // this.getLogger().info( "Creating backup from the old file and saving the upgraded configuration." );
-    //
-    // // backup the file
-    // File backup = new File( file.getParentFile(), file.getName() + ".bak" );
-    //
-    // FileUtils.copyFile( file, backup );
-    //
-    // // set the upgradeInstance to warn the application about this
-    // setConfigurationUpgraded( true );
-    //
-    // saveConfiguration( file );
-    // }
+     protected void upgradeConfiguration( File file )
+    		 throws IOException,
+    		 ConfigurationException
+     {
+	     this.getLogger().info( "Trying to upgrade the security configuration file {}", file.getAbsolutePath() );
+	    
+	     setConfiguration( configurationUpgrader.loadOldConfiguration( file ) );
+	    
+	     // after all we should have a configuration
+	     if ( getConfiguration() == null )
+	     {
+	    	 throw new ConfigurationException( "Could not upgrade Security configuration! Please replace the "
+	    			 + file.getAbsolutePath() + " file with a valid Security configuration file." );
+	     }
+	    
+	     this.getLogger().info( "Creating backup from the old file and saving the upgraded security configuration." );
+	    
+	     // backup the file
+	     File backup = new File( file.getParentFile(), file.getName() + ".bak" );
+	    
+	     FileUtils.copyFile( file, backup );
+	    
+	     // set the upgradeInstance to warn the application about this
+	     setConfigurationUpgraded( true );
+	    
+	     saveConfiguration( file );
+     }
 
     /**
      * Load configuration.
@@ -191,7 +193,7 @@ public class FileSecurityConfigurationSource
     private void loadConfiguration( File file )
         throws IOException
     {
-        this.getLogger().info( "Loading Security configuration from " + file.getAbsolutePath() );
+        this.getLogger().info( "Loading Security configuration from {}", file.getAbsolutePath() );
 
         FileInputStream fis = null;
         try

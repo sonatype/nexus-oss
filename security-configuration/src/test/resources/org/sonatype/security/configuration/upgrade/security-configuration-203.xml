@@ -13,14 +13,13 @@
 
 -->
 <security-configuration>
-  <version>2.0.4</version>
+  <version>2.0.3</version>
   <enabled>true</enabled>
-  <anonymousAccessEnabled>false</anonymousAccessEnabled>
+  <anonymousAccessEnabled>true</anonymousAccessEnabled>
   <anonymousUsername>anonymous-user</anonymousUsername>
   <anonymousPassword>anonymous-pass</anonymousPassword>
   <realms>
     <realm>MyRealmHint1</realm>
     <realm>MyRealmHint2</realm>
   </realms>
-  <hashIterations>1024</hashIterations>
 </security-configuration>

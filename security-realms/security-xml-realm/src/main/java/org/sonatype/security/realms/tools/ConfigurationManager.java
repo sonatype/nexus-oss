@@ -176,9 +176,17 @@ public interface ConfigurationManager
      */
     CPrivilege readPrivilege( String id )
         throws NoSuchPrivilegeException;
+    
+    /**
+     * Update an existing user. Roles are unchanged
+     * 
+     * @param user to update
+     */
+    public void updateUser( CUser user )
+        throws InvalidConfigurationException, UserNotFoundException;
 
     /**
-     * Update an existing user
+     * Update an existing user and their roles
      * 
      * @param user
      */

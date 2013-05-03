@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.realms;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
@@ -20,6 +23,7 @@ import java.util.Set;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.realm.Realm;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
@@ -29,25 +33,32 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
-import org.sonatype.security.usermanagement.StringDigester;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 
 public class XmlAuthenticatingRealmTest
     extends InjectedTestCase
 {
-    public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
+    private final String SECURITY_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml";
+    
+    private final String SECURITY_CONFIGURATION_FILE_PATH = getBasedir() + "/target/jsecurity/security-configuration.xml";
 
-    private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml";
-
-    private File configFile = new File( SECURITY_CONFIG_FILE_PATH );
+    private File configFile = new File( SECURITY_FILE_PATH );
 
     private XmlAuthenticatingRealm realm;
 
     private DefaultConfigurationManager configurationManager;
+    
+    private PasswordGenerator passwordGenerator;
+    
+    private PasswordService passwordService;
+    
+    private CUser testUser;
 
     @Override
     public void configure( Properties properties )
     {
-        properties.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        properties.put( "security-xml-file", SECURITY_FILE_PATH );
+        properties.put( "application-conf" , SECURITY_CONFIGURATION_FILE_PATH );
         super.configure( properties );
     }
 
@@ -62,6 +73,9 @@ public class XmlAuthenticatingRealmTest
         configurationManager = lookup( DefaultConfigurationManager.class);
 
         configurationManager.clearCache();
+        
+        passwordGenerator = lookup( PasswordGenerator.class, "default" );
+        passwordService = lookup( PasswordService.class, "default" );
 
         configFile.delete();
     }
@@ -77,7 +91,7 @@ public class XmlAuthenticatingRealmTest
 
         String password = new String( (char[]) ai.getCredentials() );
 
-        assertEquals( StringDigester.getSha1Digest( "password" ), password );
+        assertThat(this.passwordService.passwordsMatch("password", password), is(true));
     }
 
     public void testCreateWithPassowrd()
@@ -86,13 +100,14 @@ public class XmlAuthenticatingRealmTest
         buildTestAuthenticationConfig( CUser.STATUS_ACTIVE );
 
         String clearPassword = "default-password";
+        String username = "testCreateWithPassowrdEmailUserId";
 
         CUser user = new CUser();
         user.setEmail( "testCreateWithPassowrdEmail@somewhere" );
         user.setFirstName( "testCreateWithPassowrdEmail" );
         user.setLastName( "testCreateWithPassowrdEmail" );
         user.setStatus( CUser.STATUS_ACTIVE );
-        user.setId( "testCreateWithPassowrdEmailUserId" );
+        user.setId( username );
 
         Set<String> roles = new HashSet<String>();
         roles.add( "role" );
@@ -104,8 +119,8 @@ public class XmlAuthenticatingRealmTest
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
 
         String password = new String( (char[]) ai.getCredentials() );
-
-        assertEquals( StringDigester.getSha1Digest( clearPassword ), password );
+        
+        assertThat(this.passwordService.passwordsMatch(clearPassword, password), is(true));
     }
 
     public void testFailedAuthentication()
@@ -145,9 +160,31 @@ public class XmlAuthenticatingRealmTest
             // good
         }
     }
+    
+    public void testDetectLegacyUser()
+        throws Exception
+    {
+        String password = "password";
+        String username = "username";
+        buildLegacyTestAuthenticationConfig(password);
+        
+        UsernamePasswordToken upToken = new UsernamePasswordToken(username, password);
+        AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
+        CUser updatedUser = this.configurationManager.readUser(username);
+        String hash = new String( (char[]) ai.getCredentials() );
+        
+        assertThat(this.passwordService.passwordsMatch(password, hash), is(true));
+        assertThat(this.passwordService.passwordsMatch(password, updatedUser.getPassword()), is(true));
+    }
 
     private void buildTestAuthenticationConfig( String status )
         throws InvalidConfigurationException
+    {
+        buildTestAuthenticationConfig(status, this.hashPassword("password"));
+    }
+    
+    private void buildTestAuthenticationConfig(String status, String hash)
+    	throws InvalidConfigurationException
     {
         CPrivilege priv = new CPrivilege();
         priv.setId( "priv" );
@@ -176,18 +213,34 @@ public class XmlAuthenticatingRealmTest
 
         configurationManager.createRole( role );
 
-        CUser user = new CUser();
-        user.setEmail( "dummyemail@somewhere" );
-        user.setFirstName( "dummyFirstName" );
-        user.setLastName( "dummyLastName" );
-        user.setStatus( status );
-        user.setId( "username" );
-        user.setPassword( StringDigester.getSha1Digest( "password" ) );
+        testUser = new CUser();
+        testUser.setEmail( "dummyemail@somewhere" );
+        testUser.setFirstName( "dummyFirstName" );
+        testUser.setLastName( "dummyLastName" );
+        testUser.setStatus( status );
+        testUser.setId( "username" );
+        testUser.setPassword(hash);
 
         Set<String> roles = new HashSet<String>();
         roles.add( "role" );
 
-        configurationManager.createUser( user, roles );
+        configurationManager.createUser( testUser, roles );
         configurationManager.save();
+    }
+    
+    private void buildLegacyTestAuthenticationConfig(String password)
+    	throws InvalidConfigurationException
+    {
+        buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, this.legacyHashPassword(password));
+    }
+    
+    private String hashPassword(String password)
+    {
+        return this.passwordService.encryptPassword(password);
+    }
+    
+    private String legacyHashPassword(String password)
+    {
+        return this.passwordGenerator.hashPassword(password);
     }
 }

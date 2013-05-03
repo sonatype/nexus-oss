@@ -99,6 +99,13 @@
           <type>String</type>
           <description>The id of a security manager to be used by default security system.</description>
           <required>true</required>
+        </field>
+        <field>
+          <name>hashIterations</name>
+          <version>2.0.4+</version>
+          <type>int</type>
+          <description>The id of a security manager to be used by default security system.</description>
+          <required>true</required>
         </field>        
       </fields>
       <codeSegments>
@@ -106,6 +113,12 @@
             <version>2.0.3</version>
             <code><![CDATA[
     public static final String MODEL_VERSION = "2.0.3";
+]]></code>
+        </codeSegment>
+        <codeSegment>
+            <version>2.0.4</version>
+            <code><![CDATA[
+    public static final String MODEL_VERSION = "2.0.4";
 ]]></code>
         </codeSegment>
     </codeSegments>

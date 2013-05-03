@@ -10,30 +10,20 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.usermanagement;
+package org.sonatype.security.configuration.upgrade;
+
+import org.sonatype.configuration.upgrade.ConfigurationUpgrader;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
- * Generates passwords for users.
+ * Defines a type for upgraders of security-configuration.xml.
+ * This is only used if an old version is detected and needs to be upgraded
  * 
- * @author Brian Demers
+ * @author Steve Carlucci
+ * @since 3.1
  */
-public interface PasswordGenerator
+public interface SecurityConfigurationUpgrader
+    extends ConfigurationUpgrader<SecurityConfiguration>
 {
-    /**
-     * Generates a password.
-     * 
-     * @param minChars the minimum number of characters in the password.
-     * @param maxChars the maximum number of characters in the password.
-     * @return
-     */
-    String generatePassword( int minChars, int maxChars );
 
-    /**
-     * Hash a password String.
-     * 
-     * @param password to be hashed.
-     * @return the hash password String.
-     * @deprecated use only to generate legacy unsalted password hashes
-     */
-    String hashPassword( String password );
 }

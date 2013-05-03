@@ -24,7 +24,8 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 public class DefaultSecurityConfigurationUpgraderTest
     extends AbstractSecurityConfigTest
 {
-
+	protected final String UPGRADE_HOME = new String("/org/sonatype/security/model/upgrade");
+	
     protected SecurityConfigurationUpgrader configurationUpgrader;
 
     public void setUp()
@@ -51,56 +52,35 @@ public class DefaultSecurityConfigurationUpgraderTest
 
         assertEquals( shouldBe, sw.toString() );
     }
-
-    public void testFrom100()
-        throws Exception
-    {
-        copyFromClasspathToFile( "/org/sonatype/security/model/upgrade/security-100.xml", getSecurityConfiguration() );
+    
+    protected void testUpgrade(String filename)
+    	throws Exception
+	{
+		copyFromClasspathToFile( UPGRADE_HOME + "/" + filename, getSecurityConfiguration() );
 
         Configuration configuration =
             configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        resultIsFine( "/org/sonatype/security/model/upgrade/security-100.xml", configuration );
+        resultIsFine( UPGRADE_HOME + "/" + filename, configuration );
+	}
+
+    public void testFrom100()
+        throws Exception
+    {
+    	testUpgrade("security-100.xml");
     }
 
     public void testFrom100Part2()
         throws Exception
     {
-        copyFromClasspathToFile( "/org/sonatype/security/model/upgrade/security-100-2.xml", getSecurityConfiguration() );
-
-        Configuration configuration =
-            configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
-
-        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
-
-        resultIsFine( "/org/sonatype/security/model/upgrade/security-100-2.xml", configuration );
-    }
-
-    public void testFrom201to202()
-        throws Exception
-    {
-        copyFromClasspathToFile( "/org/sonatype/security/model/upgrade/security-100-2.xml", getSecurityConfiguration() );
-
-        Configuration configuration =
-            configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
-
-        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
-
-        resultIsFine( "/org/sonatype/security/model/upgrade/security-100-2.xml", configuration );
-    }
+    	testUpgrade("security-100-2.xml");        
+    }    
 
     public void testFrom202to203OrphanRoleMappings()
         throws Exception
     {
-        copyFromClasspathToFile( "/org/sonatype/security/model/upgrade/security-202.xml", getSecurityConfiguration() );
-
-        Configuration configuration =
-            configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
-
-        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
-
-        resultIsFine( "/org/sonatype/security/model/upgrade/security-202.xml", configuration );
+    	testUpgrade("security-202.xml");        
     }
 }

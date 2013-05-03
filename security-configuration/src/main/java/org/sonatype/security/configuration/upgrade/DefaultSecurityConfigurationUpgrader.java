@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.model.upgrade;
+package org.sonatype.security.configuration.upgrade;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,13 +32,13 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
- * Default configuration updater, using versioned Modello models. It tried to detect version signature from existing
- * file and apply apropriate modello io stuff to load configuration. It is also aware of changes across model versions.
+ * Default security configuration (security-configuration.xml) updater. It attempts to detect the version in the file,
+ * and iteratively apply the appropriate version-specific updaters to update the file to the latest version
  * 
- * @author cstamas
+ * @author Steve Carlucci
  */
 @Singleton
 @Typed( SecurityConfigurationUpgrader.class )
@@ -48,27 +48,24 @@ public class DefaultSecurityConfigurationUpgrader
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private final Map<String, SecurityUpgrader> upgraders;
+    private final Map<String, SecurityConfigurationVersionUpgrader> upgraders;
 
-    private final Map<String, SecurityDataUpgrader> dataUpgraders;
+    //private final Map<String, SecurityDataUpgrader> dataUpgraders;
 
     @Inject
-    public DefaultSecurityConfigurationUpgrader( Map<String, SecurityUpgrader> upgraders,
-                                                 Map<String, SecurityDataUpgrader> dataUpgraders )
+    public DefaultSecurityConfigurationUpgrader( Map<String, SecurityConfigurationVersionUpgrader> upgraders )                                                 
     {
         this.upgraders = upgraders;
-        this.dataUpgraders = dataUpgraders;
+        //this.dataUpgraders = dataUpgraders;
     }
 
     /**
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
      * the needed (current) model version.
      * 
-     * @throws IOException if file does not exist or cannot be read
-     * @throws ConfigurationIsCorruptedException if file is corrupt, or does not need updating
-     * @throws UnsupportedConfigurationVersionException if file is of a version for which upgrades are not supported
+     * @throws
      */
-    public Configuration loadOldConfiguration( File file )
+    public SecurityConfiguration loadOldConfiguration( File file )
         throws IOException, ConfigurationIsCorruptedException, UnsupportedConfigurationVersionException
     {
         // try to find out the model version
@@ -76,7 +73,7 @@ public class DefaultSecurityConfigurationUpgrader
 
         try
         {
-            Reader r = new BufferedReader(ReaderFactory.newXmlReader(file));
+            Reader r = new BufferedReader(ReaderFactory.newXmlReader( file ));
 
             Xpp3Dom dom = Xpp3DomBuilder.build( r );
 
@@ -87,7 +84,7 @@ public class DefaultSecurityConfigurationUpgrader
             throw new ConfigurationIsCorruptedException( file.getAbsolutePath(), e );
         }
 
-        if ( Configuration.MODEL_VERSION.equals( modelVersion ) )
+        if ( SecurityConfiguration.MODEL_VERSION.equals( modelVersion ) )
         {
             // we have a problem here, model version is OK but we could not load it previously?
             throw new ConfigurationIsCorruptedException( file );
@@ -97,29 +94,20 @@ public class DefaultSecurityConfigurationUpgrader
 
         msg.setModelVersion( modelVersion );
 
-        SecurityUpgrader upgrader = upgraders.get( msg.getModelVersion() );
+        SecurityConfigurationVersionUpgrader upgrader = upgraders.get( msg.getModelVersion() );
 
         if ( upgrader != null )
         {
-            logger.info( "Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
-                + file.getAbsolutePath() );
+            logger.info( "Upgrading old Security configuration file (version {}) from {}", msg.getModelVersion(),
+                file.getAbsolutePath() );
 
             msg.setConfiguration( upgrader.loadConfiguration( file ) );
 
-            while ( !Configuration.MODEL_VERSION.equals( msg.getModelVersion() ) )
-            {
-
-                // an application might need to upgrade content, that is NOT part of the model
-                SecurityDataUpgrader dataUpgrader = this.dataUpgraders.get( msg.getModelVersion() );
-
+            while ( !SecurityConfiguration.MODEL_VERSION.equals( msg.getModelVersion() ) )
+            {            	
                 if ( upgrader != null )
                 {
-                    upgrader.upgrade( msg );
-
-                    if ( dataUpgrader != null )
-                    {
-                        dataUpgrader.upgrade( msg.getConfiguration() );
-                    }
+                    upgrader.upgrade( msg );                    
                 }
                 else
                 {
@@ -130,10 +118,9 @@ public class DefaultSecurityConfigurationUpgrader
                 upgrader = upgraders.get( msg.getModelVersion() );
             }
 
-            logger.info( "Security configuration file upgraded to current version " + msg.getModelVersion()
-                + " succesfully." );
+            logger.info( "Security configuration file upgraded to current version {} successfully", msg.getModelVersion());
 
-            return (Configuration) msg.getConfiguration();
+            return (SecurityConfiguration) msg.getConfiguration();
         }
         else
         {

@@ -19,7 +19,7 @@ import javax.inject.Inject;
 
 import junit.framework.Assert;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.security.AbstractSecurityTestCase;
 
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
@@ -28,7 +28,7 @@ import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;
 
 public class ResourceMergingManagerThreadedTest
-    extends InjectedTestCase
+    extends AbstractSecurityTestCase
 {
     private ConfigurationManager manager;
 
@@ -43,9 +43,11 @@ public class ResourceMergingManagerThreadedTest
     @Override
     public void configure( Properties properties )
     {
-        properties.put( "security-xml-file",
-                        "target/test-classes/org/sonatype/jsecurity/configuration/static-merging/security.xml" );
         super.configure( properties );
+        
+        //Overriding default value set in parent
+        properties.put( "security-xml-file",
+            "target/test-classes/org/sonatype/jsecurity/configuration/static-merging/security.xml" );
     }
 
     @Override

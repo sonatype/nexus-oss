@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.locators.MockStaticSecurityResource;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
@@ -25,7 +25,7 @@ import com.google.inject.Binder;
 import com.google.inject.name.Names;
 
 public class ResourceMergingConfigurationManagerTest
-    extends InjectedTestCase
+    extends AbstractSecurityTestCase
 {
     private ConfigurationManager manager;
 
@@ -33,6 +33,8 @@ public class ResourceMergingConfigurationManagerTest
     public void configure( Properties properties )
     {
         super.configure( properties );
+        
+        //Overriding value set in parent
         properties.put( "security-xml-file",
                         "target/test-classes/org/sonatype/security/configuration/static-merging/security.xml" );
     }

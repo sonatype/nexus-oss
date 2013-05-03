@@ -36,6 +36,14 @@ public interface SecurityConfigurationManager
         throws InvalidConfigurationException;
 
     String getAnonymousPassword();
+    
+    /**
+     * The number of iterations to be used when hashing passwords
+     * 
+     * @return number of hash iterations
+     * @since 3.1
+     */
+    int getHashIterations();
 
     void setRealms( List<String> realms )
         throws InvalidConfigurationException;

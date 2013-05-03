@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -22,6 +25,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.authc.credential.PasswordService;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.AbstractSecurityTestCase;
@@ -34,7 +38,6 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -43,6 +46,7 @@ import org.sonatype.security.usermanagement.UserStatus;
 public class UserManagerTest
     extends AbstractSecurityTestCase
 {
+    private PasswordService passwordService;
 
     @Override
     protected void setUp()
@@ -54,6 +58,8 @@ public class UserManagerTest
         String securityXml = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security.xml";
         FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ),
                                  new File( CONFIG_DIR, "security.xml" ) );
+        
+        passwordService = lookup( PasswordService.class, "default" );
     }
 
     public SecuritySystem getSecuritySystem()
@@ -118,7 +124,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
         Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
         Assert.assertEquals( secUser.getLastName(), user.getLastName() );
-        Assert.assertEquals( secUser.getPassword(), StringDigester.getSha1Digest( "my-password" ) );
+        assertThat( this.passwordService.passwordsMatch("my-password", secUser.getPassword()), is(true) );
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
@@ -141,8 +147,8 @@ public class UserManagerTest
         UserManager userManager = this.getUserManager();
         userManager.changePassword( "test-user", "new-user-password" );
 
-        Assert.assertEquals( this.getConfigurationManager().readUser( "test-user" ).getPassword(),
-                             StringDigester.getSha1Digest( "new-user-password" ) );
+        CUser user = this.getConfigurationManager().readUser( "test-user" );
+        assertThat(this.passwordService.passwordsMatch("new-user-password", user.getPassword()), is(true));
     }
 
     public void testUpdateUser()
@@ -376,5 +382,4 @@ public class UserManagerTest
 
         return roleIds;
     }
-
 }
