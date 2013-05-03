@@ -143,7 +143,7 @@ public class TextFilePrefixSourceMarshallerTest
         assertThat( outputStream.size(), greaterThan( 15 ) );
 
         final String output = new String( outputStream.toByteArray(), UTF8 );
-        assertThat( output.replace("\r", ""), equalTo( withStandardHeaders( prefixFile1( false ) ).replace("\r", "") ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile1( false ) ) ) );
     }
 
     @Test
@@ -165,7 +165,7 @@ public class TextFilePrefixSourceMarshallerTest
         // once read, the file looses "peculiarities" as dots from start and comments
         // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
         // passed on as-is (unchanged)
-        assertThat( output.replace("\r", ""), equalTo( withStandardHeaders( prefixFile1( false ) ).replace("\r", "") ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile1( false ) ) ) );
     }
 
     @Test
@@ -187,7 +187,7 @@ public class TextFilePrefixSourceMarshallerTest
         // once read, the file looses "peculiarities" as dots from start and comments
         // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
         // passed on as-is (unchanged)
-        assertThat( output.replace("\r", ""), equalTo( withStandardHeaders( prefixFile3( false ) ).replace("\r", "") ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile3( false ) ) ) );
     }
 
     @Test
@@ -209,6 +209,6 @@ public class TextFilePrefixSourceMarshallerTest
         // once read, the file looses "peculiarities" as dots from start and comments
         // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
         // passed on as-is (unchanged)
-        assertThat( output.replace("\r", ""), equalTo( withStandardHeaders( prefixFile4( false, true ) ).replace("\r", "") ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile4( false, true ) ) ) );
     }
 }
