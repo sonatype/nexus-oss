@@ -20,17 +20,17 @@ import org.apache.shiro.crypto.hash.Hash;
 import org.junit.Test;
 import org.sonatype.security.AbstractSecurityTestCase;
 
-public class DefaultNexusPasswordServiceTest
+public class DefaultSecurityPasswordServiceTest
     extends AbstractSecurityTestCase
 {
-    DefaultNexusPasswordService passwordService;
+    DefaultSecurityPasswordService passwordService;
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
         
-        this.passwordService = (DefaultNexusPasswordService) lookup(PasswordService.class, "default");
+        this.passwordService = (DefaultSecurityPasswordService) lookup(PasswordService.class, "default");
     }
     
     @Test
