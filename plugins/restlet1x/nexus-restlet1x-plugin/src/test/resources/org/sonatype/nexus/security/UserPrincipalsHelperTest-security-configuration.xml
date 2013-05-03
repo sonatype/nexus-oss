@@ -1,5 +1,5 @@
 <security-configuration>
-  <version>2.0.3</version>
+  <version>2.0.4</version>
   <anonymousAccessEnabled>true</anonymousAccessEnabled>
   <anonymousUsername>anonymous</anonymousUsername>
   <anonymousPassword>{oHoWkZPMDS8Hc3TVuAGDRGYK/NRIM/047Idl50aU19U=}</anonymousPassword>
@@ -8,4 +8,5 @@
     <realm>XmlAuthorizingRealm</realm>
   </realms>
   <securityManager>default</securityManager>
+  <hashIterations>1024</hashIterations>
 </security-configuration>
