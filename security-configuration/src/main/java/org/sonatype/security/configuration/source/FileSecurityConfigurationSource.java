@@ -169,6 +169,22 @@ public class FileSecurityConfigurationSource
 	    	 throw new ConfigurationException( "Could not upgrade Security configuration! Please replace the "
 	    			 + file.getAbsolutePath() + " file with a valid Security configuration file." );
 	     }
+	     
+         // Need to decrypt the anonymous user's password
+         SecurityConfiguration configuration = this.getConfiguration();
+         if ( StringUtils.isNotEmpty( configuration.getAnonymousPassword() ) )
+         {
+             String encryptedPassword = configuration.getAnonymousPassword();
+             try
+             {
+                 configuration.setAnonymousPassword( this.passwordHelper.decrypt( encryptedPassword ) );
+             }
+             catch ( PlexusCipherException e )
+             {
+                 this.getLogger().error( "Failed to decrypt anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
+                                         e );
+             }
+         }
 	    
 	     this.getLogger().info( "Creating backup from the old file and saving the upgraded security configuration." );
 	    
