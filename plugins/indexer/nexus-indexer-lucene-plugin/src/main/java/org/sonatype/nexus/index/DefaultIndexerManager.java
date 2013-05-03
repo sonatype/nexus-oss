@@ -1230,23 +1230,48 @@ public class DefaultIndexerManager
         {
             try
             {
+                if ( !forceFullUpdate )
+                {
+                    //Try incremental update first
+                    try
+                    {
+                        Runnable runnable = new Runnable()
+                        {
+                            @Override
+                            public void run( IndexingContext context )
+                                throws IOException
+                            {
+                                updateRemoteIndex( repository, context, false );
+                            }
+                        };
+                        
+                        sharedSingle( repository, runnable );
+                        return;
+                    }
+                    catch(IncrementalIndexUpdateException e)
+                    {
+                        //This exception is an indication that an incremental
+                        //update is not possible, and a full update is necessary
+                        logger.info( "Unable to incrementally update index for repository {}. Trying full index update", repository.getId() );
+                        
+                        //Let execution continue to below to try full index update
+                    }
+                }
+                
+                //If we're here, either a full update was requested, or incremental failed
+                //Try full index update
+                
                 Runnable runnable = new Runnable()
                 {
                     @Override
                     public void run( IndexingContext context )
                         throws IOException
                     {
-                        updateRemoteIndex( repository, context, forceFullUpdate );
+                        updateRemoteIndex( repository, context, true );
                     }
                 };
-                if ( forceFullUpdate )
-                {
-                    temporary( repository, runnable );
-                }
-                else
-                {
-                    sharedSingle( repository, runnable );
-                }
+                
+                temporary( repository, runnable );
             }
             finally
             {
