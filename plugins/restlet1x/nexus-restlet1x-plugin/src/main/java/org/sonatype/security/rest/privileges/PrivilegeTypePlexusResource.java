@@ -58,7 +58,7 @@ public class PrivilegeTypePlexusResource
     public static final String RESOURCE_URI = "/privilege_types";
 
     @Inject
-    @Named( "resourceMerging" )
+    @Named( "default" )
     private ConfigurationManager configurationManager;
 
     @Override

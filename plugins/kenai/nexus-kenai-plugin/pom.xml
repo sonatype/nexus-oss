@@ -31,7 +31,7 @@
   <properties>
     <pluginName>Nexus Kenai Realm Plugin</pluginName>
     <pluginDescription>Adds Kenai realm to Nexus.</pluginDescription>
-    <security.version>3.0.3-SNAPSHOT</security.version>
+    <security.version>3.1-SNAPSHOT</security.version>
     <jetty.version>6.1.12</jetty.version>
   </properties>
 
@@ -48,20 +48,8 @@
       <artifactId>org.json</artifactId>
       <version>2.0-NEXUS-3758</version>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <version>${security.version}</version>
-      <scope>provided</scope>
-    </dependency>
 
     <!-- These below are transitive deps but are in core already -->
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <version>${security.version}</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>

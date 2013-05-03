@@ -36,8 +36,11 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import com.google.common.base.Throwables;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -162,7 +165,23 @@ public class NexusViewSecurityResource
     {
         setDirty( true );
 
-        configManager.cleanRemovedPrivilege( createPrivilegeId( event.getRepository().getId() ) );
+        try
+        {
+            configManager.runWrite(new ConfigurationManagerAction()
+            {
+                @Override
+                public void run()
+                    throws Exception
+                {
+                    configManager.cleanRemovedPrivilege( createPrivilegeId( event.getRepository().getId() ) );
+                }
+                
+            });
+        }
+        catch(Exception e)
+        {
+            throw Throwables.propagate(e);
+        }
     }
 
     public void initialize()

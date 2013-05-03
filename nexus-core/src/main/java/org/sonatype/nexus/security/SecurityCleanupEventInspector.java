@@ -32,6 +32,9 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ConfigurationManagerAction;
+
+import com.google.common.base.Throwables;
 
 @Component( role = EventInspector.class, hint = "SecurityCleanupEventInspector" )
 public class SecurityCleanupEventInspector
@@ -97,7 +100,7 @@ public class SecurityCleanupEventInspector
     {
         Set<Privilege> privileges = security.listPrivileges();
 
-        Set<String> removedIds = new HashSet<String>();
+        final Set<String> removedIds = new HashSet<String>();
 
         for ( Privilege privilege : privileges )
         {
@@ -111,10 +114,26 @@ public class SecurityCleanupEventInspector
             }
         }
 
-        for ( String privilegeId : removedIds )
+        try
         {
-            configManager.cleanRemovedPrivilege( privilegeId );
+            configManager.runWrite(new ConfigurationManagerAction()
+            {
+                @Override
+                public void run()
+                    throws Exception
+                {
+                    for ( String privilegeId : removedIds )
+                    {
+                        configManager.cleanRemovedPrivilege( privilegeId );
+                    }
+                    configManager.save();
+                }
+                
+            });
         }
-        configManager.save();
+        catch(Exception e)
+        {
+            throw Throwables.propagate(e);
+        }
     }
 }
