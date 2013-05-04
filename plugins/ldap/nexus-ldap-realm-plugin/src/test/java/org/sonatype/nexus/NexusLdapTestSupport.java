@@ -30,6 +30,7 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
@@ -99,6 +100,12 @@ public abstract class NexusLdapTestSupport
 
         this.copyDefaultSecurityConfigToPlace();
         this.copyDefaultLdapConfigToPlace();
+        
+        //Force a load of security-configuration.xml. Before we copy our test security-configuration.xml
+        //in place, a load is attempted, which forces defaults to be loaded. When the SecuritySystem
+        //is constructed, it then saves the configuration, which overwrites our test security-configuration.xml
+        //with the defaults
+        lookup(SecurityConfigurationSource.class, "file").loadConfiguration();
     }
 
     @Override
