@@ -18,7 +18,7 @@
   <parent>
     <groupId>org.sonatype.security</groupId>
     <artifactId>security-parent</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1</version>
   </parent>
 
   <artifactId>security-system</artifactId>
