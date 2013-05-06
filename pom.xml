@@ -46,7 +46,7 @@
     <pluginName>Nexus P2 Bridge Plugin</pluginName>
     <pluginDescription>Bridge between Nexus and P2 Eclipse Runtime.</pluginDescription>
 
-    <p2-bridge.version>1.1.6-SNAPSHOT</p2-bridge.version>
+    <p2-bridge.version>1.1.6</p2-bridge.version>
   </properties>
 
   <dependencyManagement>
