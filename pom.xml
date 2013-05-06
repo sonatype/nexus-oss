@@ -232,8 +232,8 @@
                 </goals>
                 <configuration>
                   <extraArtifacts>
-                    <extraArtifact>org.sonatype.maven.plugins:maven-p2-bridge-plugin:1.1.6-SNAPSHOT</extraArtifact>
-                    <extraArtifact>org.sonatype.p2.bridge:org.sonatype.p2.bridge.impl:1.1.6-SNAPSHOT</extraArtifact>
+                    <extraArtifact>org.sonatype.maven.plugins:maven-p2-bridge-plugin:1.1.6</extraArtifact>
+                    <extraArtifact>org.sonatype.p2.bridge:org.sonatype.p2.bridge.impl:1.1.6</extraArtifact>
                     <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4.1</extraArtifact>
                   </extraArtifacts>
                   <localRepositoryPath>${project.build.directory}/maven-local-repository</localRepositoryPath>
