@@ -31,7 +31,7 @@
   <properties>
     <pluginName>Nexus Kenai Realm Plugin</pluginName>
     <pluginDescription>Adds Kenai realm to Nexus.</pluginDescription>
-    <security.version>3.1-SNAPSHOT</security.version>
+    <security.version>3.1</security.version>
     <jetty.version>6.1.12</jetty.version>
   </properties>
 
