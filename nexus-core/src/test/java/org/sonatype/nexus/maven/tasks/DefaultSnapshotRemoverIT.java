@@ -21,8 +21,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.access.OpenAccessManager;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
@@ -32,7 +30,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -740,36 +737,6 @@ public class DefaultSnapshotRemoverIT
         expecting.put( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.064938-1.jar", Boolean.FALSE );
         expecting.put( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.065026-2.pom", Boolean.FALSE );
         expecting.put( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.065026-2.jar", Boolean.FALSE );
-
-        validateResults( snapshots, expecting );
-    }
-
-    /**
-     * This test case uses 3 alpha snapshots and 2 beta snapshots, and after running the task only one of each
-     * artifacts should still be present.
-     * @see <a href='https://issues.sonatype.org/browse/NEXUS-3148'>NEXUS-5094</a>
-     */
-    @Test
-    public void testSnapshotsWithClassifiers()
-        throws Exception
-    {
-        fillInRepo();
-
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 1, -1, false );
-        SnapshotRemovalResult snapshotRemovalResult = defaultNexus.removeSnapshots( request );
-        assertThat( snapshotRemovalResult.isSuccessful(), is( true ) );
-
-        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.154949-1-alpha.jar", false );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.154949-1.pom", false );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.154953-2-alpha.jar", false );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.154953-2.pom", false );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.154956-3-alpha.jar", true );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.154956-3.pom", true );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.155001-4-beta.jar", false );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.155001-4.pom", false );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.155005-5-beta.jar", true );
-        expecting.put( "/org/sonatype/test/1.0-SNAPSHOT/test-1.0-20130501.155005-5.pom", true );
 
         validateResults( snapshots, expecting );
     }
