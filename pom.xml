@@ -60,7 +60,7 @@
     <pluginName>Nexus P2 Repository Plugin</pluginName>
     <pluginDescription>P2 repository support.</pluginDescription>
 
-    <capabilities-plugin.version>2.2.1</capabilities-plugin.version>
+    <capabilities-plugin.version>2.4</capabilities-plugin.version>
 
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
@@ -84,7 +84,7 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-p2-bridge-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
-      <version>2.1.1-SNAPSHOT</version>
+      <version>2.1.1</version>
       <scope>provided</scope>
     </dependency>
 
