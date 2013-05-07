@@ -51,7 +51,13 @@ public class NexusStatusService
 
         dataModel.put( "request", request );
         dataModel.put( "nexusVersion", nexus.getSystemStatus().getVersion() );
-        dataModel.put( "nexusRoot", referenceFactory.getContextRoot( request ).toString() );
+        // getContentRoot(req) always returns Reference with "/" as last character
+        String nexusRoot = referenceFactory.getContextRoot( request ).toString();
+        if ( nexusRoot.endsWith( "/" ) )
+        {
+            nexusRoot = nexusRoot.substring( 0, nexusRoot.length() - 1 );
+        }
+        dataModel.put( "nexusRoot", nexusRoot );
 
         dataModel.put( "statusCode", status.getCode() );
         dataModel.put( "statusName", status.getName() );
