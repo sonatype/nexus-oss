@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -147,15 +147,8 @@ public class Jetty8NexusBooter
         // guice finalizer
         System.setProperty( "guice.executor.class", "NONE" );
         
-        // Note: in ITs we want to make Indexer perform blocking commits.
-        // Since MavenIndexer 4.0, it performs async commits by default, meaning that no "helper" from Nexus
-        // is able to tell and potentially block (see EventInspectorsUtil#waitForCalmPeriod() as example) execution
-        // up to the moment when readers are refreshed (indexing operation IS done, but readers will not "see" the
-        // change without reopening those).
-        // By having this switch, we are switching Maven Indexer back into "blocking" mode as it was before 4.0.
-        // The proper fix is to make all Indexer related ITs behave "properly" (with some heuristics?), and have some
-        // sort of "try-wait-try-failAfterSomeRetries" the search operation itself.
-        System.setProperty( "mavenIndexerBlockingCommits", Boolean.TRUE.toString() );
+        // Making MI integration in Nexus behave in-sync
+        System.setProperty( "org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString() );
         
         // Note: autorouting initialization prevented
         // Presence breaks many ITs, especially those that either listen for proxy requests (will be more coz of prefix file

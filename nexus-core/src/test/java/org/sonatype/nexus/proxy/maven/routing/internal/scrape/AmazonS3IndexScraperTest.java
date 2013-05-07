@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,37 +14,26 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.routing.internal.scrape.AmazonS3IndexScraper;
-import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Page;
-import org.sonatype.nexus.proxy.maven.routing.internal.scrape.ScrapeContext;
-import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Scraper;
 import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
-import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
+
+import com.google.common.collect.Maps;
 
 public class AmazonS3IndexScraperTest
     extends TestSupport
@@ -113,6 +102,82 @@ public class AmazonS3IndexScraperTest
             + "</Contents>"//
             + "</ListBucketResult>";
 
+    final static String MULTI_PAGE_RESPONSE_PAGE_1 = //
+        "<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"//
+            + "<Name>foo-bar</Name>"//
+            + "<Prefix />"//
+            + "<Marker />"//
+            + "<MaxKeys>1000</MaxKeys>"//
+            + "<IsTruncated>true</IsTruncated>"//
+            + "<Contents>"//
+            + "<Key>release/foo1/bar/1/bar-1.jar</Key>"//
+            + "<LastModified>2011-08-25T01:38:05.000Z</LastModified>"//
+            + "<ETag>\"21c28f400f3c48799fdae89226066a8d\"</ETag>"//
+            + "<Size>9298877</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "<Contents>"//
+            + "<Key>release/.meta/repository-metadata.xml</Key>"//
+            + "<LastModified>2011-08-25T01:38:05.000Z</LastModified>"//
+            + "<ETag>\"8bf32bb10b5a9c818739cc0031c67ac9\"</ETag>"//
+            + "<Size>267</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "<Contents>"//
+            + "<Key>release/foo1/baz/1/baz-2.jar</Key>"//
+            + "<LastModified>2013-02-02T10:25:26.000Z</LastModified>"//
+            + "<ETag>\"9f25f7c8efd60f815626306442d5e71c\"</ETag>"//
+            + "<Size>436</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "</ListBucketResult>";
+
+    final static String MULTI_PAGE_RESPONSE_PAGE_2 = //
+        "<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"//
+            + "<Name>foo-bar</Name>"//
+            + "<Prefix />"//
+            + "<Marker />"//
+            + "<MaxKeys>1000</MaxKeys>"//
+            + "<IsTruncated>true</IsTruncated>"//
+            + "<Contents>"//
+            + "<Key>release/foo2/bar/1/bar-1.jar</Key>"//
+            + "<LastModified>2011-08-25T01:38:05.000Z</LastModified>"//
+            + "<ETag>\"21c28f400f3c48799fdae89226066a8d\"</ETag>"//
+            + "<Size>9298877</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "<Contents>"//
+            + "<Key>release/foo2/baz/1/baz-2.jar</Key>"//
+            + "<LastModified>2013-02-02T10:25:26.000Z</LastModified>"//
+            + "<ETag>\"9f25f7c8efd60f815626306442d5e71c\"</ETag>"//
+            + "<Size>436</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "</ListBucketResult>";
+
+    final static String MULTI_PAGE_RESPONSE_PAGE_3 = //
+        "<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"//
+            + "<Name>foo-bar</Name>"//
+            + "<Prefix />"//
+            + "<Marker />"//
+            + "<MaxKeys>1000</MaxKeys>"//
+            + "<IsTruncated>false</IsTruncated>"//
+            + "<Contents>"//
+            + "<Key>release/foo3/bar/1/bar-1.jar</Key>"//
+            + "<LastModified>2011-08-25T01:38:05.000Z</LastModified>"//
+            + "<ETag>\"21c28f400f3c48799fdae89226066a8d\"</ETag>"//
+            + "<Size>9298877</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "<Contents>"//
+            + "<Key>release/foo3/baz/1/baz-2.jar</Key>"//
+            + "<LastModified>2013-02-02T10:25:26.000Z</LastModified>"//
+            + "<ETag>\"9f25f7c8efd60f815626306442d5e71c\"</ETag>"//
+            + "<Size>436</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "</ListBucketResult>";
+
     @Mock
     private MavenProxyRepository mavenProxyRepository;
 
@@ -125,44 +190,50 @@ public class AmazonS3IndexScraperTest
         s3scraper = new AmazonS3IndexScraper();
     }
 
+    /**
+     * Server that delivers trivial repository as single page.
+     */
     protected Server prepareServer()
         throws Exception
     {
         final Server result = Server.withPort( 0 );
-        result.serve( "/release/" ).withBehaviours( new S3Headers(),
+        result.serve( "/release/" ).withBehaviours( new S3ResponseHeadersBehaviour(),
             new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
-        result.serve( "/" ).withBehaviours( new S3Headers(),
+        result.serve( "/" ).withBehaviours( new S3ResponseHeadersBehaviour(),
             new DeliverBehaviour( 200, "application/xml", ONE_PAGE_RESPONSE ) );
         return result;
     }
 
-    protected Server prepareErrorServer( int code )
+    /**
+     * Server that delivers trivial repository as single page, but will hit an error during deliver of repo root.
+     */
+    protected Server prepareErrorServer( final int code )
         throws Exception
     {
         if ( code == 403 )
         {
             final Server result = Server.withPort( 0 );
-            result.serve( "/release/" ).withBehaviours( new S3Headers(),
+            result.serve( "/release/" ).withBehaviours( new S3ResponseHeadersBehaviour(),
                 new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
-            result.serve( "/*" ).withBehaviours( new S3Headers(),
+            result.serve( "/*" ).withBehaviours( new S3ResponseHeadersBehaviour(),
                 new DeliverBehaviour( 403, "application/xml", ACCESS_DENIED_RESPONSE ) );
             return result;
         }
         else if ( code == 404 )
         {
             final Server result = Server.withPort( 0 );
-            result.serve( "/release/" ).withBehaviours( new S3Headers(),
+            result.serve( "/release/" ).withBehaviours( new S3ResponseHeadersBehaviour(),
                 new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
-            result.serve( "/*" ).withBehaviours( new S3Headers(),
+            result.serve( "/*" ).withBehaviours( new S3ResponseHeadersBehaviour(),
                 new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE_ROOT ) );
             return result;
         }
         else if ( code == 500 )
         {
             final Server result = Server.withPort( 0 );
-            result.serve( "/release/" ).withBehaviours( new S3Headers(),
+            result.serve( "/release/" ).withBehaviours( new S3ResponseHeadersBehaviour(),
                 new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
-            result.serve( "/*" ).withBehaviours( new S3Headers(),
+            result.serve( "/*" ).withBehaviours( new S3ResponseHeadersBehaviour(),
                 new DeliverBehaviour( 500, "application/xml", INTERNAL_ERROR_RESPONSE ) );
             return result;
         }
@@ -172,22 +243,74 @@ public class AmazonS3IndexScraperTest
         }
     }
 
-    protected static class S3Headers
-        implements Behaviour
+    /**
+     * Server that delivers "big" repository as multiple pages, and all transactions are fine.
+     */
+    protected Server prepareMultiPageServer()
+        throws Exception
     {
-        @Override
-        public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
-            throws Exception
-        {
-            response.addHeader( "Server", "AmazonS3" );
-            response.addHeader( "x-amz-request-id", "1234567890" );
-            return true;
-        }
+        // maps with "subsequent pages" that client needs to ask using ?marker=XXX
+        // where marker value is actually last key it got from previous page
+        // Hence, key for 2nd page in last <Key> from 1st page response
+        // key for 3rd page is last <Key> from 2nd page response
+        final Map<String, DeliverBehaviour> pages = Maps.newHashMapWithExpectedSize( 2 );
+        pages.put( "release/foo1/baz/1/baz-2.jar", new DeliverBehaviour( 200, "application/xml",
+            MULTI_PAGE_RESPONSE_PAGE_2 ) );
+        pages.put( "release/foo2/baz/1/baz-2.jar", new DeliverBehaviour( 200, "application/xml",
+            MULTI_PAGE_RESPONSE_PAGE_3 ) );
+
+        final Server result = Server.withPort( 0 );
+        result.serve( "/release/" ).withBehaviours( new S3ResponseHeadersBehaviour(),
+            new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
+        result.serve( "/" ).withBehaviours(
+            new S3ResponseHeadersBehaviour(),
+            new S3PagedDeliverBehaviour( new DeliverBehaviour( 200, "application/xml", MULTI_PAGE_RESPONSE_PAGE_1 ),
+                pages ) );
+        return result;
     }
 
-    protected Scraper getScraper()
+    /**
+     * Erroneous server that delivers "big" repository as multiple pages, and last page transactions fails.
+     */
+    protected Server prepareErrorMultiPageServer( final int code )
+        throws Exception
     {
-        return s3scraper;
+        // maps with "subsequent pages" that client needs to ask using ?marker=XXX
+        // where marker value is actually last key it got from previous page
+        // Hence, key for 2nd page in last <Key> from 1st page response
+        // key for 3rd page is last <Key> from 2nd page response
+        final Map<String, DeliverBehaviour> pages = Maps.newHashMapWithExpectedSize( 2 );
+        pages.put( "release/foo1/baz/1/baz-2.jar", new DeliverBehaviour( 200, "application/xml",
+            MULTI_PAGE_RESPONSE_PAGE_2 ) );
+
+        if ( code == 403 )
+        {
+            pages.put( "release/foo2/baz/1/baz-2.jar", new DeliverBehaviour( 403, "application/xml",
+                ACCESS_DENIED_RESPONSE ) );
+        }
+        else if ( code == 404 )
+        {
+            pages.put( "release/foo2/baz/1/baz-2.jar", new DeliverBehaviour( 404, "application/xml",
+                NO_SUCH_KEY_RESPONSE_ROOT ) );
+        }
+        else if ( code == 500 )
+        {
+            pages.put( "release/foo2/baz/1/baz-2.jar", new DeliverBehaviour( 500, "application/xml",
+                INTERNAL_ERROR_RESPONSE ) );
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Code " + code + " not supported!" );
+        }
+
+        final Server result = Server.withPort( 0 );
+        result.serve( "/release/" ).withBehaviours( new S3ResponseHeadersBehaviour(),
+            new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
+        result.serve( "/" ).withBehaviours(
+            new S3ResponseHeadersBehaviour(),
+            new S3PagedDeliverBehaviour( new DeliverBehaviour( 200, "application/xml", MULTI_PAGE_RESPONSE_PAGE_1 ),
+                pages ) );
+        return result;
     }
 
     // == One page:
@@ -207,7 +330,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( true ) );
             assertThat( context.getPrefixSource(), notNullValue() );
@@ -237,7 +360,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( false ) );
         }
@@ -267,7 +390,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( false ) );
         }
@@ -298,7 +421,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( false ) );
         }
@@ -328,7 +451,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( true ) );
             assertThat( context.getPrefixSource(), notNullValue() );
@@ -358,7 +481,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( false ) );
         }
@@ -383,7 +506,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( false ) );
         }
@@ -408,7 +531,7 @@ public class AmazonS3IndexScraperTest
             when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
             final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
+            s3scraper.scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( false ) );
         }
@@ -418,42 +541,114 @@ public class AmazonS3IndexScraperTest
         }
     }
 
-    /**
-     * This test is set as ignored as it would really go remotely to scrape it. Used just for debugging purposes or
-     * tuning.
-     * 
-     * @throws IOException
-     */
-    @Test
-    @Ignore
-    public void smoke()
-        throws IOException
-    {
-        final HttpClient httpClient = new DefaultHttpClient();
-        final String remoteUrl = "http://spring-roo-repository.springsource.org/release/";
-        final HttpGet get = new HttpGet( remoteUrl );
-        final HttpResponse response = httpClient.execute( get );
-        final Document document = Jsoup.parse( response.getEntity().getContent(), null, remoteUrl );
-        when( mavenProxyRepository.getRemoteUrl() ).thenReturn( remoteUrl );
-        final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
-        final Page page = new Page( remoteUrl, response, document );
-        s3scraper.scrape( context, page );
+    // == Multi-pages (big repo)
+    // Scenarios generally covers case when the repo root (that is nested in bucket, not at it's root)
+    // responds as expected (NoSuchKey), and then tests simulates various responses for "fixed" URL
+    // Point here, is that we did recognize remote as S3, and in any case, we should STOP scraping
+    // instead throwing generic IOEx that would make other scrapers pick up and continue trying to scrape
+    // the URL.
 
-        if ( context.isSuccessful() )
+    @Test
+    public void multiPagesHttp200()
+        throws Exception
+    {
+        final Server server = prepareMultiPageServer();
+        server.start();
+        try
         {
-            System.out.println( context.getPrefixSource().readEntries() );
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/release/";
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            s3scraper.scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( true ) );
+            assertThat( context.getPrefixSource(), notNullValue() );
+            final List<String> entries = context.getPrefixSource().readEntries();
+            assertThat( entries, notNullValue() );
+            assertThat( entries.size(), equalTo( 6 ) );
+            assertThat( entries,
+                containsInAnyOrder( "/foo1/bar", "/foo1/baz", "/foo2/bar", "/foo2/baz", "/foo3/bar", "/foo3/baz" ) );
         }
-        else
+        finally
         {
-            if ( context.isStopped() )
-            {
-                System.out.println( context.getMessage() );
-            }
-            else
-            {
-                System.out.println( "Huh?" );
-            }
+            server.stop();
         }
     }
 
+    @Test
+    public void multiPagesHttp403()
+        throws Exception
+    {
+        // server recognized as S3 but AccessDenied:
+        // context should be stopped and unsuccessful
+        final Server server = prepareErrorMultiPageServer( 403 );
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/release/";
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            s3scraper.scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( false ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    @Test
+    public void multiPagesHttp404()
+        throws Exception
+    {
+        // server recognized as S3 but 404:
+        // context should be stopped and unsuccessful
+        final Server server = prepareErrorMultiPageServer( 404 );
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/release/";
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            s3scraper.scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( false ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    @Test
+    public void multiPagesHttp500()
+        throws Exception
+    {
+        // server recognized as S3 but 500:
+        // context should be stopped and unsuccessful
+        final Server server = prepareErrorMultiPageServer( 500 );
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/release/";
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            s3scraper.scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( false ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
 }

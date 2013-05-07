@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugins.ui.rest;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,6 +31,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
  */
 @Named( "IndexRedirectingPlexusResource" )
 @Singleton
+@Typed( ManagedPlexusResource.class )
 public class IndexRedirectingPlexusResource
     extends AbstractNexusPlexusResource
     implements ManagedPlexusResource

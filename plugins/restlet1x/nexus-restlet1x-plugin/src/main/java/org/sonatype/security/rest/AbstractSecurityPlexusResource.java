@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -324,6 +324,7 @@ public abstract class AbstractSecurityPlexusResource
         xstream.registerLocalConverter( UserChangePasswordResource.class, "newPassword", new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( RoleResource.class, "id", new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( UserResource.class, "userId", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( UserResource.class, "password", new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( RoleAndPrivilegeListResource.class, "id", new HtmlUnescapeStringConverter( true) );
 
         xstream.registerLocalConverter( UserResource.class, "roles", new HtmlUnescapeStringCollectionConverter( "role" ) );

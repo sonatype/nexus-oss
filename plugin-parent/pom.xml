@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2012 Sonatype, Inc.
+    Copyright (c) 2007-2013 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>34</version>
+    <version>35</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -43,7 +43,7 @@
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
     <!-- Used in enunciate.xml -->
-    <copyright.year>2012</copyright.year>
+    <copyright.year>2013</copyright.year>
 
     <!-- Nexus _bundle-launcher-style_ integration-tests configuration -->
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,12 +12,17 @@
  */
 package org.sonatype.nexus.integrationtests.nexus142;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.shiro.authc.credential.PasswordService;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -26,7 +31,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.rest.model.UserResource;
-import org.sonatype.security.usermanagement.PasswordGenerator;
 
 /**
  * CRUD tests for JSON request/response.
@@ -35,10 +39,19 @@ public class Nexus142UserCrudJsonIT
     extends AbstractNexusIntegrationTest
 {
     protected UserMessageUtil messageUtil;
+    
+    private PasswordService passwordService;
 
     public Nexus142UserCrudJsonIT()
     {
         this.messageUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    }
+    
+    @Before
+    public void setUp()
+        throws Exception
+    {
+        passwordService = lookup( PasswordService.class );
     }
 
     @Test
@@ -76,11 +89,8 @@ public class Nexus142UserCrudJsonIT
         this.messageUtil.createUser( resource );
 
         // validate password is correct
-        PasswordGenerator pwGenerator = lookup( PasswordGenerator.class );
-        String hashedPassword = pwGenerator.hashPassword( password );
         CUser cUser = getSecurityConfigUtil().getCUser( "createTestWithPassword" );
-        Assert.assertEquals( "Expected hashed passwords to be the same.", cUser.getPassword(), hashedPassword );
-
+        assertThat( "Expected passwords to match", passwordService.passwordsMatch( password, cUser.getPassword() ), is( true ) );
     }
 
     @Test

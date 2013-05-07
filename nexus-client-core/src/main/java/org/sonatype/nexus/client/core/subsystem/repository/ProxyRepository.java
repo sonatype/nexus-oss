@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@ package org.sonatype.nexus.client.core.subsystem.repository;
  * @since 2.3
  */
 public interface ProxyRepository<T extends ProxyRepository>
-    extends Repository<T, ProxyRepositoryStatus>
+    extends BaseRepository<T, ProxyRepositoryStatus>
 {
 
     /**
@@ -57,6 +57,12 @@ public interface ProxyRepository<T extends ProxyRepository>
     T doNotAutoBlock();
 
     /**
+     * @return {@code true} if auto-blocking is enabled, {@code false} otherwise.
+     * @since 2.5
+     */
+    boolean isAutoBlocking();
+
+    /**
      * Directly blocks the repository (no save required).
      *
      * @return itself, for fluent api usage
@@ -86,4 +92,9 @@ public interface ProxyRepository<T extends ProxyRepository>
      */
     T withItemMaxAge( int minutes );
 
+    /**
+     * @return the repository's max item age.
+     * @since 2.5
+     */
+    int itemMaxAge();
 }

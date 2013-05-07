@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -280,6 +280,7 @@ public class Upgrade108to140
                     "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e );
             }
             securityConfig.setEnabled( oldsecurity.isEnabled() );
+            securityConfig.setHashIterations(1024);
             
             List<String> realms = oldsecurity.getRealms();
             

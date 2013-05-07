@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,6 +39,9 @@ public class IndexerManagerEventInspector
     private final boolean enabled =
         SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.events.IndexerManagerEventInspector.enabled", true );
 
+    private final boolean async =
+        SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.events.IndexerManagerEventInspector.async", true );
+
     @Requirement
     private IndexerManager indexerManager;
 
@@ -47,22 +50,29 @@ public class IndexerManagerEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( Event<?> evt )
+    @Override
+    public boolean accepts( final Event<?> evt )
     {
         // listen for STORE, CACHE, DELETE only
-        return enabled
+        final boolean accepts = enabled
             && ( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache || evt instanceof RepositoryItemEventDelete );
+        if ( !async && accepts )
+        {
+            inspectForIndexerManager( evt );
+        }
+        return accepts;
     }
 
-    public void inspect( Event<?> evt )
+    @Override
+    public void inspect( final Event<?> evt )
     {
-        if ( enabled )
+        if ( async )
         {
             inspectForIndexerManager( evt );
         }
     }
 
-    private void inspectForIndexerManager( Event<?> evt )
+    private void inspectForIndexerManager( final Event<?> evt )
     {
         RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 

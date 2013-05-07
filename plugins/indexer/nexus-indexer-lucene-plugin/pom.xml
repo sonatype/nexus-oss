@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2012 Sonatype, Inc.
+    Copyright (c) 2007-2013 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -30,8 +30,7 @@
   <properties>
     <pluginName>Nexus Indexer Lucene Plugin</pluginName>
     <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
-
-    <mavenIndexer.version>5.1.2-c65990c</mavenIndexer.version>
+    <mavenIndexer.version>5.1.2-bf3d48b</mavenIndexer.version>
     <aether.version>1.13.1</aether.version>
   </properties>
 

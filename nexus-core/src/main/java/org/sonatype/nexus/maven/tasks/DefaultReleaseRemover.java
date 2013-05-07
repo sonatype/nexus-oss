@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -186,7 +186,7 @@ public class DefaultReleaseRemover
 
         ctxMain.getContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, DeleteOperation.MOVE_TO_TRASH );
 
-        ctxMain.getProcessors().add( new ReleaseRemovalWalkerProcessor( repository, request, result ) );
+        ctxMain.getProcessors().add( new ReleaseRemovalWalkerProcessor( repository, request, result, repositoryTarget ) );
 
         walker.walk( ctxMain );
 
@@ -238,14 +238,18 @@ public class DefaultReleaseRemover
 
         private final ReleaseRemovalResult result;
 
+        private final Target repositoryTarget;
+
         private int deletedFiles = 0;
 
         private ReleaseRemovalWalkerProcessor( final MavenRepository repository,
-                                               final ReleaseRemovalRequest request, final ReleaseRemovalResult result )
+                                               final ReleaseRemovalRequest request, final ReleaseRemovalResult result,
+                                               final Target repositoryTarget )
         {
             this.repository = repository;
             this.request = request;
             this.result = result;
+            this.repositoryTarget = repositoryTarget;
         }
 
         @Override
@@ -287,7 +291,8 @@ public class DefaultReleaseRemover
                     if ( gav != null )
                     {
                         addCollectionToContext( context, coll );
-                        addStorageFileItemToMap( deletableVersionsAndFiles, gav, (StorageFileItem) item );
+
+                        maybeAddStorageFileItemToMap( gav, (StorageFileItem) item );
                     }
                 }
             }
@@ -296,6 +301,22 @@ public class DefaultReleaseRemover
             {
                 groupVersions( groupArtifactToVersions, deletableVersionsAndFiles, gav );
             }
+        }
+
+        /**
+         * Compare the item path to the RepositoryTarget(if it is declared) and only include files that match that pattern.
+         * While the walker itself handles GAV paths, this ensures that we also respect patterns with file-level granularity.
+         */
+        private void maybeAddStorageFileItemToMap( final Gav gav, final StorageFileItem item )
+        {
+            if ( repositoryTarget != null && !repositoryTarget.isPathContained(
+                item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item
+                .getPath() ) )
+            {
+                getLogger().debug( "Excluding file: {} from deletion due to repositoryTarget: {}.", item.getName(), repositoryTarget.getName() );
+                return;
+            }
+            addStorageFileItemToMap( deletableVersionsAndFiles, gav, (StorageFileItem) item );
         }
 
         /**

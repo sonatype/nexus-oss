@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -48,13 +48,13 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
     |             C O N S T A N T S             |
     ============================================*/
     /**
-     * The Sun LDAP property used to enable connection pooling.  This is used in the default implementation
-     * to enable LDAP connection pooling.
+     * The Sun LDAP environment property used to enable connection pooling for given context. This is used in the
+     * default implementation to enable LDAP connection pooling. Still, connection pooling parameters are set on JVM
+     * global level using System Properties.
      */
-    protected static final String SUN_CONNECTION_POOLING_PROPERTY = "com.sun.jndi.ldap.connect.pool";
-    protected static final String SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY = "com.sun.jndi.ldap.connect.pool.protocol";
+    protected static final String SUN_CONNECTION_POOLING_ENV_PROPERTY = "com.sun.jndi.ldap.connect.pool";
 
-    /*--------------------------------------------
+   /*--------------------------------------------
     |    I N S T A N C E   V A R I A B L E S    |
     ============================================*/
 
@@ -169,14 +169,13 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
     }
 
     /**
-     * Determines whether or not LdapContext pooling is enabled for connections made using the system
-     * user account.  In the default implementation, this simply
-     * sets the <tt>com.sun.jndi.ldap.connect.pool</tt> property to true and
-     * <tt>com.sun.jndi.ldap.connect.pool.protocol</tt> to "plain ssl" in the LDAP context environment.  If you use a
-     * LDAP Context Factory that is not Sun's default implementation, you will need to override the
-     * default behavior to use this setting in whatever way your underlying LDAP ContextFactory
-     * supports.  By default, pooling is enabled.
-     *
+     * Determines whether or not LdapContext pooling is enabled for connections made using the system user account. In
+     * the default implementation, it sets <tt>com.sun.jndi.ldap.connect.pool</tt> property to {@code true}. Still, using
+     * <b>system properties</b> like <tt>com.sun.jndi.ldap.connect.pool.protocol</tt> and others you control at
+     * JVM-global level the pool properties. If you use a LDAP Context Factory that is not Sun's default implementation,
+     * you will need to override the default behavior to use this setting in whatever way your underlying LDAP
+     * ContextFactory supports. By default, pooling is enabled.
+     * 
      * @param usePooling true to enable pooling, or false to disable it.
      */
     public void setUsePooling(boolean usePooling) {
@@ -272,15 +271,11 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
         env.put( Context.PROVIDER_URL, url );
         env.put( Context.REFERRAL, referral );
 
-        // Only pool connections for system contexts
         if ( usePooling && username != null && systemContext )
         {
             // Enable connection pooling
-            env.put(SUN_CONNECTION_POOLING_PROPERTY, "true");
-            // Enable pooling for plain and ssl connections
-            env.put( SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY, "plain ssl" );
+            env.put( SUN_CONNECTION_POOLING_ENV_PROPERTY, "true" );
         }
-
 
         if ( log.isDebugEnabled() )
         {

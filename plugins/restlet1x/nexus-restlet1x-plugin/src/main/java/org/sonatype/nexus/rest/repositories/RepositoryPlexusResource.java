@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -277,26 +277,29 @@ public class RepositoryPlexusResource
                             // This is a total hack to be able to retrieve this data from a non core repo if available
                             try
                             {
-                                Method artifactMethod =
-                                    repository.getClass().getMethod( "setArtifactMaxAge", int.class );
-                                Method metadataMethod =
-                                    repository.getClass().getMethod( "setMetadataMaxAge", int.class );
-                                Method itemMethod =
-                                    repository.getClass().getMethod( "setItemMaxAge", int.class );
-
                                 RepositoryProxyResource proxyModel = (RepositoryProxyResource) model;
 
+                                // NXCM-5131 Ask for itemMaxAge first, because it's already introduced in AbstractProxyRepository and
+                                // may be a superclass for non-maven repositories (e.g. NuGet)
+                                Method itemMethod =
+                                    repository.getClass().getMethod( "setItemMaxAge", int.class );
+                                if ( itemMethod != null && proxyModel.getItemMaxAge() != null)
+                                {
+                                    itemMethod.invoke( repository, proxyModel.getItemMaxAge() );
+                                }
+
+                                Method artifactMethod =
+                                    repository.getClass().getMethod( "setArtifactMaxAge", int.class );
                                 if ( artifactMethod != null )
                                 {
                                     artifactMethod.invoke( repository, proxyModel.getArtifactMaxAge() );
                                 }
+
+                                Method metadataMethod =
+                                    repository.getClass().getMethod( "setMetadataMaxAge", int.class );
                                 if ( metadataMethod != null )
                                 {
                                     metadataMethod.invoke( repository, proxyModel.getMetadataMaxAge() );
-                                }
-                                if ( itemMethod != null && proxyModel.getItemMaxAge() != null)
-                                {
-                                    itemMethod.invoke( repository, proxyModel.getItemMaxAge() );
                                 }
                             }
                             catch ( Exception e )

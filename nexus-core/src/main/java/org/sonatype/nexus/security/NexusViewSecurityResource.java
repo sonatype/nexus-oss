@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -36,8 +36,11 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import com.google.common.base.Throwables;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -162,7 +165,23 @@ public class NexusViewSecurityResource
     {
         setDirty( true );
 
-        configManager.cleanRemovedPrivilege( createPrivilegeId( event.getRepository().getId() ) );
+        try
+        {
+            configManager.runWrite(new ConfigurationManagerAction()
+            {
+                @Override
+                public void run()
+                    throws Exception
+                {
+                    configManager.cleanRemovedPrivilege( createPrivilegeId( event.getRepository().getId() ) );
+                }
+                
+            });
+        }
+        catch(Exception e)
+        {
+            throw Throwables.propagate(e);
+        }
     }
 
     public void initialize()

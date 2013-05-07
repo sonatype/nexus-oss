@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -11,6 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.proxy.repository;
+
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,8 +75,6 @@ import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-
-import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -1132,10 +1132,19 @@ public abstract class AbstractProxyRepository
         }
     }
 
-    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+    protected void shouldTryRemote( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException
     {
-        return !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
+        if ( request.isRequestLocalOnly() )
+        {
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                "Request is marked as local-only, remote access not allowed from %s", this ) );
+        }
+        if ( getProxyMode() != null && !getProxyMode().shouldProxy() )
+        {
+            throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                "Repository proxy-mode is %s, remote access not allowed from %s", getProxyMode(), this ) );
+        }
     }
 
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
@@ -1145,11 +1154,17 @@ public abstract class AbstractProxyRepository
         AbstractStorageItem remoteItem = null;
 
         // proxyMode and request.localOnly decides 1st
-        boolean shouldProxy = shouldTryRemote( request );
+        ItemNotFoundException noRemoteAccessReason = null;
+        try
+        {
+            shouldTryRemote( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            noRemoteAccessReason = e;
+        }
 
-        ItemNotFoundException requestProcessorReason = null;
-
-        if ( shouldProxy )
+        if ( noRemoteAccessReason == null )
         {
             for ( RequestStrategy strategy : getRegisteredStrategies().values() )
             {
@@ -1159,15 +1174,14 @@ public abstract class AbstractProxyRepository
                 }
                 catch ( ItemNotFoundException e )
                 {
-                    requestProcessorReason = e;
-                    shouldProxy = false;
+                    noRemoteAccessReason = e;
                     // escape
                     break;
                 }
             }
         }
 
-        if ( shouldProxy )
+        if ( noRemoteAccessReason == null )
         {
             // we are able to go remote
             if ( localItem == null || request.isRequestAsExpired() || isOld( localItem ) )
@@ -1318,8 +1332,8 @@ public abstract class AbstractProxyRepository
                 }
 
                 throw new ItemNotFoundException( reasonFor( request, this,
-                    "Path %s not found in local nor in remote storage of %s repository.", request.getRequestPath(),
-                    RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                    "Path %s not found in local nor in remote storage of %s", request.getRequestPath(),
+                    this ) );
             }
             else if ( localItem != null && remoteItem == null )
             {
@@ -1364,18 +1378,8 @@ public abstract class AbstractProxyRepository
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
-                if ( requestProcessorReason != null )
-                {
-                    throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
-                        "Request processor prevented remote access" ), requestProcessorReason );
-                }
-                else
-                {
-                    // a generic one
-                    throw new ItemNotFoundException( reasonFor( request, this,
-                        "Path %s not found in local storage and remote storage access is prevented of %s repository.",
-                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
-                }
+                throw new ItemNotFoundException( ItemNotFoundException.reasonFor( request, this,
+                    noRemoteAccessReason.getMessage() ), noRemoteAccessReason );
             }
         }
 
@@ -1714,8 +1718,8 @@ public abstract class AbstractProxyRepository
 
             // validation failed, I guess.
             throw new ItemNotFoundException( reasonFor( request, this,
-                "Path %s fetched from remote but failed validation in %s.", request.getRequestPath(),
-                RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                "Path %s fetched from remote storage of %s but failed validation.", request.getRequestPath(),
+                this ) );
         }
         finally
         {
@@ -1811,7 +1815,7 @@ public abstract class AbstractProxyRepository
                             RemoteStatus.UNAVAILABLE,
                             new ItemNotFoundException( reasonFor( request, AbstractProxyRepository.this,
                                 "Proxy mode %s or repository %s forbids remote storage use.", getProxyMode(),
-                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
+                                AbstractProxyRepository.this ) ) );
                     }
                     else
                     {
@@ -1823,7 +1827,7 @@ public abstract class AbstractProxyRepository
                         {
                             autoBlockProxying( new ItemNotFoundException( reasonFor( request,
                                 AbstractProxyRepository.this, "Remote peer of repository %s detected as unavailable.",
-                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
+                                AbstractProxyRepository.this ) ) );
                         }
                     }
                 }

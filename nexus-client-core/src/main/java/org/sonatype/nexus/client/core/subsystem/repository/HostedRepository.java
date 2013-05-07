@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@ package org.sonatype.nexus.client.core.subsystem.repository;
  * @since 2.3
  */
 public interface HostedRepository<T extends HostedRepository>
-    extends Repository<T, RepositoryStatus>
+    extends BaseRepository<T, RepositoryStatus>
 {
 
     T withRepoPolicy( final String policy );
@@ -43,19 +43,5 @@ public interface HostedRepository<T extends HostedRepository>
      * @return itself, for fluent api usage
      */
     T disableRedeploy();
-
-    /**
-     * Enable browsing (see content of repository)
-     *
-     * @return itself, for fluent api usage
-     */
-    T enableBrowsing();
-
-    /**
-     * Disable browsing (see content of repository).
-     *
-     * @return itself, for fluent api usage
-     */
-    T disableBrowsing();
 
 }

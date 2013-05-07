@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -482,7 +482,7 @@ public class DefaultSnapshotRemover
                             }
                             else
                             {
-                                getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
+                                getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateThreshold=" + dateThreshold );
 
                                 // if dateThreshold is not used (zero days) OR
                                 // if itemTimestamp is less then dateThreshold (NB: both are positive!)
@@ -494,6 +494,7 @@ public class DefaultSnapshotRemover
                                 }
                                 else
                                 {
+                                    //do not delete if dateThreshold not met
                                     addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
                                 }
                             }
@@ -606,10 +607,14 @@ public class DefaultSnapshotRemover
                         }
                         catch ( ItemNotFoundException e )
                         {
-                            if ( getLogger().isDebugEnabled() )
+                            // NEXUS-5682 Since checksum files are no longer physically represented on the file system,
+                            // it is expected that they will generate ItemNotFoundException. Log at trace level only for
+                            // diagnostic purposes.
+                            if ( getLogger().isTraceEnabled() )
                             {
-                                getLogger().debug( "Could not delete file:", e );
+                                getLogger().trace( "Could not delete file:", e );
                             }
+
                         }
                         catch ( Exception e )
                         {

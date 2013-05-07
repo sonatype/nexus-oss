@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -58,7 +58,7 @@ public class PrivilegeTypePlexusResource
     public static final String RESOURCE_URI = "/privilege_types";
 
     @Inject
-    @Named( "resourceMerging" )
+    @Named( "default" )
     private ConfigurationManager configurationManager;
 
     @Override

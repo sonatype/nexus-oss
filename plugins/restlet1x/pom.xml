@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2012 Sonatype, Inc.
+    Copyright (c) 2007-2013 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -153,12 +153,28 @@
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
+        <version>${nexus.version}</version>
+        <classifier>bundle</classifier>
+        <type>${nexus-plugin.type}</type>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+
     </dependencies>
   </dependencyManagement>
 
   <modules>
     <module>nexus-restlet1x-model</module>
     <module>nexus-restlet1x-plugin</module>
+    <module>nexus-restlet1x-testsuite</module>
+    <module>nexus-restlet1x-testsupport-plugin</module>
   </modules>
 
 </project>

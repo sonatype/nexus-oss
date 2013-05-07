@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2012 Sonatype, Inc.
+    Copyright (c) 2007-2013 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,7 +31,7 @@
   <properties>
     <pluginName>Nexus Kenai Realm Plugin</pluginName>
     <pluginDescription>Adds Kenai realm to Nexus.</pluginDescription>
-    <security.version>3.0.3-SNAPSHOT</security.version>
+    <security.version>3.1</security.version>
     <jetty.version>6.1.12</jetty.version>
   </properties>
 
@@ -48,20 +48,8 @@
       <artifactId>org.json</artifactId>
       <version>2.0-NEXUS-3758</version>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <version>${security.version}</version>
-      <scope>provided</scope>
-    </dependency>
 
     <!-- These below are transitive deps but are in core already -->
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <version>${security.version}</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>

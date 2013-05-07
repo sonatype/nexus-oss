@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2012 Sonatype, Inc.
+ * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -1060,47 +1060,35 @@ public class DefaultIndexerManager
             {
                 logger.debug( "Reindexing repository {} fromPath={} fullReindex={}", repository.getId(), fromPath,
                     fullReindex );
-
-                Runnable runnable = new Runnable()
+                
+                if ( !fullReindex )
                 {
-                    @Override
-                    public void run( final IndexingContext context )
-                        throws IOException
+                    //Try incremental update first
+                    try
                     {
-                        if ( ISPROXY( repository ) )
-                        {
-                            updateRemoteIndex( repository.adaptToFacet( ProxyRepository.class ), context, fullReindex );
-                        }
-
-                        TaskUtil.checkInterruption();
-
-                        // igorf, this needs be merged back to maven indexer, see MINDEXER-65
-                        final IndexSearcher contextIndexSearcher = context.acquireIndexSearcher();
-                        try
-                        {
-                            final NexusScanningListener scanListener =
-                                new NexusScanningListener( context, contextIndexSearcher, fullReindex,
-                                    ISPROXY( repository ) );
-                            scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
-                        }
-                        finally
-                        {
-                            context.releaseIndexSearcher( contextIndexSearcher );
-                        }
+                        Runnable runnable = new IndexUpdateRunnable(repository, fromPath, false);
+                        sharedSingle( repository, runnable );
+                        logger.debug( "Reindexed repository {}", repository.getId() );
+                        return;
                     }
-                };
-                if ( fullReindex )
-                {
-                    // delete published stuff too, as we are breaking incremental downstream chain
-                    deleteIndexItems( repository );
-                    // creates a temp ctx and finally replaces the "real" with temp
-                    temporary( repository, runnable );
+                    catch(IncrementalIndexUpdateException e)
+                    {
+                        //This exception is an indication that an incremental
+                        //update is not possible, and a full update is necessary
+                        logger.info( "Unable to incrementally update index for repository {}. Trying full index update", repository.getId() );
+                        
+                        //Let execution continue to below to try full index update
+                    }
                 }
-                else
-                {
-                    // scans directly into "real" ctx
-                    sharedSingle( repository, runnable );
-                }
+                
+                //Perform full index update
+                Runnable runnable = new IndexUpdateRunnable(repository, fromPath, true);
+                
+                // delete published stuff too, as we are breaking incremental downstream chain
+                deleteIndexItems( repository );
+                
+                // creates a temp ctx and finally replaces the "real" with temp
+                temporary( repository, runnable );
 
                 logger.debug( "Reindexed repository {}", repository.getId() );
             }
@@ -1114,6 +1102,49 @@ public class DefaultIndexerManager
             logger.info(
                 "Repository '{}' is already in the process of being re-indexed. Skipping additional reindex requests.",
                 repository.getId() );
+        }
+    }
+    
+    /**
+     * Runnable implementation for updating an index
+     */
+    private class IndexUpdateRunnable implements Runnable
+    {
+        Repository repository;
+        String fromPath;
+        boolean fullReindex;
+        
+        IndexUpdateRunnable(Repository repository, String fromPath, boolean fullReindex)
+        {
+            this.repository = repository;
+            this.fromPath = fromPath;
+            this.fullReindex = fullReindex;
+        }
+        
+        @Override
+        public void run( final IndexingContext context )
+            throws IOException
+        {
+            if ( ISPROXY( this.repository ) )
+            {
+                updateRemoteIndex( this.repository.adaptToFacet( ProxyRepository.class ), context, this.fullReindex );
+            }
+
+            TaskUtil.checkInterruption();
+
+            // igorf, this needs be merged back to maven indexer, see MINDEXER-65
+            final IndexSearcher contextIndexSearcher = context.acquireIndexSearcher();
+            try
+            {
+                final NexusScanningListener scanListener =
+                    new NexusScanningListener( context, contextIndexSearcher, this.fullReindex,
+                        ISPROXY( this.repository ) );
+                scanner.scan( new ScanningRequest( context, scanListener, this.fromPath ) );
+            }
+            finally
+            {
+                context.releaseIndexSearcher( contextIndexSearcher );
+            }
         }
     }
 
@@ -1199,23 +1230,48 @@ public class DefaultIndexerManager
         {
             try
             {
+                if ( !forceFullUpdate )
+                {
+                    //Try incremental update first
+                    try
+                    {
+                        Runnable runnable = new Runnable()
+                        {
+                            @Override
+                            public void run( IndexingContext context )
+                                throws IOException
+                            {
+                                updateRemoteIndex( repository, context, false );
+                            }
+                        };
+                        
+                        sharedSingle( repository, runnable );
+                        return;
+                    }
+                    catch(IncrementalIndexUpdateException e)
+                    {
+                        //This exception is an indication that an incremental
+                        //update is not possible, and a full update is necessary
+                        logger.info( "Unable to incrementally update index for repository {}. Trying full index update", repository.getId() );
+                        
+                        //Let execution continue to below to try full index update
+                    }
+                }
+                
+                //If we're here, either a full update was requested, or incremental failed
+                //Try full index update
+                
                 Runnable runnable = new Runnable()
                 {
                     @Override
                     public void run( IndexingContext context )
                         throws IOException
                     {
-                        updateRemoteIndex( repository, context, forceFullUpdate );
+                        updateRemoteIndex( repository, context, true );
                     }
                 };
-                if ( forceFullUpdate )
-                {
-                    temporary( repository, runnable );
-                }
-                else
-                {
-                    sharedSingle( repository, runnable );
-                }
+                
+                temporary( repository, runnable );
             }
             finally
             {
@@ -1308,7 +1364,18 @@ public class DefaultIndexerManager
             }
         } );
 
-        updateRequest.setForceFullUpdate( forceFullUpdate );
+        //Set request for either full or incremental-only update
+        if( forceFullUpdate )
+        {
+            updateRequest.setForceFullUpdate( true );
+            updateRequest.setIncrementalOnly( false );
+        }
+        else
+        {
+            updateRequest.setForceFullUpdate( false );
+            updateRequest.setIncrementalOnly( true );
+        }
+		
         updateRequest.setFSDirectoryFactory( luceneDirectoryFactory );
 
         if ( repository instanceof MavenRepository )
@@ -1322,6 +1389,14 @@ public class DefaultIndexerManager
         {
             IndexUpdateResult result = indexUpdater.fetchAndUpdateIndex( updateRequest );
 
+            //Check if successful
+            if( !result.isSuccessful() )
+            {
+                //This condition occurs when we have requested an incremental-only update,
+                //but it could not be completed. In this case, we need to request a full update
+                //This needs to be communicated upstream so that the proper locking can take place
+                throw new IncrementalIndexUpdateException("Cannot incrementally update index. Request a full update");
+            }
             boolean hasRemoteIndexUpdate = result.getTimestamp() != null;
 
             if ( hasRemoteIndexUpdate )
@@ -1354,6 +1429,14 @@ public class DefaultIndexerManager
         {
             logger.warn( RepositoryStringUtils.getFormattedMessage(
                 "Cannot fetch remote index for repository %s, task cancelled.", repository ) );
+        }
+        catch ( IncrementalIndexUpdateException e )
+        {
+            //This is an indication that an incremental index update is not possible, and a full index
+            //update must be performed.
+            //Just log this, and pass this exception upstream so that it can be handled appropriately
+            logger.info( "Cannot incrementally update index for repository {}", repository.getId() );
+            throw e;
         }
         catch ( IOException e )
         {
@@ -2799,5 +2882,15 @@ public class DefaultIndexerManager
     public IndexingContext getRepositoryIndexContext( String repositoryId )
     {
         return mavenIndexer.getIndexingContexts().get( getContextId( repositoryId ) );
+    }
+    
+    private static class IncrementalIndexUpdateException extends IOException
+    {
+        private static final long serialVersionUID = 6444842181110866037L;
+        
+        public IncrementalIndexUpdateException(String message)
+        {
+            super(message);
+        }
     }
 }
