@@ -90,7 +90,7 @@ public class DefaultKenaiRealmConfiguration
         }
         catch ( IOException e )
         {
-            logger.error( "IOException while retrieving configuration file", e );
+            logger.error( "IOException while retrieving Kenai Realm configuration file", e );
         }
         catch ( XmlPullParserException e )
         {
@@ -129,7 +129,7 @@ public class DefaultKenaiRealmConfiguration
         }
         catch ( IOException e )
         {
-            throw new ConfigurationException( "Failed to save configuration: " + e.getMessage(), e );
+            throw new ConfigurationException( "Failed to save Kenai Realm configuration: " + e.getMessage(), e );
         }
         finally
         {
@@ -207,7 +207,7 @@ public class DefaultKenaiRealmConfiguration
             }
             catch ( Exception e )
             {
-                logger.debug( "Failed to find role: " + config.getDefaultRole() + " durring validation.", e );
+                logger.debug( "Failed to find role {} during validation.", config.getDefaultRole(), e );
                 ValidationMessage msg = new ValidationMessage( "defaultRole", "Failed to find role." );
                 response.addValidationError( msg );
             }

@@ -138,7 +138,7 @@ public class KenaiRealm
 
             try
             {
-                logger.debug( "User \"{}\" validated against URL={} as {}", usernamePasswordToken.getUsername(), url,
+                logger.debug( "Kenai Realm user \"{}\" validated against URL={} as {}", usernamePasswordToken.getUsername(), url,
                     response.getStatusLine() );
                 final boolean success =
                     response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299;
@@ -151,7 +151,7 @@ public class KenaiRealm
         }
         catch ( IOException e )
         {
-            logger.info( "URLRealm was unable to perform authentication.", e );
+            logger.info( "Kenai Realm was unable to perform authentication", e );
             return false;
         }
     }
