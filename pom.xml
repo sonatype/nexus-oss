@@ -27,7 +27,7 @@
   <artifactId>nexus-p2-repository-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <version>2.3.2-SNAPSHOT</version>
+  <version>2.3.2</version>
 
   <licenses>
     <license>
