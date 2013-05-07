@@ -597,7 +597,13 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             dataModel.put( "nexusVersion", getNexus().getSystemStatus().getVersion() );
 
-            dataModel.put( "nexusRoot", getContextRoot( req ).toString() );
+            // getContentRoot(req) always returns Reference with "/" as last character
+            String nexusRoot = getContextRoot( req ).toString();
+            if ( nexusRoot.endsWith( "/" ) )
+            {
+                nexusRoot = nexusRoot.substring( 0, nexusRoot.length() - 1 );
+            }
+            dataModel.put( "nexusRoot", nexusRoot );
 
             final VelocityRepresentation representation =
                 new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm",
