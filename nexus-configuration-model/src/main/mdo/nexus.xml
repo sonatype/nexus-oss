@@ -337,7 +337,7 @@
         </field>
         <field>
           <name>nonProxyHosts</name>
-          <version>1.4.1+</version>
+          <version>2.5.0+</version>
           <description>
             List of addresses that can ignore the proxy settings.</description>
           <association>
