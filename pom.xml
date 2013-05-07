@@ -25,7 +25,7 @@
 
   <groupId>org.sonatype.nexus.capabilities</groupId>
   <artifactId>nexus-capabilities</artifactId>
-  <version>2.4-SNAPSHOT</version>
+  <version>2.4</version>
 
   <packaging>pom</packaging>
 
@@ -67,27 +67,27 @@
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-model</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.4</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-client</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.4</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-capabilities-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.4</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-testsuite-helper</artifactId>
         <type>${nexus-plugin.type}</type>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.4</version>
       </dependency>
 
     </dependencies>
