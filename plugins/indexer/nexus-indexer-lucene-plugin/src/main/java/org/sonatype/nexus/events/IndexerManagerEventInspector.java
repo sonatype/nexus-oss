@@ -39,6 +39,9 @@ public class IndexerManagerEventInspector
     private final boolean enabled =
         SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.events.IndexerManagerEventInspector.enabled", true );
 
+    private final boolean async =
+        SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.events.IndexerManagerEventInspector.async", true );
+
     @Requirement
     private IndexerManager indexerManager;
 
@@ -47,22 +50,29 @@ public class IndexerManagerEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( Event<?> evt )
+    @Override
+    public boolean accepts( final Event<?> evt )
     {
         // listen for STORE, CACHE, DELETE only
-        return enabled
+        final boolean accepts = enabled
             && ( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache || evt instanceof RepositoryItemEventDelete );
+        if ( !async && accepts )
+        {
+            inspectForIndexerManager( evt );
+        }
+        return accepts;
     }
 
-    public void inspect( Event<?> evt )
+    @Override
+    public void inspect( final Event<?> evt )
     {
-        if ( enabled )
+        if ( async )
         {
             inspectForIndexerManager( evt );
         }
     }
 
-    private void inspectForIndexerManager( Event<?> evt )
+    private void inspectForIndexerManager( final Event<?> evt )
     {
         RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
