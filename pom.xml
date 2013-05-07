@@ -27,7 +27,7 @@
   <artifactId>nexus-p2-bridge-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <version>2.1.1</version>
+  <version>2.1.2-SNAPSHOT</version>
 
   <licenses>
     <license>
