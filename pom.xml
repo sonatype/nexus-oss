@@ -27,7 +27,7 @@
   <artifactId>nexus-yum</artifactId>
   <packaging>pom</packaging>
 
-  <version>3.0.2-SNAPSHOT</version>
+  <version>3.0.2</version>
 
   <developers>
     <developer>
@@ -163,13 +163,13 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.2</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.yum</groupId>
         <artifactId>nexus-yum-client</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
