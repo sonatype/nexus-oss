@@ -27,7 +27,7 @@
   <artifactId>nexus-obr</artifactId>
   <packaging>pom</packaging>
 
-  <version>2.1.2-SNAPSHOT</version>
+  <version>2.1.2</version>
 
   <licenses>
     <license>
@@ -98,14 +98,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.obr</groupId>
         <artifactId>nexus-obr-client</artifactId>
-        <version>2.1.2-SNAPSHOT</version>
+        <version>2.1.2</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-obr-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
-        <version>2.1.2-SNAPSHOT</version>
+        <version>2.1.2</version>
       </dependency>
 
     </dependencies>
