@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.nexus.obr</groupId>
     <artifactId>nexus-obr</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
