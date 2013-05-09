@@ -65,7 +65,7 @@ public class DefaultNexusBundleConfiguration
     /**
      * Default logging pattern.
      */
-    private static final String DEFAULT_LOG_PATTERN = "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n";
+    private static final String DEFAULT_LOG_PATTERN = "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.-15t] - %c - %m%n";
 
     /**
      * File task builder.
