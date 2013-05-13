@@ -293,34 +293,37 @@ public class ManagerImpl
         getLogger().trace( "mayUpdateAllProxyPrefixFiles started" );
         for ( MavenRepository mavenRepository : repositoryRegistry.getRepositoriesWithFacet( MavenRepository.class ) )
         {
-            try
+            if ( isMavenRepositorySupported( mavenRepository ) )
             {
-                final FilePrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
-                if ( !prefixSource.exists() )
+                try
                 {
-                    // automatic routing has not been initialized for this repository yet, for initialization.
-                    doUpdatePrefixFileAsync( true, mavenRepository );
-                }
-                else
-                {
-                    MavenProxyRepository mavenProxyRepository =
-                        mavenRepository.adaptToFacet( MavenProxyRepository.class );
-                    if ( mavenProxyRepository != null )
+                    final FilePrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
+                    if ( !prefixSource.exists() )
                     {
-                        mayUpdateProxyPrefixFile( mavenProxyRepository );
+                        // automatic routing has not been initialized for this repository yet, for initialization.
+                        doUpdatePrefixFileAsync( true, mavenRepository );
+                    }
+                    else
+                    {
+                        MavenProxyRepository mavenProxyRepository =
+                            mavenRepository.adaptToFacet( MavenProxyRepository.class );
+                        if ( mavenProxyRepository != null )
+                        {
+                            mayUpdateProxyPrefixFile( mavenProxyRepository );
+                        }
                     }
                 }
-            }
-            catch ( IllegalStateException e )
-            {
-                // just neglect it and continue, this one might be auto blocked if proxy or put out of service
-                getLogger().trace( "Repository {} is not in state to be updated", mavenRepository );
-            }
-            catch ( Exception e )
-            {
-                // just neglect it and continue, but do log it
-                getLogger().warn( "Problem during prefix file update of repository {}",
-                                  RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+                catch ( IllegalStateException e )
+                {
+                    // just neglect it and continue, this one might be auto blocked if proxy or put out of service
+                    getLogger().trace( "Repository {} is not in state to be updated", mavenRepository );
+                }
+                catch ( Exception e )
+                {
+                    // just neglect it and continue, but do log it
+                    getLogger().warn( "Problem during prefix file update of repository {}",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+                }
             }
         }
     }
