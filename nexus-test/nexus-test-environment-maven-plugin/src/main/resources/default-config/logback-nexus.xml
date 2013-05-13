@@ -34,7 +34,7 @@
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <target>System.out</target>
     <encoder>
-      <pattern>NEXUS: %date{HH:mm:ss.SSS} %level [  %thread%X{DC}] %logger - %msg%n</pattern>
+      <pattern>NEXUS: %date{HH:mm:ss.SSS} %level [%thread%X{DC}] %logger - %msg%n</pattern>
     </encoder>
   </appender>
 
