@@ -62,7 +62,7 @@ public class GenerateMetadataCapabilityConfiguration
         boolean processDeletes = true;
         if ( properties.containsKey( DELETE_PROCESSING ) )
         {
-            processDeletes = Boolean.parseBoolean( DELETE_PROCESSING );
+            processDeletes = Boolean.parseBoolean( properties.get( DELETE_PROCESSING ) );
         }
         this.processDeletes = processDeletes;
 
