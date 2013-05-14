@@ -20,7 +20,7 @@
     <File>${project.build.directory}/logs/${test-id}/nexus.log</File>
     <Append>true</Append>
     <encoder>
-      <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n</pattern>
+      <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%thread] - %c - %m%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <maxIndex>12</maxIndex>
