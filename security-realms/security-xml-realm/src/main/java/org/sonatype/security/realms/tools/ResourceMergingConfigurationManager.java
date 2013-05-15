@@ -531,7 +531,7 @@ public class ResourceMergingConfigurationManager
         return super.getConfiguration();
     }
 
-    protected Configuration doGetConfiguration()
+    protected synchronized Configuration doGetConfiguration()
     {
         final Configuration configuration = new Configuration();
 
