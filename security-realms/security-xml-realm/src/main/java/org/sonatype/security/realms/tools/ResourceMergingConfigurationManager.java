@@ -531,11 +531,7 @@ public class ResourceMergingConfigurationManager
         return super.getConfiguration();
     }
 
-    /**
-     * Synchronized to avoid threads eating up cpu while re-building configuration.
-     * Really need to revisit how the configuration is created and rebuilt to avoid a lock here.
-     */
-    protected synchronized Configuration doGetConfiguration()
+    protected Configuration doGetConfiguration()
     {
         final Configuration configuration = new Configuration();
 
