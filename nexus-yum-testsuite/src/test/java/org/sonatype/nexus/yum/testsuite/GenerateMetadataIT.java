@@ -52,6 +52,26 @@ public class GenerateMetadataIT
         assertThat( primaryXml, containsString( "test-artifact" ) );
     }
 
+    /**
+     * @since 3.0.3
+     */
+    @Test
+    public void addRpmWithUpperCaseExtension()
+        throws Exception
+    {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.RPM" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+        assertThat( primaryXml, containsString( "test-artifact" ) );
+    }
+
     @Test
     public void removeRpm()
         throws Exception

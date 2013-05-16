@@ -139,7 +139,7 @@ public class EventsRouter
     private boolean isRpmItemEvent( RepositoryItemEvent itemEvent )
     {
         return yumRegistryProvider.get().isRegistered( itemEvent.getRepository().getId() )
-            && itemEvent.getItem().getPath().endsWith( ".rpm" );
+            && itemEvent.getItem().getPath().toLowerCase().endsWith( ".rpm" );
     }
 
     private String getItemVersion( StorageItem item )
