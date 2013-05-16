@@ -30,12 +30,15 @@ public abstract class AbstractConfigurationManager
 
     private volatile EnhancedConfiguration configuration = null;
 
-    public void clearCache()
+    // FIXME: Synchronized to avoid threads eating up cpu while re-building configuration.
+    // FIXME: Really need to revisit how the configuration is created and rebuilt to avoid a lock here.
+
+    public synchronized void clearCache()
     {
         configuration = null;
     }
 
-    protected EnhancedConfiguration getConfiguration()
+    protected synchronized EnhancedConfiguration getConfiguration()
     {
         //Assign configuration to local variable first, as calls to clearCache
         //can null it out at any time
