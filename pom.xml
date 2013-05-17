@@ -175,7 +175,7 @@
     <aether.version>1.13.1</aether.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <plexus-security.version>3.1</plexus-security.version>
+    <plexus-security.version>3.2</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.6.1</goodies.version>
