@@ -17,7 +17,7 @@
   <parent>
     <artifactId>security-parent</artifactId>
     <groupId>org.sonatype.security</groupId>
-    <version>3.2</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>security-model-xml</artifactId>
   <description>Contains an xml implementation of the security-model.</description>
