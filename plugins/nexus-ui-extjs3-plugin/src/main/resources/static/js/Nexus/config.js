@@ -90,7 +90,7 @@ define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init', 'Nexus/conf
           configCurrent : servicePath + '/configs/current',
           logs : servicePath + '/logs',
           logConfig : servicePath + '/log/config',
-          status : servicePath + '/status',
+          status : servicePath + '/status?perms=1',
           schedules : servicePath + '/schedules',
           scheduleRun : servicePath + '/schedule_run',
           scheduleTypes : servicePath + '/schedule_types',

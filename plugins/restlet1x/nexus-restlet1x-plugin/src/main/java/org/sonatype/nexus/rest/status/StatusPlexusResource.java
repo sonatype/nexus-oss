@@ -18,17 +18,18 @@ import java.io.StringWriter;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
-import com.yammer.metrics.annotation.Timed;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
@@ -37,6 +38,8 @@ import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
+
+import com.yammer.metrics.annotation.Timed;
 
 @Component( role = ManagedPlexusResource.class, hint = "StatusPlexusResource" )
 @Path( StatusPlexusResource.RESOURCE_URI )
@@ -48,7 +51,7 @@ public class StatusPlexusResource
     public static final String RESOURCE_URI = "/status";
 
     @Requirement
-    private Nexus nexus;
+    private ApplicationStatusSource applicationStatusSource;
 
     @Override
     public Object getPayloadInstance()
@@ -69,18 +72,21 @@ public class StatusPlexusResource
     }
 
     /**
-     * Get the status of the nexus server.
+     * Returns the status of the Nexus server.
+     * 
+     * @param perms If query parameter with this name present (without or with any value, does not matter, it is only
+     *            checked for presence), this resource will emit the user permissions too.
      */
     @Timed
     @Override
     @GET
-    @ResourceMethodSignature( output = StatusResourceResponse.class )
+    @ResourceMethodSignature( queryParams = { @QueryParam( "perms" ) }, output = StatusResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        SystemStatus status = this.nexus.getSystemStatus();
+        final SystemStatus status = applicationStatusSource.getSystemStatus();
 
-        StatusResource resource = new StatusResource();
+        final StatusResource resource = new StatusResource();
 
         resource.setAppName( status.getAppName() );
 
@@ -138,7 +144,11 @@ public class StatusPlexusResource
         // }
         // }
 
-        resource.setClientPermissions( this.getClientPermissions( request ) );
+        final Form form = request.getResourceRef().getQueryAsForm();
+        if ( form.getFirst( "perms" ) != null )
+        {
+            resource.setClientPermissions( getClientPermissions( request ) );
+        }
 
         resource.setBaseUrl( getContextRoot( request ).toString() );
 
