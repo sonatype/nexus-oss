@@ -108,17 +108,40 @@ public class NexusStatusUtil
     }
 
     /**
-     * Get Nexus Status, failing if the request response is not successfully returned.
-     *
+     * Get Nexus Status, failing if the request response is not successfully returned. Delegates call to
+     * {@link #getNexusStatus(boolean)} with {@code false} parameter.
+     * 
      * @return the status resource
      * @throws NexusIllegalStateException
      */
     public StatusResourceResponse getNexusStatus()
         throws NexusIllegalStateException
     {
+        return getNexusStatus( false );
+    }
+
+    /**
+     * Get Nexus Status, failing if the request response is not successfully returned.
+     * 
+     * @param withPermissions if {@code true}, it will ask for permissions too, as returned before Nexus 2.6
+     * @return the status resource
+     * @throws NexusIllegalStateException
+     * @since 2.6
+     */
+    public StatusResourceResponse getNexusStatus( final boolean withPermissions )
+        throws NexusIllegalStateException
+    {
         try
         {
-            String entityText = RequestFacade.doGetForText( "service/local/status" );
+            final String entityText;
+            if ( withPermissions )
+            {
+                entityText = RequestFacade.doGetForText( "service/local/status?perms=1" );
+            }
+            else
+            {
+                entityText = RequestFacade.doGetForText( "service/local/status" );
+            }
             StatusResourceResponse status =
                 (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML( entityText );
             return status;
