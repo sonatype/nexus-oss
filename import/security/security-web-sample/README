@@ -1,0 +1,7 @@
+A quick sample REST app.
+
+1.) Start it up.
+  mvn jetty:run
+
+2.) Access the service.
+  curl http://localhost:8080/security-web-sample/test --user admin:admin123

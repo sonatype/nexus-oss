@@ -1,0 +1,494 @@
+<!--
+
+    Copyright (c) 2007-2013 Sonatype, Inc. All rights reserved.
+
+    This program is licensed to you under the Apache License Version 2.0,
+    and you may not use this file except in compliance with the Apache License Version 2.0.
+    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the Apache License Version 2.0 is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>35</version>
+  </parent>
+
+  <groupId>org.sonatype.security</groupId>
+  <artifactId>security-parent</artifactId>
+  <packaging>pom</packaging>
+  <version>3.3-SNAPSHOT</version>
+
+  <url>http://github.com/sonatype/security</url>
+
+  <scm>
+    <connection>scm:git:git@github.com/sonatype/security.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/security.git</developerConnection>
+    <url>http://github.com/sonatype/security</url>
+  </scm>
+
+  <properties>
+    <shiro.version>1.2.1</shiro.version>
+    <sisu-ehcache.version>1.1</sisu-ehcache.version>
+    <goodies.version>1.5</goodies.version>
+    <base-configuration.version>1.0</base-configuration.version>
+    <plexus-cipher.version>1.6</plexus-cipher.version>
+    <sisu-inject.version>2.3.0</sisu-inject.version>
+    <sisu-guice.version>3.1.1</sisu-guice.version>
+    <slf4j.version>1.7.2</slf4j.version>
+    <logback.version>1.0.7</logback.version>
+    <plexus.version>1.5.5</plexus.version>
+  </properties>
+
+  <modules>
+    <module>security-model</module>
+    <module>security-model-xml</module>
+    <module>security-realms</module>
+    <module>security-system</module>
+    <module>security-configuration</module>
+    <module>security-web</module>
+    <module>security-web-sample</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-bean</artifactId>
+        <version>${sisu-inject.version}</version>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu.inject</groupId>
+            <artifactId>guice-bean-containers</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-plexus</artifactId>
+        <version>${sisu-inject.version}</version>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu.inject</groupId>
+            <artifactId>guice-plexus-shim</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-guice</artifactId>
+        <version>${sisu-guice.version}</version>
+        <classifier>no_aop</classifier>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guava</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu.inject</groupId>
+        <artifactId>guice-servlet</artifactId>
+        <version>${sisu-guice.version}</version>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu.inject</groupId>
+        <artifactId>guice-multibindings</artifactId>
+        <version>${sisu-guice.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>13.0.1</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-ehcache</artifactId>
+        <version>${shiro.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>${shiro.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-guice</artifactId>
+        <version>${shiro.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-ehcache</artifactId>
+        <version>${sisu-ehcache.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-eventbus</artifactId>
+        <version>${goodies.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.configuration</groupId>
+        <artifactId>base-configuration</artifactId>
+        <version>${base-configuration.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-cipher</artifactId>
+        <version>${plexus-cipher.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <!-- TESTING -->
+      <dependency>
+        <groupId>org.sonatype.sisu.litmus</groupId>
+        <artifactId>litmus-testsupport</artifactId>
+        <version>1.4</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- Provide a backend for JUnit tests purposes -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>edu.umd.cs.mtc</groupId>
+        <artifactId>multithreadedtc</artifactId>
+        <version>1.01</version>
+        <scope>test</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <!-- TESTING -->
+    <dependency>
+        <groupId>org.sonatype.sisu.litmus</groupId>
+        <artifactId>litmus-testsupport</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. -->
+            <phase>package</phase>
+            <id>enforce</id>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.codehaus.plexus:plexus-container-default:*</exclude>
+                  </excludes>
+                  <message>The Plexus Container is banned, use org.sonatype.sisu:sisu-inject-plexus.
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:jsecurity</exclude>
+                  </excludes>
+                  <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+          <execution>
+            <id>test-checks</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>junit:junit</exclude>
+                  </excludes>
+                  <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead.</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>junit:junit-dep:(,4.9]</exclude>
+                  </excludes>
+                  <message>junit:junit-dep 4.9 wrongly includes hamcrest api in jar, 4.10 or greater required due to TestRule changes over earlier versions</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.mockito:mockito-all</exclude>
+                  </excludes>
+                  <message>mockito-all includes third party classes within it - use mockito-core instead</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.hamcrest:*</exclude>
+                  </excludes>
+                  <includes>
+                    <include>org.hamcrest:*:1.3</include>
+                  </includes>
+                  <message>Make sure you are using the hamcrest version defined in parent</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.hamcrest:hamcrest-all:*</exclude>
+                  </excludes>
+                  <message>Use more specific hamcrest dependencies like hamcrest-core, hamcrest-library</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.sonatype.sisu.litmus:litmus-testsupport:(,1.3]</exclude>
+                  </excludes>
+                  <message>litmus-testsupport greater than 1.3 required</message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+
+          </execution>
+          <execution>
+            <id>old-plexus</id>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:plexus-container-default</exclude>
+                  </excludes>
+                  <message>Plexus IoC container is phased out, use Sisu Inject Plexus instead!</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:plexus-component-api</exclude>
+                  </excludes>
+                  <message>plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made with older plexus
+                    container.
+                  </message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.5.6.201201232323</version>
+        <executions>
+          <execution>
+            <id>agent</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <tagNameFormat>security-@{version}</tagNameFormat>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>${plexus.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate-metadata</goal>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <versionRange>[0.5.6,)</versionRange>
+                        <goals>
+                          <goal>prepare-agent</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore />
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.9.9</version>
+            <configuration>
+              <mappingId>customizable</mappingId>
+              <configurators>
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
+              </configurators>
+              <mojoExecutions>
+                <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
+                <!-- <mojoExecution>org.sonatype.plugins:yuicompressor-maven-plugin::</mojoExecution> -->
+              </mojoExecutions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.5.6.201201232323</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>

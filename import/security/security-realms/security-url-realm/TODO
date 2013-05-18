@@ -1,0 +1,5 @@
+
+TODO:
+o - Implement configuration storage, this might be accomplished with the soon coming plugin manager.
+o - Add a REST service to configure it
+o - Add a UI to make things easy.
