@@ -29,16 +29,6 @@
   <version>4.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>A small utility useful in various use cases, like "booting" an application. All it does is simply creates a plain Map, with it's values sourced from different places and applies different strategies (override order).</description>
-
-  <url>https://github.com/sonatype/appcontext</url>
-
-  <scm>
-    <url>https://github.com/sonatype/appcontext</url>
-    <connection>scm:git:git://github.com/sonatype/appcontext.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/appcontext.git</developerConnection>
-  </scm>
-
   <dependencyManagement>
     <dependencies>
 

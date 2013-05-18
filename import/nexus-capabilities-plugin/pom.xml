@@ -29,19 +29,6 @@
 
   <packaging>pom</packaging>
 
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com/sonatype/nexus-capabilities-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-capabilities-plugin.git</developerConnection>
-    <url>http://github.com/sonatype/nexus-capabilities-plugin</url>
-  </scm>
-
   <modules>
     <module>nexus-capabilities-model</module>
     <module>nexus-capabilities-plugin</module>

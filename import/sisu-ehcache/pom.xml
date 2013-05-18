@@ -26,14 +26,6 @@
   <artifactId>sisu-ehcache</artifactId>
   <version>1.2-SNAPSHOT</version>
 
-  <url>https://github.com/sonatype/sisu-ehcache</url>
-
-  <scm>
-    <url>https://github.com/sonatype/sisu-ehcache</url>
-    <connection>scm:git:git://github.com/sonatype/sisu-ehcache.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/sisu-ehcache.git</developerConnection>
-  </scm>
-
   <dependencies>
     <dependency>
       <groupId>net.sf.ehcache</groupId>

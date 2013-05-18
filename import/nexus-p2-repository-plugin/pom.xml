@@ -29,33 +29,6 @@
 
   <version>2.3.3-SNAPSHOT</version>
 
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com/sonatype/nexus-p2-repository-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-p2-repository-plugin.git</developerConnection>
-    <url>http://github.com/sonatype/nexus-p2-repository-plugin</url>
-  </scm>
-
-  <repositories>
-    <repository>
-      <id>rso-public-grid</id>
-      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>rso-public-grid</id>
-      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
-    </pluginRepository>
-  </pluginRepositories>
-
   <properties>
     <pluginName>Nexus P2 Repository Plugin</pluginName>
     <pluginDescription>P2 repository support.</pluginDescription>

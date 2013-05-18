@@ -26,14 +26,6 @@
   <packaging>pom</packaging>
   <version>3.3-SNAPSHOT</version>
 
-  <url>http://github.com/sonatype/security</url>
-
-  <scm>
-    <connection>scm:git:git@github.com/sonatype/security.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/security.git</developerConnection>
-    <url>http://github.com/sonatype/security</url>
-  </scm>
-
   <properties>
     <shiro.version>1.2.1</shiro.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
@@ -483,15 +475,5 @@
       </build>
     </profile>
   </profiles>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.5.6.201201232323</version>
-      </plugin>
-    </plugins>
-  </reporting>
 
 </project>

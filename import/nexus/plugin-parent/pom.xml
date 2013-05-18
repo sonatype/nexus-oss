@@ -552,11 +552,14 @@
     <profile>
       <id>enunciate</id>
 
-      <activation>
-        <file>
-          <exists>enunciate.xml</exists>
-        </file>
-      </activation>
+      <!--
+      HACK: Disable enunciate for merge, its too slow
+      -->
+      <!--<activation>-->
+        <!--<file>-->
+          <!--<exists>enunciate.xml</exists>-->
+        <!--</file>-->
+      <!--</activation>-->
 
       <build>
         <plugins>

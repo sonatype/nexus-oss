@@ -27,12 +27,6 @@
 
   <version>1.26-SNAPSHOT</version>
 
-  <scm>
-    <url>https://github.com/sonatype/sisu-restlet-bridge</url>
-    <connection>scm:git:git://github.com/sonatype/sisu-restlet-bridge.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/sisu-restlet-bridge.git</developerConnection>
-  </scm>
-
   <properties>
     <restlet.version>1.1.6-SONATYPE-5348-V8</restlet.version>
   </properties>

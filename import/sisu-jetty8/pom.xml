@@ -26,25 +26,6 @@
   <artifactId>sisu-jetty8</artifactId>
   <version>1.4.3-SNAPSHOT</version>
 
-  <url>https://github.com/sonatype/sisu-jetty8</url>
-  <inceptionYear>2012</inceptionYear>
-
-  <scm>
-    <url>https://github.com/sonatype/sisu-jetty8</url>
-    <connection>scm:git:git://github.com/sonatype/sisu-jetty8.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/sisu-jetty8.git</developerConnection>
-  </scm>
-
-  <ciManagement>
-      <system>Hudson</system>
-      <url>https://builds.sonatype.org/job/sisu-jetty8</url>
-  </ciManagement>
-
-  <issueManagement>
-      <system>Github</system>
-      <url>https://github.com/sonatype/sisu-jetty8/issues</url>
-  </issueManagement>
-
   <properties>
     <jetty.version>8.1.8.v20121106</jetty.version>
   </properties>

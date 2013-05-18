@@ -29,19 +29,6 @@
 
   <version>2.1.2-SNAPSHOT</version>
 
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com/sonatype/nexus-p2-bridge-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-p2-bridge-plugin.git</developerConnection>
-    <url>http://github.com/sonatype/nexus-p2-bridge-plugin</url>
-  </scm>
-
   <properties>
     <pluginName>Nexus P2 Bridge Plugin</pluginName>
     <pluginDescription>Bridge between Nexus and P2 Eclipse Runtime.</pluginDescription>

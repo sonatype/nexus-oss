@@ -27,23 +27,6 @@
   <version>1.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com/sonatype/nexus-site-repository.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-site-repository.git</developerConnection>
-    <url>http://github.com/sonatype/nexus-site-repository</url>
-  </scm>
-
-  <properties>
-    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-  </properties>
-
   <modules>
     <module>nexus-site-repository-plugin</module>
     <module>nexus-site-repository-client</module>

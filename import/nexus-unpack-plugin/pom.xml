@@ -28,38 +28,6 @@
 
   <version>1.0.2-SNAPSHOT</version>
 
-  <inceptionYear>2009</inceptionYear>
-  <url>http://github.com/sonatype/nexus-unpack-plugin</url>
-
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com/sonatype/nexus-unpack-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-unpack-plugin.git</developerConnection>
-    <url>http://github.com/sonatype/nexus-unpack-plugin</url>
-  </scm>
-
-  <issueManagement>
-    <system>Github</system>
-    <url>http://github.com/sonatype/nexus-unpack-plugin/issues</url>
-  </issueManagement>
-
-  <properties>
-    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-  </properties>
-
-  <repositories>
-    <repository>
-      <id>rso-public-grid</id>
-      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
-    </repository>
-  </repositories>
-
   <modules>
     <module>nexus-unpack-plugin</module>
   </modules>
