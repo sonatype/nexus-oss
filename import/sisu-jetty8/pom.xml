@@ -17,9 +17,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>27</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-oss</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.sisu</groupId>

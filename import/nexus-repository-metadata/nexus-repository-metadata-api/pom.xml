@@ -72,18 +72,18 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>com.google.code.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-        <version>1.4.0</version>
-        <configuration>
-          <header>${basedir}/header.txt</header>
-          <includes>
-            <include>**/*.java</include>
-          </includes>
-          <!-- this is important for muti-module project <aggregate>true</aggregate> -->
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>com.google.code.maven-license-plugin</groupId>-->
+        <!--<artifactId>maven-license-plugin</artifactId>-->
+        <!--<version>1.4.0</version>-->
+        <!--<configuration>-->
+          <!--<header>${basedir}/header.txt</header>-->
+          <!--<includes>-->
+            <!--<include>**/*.java</include>-->
+          <!--</includes>-->
+          <!--&lt;!&ndash; this is important for muti-module project <aggregate>true</aggregate> &ndash;&gt;-->
+        <!--</configuration>-->
+      <!--</plugin>-->
     </plugins>
   </build>
 

@@ -93,21 +93,21 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <configuration>
-            <excludes combine.children="append">
-              <!-- nexus-site-repository-plugin test resources need to be left ASIS for tests to function. -->
-              <exclude>nexus-site-repository-plugin/src/test/resources/**</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+  <!--<build>-->
+    <!--<pluginManagement>-->
+      <!--<plugins>-->
+        <!--<plugin>-->
+          <!--<groupId>com.mycila.maven-license-plugin</groupId>-->
+          <!--<artifactId>maven-license-plugin</artifactId>-->
+          <!--<configuration>-->
+            <!--<excludes combine.children="append">-->
+              <!--&lt;!&ndash; nexus-site-repository-plugin test resources need to be left ASIS for tests to function. &ndash;&gt;-->
+              <!--<exclude>nexus-site-repository-plugin/src/test/resources/**</exclude>-->
+            <!--</excludes>-->
+          <!--</configuration>-->
+        <!--</plugin>-->
+      <!--</plugins>-->
+    <!--</pluginManagement>-->
+  <!--</build>-->
 
 </project>

@@ -17,15 +17,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.spice</groupId>
-    <artifactId>spice-parent</artifactId>
-    <version>20</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-oss</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.configuration</groupId>
   <artifactId>base-configuration</artifactId>
   <version>1.1.2-SNAPSHOT</version>
-  
+
   <scm>
     <connection>scm:git:git://github.com/sonatype/base-configuration.git</connection>
     <developerConnection>scm:git:git@github.com:sonatype/base-configuration.git</developerConnection>
@@ -41,30 +41,31 @@
           <skipTests>true</skipTests>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-        <configuration>
-          <header>header.txt</header>
-          <properties>
-            <year>2012</year>
-          </properties>
-          <aggregate>true</aggregate>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>com.mycila.maven-license-plugin</groupId>-->
+        <!--<artifactId>maven-license-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<header>header.txt</header>-->
+          <!--<properties>-->
+            <!--<year>2012</year>-->
+          <!--</properties>-->
+          <!--<aggregate>true</aggregate>-->
+        <!--</configuration>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<goals>-->
+              <!--<goal>check</goal>-->
+            <!--</goals>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
     </plugins>
   </build>
   <dependencies>
   	<dependency>
   		<groupId>org.slf4j</groupId>
   		<artifactId>slf4j-api</artifactId>
+                <version>1.7.2</version>
   	</dependency>
   </dependencies>
 </project>

@@ -42,23 +42,23 @@
       <module>sonatype-enunciate-template</module>
   </modules>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.google.code.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<version>1.4.0</version>
-				<configuration>
-					<header>${basedir}/header.txt</header>
-					<includes>
-						<include>**/*.java</include>
-					</includes>
-					<!-- this is important for muti-module project -->
-					<aggregate>true</aggregate>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<!--<build>-->
+		<!--<plugins>-->
+			<!--<plugin>-->
+				<!--<groupId>com.google.code.maven-license-plugin</groupId>-->
+				<!--<artifactId>maven-license-plugin</artifactId>-->
+				<!--<version>1.4.0</version>-->
+				<!--<configuration>-->
+					<!--<header>${basedir}/header.txt</header>-->
+					<!--<includes>-->
+						<!--<include>**/*.java</include>-->
+					<!--</includes>-->
+					<!--&lt;!&ndash; this is important for muti-module project &ndash;&gt;-->
+					<!--<aggregate>true</aggregate>-->
+				<!--</configuration>-->
+			<!--</plugin>-->
+		<!--</plugins>-->
+	<!--</build>-->
     
     <distributionManagement>
       <repository>

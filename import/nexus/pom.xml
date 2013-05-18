@@ -18,9 +18,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>35</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-oss</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -1210,42 +1210,42 @@
           </configuration>
         </plugin>
 
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <configuration>
-            <!-- caution do not append children excludes since we have 'target' package -->
-            <excludes>
-              <exclude>**/.*/**</exclude>
-              <!-- we have target pattern in this format because of target package in nexus-core modules -->
-              <exclude>**/nexus*/target/**</exclude>
-              <exclude>**/ldap-common/target/**</exclude>
-              <exclude>plugin*/**/target/**</exclude>
-              <exclude>**/ext-3.4.1.1/**</exclude>
-              <exclude>**/js/filetree/**</exclude>
-              <exclude>**/editarea_0_8_2/**</exclude>
-              <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
-              <!-- FIXME is this really a good idea excluding all test resources? -->
-              <exclude>**/src/test/resources/**</exclude>
-              <exclude>**/src/test/filtered-resources/**</exclude>
-              <exclude>**/nexus-test-harness-its/resources/**</exclude>
-              <exclude>**/gwt/ext/ui/**/*.js</exclude>
-              <exclude>**/gwt/ext/ui/**/*.css</exclude>
-              <!-- already has a lgpl license -->
-              <exclude>**/Ext.ux.form.LovCombo.css</exclude>
-              <!-- temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check -->
-              <exclude>**/dependency-reduced-pom.xml</exclude>
-              <!-- netbeans adds these -->
-              <exclude>**/nbactions*.xml</exclude>
-              <exclude>**/nb-configuration.xml</exclude>
-              <!-- IntelliJ IDEA files-->
-              <exclude>**/atlassian-ide-plugin.xml</exclude>
-              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
-              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
-              <exclude>plugins/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
+        <!--<plugin>-->
+          <!--<groupId>com.mycila.maven-license-plugin</groupId>-->
+          <!--<artifactId>maven-license-plugin</artifactId>-->
+          <!--<configuration>-->
+            <!--&lt;!&ndash; caution do not append children excludes since we have 'target' package &ndash;&gt;-->
+            <!--<excludes>-->
+              <!--<exclude>**/.*/**</exclude>-->
+              <!--&lt;!&ndash; we have target pattern in this format because of target package in nexus-core modules &ndash;&gt;-->
+              <!--<exclude>**/nexus*/target/**</exclude>-->
+              <!--<exclude>**/ldap-common/target/**</exclude>-->
+              <!--<exclude>plugin*/**/target/**</exclude>-->
+              <!--<exclude>**/ext-3.4.1.1/**</exclude>-->
+              <!--<exclude>**/js/filetree/**</exclude>-->
+              <!--<exclude>**/editarea_0_8_2/**</exclude>-->
+              <!--<exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>-->
+              <!--&lt;!&ndash; FIXME is this really a good idea excluding all test resources? &ndash;&gt;-->
+              <!--<exclude>**/src/test/resources/**</exclude>-->
+              <!--<exclude>**/src/test/filtered-resources/**</exclude>-->
+              <!--<exclude>**/nexus-test-harness-its/resources/**</exclude>-->
+              <!--<exclude>**/gwt/ext/ui/**/*.js</exclude>-->
+              <!--<exclude>**/gwt/ext/ui/**/*.css</exclude>-->
+              <!--&lt;!&ndash; already has a lgpl license &ndash;&gt;-->
+              <!--<exclude>**/Ext.ux.form.LovCombo.css</exclude>-->
+              <!--&lt;!&ndash; temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check &ndash;&gt;-->
+              <!--<exclude>**/dependency-reduced-pom.xml</exclude>-->
+              <!--&lt;!&ndash; netbeans adds these &ndash;&gt;-->
+              <!--<exclude>**/nbactions*.xml</exclude>-->
+              <!--<exclude>**/nb-configuration.xml</exclude>-->
+              <!--&lt;!&ndash; IntelliJ IDEA files&ndash;&gt;-->
+              <!--<exclude>**/atlassian-ide-plugin.xml</exclude>-->
+              <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>-->
+              <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>-->
+              <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>-->
+            <!--</excludes>-->
+          <!--</configuration>-->
+        <!--</plugin>-->
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
