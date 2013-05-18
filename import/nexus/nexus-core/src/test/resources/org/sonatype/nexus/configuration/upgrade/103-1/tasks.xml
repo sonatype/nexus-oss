@@ -1,0 +1,67 @@
+<org.sonatype.nexus.configuration.model.CTaskConfiguration>
+  <tasks>
+    <org.sonatype.nexus.configuration.model.CScheduledTask>
+      <id>0</id>
+      <name>Snapshot Cleanup</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.maven.tasks.SnapshotRemoverTask</type>
+      <status>RUNNING</status>
+      <lastRun>2008-07-15 18:30:00.141 CDT</lastRun>
+      <nextRun>2008-07-16 18:30:00.0 CDT</nextRun>
+      <schedule class="org.sonatype.nexus.configuration.model.CDailySchedule">
+        <startDate>2008-06-24 18:30:00.0 CDT</startDate>
+      </schedule>
+      <properties>
+        <org.sonatype.nexus.configuration.model.CProps>
+          <key>removeOlderThanDays</key>
+          <value>7</value>
+        </org.sonatype.nexus.configuration.model.CProps>
+        <org.sonatype.nexus.configuration.model.CProps>
+          <key>minSnapshotsToKeep</key>
+          <value>3</value>
+        </org.sonatype.nexus.configuration.model.CProps>
+        <org.sonatype.nexus.configuration.model.CProps>
+          <key>removeIfReleaseExists</key>
+          <value>true</value>
+        </org.sonatype.nexus.configuration.model.CProps>
+        <org.sonatype.nexus.configuration.model.CProps>
+          <key>repositoryOrGroupId</key>
+          <value>all_repo</value>
+        </org.sonatype.nexus.configuration.model.CProps>
+      </properties>
+    </org.sonatype.nexus.configuration.model.CScheduledTask>
+    <org.sonatype.nexus.configuration.model.CScheduledTask>
+      <id>1</id>
+      <name>Refresh Plexus-Releases Index for Promoted Releases</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <status>RUNNING</status>
+      <lastRun>2008-07-16 16:15:00.941 CDT</lastRun>
+      <nextRun>2008-07-16 20:15:00.0 CDT</nextRun>
+      <schedule class="org.sonatype.nexus.configuration.model.CAdvancedSchedule">
+        <cronCommand>0 15 0-23/4 * * ?</cronCommand>
+      </schedule>
+      <properties>
+        <org.sonatype.nexus.configuration.model.CProps>
+          <key>repositoryOrGroupId</key>
+          <value>repo_plexus.releases</value>
+        </org.sonatype.nexus.configuration.model.CProps>
+      </properties>
+    </org.sonatype.nexus.configuration.model.CScheduledTask>
+    <org.sonatype.nexus.configuration.model.CScheduledTask>
+      <id>2</id>
+      <name>A manual task</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <status>RUNNING</status>
+      <lastRun>2008-07-16 16:15:00.941 CDT</lastRun>
+      <nextRun>2008-07-16 20:15:00.0 CDT</nextRun>
+      <properties>
+        <org.sonatype.nexus.configuration.model.CProps>
+          <key>repositoryOrGroupId</key>
+          <value>repo_plexus.releases</value>
+        </org.sonatype.nexus.configuration.model.CProps>
+      </properties>
+    </org.sonatype.nexus.configuration.model.CScheduledTask>
+  </tasks>
+</org.sonatype.nexus.configuration.model.CTaskConfiguration>

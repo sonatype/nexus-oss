@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+  <version>1.0.7</version>
+  
+  <smtpConfiguration>
+    <host>smtp-host</host>
+    <port>1234</port>
+    <sslEnabled>false</sslEnabled>
+    <tlsEnabled>false</tlsEnabled>
+    <username>smtp-username</username>
+    <password>smtp-password</password>
+    <debugMode>false</debugMode>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+  
+  <security>
+    <enabled>false</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
+	<anonymousPassword>anonymous</anonymousPassword> 
+    <realms>
+      <realm>XmlAuthenticatingRealm</realm>
+      <realm>NexusMethodAuthorizingRealm</realm>
+      <realm>NexusTargetAuthorizingRealm</realm>
+    </realms>
+  </security>
+  <globalConnectionSettings />
+  <restApi />
+  <httpProxy><port>${nexus-proxy-port}</port><proxyPolicy>strict</proxyPolicy></httpProxy>
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+
+    <repository>
+      <id>nexus-test-harness-release-repo</id>
+      <name>nexus-test-harness-release-repo</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-snapshot-repo</id>
+      <name>nexus-test-harness-snapshot-repo</name>
+      <allowWrite>true</allowWrite>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+      <localStorage>
+      	<url>${test-resources-folder}/nexus169/storage</url>
+      </localStorage>
+    </repository>
+
+  </repositories>
+  <repositoryGrouping>
+    <repositoryGroups>
+      <repositoryGroup>
+        <groupId>nexus-test-harness-snapshot-group</groupId>
+        <name>nexus-test-harness-snapshot-group</name>
+        <repositories>
+          <repository>nexus-test-harness-snapshot-repo</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nexus-test-harness-release-group</groupId>
+        <name>nexus-test-harness-release-group</name>
+        <repositories>
+          <repository>nexus-test-harness-release-repo</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+</nexusConfiguration>

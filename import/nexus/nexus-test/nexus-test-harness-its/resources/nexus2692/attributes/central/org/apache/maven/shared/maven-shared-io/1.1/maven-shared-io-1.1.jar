@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1195891870000</created>
+  <modified>1195891870000</modified>
+  <storedLocally>1258575828684</storedLocally>
+  <lastTouched>1258575828684</lastTouched>
+  <lastRequested>1258575828935</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>02e1d57be05ecac7dbe56a3c73b113e98f22240f</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>fe668f50b2c0edc8707609f792ca4036</string>
+    </entry>
+  </attributes>
+  <length>39480</length>
+</file>

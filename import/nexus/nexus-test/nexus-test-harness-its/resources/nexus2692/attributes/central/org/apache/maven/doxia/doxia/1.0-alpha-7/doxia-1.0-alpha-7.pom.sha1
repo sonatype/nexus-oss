@@ -1,0 +1,29 @@
+<file>
+  <generation>6</generation>
+  <path>/org/apache/maven/doxia/doxia/1.0-alpha-7/doxia-1.0-alpha-7.pom.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1147041098000</created>
+  <modified>1147041098000</modified>
+  <storedLocally>1258575847936</storedLocally>
+  <lastTouched>1258575847936</lastTouched>
+  <lastRequested>1258576565085</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/doxia/doxia/1.0-alpha-7/doxia-1.0-alpha-7.pom.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>b541f1ac885c76da3ca6b620d6ccddc611c2fce6</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>ed7852ee2470080b477f0cec7d1456cd</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

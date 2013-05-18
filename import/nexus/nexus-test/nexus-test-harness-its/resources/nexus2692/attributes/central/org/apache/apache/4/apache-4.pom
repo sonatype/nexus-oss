@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/apache/4/apache-4.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1173132300000</created>
+  <modified>1173132300000</modified>
+  <storedLocally>1258575812394</storedLocally>
+  <lastTouched>1258575812394</lastTouched>
+  <lastRequested>1258575812402</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/apache/4/apache-4.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>602b647986c1d24301bc3d70e5923696bc7f1401</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>d95741bde072d96582983b122e5052cb</string>
+    </entry>
+  </attributes>
+  <length>4495</length>
+</file>

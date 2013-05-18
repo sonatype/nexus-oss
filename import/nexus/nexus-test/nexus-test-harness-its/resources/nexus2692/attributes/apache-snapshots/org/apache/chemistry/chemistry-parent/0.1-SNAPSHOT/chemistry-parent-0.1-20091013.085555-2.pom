@@ -1,0 +1,29 @@
+<file>
+  <generation>2</generation>
+  <path>/org/apache/chemistry/chemistry-parent/0.1-SNAPSHOT/chemistry-parent-0.1-20091013.085555-2.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>apache-snapshots</repositoryId>
+  <created>1255424158000</created>
+  <modified>1255424158000</modified>
+  <storedLocally>1258577884477</storedLocally>
+  <lastTouched>1258577884477</lastTouched>
+  <lastRequested>1258577884620</lastRequested>
+  <expired>false</expired>
+  <remoteUrl>http://repository.apache.org/snapshots/org/apache/chemistry/chemistry-parent/0.1-SNAPSHOT/chemistry-parent-0.1-20091013.085555-2.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>a9c72317f0cf4b395fd2e94b1cf854284d515bd0</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>af2ec47a8090172e87ecb0141b82bc9f</string>
+    </entry>
+  </attributes>
+  <length>7198</length>
+</file>

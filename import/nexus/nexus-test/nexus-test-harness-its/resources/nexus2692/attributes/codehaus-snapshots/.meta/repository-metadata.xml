@@ -1,0 +1,28 @@
+<file>
+  <generation>4</generation>
+  <path>/.meta/repository-metadata.xml</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>codehaus-snapshots</repositoryId>
+  <created>1258576673628</created>
+  <modified>1258576673628</modified>
+  <storedLocally>1258576673628</storedLocally>
+  <lastTouched>1258576673628</lastTouched>
+  <lastRequested>1258576673631</lastRequested>
+  <expired>false</expired>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>c7e475ea4e45e7a1dc86826beebfaf00a2c501ad</string>
+    </entry>
+    <entry>
+      <string>contentGenerator</string>
+      <string>NexusRepositoryMetadataContentGenerator</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>384c3c01755bed53c49069a5047a5f90</string>
+    </entry>
+  </attributes>
+  <length>357</length>
+</file>

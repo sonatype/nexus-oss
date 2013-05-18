@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.pom.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1170981064000</created>
+  <modified>1170981064000</modified>
+  <storedLocally>1258575846623</storedLocally>
+  <lastTouched>1258575846623</lastTouched>
+  <lastRequested>1258575846646</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.pom.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>9d9d992c63fd7a2c5e0451ebc41c464e1579f7d4</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>f82e80087184a05b88f62b2b8adefd15</string>
+    </entry>
+  </attributes>
+  <length>62</length>
+</file>

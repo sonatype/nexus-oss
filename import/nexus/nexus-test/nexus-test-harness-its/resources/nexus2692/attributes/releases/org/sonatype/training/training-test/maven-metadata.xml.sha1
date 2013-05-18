@@ -1,0 +1,32 @@
+<file>
+  <generation>5</generation>
+  <path>/org/sonatype/training/training-test/maven-metadata.xml.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>releases</repositoryId>
+  <created>1258575883000</created>
+  <modified>1258575883000</modified>
+  <storedLocally>1258575883801</storedLocally>
+  <lastTouched>1258575883801</lastTouched>
+  <lastRequested>1258575883802</lastRequested>
+  <expired>true</expired>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>b71a180b482c0e75683d2c59b9d46c6070bcb3b3</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>request.user</string>
+      <string>admin</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>7a712cc7ff242d41387139f2fc9ff9bb</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

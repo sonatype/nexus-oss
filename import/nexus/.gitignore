@@ -1,0 +1,31 @@
+# Ignores for Sonatype Nexus Core
+# Language is Java
+# Build tool is Apache Maven2/3
+# IDE used is Eclipse MSE
+# so, we have to ignore all the specifics of these above
+
+# Eclipse related (and M2e)
+.classpath
+.project
+.settings/
+
+# Maven related (and some plugins)
+target/
+*.ser
+*.ec
+
+# Intellij
+*.ipr
+*.iml
+*.iws
+.idea/
+
+# Other
+.svn/
+.benchmarks.*.db
+
+# Junk (to be cleaned up)
+#nexus/nexus-test-harness/nexus-test-harness-its/velocity.log*
+
+#nexus/nexus-test-harness/nexus-test-harness-its/test-output
+#nexus/nexus-clients/nexus-rest-client-java/test-output/

@@ -1,0 +1,3 @@
+[
+    [ "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" ]
+]

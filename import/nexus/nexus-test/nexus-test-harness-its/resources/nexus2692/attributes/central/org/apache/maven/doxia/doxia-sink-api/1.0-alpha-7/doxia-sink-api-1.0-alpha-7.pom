@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-7/doxia-sink-api-1.0-alpha-7.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1147041099000</created>
+  <modified>1147041099000</modified>
+  <storedLocally>1258575847421</storedLocally>
+  <lastTouched>1258575847421</lastTouched>
+  <lastRequested>1258576565090</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/doxia/doxia-sink-api/1.0-alpha-7/doxia-sink-api-1.0-alpha-7.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>d8e08f33563f684917311978da2ff03a9d0022ab</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>138f0494c7ed1409a33902efa5b3940f</string>
+    </entry>
+  </attributes>
+  <length>424</length>
+</file>

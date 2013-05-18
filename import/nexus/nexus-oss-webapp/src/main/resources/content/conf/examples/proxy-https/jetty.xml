@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <Set name="threadPool">
+        <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    </Set>
+    <Call name="addConnector">
+        <Arg>
+            <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+              <Set name="host">${application-host}</Set>
+              <Set name="port">${application-port}</Set>
+            </New>
+        </Arg>
+    </Call>
+
+     <New id="RewriteHandler" class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
+       <Set name="rules">
+         <Array type="org.eclipse.jetty.rewrite.handler.Rule">
+
+           <Item>
+             <New id="forwardedHttps" class="org.eclipse.jetty.rewrite.handler.ForwardedSchemeHeaderRule">
+               <Set name="header">X-Forwarded-Scheme</Set>
+               <Set name="headerValue">https</Set>
+               <Set name="scheme">https</Set>
+             </New>
+           </Item>
+
+         </Array>
+       </Set>
+     </New>
+
+    <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+        <!-- The following configuration disables JSP taglib support, the validation of which
+             slows down Jetty's startup significantly. -->
+        <Call name="addLifeCycleListener">
+            <Arg>
+              <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
+            </Arg>
+        </Call>
+    </New>
+
+ 
+    <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+      <Arg><Ref id="Contexts"/></Arg>
+      <Arg>${nexus-webapp}</Arg>
+      <Arg>${nexus-webapp-context-path}</Arg>
+      <Set name="extractWAR">false</Set>
+    </New>
+
+    <Set name="handler"> <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+            <Set name="handlers">
+                <Array type="org.eclipse.jetty.server.Handler">
+                    <Item><Ref id="RewriteHandler"/></Item>
+                    <Item><Ref id="Contexts"/></Item>
+                    <Item><New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/></Item>
+                    <Item><New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/></Item>
+                </Array>
+            </Set>
+        </New>
+    </Set>
+    <Set name="stopAtShutdown">true</Set>
+    <Set name="sendServerVersion">true</Set>
+    <Set name="sendDateHeader">true</Set>
+    <Set name="gracefulShutdown">1000</Set>
+</Configure>

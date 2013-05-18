@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/apache/maven/surefire/surefire-booter/2.4.3/surefire-booter-2.4.3.jar.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1210701428000</created>
+  <modified>1210701428000</modified>
+  <storedLocally>1258575866029</storedLocally>
+  <lastTouched>1258575866029</lastTouched>
+  <lastRequested>1258575866065</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/surefire/surefire-booter/2.4.3/surefire-booter-2.4.3.jar.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>45a49e24c1632b295c95ef08cc368235b252a8c9</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>212d8a2a1f51c5d552600fc9c42b9b54</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

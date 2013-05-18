@@ -1,0 +1,652 @@
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>35</version>
+  </parent>
+
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>nexus-plugin-parent</artifactId>
+  <packaging>pom</packaging>
+
+  <version>2.5.0-SNAPSHOT</version>
+
+  <!--
+  ******************************************************************
+  MUST KEEP IN SYNC WITH PRO com.sonatype.nexus:nexus-plugin-parent!
+  ******************************************************************
+  -->
+
+  <properties>
+    <nexus.version>2.5.0-SNAPSHOT</nexus.version>
+    <enunciate.version>1.26.2</enunciate.version>
+
+    <!-- See 'idea' profile -->
+    <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
+
+    <!-- Used in enunciate.xml -->
+    <copyright.year>2013</copyright.year>
+
+    <!-- Nexus _bundle-launcher-style_ integration-tests configuration -->
+    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
+
+    <!-- Configuration for 'nexus-plugin' packaging. -->
+    <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+
+    <!-- Default debug friendly options; see 'optimize-js' profile -->
+    <maven.yuicompressor.jswarn>true</maven.yuicompressor.jswarn>
+    <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
+    <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+    <!-- preserve linebreaks -->
+    <maven.yuicompressor.linebreakpos>0</maven.yuicompressor.linebreakpos>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <!--
+      Basic dependency for *all* plugins.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-api</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.client</groupId>
+        <artifactId>nexus-client-core</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!-- ******************** PLUGINS ******************** -->
+
+      <!--
+      Required for plugins which use H2 databases.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-h2-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Required for plugins which use BouncyCastle/JCE/goodies-crypto.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-crypto-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-crypto-plugin</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Required for plugins which use the maven-bridge.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-maven-bridge-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Required for plugins which provide legacy restlet-1.x REST resources.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.  Need to kill all these -tests.jar dependencies.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <classifier>tests</classifier>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-model</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Here only to bring in 'org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature' so that Enunciate can understand
+      restlet1x plugins which have these annotations for documentation generation.
+
+      FIXME: Remove need for this dep once we have most bits on JAX-RS compatible resources.
+      FIXME: Short-term, may want to just include this in deps provided by nexus-restlet1x-plugin?
+      -->
+      <dependency>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>enunciate-core</artifactId>
+        <version>${enunciate.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>enunciate-core-rt</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.sf.apt-jelly</groupId>
+            <artifactId>apt-jelly-freemarker</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!--
+      Required for plugins which provide modern JAX-RS 1.1 REST resources.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-siesta-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Required for plugins which provide indexer integration.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-indexer-lucene-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+      
+      <!--
+      Required for plugins which contribute UI
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ui-extjs3-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ui-extjs3-plugin</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!-- ******************** TESTING ******************** -->
+
+      <!--
+      Basic dependency for *all* plugins which provide tests.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-test-api</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Basic dependency for plugins which provide _bundle-launcher-style_ integration-tests.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      DM entry here is used to allow the _bundle-launcher-style_ integration-tests to locate the appropriate Nexus bundle to test with.
+      -->
+      <dependency>
+        <groupId>${it.nexus.bundle.groupId}</groupId>
+        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <version>${it.nexus.bundle.version}</version>
+      </dependency>
+
+      <!--
+      Dependency for all plugins which provide _legacy-style_ integration-tests.
+      This can *NOT* be included in nexus-plugin-test-api as it depends on several plugins.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-harness-launcher</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+
+    </dependencies>
+  </dependencyManagement>
+
+  <!--
+  Explicitly *NOT* adding a <dependencies> section to this POM, children must configure what they need.
+  We must *NOT* assume we know what artifacts should be depended upon.
+  -->
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!--
+        Nexus plugins require Java 6 minimum.
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+
+        <!--
+        Support for nexus-plugin packaging.
+        -->
+        <plugin>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+          <version>1.0</version>
+          <extensions>true</extensions>
+        </plugin>
+
+        <!--
+        For legacy-plugins which still need Plexus descriptors.
+        -->
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>1.5.5</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.thoughtworks.qdox</groupId>
+              <artifactId>qdox</artifactId>
+              <version>1.12</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate-metadata</goal>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!--
+        Support for Nexus plugins which provide a UI.
+        -->
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <!--
+               yuicompressor warns when code is not in a shape that's optimized for minifying.
+               ATM this only pollutes the log (~9400 warnings)
+            -->
+            <jswarn>false</jswarn>
+            <nominify>${maven.yuicompressor.nocompress}</nominify>
+            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
+            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
+            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
+            <sourceDirectory>${project.build.sourceDirectory}/../resources/static</sourceDirectory>
+          </configuration>
+          <executions>
+            <execution>
+              <id>js</id>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/js</sourceDirectory>
+              </configuration>
+            </execution>
+            <execution>
+              <id>css</id>
+              <goals>
+                <goal>aggregate-css</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/css</sourceDirectory>
+                <required>false</required>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!--
+        Plugin supporting _legacy-style_ integration-tests.
+        -->
+        <plugin>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>${nexus.version}</version>
+        </plugin>
+
+        <!--
+        Support for bridging maven configuration to test-suite executions; see 'it' profile.
+        -->
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
+          <version>3.0</version>
+        </plugin>
+
+        <!--
+        Additional configuration for release; enable the optimize-js profile.
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <releaseProfiles>release,optimize-js</releaseProfiles>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
+    <!--
+    Explicitly *NOT* adding a <plugins> section to this POM, children must configure what they need.
+    We must *NOT* assume we know what plugins should execute by default.
+    -->
+  </build>
+
+  <profiles>
+    <!--
+    Enable running of integration-tests.
+    -->
+    <profile>
+      <id>it</id>
+
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>export</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+    Enable verbose logging for unit tests; defaults to DEBUG.
+    -->
+    <profile>
+      <id>test.debug</id>
+
+      <activation>
+        <property>
+          <name>test.debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <properties>
+        <test.log.level>DEBUG</test.log.level>
+      </properties>
+
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <test.log.level>${test.log.level}</test.log.level>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Enable verbose logging for integration tests; defaults to DEBUG.
+    -->
+    <profile>
+      <id>it.debug</id>
+
+      <activation>
+        <property>
+          <name>it.debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <properties>
+        <test.log.level>DEBUG</test.log.level>
+        <it.test.log.level>DEBUG</it.test.log.level>
+        <it.nexus.log.level>DEBUG</it.nexus.log.level>
+      </properties>
+
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <test.log.level>${test.log.level}</test.log.level>
+                  <it.test.log.level>${it.test.log.level}</it.test.log.level>
+                  <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Optimize javascript & css files, for use on production/release builds.
+    -->
+    <profile>
+      <id>optimize-js</id>
+
+      <properties>
+        <!--
+        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
+        -->
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+        <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
+        <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+        <!-- do not preserve linebreaks -->
+        <maven.yuicompressor.linebreakpos>-1</maven.yuicompressor.linebreakpos>
+      </properties>
+    </profile>
+
+    <!--
+    Generates Nexus plugin REST documentation, which is included in plugin bundles.
+    Enunciate is *only* used to generate documentation presently.
+    -->
+    <profile>
+      <id>enunciate</id>
+
+      <activation>
+        <file>
+          <exists>enunciate.xml</exists>
+        </file>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>maven-enunciate-slim-plugin</artifactId>
+            <version>${enunciate.version}</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-docs</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
+              <!--
+              enunciate-xml module is needed to properly handle 'defaultRestSubcontext' configuration,
+              which is used to generate the mount point location in documentation.
+              when this dependency is included the module appears to be automatically enabled.
+              -->
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-xml</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>docs</goal>
+                </goals>
+                <configuration>
+                  <configFile>enunciate.xml</configFile>
+                  <docsDir>${project.build.outputDirectory}/docs</docsDir>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+    Support for loading Nexus plugin projects in Intellij IDEA; as it doesn't handle the 'nexus-plugin' packaging WRT to dependency calculations.
+    -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <nexus-plugin.type>jar</nexus-plugin.type>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.codehaus.enunciate</groupId>
+                        <artifactId>maven-enunciate-slim-plugin</artifactId>
+                        <versionRange>[0,)</versionRange>
+                        <goals>
+                          <goal>docs</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore></ignore>
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/wagon/wagon-ssh-external/1.0-beta-2/wagon-ssh-external-1.0-beta-2.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1165962218000</created>
+  <modified>1165962218000</modified>
+  <storedLocally>1258575848852</storedLocally>
+  <lastTouched>1258575848852</lastTouched>
+  <lastRequested>1258575848858</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/wagon/wagon-ssh-external/1.0-beta-2/wagon-ssh-external-1.0-beta-2.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>17ff27f9d0af5fc86242e18d81023b6a71e09e09</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>fabd07916cc80342a3b1c51ddaf4e9db</string>
+    </entry>
+  </attributes>
+  <length>1459</length>
+</file>

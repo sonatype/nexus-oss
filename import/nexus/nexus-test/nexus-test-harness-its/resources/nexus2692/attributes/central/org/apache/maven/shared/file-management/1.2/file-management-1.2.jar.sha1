@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/apache/maven/shared/file-management/1.2/file-management-1.2.jar.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1196271146000</created>
+  <modified>1196271146000</modified>
+  <storedLocally>1258575828491</storedLocally>
+  <lastTouched>1258575828491</lastTouched>
+  <lastRequested>1258575828532</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/shared/file-management/1.2/file-management-1.2.jar.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>dd328b8a63e237d5628fa0d2c1eacc079b8c0eff</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>75fe74004a34576c224c5f33787336e9</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

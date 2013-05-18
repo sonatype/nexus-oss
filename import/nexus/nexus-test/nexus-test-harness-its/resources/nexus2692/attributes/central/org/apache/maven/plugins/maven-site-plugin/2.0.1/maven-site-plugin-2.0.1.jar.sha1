@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/apache/maven/plugins/maven-site-plugin/2.0.1/maven-site-plugin-2.0.1.jar.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1247227263000</created>
+  <modified>1247227263000</modified>
+  <storedLocally>1258575815399</storedLocally>
+  <lastTouched>1258575815399</lastTouched>
+  <lastRequested>1258575815446</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/plugins/maven-site-plugin/2.0.1/maven-site-plugin-2.0.1.jar.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>3465d45cb654d87df97cea8ca3d80d3453c6ca62</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>b211bda547a483128cb4c511390e28d8</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

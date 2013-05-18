@@ -1,0 +1,29 @@
+<file>
+  <generation>3</generation>
+  <path>/org/apache/chemistry/chemistry-api/0.1-SNAPSHOT/maven-metadata.xml</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>apache-snapshots</repositoryId>
+  <created>1258577805000</created>
+  <modified>1258577805000</modified>
+  <storedLocally>1258577805325</storedLocally>
+  <lastTouched>1258577805325</lastTouched>
+  <lastRequested>1258577882415</lastRequested>
+  <expired>false</expired>
+  <remoteUrl>http://repository.apache.org/snapshots/org/apache/chemistry/chemistry-api/0.1-SNAPSHOT/maven-metadata.xml</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>ebe9556f64ed3b9e6c887713f674eca69c76299a</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>0:0:0:0:0:0:0:1%0</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>d9356875c3ba206829660429b73e8f2b</string>
+    </entry>
+  </attributes>
+  <length>367</length>
+</file>

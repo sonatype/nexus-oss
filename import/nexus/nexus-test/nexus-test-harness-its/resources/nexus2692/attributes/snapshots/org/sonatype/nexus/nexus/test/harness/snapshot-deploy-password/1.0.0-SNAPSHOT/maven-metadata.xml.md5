@@ -1,0 +1,32 @@
+<file>
+  <generation>17</generation>
+  <path>/org/sonatype/nexus/nexus/test/harness/snapshot-deploy-password/1.0.0-SNAPSHOT/maven-metadata.xml.md5</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>snapshots</repositoryId>
+  <created>1258578500890</created>
+  <modified>1258578500890</modified>
+  <storedLocally>1258578500890</storedLocally>
+  <lastTouched>1258578500890</lastTouched>
+  <lastRequested>1258578500891</lastRequested>
+  <expired>false</expired>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>5b1c77934a6995415613cc623c3e5473b80a6896</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>request.user</string>
+      <string>admin</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>ee228506cad4d7f8cf18d8cfe91215d7</string>
+    </entry>
+  </attributes>
+  <length>32</length>
+</file>

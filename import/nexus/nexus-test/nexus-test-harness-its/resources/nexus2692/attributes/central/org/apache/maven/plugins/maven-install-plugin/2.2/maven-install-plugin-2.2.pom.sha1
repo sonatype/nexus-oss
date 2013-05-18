@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/apache/maven/plugins/maven-install-plugin/2.2/maven-install-plugin-2.2.pom.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1179164163000</created>
+  <modified>1179164163000</modified>
+  <storedLocally>1258575834989</storedLocally>
+  <lastTouched>1258575834989</lastTouched>
+  <lastRequested>1258575835018</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/plugins/maven-install-plugin/2.2/maven-install-plugin-2.2.pom.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>f92ace4feae6b50a2d4c49b75904bf3d5bec516b</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>07f4d08ce576342e3a2a0ac73d74baa6</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/codehaus/plexus/plexus-archiver/1.0-alpha-9/plexus-archiver-1.0-alpha-9.jar</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1184981212000</created>
+  <modified>1184981212000</modified>
+  <storedLocally>1258575880280</storedLocally>
+  <lastTouched>1258575880280</lastTouched>
+  <lastRequested>1258575880807</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/codehaus/plexus/plexus-archiver/1.0-alpha-9/plexus-archiver-1.0-alpha-9.jar</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>3aaea34102ae76918290374a8e70b65e6f898c8d</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>3c40b6fadf3448011abb4dcb5ead3977</string>
+    </entry>
+  </attributes>
+  <length>157072</length>
+</file>

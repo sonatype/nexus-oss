@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<included>
+  <jmxConfigurator/>
+
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${appender.pattern}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${appender.file}</File>
+    <Append>true</Append>
+    <encoder>
+      <pattern>${appender.pattern}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${appender.file}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+
+  <appender name="metrics" class="com.yammer.metrics.logback.InstrumentedAppender"/>
+
+  <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN" />
+  <logger name="httpclient" level="INFO" />
+  <logger name="org.apache.http" level="INFO" />
+  <logger name="org.restlet" level="INFO" />
+  <logger name="org.apache.commons" level="WARN" />
+  <logger name="org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter" level="INFO" />
+  <logger name="org.apache.shiro.web.filter.mgt.DefaultFilterChainManager" level="INFO"/>
+  <logger name="org.eclipse.jetty" level="INFO" />
+  <logger name="eu.medsea.mimeutil.MimeUtil2" level="INFO"/>
+  
+  <root level="${root.level}">
+    <appender-ref ref="console" />
+    <appender-ref ref="logfile" />
+    <appender-ref ref="metrics" />
+  </root>
+  
+</included>

@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/jtidy/jtidy/4aug2000r7-dev/jtidy-4aug2000r7-dev.pom.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1170983453000</created>
+  <modified>1170983453000</modified>
+  <storedLocally>1258575846278</storedLocally>
+  <lastTouched>1258575846278</lastTouched>
+  <lastRequested>1258575846299</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//jtidy/jtidy/4aug2000r7-dev/jtidy-4aug2000r7-dev.pom.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>985b4f200ec49c4a16fea8f32f9ef77cff2c75e0</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>10fc7999a48865cc81431cf8e573bf0b</string>
+    </entry>
+  </attributes>
+  <length>67</length>
+</file>

@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/surefire/surefire-api/2.4.3/surefire-api-2.4.3.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1210701428000</created>
+  <modified>1210701428000</modified>
+  <storedLocally>1258575864008</storedLocally>
+  <lastTouched>1258575864008</lastTouched>
+  <lastRequested>1258575864014</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/surefire/surefire-api/2.4.3/surefire-api-2.4.3.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>4bbf79b9d5f1a06c68923662306882c347044c60</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>ea69d63df1ee39dd4b1bb25ee5d9cf84</string>
+    </entry>
+  </attributes>
+  <length>2112</length>
+</file>
