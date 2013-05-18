@@ -35,7 +35,7 @@ public class Nexus3936DisableSecurityStatusIT
     {
 
         NexusStatusUtil statusUtil = getNexusStatusUtil();
-        StatusResource statusResource = statusUtil.getNexusStatus().getData();
+        StatusResource statusResource = statusUtil.getNexusStatus( true ).getData();
 
         List<ClientPermission> permisisons = statusResource.getClientPermissions().getPermissions();
 
