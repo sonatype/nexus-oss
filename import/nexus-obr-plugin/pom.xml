@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
+    <version>2.5.0-01</version>
+  </parent>
+
+  <groupId>org.sonatype.nexus.obr</groupId>
+  <artifactId>nexus-obr</artifactId>
+  <packaging>pom</packaging>
+
+  <version>2.1.3-SNAPSHOT</version>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git@github.com/sonatype/nexus-obr-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-obr-plugin.git</developerConnection>
+    <url>http://github.com/sonatype/nexus-obr-plugin</url>
+  </scm>
+
+  <properties>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.osgi.service.obr</artifactId>
+        <version>1.0.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.main.distribution</artifactId>
+        <classifier>project</classifier>
+        <type>tar.gz</type>
+        <version>3.2.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>apache-maven</artifactId>
+        <version>3.0.4</version>
+        <classifier>bin</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.shared</groupId>
+        <artifactId>maven-verifier</artifactId>
+        <version>1.3</version>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit-dep</artifactId>
+          </exclusion>
+          <exclusion>
+            <artifactId>junit</artifactId>
+            <groupId>junit</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- INTERNAL -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.obr</groupId>
+        <artifactId>nexus-obr-client</artifactId>
+        <version>2.1.3-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-obr-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>2.1.3-SNAPSHOT</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <modules>
+    <module>nexus-obr-plugin</module>
+    <module>nexus-obr-client</module>
+    <module>nexus-obr-testsuite</module>
+  </modules>
+
+</project>
