@@ -17,8 +17,6 @@
 
   <artifactId>nexus-repository-metadata-api</artifactId>
 
-  <name>Sonatype Nexus Repository Metadata : API</name>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

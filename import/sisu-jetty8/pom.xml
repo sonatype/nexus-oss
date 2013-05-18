@@ -26,8 +26,6 @@
   <artifactId>sisu-jetty8</artifactId>
   <version>1.4.3-SNAPSHOT</version>
 
-  <name>SISU Jetty8 Component</name>
-
   <url>https://github.com/sonatype/sisu-jetty8</url>
   <inceptionYear>2012</inceptionYear>
 

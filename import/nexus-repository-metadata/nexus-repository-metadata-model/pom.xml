@@ -17,8 +17,6 @@
 
   <artifactId>nexus-repository-metadata-model</artifactId>
 
-  <name>Sonatype Nexus Repository Metadata : Model</name>
-
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

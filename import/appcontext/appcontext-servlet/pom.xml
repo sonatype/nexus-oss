@@ -26,8 +26,6 @@
 
   <artifactId>appcontext-servlet</artifactId>
 
-  <name>Sonatype AppContext Servlet</name>
-
   <dependencies>
 
     <dependency>

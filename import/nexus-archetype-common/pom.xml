@@ -17,17 +17,21 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <!--<parent>-->
+    <!--<groupId>org.sonatype.spice</groupId>-->
+    <!--<artifactId>spice-parent</artifactId>-->
+    <!--<version>20</version>-->
+  <!--</parent>-->
+
   <parent>
-    <groupId>org.sonatype.spice</groupId>
-    <artifactId>spice-parent</artifactId>
-    <version>20</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>35</version>
   </parent>
 
   <artifactId>nexus-archetype-common-parent</artifactId>
   <version>1.4-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <name>Nexus Maven Archetype Catalog Parent</name>
 
   <licenses>
     <license>
@@ -52,27 +56,27 @@
     <module>nexus-archetype-common-cli</module>
   </modules>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-        <configuration>
-          <header>header.txt</header>
-          <properties>
-            <year>2012</year>
-          </properties>
-          <aggregate>true</aggregate>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <!--<build>-->
+    <!--<plugins>-->
+      <!--<plugin>-->
+        <!--<groupId>com.mycila.maven-license-plugin</groupId>-->
+        <!--<artifactId>maven-license-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<header>header.txt</header>-->
+          <!--<properties>-->
+            <!--<year>2012</year>-->
+          <!--</properties>-->
+          <!--<aggregate>true</aggregate>-->
+        <!--</configuration>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<goals>-->
+              <!--<goal>check</goal>-->
+            <!--</goals>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
+    <!--</plugins>-->
+  <!--</build>-->
 
 </project>

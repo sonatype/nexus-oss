@@ -26,8 +26,6 @@
 
   <artifactId>appcontext-guice</artifactId>
 
-  <name>Sonatype AppContext Guice</name>
-
   <dependencies>
 
     <dependency>

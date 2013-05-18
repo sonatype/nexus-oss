@@ -29,7 +29,6 @@
   <version>4.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Sonatype AppContext (parent)</name>
   <description>A small utility useful in various use cases, like "booting" an application. All it does is simply creates a plain Map, with it's values sourced from different places and applies different strategies (override order).</description>
 
   <url>https://github.com/sonatype/appcontext</url>

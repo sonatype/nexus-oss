@@ -29,4 +29,26 @@
   
   <version>2.5.0-SNAPSHOT</version>
 
+  <modules>
+    <module>import/appcontext</module>
+    <module>import/base-configuration</module>
+    <module>import/security</module>
+    <module>import/sisu-jetty8</module>
+    <module>import/sisu-ehcache</module>
+    <module>import/sisu-restlet-bridge</module>
+    <module>import/nexus</module>
+    <module>import/nexus-capabilities-plugin</module>
+    <module>import/nexus-site-repository</module>
+    <module>import/nexus-unpack-plugin</module>
+    <module>import/nexus-p2-bridge-plugin</module>
+    <module>import/nexus-p2-repository-plugin</module>
+    <module>import/nexus-obr-plugin</module>
+
+    <!--
+    TODO: Need to sort out build issues here:
+    -->
+    <!--<module>import/nexus-archetype-common</module>-->
+    <!--<module>import/nexus-repository-metadata</module>-->
+  </modules>
+
 </project>

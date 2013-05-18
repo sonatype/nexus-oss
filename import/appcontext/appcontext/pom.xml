@@ -26,8 +26,6 @@
 
   <artifactId>appcontext</artifactId>
 
-  <name>Sonatype AppContext</name>
-
   <dependencies>
 
     <!-- interpolation (mandatory) -->

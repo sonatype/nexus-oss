@@ -25,8 +25,6 @@
 
   <artifactId>nexus-archetype-common</artifactId>
 
-  <name>Nexus Maven Archetype Catalog Plugin Common</name>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.archetype</groupId>
