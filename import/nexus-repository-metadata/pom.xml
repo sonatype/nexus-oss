@@ -1,0 +1,159 @@
+<!--
+
+    Copyright (c) 2007-2011 Sonatype, Inc.
+    All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse
+    Public License Version 1.0, which accompanies this distribution and is available at
+    http://www.eclipse.org/legal/epl-v10.html.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.spice</groupId>
+    <artifactId>spice-parent</artifactId>
+    <version>18</version>
+  </parent>
+
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>nexus-repository-metadata</artifactId>
+  <version>1.3-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Sonatype Nexus Repository Metadata</name>
+  <url>${nexus-site-base-url}/nexus-repository-metadata</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/org/documents/epl-v10.html</url>
+    </license>
+  </licenses>
+
+  <properties>
+    <sisu-inject.version>2.1.1</sisu-inject.version>
+    <plexus-component-metadata.version>1.5.5</plexus-component-metadata.version>
+    <plexus-utils.version>2.0.5</plexus-utils.version>
+  </properties>
+
+  <modules>
+    <module>nexus-repository-metadata-model</module>
+    <module>nexus-repository-metadata-api</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <!-- SISU and Plexus support (the version should be tied to SISU used ones!) -->
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-plexus</artifactId>
+        <version>${sisu-inject.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>${plexus-component-metadata.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus-utils.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-repository-metadata-model</artifactId>
+        <version>${project.version}</version>
+        <type>jar</type>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-repository-metadata-api</artifactId>
+        <version>${project.version}</version>
+        <type>jar</type>
+        <scope>compile</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>${plexus-component-metadata.version}</version>
+          <executions>
+            <execution>
+              <id>process-classes</id>
+              <goals>
+                <goal>generate-metadata</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>process-test-classes</id>
+              <goals>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <version>1.4.1</version>
+          <configuration>
+            <useJava5>true</useJava5>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <configuration>
+            <header>nexus-repository-metadata/header.txt</header>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+  </build>
+
+  <developers>
+    <developer>
+      <id>cstamas</id>
+      <name>Tamas Cservenak</name>
+      <email>cstamas@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>2</timezone>
+    </developer>
+    <developer>
+      <id>brianf</id>
+      <name>Brian Fox</name>
+      <email>brian@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-6</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/sonatype/nexus-repository-metadata.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus-repository-metadata.git</developerConnection>
+    <url>https://github.com/sonatype/nexus-repository-metadata</url>
+  </scm>
+ 
+  <distributionManagement>
+    <site>
+      <id>forge-sites</id>
+      <url>dav:${nexus-site-base-url}/nexus-repository-metadata</url>
+    </site>
+  </distributionManagement>
+ 
+</project>

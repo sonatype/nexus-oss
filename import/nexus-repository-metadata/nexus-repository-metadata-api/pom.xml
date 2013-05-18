@@ -1,0 +1,92 @@
+<!--
+
+    Copyright (c) 2007-2011 Sonatype, Inc.
+    All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse
+    Public License Version 1.0, which accompanies this distribution and is available at
+    http://www.eclipse.org/legal/epl-v10.html.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-repository-metadata</artifactId>
+    <version>1.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-repository-metadata-api</artifactId>
+
+  <name>Sonatype Nexus Repository Metadata : API</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-repository-metadata-model</artifactId>
+    </dependency>
+
+    <!-- Plexus -->
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+    </dependency>
+
+    <!-- Optional simple client -->
+    <dependency>
+      <groupId>org.restlet</groupId>
+      <artifactId>org.restlet</artifactId>
+      <version>1.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.noelios.restlet</groupId>
+      <artifactId>com.noelios.restlet</artifactId>
+      <version>1.1.2</version>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+      <version>3.8.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <scope>test</scope>
+      <version>2.5.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <forkMode>never</forkMode>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.google.code.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <version>1.4.0</version>
+        <configuration>
+          <header>${basedir}/header.txt</header>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+          <!-- this is important for muti-module project <aggregate>true</aggregate> -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
