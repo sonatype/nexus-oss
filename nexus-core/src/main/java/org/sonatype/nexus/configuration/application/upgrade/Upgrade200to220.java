@@ -22,6 +22,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.configuration.model.v2_2_0.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.v2_2_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
@@ -77,10 +78,9 @@ public class Upgrade200to220
         BasicVersionUpgrade versionConverter = new BasicVersionUpgrade()
         {
             @Override
-            public org.sonatype.nexus.configuration.model.CRemoteStorage upgradeCRemoteStorage( org.sonatype.nexus.configuration.model.v2_0_0.CRemoteStorage cRemoteStorage )
+            public CRemoteStorage upgradeCRemoteStorage( org.sonatype.nexus.configuration.model.v2_0_0.CRemoteStorage cRemoteStorage )
             {
-                final org.sonatype.nexus.configuration.model.CRemoteStorage remoteStorage =
-                    super.upgradeCRemoteStorage( cRemoteStorage );
+                final CRemoteStorage remoteStorage = super.upgradeCRemoteStorage( cRemoteStorage );
                 if ( remoteStorage != null )
                 {
                     if ( StringUtils.equals( remoteStorage.getProvider(), "apacheHttpClient3x" ) )
@@ -96,10 +96,10 @@ public class Upgrade200to220
             }
         };
 
-        org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        org.sonatype.nexus.configuration.model.v2_2_0.Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v2_2_0.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v2_2_0.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 }

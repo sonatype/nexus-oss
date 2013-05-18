@@ -198,32 +198,6 @@ public interface ProxyRepository
     void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings );
 
     /**
-     * Gets remote proxy settings. Delegates to RemoteStorageContext.
-     * 
-     * @return
-     */
-    RemoteProxySettings getRemoteProxySettings();
-
-    /**
-     * Sets remote proxy settings. Delegates to RemoteStorageContext.
-     * 
-     * @param settings
-     */
-    void setRemoteProxySettings( RemoteProxySettings settings );
-
-    /**
-     * Gets the proxy selector of this repository.
-     * 
-     * @return
-     */
-    ProxySelector getProxySelector();
-
-    /**
-     * Sets the proxy selector of this repository.
-     */
-    void setProxySelector( ProxySelector proxySelector );
-
-    /**
      * Returns is the "aging" applied to the items in this proxy repository. If false, then this proxy will not apply
      * "aging" to items, and will always go for remote to check for change.
      * 

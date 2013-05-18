@@ -24,11 +24,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -50,7 +48,6 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
@@ -73,9 +70,6 @@ public abstract class AbstractRepositoryPlexusResource
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
     @Requirement
-    private GlobalHttpProxySettings globalHttpProxySettings;
-
-    @Requirement
     private ApplicationConfiguration applicationConfiguration;
     
     @Requirement(hint="RestletRepositoryUrlBuilder")
@@ -89,11 +83,6 @@ public abstract class AbstractRepositoryPlexusResource
     protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
     {
         return globalRemoteConnectionSettings;
-    }
-
-    protected GlobalHttpProxySettings getGlobalHttpProxySettings()
-    {
-        return globalHttpProxySettings;
     }
 
     protected ApplicationConfiguration getApplicationConfiguration()
@@ -369,10 +358,6 @@ public abstract class AbstractRepositoryPlexusResource
             AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration( repository )
                 .getRemoteStorage().getConnectionSettings() ) );
 
-        resource.getRemoteStorage().setHttpProxySettings(
-            AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration( repository )
-                .getRemoteStorage().getHttpProxySettings() ) );
-
         // set auto block
         resource.setAutoBlockActive( repository.isAutoBlockActive() );
         
@@ -461,26 +446,6 @@ public abstract class AbstractRepositoryPlexusResource
         appModelSettings.setNtlmHost( authentication.getNtlmHost() );
 
         return appModelSettings;
-    }
-
-    protected CRemoteHttpProxySettings convertHttpProxySettings( RemoteHttpProxySettings remoteHttpProxySettings,
-                                                                 String oldPassword )
-    {
-        if ( remoteHttpProxySettings == null )
-        {
-            return null;
-        }
-
-        CRemoteHttpProxySettings httpProxySettings = new CRemoteHttpProxySettings();
-
-        httpProxySettings.setProxyHostname( remoteHttpProxySettings.getProxyHostname() );
-
-        httpProxySettings.setProxyPort( remoteHttpProxySettings.getProxyPort() );
-
-        httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication(),
-            oldPassword ) );
-
-        return httpProxySettings;
     }
 
     protected CRemoteConnectionSettings convertRemoteConnectionSettings(

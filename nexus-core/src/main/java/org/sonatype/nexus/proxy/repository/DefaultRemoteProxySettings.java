@@ -15,64 +15,39 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
+import com.google.common.collect.Sets;
 
+/**
+ * Default {@link RemoteProxySettings} implementation.
+ */
 public class DefaultRemoteProxySettings
     implements RemoteProxySettings
 {
-    private boolean blockInheritance;
 
-    private String hostname;
+    private RemoteHttpProxySettings httpProxySettings;
 
-    private int port;
-    
-    private Set<String> nonProxyHosts = new HashSet<String>();
+    private RemoteHttpProxySettings httpsProxySettings;
 
-    private RemoteAuthenticationSettings proxyAuthentication;
+    private Set<String> nonProxyHosts = Sets.newHashSet();
 
-    public boolean isEnabled()
+    public RemoteHttpProxySettings getHttpProxySettings()
     {
-        return StringUtils.isNotBlank( getHostname() ) && getPort() != 0;
+        return httpProxySettings;
     }
 
-    public boolean isBlockInheritance()
+    public void setHttpProxySettings( final RemoteHttpProxySettings httpProxySettings )
     {
-        return blockInheritance;
+        this.httpProxySettings = httpProxySettings;
     }
 
-    public void setBlockInheritance( boolean blockInheritance )
+    public RemoteHttpProxySettings getHttpsProxySettings()
     {
-        this.blockInheritance = blockInheritance;
+        return httpsProxySettings;
     }
 
-    public String getHostname()
+    public void setHttpsProxySettings( final RemoteHttpProxySettings httpsProxySettings )
     {
-        return hostname;
-    }
-
-    public void setHostname( String hostname )
-    {
-        this.hostname = hostname;
-    }
-
-    public int getPort()
-    {
-        return port;
-    }
-
-    public void setPort( int port )
-    {
-        this.port = port;
-    }
-
-    public RemoteAuthenticationSettings getProxyAuthentication()
-    {
-        return proxyAuthentication;
-    }
-
-    public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )
-    {
-        this.proxyAuthentication = proxyAuthentication;
+        this.httpsProxySettings = httpsProxySettings;
     }
 
     public Set<String> getNonProxyHosts()
@@ -80,8 +55,13 @@ public class DefaultRemoteProxySettings
         return nonProxyHosts;
     }
 
-    public void setNonProxyHosts( Set<String> nonProxyHosts )
+    public void setNonProxyHosts( final Set<String> nonProxyHosts )
     {
-        this.nonProxyHosts = nonProxyHosts;
+        this.nonProxyHosts.clear();
+        if ( nonProxyHosts != null && !nonProxyHosts.isEmpty() )
+        {
+            this.nonProxyHosts.addAll( nonProxyHosts );
+        }
     }
+
 }

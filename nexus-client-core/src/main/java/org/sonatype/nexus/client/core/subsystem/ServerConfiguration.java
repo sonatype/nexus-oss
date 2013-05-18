@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.client.core.subsystem;
 
-import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
+import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
 
 /**
  * Server configuration subsystem.
@@ -23,8 +23,9 @@ public interface ServerConfiguration
 {
 
     /**
-     * @return Http Proxy configuration segment.
+     * @return Remote Proxy configuration segment.
+     * @since 2.5
      */
-    HttpProxy proxySettings();
+    RemoteProxy remoteProxySettings();
 
 }

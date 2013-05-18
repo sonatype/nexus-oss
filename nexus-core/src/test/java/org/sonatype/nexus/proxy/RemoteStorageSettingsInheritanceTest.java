@@ -20,6 +20,7 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 
@@ -50,25 +51,6 @@ public class RemoteStorageSettingsInheritanceTest
     }
 
     @Test
-    public void testNEXUS3064PerRepo()
-        throws Exception
-    {
-        int rscChange = aProxyRepository.getRemoteStorageContext().getGeneration();
-
-        RemoteProxySettings proxy = aProxyRepository.getRemoteProxySettings();
-        assertThat( "Should no proxy be set!", !proxy.isEnabled() );
-        proxy.setHostname( "192.168.1.1" );
-        proxy.setPort( 1234 );
-        // TODO: this is the spurious part!!! Make it not needed! Config framework DOES know it changed!
-        // If you remove this, test will fail
-        aProxyRepository.setRemoteProxySettings( proxy );
-        applicationConfiguration.saveConfiguration();
-
-        assertThat( "The change should be detected", aProxyRepository.getRemoteStorageContext().getGeneration(),
-            greaterThan( rscChange ) );
-    }
-
-    @Test
     public void testNEXUS3064Global()
         throws Exception
     {
@@ -76,9 +58,13 @@ public class RemoteStorageSettingsInheritanceTest
 
         // and the problem now
         // change the global proxy
+        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+        httpProxySettings.setHostname( "192.168.1.1" );
+        httpProxySettings.setPort( 1234 );
+
         RemoteProxySettings proxy = applicationConfiguration.getGlobalRemoteStorageContext().getRemoteProxySettings();
-        proxy.setHostname( "192.168.1.1" );
-        proxy.setPort( 1234 );
+        proxy.setHttpProxySettings( httpProxySettings );
+
         // TODO: this is the spurious part!!! Make it not needed! Config framework DOES know it changed!
         // If you remove this, test will fail
         applicationConfiguration.getGlobalRemoteStorageContext().setRemoteProxySettings( proxy );

@@ -14,8 +14,8 @@ package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
-import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyHttpProxy;
+import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
+import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyRemoteProxy;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
@@ -30,21 +30,24 @@ public class JerseyServerConfiguration
      * Http Proxy configuration segment.
      * Lazy initialized on first request.
      */
-    private HttpProxy httpProxy;
+    private RemoteProxy remoteProxy;
 
     public JerseyServerConfiguration( final JerseyNexusClient nexusClient )
     {
         super( nexusClient );
     }
 
+    /**
+     * @since 2.5
+     */
     @Override
-    public HttpProxy proxySettings()
+    public RemoteProxy remoteProxySettings()
     {
-        if ( httpProxy == null )
+        if ( remoteProxy == null )
         {
-            httpProxy = new JerseyHttpProxy( getNexusClient() );
+            remoteProxy = new JerseyRemoteProxy( getNexusClient() );
         }
-        return httpProxy;
+        return remoteProxy;
     }
 
 }

@@ -12,12 +12,13 @@
  */
 package org.sonatype.nexus.configuration.application.upgrade;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.configuration.source.FileSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
 
 public class DefaultApplicationConfigurationUpgraderTest
     extends NexusTestSupport
@@ -56,32 +58,33 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         w.write( sw, configuration );
 
-        // System.out.println(sw.toString());
-
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
-        shouldBe = shouldBe.replace( "\r", "" );
 
-        if ( !StringUtils.equals( shouldBe, sw.toString() ) )
-        {
-            // write the file out so we can have something to compare
+        assertThat( sw.toString(), DiffMatchers.equalToOnlyDiffs( shouldBe ) );
 
-            File expected = FileUtils.toFile( getClass().getResource( path + ".result" ) );
-            File actual = new File( "target", expected.getName().replaceFirst( "result", "actual" ) );
-            FileOutputStream out = new FileOutputStream( actual );
-            try
-            {
-                IOUtil.copy( sw.toString(), out );
-            }
-            finally
-            {
-                IOUtil.close( out );
-            }
-            String diffMessage = "diff " + expected.getAbsolutePath() + " " + actual.getAbsolutePath();
-            String message = "Files differ, you can manually diff them:\n" + diffMessage;
-
-            // the method makes the error pretty, so we can keep it.
-            assertEquals( message, shouldBe, sw.toString().replace( "\r", "" ) );
-        }
+//        shouldBe = shouldBe.replace( "\r", "" );
+//
+//        if ( !StringUtils.equals( shouldBe, sw.toString() ) )
+//        {
+//            // write the file out so we can have something to compare
+//
+//            File expected = FileUtils.toFile( getClass().getResource( path + ".result" ) );
+//            File actual = new File( "target", expected.getName().replaceFirst( "result", "actual" ) );
+//            FileOutputStream out = new FileOutputStream( actual );
+//            try
+//            {
+//                IOUtil.copy( sw.toString(), out );
+//            }
+//            finally
+//            {
+//                IOUtil.close( out );
+//            }
+//            String diffMessage = "diff " + expected.getAbsolutePath() + " " + actual.getAbsolutePath();
+//            String message = "Files differ, you can manually diff them:\n" + diffMessage;
+//
+//            // the method makes the error pretty, so we can keep it.
+//            assertEquals( message, shouldBe, sw.toString().replace( "\r", "" ) );
+//        }
     }
 
     protected void securityResultIsFine( String path )
@@ -381,6 +384,19 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-143.xml", configuration );
+    }
+
+    @Test
+    public void testFrom220()
+        throws Exception
+    {
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-220.xml", getNexusConfiguration() );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertThat( configuration.getVersion(), is( Configuration.MODEL_VERSION ) );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-220.xml", configuration );
     }
 
 }

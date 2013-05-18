@@ -26,6 +26,7 @@ import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.email.NexusEmailer;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.security.SecuritySystem;
 
@@ -38,7 +39,7 @@ public class DefaultNexusConfigurationTest
 
     protected NexusEmailer nexusEmailer;
 
-    protected GlobalHttpProxySettings globalHttpProxySettings;
+    protected RemoteProxySettingsConfiguration remoteProxySettingsConfiguration;
 
     protected void setUp()
         throws Exception
@@ -53,7 +54,7 @@ public class DefaultNexusConfigurationTest
 
         nexusEmailer = lookup( NexusEmailer.class );
 
-        globalHttpProxySettings = lookup( GlobalHttpProxySettings.class );
+        remoteProxySettingsConfiguration = lookup( RemoteProxySettingsConfiguration.class );
     }
 
     protected void tearDown()
@@ -87,16 +88,23 @@ public class DefaultNexusConfigurationTest
     }
 
     @Test
-    public void testSaveGlobalProxyConfiguration()
+    public void testSaveRemoteProxyConfiguration()
         throws Exception
     {
         Configuration config = nexusConfiguration.getConfigurationModel();
 
-        assertEquals( null, config.getGlobalHttpProxySettings() );
-        assertTrue( !globalHttpProxySettings.isEnabled() );
+        assertEquals( null, config.getRemoteProxySettings() );
 
-        globalHttpProxySettings.setHostname( "testhost.proxy.com" );
-        globalHttpProxySettings.setPort( 1234 );
+        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+        httpProxySettings.setHostname( "http.proxy.com" );
+        httpProxySettings.setPort( 1234 );
+
+        final DefaultRemoteHttpProxySettings httpsProxySettings = new DefaultRemoteHttpProxySettings();
+        httpsProxySettings.setHostname( "https.proxy.com" );
+        httpsProxySettings.setPort( 4321 );
+
+        remoteProxySettingsConfiguration.setHttpProxySettings( httpProxySettings );
+        remoteProxySettingsConfiguration.setHttpsProxySettings( httpsProxySettings );
 
         nexusConfiguration.saveConfiguration();
 
@@ -105,16 +113,33 @@ public class DefaultNexusConfigurationTest
 
         config = nexusConfiguration.getConfigurationModel();
 
-        String proxyHostName =
-            nexusConfiguration.getGlobalRemoteStorageContext().getRemoteProxySettings().getHostname();
+        assertEquals(
+            nexusConfiguration.getConfigurationModel()
+                .getRemoteProxySettings().getHttpProxySettings().getProxyHostname(),
+            nexusConfiguration.getGlobalRemoteStorageContext()
+                .getRemoteProxySettings().getHttpProxySettings().getHostname()
+        );
 
-        int proxyPort = nexusConfiguration.getGlobalRemoteStorageContext().getRemoteProxySettings().getPort();
+        assertEquals(
+            nexusConfiguration.getConfigurationModel()
+                .getRemoteProxySettings().getHttpProxySettings().getProxyPort(),
+            nexusConfiguration.getGlobalRemoteStorageContext()
+                .getRemoteProxySettings().getHttpProxySettings().getPort()
+        );
 
-        assertEquals( nexusConfiguration.getConfigurationModel().getGlobalHttpProxySettings().getProxyHostname(),
-                      proxyHostName );
+        assertEquals(
+            nexusConfiguration.getConfigurationModel()
+                .getRemoteProxySettings().getHttpsProxySettings().getProxyHostname(),
+            nexusConfiguration.getGlobalRemoteStorageContext()
+                .getRemoteProxySettings().getHttpsProxySettings().getHostname()
+        );
 
-        assertEquals( nexusConfiguration.getConfigurationModel().getGlobalHttpProxySettings().getProxyPort(), proxyPort );
-
+        assertEquals(
+            nexusConfiguration.getConfigurationModel()
+                .getRemoteProxySettings().getHttpsProxySettings().getProxyPort(),
+            nexusConfiguration.getGlobalRemoteStorageContext()
+                .getRemoteProxySettings().getHttpsProxySettings().getPort()
+        );
     }
 
     @Test

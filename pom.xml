@@ -170,6 +170,7 @@
 
     <!-- version properties -->
     <nexus.version>${project.version}</nexus.version>
+    <nexus.configuration.version>2.5.0</nexus.configuration.version>
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>

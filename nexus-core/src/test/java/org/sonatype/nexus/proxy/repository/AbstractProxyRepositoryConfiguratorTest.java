@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -33,7 +30,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
-import org.sonatype.sisu.litmus.testsupport.mock.MockitoRule;
 
 /**
  *
@@ -49,9 +45,6 @@ public class AbstractProxyRepositoryConfiguratorTest
 
     @Mock
     private GlobalRemoteConnectionSettings connSettings;
-
-    @Mock
-    private GlobalHttpProxySettings proxySettings;
 
     @Mock
     private AuthenticationInfoConverter authInfoConverter;
@@ -80,8 +73,7 @@ public class AbstractProxyRepositoryConfiguratorTest
     @Before
     public void setup()
     {
-        underTest =
-            new AbstractProxyRepositoryConfigurator( authInfoConverter, proxySettings, connSettings, providerHints ) {};
+        underTest = new AbstractProxyRepositoryConfigurator( authInfoConverter, connSettings, providerHints ) {};
 
         when( providerHints.getDefaultHttpRoleHint() ).thenReturn( "defaultHint" );
         when( coreConfiguration.getConfiguration( true ) ).thenReturn( repoConfiguration );

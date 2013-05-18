@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -90,43 +89,7 @@ public class DefaultRemoteStorageContext
     @Override
     public RemoteProxySettings getRemoteProxySettings()
     {
-        // we have a special case here, need to track blockInheritance flag
-        // so, a little code duplication happens
-        // three cases:
-        // 1. we have _no_ proxy settings in this context, fallback to original code
-        // 2. we have proxy settings with no proxyHost set, then obey the blockInheritance
-        // 3. we have proxy settings with set proxyHost, then return it
-
-        final String key = RemoteProxySettings.class.getName();
-
-        if ( !hasContextObject( key ) )
-        {
-            // case 1
-            return (RemoteProxySettings) getContextObject( key );
-        }
-        else
-        {
-            RemoteProxySettings remoteProxySettings = (RemoteProxySettings) getContextObject( key, false );
-
-            if ( StringUtils.isBlank( remoteProxySettings.getHostname() ) )
-            {
-                // case 2
-                if ( !remoteProxySettings.isBlockInheritance() )
-                {
-                    return (RemoteProxySettings) getContextObject( key );
-                }
-                else
-                {
-                    // no proxy on this level, and do _not_ inherit
-                    return null;
-                }
-            }
-            else
-            {
-                // case 3
-                return remoteProxySettings;
-            }
-        }
+        return (RemoteProxySettings) getContextObject( RemoteProxySettings.class.getName() );
     }
 
     @Override

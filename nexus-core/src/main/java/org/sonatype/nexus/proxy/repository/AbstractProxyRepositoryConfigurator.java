@@ -21,9 +21,7 @@ import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
@@ -42,9 +40,6 @@ public abstract class AbstractProxyRepositoryConfigurator
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
     @Requirement
-    private GlobalHttpProxySettings globalHttpProxySettings;
-
-    @Requirement
     private RemoteProviderHintFactory remoteProviderHintFactory;
 
     /**
@@ -56,12 +51,10 @@ public abstract class AbstractProxyRepositoryConfigurator
 
     @VisibleForTesting
     AbstractProxyRepositoryConfigurator( final AuthenticationInfoConverter authenticationInfoConverter,
-                                                   final GlobalHttpProxySettings globalHttpProxySettings,
-                                                   final GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
-                                                   final RemoteProviderHintFactory remoteProviderHintFactory )
+                                         final GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
+                                         final RemoteProviderHintFactory remoteProviderHintFactory )
     {
         this.authenticationInfoConverter = authenticationInfoConverter;
-        this.globalHttpProxySettings = globalHttpProxySettings;
         this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
         this.remoteProviderHintFactory = remoteProviderHintFactory;
     }
@@ -117,18 +110,6 @@ public abstract class AbstractProxyRepositoryConfigurator
                     if ( repo.getRemoteStorage().getConnectionSettings() != null )
                     {
                         prepository.setRemoteConnectionSettings( globalRemoteConnectionSettings.convertAndValidateFromModel( repo.getRemoteStorage().getConnectionSettings() ) );
-                    }
-
-                    if ( repo.getRemoteStorage().getHttpProxySettings() != null )
-                    {
-                        if ( repo.getRemoteStorage().getHttpProxySettings().isBlockInheritance() )
-                        {
-                            prepository.setRemoteProxySettings( null );
-                        }
-                        else
-                        {
-                            prepository.setRemoteProxySettings( globalHttpProxySettings.convertAndValidateFromModel( repo.getRemoteStorage().getHttpProxySettings() ) );
-                        }
                     }
                 }
                 else
@@ -192,25 +173,6 @@ public abstract class AbstractProxyRepositoryConfigurator
                 else
                 {
                     repoConfig.getRemoteStorage().setConnectionSettings( null );
-                }
-
-                if ( rsc.hasRemoteProxySettings() )
-                {
-                    if ( rsc.getRemoteProxySettings() != null )
-                    {
-                        repoConfig.getRemoteStorage().setHttpProxySettings(
-                            globalHttpProxySettings.convertToModel( rsc.getRemoteProxySettings() ) );
-                    }
-                    else
-                    {
-                        repoConfig.getRemoteStorage().setHttpProxySettings( new CRemoteHttpProxySettings() );
-
-                        repoConfig.getRemoteStorage().getHttpProxySettings().setBlockInheritance( true );
-                    }
-                }
-                else
-                {
-                    repoConfig.getRemoteStorage().setHttpProxySettings( null );
                 }
             }
         }

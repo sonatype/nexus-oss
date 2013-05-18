@@ -43,7 +43,6 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -205,18 +204,6 @@ public class RepositoryPlexusResource
                                         .getRemoteAuthenticationSettings() ).getPassword();
                             }
 
-                            String oldPasswordForProxy = null;
-                            if ( proxyRepo.getRemoteProxySettings() != null
-                                && proxyRepo.getRemoteProxySettings().isEnabled()
-                                && proxyRepo.getRemoteProxySettings().getProxyAuthentication() != null
-                                && UsernamePasswordRemoteAuthenticationSettings.class.isInstance( proxyRepo
-                                    .getRemoteAuthenticationSettings() ) )
-                            {
-                                oldPasswordForProxy =
-                                    ( (UsernamePasswordRemoteAuthenticationSettings) proxyRepo.getRemoteProxySettings()
-                                        .getProxyAuthentication() ).getPassword();
-                            }
-
                             RemoteAuthenticationSettings remoteAuth =
                                 getAuthenticationInfoConverter().convertAndValidateFromModel(
                                     this.convertAuthentication( model.getRemoteStorage().getAuthentication(),
@@ -225,10 +212,6 @@ public class RepositoryPlexusResource
                                 getGlobalRemoteConnectionSettings().convertAndValidateFromModel(
                                     this.convertRemoteConnectionSettings( model.getRemoteStorage()
                                         .getConnectionSettings() ) );
-                            RemoteProxySettings httpProxySettings =
-                                getGlobalHttpProxySettings().convertAndValidateFromModel(
-                                    this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(),
-                                        oldPasswordForProxy ) );
 
                             if ( remoteAuth != null )
                             {
@@ -246,15 +229,6 @@ public class RepositoryPlexusResource
                             else
                             {
                                 proxyRepo.getRemoteStorageContext().removeRemoteConnectionSettings();
-                            }
-
-                            if ( httpProxySettings != null )
-                            {
-                                proxyRepo.setRemoteProxySettings( httpProxySettings );
-                            }
-                            else
-                            {
-                                proxyRepo.getRemoteStorageContext().removeRemoteProxySettings();
                             }
 
                             // set auto block

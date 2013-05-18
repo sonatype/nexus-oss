@@ -28,7 +28,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       autoScroll : true
     });
 
-    var
+    var   self = this,
           securityConfigField,
           ht = Sonatype.repoServer.resources.help.server,
           formId = Ext.id(),
@@ -489,8 +489,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
           xtype : 'fieldset',
           checkboxToggle : true,
           collapsed : true,
-          id : formId + '_' + 'globalHttpProxySettings',
-          name : 'globalHttpProxySettings',
+          id : formId + '_' + 'remoteProxySettings.httpProxySettings',
+          name : 'remoteProxySettings.httpProxySettings',
           title : 'Default HTTP Proxy Settings (optional)',
           anchor : Sonatype.view.FIELDSET_OFFSET,
           autoHeight : true,
@@ -499,11 +499,20 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
           },
           listeners : {
             'expand' : {
-              fn : this.optionalFieldsetExpandHandler,
+              fn : Ext.createSequence(this.optionalFieldsetExpandHandler, function() {
+                var fieldset = self.find('name', 'remoteProxySettings.httpsProxySettings')[0];
+                // we need to use the DOM here because the 'checkboxToggle' is not a real Ext component
+                fieldset.checkbox.dom.disabled = false;
+              }),
               scope : this
             },
             'collapse' : {
-              fn : this.optionalFieldsetCollapseHandler,
+              fn : Ext.createSequence(this.optionalFieldsetCollapseHandler, function() {
+                var fieldset = self.find('name', 'remoteProxySettings.httpsProxySettings')[0];
+                fieldset.collapse();
+                // we need to use the DOM here because the 'checkboxToggle' is not a real Ext component
+                fieldset.checkbox.dom.disabled = true;
+              }),
               scope : this,
               delay : 100
             }
@@ -514,7 +523,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               xtype : 'textfield',
               fieldLabel : 'Proxy Host',
               helpText : ht.proxyHostname,
-              name : 'globalHttpProxySettings.proxyHostname',
+              name : 'remoteProxySettings.httpProxySettings.proxyHostname',
               anchor : Sonatype.view.FIELD_OFFSET,
               itemCls : 'required-field',
               allowBlank : true,
@@ -530,7 +539,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               xtype : 'numberfield',
               fieldLabel : 'Proxy Port',
               helpText : ht.proxyPort,
-              name : 'globalHttpProxySettings.proxyPort',
+              name : 'remoteProxySettings.httpProxySettings.proxyPort',
               width : 50,
               itemCls : 'required-field',
               allowBlank : true,
@@ -539,18 +548,11 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               maxValue : 65535
             },
             {
-              xtype : 'textentrylist',
-              name : 'nonProxyHosts',
-              entryHelpText : ht.nonProxyHosts,
-              entryLabel : 'Non Proxy Host',
-              listLabel : 'Non Proxy Hosts'
-            },
-            {
               xtype : 'fieldset',
               checkboxToggle : true,
               collapsed : true,
-              id : formId + '_' + 'globalHttpProxySettings.authentication',
-              name : 'globalHttpProxySettings.authentication',
+              id : formId + '_' + 'remoteProxySettings.httpProxySettings.authentication',
+              name : 'remoteProxySettings.httpProxySettings.authentication',
               title : 'Authentication (optional)',
               anchor : Sonatype.view.FIELDSET_OFFSET,
               autoHeight : true,
@@ -573,7 +575,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
                   xtype : 'textfield',
                   fieldLabel : 'Username',
                   helpText : ht.username,
-                  name : 'globalHttpProxySettings.authentication.username',
+                  name : 'remoteProxySettings.httpProxySettings.authentication.username',
                   width : 100,
                   allowBlank : true
                 },
@@ -582,7 +584,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
                   fieldLabel : 'Password',
                   helpText : ht.password,
                   inputType : 'password',
-                  name : 'globalHttpProxySettings.authentication.password',
+                  name : 'remoteProxySettings.httpProxySettings.authentication.password',
                   width : 100,
                   allowBlank : true
                 },
@@ -590,7 +592,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
                   xtype : 'textfield',
                   fieldLabel : 'NT LAN Host',
                   helpText : ht.ntlmHost,
-                  name : 'globalHttpProxySettings.authentication.ntlmHost',
+                  name : 'remoteProxySettings.httpProxySettings.authentication.ntlmHost',
                   anchor : Sonatype.view.FIELD_OFFSET,
                   allowBlank : true
                 },
@@ -598,7 +600,129 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
                   xtype : 'textfield',
                   fieldLabel : 'NT LAN Manager Domain',
                   helpText : ht.ntlmDomain,
-                  name : 'globalHttpProxySettings.authentication.ntlmDomain',
+                  name : 'remoteProxySettings.httpProxySettings.authentication.ntlmDomain',
+                  anchor : Sonatype.view.FIELD_OFFSET,
+                  allowBlank : true
+                }
+              ]
+            }, // end auth fieldset
+            {
+              xtype : 'textentrylist',
+              name : 'nonProxyHosts',
+              entryHelpText : ht.nonProxyHosts,
+              entryLabel : 'Non Proxy Host',
+              listLabel : 'Non Proxy Hosts'
+            },
+          ]
+        },
+        // end http proxy settings
+        {
+          xtype : 'fieldset',
+          checkboxToggle : true,
+          collapsed : true,
+          id : formId + '_' + 'remoteProxySettings.httpsProxySettings',
+          name : 'remoteProxySettings.httpsProxySettings',
+          title : 'Default HTTPS Proxy Settings (optional, defaults to HTTP Proxy Settings )',
+          anchor : Sonatype.view.FIELDSET_OFFSET,
+          autoHeight : true,
+          layoutConfig : {
+            labelSeparator : ''
+          },
+          listeners : {
+            'expand' : {
+              fn : this.optionalFieldsetExpandHandler,
+              scope : this
+            },
+            'collapse' : {
+              fn : this.optionalFieldsetCollapseHandler,
+              scope : this,
+              delay : 100
+            }
+          },
+
+          items : [
+            {
+              xtype : 'textfield',
+              fieldLabel : 'Proxy Host',
+              helpText : ht.proxyHostname,
+              name : 'remoteProxySettings.httpsProxySettings.proxyHostname',
+              anchor : Sonatype.view.FIELD_OFFSET,
+              itemCls : 'required-field',
+              allowBlank : true,
+              validator : function(v) {
+                if (v.search(/:\//) === -1) {
+                  return true;
+                }
+
+                return 'Specify hostname without the protocol, example "my.host.com"';
+              }
+            },
+            {
+              xtype : 'numberfield',
+              fieldLabel : 'Proxy Port',
+              helpText : ht.proxyPort,
+              name : 'remoteProxySettings.httpsProxySettings.proxyPort',
+              width : 50,
+              itemCls : 'required-field',
+              allowBlank : true,
+              allowDecimals : false,
+              allowNegative : false,
+              maxValue : 65535
+            },
+            {
+              xtype : 'fieldset',
+              checkboxToggle : true,
+              collapsed : true,
+              id : formId + '_' + 'remoteProxySettings.httpsProxySettings.authentication',
+              name : 'remoteProxySettings.httpsProxySettings.authentication',
+              title : 'Authentication (optional)',
+              anchor : Sonatype.view.FIELDSET_OFFSET,
+              autoHeight : true,
+              layoutConfig : {
+                labelSeparator : ''
+              },
+              listeners : {
+                'expand' : {
+                  fn : this.optionalFieldsetExpandHandler,
+                  scope : this
+                },
+                'collapse' : {
+                  fn : this.optionalFieldsetCollapseHandler,
+                  scope : this,
+                  delay : 100
+                }
+              },
+              items : [
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'Username',
+                  helpText : ht.username,
+                  name : 'remoteProxySettings.httpsProxySettings.authentication.username',
+                  width : 100,
+                  allowBlank : true
+                },
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'Password',
+                  helpText : ht.password,
+                  inputType : 'password',
+                  name : 'remoteProxySettings.httpsProxySettings.authentication.password',
+                  width : 100,
+                  allowBlank : true
+                },
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'NT LAN Host',
+                  helpText : ht.ntlmHost,
+                  name : 'remoteProxySettings.httpsProxySettings.authentication.ntlmHost',
+                  anchor : Sonatype.view.FIELD_OFFSET,
+                  allowBlank : true
+                },
+                {
+                  xtype : 'textfield',
+                  fieldLabel : 'NT LAN Manager Domain',
+                  helpText : ht.ntlmDomain,
+                  name : 'remoteProxySettings.httpsProxySettings.authentication.ntlmDomain',
                   anchor : Sonatype.view.FIELD_OFFSET,
                   allowBlank : true
                 }
@@ -606,7 +730,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
             } // end auth fieldset
           ]
         },
-        // end proxy settings
+        // end https proxy settings
         {
           xtype : 'fieldset',
           checkboxToggle : false,
@@ -756,7 +880,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         "securityAnonymousAccessEnabled" : function(val, fpanel) {
           return fpanel.isSecurityAnonymousAccessEnabled;
         },
-        "globalHttpProxySettings.nonProxyHosts" : function(val, fpanel) {
+        "remoteProxySettings.nonProxyHosts" : function(val, fpanel) {
           return fpanel.find('name', 'nonProxyHosts')[0].getEntries();
         }
       },
@@ -825,7 +949,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel) {
           fpanel.isSecurityAnonymousAccessEnabled = arr;
         },
-        "globalHttpProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
+        "remoteProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
           fpanel.find('name', 'nonProxyHosts')[0].setEntries(arr);
         }
       }

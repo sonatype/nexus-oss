@@ -73,13 +73,22 @@
         </field>
         <field>
           <name>globalHttpProxySettings</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.2.0</version>
           <description>
             The global HTTP Proxy settings are settings applied across Nexus. These can be overridden by
             per-repository HTTP Proxy
             settings.</description>
           <association>
             <type>CRemoteHttpProxySettings</type>
+          </association>
+          <required>false</required>
+        </field>
+        <field>
+          <name>remoteProxySettings</name>
+          <version>2.5.0+</version>
+          <description>The global Remote Proxy settings are settings applied across Nexus.</description>
+          <association>
+            <type>CRemoteProxySettings</type>
           </association>
           <required>false</required>
         </field>
@@ -258,6 +267,12 @@
     public static final String MODEL_VERSION = "2.2.0";
 ]]></code>
         </codeSegment>
+        <codeSegment>
+          <version>2.5.0</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "2.5.0";
+]]></code>
+        </codeSegment>
       </codeSegments>
     </class>
 
@@ -298,13 +313,50 @@
     </class>
 
     <class>
+      <name>CRemoteProxySettings</name>
+      <version>2.5.0+</version>
+      <description>The HTTP Proxy defines proxies used to access the internet.</description>
+      <fields>
+        <field>
+          <name>httpProxySettings</name>
+          <version>2.5.0+</version>
+          <description>The global HTTP Proxy settings are settings applied across Nexus.</description>
+          <association>
+            <type>CRemoteHttpProxySettings</type>
+          </association>
+          <required>false</required>
+        </field>
+        <field>
+          <name>httpsProxySettings</name>
+          <version>2.5.0+</version>
+          <description>The global HTTPS Proxy settings are settings applied across Nexus.</description>
+          <association>
+            <type>CRemoteHttpProxySettings</type>
+          </association>
+          <required>false</required>
+        </field>
+        <field>
+          <name>nonProxyHosts</name>
+          <version>2.5.0+</version>
+          <description>
+            List of addresses that can ignore the proxy settings.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
       <name>CRemoteHttpProxySettings</name>
       <version>1.4.0+</version>
       <description>The HTTP Proxy defines proxies used to access the internet.</description>
       <fields>
         <field>
           <name>blockInheritance</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.2.0</version>
           <type>boolean</type>
           <description>Set to true if you want to block inheritance.</description>
           <required>true</required>
@@ -333,7 +385,7 @@
         </field>
         <field>
           <name>nonProxyHosts</name>
-          <version>1.4.1+</version>
+          <version>1.4.1/2.2.0</version>
           <description>
             List of addresses that can ignore the proxy settings.</description>
           <association>
@@ -759,14 +811,14 @@
         </field>
         <field>
           <name>inheritHttpProxySettings</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.2.0</version>
           <type>boolean</type>
           <description>Should this remote storage inherit the global settings? If true, it will inherit, if false, the proxy defined or none will be used.</description>
           <required>true</required>
         </field>
         <field>
           <name>httpProxySettings</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.2.0</version>
           <description>
             The specific HTTP Proxy settings to use when connecting to this repository.
           </description>

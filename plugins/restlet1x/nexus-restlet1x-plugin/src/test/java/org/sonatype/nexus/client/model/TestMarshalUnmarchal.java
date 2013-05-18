@@ -77,7 +77,8 @@ import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
+import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryDependentStatusResource;
@@ -347,13 +348,6 @@ public class TestMarshalUnmarchal
 
         remoteStorage.setConnectionSettings( connection );
 
-        RemoteHttpProxySettings proxy = new RemoteHttpProxySettings();
-        proxy.setAuthentication( auth );
-        proxy.setProxyHostname( "proxyhost" );
-        proxy.setProxyPort( 55 );
-
-        remoteStorage.setHttpProxySettings( proxy );
-
         repo.setRemoteStorage( remoteStorage );
 
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
@@ -431,13 +425,6 @@ public class TestMarshalUnmarchal
         connection.setUserAgentString( "useragent" );
 
         remoteStorage.setConnectionSettings( connection );
-
-        RemoteHttpProxySettings proxy = new RemoteHttpProxySettings();
-        proxy.setAuthentication( auth );
-        proxy.setProxyHostname( "proxyhost" );
-        proxy.setProxyPort( 55 );
-
-        remoteStorage.setHttpProxySettings( proxy );
 
         repo.setRemoteStorage( remoteStorage );
 
@@ -765,16 +752,31 @@ public class TestMarshalUnmarchal
         connSet.setUserAgentString( "userAgentString" );
         resource.setGlobalConnectionSettings( connSet );
 
-        RemoteHttpProxySettings proxySet = new RemoteHttpProxySettings();
-        proxySet.setProxyHostname( "proxyHostname" );
-        proxySet.setProxyPort( 78 );
+        RemoteHttpProxySettingsDTO proxyHttpSet = new RemoteHttpProxySettingsDTO();
+        proxyHttpSet.setProxyHostname( "proxyHostname1" );
+        proxyHttpSet.setProxyPort( 78 );
         AuthenticationSettings authSet = new AuthenticationSettings();
-        authSet.setNtlmDomain( "ntlmDomain" );
-        authSet.setNtlmHost( "ntlmHost" );
-        authSet.setPassword( "password" );
-        authSet.setUsername( "username" );
-        proxySet.setAuthentication( authSet );
-        resource.setGlobalHttpProxySettings( proxySet );
+        authSet.setNtlmDomain( "ntlmDomain1" );
+        authSet.setNtlmHost( "ntlmHost1" );
+        authSet.setPassword( "password1" );
+        authSet.setUsername( "username1" );
+        proxyHttpSet.setAuthentication( authSet );
+
+        RemoteHttpProxySettingsDTO proxyHttpsSet = new RemoteHttpProxySettingsDTO();
+        proxyHttpsSet.setProxyHostname( "proxyHostname2" );
+        proxyHttpsSet.setProxyPort( 87 );
+        AuthenticationSettings httpsAuthSet = new AuthenticationSettings();
+        httpsAuthSet.setNtlmDomain( "ntlmDomain2" );
+        httpsAuthSet.setNtlmHost( "ntlmHost2" );
+        httpsAuthSet.setPassword( "password2" );
+        httpsAuthSet.setUsername( "username2" );
+        proxyHttpsSet.setAuthentication( httpsAuthSet );
+
+        RemoteProxySettingsDTO proxySet = new RemoteProxySettingsDTO();
+        proxySet.setHttpProxySettings( proxyHttpSet );
+        proxySet.setHttpsProxySettings( proxyHttpsSet );
+
+        resource.setRemoteProxySettings( proxySet );
 
         SmtpSettings smtpSet = new SmtpSettings();
         smtpSet.setHost( "host" );
