@@ -19,13 +19,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
-import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.application.events.RemoteProxySettingsConfigurationChangedEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.p2.bridge.HttpProxy;
 import org.sonatype.plexus.appevents.Event;
@@ -37,22 +37,22 @@ public class GlobalHttpProxySettingsInspector
     implements EventInspector
 {
 
-    private final GlobalHttpProxySettings globalHttpProxySettings;
+    private final RemoteProxySettings remoteProxySettings;
 
     private final HttpProxy httpProxy;
 
     @Inject
-    public GlobalHttpProxySettingsInspector( final GlobalHttpProxySettings globalHttpProxySettings,
+    public GlobalHttpProxySettingsInspector( final RemoteProxySettings remoteProxySettings,
                                              final HttpProxy httpProxy )
     {
-        this.globalHttpProxySettings = checkNotNull( globalHttpProxySettings );
+        this.remoteProxySettings = checkNotNull( remoteProxySettings );
         this.httpProxy = checkNotNull( httpProxy );
     }
 
     @Override
     public boolean accepts( final Event<?> evt )
     {
-        return evt instanceof GlobalHttpProxySettingsChangedEvent
+        return evt instanceof RemoteProxySettingsConfigurationChangedEvent
             || evt instanceof NexusStartedEvent;
     }
 
@@ -64,12 +64,15 @@ public class GlobalHttpProxySettingsInspector
             return;
         }
 
-        if ( globalHttpProxySettings.isEnabled() )
+        // FIXME: Sort out what to do with http/https here
+        RemoteHttpProxySettings httpProxySettings = remoteProxySettings.getHttpProxySettings();
+
+        if ( httpProxySettings != null && httpProxySettings.isEnabled() )
         {
             String username = null;
             String password = null;
 
-            final RemoteAuthenticationSettings authentication = globalHttpProxySettings.getProxyAuthentication();
+            final RemoteAuthenticationSettings authentication = httpProxySettings.getProxyAuthentication();
 
             if ( authentication != null
                 && UsernamePasswordRemoteAuthenticationSettings.class.isAssignableFrom( authentication.getClass() ) )
@@ -78,9 +81,9 @@ public class GlobalHttpProxySettingsInspector
                 password = ( (UsernamePasswordRemoteAuthenticationSettings) authentication ).getPassword();
             }
 
-            final String hostname = globalHttpProxySettings.getHostname();
-            final int port = globalHttpProxySettings.getPort();
-            final Set<String> nonProxyHosts = globalHttpProxySettings.getNonProxyHosts();
+            final String hostname = httpProxySettings.getHostname();
+            final int port = httpProxySettings.getPort();
+            final Set<String> nonProxyHosts = remoteProxySettings.getNonProxyHosts();
 
             getLogger().debug(
                 "Configure P2 proxy using global http proxy settings: hostname={}, port={}, username={}, nonProxyHosts={}",

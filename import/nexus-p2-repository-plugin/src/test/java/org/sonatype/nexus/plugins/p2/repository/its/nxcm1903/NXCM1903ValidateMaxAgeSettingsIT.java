@@ -61,7 +61,6 @@ public class NXCM1903ValidateMaxAgeSettingsIT
         p2proxyRemoteStorage.setRemoteStorageUrl( "http://updatesite" );
         p2proxyRemoteStorage.setAuthentication( null );
         p2proxyRemoteStorage.setConnectionSettings( null );
-        p2proxyRemoteStorage.setHttpProxySettings( null );
 
         updatesiterepo.setRemoteStorage( p2proxyRemoteStorage );
 
@@ -111,7 +110,6 @@ public class NXCM1903ValidateMaxAgeSettingsIT
         p2proxyRemoteStorage.setRemoteStorageUrl( "http://p2proxy" );
         p2proxyRemoteStorage.setAuthentication( null );
         p2proxyRemoteStorage.setConnectionSettings( null );
-        p2proxyRemoteStorage.setHttpProxySettings( null );
 
         p2repo.setRemoteStorage( p2proxyRemoteStorage );
 
