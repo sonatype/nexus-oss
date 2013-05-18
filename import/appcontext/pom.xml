@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2007-2013 Sonatype, Inc. All rights reserved.
+
+    This program is licensed to you under the Apache License Version 2.0,
+    and you may not use this file except in compliance with the Apache License Version 2.0.
+    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the Apache License Version 2.0 is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>32</version>
+  </parent>
+
+  <groupId>org.sonatype.appcontext</groupId>
+  <artifactId>appcontext-parent</artifactId>
+  <version>4.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Sonatype AppContext (parent)</name>
+  <description>A small utility useful in various use cases, like "booting" an application. All it does is simply creates a plain Map, with it's values sourced from different places and applies different strategies (override order).</description>
+
+  <url>https://github.com/sonatype/appcontext</url>
+
+  <scm>
+    <url>https://github.com/sonatype/appcontext</url>
+    <connection>scm:git:git://github.com/sonatype/appcontext.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/appcontext.git</developerConnection>
+  </scm>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <!-- interpolation (mandatory) -->
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-interpolation</artifactId>
+        <version>1.14</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <!-- logging in dumping (optional, consumer env should provide) -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.6.6</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- SISU/Guice module (optional, consumer env should provide) -->
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-bean</artifactId>
+        <version>2.2.3</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-guice</artifactId>
+        <version>2.9.4</version>
+        <classifier>no_aop</classifier>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- Servlet support (optional, consumer env should provide) -->
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.0.1</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- Test -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.10</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.6.6</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <modules>
+    <module>appcontext</module>
+    <module>appcontext-guice</module>
+    <module>appcontext-servlet</module>
+  </modules>
+
+</project>
