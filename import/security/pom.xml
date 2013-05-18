@@ -54,7 +54,10 @@
     <module>security-system</module>
     <module>security-configuration</module>
     <module>security-web</module>
-    <module>security-web-sample</module>
+    <!--
+    FIXME: Remove this, we don't need "samples"
+    -->
+    <!--<module>security-web-sample</module>-->
   </modules>
 
   <dependencyManagement>
