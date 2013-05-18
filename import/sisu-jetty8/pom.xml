@@ -1,0 +1,210 @@
+<!--
+
+    Copyright (c) 2012 Sonatype, Inc. All rights reserved.
+
+    This program is licensed to you under the Apache License Version 2.0,
+    and you may not use this file except in compliance with the Apache License Version 2.0.
+    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the Apache License Version 2.0 is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>27</version>
+  </parent>
+
+  <groupId>org.sonatype.sisu</groupId>
+  <artifactId>sisu-jetty8</artifactId>
+  <version>1.4.3-SNAPSHOT</version>
+
+  <name>SISU Jetty8 Component</name>
+
+  <url>https://github.com/sonatype/sisu-jetty8</url>
+  <inceptionYear>2012</inceptionYear>
+
+  <scm>
+    <url>https://github.com/sonatype/sisu-jetty8</url>
+    <connection>scm:git:git://github.com/sonatype/sisu-jetty8.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/sisu-jetty8.git</developerConnection>
+  </scm>
+
+  <ciManagement>
+      <system>Hudson</system>
+      <url>https://builds.sonatype.org/job/sisu-jetty8</url>
+  </ciManagement>
+
+  <issueManagement>
+      <system>Github</system>
+      <url>https://github.com/sonatype/sisu-jetty8/issues</url>
+  </issueManagement>
+
+  <properties>
+    <jetty.version>8.1.8.v20121106</jetty.version>
+  </properties>
+
+  <dependencies>
+
+    <!-- "Hard" dependencies -->
+
+    <!-- AppContext as one of the few "real" dependencies -->
+    <dependency>
+      <groupId>org.sonatype.appcontext</groupId>
+      <artifactId>appcontext</artifactId>
+      <version>3.2</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- Jetty Server -->
+    <!-- Basically we really depend on "minimal" Server only, but we provide some optional extras -->
+    <!-- For example, if you want j2ee servlet, you have to put them in env anyway -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>${jetty.version}</version>
+      <scope>compile</scope>
+      <optional>false</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-rewrite</artifactId>
+      <version>${jetty.version}</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+      <version>${jetty.version}</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-deploy</artifactId>
+      <version>${jetty.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-ajp</artifactId>
+      <version>${jetty.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- JSW, needed if you use this library as Jetty JSW enabled booter -->
+    <dependency>
+      <groupId>tanukisoft</groupId>
+      <artifactId>wrapper</artifactId>
+      <version>3.2.3</version>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+            <systemProperties>
+              <property>
+                <name>default-jetty-port</name>
+                <value>${default-jetty-port}</value>
+              </property>
+              <property>
+                <name>test-connector-port</name>
+                <value>${test-connector-port}</value>
+              </property>
+              <property>
+                <name>test-ajp-port</name>
+                <value>${test-ajp-port}</value>
+              </property>
+            </systemProperties>
+          </configuration>
+        </plugin>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build
+          itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>port-allocator-maven-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
+                    <goals>
+                      <goal>allocate-ports</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <!-- FIXME tests should allocate ports themselves directly -->
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>port-allocator-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>reserve-nexus-ports</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>allocate-ports</goal>
+            </goals>
+            <configuration>
+              <ports>
+                <port>
+                  <name>default-jetty-port</name>
+                </port>
+                <port>
+                  <name>test-connector-port</name>
+                </port>
+                <port>
+                  <name>test-ajp-port</name>
+                </port>
+              </ports>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
