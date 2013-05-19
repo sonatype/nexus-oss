@@ -26,4 +26,10 @@
   <artifactId>buildsupport</artifactId>
   <packaging>pom</packaging>
 
+  <modules>
+    <module>logging</module>
+    <module>eclipse-jetty</module>
+    <module>yammer-metrics</module>
+  </modules>
+
 </project>

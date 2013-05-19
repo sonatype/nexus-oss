@@ -71,16 +71,16 @@
     <!-- dependency versions; when referenced multiple times -->
     <nexus.version>${project.version}</nexus.version>
     <nexus.configuration.version>2.5.0</nexus.configuration.version>
-    <slf4j.version>1.7.2</slf4j.version>
-    <logback.version>1.0.7</logback.version>
+    <!--<slf4j.version>1.7.2</slf4j.version>-->
+    <!--<logback.version>1.0.7</logback.version>-->
     <aether.version>1.13.1</aether.version>
-    <jetty.version>8.1.8.v20121106</jetty.version>
+    <!--<jetty.version>8.1.8.v20121106</jetty.version>-->
     <maven.version>3.0.4</maven.version>
     <plexus-security.version>3.3-SNAPSHOT</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.6.1</goodies.version>
-    <metrics.version>2.2.0</metrics.version>
+    <!--<metrics.version>2.2.0</metrics.version>-->
     <sisu-inject.version>2.3.2</sisu-inject.version>
     <sisu-guice.version>3.1.2</sisu-guice.version>
 
@@ -237,101 +237,101 @@
       </dependency>
 
       <!-- Jetty -->
-      <dependency>
-        <groupId>org.eclipse.jetty.orbit</groupId>
-        <artifactId>javax.servlet</artifactId>
-        <version>3.0.0.v201112011016</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
+        <!--<artifactId>javax.servlet</artifactId>-->
+        <!--<version>3.0.0.v201112011016</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-webapp</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-webapp</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-continuation</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-continuation</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-servlet</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-servlet</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-security</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-security</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-server</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-server</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-deploy</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-deploy</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-client</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-client</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-util</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-servlets</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-servlets</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-http</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-http</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-io</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-io</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-xml</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-xml</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-jmx</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-jmx</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-rewrite</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-rewrite</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-ajp</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-ajp</artifactId>-->
+        <!--<version>${jetty.version}</version>-->
+      <!--</dependency>-->
 
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
@@ -550,59 +550,59 @@
         <version>1.7.1</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.slf4j</groupId>-->
+        <!--<artifactId>slf4j-api</artifactId>-->
+        <!--<version>${slf4j.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.slf4j</groupId>-->
+        <!--<artifactId>slf4j-simple</artifactId>-->
+        <!--<version>${slf4j.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.slf4j</groupId>-->
+        <!--<artifactId>jcl-over-slf4j</artifactId>-->
+        <!--<version>${slf4j.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>log4j-over-slf4j</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.slf4j</groupId>-->
+        <!--<artifactId>log4j-over-slf4j</artifactId>-->
+        <!--<version>${slf4j.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jul-to-slf4j</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.slf4j</groupId>-->
+        <!--<artifactId>jul-to-slf4j</artifactId>-->
+        <!--<version>${slf4j.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-core</artifactId>
-        <version>${logback.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>ch.qos.logback</groupId>-->
+        <!--<artifactId>logback-core</artifactId>-->
+        <!--<version>${logback.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${logback.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>ch.qos.logback</groupId>-->
+        <!--<artifactId>logback-classic</artifactId>-->
+        <!--<version>${logback.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-slf4j-logging</artifactId>
-        <version>1.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.codehaus.plexus</groupId>-->
+        <!--<artifactId>plexus-slf4j-logging</artifactId>-->
+        <!--<version>1.1</version>-->
+        <!--<exclusions>-->
+          <!--<exclusion>-->
+            <!--<groupId>org.codehaus.plexus</groupId>-->
+            <!--<artifactId>plexus-container-default</artifactId>-->
+          <!--</exclusion>-->
+        <!--</exclusions>-->
+      <!--</dependency>-->
 
       <!--
       FIXME: Sort out what maven/aether stuff is actually needed by core and what is needed by plugins.
@@ -869,53 +869,53 @@
         <version>3.2.1</version>
       </dependency>
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-core</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-core</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-guice</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-guice</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-servlet</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-servlet</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-jersey</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-jersey</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-jetty</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-jetty</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-httpclient</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-httpclient</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-logback</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-logback</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-web</artifactId>
-        <version>${metrics.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.yammer.metrics</groupId>-->
+        <!--<artifactId>metrics-web</artifactId>-->
+        <!--<version>${metrics.version}</version>-->
+      <!--</dependency>-->
 
       <!-- INTERNAL -->
 
@@ -1201,6 +1201,9 @@
           <version>3.0</version>
         </plugin>
 
+        <!--
+        NOTE: This is only used by nexus-webapp, plugins use config from plugin-parent; move this configuration
+        -->
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
