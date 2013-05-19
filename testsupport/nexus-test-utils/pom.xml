@@ -47,8 +47,8 @@
       <version>${nexus.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-jetty8</artifactId>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-jetty8</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
