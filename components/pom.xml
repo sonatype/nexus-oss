@@ -48,7 +48,6 @@
     <module>nexus-launcher</module>
     <module>nexus-client-core</module>
     <module>nexus-stories</module>
-    <module>nexus-test</module>
     <module>nexus-client-core-testsuite</module>
   </modules>
 

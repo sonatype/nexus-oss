@@ -27,4 +27,21 @@
   <artifactId>testsuite</artifactId>
   <packaging>pom</packaging>
 
+  <modules>
+    <module>nexus-core-testsuite</module>
+    <module>nexus-test-harness-its</module>
+  </modules>
+
+  <!--<profiles>-->
+    <!--<profile>-->
+      <!--<id>nexus-test-harness-its</id>-->
+      <!--<activation>-->
+        <!--<activeByDefault>true</activeByDefault>-->
+      <!--</activation>-->
+      <!--<modules>-->
+        <!--<module>nexus-test-harness-its</module>-->
+      <!--</modules>-->
+    <!--</profile>-->
+  <!--</profiles>-->
+
 </project>
