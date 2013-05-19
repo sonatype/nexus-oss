@@ -13,7 +13,8 @@
     See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -32,19 +33,19 @@
     </dependency>
 
     <!--<dependency>-->
-      <!--<groupId>org.sonatype.sisu</groupId>-->
-      <!--<artifactId>sisu-inject-plexus</artifactId>-->
+    <!--<groupId>org.sonatype.sisu</groupId>-->
+    <!--<artifactId>sisu-inject-plexus</artifactId>-->
     <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-      <optional>true</optional>
-    </dependency>
+    <!--<dependency>-->
+    <!--<groupId>org.codehaus.plexus</groupId>-->
+    <!--<artifactId>plexus-component-annotations</artifactId>-->
+    <!--<optional>true</optional>-->
+    <!--</dependency>-->
 
     <!--<dependency>-->
-      <!--<groupId>org.codehaus.plexus</groupId>-->
-      <!--<artifactId>plexus-utils</artifactId>-->
+    <!--<groupId>org.codehaus.plexus</groupId>-->
+    <!--<artifactId>plexus-utils</artifactId>-->
     <!--</dependency>-->
 
     <dependency>
@@ -83,14 +84,14 @@
     </dependency>
 
     <!--<dependency>-->
-      <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
-      <!--<artifactId>javax.servlet</artifactId>-->
-      <!--<scope>provided</scope>-->
+    <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
+    <!--<artifactId>javax.servlet</artifactId>-->
+    <!--<scope>provided</scope>-->
     <!--</dependency>-->
 
     <!--<dependency>-->
-      <!--<groupId>org.codehaus.plexus</groupId>-->
-      <!--<artifactId>plexus-interpolation</artifactId>-->
+    <!--<groupId>org.codehaus.plexus</groupId>-->
+    <!--<artifactId>plexus-interpolation</artifactId>-->
     <!--</dependency>-->
 
     <!--
@@ -103,13 +104,13 @@
     </dependency>
 
     <!--<dependency>-->
-      <!--<groupId>commons-io</groupId>-->
-      <!--<artifactId>commons-io</artifactId>-->
+    <!--<groupId>commons-io</groupId>-->
+    <!--<artifactId>commons-io</artifactId>-->
     <!--</dependency>-->
 
     <!--<dependency>-->
-      <!--<groupId>com.thoughtworks.xstream</groupId>-->
-      <!--<artifactId>xstream</artifactId>-->
+    <!--<groupId>com.thoughtworks.xstream</groupId>-->
+    <!--<artifactId>xstream</artifactId>-->
     <!--</dependency>-->
 
     <dependency>
@@ -118,30 +119,36 @@
     </dependency>
 
     <!--<dependency>-->
-      <!--<groupId>org.sonatype.sisu</groupId>-->
-      <!--<artifactId>sisu-velocity</artifactId>-->
+    <!--<groupId>org.sonatype.sisu</groupId>-->
+    <!--<artifactId>sisu-velocity</artifactId>-->
     <!--</dependency>-->
 
     <!--<dependency>-->
-      <!--<groupId>org.apache.velocity</groupId>-->
-      <!--<artifactId>velocity</artifactId>-->
+    <!--<groupId>org.apache.velocity</groupId>-->
+    <!--<artifactId>velocity</artifactId>-->
     <!--</dependency>-->
 
     <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>slf4j-api</artifactId>-->
+    <!--<groupId>org.slf4j</groupId>-->
+    <!--<artifactId>slf4j-api</artifactId>-->
     <!--</dependency>-->
 
     <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>jcl-over-slf4j</artifactId>-->
+    <!--<groupId>org.slf4j</groupId>-->
+    <!--<artifactId>jcl-over-slf4j</artifactId>-->
     <!--</dependency>-->
 
     <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--<dependency>-->
+    <!--<groupId>org.sonatype.sisu.litmus</groupId>-->
+    <!--<artifactId>litmus-testsupport</artifactId>-->
+    <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>com.noelios.restlet</groupId>

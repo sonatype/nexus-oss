@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2012 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.unpack</groupId>
+    <artifactId>nexus-unpack</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.sonatype.nexus.plugins</groupId>
+  <artifactId>nexus-unpack-plugin</artifactId>
+  <packaging>nexus-plugin</packaging>
+
+  <properties>
+    <pluginName>Nexus Unpack Plugin</pluginName>
+    <pluginDescription>Automatically unpack deployed bundles.</pluginDescription>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>apache-maven</artifactId>
+      <version>3.0.4</version>
+      <type>tar.gz</type>
+      <classifier>bin</classifier>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.nexus.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>setup-nexus-plugin-environment</goal>
+                  <goal>package</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <nexusBundleArtifact>
+                <groupId>${it.nexus.bundle.groupId}</groupId>
+                <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+                <version>${it.nexus.bundle.version}</version>
+                <type>zip</type>
+                <classifier>bundle</classifier>
+              </nexusBundleArtifact>
+              <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
+              <nexusVersion>${nexus.version}</nexusVersion>
+              <nexusPluginsArtifacts>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <version>${nexus.version}</version>
+                  <classifier>cp</classifier>
+                  <type>jar</type>
+                </plugin>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <version>${nexus.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </plugin>
+              </nexusPluginsArtifacts>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <configuration>
+              <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
+              <extraArtifacts>
+                <xml>org.codehaus.plexus:plexus-utils:2.1</xml>
+                <xml>org.sonatype.plexus:plexus-cipher:1.5</xml>
+                <xml>commons-codec:commons-codec:1.4</xml>
+                <xml>log4j:log4j:1.2.16</xml>
+                <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-site-plugin:2.0.1:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.5:maven-plugin</xml>
+                <!-- nexus maven site plugin -->
+                <xml>org.apache.maven.plugins:maven-project-info-reports-plugin:2.1</xml>
+                <xml>xml-apis:xml-apis:2.0.2</xml>
+                <xml>nekohtml:nekohtml:1.9.6.2</xml>
+                <xml>org.apache.maven.skins:maven-default-skin:1.0</xml>
+                <!-- nexus maven site plugin -->
+                <xml>org.sonatype.plugins:maven-upload-plugin:0.0.1:maven-plugin</xml>
+              </extraArtifacts>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

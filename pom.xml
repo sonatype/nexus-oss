@@ -918,12 +918,8 @@
     <module>import/sisu-ehcache</module>
     <module>import/nexus-repository-metadata</module>
     <module>import/nexus</module>
-    <module>import/nexus-capabilities-plugin</module>
-    <module>import/nexus-site-repository</module>
-    <module>import/nexus-unpack-plugin</module>
     <module>import/nexus-p2-bridge-plugin</module>
     <module>import/nexus-p2-repository-plugin</module>
-    <module>import/nexus-obr-plugin</module>
   </modules>
 
   <build>

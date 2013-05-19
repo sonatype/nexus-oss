@@ -55,6 +55,10 @@
         <module>archetype</module>
         <module>nexus-maven-bridge-plugin</module>
         <module>nexus-ui-extjs3-plugin</module>
+        <module>capabilities</module>
+        <module>obr</module>
+        <module>site</module>
+        <module>unpack</module>
       </modules>
     </profile>
   </profiles>
