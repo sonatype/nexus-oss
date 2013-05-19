@@ -923,7 +923,8 @@
   <modules>
     <module>buildsupport</module>
     <module>components</module>
-    <module>import/nexus</module>
+    <module>plugin-parent</module>
+    <module>plugins</module>
   </modules>
 
   <build>

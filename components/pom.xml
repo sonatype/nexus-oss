@@ -12,7 +12,8 @@
     See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,9 +32,190 @@
     <module>security</module>
     <module>sisu-jetty8</module>
     <module>sisu-ehcache</module>
+    <module>nexus-bootstrap</module>
+    <module>nexus-plugin-api</module>
+    <module>nexus-plugin-test-api</module>
+    <module>nexus-core</module>
+    <module>nexus-web-utils</module>
+    <module>nexus-logging-extras</module>
+    <module>nexus-logging-extras-appender</module>
+    <module>nexus-repository-metadata-model</module>
+    <module>nexus-repository-metadata-api</module>
+    <module>nexus-compat</module>
+    <module>nexus-oss-edition</module>
+    <module>nexus-configuration-model</module>
+    <module>nexus-webapp</module>
+    <module>nexus-launcher</module>
+    <module>nexus-client-core</module>
+    <module>nexus-oss-webapp</module>
+    <module>nexus-stories</module>
+    <module>nexus-test</module>
+    <module>nexus-client-core-testsuite</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+
+      <!-- INTERNAL -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-bootstrap</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.client</groupId>
+        <artifactId>nexus-client-core</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-compat</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-configuration-model</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-repository-metadata-model</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-repository-metadata-api</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-core</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-core</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+        <classifier>tests</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-launcher</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-logging-extras</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-logging-extras-appender</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-oss-edition</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-web-utils</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp</artifactId>
+        <type>war</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-common</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-oss-webapp</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-api</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-test-api</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-harness-launcher</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-client</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-utils</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <build>
+    <pluginManagement>
+      <plugins>
+
+        <!-- INTERNAL -->
+
+        <plugin>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>2.5.0-SNAPSHOT</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <!--
       TODO: Move to specific modules which use plexus, we eventually want to remove the need for this
