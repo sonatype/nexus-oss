@@ -1065,9 +1065,12 @@
 
   <modules>
     <module>buildsupport</module>
+    <module>testsupport</module>
     <module>components</module>
     <module>plugin-parent</module>
     <module>plugins</module>
+    <module>assemblies</module>
+    <module>testsuite</module>
   </modules>
 
   <build>
