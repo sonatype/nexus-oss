@@ -14,7 +14,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -22,74 +22,38 @@
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-oss</artifactId>
     <version>2.5.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.sonatype.appcontext</groupId>
   <artifactId>appcontext-parent</artifactId>
-  <version>4.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
+  <version>4.0-SNAPSHOT</version>
 
   <dependencyManagement>
     <dependencies>
 
-      <!-- interpolation (mandatory) -->
+      <!-- INTERNAL -->
+
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-interpolation</artifactId>
-        <version>1.14</version>
-        <scope>compile</scope>
+        <groupId>org.sonatype.appcontext</groupId>
+        <artifactId>appcontext</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
-      <!-- logging in dumping (optional, consumer env should provide) -->
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.6.6</version>
-        <scope>provided</scope>
+        <groupId>org.sonatype.appcontext</groupId>
+        <artifactId>appcontext-guice</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
-      <!-- SISU/Guice module (optional, consumer env should provide) -->
       <dependency>
-        <groupId>javax.inject</groupId>
-        <artifactId>javax.inject</artifactId>
-        <version>1</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-bean</artifactId>
-        <version>2.2.3</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-guice</artifactId>
-        <version>2.9.4</version>
-        <classifier>no_aop</classifier>
-        <scope>provided</scope>
+        <groupId>org.sonatype.appcontext</groupId>
+        <artifactId>appcontext-servlet</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
-      <!-- Servlet support (optional, consumer env should provide) -->
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.0.1</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <!-- Test -->
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.10</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>1.6.6</version>
-        <scope>test</scope>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 

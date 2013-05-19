@@ -145,13 +145,10 @@
             <configuration>
               <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
               <extraArtifacts>
-                <!-- Nexus Maven Plugin uses nexus-runtime-platform as parent, and the p-u depMgt in there kicks in -->
                 <xml>org.codehaus.plexus:plexus-utils:2.1</xml>
                 <xml>org.sonatype.plexus:plexus-cipher:1.5</xml>
                 <xml>commons-codec:commons-codec:1.4</xml>
                 <xml>log4j:log4j:1.2.16</xml>
-                <!-- The rest -->
-                <xml>org.sonatype.nexus:nexus-runtime-platform:${nexus.version}:pom</xml>
                 <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
                 <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
                 <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>

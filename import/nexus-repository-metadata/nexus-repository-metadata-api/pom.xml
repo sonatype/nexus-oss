@@ -23,19 +23,18 @@
       <artifactId>nexus-repository-metadata-model</artifactId>
     </dependency>
 
-    <!-- Plexus -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
-    <!-- Optional simple client -->
     <dependency>
       <groupId>org.restlet</groupId>
       <artifactId>org.restlet</artifactId>
       <version>1.1.2</version>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>com.noelios.restlet</groupId>
       <artifactId>com.noelios.restlet</artifactId>
@@ -43,13 +42,13 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
       <version>3.8.2</version>
     </dependency>
+
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock</artifactId>
@@ -64,26 +63,6 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
-
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <forkMode>never</forkMode>
-        </configuration>
-      </plugin>
-
-      <!--<plugin>-->
-        <!--<groupId>com.google.code.maven-license-plugin</groupId>-->
-        <!--<artifactId>maven-license-plugin</artifactId>-->
-        <!--<version>1.4.0</version>-->
-        <!--<configuration>-->
-          <!--<header>${basedir}/header.txt</header>-->
-          <!--<includes>-->
-            <!--<include>**/*.java</include>-->
-          <!--</includes>-->
-          <!--&lt;!&ndash; this is important for muti-module project <aggregate>true</aggregate> &ndash;&gt;-->
-        <!--</configuration>-->
-      <!--</plugin>-->
     </plugins>
   </build>
 

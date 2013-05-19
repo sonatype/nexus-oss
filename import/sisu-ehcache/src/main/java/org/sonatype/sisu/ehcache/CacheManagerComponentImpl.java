@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,7 +30,6 @@ import net.sf.ehcache.config.ConfigurationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.appcontext.AppContext;
-import org.sonatype.inject.Nullable;
 
 /**
  * Default implementation of CacheManagerComponent. Note: as SISU-93 is not yet here, and this component does need

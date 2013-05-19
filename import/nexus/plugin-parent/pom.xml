@@ -21,6 +21,7 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>35</version>
+    <relativePath/>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -227,6 +228,16 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-ui-extjs3-plugin</artifactId>
         <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      TODO: Added for merge, resolve with pro...
+      -->
+
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
       </dependency>
 
       <!-- ******************** TESTING ******************** -->

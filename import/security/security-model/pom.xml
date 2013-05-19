@@ -12,9 +12,10 @@
     See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>org.sonatype.security</groupId>
     <artifactId>security-parent</artifactId>
@@ -22,26 +23,32 @@
   </parent>
 
   <artifactId>security-model</artifactId>
-  <description>The modello model for the storage of users, roles, privileges, and the mapping of users to roles. (and a bit of legacy code, not yet refactored out.)</description>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-bean</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -120,42 +127,10 @@
         </executions>
         <configuration>
           <packageWithVersion>false</packageWithVersion>
-        </configuration>        
+        </configuration>
       </plugin>
 
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!--TODO TEXT. This plugin's configuration is used in m2e only. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.sonatype.plugins
-                    </groupId>
-                    <artifactId>
-                      modello-plugin-upgrade
-                    </artifactId>
-                    <versionRange>[1.0,)</versionRange>
-                    <goals>
-                      <goal>upgrade</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
+
 </project>

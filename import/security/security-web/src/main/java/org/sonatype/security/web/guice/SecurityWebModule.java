@@ -238,7 +238,7 @@ public class SecurityWebModule
             return servletContext.getInitParameter( name );
         }
 
-        public Enumeration<?> getInitParameterNames()
+        public Enumeration getInitParameterNames()
         {
             return servletContext.getInitParameterNames();
         }

@@ -20,6 +20,7 @@
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-plugin-parent</artifactId>
     <version>2.5.0-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
   <groupId>org.sonatype.nexus.repository.site</groupId>
@@ -50,12 +51,6 @@
             <groupId>junit</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.inject</groupId>
-        <artifactId>javax.inject</artifactId>
-        <version>1</version>
       </dependency>
 
       <!-- INTERNAL -->

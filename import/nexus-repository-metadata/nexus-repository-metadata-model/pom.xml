@@ -6,7 +6,8 @@
     http://www.eclipse.org/legal/epl-v10.html.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -30,6 +31,10 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+
         <executions>
           <execution>
             <id>repository-metadata.xml</id>
@@ -46,6 +51,7 @@
               </models>
             </configuration>
           </execution>
+
           <execution>
             <id>mirror-list-metadata.xml</id>
             <goals>
@@ -62,30 +68,7 @@
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-          </dependency>
-        </dependencies>
       </plugin>
-
-      <!--<plugin>-->
-        <!--<groupId>com.google.code.maven-license-plugin</groupId>-->
-        <!--<artifactId>maven-license-plugin</artifactId>-->
-        <!--<version>1.4.0</version>-->
-        <!--<configuration>-->
-          <!--<header>${basedir}/header.txt</header>-->
-          <!--<includes>-->
-            <!--<include>**/*.java</include>-->
-          <!--</includes>-->
-          <!--&lt;!&ndash; this is important for muti-module project <aggregate>true</aggregate> &ndash;&gt;-->
-        <!--</configuration>-->
-      <!--</plugin>-->
     </plugins>
   </build>
 

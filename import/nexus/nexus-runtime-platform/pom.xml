@@ -20,6 +20,7 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>35</version>
+    <relativePath/>
   </parent>
 
   <!--
@@ -36,43 +37,6 @@
     <sisu-inject.version>2.3.2</sisu-inject.version>
     <sisu-guice.version>3.1.2</sisu-guice.version>
   </properties>
-
-  <prerequisites>
-    <maven>3.0.4</maven>
-  </prerequisites>
-
-  <inceptionYear>2007</inceptionYear>
-  <url>http://nexus.sonatype.org/</url>
-
-  <issueManagement>
-    <system>Jira</system>
-    <url>http://links.sonatype.com/products/nexus/oss/issues</url>
-  </issueManagement>
-
-  <ciManagement>
-    <system>Bamboo</system>
-    <url>https://bamboo.zion.sonatype.com/browse/NXO</url>
-  </ciManagement>
-
-  <scm>
-    <connection>scm:git:git://github.com/sonatype/nexus.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/nexus.git</developerConnection>
-    <url>https://github.com/sonatype/nexus</url>
-  </scm>
-
-  <repositories>
-    <repository>
-      <id>rso-public-grid</id>
-      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
-    </repository>
-  </repositories>
-
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
 
   <dependencyManagement>
     <dependencies>
