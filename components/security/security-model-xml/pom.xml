@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>security-model-xml</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>

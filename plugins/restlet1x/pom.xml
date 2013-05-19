@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>nexus-restlet1x-parent</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <properties>

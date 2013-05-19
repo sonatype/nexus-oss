@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>nexus-obr-testsuite</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <felix.home>${project.build.directory}/felix</felix.home>

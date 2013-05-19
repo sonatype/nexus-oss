@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>nexus-restlet1x-testsuite</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>

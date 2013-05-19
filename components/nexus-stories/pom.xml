@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-stories</artifactId>
-
-  <description>BDD Style User Stories for Nexus</description>
+  <name>${project.groupId}:${project.artifactId}</name>
 
 </project>

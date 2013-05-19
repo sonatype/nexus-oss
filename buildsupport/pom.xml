@@ -24,12 +24,22 @@
 
   <groupId>org.sonatype.nexus.buildsupport</groupId>
   <artifactId>buildsupport</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>
-    <module>logging</module>
+    <module>apache-commons</module>
+    <module>apache-httpclient</module>
+    <module>apache-maven</module>
+    <module>apache-shiro</module>
     <module>eclipse-jetty</module>
+    <module>guice</module>
+    <module>logging</module>
+    <module>other</module>
+    <module>plexus</module>
+    <module>testing</module>
     <module>yammer-metrics</module>
+    <module>all</module>
   </modules>
 
 </project>

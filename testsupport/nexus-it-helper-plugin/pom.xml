@@ -25,6 +25,7 @@
   <!-- FIXME: Use parent groupId -->
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-it-helper-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>

@@ -25,6 +25,7 @@
   </parent>
 
   <artifactId>nexus-maven-bridge-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>

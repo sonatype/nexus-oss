@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>nexus-p2-bridge-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>

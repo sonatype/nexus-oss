@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>components</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>
@@ -57,23 +58,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>logging</artifactId>
-        <type>pom</type>
-        <version>2.5.0-SNAPSHOT</version>
-        <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>eclipse-jetty</artifactId>
-        <type>pom</type>
-        <version>2.5.0-SNAPSHOT</version>
-        <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>yammer-metrics</artifactId>
+        <artifactId>all</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>

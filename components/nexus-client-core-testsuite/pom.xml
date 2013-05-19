@@ -25,6 +25,7 @@
 
   <groupId>org.sonatype.nexus.client</groupId>
   <artifactId>nexus-client-core-testsuite</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>

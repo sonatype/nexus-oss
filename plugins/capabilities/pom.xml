@@ -25,6 +25,7 @@
 
   <groupId>org.sonatype.nexus.capabilities</groupId>
   <artifactId>nexus-capabilities</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>

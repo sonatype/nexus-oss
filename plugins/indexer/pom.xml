@@ -25,6 +25,7 @@
 
   <groupId>org.sonatype.nexus.indexer-lucene</groupId>
   <artifactId>nexus-indexer-lucene</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <dependencyManagement>

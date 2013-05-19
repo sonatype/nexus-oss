@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>nexus-capabilities-model</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>

@@ -28,6 +28,7 @@
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>plugins</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <profiles>
@@ -48,13 +49,13 @@
         <module>crypto</module>
         <module>ldap</module>
         <module>kenai</module>
-        <module>nexus-timeline-plugin</module>
-        <module>nexus-lvo-plugin</module>
-        <module>nexus-plugin-console-plugin</module>
-        <module>nexus-rrb-plugin</module>
+        <module>timeline</module>
+        <module>lvo</module>
+        <module>plugin-console</module>
+        <module>rrb</module>
         <module>archetype</module>
-        <module>nexus-maven-bridge-plugin</module>
-        <module>nexus-ui-extjs3-plugin</module>
+        <module>maven-bridge</module>
+        <module>ui-extjs3</module>
         <module>capabilities</module>
         <module>obr</module>
         <module>site</module>

@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>nexus-restlet1x-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>

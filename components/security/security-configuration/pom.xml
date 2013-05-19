@@ -22,9 +22,7 @@
   </parent>
 
   <artifactId>security-configuration</artifactId>
-  <description>Defines how the security system is configured, which realms are used, the anonymous username/password, and if security is enabled or
-    not.
-  </description>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>

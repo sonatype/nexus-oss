@@ -22,7 +22,7 @@
   </parent>
 
   <artifactId>security-xml-realm</artifactId>
-  <description>The security.xml based Realm, which stores users, roles, privileges, and user to role mappings using security-model-xml.</description>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>

@@ -28,6 +28,7 @@
   -->
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-oss-webapp</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <dependencies>

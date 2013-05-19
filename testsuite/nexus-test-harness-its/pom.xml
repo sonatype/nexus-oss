@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>nexus-test-harness-its</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <cargo.version>1.3.0</cargo.version>

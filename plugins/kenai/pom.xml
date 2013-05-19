@@ -26,6 +26,7 @@
 
   <groupId>org.sonatype.nexus.plugins.kenai</groupId>
   <artifactId>nexus-kenai</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <packaging>pom</packaging>
 

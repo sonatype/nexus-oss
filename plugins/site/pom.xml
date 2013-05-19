@@ -25,6 +25,7 @@
 
   <groupId>org.sonatype.nexus.repository.site</groupId>
   <artifactId>nexus-site-repository</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>

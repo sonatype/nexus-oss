@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>nexus-siesta</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>

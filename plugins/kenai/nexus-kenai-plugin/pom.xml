@@ -26,6 +26,7 @@
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-kenai-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>

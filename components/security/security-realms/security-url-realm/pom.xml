@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>security-url-realm</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
 

@@ -25,6 +25,7 @@
 
   <groupId>org.sonatype.nexus.plugins.p2</groupId>
   <artifactId>nexus-p2</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>

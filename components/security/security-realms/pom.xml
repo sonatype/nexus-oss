@@ -22,6 +22,7 @@
 
   <groupId>org.sonatype.security.realms</groupId>
   <artifactId>security-realms</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>

@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>nexus-lvo-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>

@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>nexus-ldap-realm-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>

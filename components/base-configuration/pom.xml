@@ -25,6 +25,7 @@
 
   <groupId>org.sonatype.configuration</groupId>
   <artifactId>base-configuration</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <version>1.1.2-SNAPSHOT</version>
 
   <dependencies>

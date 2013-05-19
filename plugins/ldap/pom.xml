@@ -24,6 +24,7 @@
 
   <groupId>org.sonatype.nexus.plugins.ldap</groupId>
   <artifactId>nexus-ldap-plugin-parent</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <dependencyManagement>

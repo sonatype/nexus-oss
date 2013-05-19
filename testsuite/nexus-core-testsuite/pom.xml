@@ -25,6 +25,7 @@
   </parent>
 
   <artifactId>nexus-core-testsuite</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>

@@ -23,6 +23,7 @@
   </parent>
 
   <artifactId>nexus-webapp</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>war</packaging>
 
   <properties>

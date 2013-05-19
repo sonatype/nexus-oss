@@ -25,6 +25,7 @@
   <!-- FIXME: Use parent groupId -->
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-test-harness-launcher</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>
