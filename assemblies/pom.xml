@@ -29,7 +29,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>bundle-template</module>
+    <module>nexus-oss-webapp</module>
   </modules>
 
   <dependencyManagement>
