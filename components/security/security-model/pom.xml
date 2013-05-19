@@ -47,7 +47,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.configuration</groupId>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>base-configuration</artifactId>
     </dependency>
   </dependencies>
