@@ -56,21 +56,25 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--
+    FIXME: For some reason these are needed to be in non-test scope for the sisu index to generate :-(
+    -->
 
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-bean</artifactId>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
