@@ -915,7 +915,6 @@
     <module>import/security</module>
     <module>import/sisu-jetty8</module>
     <module>import/sisu-ehcache</module>
-    <module>import/nexus-repository-metadata</module>
     <module>import/nexus</module>
   </modules>
 
