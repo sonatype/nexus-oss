@@ -27,7 +27,7 @@
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>nexus-plugins</artifactId>
+  <artifactId>plugins</artifactId>
   <packaging>pom</packaging>
 
   <profiles>
