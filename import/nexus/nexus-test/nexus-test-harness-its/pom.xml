@@ -97,7 +97,7 @@
 
     <!-- NEXUS-3947 ArchetypeCatalog -->
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
+      <groupId>org.sonatype.nexus.plugins.archetype</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
