@@ -450,7 +450,7 @@ public class Jetty8NexusBooter
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-utils-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-interpolation-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-classworlds-*.jar" );
-        tamperJarsForSharedClasspath( basedir, sharedLibs, "appcontext-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "nexus-appcontext-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "slf4j-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "nexus-logging-extras-appender-*.jar" );

@@ -29,7 +29,7 @@
 
   <modules>
     <module>base-configuration</module>
-    <module>appcontext</module>
+    <module>nexus-appcontext</module>
     <module>security</module>
     <module>nexus-jetty8</module>
     <module>nexus-ehcache</module>

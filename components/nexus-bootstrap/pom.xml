@@ -32,8 +32,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.appcontext</groupId>
-      <artifactId>appcontext</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-appcontext</artifactId>
     </dependency>
 
     <dependency>

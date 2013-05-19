@@ -19,23 +19,23 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.appcontext</groupId>
-    <artifactId>appcontext-parent</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>components</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>appcontext-servlet</artifactId>
+  <artifactId>nexus-appcontext</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.appcontext</groupId>
-      <artifactId>appcontext</artifactId>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interpolation</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse.jetty.orbit</groupId>
-      <artifactId>javax.servlet</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
