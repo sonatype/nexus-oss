@@ -49,7 +49,6 @@
     <module>nexus-launcher</module>
     <module>nexus-client-core</module>
     <module>nexus-stories</module>
-    <module>nexus-client-core-testsuite</module>
   </modules>
 
   <dependencyManagement>
