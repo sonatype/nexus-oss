@@ -54,15 +54,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
+      <groupId>org.sonatype.nexus.plugins.archetype</groupId>
       <artifactId>nexus-archetype-common</artifactId>
-      <version>1.4-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
