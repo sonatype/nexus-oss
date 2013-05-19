@@ -916,8 +916,6 @@
     <module>import/security</module>
     <module>import/sisu-jetty8</module>
     <module>import/sisu-ehcache</module>
-    <module>import/sisu-restlet-bridge</module>
-    <module>import/nexus-archetype-common</module>
     <module>import/nexus-repository-metadata</module>
     <module>import/nexus</module>
     <module>import/nexus-capabilities-plugin</module>

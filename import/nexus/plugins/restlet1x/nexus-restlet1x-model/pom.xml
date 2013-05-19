@@ -32,8 +32,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-restlet-bridge</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet-bridge</artifactId>
       <scope>provided</scope>
     </dependency>
 
