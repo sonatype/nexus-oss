@@ -335,11 +335,11 @@
       <!--
       FIXME: Move to sisu-ehcahe module
       -->
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>2.5.1</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>net.sf.ehcache</groupId>-->
+        <!--<artifactId>ehcache-core</artifactId>-->
+        <!--<version>2.5.1</version>-->
+      <!--</dependency>-->
 
       <!--<dependency>-->
       <!--<groupId>org.apache.httpcomponents</groupId>-->
@@ -469,12 +469,6 @@
       <!-- INTERNAL -->
 
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-ehcache</artifactId>
-        <version>1.2-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.sonatype.configuration</groupId>
         <artifactId>base-configuration</artifactId>
         <version>1.1.2-SNAPSHOT</version>
@@ -584,6 +578,12 @@
         <artifactId>nexus-core</artifactId>
         <version>2.5.0-SNAPSHOT</version>
         <classifier>tests</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-ehcache</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -1106,7 +1106,7 @@
           <!--<excludes>-->
           <!--<exclude>org.sonatype.spice:plexus-ehcache</exclude>-->
           <!--</excludes>-->
-          <!--<message>Use org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache</message>-->
+          <!--<message>Use org.sonatype.nexus:nexus-ehcache instead of plexus-ehcache</message>-->
           <!--</bannedDependencies>-->
           <!--</rules>-->
           <!--<fail>true</fail>-->

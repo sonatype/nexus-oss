@@ -32,7 +32,7 @@
     <module>appcontext</module>
     <module>security</module>
     <module>sisu-jetty8</module>
-    <module>sisu-ehcache</module>
+    <module>nexus-ehcache</module>
     <module>nexus-bootstrap</module>
     <module>nexus-plugin-api</module>
     <module>nexus-plugin-test-api</module>

@@ -62,8 +62,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-ehcache</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-ehcache</artifactId>
     </dependency>
 
     <dependency>
