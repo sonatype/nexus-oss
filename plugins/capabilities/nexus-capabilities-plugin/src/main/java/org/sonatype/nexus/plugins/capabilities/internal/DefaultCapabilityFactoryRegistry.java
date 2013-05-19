@@ -13,8 +13,8 @@
 package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.inject.name.Names.named;
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;

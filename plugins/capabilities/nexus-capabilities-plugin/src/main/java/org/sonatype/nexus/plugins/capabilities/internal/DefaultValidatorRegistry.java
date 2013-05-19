@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
-
 import java.util.Collection;
 import java.util.Set;
 import javax.inject.Inject;
@@ -30,6 +28,8 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import com.google.common.collect.Sets;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default {@link ValidatorRegistry} implementation.

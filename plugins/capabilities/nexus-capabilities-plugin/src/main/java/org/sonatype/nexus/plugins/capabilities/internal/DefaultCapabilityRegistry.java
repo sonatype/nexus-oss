@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableCollection;
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 
 import java.io.IOException;
