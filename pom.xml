@@ -905,16 +905,7 @@
   </dependencyManagement>
 
   <modules>
-    <!--<module>testsupport</module>-->
-    <!--<module>components</module>-->
-    <!--<module>plugins</module>-->
-    <!--<module>distribution</module>-->
-    <!--<module>testsuite</module>-->
-    <module>import/appcontext</module>
-    <module>import/base-configuration</module>
-    <module>import/security</module>
-    <module>import/sisu-jetty8</module>
-    <module>import/sisu-ehcache</module>
+    <module>components</module>
     <module>import/nexus</module>
   </modules>
 
