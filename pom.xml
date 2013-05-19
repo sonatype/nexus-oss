@@ -87,10 +87,26 @@
     <!-- See 'idea' profile -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
-    <!-- Tattletale plugin defaults -->
+    <!-- tattletale defaults -->
     <tattletale.failOnInfo>false</tattletale.failOnInfo>
     <tattletale.failOnWarn>false</tattletale.failOnWarn>
     <tattletale.failOnError>true</tattletale.failOnError>
+
+    <!-- yuicompressor defaults; non-optimized for debug -->
+    <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
+    <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+    <maven.yuicompressor.linebreakpos>0<!-- preserve linebreaks --></maven.yuicompressor.linebreakpos>
+
+    <!-- logging configuration used in logback config files to control test logging -->
+    <test.log.level>INFO</test.log.level>
+    <it.test.log.level>INFO</it.test.log.level>
+    <it.nexus.log.level>INFO</it.nexus.log.level>
+
+    <!-- nexus integration-testing bundle configuration -->
+    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
   </properties>
 
   <dependencyManagement>
@@ -905,6 +921,7 @@
   </dependencyManagement>
 
   <modules>
+    <module>buildsupport</module>
     <module>components</module>
     <module>import/nexus</module>
   </modules>
@@ -918,6 +935,56 @@
           <configuration>
             <source>1.6</source>
             <target>1.6</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <releaseProfiles>release,tattletale,optimize-js</releaseProfiles>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables combine.children="append">
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+
+              <!-- junit benchmarks configuration -->
+              <jub.consumers>H2,CONSOLE</jub.consumers>
+              <jub.db.file>.benchmarks</jub.db.file>
+              <jub.customkey>${os.name}</jub.customkey>
+              <jub.charts.dir>${project.build.directory}/junit-benchmarks</jub.charts.dir>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <forkMode>once</forkMode>
+            <excludes combine.children="append">
+              <exclude>**/Abstract*</exclude>
+            </excludes>
+            <systemPropertyVariables combine.children="append">
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
 
@@ -971,6 +1038,96 @@
           <version>1.0</version>
           <extensions>true</extensions>
         </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>provided-dependencies-maven-plugin</artifactId>
+          <version>1.6</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>modello-plugin-upgrade</artifactId>
+          <version>1.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
+          <version>3.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <!-- yuicompressor warns when code is not in a shape that's optimized for minifying. ATM this only pollutes the log (~9400 warnings) -->
+            <jswarn>false</jswarn>
+            <nominify>${maven.yuicompressor.nocompress}</nominify>
+            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
+            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
+            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
+          </configuration>
+          <executions>
+            <execution>
+              <id>js</id>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
+              </configuration>
+            </execution>
+            <execution>
+              <id>css</id>
+              <goals>
+                <goal>aggregate-css</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
+                <required>false</required>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!--<plugin>-->
+        <!--<groupId>com.mycila.maven-license-plugin</groupId>-->
+        <!--<artifactId>maven-license-plugin</artifactId>-->
+        <!--<configuration>-->
+        <!--&lt;!&ndash; caution do not append children excludes since we have 'target' package &ndash;&gt;-->
+        <!--<excludes>-->
+        <!--<exclude>**/.*/**</exclude>-->
+        <!--&lt;!&ndash; we have target pattern in this format because of target package in nexus-core modules &ndash;&gt;-->
+        <!--<exclude>**/nexus*/target/**</exclude>-->
+        <!--<exclude>**/ldap-common/target/**</exclude>-->
+        <!--<exclude>plugin*/**/target/**</exclude>-->
+        <!--<exclude>**/ext-3.4.1.1/**</exclude>-->
+        <!--<exclude>**/js/filetree/**</exclude>-->
+        <!--<exclude>**/editarea_0_8_2/**</exclude>-->
+        <!--<exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>-->
+        <!--&lt;!&ndash; FIXME is this really a good idea excluding all test resources? &ndash;&gt;-->
+        <!--<exclude>**/src/test/resources/**</exclude>-->
+        <!--<exclude>**/src/test/filtered-resources/**</exclude>-->
+        <!--<exclude>**/nexus-test-harness-its/resources/**</exclude>-->
+        <!--<exclude>**/gwt/ext/ui/**/*.js</exclude>-->
+        <!--<exclude>**/gwt/ext/ui/**/*.css</exclude>-->
+        <!--&lt;!&ndash; already has a lgpl license &ndash;&gt;-->
+        <!--<exclude>**/Ext.ux.form.LovCombo.css</exclude>-->
+        <!--&lt;!&ndash; temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check &ndash;&gt;-->
+        <!--<exclude>**/dependency-reduced-pom.xml</exclude>-->
+        <!--&lt;!&ndash; netbeans adds these &ndash;&gt;-->
+        <!--<exclude>**/nbactions*.xml</exclude>-->
+        <!--<exclude>**/nb-configuration.xml</exclude>-->
+        <!--&lt;!&ndash; IntelliJ IDEA files&ndash;&gt;-->
+        <!--<exclude>**/atlassian-ide-plugin.xml</exclude>-->
+        <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>-->
+        <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>-->
+        <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>-->
+        <!--</excludes>-->
+        <!--</configuration>-->
+        <!--</plugin>-->
       </plugins>
     </pluginManagement>
 
@@ -1185,6 +1342,73 @@
   </build>
 
   <profiles>
+    <profile>
+      <id>debug</id>
+      <activation>
+        <property>
+          <name>debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <!-- configure test logging properties to debug levels -->
+        <test.log.level>DEBUG</test.log.level>
+        <it.test.log.level>DEBUG</it.test.log.level>
+        <it.nexus.log.level>DEBUG</it.nexus.log.level>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>export</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>optimize-js</id>
+      <properties>
+        <!--
+        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
+        -->
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+        <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
+        <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+        <maven.yuicompressor.linebreakpos>-1<!-- do not preserve linebreaks --></maven.yuicompressor.linebreakpos>
+      </properties>
+    </profile>
+
     <profile>
       <id>idea</id>
       <properties>
