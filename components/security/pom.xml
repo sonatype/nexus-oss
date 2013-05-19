@@ -50,24 +50,24 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-configuration</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.sonatype.security</groupId>-->
+        <!--<artifactId>security-configuration</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-system</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.sonatype.security</groupId>-->
+        <!--<artifactId>security-system</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-system</artifactId>
-        <classifier>tests</classifier>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.sonatype.security</groupId>-->
+        <!--<artifactId>security-system</artifactId>-->
+        <!--<classifier>tests</classifier>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
@@ -88,9 +88,9 @@
     <module>security-model</module>
     <module>security-model-xml</module>
     <module>security-realms</module>
-    <module>security-system</module>
-    <module>security-configuration</module>
-    <module>security-web</module>
+    <!--<module>security-system</module>-->
+    <!--<module>security-configuration</module>-->
+    <!--<module>security-web</module>-->
   </modules>
 
   <build>

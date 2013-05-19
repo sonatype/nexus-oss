@@ -143,8 +143,8 @@
       <artifactId>security-xml-realm</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-configuration</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-security</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>

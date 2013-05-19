@@ -40,8 +40,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-system</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-security</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
