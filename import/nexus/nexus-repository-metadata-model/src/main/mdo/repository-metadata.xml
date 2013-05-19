@@ -7,14 +7,15 @@
 
 -->
 
-<model xsd.namespace="http://www.sonatype.com/xsd/nexus-repository-metadata-1.0.0" xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-repository-metadata-1.0.0">
+<model xsd.namespace="http://www.sonatype.com/xsd/nexus-repository-metadata-1.0.0"
+       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-repository-metadata-1.0.0">
 
   <id>repository-metadata</id>
 
   <name>RepositoryMetadata</name>
 
   <description>
-		<![CDATA[
+    <![CDATA[
     	<p>Repository Metadata Model.</p>
     	]]>
   </description>
@@ -111,7 +112,8 @@
           <version>1.0.0+</version>
           <description>A typical period of content change in repository, if any. In minutes. For example: the period
             when sync tools are
-            run. MRM/IDEs may use this value to tweak their cache TTLs.</description>
+            run. MRM/IDEs may use this value to tweak their cache TTLs.
+          </description>
           <type>int</type>
           <required>false</required>
         </field>

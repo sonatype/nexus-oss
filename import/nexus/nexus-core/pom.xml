@@ -35,8 +35,7 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>
     </dependency>
-    
-    <!-- Was nexus, now is external -->
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository-metadata-api</artifactId>

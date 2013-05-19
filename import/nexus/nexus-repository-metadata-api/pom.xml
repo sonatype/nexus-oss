@@ -6,13 +6,14 @@
     http://www.eclipse.org/legal/epl-v10.html.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-repository-metadata</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <artifactId>nexus</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-repository-metadata-api</artifactId>
@@ -28,6 +29,9 @@
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
+    <!--
+    FIXME: WTF is restlet doing here?!
+    -->
     <dependency>
       <groupId>org.restlet</groupId>
       <artifactId>org.restlet</artifactId>
@@ -40,20 +44,6 @@
       <artifactId>com.noelios.restlet</artifactId>
       <version>1.1.2</version>
       <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-      <version>3.8.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock</artifactId>
-      <scope>test</scope>
-      <version>2.5.1</version>
     </dependency>
   </dependencies>
 
