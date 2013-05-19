@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.plugins.p2</groupId>
+    <artifactId>nexus-p2</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-p2-repository-plugin</artifactId>
+  <packaging>nexus-plugin</packaging>
+
+  <properties>
+    <pluginName>Nexus P2 Repository Plugin</pluginName>
+    <pluginDescription>P2 repository support.</pluginDescription>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <version>${project.version}</version>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.p2</groupId>
+      <artifactId>nexus-p2-bridge-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.tycho</groupId>
+      <artifactId>tycho-metadata-model</artifactId>
+      <version>0.12.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.p2.bridge</groupId>
+      <artifactId>org.sonatype.p2.bridge.api</artifactId>
+      <version>1.1.5</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <version>${nexus.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-verifier</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.capabilities</groupId>
+      <artifactId>nexus-capabilities-client</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-Xmx512m</argLine>
+          <systemProperties>
+            <property>
+              <name>user.home</name>
+              <value>${project.build.directory}/user_home</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+          <workingDirectory>${project.build.directory}</workingDirectory>
+          <excludes>
+            <exclude>**/*$*</exclude>
+            <exclude>**/Abstract*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.nexus.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>setup-nexus-plugin-environment</goal>
+                  <goal>package</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <nexusBundleArtifact>
+                <groupId>${it.nexus.bundle.groupId}</groupId>
+                <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+                <version>${it.nexus.bundle.version}</version>
+                <type>zip</type>
+                <classifier>bundle</classifier>
+              </nexusBundleArtifact>
+              <nexusPluginsArtifacts>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <version>${nexus.version}</version>
+                  <classifier>cp</classifier>
+                  <type>jar</type>
+                </plugin>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <version>${nexus.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </plugin>
+              </nexusPluginsArtifacts>
+            </configuration>
+          </plugin>
+
+          <!-- HACK: This plugin is here just to force download of plugins used in poms built via Verifier -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+                <configuration>
+                  <extraArtifacts>
+                    <extraArtifact>org.sonatype.maven.plugins:maven-p2-bridge-plugin:1.1.6</extraArtifact>
+                    <extraArtifact>org.sonatype.p2.bridge:org.sonatype.p2.bridge.impl:1.1.6</extraArtifact>
+                    <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4.1</extraArtifact>
+                  </extraArtifacts>
+                  <localRepositoryPath>${project.build.directory}/maven-local-repository</localRepositoryPath>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

@@ -59,6 +59,7 @@
         <module>obr</module>
         <module>site</module>
         <module>unpack</module>
+        <module>p2</module>
       </modules>
     </profile>
   </profiles>
