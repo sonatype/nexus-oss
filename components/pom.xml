@@ -48,7 +48,8 @@
     <module>nexus-webapp</module>
     <module>nexus-launcher</module>
     <module>nexus-client-core</module>
-    <module>nexus-stories</module>
+    <!-- FIXME: This module is mostly useless, its not a component, should remove or relocate -->
+    <!--<module>nexus-stories</module>-->
   </modules>
 
   <dependencyManagement>

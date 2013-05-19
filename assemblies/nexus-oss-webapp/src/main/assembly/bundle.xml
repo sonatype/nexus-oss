@@ -101,7 +101,7 @@
       <unpackOptions>
         <excludes>
           <exclude>META-INF/**</exclude>
-          <exclude>WEB-INF/lib/appcontext*.jar</exclude>
+          <exclude>WEB-INF/lib/nexus-appcontext*.jar</exclude>
           <exclude>WEB-INF/lib/slf4j-api*.jar</exclude>
           <exclude>WEB-INF/lib/logback-core*.jar</exclude>
           <exclude>WEB-INF/lib/logback-classic*.jar</exclude>
@@ -122,11 +122,10 @@
       <includes>
         <include>org.sonatype.nexus:nexus-bootstrap</include>
         <include>org.sonatype.nexus:nexus-logging-extras-appender</include>
+        <include>org.sonatype.nexus:nexus-appcontext</include>
+        <include>org.sonatype.nexus:nexus-jetty8</include>
         <include>org.eclipse.jetty.orbit:javax.servlet</include>
         <include>org.eclipse.jetty:*</include>
-        <include>org.codehaus.plexus:*</include>
-        <include>org.sonatype.sisu:*</include>
-        <include>org.sonatype.appcontext:*</include>
         <include>org.slf4j:*</include>
         <include>ch.qos.logback:*</include>
         <include>com.yammer.metrics:metrics-core</include>

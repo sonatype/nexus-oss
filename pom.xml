@@ -70,8 +70,10 @@
   <properties>
     <!-- dependency versions; when referenced multiple times -->
     <nexus.version>${project.version}</nexus.version>
-    <nexus.configuration.version>2.5.0</nexus.configuration.version> <!-- FIXME: WTF is this for, part of the http proxy changes -->
     <plexus-security.version>3.3-SNAPSHOT</plexus-security.version>
+
+    <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
+    <nexus.configuration.version>2.5.0</nexus.configuration.version>
 
     <!-- See 'idea' profile -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
