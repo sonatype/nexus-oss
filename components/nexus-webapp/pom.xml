@@ -148,7 +148,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
@@ -193,7 +193,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.archetype</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>

@@ -17,8 +17,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.repository.site</groupId>
-    <artifactId>nexus-site-repository</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>site</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
@@ -33,7 +33,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.repository.site</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-site-repository-client</artifactId>
     </dependency>
 

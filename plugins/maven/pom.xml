@@ -24,8 +24,7 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins.archetype</groupId>
-  <artifactId>nexus-archetype</artifactId>
+  <artifactId>maven</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -64,7 +63,7 @@
       <!-- INTERNAL -->
 
       <dependency>
-        <groupId>org.sonatype.nexus.plugins.archetype</groupId>
+        <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-archetype-common</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -73,6 +72,7 @@
   </dependencyManagement>
 
   <modules>
+    <module>nexus-maven-bridge-plugin</module>
     <module>nexus-archetype-common</module>
     <module>nexus-archetype-common-cli</module>
     <module>nexus-archetype-plugin</module>

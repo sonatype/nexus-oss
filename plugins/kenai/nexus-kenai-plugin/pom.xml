@@ -19,15 +19,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins.kenai</groupId>
-    <artifactId>nexus-kenai</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>kenai</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-kenai-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
+
+  <!--
+  FIXME: Sort out dependency versions declared here
+  -->
 
   <properties>
     <pluginName>Nexus Kenai Realm Plugin</pluginName>
@@ -51,36 +54,36 @@
     </dependency>
 
     <!-- These below are transitive deps but are in core already -->
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.2.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpmime</artifactId>
-      <version>4.2.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>4.2.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-      <version>1.2.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>1.7.2</version>
-      <scope>provided</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.httpcomponents</groupId>-->
+      <!--<artifactId>httpclient</artifactId>-->
+      <!--<version>4.2.2</version>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.apache.httpcomponents</groupId>-->
+      <!--<artifactId>httpmime</artifactId>-->
+      <!--<version>4.2.2</version>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.apache.httpcomponents</groupId>-->
+      <!--<artifactId>httpcore</artifactId>-->
+      <!--<version>4.2.2</version>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.apache.shiro</groupId>-->
+      <!--<artifactId>shiro-core</artifactId>-->
+      <!--<version>1.2.1</version>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>jcl-over-slf4j</artifactId>-->
+      <!--<version>1.7.2</version>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
 
     <!-- Tests -->
     <dependency>
@@ -88,13 +91,15 @@
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <version>${security.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.security.realms</groupId>-->
+      <!--<artifactId>security-xml-realm</artifactId>-->
+      <!--<version>${security.version}</version>-->
+      <!--<classifier>tests</classifier>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-jetty-testsuite</artifactId>
@@ -107,7 +112,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -115,16 +119,18 @@
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <sharedDependencies>org.sonatype.security.realms:security-kenai-realm</sharedDependencies>
-          </sharedDependencies>
-        </configuration>
+        <!--<configuration>-->
+          <!--<sharedDependencies>-->
+            <!--<sharedDependencies>org.sonatype.security.realms:security-kenai-realm</sharedDependencies>-->
+          <!--</sharedDependencies>-->
+        <!--</configuration>-->
       </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
       </plugin>
+
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -139,15 +145,13 @@
             </goals>
             <configuration>
               <version>1.0.0</version>
+              <packageWithVersion>false</packageWithVersion>
               <models>
                 <model>src/main/mdo/kenai-realm-config.xml</model>
               </models>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
       </plugin>
     </plugins>
   </build>

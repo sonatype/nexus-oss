@@ -53,8 +53,7 @@
         <module>lvo</module>
         <module>plugin-console</module>
         <module>rrb</module>
-        <module>archetype</module>
-        <module>maven-bridge</module>
+        <module>maven</module>
         <module>ui-extjs3</module>
         <module>capabilities</module>
         <module>obr</module>

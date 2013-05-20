@@ -23,10 +23,15 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.indexer-lucene</groupId>
-  <artifactId>nexus-indexer-lucene</artifactId>
+  <artifactId>indexer</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
+
+  <modules>
+    <module>nexus-indexer-lucene-model</module>
+    <module>nexus-indexer-lucene-client</module>
+    <module>nexus-indexer-lucene-plugin</module>
+  </modules>
 
   <dependencyManagement>
     <dependencies>
@@ -34,18 +39,12 @@
       <!-- INTERNAL -->
 
       <dependency>
-        <groupId>org.sonatype.nexus.indexer-lucene</groupId>
+        <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-model</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
     </dependencies>
   </dependencyManagement>
-
-  <modules>
-    <module>nexus-indexer-lucene-model</module>
-    <module>nexus-indexer-lucene-client</module>
-    <module>nexus-indexer-lucene-plugin</module>
-  </modules>
 
 </project>

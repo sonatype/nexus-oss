@@ -18,12 +18,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.capabilities</groupId>
-    <artifactId>nexus-capabilities</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>capabilities</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-capabilities-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
@@ -38,7 +37,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus.capabilities</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-model</artifactId>
     </dependency>
 
