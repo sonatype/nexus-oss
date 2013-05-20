@@ -12,20 +12,24 @@
  */
 package org.sonatype.security.configuration;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import junit.framework.Assert;
-
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
 public class SecurityConfigurationManagerTest
     extends InjectedTestCase
 {
+    // FIXME: Upgrade to junit4
+
     private File PLEXUS_HOME = new File( "./target/plexus-home/" );
 
     private File APP_CONF = new File( PLEXUS_HOME, "conf" );
@@ -53,6 +57,7 @@ public class SecurityConfigurationManagerTest
         super.setUp();
     }
 
+    //@Test
     public void testLoadEmptyDefaults()
         throws Exception
     {
@@ -67,11 +72,11 @@ public class SecurityConfigurationManagerTest
         Assert.assertEquals( true, config.isEnabled() );
 
         List<String> realms = config.getRealms();
-        Assert.assertEquals( 2, realms.size() );
-        Assert.assertEquals( "MyRealmHint1", realms.get( 0 ) );
-        Assert.assertEquals( "MyRealmHint2", realms.get( 1 ) );
+        assertThat(realms, containsInAnyOrder(
+            "MockRealmA", "MockRealmB", "ExceptionThrowingMockRealm", "FakeRealm1", "FakeRealm2"));
     }
 
+    //@Test
     public void testWrite()
         throws Exception
     {
@@ -82,8 +87,7 @@ public class SecurityConfigurationManagerTest
         config.setAnonymousPassword( "new-pass" );
         config.setAnonymousUsername( "new-user" );
 
-        List<String> realms = new ArrayList<String>( config.getRealms() );
-        realms.remove( 1 );
+        List<String> realms = Collections.singletonList("FakeRealm1");
         config.setRealms( realms );
 
         config.save();
@@ -98,7 +102,6 @@ public class SecurityConfigurationManagerTest
 
         realms = config.getRealms();
         Assert.assertEquals( 1, realms.size() );
-        Assert.assertEquals( "MyRealmHint1", realms.get( 0 ) );
-
+        Assert.assertEquals( "FakeRealm1", realms.get( 0 ) );
     }
 }

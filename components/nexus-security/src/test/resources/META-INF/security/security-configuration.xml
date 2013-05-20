@@ -1,4 +1,3 @@
-
 <security-configuration>
   <version>2.0.4</version>
   <enabled>true</enabled>
@@ -14,40 +13,3 @@
   </realms>
   <hashIterations>1024</hashIterations>
 </security-configuration>
-
-<!-- this is the version from security-confiuguration, above is security-system, sort out which one is right
-<security-configuration>
-  <version>2.0.4</version>
-  <enabled>true</enabled>
-  <anonymousAccessEnabled>false</anonymousAccessEnabled>
-  <anonymousUsername>anonymous-user</anonymousUsername>
-  <anonymousPassword>anonymous-pass</anonymousPassword>
-  <realms>
-    <realm>MyRealmHint1</realm>
-    <realm>MyRealmHint2</realm>
-  </realms>
-  <hashIterations>1024</hashIterations>
-</security-configuration>
-
-FIXME: A few tests rely on ^^^ but seems to only be on expected # of things
-
-
-this one is from security-web
-
-<security-configuration>
-  <version>2.0.4</version>
-  <enabled>true</enabled>
-  <anonymousAccessEnabled>false</anonymousAccessEnabled>
-  <anonymousUsername>anonymous-user</anonymousUsername>
-  <anonymousPassword>anonymous-pass</anonymousPassword>
-  <realms>
-    <realm>MockRealmA</realm>
-    <realm>ExceptionThrowingMockRealm</realm>
-    <realm>MockRealmB</realm>
-    <realm>FakeRealm1</realm>
-    <realm>FakeRealm2</realm>
-  </realms>
-  <hashIterations>1024</hashIterations>
-</security-configuration>
-
--->
