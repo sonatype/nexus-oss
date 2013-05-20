@@ -56,8 +56,8 @@
     </dependency>
 
     <!--
-    FIXME: These 'tests' classifier artifacts mess up mavens dependency resolution slightly and
-    FIXME: causes IDEA to build incorrect module dependency defs
+    FIXME: These 'tests' classifier artifacts mess up mavens dependency resolution and causes IDEA to build incorrect module dependency defs
+    HACK: exclude all transitive deps using * globs
     -->
 
     <dependency>
@@ -65,10 +65,10 @@
       <artifactId>nexus-core</artifactId>
       <classifier>tests</classifier>
       <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-oss-edition</artifactId>
-        </exclusion>
+        <!--<exclusion>-->
+          <!--<groupId>org.sonatype.nexus</groupId>-->
+          <!--<artifactId>nexus-oss-edition</artifactId>-->
+        <!--</exclusion>-->
         <exclusion>
           <groupId>*</groupId>
           <artifactId>*</artifactId>
