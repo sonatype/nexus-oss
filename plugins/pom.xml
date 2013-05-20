@@ -17,6 +17,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!--
+  FIXME: Merge plugin-parent into this module, avoid 2 pom roots in the same tree.
+  -->
+
+  <!--
   All Nexus OSS plugins extend from the nexus-plugin-parent POM configuration.
   -->
   <parent>
