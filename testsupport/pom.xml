@@ -71,4 +71,16 @@
     </dependencies>
   </dependencyManagement>
 
+  <build>
+    <plugins>
+      <!--
+      TODO: Move to specific modules which use plexus, we eventually want to remove the need for this
+      -->
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
