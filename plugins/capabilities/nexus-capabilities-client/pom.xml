@@ -32,15 +32,6 @@
       <artifactId>nexus-client-core</artifactId>
     </dependency>
 
-    <!--
-    TODO: Consider making this a non-provided dep on nexus-client-core, so we don't have to keep defining this everywhere.
-    -->
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <optional>true</optional>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-model</artifactId>

@@ -112,19 +112,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.5.1</version>
-        <configuration>
-          <instrumentation>
-            <includes>
-              <include>org/sonatype/nexus/obr/**/*.class</include>
-            </includes>
-          </instrumentation>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>

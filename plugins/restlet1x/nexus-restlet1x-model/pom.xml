@@ -58,11 +58,13 @@
             </goals>
             <configuration>
               <version>1.0.0</version>
+              <packageWithVersion>false</packageWithVersion>
               <models>
                 <model>src/main/mdo/vos.xml</model>
               </models>
             </configuration>
           </execution>
+
           <execution>
             <id>vos-security.xml</id>
             <goals>
@@ -70,15 +72,13 @@
             </goals>
             <configuration>
               <version>1.0.0</version>
+              <packageWithVersion>false</packageWithVersion>
               <models>
                 <model>src/main/mdo/vos-security.xml</model>
               </models>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
       </plugin>
     </plugins>
   </build>

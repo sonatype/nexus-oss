@@ -47,6 +47,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-crypto-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
@@ -73,13 +80,6 @@
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 

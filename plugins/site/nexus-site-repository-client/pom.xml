@@ -30,12 +30,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-client-core</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <optional>true</optional>
-    </dependency>
   </dependencies>
 
 </project>

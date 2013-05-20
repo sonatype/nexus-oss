@@ -23,7 +23,6 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-indexer-lucene-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
@@ -110,6 +109,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.codehaus.enunciate</groupId>
       <artifactId>enunciate-core</artifactId>
       <scope>provided</scope>
@@ -127,13 +133,6 @@
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 

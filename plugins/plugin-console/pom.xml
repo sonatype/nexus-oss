@@ -47,6 +47,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.codehaus.enunciate</groupId>
       <artifactId>enunciate-core</artifactId>
       <scope>provided</scope>
@@ -56,13 +63,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -89,15 +89,13 @@
             </goals>
             <configuration>
               <version>1.0.0</version>
+              <packageWithVersion>false</packageWithVersion>
               <models>
                 <model>src/main/mdo/model.xml</model>
               </models>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
       </plugin>
 
       <plugin>

@@ -33,22 +33,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!--<dependency>-->
-    <!--<groupId>org.sonatype.sisu</groupId>-->
-    <!--<artifactId>sisu-inject-plexus</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>org.codehaus.plexus</groupId>-->
-    <!--<artifactId>plexus-component-annotations</artifactId>-->
-    <!--<optional>true</optional>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>org.codehaus.plexus</groupId>-->
-    <!--<artifactId>plexus-utils</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>org.restlet</groupId>
       <artifactId>org.restlet</artifactId>
@@ -84,17 +68,6 @@
       <artifactId>com.noelios.restlet.ext.servlet</artifactId>
     </dependency>
 
-    <!--<dependency>-->
-    <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
-    <!--<artifactId>javax.servlet</artifactId>-->
-    <!--<scope>provided</scope>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>org.codehaus.plexus</groupId>-->
-    <!--<artifactId>plexus-interpolation</artifactId>-->
-    <!--</dependency>-->
-
     <!--
     For org.restlet.ext.fileupload, since it depends on commons-fileupload, and that depends on commons-io, but for
     some reason, this last dependency is declared as optional
@@ -104,52 +77,16 @@
       <artifactId>commons-fileupload</artifactId>
     </dependency>
 
-    <!--<dependency>-->
-    <!--<groupId>commons-io</groupId>-->
-    <!--<artifactId>commons-io</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>com.thoughtworks.xstream</groupId>-->
-    <!--<artifactId>xstream</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>org.json</artifactId>
     </dependency>
-
-    <!--<dependency>-->
-    <!--<groupId>org.sonatype.sisu</groupId>-->
-    <!--<artifactId>sisu-velocity</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>org.apache.velocity</groupId>-->
-    <!--<artifactId>velocity</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>org.slf4j</groupId>-->
-    <!--<artifactId>slf4j-api</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>org.slf4j</groupId>-->
-    <!--<artifactId>jcl-over-slf4j</artifactId>-->
-    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!--<dependency>-->
-    <!--<groupId>org.sonatype.sisu.litmus</groupId>-->
-    <!--<artifactId>litmus-testsupport</artifactId>-->
-    <!--<scope>test</scope>-->
-    <!--</dependency>-->
 
     <dependency>
       <groupId>com.noelios.restlet</groupId>

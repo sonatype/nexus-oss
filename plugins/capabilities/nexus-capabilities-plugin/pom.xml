@@ -76,7 +76,7 @@
         <configuration>
           <sharedDependencies>
             <sharedDependency>org.sonatype.sisu.goodies:goodies-eventbus</sharedDependency>
-            <sharedDependencies>org.sonatype.nexus.capabilities:nexus-capabilities-model</sharedDependencies>
+            <sharedDependency>org.sonatype.nexus.plugins:nexus-capabilities-model</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>

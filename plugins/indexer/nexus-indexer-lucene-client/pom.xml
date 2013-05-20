@@ -36,13 +36,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-model</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <optional>true</optional>
-      <version>1</version>
-    </dependency>
   </dependencies>
 
 </project>
