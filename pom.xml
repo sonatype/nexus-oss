@@ -432,42 +432,21 @@
           <version>3.0</version>
         </plugin>
 
-        <!--
-        NOTE: This is only used by nexus-webapp, plugins use config from plugin-parent; move this configuration
-        -->
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.0.0</version>
           <configuration>
-            <!-- yuicompressor warns when code is not in a shape that's optimized for minifying. ATM this only pollutes the log (~9400 warnings) -->
+            <!--
+            yuicompressor warns when code is not in a shape that's optimized for minifying.
+            ATM this only pollutes the log (~9400 warnings)
+            -->
             <jswarn>false</jswarn>
             <nominify>${maven.yuicompressor.nocompress}</nominify>
             <nomunge>${maven.yuicompressor.nomunge}</nomunge>
             <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
             <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
           </configuration>
-          <executions>
-            <execution>
-              <id>js</id>
-              <goals>
-                <goal>aggregate</goal>
-              </goals>
-              <configuration>
-                <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
-              </configuration>
-            </execution>
-            <execution>
-              <id>css</id>
-              <goals>
-                <goal>aggregate-css</goal>
-              </goals>
-              <configuration>
-                <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
-                <required>false</required>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
 
         <!--

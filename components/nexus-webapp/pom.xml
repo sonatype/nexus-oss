@@ -205,6 +205,32 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>js</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
+            </configuration>
+          </execution>
+          <execution>
+            <id>css</id>
+            <goals>
+              <goal>aggregate-css</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
+              <required>false</required>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -356,32 +382,6 @@
           </webResources>
         </configuration>
       </plugin>
-
-      <!--
-      <plugin>
-        <groupId>com.github.mcheely</groupId>
-        <artifactId>requirejs-maven-plugin</artifactId>
-        <version>1.0.4</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>optimize</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <configFile>
-            ${basedir}/src/main/config/buildconfig.js
-          </configFile>
-          <filterConfig>
-            true
-          </filterConfig>
-          <skip>
-            false
-          </skip>
-        </configuration>
-      </plugin>
-      -->
     </plugins>
   </build>
 
