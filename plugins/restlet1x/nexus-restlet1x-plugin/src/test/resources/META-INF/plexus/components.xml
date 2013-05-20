@@ -16,11 +16,9 @@
 <component-set>
   <components>
     <component>
-      <role>org.sonatype.plexus.rest.ReferenceFactory
-      </role>
+      <role>org.sonatype.plexus.rest.ReferenceFactory</role>
       <role-hint>default</role-hint>
-      <implementation>org.sonatype.plexus.rest.DefaultReferenceFactory
-      </implementation>
+      <implementation>org.sonatype.plexus.rest.DefaultReferenceFactory</implementation>
       <isolated-realm>false</isolated-realm>
     </component>
   </components>
