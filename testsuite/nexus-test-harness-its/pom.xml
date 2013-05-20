@@ -386,10 +386,10 @@
                   <classifier>bundle</classifier>
                   <type>zip</type>
                 </plugin>
-                <jar>
-                  <groupId>org.sonatype.security.realms</groupId>
-                  <artifactId>security-url-realm</artifactId>
-                </jar>
+                <!--<jar>-->
+                  <!--<groupId>org.sonatype.security.realms</groupId>-->
+                  <!--<artifactId>security-url-realm</artifactId>-->
+                <!--</jar>-->
               </nexusPluginsArtifacts>
             </configuration>
           </plugin>

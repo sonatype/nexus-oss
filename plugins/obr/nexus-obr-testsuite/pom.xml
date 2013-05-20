@@ -38,7 +38,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.obr</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-obr-client</artifactId>
     </dependency>
 

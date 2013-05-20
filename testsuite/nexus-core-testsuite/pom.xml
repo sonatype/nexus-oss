@@ -36,6 +36,7 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-support</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
       <artifactId>server-provider</artifactId>
