@@ -34,63 +34,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-bean</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-guice</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>base-configuration</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpmime</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
       <scope>test</scope>
@@ -103,7 +46,7 @@
     </dependency>
 
     <!--
-    FIXME: Sort out, if needed, the move version mgmt to buildsupport/testing?
+    FIXME: Sort this out; used by ResourceMergingManagerThreadedTest
     -->
     <dependency>
       <groupId>edu.umd.cs.mtc</groupId>
@@ -170,23 +113,6 @@
               <packageWithVersion>true</packageWithVersion>
               <models>
                 <model>src/main/mdo/security-old.xml</model>
-              </models>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>url-realm-config.xml</id>
-            <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-              <goal>xsd</goal>
-            </goals>
-            <configuration>
-              <version>1.0.0</version>
-              <packageWithVersion>false</packageWithVersion>
-              <models>
-                <model>src/main/mdo/url-realm-config.xml</model>
               </models>
             </configuration>
           </execution>
