@@ -28,6 +28,5 @@
   <modules>
     <module>security-xml-realm</module>
     <module>security-url-realm</module>
-    <module>security-public-key-realm</module>
   </modules>
 </project>
