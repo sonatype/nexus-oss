@@ -87,6 +87,9 @@
   </fileSets>
 
   <dependencySets>
+    <!--
+    FIXME: Rename nexus/ -> webapp/
+    -->
     <dependencySet>
       <outputDirectory>${project.build.finalName}/nexus</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>
