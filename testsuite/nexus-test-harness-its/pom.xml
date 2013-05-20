@@ -61,8 +61,7 @@
       <artifactId>nexus-oss-edition</artifactId>
     </dependency>
 
-
-    <!-- NEXUS-2862 (url realm) -->
+    <!-- NEXUS-2862 (url realm?) -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-security-realms</artifactId>
@@ -98,7 +97,7 @@
 
     <!-- NEXUS-3947 ArchetypeCatalog -->
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.archetype</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
