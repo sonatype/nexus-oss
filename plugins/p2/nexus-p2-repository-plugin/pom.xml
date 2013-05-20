@@ -58,26 +58,17 @@
     <dependency>
       <groupId>org.eclipse.tycho</groupId>
       <artifactId>tycho-metadata-model</artifactId>
-      <version>0.12.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.p2.bridge</groupId>
       <artifactId>org.sonatype.p2.bridge.api</artifactId>
-      <version>1.1.5</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
 

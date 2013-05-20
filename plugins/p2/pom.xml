@@ -27,9 +27,85 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
+  <properties>
+    <p2-bridge.version>1.1.6</p2-bridge.version>
+  </properties>
+
   <modules>
     <module>nexus-p2-bridge-plugin</module>
     <module>nexus-p2-repository-plugin</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>org.sonatype.p2.bridge.api</artifactId>
+        <version>${p2-bridge.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>org.sonatype.p2.bridge.model</artifactId>
+        <version>${p2-bridge.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>org.sonatype.p2.bridge.impl</artifactId>
+        <version>${p2-bridge.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>eclipse-bridge</artifactId>
+        <version>${p2-bridge.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>p2-runtime</artifactId>
+        <version>${p2-bridge.version}</version>
+        <type>zip</type>
+      </dependency>
+
+      <!--
+      FIXME: Should these be the same version?
+      -->
+      <dependency>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>org.eclipse.tycho.noopsecurity</artifactId>
+        <version>0.13.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-metadata-model</artifactId>
+        <version>0.12.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- INTERNAL -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-p2-bridge-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-p2-repository-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 </project>
