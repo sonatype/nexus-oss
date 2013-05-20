@@ -22,6 +22,10 @@
     <version>3.3-SNAPSHOT</version>
   </parent>
 
+  <!--
+  NOTE: Used by nexus-test-harness-its, merge into xml realm?
+  -->
+
   <artifactId>security-url-realm</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 

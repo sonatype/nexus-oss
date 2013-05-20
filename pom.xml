@@ -105,18 +105,6 @@
 
       <!-- INTERNAL -->
 
-      <!--<dependency>-->
-        <!--<groupId>org.sonatype.security</groupId>-->
-        <!--<artifactId>security-system</artifactId>-->
-        <!--<version>${plexus-security.version}</version>-->
-        <!--<exclusions>-->
-          <!--<exclusion>-->
-            <!--<groupId>org.sonatype.spice</groupId>-->
-            <!--<artifactId>plexus-ehcache</artifactId>-->
-          <!--</exclusion>-->
-        <!--</exclusions>-->
-      <!--</dependency>-->
-
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
@@ -129,18 +117,6 @@
         <classifier>tests</classifier>
         <version>${plexus-security.version}</version>
       </dependency>
-
-      <!--<dependency>-->
-        <!--<groupId>org.sonatype.security</groupId>-->
-        <!--<artifactId>security-web</artifactId>-->
-        <!--<version>${plexus-security.version}</version>-->
-      <!--</dependency>-->
-
-      <!--<dependency>-->
-        <!--<groupId>org.sonatype.security</groupId>-->
-        <!--<artifactId>security-configuration</artifactId>-->
-        <!--<version>${plexus-security.version}</version>-->
-      <!--</dependency>-->
 
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
@@ -201,6 +177,12 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-security</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-security-realms</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 

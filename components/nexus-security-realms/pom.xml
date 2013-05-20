@@ -1,28 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2007-2013 Sonatype, Inc. All rights reserved.
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
-    This program is licensed to you under the Apache License Version 2.0,
-    and you may not use this file except in compliance with the Apache License Version 2.0.
-    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
 
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the Apache License Version 2.0 is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.security</groupId>
-    <artifactId>security-parent</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>components</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>security-model</artifactId>
+  <artifactId>nexus-security-realms</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
@@ -49,6 +51,12 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>base-configuration</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -80,6 +88,7 @@
               </packagedVersions>
             </configuration>
           </execution>
+
           <execution>
             <id>security-old.xml</id>
             <goals>
@@ -93,7 +102,6 @@
                 <model>src/main/mdo/security-old.xml</model>
               </models>
               <packageWithVersion>true</packageWithVersion>
-              <!-- <packagedVersions> <packagedVersion>1.0.0</packagedVersion> </packagedVersions> -->
             </configuration>
           </execution>
         </executions>
@@ -103,10 +111,8 @@
       </plugin>
 
       <plugin>
-        <!-- TODO remove when upgrade generator is merged into modello -->
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>modello-plugin-upgrade</artifactId>
-        <version>1.0</version>
         <executions>
           <execution>
             <id>security-upgrade</id>
@@ -123,12 +129,10 @@
                 <packagedVersion>2.0.3</packagedVersion>
                 <packagedVersion>2.0.4</packagedVersion>
               </packagedVersions>
+              <packageWithVersion>false</packageWithVersion>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
       </plugin>
 
     </plugins>

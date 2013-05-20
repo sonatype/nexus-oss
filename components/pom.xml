@@ -35,6 +35,7 @@
     <module>nexus-ehcache</module>
     <module>nexus-bootstrap</module>
     <module>nexus-security</module>
+    <module>nexus-security-realms</module>
     <module>nexus-plugin-api</module>
     <module>nexus-plugin-test-api</module>
     <module>nexus-core</module>

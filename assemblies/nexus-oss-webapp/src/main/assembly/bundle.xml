@@ -124,6 +124,7 @@
         <include>org.sonatype.nexus:nexus-logging-extras-appender</include>
         <include>org.sonatype.nexus:nexus-appcontext</include>
         <include>org.sonatype.nexus:nexus-jetty8</include>
+        <include>org.codehaus.plexus:plexus-interpolation</include>
         <include>org.eclipse.jetty.orbit:javax.servlet</include>
         <include>org.eclipse.jetty:*</include>
         <include>org.slf4j:*</include>

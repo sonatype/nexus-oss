@@ -38,17 +38,17 @@
 
       <!-- INTERNAL -->
 
-      <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-model</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.sonatype.security</groupId>-->
+        <!--<artifactId>security-model</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-model-xml</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.sonatype.security</groupId>-->
+        <!--<artifactId>security-model-xml</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!--<dependency>-->
         <!--<groupId>org.sonatype.security</groupId>-->
@@ -85,8 +85,8 @@
   </dependencyManagement>
 
   <modules>
-    <module>security-model</module>
-    <module>security-model-xml</module>
+    <!--<module>security-model</module>-->
+    <!--<module>security-model-xml</module>-->
     <module>security-realms</module>
     <!--<module>security-system</module>-->
     <!--<module>security-configuration</module>-->
