@@ -115,6 +115,9 @@
 
   <build>
     <plugins>
+      <!--
+      FIXME: Get rid of test-jar, these artifacts cause problems with transitive dependencies.
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
