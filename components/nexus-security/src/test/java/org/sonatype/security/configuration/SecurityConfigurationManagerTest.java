@@ -16,6 +16,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import java.io.File;
 import java.util.Collections;
@@ -28,9 +29,11 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 public class SecurityConfigurationManagerTest
     extends InjectedTestCase
 {
+    private final TestUtil util = new TestUtil(this);
+
     // FIXME: Upgrade to junit4
 
-    private File PLEXUS_HOME = new File( "./target/plexus-home/" );
+    private File PLEXUS_HOME = util.createTempDir("plexus-home");
 
     private File APP_CONF = new File( PLEXUS_HOME, "conf" );
 
