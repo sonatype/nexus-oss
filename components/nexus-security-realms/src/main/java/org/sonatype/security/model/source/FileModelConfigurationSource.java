@@ -12,11 +12,14 @@
  */
 package org.sonatype.security.model.source;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
@@ -150,7 +153,7 @@ public class FileModelConfigurationSource
     public InputStream getConfigurationAsStream()
         throws IOException
     {
-        return new FileInputStream( getConfigurationFile() );
+        return new BufferedInputStream( new FileInputStream( getConfigurationFile() ) );
     }
 
     @Override
@@ -194,20 +197,20 @@ public class FileModelConfigurationSource
     private void loadConfiguration( File file )
         throws IOException
     {
-        getLogger().info( "Loading Security configuration from " + file.getAbsolutePath() );
+        getLogger().info( "Loading security configuration from: " + file.getAbsolutePath() );
 
-        FileInputStream fis = null;
+        InputStream input = null;
         try
         {
-            fis = new FileInputStream( file );
+            input = new BufferedInputStream( new FileInputStream( file ) );
 
-            loadConfiguration( fis );
+            loadConfiguration( input );
         }
         finally
         {
-            if ( fis != null )
+            if ( input != null )
             {
-                fis.close();
+                input.close();
             }
         }
     }
@@ -221,7 +224,7 @@ public class FileModelConfigurationSource
     private void saveConfiguration( File file )
         throws IOException
     {
-        FileOutputStream fos = null;
+        OutputStream output = null;
 
         File backupFile = new File( file.getParentFile(), file.getName() + ".old" );
 
@@ -233,9 +236,7 @@ public class FileModelConfigurationSource
             {
                 String message =
                     "\r\n******************************************************************************\r\n"
-                        + "* Could not create configuration file [ "
-                        + file.toString()
-                        + "]!!!! *\r\n"
+                        + "* Could not create configuration file [ " + file.toString() + "]!!!! *\r\n"
                         + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
                         + "******************************************************************************";
 
@@ -248,15 +249,17 @@ public class FileModelConfigurationSource
                 FileUtils.copyFile( file, backupFile );
             }
 
-            fos = new FileOutputStream( file );
+            output = new BufferedOutputStream( new FileOutputStream( file ) );
 
-            saveConfiguration( fos, getConfiguration() );
+            getLogger().info( "Saving security configuration to: " + file.getAbsolutePath() );
 
-            fos.flush();
+            saveConfiguration( output, getConfiguration() );
+
+            output.flush();
         }
         finally
         {
-            IOUtil.close( fos );
+            IOUtil.close( output );
         }
 
         // if all went well, delete the bak file
