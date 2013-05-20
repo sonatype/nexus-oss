@@ -38,10 +38,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
     </dependency>
+
      <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras</artifactId>
@@ -51,45 +53,11 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
     </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
-      <!--<artifactId>nexus-restlet1x-model</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
-      <!--<artifactId>nexus-restlet1x-plugin</artifactId>-->
-      <!--<scope>provided</scope>-->
-      <!--<exclusions>-->
-        <!--<exclusion>-->
-          <!--<groupId>org.sonatype.nexus</groupId>-->
-          <!--<artifactId>nexus-jetty8</artifactId>-->
-        <!--</exclusion>-->
-      <!--</exclusions>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
-      <!--<artifactId>nexus-indexer-lucene-plugin</artifactId>-->
-      <!--<scope>provided</scope>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus</groupId>-->
-      <!--<artifactId>nexus-rest-client-java</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--<exclusions>-->
-        <!--<exclusion>-->
-          <!--<groupId>junit</groupId>-->
-          <!--<artifactId>junit-dep</artifactId>-->
-        <!--</exclusion>-->
-      <!--</exclusions>-->
-    <!--</dependency>-->
 
     <!-- MailUtil et al -->
     <dependency>
@@ -173,6 +141,7 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
