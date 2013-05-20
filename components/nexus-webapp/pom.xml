@@ -26,11 +26,6 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>war</packaging>
 
-  <properties>
-    <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
-    <maven.yuicompressor.failOnWarning>true</maven.yuicompressor.failOnWarning>
-  </properties>
-
   <dependencies>
     <!--
     Prevent Servlet API from being included in the WAR.
@@ -204,32 +199,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>js</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
-            </configuration>
-          </execution>
-          <execution>
-            <id>css</id>
-            <goals>
-              <goal>aggregate-css</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
-              <required>false</required>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

@@ -43,6 +43,9 @@
       <artifactId>plexus-archiver</artifactId>
     </dependency>
 
+    <!--
+    FIXME: Clean up these deps, newer versions available, avoid exclusions if they are not really needed
+    -->
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-common-artifact-filters</artifactId>

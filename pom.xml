@@ -81,12 +81,6 @@
     <tattletale.failOnWarn>false</tattletale.failOnWarn>
     <tattletale.failOnError>true</tattletale.failOnError>
 
-    <!-- yuicompressor defaults; non-optimized for debug -->
-    <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
-    <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
-    <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
-    <maven.yuicompressor.linebreakpos>0<!-- preserve linebreaks --></maven.yuicompressor.linebreakpos>
-
     <!-- logging configuration used in logback config files to control test logging -->
     <test.log.level>INFO</test.log.level>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
@@ -98,6 +92,16 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
   </properties>
+
+  <modules>
+    <module>buildsupport</module>
+    <module>testsupport</module>
+    <module>components</module>
+    <module>plugin-parent</module>
+    <module>plugins</module>
+    <module>assemblies</module>
+    <module>testsuite</module>
+  </modules>
 
   <dependencyManagement>
     <dependencies>
@@ -291,16 +295,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <modules>
-    <module>buildsupport</module>
-    <module>testsupport</module>
-    <module>components</module>
-    <module>plugin-parent</module>
-    <module>plugins</module>
-    <module>assemblies</module>
-    <module>testsuite</module>
-  </modules>
-
   <build>
     <pluginManagement>
       <plugins>
@@ -430,23 +424,6 @@
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
           <version>3.0</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <!--
-            yuicompressor warns when code is not in a shape that's optimized for minifying.
-            ATM this only pollutes the log (~9400 warnings)
-            -->
-            <jswarn>false</jswarn>
-            <nominify>${maven.yuicompressor.nocompress}</nominify>
-            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
-            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
-            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
-          </configuration>
         </plugin>
 
         <!--
@@ -761,20 +738,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-
-    <profile>
-      <id>optimize-js</id>
-      <properties>
-        <!--
-        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
-        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
-        -->
-        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
-        <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
-        <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
-        <maven.yuicompressor.linebreakpos>-1<!-- do not preserve linebreaks --></maven.yuicompressor.linebreakpos>
-      </properties>
     </profile>
 
     <profile>
