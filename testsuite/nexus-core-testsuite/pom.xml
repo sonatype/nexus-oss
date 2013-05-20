@@ -19,17 +19,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.testsuite</groupId>
+    <groupId>org.sonatype.nexus</groupId>
     <artifactId>testsuite</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-core-testsuite</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-
-  <properties>
-    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -42,25 +38,5 @@
       <artifactId>server-provider</artifactId>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>it</id>
-      <activation>
-        <property>
-          <name>it</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>

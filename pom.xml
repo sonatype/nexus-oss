@@ -90,6 +90,7 @@
 
     <!-- logging configuration used in logback config files to control test logging -->
     <test.log.level>INFO</test.log.level>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
     <it.test.log.level>INFO</it.test.log.level>
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
