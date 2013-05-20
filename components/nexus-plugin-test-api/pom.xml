@@ -68,8 +68,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-security-realms</artifactId>
       <classifier>tests</classifier>
     </dependency>
   </dependencies>

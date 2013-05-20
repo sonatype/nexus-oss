@@ -62,10 +62,10 @@
     </dependency>
 
 
-    <!-- NEXUS-2862 -->
+    <!-- NEXUS-2862 (url realm) -->
     <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-url-realm</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-security-realms</artifactId>
     </dependency>
 
     <!-- NEXUS-2490 -->

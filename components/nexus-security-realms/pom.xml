@@ -49,6 +49,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -66,11 +72,33 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty-testsuite</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -88,6 +116,18 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
@@ -101,6 +141,7 @@
             </goals>
             <configuration>
               <version>2.0.5</version>
+              <packageWithVersion>false</packageWithVersion>
               <models>
                 <model>src/main/mdo/security.xml</model>
               </models>
@@ -123,16 +164,30 @@
             </goals>
             <configuration>
               <version>1.0.0</version>
+              <packageWithVersion>true</packageWithVersion>
               <models>
                 <model>src/main/mdo/security-old.xml</model>
               </models>
-              <packageWithVersion>true</packageWithVersion>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>url-realm-config.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+              <goal>xsd</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <packageWithVersion>false</packageWithVersion>
+              <models>
+                <model>src/main/mdo/url-realm-config.xml</model>
+              </models>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
       </plugin>
 
       <plugin>
