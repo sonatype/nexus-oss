@@ -28,6 +28,12 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
+  <modules>
+    <module>nexus-obr-plugin</module>
+    <module>nexus-obr-client</module>
+    <module>nexus-obr-testsuite</module>
+  </modules>
+
   <dependencyManagement>
     <dependencies>
 
@@ -86,11 +92,5 @@
 
     </dependencies>
   </dependencyManagement>
-
-  <modules>
-    <module>nexus-obr-plugin</module>
-    <module>nexus-obr-client</module>
-    <module>nexus-obr-testsuite</module>
-  </modules>
 
 </project>

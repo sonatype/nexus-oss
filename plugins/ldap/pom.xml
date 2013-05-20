@@ -26,6 +26,12 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
+  <modules>
+    <module>ldap-common</module>
+    <module>nexus-ldap-realm-plugin</module>
+    <module>nexus-ldap-plugin-it</module>
+  </modules>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -82,11 +88,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <modules>
-    <module>ldap-common</module>
-    <module>nexus-ldap-realm-plugin</module>
-    <module>nexus-ldap-plugin-it</module>
-  </modules>
 
 </project>

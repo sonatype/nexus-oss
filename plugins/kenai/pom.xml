@@ -26,12 +26,7 @@
 
   <artifactId>kenai</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-
   <packaging>pom</packaging>
-
-  <properties>
-    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-  </properties>
 
   <modules>
     <module>nexus-kenai-plugin</module>
