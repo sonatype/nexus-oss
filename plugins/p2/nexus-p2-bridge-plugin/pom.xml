@@ -18,8 +18,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins.p2</groupId>
-    <artifactId>nexus-p2</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>p2</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
