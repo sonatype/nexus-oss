@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.site.plugin;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import javax.inject.Inject;
@@ -34,6 +32,8 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The default Site Repository.

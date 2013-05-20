@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.site.plugin;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,6 +23,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named( SiteRepositoryTemplateProvider.PROVIDER_ID )
 @Singleton
