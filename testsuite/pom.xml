@@ -27,12 +27,6 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>nexus-core-testsuite</module>
-    <module>nexus-client-core-testsuite</module>
-    <module>nexus-test-harness-its</module>
-  </modules>
-
   <dependencyManagement>
     <dependencies>
       <!-- IMPORTS -->
@@ -47,16 +41,22 @@
     </dependencies>
   </dependencyManagement>
 
-  <!--<profiles>-->
-  <!--<profile>-->
-  <!--<id>nexus-test-harness-its</id>-->
-  <!--<activation>-->
-  <!--<activeByDefault>true</activeByDefault>-->
-  <!--</activation>-->
-  <!--<modules>-->
-  <!--<module>nexus-test-harness-its</module>-->
-  <!--</modules>-->
-  <!--</profile>-->
-  <!--</profiles>-->
+  <profiles>
+    <profile>
+      <id>testsuite</id>
+
+      <activation>
+        <property>
+          <name>!skip-testsuite</name>
+        </property>
+      </activation>
+
+      <modules>
+        <module>nexus-core-testsuite</module>
+        <module>nexus-client-core-testsuite</module>
+        <module>nexus-test-harness-its</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
