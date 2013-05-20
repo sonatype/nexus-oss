@@ -30,10 +30,6 @@
   <properties>
     <pluginName>Nexus Restlet 1.x Plugin</pluginName>
     <pluginDescription>Provides Restlet 1.x REST API.</pluginDescription>
-
-    <!-- build.timestamp is used for mapping the js/css files to a timestamped URL -->
-    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
-    <build.timestamp>${maven.build.timestamp}</build.timestamp>
   </properties>
 
   <dependencies>
@@ -92,8 +88,8 @@
           <sharedDependencies>
             <!-- Legacy REST API model -->
             <sharedDependency>org.sonatype.nexus.plugins:nexus-restlet1x-model</sharedDependency>
-            <!-- Plexus bridge for Restlet 1.x -->
-            <sharedDependency>org.sonatype.plexus:plexus-restlet-bridge</sharedDependency>
+            <!-- Restlet 1.x bridge -->
+            <sharedDependency>org.sonatype.nexus.plugins:nexus-restlet-bridge</sharedDependency>
             <!-- Restlet API and impl -->
             <sharedDependency>org.restlet:org.restlet</sharedDependency>
             <sharedDependency>com.noelios.restlet:com.noelios.restlet</sharedDependency>
