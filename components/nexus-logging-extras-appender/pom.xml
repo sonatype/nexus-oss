@@ -22,6 +22,10 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
+  <!--
+  FIXME: This can probably get merged into nexus-bootstrap
+  -->
+
   <artifactId>nexus-logging-extras-appender</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
