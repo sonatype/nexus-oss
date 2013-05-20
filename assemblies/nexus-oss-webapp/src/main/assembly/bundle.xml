@@ -95,7 +95,7 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
       <includes>
-        <include>*:nexus-webapp:war</include>
+        <include>org.sonatype.nexus:nexus-webapp:war</include>
       </includes>
       <unpack>true</unpack>
       <unpackOptions>
@@ -114,25 +114,14 @@
 
     <dependencySet>
       <outputDirectory>${project.build.finalName}/lib</outputDirectory>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
       <useStrictFiltering>true</useStrictFiltering>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
-      <includes>
-        <include>org.sonatype.nexus:nexus-bootstrap</include>
-        <include>org.sonatype.nexus:nexus-logging-extras-appender</include>
-        <include>org.sonatype.nexus:nexus-appcontext</include>
-        <include>org.sonatype.nexus:nexus-jetty8</include>
-        <include>org.codehaus.plexus:plexus-interpolation</include>
-        <include>org.eclipse.jetty.orbit:javax.servlet</include>
-        <include>org.eclipse.jetty:*</include>
-        <include>org.slf4j:*</include>
-        <include>ch.qos.logback:*</include>
-        <include>com.yammer.metrics:metrics-core</include>
-        <include>com.yammer.metrics:metrics-jetty</include>
-        <include>com.yammer.metrics:metrics-logback</include>
-      </includes>
+      <excludes>
+        <exclude>org.sonatype.nexus:nexus-webapp</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
 
