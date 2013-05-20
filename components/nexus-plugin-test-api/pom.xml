@@ -55,6 +55,11 @@
       <artifactId>plexus-jetty-testsuite</artifactId>
     </dependency>
 
+    <!--
+    FIXME: These 'tests' classifier artifacts mess up mavens dependency resolution slightly and
+    FIXME: causes IDEA to build incorrect module dependency defs
+    -->
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
@@ -64,6 +69,10 @@
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-oss-edition</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -71,6 +80,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-security-realms</artifactId>
       <classifier>tests</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
