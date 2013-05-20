@@ -28,7 +28,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus.client</groupId>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-client-core</artifactId>
     </dependency>
 

@@ -77,7 +77,7 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.nexus.client</groupId>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-client-core</artifactId>
         <version>${nexus.version}</version>
       </dependency>

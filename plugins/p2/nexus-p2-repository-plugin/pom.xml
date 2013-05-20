@@ -95,7 +95,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.capabilities</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
