@@ -24,6 +24,7 @@
 
   <!--
   FIXME: Remove the need for this module, it does not provide much value.
+  FIXME: Unfortunately some of these classes has leaked into plugins and moving to nexus-webapp causes other problems.
   -->
 
   <artifactId>nexus-web-utils</artifactId>
