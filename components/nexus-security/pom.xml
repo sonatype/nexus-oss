@@ -58,101 +58,95 @@
       <artifactId>plexus-cipher</artifactId>
     </dependency>
 
-
-
-
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+    </dependency>
 
     <dependency>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-core</artifactId>
-        </dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-ehcache</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-ehcache</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-guice</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-guice</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-multibindings</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.sonatype.sisu.inject</groupId>
-          <artifactId>guice-multibindings</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-ehcache</artifactId>
+    </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-ehcache</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-eventbus</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.sonatype.sisu.goodies</groupId>
-          <artifactId>goodies-eventbus</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-inject-plexus</artifactId>
-          <scope>provided</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-servlet</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-web</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>org.sonatype.sisu.inject</groupId>
-          <artifactId>guice-servlet</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>org.eclipse.jetty.orbit</groupId>
-          <artifactId>javax.servlet</artifactId>
-          <scope>provided</scope>
-        </dependency>
-
-        <!--<dependency>-->
-          <!--<groupId>org.sonatype.security</groupId>-->
-          <!--<artifactId>security-system</artifactId>-->
-          <!--<classifier>tests</classifier>-->
-          <!--<scope>test</scope>-->
-        <!--</dependency>-->
-
-        <!--
-        FIXME: Replace easymock usage
-        -->
-        <dependency>
-          <groupId>org.easymock</groupId>
-          <artifactId>easymock</artifactId>
-          <version>3.1</version>
-          <scope>test</scope>
-        </dependency>
-
-
-
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    FIXME: SecurityModuleTest needs this to run correctly, probably some messe dup transitive deps, revisit once deps are cleaned up
+    -->
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    FIXME: Replace easymock usage
+    -->
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>3.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
