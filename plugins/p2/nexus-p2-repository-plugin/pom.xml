@@ -88,6 +88,9 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
+      <!--
+      FIXME: Avoid using project.version
+      -->
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
