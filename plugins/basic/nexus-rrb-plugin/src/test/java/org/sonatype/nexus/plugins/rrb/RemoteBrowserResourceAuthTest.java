@@ -28,7 +28,6 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
@@ -120,7 +119,7 @@ public class RemoteBrowserResourceAuthTest
         request.setRootRef( new Reference( "http://localhost:8081/nexus/" ) );
         request.setOriginalRef( rootRef );
         request.setResourceRef( resourceRef );
-        request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, repoId );
+        request.getAttributes().put( "repositoryId", repoId );
         Form form = new Form();
         form.add( "Accept", "application/json" );
         form.add( "Referer", "http://localhost:8081/nexus/index.html#view-repositories;" + repoId );

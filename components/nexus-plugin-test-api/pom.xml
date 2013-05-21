@@ -33,17 +33,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-web-utils</artifactId>
-      <scope>runtime</scope>
+      <artifactId>nexus-core</artifactId>
     </dependency>
 
-    <!--
-    NOTE: Can *NOT* include this dependency here, as it introduces a bunch of nasty dependency cycles, since it depends on some plugins.
-    -->
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus</groupId>-->
-      <!--<artifactId>nexus-test-harness-launcher</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
@@ -67,8 +63,8 @@
       <classifier>tests</classifier>
       <exclusions>
         <!--<exclusion>-->
-          <!--<groupId>org.sonatype.nexus</groupId>-->
-          <!--<artifactId>nexus-oss-edition</artifactId>-->
+        <!--<groupId>org.sonatype.nexus</groupId>-->
+        <!--<artifactId>nexus-oss-edition</artifactId>-->
         <!--</exclusion>-->
         <exclusion>
           <groupId>*</groupId>
@@ -77,20 +73,5 @@
       </exclusions>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <!--
-      This module serves only to group dependencies for plugins, it has no classes, but we need to generate a jar for it regardless.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <skipIfEmpty>false</skipIfEmpty>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
