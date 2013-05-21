@@ -30,12 +30,14 @@
   <modules>
     <module>nexus-site-repository-plugin</module>
     <module>nexus-site-repository-client</module>
-    <module>nexus-site-repository-testsuite</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
 
+      <!--
+      FIXME: This needs to go away, moved up to parent DM.
+      -->
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-verifier</artifactId>
@@ -50,21 +52,6 @@
             <groupId>junit</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <!-- INTERNAL -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-site-repository-client</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-site-repository-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
-        <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
     </dependencies>

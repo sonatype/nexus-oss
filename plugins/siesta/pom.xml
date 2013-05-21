@@ -28,7 +28,8 @@
 
   <modules>
     <module>nexus-siesta-plugin</module>
-    <module>nexus-siesta-test-plugin</module>
+    <!-- FIXME: Drop this module -->
+    <!--<module>nexus-siesta-test-plugin</module>-->
   </modules>
 
 </project>

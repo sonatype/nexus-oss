@@ -18,8 +18,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>obr</artifactId>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>testsuite</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
@@ -68,12 +68,16 @@
                   <artifactId>apache-maven</artifactId>
                   <classifier>bin</classifier>
                   <type>zip</type>
+                  <!-- FIXME: Move versions up to DM -->
+                  <version>3.0.4</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.felix</groupId>
                   <artifactId>org.apache.felix.main.distribution</artifactId>
                   <classifier>project</classifier>
                   <type>tar.gz</type>
+                  <!-- FIXME: Move versions up to DM -->
+                  <version>3.2.2</version>
                 </artifactItem>
               </artifactItems>
             </configuration>

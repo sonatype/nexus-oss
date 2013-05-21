@@ -38,6 +38,15 @@
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>plugins</artifactId>
+        <type>pom</type>
+        <version>2.5.0-SNAPSHOT</version>
+        <scope>import</scope>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -55,6 +64,11 @@
         <module>nexus-core-testsuite</module>
         <module>nexus-client-core-testsuite</module>
         <module>nexus-test-harness-its</module>
+        <module>nexus-capabilities-testsuite</module>
+        <module>nexus-kenai-testsuite</module>
+        <module>nexus-obr-testsuite</module>
+        <module>nexus-restlet1x-testsuite</module>
+        <module>nexus-site-repository-testsuite</module>
       </modules>
     </profile>
   </profiles>
