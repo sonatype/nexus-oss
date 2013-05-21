@@ -116,6 +116,15 @@
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
+      <!-- ldap -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- lvo -->
 
       <dependency>
@@ -276,23 +285,15 @@
       </activation>
 
       <modules>
-        <module>h2</module>
-        <module>siesta</module>
+        <module>standard</module>
+        <module>optional</module>
         <module>restlet1x</module>
         <module>indexer</module>
-        <module>crypto</module>
         <module>ldap</module>
-        <module>kenai</module>
-        <module>timeline</module>
-        <module>lvo</module>
-        <module>plugin-console</module>
-        <module>rrb</module>
         <module>maven</module>
-        <module>ui-extjs3</module>
         <module>capabilities</module>
         <module>obr</module>
         <module>site</module>
-        <module>unpack</module>
         <module>p2</module>
       </modules>
     </profile>

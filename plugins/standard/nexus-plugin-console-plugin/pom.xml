@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -14,23 +13,23 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>kenai</artifactId>
+    <artifactId>standard</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-kenai-plugin</artifactId>
+  <artifactId>nexus-plugin-console-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <pluginName>Nexus Kenai Realm Plugin</pluginName>
-    <pluginDescription>Adds Kenai realm to Nexus.</pluginDescription>
+    <pluginName>Nexus Plugin Console Plugin</pluginName>
+    <pluginDescription>Adds a UI to view installed plugins.</pluginDescription>
   </properties>
 
   <dependencies>
@@ -41,28 +40,29 @@
     </dependency>
 
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>org.json</artifactId>
-      <version>2.0-NEXUS-3758</version>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
-      <version>1.8</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 
@@ -74,8 +74,8 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
 
       <plugin>
@@ -83,22 +83,24 @@
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>kenai-realm-config.xml</id>
+            <id>model.xml</id>
             <goals>
               <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-              <goal>xsd</goal>
             </goals>
             <configuration>
               <version>1.0.0</version>
               <packageWithVersion>false</packageWithVersion>
               <models>
-                <model>src/main/mdo/kenai-realm-config.xml</model>
+                <model>src/main/mdo/model.xml</model>
               </models>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

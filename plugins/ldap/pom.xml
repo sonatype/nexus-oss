@@ -66,12 +66,14 @@
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-ldap-realm-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
-        <version>2.5.0-SNAPSHOT</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+        <!--<artifactId>nexus-ldap-realm-plugin</artifactId>-->
+        <!--<type>${nexus-plugin.type}</type>-->
+        <!--<version>2.5.0-SNAPSHOT</version>-->
+      <!--</dependency>-->
+
+      <!-- FIXME: Sort out why these are needed, likely for testsuite shit -->
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
