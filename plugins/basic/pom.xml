@@ -23,15 +23,19 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <!-- FIXME: rename to 'other' -->
-
-  <artifactId>optional</artifactId>
+  <artifactId>basic</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-kenai-plugin</module>
-    <module>nexus-unpack-plugin</module>
+    <module>nexus-crypto-plugin</module>
+    <module>nexus-h2-plugin</module>
+    <module>nexus-lvo-plugin</module>
+    <module>nexus-plugin-console-plugin</module>
+    <module>nexus-rrb-plugin</module>
+    <module>nexus-siesta-plugin</module>
+    <module>nexus-timeline-plugin</module>
+    <module>nexus-ui-extjs3-plugin</module>
   </modules>
 
 </project>

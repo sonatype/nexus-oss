@@ -13,46 +13,23 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>plugins</artifactId>
+    <artifactId>osgi</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <!-- TODO: Rename to 'osgi' -->
-
-  <artifactId>obr</artifactId>
+  <artifactId>nexus-obr-client</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>pom</packaging>
 
-  <modules>
-    <module>nexus-obr-plugin</module>
-    <module>nexus-obr-client</module>
-  </modules>
-
-  <dependencyManagement>
-    <dependencies>
-
-      <dependency>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>org.osgi.service.obr</artifactId>
-        <version>1.0.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>org.apache.felix.main.distribution</artifactId>
-        <classifier>project</classifier>
-        <type>tar.gz</type>
-        <version>3.2.2</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-client-core</artifactId>
+    </dependency>
+  </dependencies>
 
 </project>

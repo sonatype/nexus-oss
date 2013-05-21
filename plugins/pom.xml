@@ -285,16 +285,16 @@
       </activation>
 
       <modules>
-        <module>standard</module>
-        <module>optional</module>
-        <module>restlet1x</module>
+        <module>basic</module>
+        <module>capabilities</module>
         <module>indexer</module>
         <module>ldap</module>
         <module>maven</module>
-        <module>capabilities</module>
-        <module>obr</module>
-        <module>site</module>
+        <module>osgi</module>
+        <module>other</module>
         <module>p2</module>
+        <module>restlet1x</module>
+        <module>site</module>
       </modules>
     </profile>
   </profiles>

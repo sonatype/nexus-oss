@@ -13,7 +13,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,21 +24,33 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <!-- FIXME: Rename to 'basic' -->
-
-  <artifactId>standard</artifactId>
+  <artifactId>osgi</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-crypto-plugin</module>
-    <module>nexus-h2-plugin</module>
-    <module>nexus-lvo-plugin</module>
-    <module>nexus-plugin-console-plugin</module>
-    <module>nexus-rrb-plugin</module>
-    <module>nexus-siesta-plugin</module>
-    <module>nexus-timeline-plugin</module>
-    <module>nexus-ui-extjs3-plugin</module>
+    <module>nexus-obr-plugin</module>
+    <module>nexus-obr-client</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.osgi.service.obr</artifactId>
+        <version>1.0.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.main.distribution</artifactId>
+        <classifier>project</classifier>
+        <type>tar.gz</type>
+        <version>3.2.2</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
 </project>

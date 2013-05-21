@@ -19,18 +19,17 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>standard</artifactId>
+    <artifactId>basic</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-crypto-plugin</artifactId>
+  <artifactId>nexus-timeline-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>
-     <pluginName>Nexus Crypto Provider Plugin</pluginName>
-     <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
-     <bouncycastle.version>1.48</bouncycastle.version>
+    <pluginName>Nexus Timeline Plugin</pluginName>
+    <pluginDescription>Adds timeline and feeds based on it.</pluginDescription>
   </properties>
 
   <dependencies>
@@ -41,27 +40,47 @@
     </dependency>
 
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>${bouncycastle.version}</version>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk15on</artifactId>
-      <version>${bouncycastle.version}</version>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
-      <version>${bouncycastle.version}</version>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>3.6.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+      <version>0.9</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -72,11 +91,19 @@
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
         <configuration>
           <sharedDependencies>
-            <sharedDependency>org.bouncycastle:bcprov-jdk15on</sharedDependency>
-            <sharedDependency>org.bouncycastle:bcpg-jdk15on</sharedDependency>
-            <sharedDependency>org.bouncycastle:bcpkix-jdk15on</sharedDependency>
+            <sharedDependencies>rome:rome</sharedDependencies>
           </sharedDependencies>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
