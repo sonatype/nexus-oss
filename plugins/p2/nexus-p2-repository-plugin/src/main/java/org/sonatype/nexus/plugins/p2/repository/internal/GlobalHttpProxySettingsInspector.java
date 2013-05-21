@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration;
 import org.sonatype.nexus.configuration.application.events.RemoteProxySettingsConfigurationChangedEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -42,7 +43,7 @@ public class GlobalHttpProxySettingsInspector
     private final HttpProxy httpProxy;
 
     @Inject
-    public GlobalHttpProxySettingsInspector( final RemoteProxySettings remoteProxySettings,
+    public GlobalHttpProxySettingsInspector( final RemoteProxySettingsConfiguration remoteProxySettings,
                                              final HttpProxy httpProxy )
     {
         this.remoteProxySettings = checkNotNull( remoteProxySettings );
