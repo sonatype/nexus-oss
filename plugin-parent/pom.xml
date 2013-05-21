@@ -343,6 +343,10 @@
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/surefire-reports
             </argLine>
+            <excludes>
+              <exclude>**/Abstract*</exclude>
+              <exclude>**/*$*</exclude>
+            </excludes>
           </configuration>
         </plugin>
 
@@ -357,6 +361,10 @@
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/failsafe-reports
             </argLine>
+            <excludes>
+              <exclude>**/Abstract*</exclude>
+              <exclude>**/*$*</exclude>
+            </excludes>
           </configuration>
         </plugin>
 

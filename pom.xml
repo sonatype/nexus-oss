@@ -332,13 +332,17 @@
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/surefire-reports
             </argLine>
+            <excludes>
+              <exclude>**/Abstract*</exclude>
+              <exclude>**/*$*</exclude>
+            </excludes>
             <systemPropertyVariables>
               <!-- logging configuration properties, see logback*.xml files -->
               <test.log.level>${test.log.level}</test.log.level>
               <it.test.log.level>${it.test.log.level}</it.test.log.level>
               <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
 
-              <!-- junit benchmarks configuration -->
+              <!-- carrotsearch junit-benchmarks configuration -->
               <jub.consumers>H2,CONSOLE</jub.consumers>
               <jub.db.file>.benchmarks</jub.db.file>
               <jub.customkey>${os.name}</jub.customkey>
@@ -358,8 +362,9 @@
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/failsafe-reports
             </argLine>
-            <excludes combine.children="append">
+            <excludes>
               <exclude>**/Abstract*</exclude>
+              <exclude>**/*$*</exclude>
             </excludes>
             <systemPropertyVariables>
               <!-- logging configuration properties, see logback*.xml files -->
@@ -793,7 +798,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <execute />
+                        <execute/>
                       </action>
                     </pluginExecution>
                     <pluginExecution>
@@ -806,7 +811,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                     <pluginExecution>
@@ -819,7 +824,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
