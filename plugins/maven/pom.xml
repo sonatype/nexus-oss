@@ -28,53 +28,8 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-catalog</artifactId>
-        <version>2.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.indexer</groupId>
-        <artifactId>indexer-core</artifactId>
-        <version>4.1.3-SONATYPE</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>commons-logging</artifactId>
-            <groupId>commons-logging</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-cli</artifactId>
-        <version>1.5</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <!-- INTERNAL -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-archetype-common</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
-
   <modules>
     <module>nexus-maven-bridge-plugin</module>
-    <module>nexus-archetype-common</module>
-    <module>nexus-archetype-common-cli</module>
     <module>nexus-archetype-plugin</module>
   </modules>
 

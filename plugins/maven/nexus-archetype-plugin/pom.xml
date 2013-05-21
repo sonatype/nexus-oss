@@ -30,7 +30,7 @@
 
   <properties>
     <pluginName>Nexus Maven Archetype Catalog Plugin</pluginName>
-    <pluginDescription>Adds a content generator for archetype.xml files.</pluginDescription>
+    <pluginDescription>Adds a content generator for Maven archetype.xml files.</pluginDescription>
   </properties>
 
   <dependencies>
@@ -38,6 +38,11 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.archetype</groupId>
+      <artifactId>archetype-catalog</artifactId>
     </dependency>
 
     <dependency>
@@ -55,11 +60,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-archetype-common</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
@@ -71,6 +71,11 @@
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
     </plugins>
   </build>
