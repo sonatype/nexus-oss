@@ -57,7 +57,8 @@
 
     <!--
     FIXME: These 'tests' classifier artifacts mess up mavens dependency resolution and causes IDEA to build incorrect module dependency defs
-    HACK: exclude all transitive deps using * globs
+    HACK: exclude all transitive deps using * globs.
+    FIXME: Should really try to get ride of this, but this one is way to far entrenched to simply remove ATM.
     -->
 
     <dependency>
