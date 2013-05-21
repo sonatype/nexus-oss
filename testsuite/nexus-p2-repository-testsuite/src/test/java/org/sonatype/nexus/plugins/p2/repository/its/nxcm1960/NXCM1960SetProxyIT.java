@@ -14,22 +14,17 @@ package org.sonatype.nexus.plugins.p2.repository.its.nxcm1960;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-//import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
+import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
-@Ignore("FIXME: Need to update http proxy api usage")
 public class NXCM1960SetProxyIT
     extends AbstractNexusProxyP2IT
 {
@@ -53,19 +48,20 @@ public class NXCM1960SetProxyIT
     {
         final GlobalConfigurationResource resource = SettingsMessageUtil.getCurrentSettings();
 
-        // FIXME: Update api
-        //RemoteHttpProxySettings proxy = resource.getRemoteProxySettings();
-        //
-        //if ( proxy == null )
-        //{
-        //    proxy = new RemoteHttpProxySettings();
-        //    resource.setGlobalHttpProxySettings( proxy );
-        //}
-        //
-        //proxy.setProxyHostname( "http://somejunkproxyurl" );
-        //proxy.setProxyPort( 555 );
-        //proxy.getNonProxyHosts().clear();
-        //proxy.addNonProxyHost( "localhost" );
+        RemoteProxySettingsDTO proxy = resource.getRemoteProxySettings();
+
+        if ( proxy == null )
+        {
+            proxy = new RemoteProxySettingsDTO();
+            resource.setRemoteProxySettings( proxy );
+        }
+
+        proxy.setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
+        proxy.getHttpProxySettings().setProxyHostname( "http://somejunkproxyurl" );
+        proxy.getHttpProxySettings().setProxyPort( 555 );
+
+        proxy.getNonProxyHosts().clear();
+        proxy.addNonProxyHost( "localhost" );
 
         final Status status = SettingsMessageUtil.save( resource );
 
