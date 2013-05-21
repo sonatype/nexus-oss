@@ -38,6 +38,7 @@
 
   <dependencyManagement>
     <dependencies>
+
       <!-- IMPORTS -->
 
       <dependency>
@@ -187,14 +188,14 @@
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- p2 -->
-
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-obr-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
+
+      <!-- p2 -->
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
@@ -207,6 +208,13 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-p2-repository-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-p2-repository-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 

@@ -25,10 +25,6 @@
   <artifactId>nexus-testsuite-support</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
-  <properties>
-    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

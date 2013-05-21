@@ -29,6 +29,7 @@
 
   <dependencyManagement>
     <dependencies>
+
       <!-- IMPORTS -->
 
       <dependency>
@@ -68,6 +69,7 @@
         <module>nexus-kenai-testsuite</module>
         <module>nexus-ldap-plugin-it</module>
         <module>nexus-obr-testsuite</module>
+        <module>nexus-p2-repository-testsuite</module>
         <module>nexus-restlet1x-testsuite</module>
         <module>nexus-site-repository-testsuite</module>
       </modules>

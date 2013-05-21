@@ -42,7 +42,8 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
-      <version>${nexus.version}</version>
+      <!-- FIXME: Avoid using project.version -->
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -63,6 +64,7 @@
 
       <!--
       TODO: Sort out WTF this odd configuration is actually for and document it.
+      FIXME: Used to make file-based prefs available on classpath, should replace with goodies implementation.
       -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

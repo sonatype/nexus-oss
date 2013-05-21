@@ -22,9 +22,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 public abstract class AbstractNexusP2IT
@@ -51,12 +51,12 @@ public abstract class AbstractNexusP2IT
                                    final Map<String, String> sysProps )
         throws Exception
     {
-        FileUtils.deleteDirectory( destination );
+        FileUtils.deleteDirectory(new File(destination));
 
         String tempDirPath = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
         File testDir = new File( tempDirPath, getTestId() + "/run-p2/" + System.currentTimeMillis() );
 
-        org.apache.maven.it.util.FileUtils.deleteDirectory( testDir );
+        FileUtils.deleteDirectory(testDir);
 
         final File basedir = ResourceExtractor.extractResourcePath( getClass(), "/run-p2", testDir, false);
 
