@@ -41,29 +41,4 @@
     <module>nexus-unpack-plugin</module>
   </modules>
 
-  <dependencyManagement>
-      <dependencies>
-
-        <!--
-        FIXME: This needs to go away, moved up to parent DM.
-        -->
-        <dependency>
-          <groupId>org.apache.maven.shared</groupId>
-          <artifactId>maven-verifier</artifactId>
-          <version>1.3</version>
-          <exclusions>
-            <exclusion>
-              <groupId>junit</groupId>
-              <artifactId>junit-dep</artifactId>
-            </exclusion>
-            <exclusion>
-              <artifactId>junit</artifactId>
-              <groupId>junit</groupId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-
-      </dependencies>
-    </dependencyManagement>
-
 </project>

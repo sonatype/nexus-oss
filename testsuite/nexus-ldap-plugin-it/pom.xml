@@ -18,8 +18,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>security</artifactId>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>testsuite</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
@@ -50,6 +50,8 @@
       <artifactId>nexus-ldap-realm-plugin</artifactId>
       <classifier>bundle</classifier>
       <type>zip</type>
+      <!-- FIXME: Avoid using project.version -->
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 

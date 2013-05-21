@@ -118,6 +118,10 @@
         <version>1.2.2</version>
       </dependency>
 
+      <!--
+      FIXME: Clean up deps which should be in parent DM.
+      -->
+
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail</artifactId>

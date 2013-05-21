@@ -68,6 +68,8 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>ldap-common</artifactId>
+      <!-- FIXME: Avoud using project.version -->
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
