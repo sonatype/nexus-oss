@@ -44,10 +44,10 @@
     <url>http://links.sonatype.com/products/nexus/oss/issues</url>
   </issueManagement>
 
-  <!--<ciManagement>-->
-  <!--<system>Bamboo</system>-->
-  <!--<url>https://bamboo.zion.sonatype.com/browse/NXO</url>-->
-  <!--</ciManagement>-->
+  <ciManagement>
+    <system>Bamboo</system>
+    <url>https://bamboo.zion.sonatype.com/browse/NX-OSS</url>
+  </ciManagement>
 
   <scm>
     <connection>scm:git:git://github.com/sonatype/nexus-oss.git</connection>
@@ -521,190 +521,190 @@
               </rules>
             </configuration>
           </execution>
-          <!--<execution>-->
-          <!--<id>enforce-dependencies</id>-->
-          <!--<goals>-->
-          <!--<goal>enforce</goal>-->
-          <!--</goals>-->
-          <!--<configuration>-->
-          <!--<rules>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>velocity:velocity</exclude>-->
-          <!--<exclude>velocity:velocity-dep</exclude>-->
-          <!--</excludes>-->
-          <!--<message>-->
-          <!--Velocity 1.4 is banned, org.apache.velocity:velocity should be used instead.-->
-          <!--You probably added a dependency that is missing the exclusions.-->
-          <!--</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>commons-logging:*</exclude>-->
-          <!--</excludes>-->
-          <!--<message>commons-logging conflicts with slf4j. You probably added a dependency that is missing the exclusions.</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>commons-vfs:commons-vfs</exclude>-->
-          <!--</excludes>-->
-          <!--<message>-->
-          <!--commons-vfs 1.0 has a potential security vulnerability (osvdb-58760).-->
-          <!--Use org.apache.commons:commons-vfs2:2.0 or greater-->
-          <!--</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>xmlrpc:*</exclude>-->
-          <!--</excludes>-->
-          <!--<message>-->
-          <!--Apache commons xmlrpc with versions less than 3.1.3 expose a potential security vulnerability (osvdb-68314).-->
-          <!--Use org.apache.commons:xmlrpc-* 3.1.3 or greater-->
-          <!--</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>*:plexus-container-default</exclude>-->
-          <!--</excludes>-->
-          <!--<message>Plexus IoC container is phased out, use Sisu Inject Plexus instead!</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>*:plexus-component-api</exclude>-->
-          <!--</excludes>-->
-          <!--<message>-->
-          <!--plexus-component-api conflicts with newer plexus-container-default.-->
-          <!--You probably a plexus component made with older plexus container.-->
-          <!--</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>*:jsecurity</exclude>-->
-          <!--</excludes>-->
-          <!--<message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>commons-beanutils:commons-beanutils</exclude>-->
-          <!--</excludes>-->
-          <!--<message>commons-beanutils includes commons-collections. use commons-beanutils-core instead</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>*:activation</exclude>-->
-          <!--<exclude>*:stax-api</exclude>-->
-          <!--<exclude>*:jaxb-api</exclude>-->
-          <!--<exclude>*:xml-apis</exclude>-->
-          <!--</excludes>-->
-          <!--<message>xml apis got banned since they are already included on java 6</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<excludes>-->
-          <!--<exclude>org.sonatype.aether:*:1.8</exclude>-->
-          <!--</excludes>-->
-          <!--<includes>-->
-          <!--<include>org.sonatype.aether:*:1.8.1</include>-->
-          <!--</includes>-->
-          <!--<message>Must use aether 1.8.1 or newer</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>junit:junit</exclude>-->
-          <!--</excludes>-->
-          <!--<message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>junit:junit-dep:(,4.9]</exclude>-->
-          <!--</excludes>-->
-          <!--<message>-->
-          <!--junit:junit-dep 4.9 wrongly includes hamcrest api in jar-->
-          <!--4.10 or greater required due to TestRule changes over earlier versions-->
-          <!--</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>org.mockito:mockito-all</exclude>-->
-          <!--</excludes>-->
-          <!--<message>mockito-all includes third party classes within it - use mockito-core instead</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>org.hamcrest:*</exclude>-->
-          <!--</excludes>-->
-          <!--<includes>-->
-          <!--<include>org.hamcrest:*:1.3</include>-->
-          <!--</includes>-->
-          <!--<message>Make sure you are using the hamcrest version defined in parent</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>org.hamcrest:hamcrest-all:*</exclude>-->
-          <!--</excludes>-->
-          <!--<message>Use more specific hamcrest dependencies like hamcrest-core, hamcrest-library</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>org.sonatype.sisu.litmus:litmus-testsupport:(,1.3]</exclude>-->
-          <!--</excludes>-->
-          <!--<message>litmus-testsupport greater than 1.3 required</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>org.slf4j:*</exclude>-->
-          <!--</excludes>-->
-          <!--<includes>-->
-          <!--<include>org.slf4j:*:${slf4j.version}</include>-->
-          <!--</includes>-->
-          <!--<message>Make sure to use the slf4j version defined in nexus parent. See slf4j.version property</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>log4j:log4j:*:jar:test</exclude>-->
-          <!--</excludes>-->
-          <!--<includes>-->
-          <!--<include>log4j:*</include>-->
-          <!--</includes>-->
-          <!--<message>Do not use log4j api directly in tests. Use slf4j api instead</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>org.mortbay.jetty:*</exclude>-->
-          <!--</excludes>-->
-          <!--<includes>-->
-          <!--<include>org.eclipse.jetty:*:${jetty.version}</include>-->
-          <!--</includes>-->
-          <!--<message>Use the Eclipse/Jetty version defined in nexus parent. See jetty.version property</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>javax.servlet:servlet-api</exclude>-->
-          <!--<exclude>org.mortbay.jetty:servlet-api</exclude>-->
-          <!--<exclude>org.mortbay.jetty:servlet-api-2.5</exclude>-->
-          <!--</excludes>-->
-          <!--<message>Use servlet API from Jetty 8.x (org.eclipse.jetty.orbit:javax.servlet)</message>-->
-          <!--</bannedDependencies>-->
-          <!--<bannedDependencies>-->
-          <!--<searchTransitive>true</searchTransitive>-->
-          <!--<excludes>-->
-          <!--<exclude>org.sonatype.spice:plexus-ehcache</exclude>-->
-          <!--</excludes>-->
-          <!--<message>Use org.sonatype.nexus:nexus-ehcache instead of plexus-ehcache</message>-->
-          <!--</bannedDependencies>-->
-          <!--</rules>-->
-          <!--<fail>true</fail>-->
-          <!--</configuration>-->
-          <!--</execution>-->
+          <execution>
+            <id>enforce-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>velocity:velocity</exclude>
+                    <exclude>velocity:velocity-dep</exclude>
+                  </excludes>
+                  <message>
+                    Velocity 1.4 is banned, org.apache.velocity:velocity should be used instead.
+                    You probably added a dependency that is missing the exclusions.
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>commons-logging:*</exclude>
+                  </excludes>
+                  <message>commons-logging conflicts with slf4j. You probably added a dependency that is missing the exclusions.</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>commons-vfs:commons-vfs</exclude>
+                  </excludes>
+                  <message>
+                    commons-vfs 1.0 has a potential security vulnerability (osvdb-58760).
+                    Use org.apache.commons:commons-vfs2:2.0 or greater
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>xmlrpc:*</exclude>
+                  </excludes>
+                  <message>
+                    Apache commons xmlrpc with versions less than 3.1.3 expose a potential security vulnerability (osvdb-68314).
+                    Use org.apache.commons:xmlrpc-* 3.1.3 or greater
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:plexus-container-default</exclude>
+                  </excludes>
+                  <message>Plexus IoC container is phased out, use Sisu Inject Plexus instead!</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:plexus-component-api</exclude>
+                  </excludes>
+                  <message>
+                    plexus-component-api conflicts with newer plexus-container-default.
+                    You probably a plexus component made with older plexus container.
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:jsecurity</exclude>
+                  </excludes>
+                  <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>commons-beanutils:commons-beanutils</exclude>
+                  </excludes>
+                  <message>commons-beanutils includes commons-collections. use commons-beanutils-core instead</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:activation</exclude>
+                    <exclude>*:stax-api</exclude>
+                    <exclude>*:jaxb-api</exclude>
+                    <exclude>*:xml-apis</exclude>
+                  </excludes>
+                  <message>xml apis got banned since they are already included on java 6</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.sonatype.aether:*:1.8</exclude>
+                  </excludes>
+                  <includes>
+                    <include>org.sonatype.aether:*:1.8.1</include>
+                  </includes>
+                  <message>Must use aether 1.8.1 or newer</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>junit:junit</exclude>
+                  </excludes>
+                  <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>junit:junit-dep:(,4.9]</exclude>
+                  </excludes>
+                  <message>
+                    junit:junit-dep 4.9 wrongly includes hamcrest api in jar
+                    4.10 or greater required due to TestRule changes over earlier versions
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.mockito:mockito-all</exclude>
+                  </excludes>
+                  <message>mockito-all includes third party classes within it - use mockito-core instead</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.hamcrest:*</exclude>
+                  </excludes>
+                  <includes>
+                    <include>org.hamcrest:*:1.3</include>
+                  </includes>
+                  <message>Make sure you are using the hamcrest version defined in parent</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.hamcrest:hamcrest-all:*</exclude>
+                  </excludes>
+                  <message>Use more specific hamcrest dependencies like hamcrest-core, hamcrest-library</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.sonatype.sisu.litmus:litmus-testsupport:(,1.3]</exclude>
+                  </excludes>
+                  <message>litmus-testsupport greater than 1.3 required</message>
+                </bannedDependencies>
+                <!--<bannedDependencies>-->
+                <!--<searchTransitive>true</searchTransitive>-->
+                <!--<excludes>-->
+                <!--<exclude>org.slf4j:*</exclude>-->
+                <!--</excludes>-->
+                <!--<includes>-->
+                <!--<include>org.slf4j:*:${slf4j.version}</include>-->
+                <!--</includes>-->
+                <!--<message>Make sure to use the slf4j version defined in nexus parent. See slf4j.version property</message>-->
+                <!--</bannedDependencies>-->
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>log4j:log4j:*:jar:test</exclude>
+                  </excludes>
+                  <includes>
+                    <include>log4j:*</include>
+                  </includes>
+                  <message>Do not use log4j api directly in tests. Use slf4j api instead</message>
+                </bannedDependencies>
+                <!--<bannedDependencies>-->
+                <!--<searchTransitive>true</searchTransitive>-->
+                <!--<excludes>-->
+                <!--<exclude>org.mortbay.jetty:*</exclude>-->
+                <!--</excludes>-->
+                <!--<includes>-->
+                <!--<include>org.eclipse.jetty:*:${jetty.version}</include>-->
+                <!--</includes>-->
+                <!--<message>Use the Eclipse/Jetty version defined in nexus parent. See jetty.version property</message>-->
+                <!--</bannedDependencies>-->
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>javax.servlet:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api-2.5</exclude>
+                  </excludes>
+                  <message>Use servlet API from Jetty 8.x (org.eclipse.jetty.orbit:javax.servlet)</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.sonatype.spice:plexus-ehcache</exclude>
+                  </excludes>
+                  <message>Use org.sonatype.nexus:nexus-ehcache instead of plexus-ehcache</message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>
