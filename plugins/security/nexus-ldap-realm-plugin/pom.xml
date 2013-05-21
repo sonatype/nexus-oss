@@ -101,15 +101,6 @@
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
-
-      <!--<plugin>-->
-        <!--<groupId>org.apache.maven.plugins</groupId>-->
-        <!--<artifactId>maven-surefire-plugin</artifactId>-->
-        <!--<configuration>-->
-          <!--&lt;!&ndash; workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart &ndash;&gt;-->
-          <!--<argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>-->
-        <!--</configuration>-->
-      <!--</plugin>-->
     </plugins>
   </build>
 

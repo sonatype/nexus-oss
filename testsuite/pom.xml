@@ -54,11 +54,19 @@
   <build>
     <pluginManagement>
       <plugins>
+        <!--
+        Increase memory settings for testsuites.
+        -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <argLine>-Xmx400m -XX:MaxPermSize=192m -XX:+HeapDumpOnOutOfMemoryError</argLine>
+            <argLine>
+              -Xmx400m
+              -XX:MaxPermSize=192m
+              -XX:+HeapDumpOnOutOfMemoryError
+              -XX:HeapDumpPath=${project.build.directory}/failsafe-reports
+            </argLine>
           </configuration>
         </plugin>
       </plugins>

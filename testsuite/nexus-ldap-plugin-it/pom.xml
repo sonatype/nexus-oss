@@ -84,14 +84,6 @@
 
   <build>
     <plugins>
-      <!--&lt;!&ndash;-->
-      <!--Need to know about 'nexus-plugin' packaging for integration-tests.-->
-      <!--&ndash;&gt;-->
-      <!--<plugin>-->
-        <!--<groupId>org.sonatype.nexus</groupId>-->
-        <!--<artifactId>nexus-plugin-bundle-maven-plugin</artifactId>-->
-      <!--</plugin>-->
-
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
@@ -147,17 +139,6 @@
               </nexusPluginsArtifacts>
             </configuration>
           </plugin>
-
-          <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-failsafe-plugin</artifactId>-->
-            <!--<configuration>-->
-              <!--&lt;!&ndash; workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart &ndash;&gt;-->
-              <!--<argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>-->
-              <!--&lt;!&ndash; LDAP NEEDS tests to be forked or they get broken, do not remove this! &ndash;&gt;-->
-              <!--<forkMode>always</forkMode>-->
-            <!--</configuration>-->
-          <!--</plugin>-->
         </plugins>
       </build>
     </profile>

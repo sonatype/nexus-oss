@@ -58,23 +58,6 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <!--<plugin>-->
-        <!--<groupId>org.apache.maven.plugins</groupId>-->
-        <!--<artifactId>maven-failsafe-plugin</artifactId>-->
-        <!--<configuration>-->
-          <!--<argLine>-Xmx600m -XX:MaxPermSize=220m -XX:+HeapDumpOnOutOfMemoryError</argLine>-->
-          <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
-          <!--<excludes>-->
-            <!--<exclude>**/*$*</exclude>-->
-            <!--<exclude>**/Abstract*</exclude>-->
-          <!--</excludes>-->
-        <!--</configuration>-->
-      <!--</plugin>-->
-    </plugins>
-  </build>
-
   <profiles>
     <profile>
       <id>it</id>
@@ -138,7 +121,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <!-- FIXME: Avoud version here, use PM -->
+            <!-- FIXME: Avoid version here, use PM -->
             <version>1.8</version>
             <executions>
               <execution>
