@@ -346,7 +346,7 @@
                 </goals>
                 <configuration>
                   <reportsDirectory>${project.build.directory}/surefire-reports-apacheHttpClient4x-provider</reportsDirectory>
-                  <systemPropertyVariables combine.children="append">
+                  <systemPropertyVariables>
                     <nexus.default.http.provider>apacheHttpClient4x</nexus.default.http.provider>
                   </systemPropertyVariables>
                 </configuration>
@@ -371,7 +371,7 @@
                 </goals>
                 <configuration>
                   <reportsDirectory>${project.build.directory}/surefire-reports-apacheHttpClient3x-provider</reportsDirectory>
-                  <systemPropertyVariables combine.children="append">
+                  <systemPropertyVariables>
                     <nexus.default.http.provider>apacheHttpClient3x</nexus.default.http.provider>
                   </systemPropertyVariables>
                 </configuration>

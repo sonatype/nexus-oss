@@ -325,7 +325,8 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <systemPropertyVariables combine.children="append">
+            <argLine>-Xmx300m -XX:MaxPermSize=192m -XX:+HeapDumpOnOutOfMemoryError</argLine>
+            <systemPropertyVariables>
               <!-- logging configuration properties, see logback*.xml files -->
               <test.log.level>${test.log.level}</test.log.level>
               <it.test.log.level>${it.test.log.level}</it.test.log.level>
@@ -344,11 +345,12 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
+            <argLine>-Xmx300m -XX:MaxPermSize=192m -XX:+HeapDumpOnOutOfMemoryError</argLine>
             <forkMode>once</forkMode>
             <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
-            <systemPropertyVariables combine.children="append">
+            <systemPropertyVariables>
               <!-- logging configuration properties, see logback*.xml files -->
               <test.log.level>${test.log.level}</test.log.level>
               <it.test.log.level>${it.test.log.level}</it.test.log.level>

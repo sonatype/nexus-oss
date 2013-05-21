@@ -330,6 +330,25 @@
         </plugin>
 
         <!--
+        Basic test environment configuration.
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>-Xmx300m -XX:MaxPermSize=192m -XX:+HeapDumpOnOutOfMemoryError</argLine>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <argLine>-Xmx300m -XX:MaxPermSize=192m -XX:+HeapDumpOnOutOfMemoryError</argLine>
+          </configuration>
+        </plugin>
+
+        <!--
         Support for nexus-plugin packaging.
         -->
         <plugin>
@@ -435,7 +454,6 @@
             <releaseProfiles>release,optimize-js</releaseProfiles>
           </configuration>
         </plugin>
-
       </plugins>
     </pluginManagement>
 

@@ -57,21 +57,21 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <forkMode>always</forkMode>
-            <!--
-            TODO: This might not be needed w/forkMode=always
-            -->
-            <argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <!--<pluginManagement>-->
+      <!--<plugins>-->
+        <!--<plugin>-->
+          <!--<groupId>org.apache.maven.plugins</groupId>-->
+          <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+          <!--<configuration>-->
+            <!--<forkMode>always</forkMode>-->
+            <!--&lt;!&ndash;-->
+            <!--TODO: This might not be needed w/forkMode=always-->
+            <!--&ndash;&gt;-->
+            <!--<argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>-->
+          <!--</configuration>-->
+        <!--</plugin>-->
+      <!--</plugins>-->
+    <!--</pluginManagement>-->
 
     <plugins>
       <plugin>

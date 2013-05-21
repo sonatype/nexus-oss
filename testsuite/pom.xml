@@ -51,6 +51,30 @@
     </dependencies>
   </dependencyManagement>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <argLine>-Xmx400m -XX:MaxPermSize=192m -XX:+HeapDumpOnOutOfMemoryError</argLine>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <!--
+      Need to know about 'nexus-plugin' packaging for integration-tests.
+      -->
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>testsuite</id>

@@ -71,6 +71,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
     </dependency>
 
@@ -78,6 +79,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
     </dependency>
 
@@ -85,6 +87,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-timeline-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
     </dependency>
 
@@ -92,6 +95,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
     </dependency>
 
@@ -99,6 +103,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
     </dependency>
 
@@ -167,15 +172,18 @@
 
   <build>
     <plugins>
-      <!--
-      FIXME: This may be needed for the testsuite execution to resolve nexus-plugin types?
-      -->
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <extensions>true</extensions>
-      </plugin>
+      <!--&lt;!&ndash;-->
+      <!--FIXME: This may be needed for the testsuite execution to resolve nexus-plugin types?-->
+      <!--&ndash;&gt;-->
+      <!--<plugin>-->
+        <!--<groupId>org.sonatype.nexus</groupId>-->
+        <!--<artifactId>nexus-plugin-bundle-maven-plugin</artifactId>-->
+        <!--<extensions>true</extensions>-->
+      <!--</plugin>-->
 
+      <!--
+      FIXME: Unsure why we do this, does this take too much time when left as default?
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -393,26 +401,26 @@
             </configuration>
           </plugin>
 
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <!--
-              NOTE: Using forkMode=always here for a few reasons...
-              Since ATM these are testNG-based tests, when using forkMode=always, instead of surefire reporting a single TestSuite execution it will show each test-class.
-              This means that the output (both to console and in the reports directory) are closer to junit (.txt, -output.txt and .xml per test).
-              The cargo-based tests (before, not sure if they currently due with updated cargo) required this forkmode and were put into a separate profile to execute.
-              This ended up becoming unmaintained and the cargo tests had not been running for a long time because of that.
-              The main side-effect is that the testsuite will take a little longer to execute given it has to fork a JVM 650+ times.
-              -->
-              <forkMode>always</forkMode>
-              <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
-              <excludes>
-                <exclude>**Suite*</exclude>
-                <exclude>**/*$*.*</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
+          <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+            <!--<configuration>-->
+              <!--&lt;!&ndash;-->
+              <!--NOTE: Using forkMode=always here for a few reasons...-->
+              <!--Since ATM these are testNG-based tests, when using forkMode=always, instead of surefire reporting a single TestSuite execution it will show each test-class.-->
+              <!--This means that the output (both to console and in the reports directory) are closer to junit (.txt, -output.txt and .xml per test).-->
+              <!--The cargo-based tests (before, not sure if they currently due with updated cargo) required this forkmode and were put into a separate profile to execute.-->
+              <!--This ended up becoming unmaintained and the cargo tests had not been running for a long time because of that.-->
+              <!--The main side-effect is that the testsuite will take a little longer to execute given it has to fork a JVM 650+ times.-->
+              <!--&ndash;&gt;-->
+              <!--&lt;!&ndash;<forkMode>always</forkMode>&ndash;&gt;-->
+              <!--&lt;!&ndash;<argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>&ndash;&gt;-->
+              <!--<excludes>-->
+                <!--<exclude>**Suite*</exclude>-->
+                <!--<exclude>**/*$*.*</exclude>-->
+              <!--</excludes>-->
+            <!--</configuration>-->
+          <!--</plugin>-->
         </plugins>
       </build>
     </profile>
@@ -431,7 +439,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables combine.children="append">
+              <systemPropertyVariables>
                 <nexus.default.http.provider>apacheHttpClient4x</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
@@ -455,7 +463,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables combine.children="append">
+              <systemPropertyVariables>
                 <nexus.default.http.provider>apacheHttpClient3x</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>

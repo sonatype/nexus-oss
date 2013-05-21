@@ -60,26 +60,18 @@
 
   <build>
     <plugins>
-      <!--
-      Need to know about 'nexus-plugin' packaging for integration-tests.
-      -->
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
-          <workingDirectory>${project.build.directory}</workingDirectory>
-          <excludes>
-            <exclude>**/*$*</exclude>
-            <exclude>**/Abstract*</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<argLine>-Xmx600m -XX:MaxPermSize=220m -XX:+HeapDumpOnOutOfMemoryError</argLine>-->
+          <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
+          <!--<excludes>-->
+            <!--<exclude>**/*$*</exclude>-->
+            <!--<exclude>**/Abstract*</exclude>-->
+          <!--</excludes>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
     </plugins>
   </build>
 
@@ -117,6 +109,7 @@
                 <plugin>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-it-helper-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>cp</classifier>
                   <type>jar</type>
@@ -124,6 +117,7 @@
                 <plugin>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-it-helper-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -131,6 +125,7 @@
                 <plugin>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-p2-repository-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>

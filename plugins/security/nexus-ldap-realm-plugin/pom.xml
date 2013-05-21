@@ -68,7 +68,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>ldap-common</artifactId>
-      <!-- FIXME: Avoud using project.version -->
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
     </dependency>
 
@@ -102,14 +102,14 @@
         <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart -->
-          <argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-surefire-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--&lt;!&ndash; workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart &ndash;&gt;-->
+          <!--<argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
     </plugins>
   </build>
 

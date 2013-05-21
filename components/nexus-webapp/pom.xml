@@ -91,6 +91,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-crypto-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -100,6 +101,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-h2-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -109,6 +111,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -118,6 +121,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-siesta-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -127,6 +131,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -136,6 +141,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -145,6 +151,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -154,6 +161,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-maven-bridge-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -163,6 +171,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -172,6 +181,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -181,6 +191,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-timeline-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -190,6 +201,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -215,6 +227,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-crypto-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -222,6 +235,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-h2-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -229,6 +243,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-restlet1x-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -236,6 +251,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-siesta-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -243,6 +259,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-lvo-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -250,6 +267,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-plugin-console-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -257,6 +275,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-ldap-realm-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -264,6 +283,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-rrb-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -271,6 +291,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-indexer-lucene-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -278,6 +299,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-timeline-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -285,6 +307,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-archetype-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -292,6 +315,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-maven-bridge-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -299,6 +323,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-ui-extjs3-plugin</artifactId>
+                  <!-- FIXME: Avoid using project.version -->
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>

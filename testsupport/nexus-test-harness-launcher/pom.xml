@@ -131,6 +131,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -184,6 +185,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
+      <!-- FIXME: Avoid using project.version -->
       <version>${project.version}</version>
       <classifier>cp</classifier>
       <type>jar</type>
