@@ -325,6 +325,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
+            <forkMode>once</forkMode>
             <argLine>
               -Xmx300m
               -XX:MaxPermSize=192m
