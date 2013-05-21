@@ -288,13 +288,11 @@
         <module>basic</module>
         <module>capabilities</module>
         <module>indexer</module>
-        <module>ldap</module>
         <module>maven</module>
         <module>osgi</module>
-        <module>other</module>
         <module>p2</module>
         <module>restlet1x</module>
-        <module>site</module>
+        <module>security</module>
       </modules>
     </profile>
   </profiles>

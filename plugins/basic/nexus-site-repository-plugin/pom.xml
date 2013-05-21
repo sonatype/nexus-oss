@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
+    Copyright (c) 2007-2012 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,22 +14,49 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>plugins</artifactId>
+    <artifactId>basic</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>other</artifactId>
+  <artifactId>nexus-site-repository-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>pom</packaging>
+  <packaging>nexus-plugin</packaging>
 
-  <modules>
-    <module>nexus-kenai-plugin</module>
-    <module>nexus-unpack-plugin</module>
-  </modules>
+  <properties>
+    <pluginName>Nexus Site Repository Plugin</pluginName>
+    <pluginDescription>Adds a repository type for deploying web sites.</pluginDescription>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
