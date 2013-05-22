@@ -23,7 +23,7 @@ public abstract class AbstractDynamicSecurityResource
     implements DynamicSecurityResource
 {
 
-    protected boolean dirty = true;
+    protected volatile boolean dirty = true;
 
     public boolean isDirty()
     {
