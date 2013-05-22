@@ -80,6 +80,7 @@ public class KenaiRealm
     {
         this.kenaiRealmConfiguration = checkNotNull( kenaiRealmConfiguration );
         this.hc4Provider = checkNotNull( hc4Provider );
+        setName( "KenaiRealm" );
 
         // TODO: write another test before enabling this
         // this.setAuthenticationCachingEnabled( true );

@@ -75,12 +75,7 @@ public class XmlAuthenticatingRealm
         PasswordMatcher passwordMatcher = new PasswordMatcher();
         passwordMatcher.setPasswordService(this.passwordService);
         setCredentialsMatcher( passwordMatcher );
-    }
-
-    @Override
-    public String getName()
-    {
-        return ROLE;
+        setName( ROLE );
     }
 
     @Override
