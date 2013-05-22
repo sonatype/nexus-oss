@@ -103,7 +103,7 @@ public class CacheManagerComponentImpl
         try
         {
             final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-            ManagementService.registerMBeans( cacheManager, mBeanServer, false, false, false, true );
+            ManagementService.registerMBeans( cacheManager, mBeanServer, false, false, true, true );
         }
         catch ( final Exception e )
         {
