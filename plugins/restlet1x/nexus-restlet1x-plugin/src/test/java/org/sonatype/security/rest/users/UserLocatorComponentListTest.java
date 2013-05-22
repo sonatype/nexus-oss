@@ -42,7 +42,7 @@ public class UserLocatorComponentListTest
 
         PlexusComponentListResourceResponse response = (PlexusComponentListResourceResponse) result;
 
-        assertThat( "Result: " + new XStream().toXML( response ), response.getData().size(), equalTo( 2 ) );
+        assertThat( "Result: " + new XStream().toXML( response ), response.getData().size(), equalTo( 3 ) );
 
         Map<String, String> data = new HashMap<String, String>();
         for ( PlexusComponentListResource item : response.getData() )
@@ -50,9 +50,10 @@ public class UserLocatorComponentListTest
             data.put( item.getRoleHint(), item.getDescription() );
         }
 
-        assertThat( data.keySet(), containsInAnyOrder( "default", "allConfigured" ) );
+        assertThat( data.keySet(), containsInAnyOrder( "default", "allConfigured", "MockUserManager" ) );
         assertThat( data.get( "default" ), equalTo( "Default" ) );
         assertThat( data.get( "allConfigured" ), equalTo( "All Configured Users" ) );
+        assertThat( data.get( "MockUserManager" ), equalTo( "MockUserManager" ) );
     }
 
 }

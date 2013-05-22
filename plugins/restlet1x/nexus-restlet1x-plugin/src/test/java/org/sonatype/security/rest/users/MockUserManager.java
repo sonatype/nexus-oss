@@ -15,19 +15,29 @@ package org.sonatype.security.rest.users;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
+@Singleton
+@Typed( UserManager.class )
+@Named( MockUserManager.SOURCE )
 public class MockUserManager
     extends AbstractReadOnlyUserManager
 {
+    public static final String SOURCE = "MockUserManager";
+
     public String getSource()
     {
-        return "MockUserManager";
+        return SOURCE;
     }
 
     public Set<User> listUsers()
