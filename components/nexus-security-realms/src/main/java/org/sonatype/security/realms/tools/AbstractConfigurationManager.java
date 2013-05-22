@@ -28,29 +28,45 @@ public abstract class AbstractConfigurationManager
 
     //
 
-    private volatile EnhancedConfiguration configuration = null;
+    private volatile EnhancedConfiguration configurationCache = null;
 
-    // FIXME: Synchronized to avoid threads eating up cpu while re-building configuration.
-    // FIXME: Really need to revisit how the configuration is created and rebuilt to avoid a lock here.
-
-    public synchronized void clearCache()
+    public void clearCache()
     {
-        configuration = null;
+        configurationCache = null;
     }
 
-    protected synchronized EnhancedConfiguration getConfiguration()
+    protected EnhancedConfiguration getConfiguration()
     {
-        //Assign configuration to local variable first, as calls to clearCache
-        //can null it out at any time
-        EnhancedConfiguration config = configuration;
-        if(config == null)
+        // Assign configuration to local variable first, as calls to clearCache can null it out at any time
+        EnhancedConfiguration configuration = this.configurationCache;
+        if ( configuration == null || shouldRebuildConifuguration() )
         {
-            config = new EnhancedConfiguration(doGetConfiguration());
-            configuration = config;
+            synchronized ( this )
+            {
+                // double-checked locking of volatile is apparently OK with java5+
+                // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
+                configuration = this.configurationCache;
+                if ( configuration == null || shouldRebuildConifuguration() )
+                {
+                    configuration = new EnhancedConfiguration( doGetConfiguration() );
+                    this.configurationCache = configuration;
+                }
+            }
         }
-        
-        return config;
+        return configuration;
     }
 
+    /**
+     * Returns <code>true</code> if configuration needs to be rebuilt (by calling {@link #doGetConfiguration()}).
+     */
+    protected boolean shouldRebuildConifuguration()
+    {
+        return false;
+    }
+
+    /**
+     * Builds and returns fresh new Configuration instance. Implementation is expected to reset
+     * {@link #shouldRebuildConifuguration()} flag back to <code>false</code>.
+     */
     protected abstract Configuration doGetConfiguration();
 }
