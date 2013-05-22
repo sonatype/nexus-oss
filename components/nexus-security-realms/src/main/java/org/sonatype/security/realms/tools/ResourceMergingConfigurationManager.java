@@ -565,22 +565,27 @@ public class ResourceMergingConfigurationManager
             configuration.addPrivilege( privilege );
         }
 
+        // number of roles can be significant (>15K), so need to speedup lookup roles by roleId 
+        final Map<String, CRole> roles = new HashMap<String, CRole>();
+        for ( CRole role : configuration.getRoles() )
+        {
+            roles.put( role.getId(), role );
+        }
+
         for ( Iterator<CRole> iterator = config.getRoles().iterator(); iterator.hasNext(); )
         {
             CRole role = iterator.next();
 
             // need to check if we need to merge the static config
-            for ( CRole eachRole : configuration.getRoles() )
+            CRole eachRole = roles.get( role.getId() );
+            if ( eachRole != null )
             {
-                if ( eachRole.getId().equals( role.getId() ) )
-                {
-                    role = this.mergeRolesContents( role, eachRole );
-                    configuration.removeRole( eachRole );
-                    break;
-                }
+                role = this.mergeRolesContents( role, eachRole );
+                configuration.removeRole( eachRole );
             }
 
             configuration.addRole( role );
+            roles.put( role.getId(), role ); // deduplicate config roles
         }
 
         for ( CUser user : (List<CUser>) config.getUsers() )
