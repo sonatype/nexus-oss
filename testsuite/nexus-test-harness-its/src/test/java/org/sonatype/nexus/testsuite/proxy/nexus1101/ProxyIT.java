@@ -26,7 +26,7 @@ import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.testsuite.proxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-public class ProxyTest
+public class ProxyIT
     extends AbstractNexusWebProxyIntegrationTest
 {
     @Test @Category( PROXY.class )

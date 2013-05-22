@@ -17,6 +17,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * @deprecated pending removal
+ */
+@Deprecated
 public class ExternalStaticResource
     implements StaticResource
 {
@@ -24,7 +28,7 @@ public class ExternalStaticResource
     private String path;
     private String contentType;
     
-    public ExternalStaticResource( File file, String path, String contentType )
+    public ExternalStaticResource(File file, String path, String contentType)
     {
         this.file = file;
         this.path = path;

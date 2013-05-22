@@ -60,6 +60,9 @@
         <version>1.6.2</version>
       </dependency>
 
+      <!--
+      TODO: Replace carrotsearch with contiperf
+      -->
       <dependency>
         <groupId>com.carrotsearch</groupId>
         <artifactId>junit-benchmarks</artifactId>

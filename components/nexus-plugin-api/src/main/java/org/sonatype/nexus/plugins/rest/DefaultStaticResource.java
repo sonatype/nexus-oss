@@ -28,7 +28,7 @@ public class DefaultStaticResource
     
     private String contentType;
     
-    public DefaultStaticResource( URL url, String path, String contentType )
+    public DefaultStaticResource(URL url, String path, String contentType)
     {
         this.resourceURL = url;
 

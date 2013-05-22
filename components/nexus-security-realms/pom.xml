@@ -58,21 +58,6 @@
 
   <build>
     <plugins>
-      <!--
-      FIXME: Get rid of test-jar, these artifacts cause problems with transitive dependencies.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -143,7 +128,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
   </build>
 

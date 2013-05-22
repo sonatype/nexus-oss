@@ -24,11 +24,14 @@ import java.lang.annotation.Target;
  * implementation.
  * 
  * @author cstamas
+ *
+ * @deprecated pending removal
  */
 @Documented
 @Inherited
 @Target( ElementType.TYPE )
 @Retention( RetentionPolicy.RUNTIME )
+@Deprecated
 public @interface RestResource
 {
 }

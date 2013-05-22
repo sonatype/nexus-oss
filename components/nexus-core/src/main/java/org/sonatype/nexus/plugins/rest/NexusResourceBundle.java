@@ -34,5 +34,5 @@ public interface NexusResourceBundle
      * 
      * @return
      */
-    List<StaticResource> getContributedResouces();
+    List<StaticResource> getContributedResouces();  // FIXME: Spelling!
 }

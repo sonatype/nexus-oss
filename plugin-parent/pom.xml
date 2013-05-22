@@ -336,12 +336,17 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
+            <forkMode>once</forkMode>
             <argLine>
               -Xmx300m
               -XX:MaxPermSize=192m
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/surefire-reports
             </argLine>
+            <excludes>
+              <exclude>**/Abstract*</exclude>
+              <exclude>**/*$*</exclude>
+            </excludes>
           </configuration>
         </plugin>
 
@@ -356,6 +361,10 @@
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/failsafe-reports
             </argLine>
+            <excludes>
+              <exclude>**/Abstract*</exclude>
+              <exclude>**/*$*</exclude>
+            </excludes>
           </configuration>
         </plugin>
 

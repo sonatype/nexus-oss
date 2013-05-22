@@ -33,17 +33,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-web-utils</artifactId>
-      <scope>runtime</scope>
+      <artifactId>nexus-core</artifactId>
     </dependency>
 
-    <!--
-    NOTE: Can *NOT* include this dependency here, as it introduces a bunch of nasty dependency cycles, since it depends on some plugins.
-    -->
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus</groupId>-->
-      <!--<artifactId>nexus-test-harness-launcher</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
@@ -57,7 +53,8 @@
 
     <!--
     FIXME: These 'tests' classifier artifacts mess up mavens dependency resolution and causes IDEA to build incorrect module dependency defs
-    HACK: exclude all transitive deps using * globs
+    HACK: exclude all transitive deps using * globs.
+    FIXME: Should really try to get ride of this, but this one is way to far entrenched to simply remove ATM.
     -->
 
     <dependency>
@@ -66,8 +63,8 @@
       <classifier>tests</classifier>
       <exclusions>
         <!--<exclusion>-->
-          <!--<groupId>org.sonatype.nexus</groupId>-->
-          <!--<artifactId>nexus-oss-edition</artifactId>-->
+        <!--<groupId>org.sonatype.nexus</groupId>-->
+        <!--<artifactId>nexus-oss-edition</artifactId>-->
         <!--</exclusion>-->
         <exclusion>
           <groupId>*</groupId>
@@ -75,33 +72,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-security-realms</artifactId>
-      <classifier>tests</classifier>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <!--
-      This module serves only to group dependencies for plugins, it has no classes, but we need to generate a jar for it regardless.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <skipIfEmpty>false</skipIfEmpty>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

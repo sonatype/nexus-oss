@@ -69,6 +69,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-servlet</artifactId>
     </dependency>

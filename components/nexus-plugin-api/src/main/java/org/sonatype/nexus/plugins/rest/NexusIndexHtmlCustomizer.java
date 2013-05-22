@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.plugins.rest;
 
-import java.util.Map;
-import javax.inject.Singleton;
-
 import org.sonatype.plugin.ExtensionPoint;
+
+import javax.inject.Singleton;
+import java.util.Map;
 
 /**
  * A Resource bundle meant for extending/contributing/spoofing existing resources (JS, CSS, Images, etc) of the Nexus
@@ -55,7 +55,7 @@ public interface NexusIndexHtmlCustomizer
      * 
      * @return
      */
-    String getPreHeadContribution( Map<String, Object> context );
+    String getPreHeadContribution(Map<String, Object> context);
 
     /**
      * A header contribution is a HTML snippet, that will be injected into the end of HEAD section of the index.html.
@@ -64,7 +64,7 @@ public interface NexusIndexHtmlCustomizer
      * 
      * @return
      */
-    String getPostHeadContribution( Map<String, Object> context );
+    String getPostHeadContribution(Map<String, Object> context);
 
     /**
      * A header contribution is a HTML snippet, that will be injected into the beginning of BODY section of the
@@ -73,7 +73,7 @@ public interface NexusIndexHtmlCustomizer
      * 
      * @return
      */
-    String getPreBodyContribution( Map<String, Object> context );
+    String getPreBodyContribution(Map<String, Object> context);
 
     /**
      * A header contribution is a HTML snippet, that will be injected into the end of BODY section of the index.html.
@@ -82,5 +82,5 @@ public interface NexusIndexHtmlCustomizer
      * 
      * @return
      */
-    String getPostBodyContribution( Map<String, Object> context );
+    String getPostBodyContribution(Map<String, Object> context);
 }
