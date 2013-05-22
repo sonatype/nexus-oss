@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.unpack.testsuite;
+package org.sonatype.nexus.unpack;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import org.sonatype.nexus.client.core.subsystem.security.User;
 /**
  * @since 2.5.1
  */
-public class AuthorizationIT
+public class UnpackAuthorizationIT
     extends UnpackITSupport
 {
 
@@ -31,7 +31,7 @@ public class AuthorizationIT
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    public AuthorizationIT( final String nexusBundleCoordinates )
+    public UnpackAuthorizationIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

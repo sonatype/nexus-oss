@@ -37,6 +37,81 @@
       <groupId>org.sonatype.http-testing-harness</groupId>
       <artifactId>server-provider</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-verifier</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <!--
+          Additional configuration required for integration-tests; nexus-plugin-parent defines the basic configuration.
+          -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache.maven</groupId>
+                      <artifactId>apache-maven</artifactId>
+                      <version>3.0.4</version>
+                      <classifier>bin</classifier>
+                      <type>zip</type>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <configuration>
+              <localRepositoryPath>${project.build.directory}/apache-maven-local-repository</localRepositoryPath>
+              <extraArtifacts>
+                <xml>org.apache.maven.plugins:maven-clean-plugin:2.4.1:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.5:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.10:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-jar-plugin:2.3.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-install-plugin:2.3.1:maven-plugin</xml>
+                <xml>org.sonatype.plugins:maven-upload-plugin:0.0.1:maven-plugin</xml>
+                <xml>org.apache.maven.surefire:surefire-junit3:2.10:jar</xml>
+                <xml>org.codehaus.plexus:plexus-utils:1.5.1:jar</xml>
+              </extraArtifacts>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
