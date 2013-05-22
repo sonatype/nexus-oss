@@ -14,6 +14,10 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
 
+/**
+ * @deprecated pending removal
+ */
+@Deprecated
 public class AbstractNexusResourceBundle
     implements NexusResourceBundle
 {

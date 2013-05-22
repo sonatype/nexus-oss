@@ -100,21 +100,11 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <!--
-      This module serves only to group dependencies for plugins, it has no classes, but we need to generate a jar for it regardless.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <skipIfEmpty>false</skipIfEmpty>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
