@@ -12,12 +12,13 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.sonatype.nexus.unpack</groupId>
-  <artifactId>upload-unpack-test</artifactId>
-  <version>${project.version}</version>
+  <artifactId>upload</artifactId>
+  <version>1.0</version>
   
   <build>
     <plugins>
@@ -34,9 +35,9 @@
             </goals>
             <configuration>
               <serverId>nexus</serverId>
-              <repositoryUrl>${nexus-base-url}service/local/repositories/nexus-test-harness-repo2/content-compressed</repositoryUrl>
+              <repositoryUrl>${nexus-base-url}service/local/repositories/${nexus-repository-id}/content-compressed</repositoryUrl>
               <file>target/${project.artifactId}-${project.version}.jar</file>
-              <repositoryPath>some/path</repositoryPath>
+              <repositoryPath>foo/bar</repositoryPath>
             </configuration>
           </execution>
         </executions>
