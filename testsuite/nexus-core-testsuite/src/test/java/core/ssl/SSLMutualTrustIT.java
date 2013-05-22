@@ -67,9 +67,9 @@ public class SSLMutualTrustIT
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
         return super.configureNexus( configuration )
-            .setSystemProperty( "javax.net.ssl.keyStore", testData().resolveFile( "keyStore-client" ).getAbsolutePath() )
+            .setSystemProperty( "javax.net.ssl.keyStore", testData().resolveFile( "keystore-client" ).getAbsolutePath() )
             .setSystemProperty( "javax.net.ssl.keyStorePassword", "changeit" )
-            .setSystemProperty( "javax.net.ssl.trustStore", testData().resolveFile( "trustStore-client" ).getAbsolutePath() )
+            .setSystemProperty( "javax.net.ssl.trustStore", testData().resolveFile( "truststore-client" ).getAbsolutePath() )
             .setSystemProperty( "javax.net.ssl.trustStorePassword", "changeit" );
     }
 
@@ -79,7 +79,7 @@ public class SSLMutualTrustIT
     {
         httpsRemoteServer = Server
             .withPort( 0 )
-            .withKeystore( testData().resolveFile( "keyStore-jetty" ).getAbsolutePath(), "changeit" )
+            .withKeystore( testData().resolveFile( "keystore-jetty" ).getAbsolutePath(), "changeit" )
             .withTruststore( testData().resolveFile( "truststore-jetty" ).getAbsolutePath(), "changeit" )
             .requireClientAuth()
             .serve( "/*" ).withBehaviours( Behaviours.get( testData().resolveFile( "remote-repo" ) ) )
