@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.testsuite;
+package org.sonatype.nexus.client;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -34,11 +34,11 @@ import org.sonatype.nexus.client.core.subsystem.routing.Status.Outcome;
  * 
  * @author cstamas
  */
-public class RoutingIT
-    extends NexusClientITSupport
+public class ClientRoutingIT
+    extends ClientITSupport
 {
 
-    public RoutingIT( final String nexusBundleCoordinates )
+    public ClientRoutingIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

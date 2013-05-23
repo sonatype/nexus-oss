@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.testsuite;
+package org.sonatype.nexus.client;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -28,8 +28,8 @@ import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 
-public class ArtifactMavenIT
-    extends NexusClientITSupport
+public class ClientArtifactMavenIT
+    extends ClientITSupport
 {
 
     private static final String AOP_POM = "aopalliance/aopalliance/1.0/aopalliance-1.0.pom";
@@ -41,7 +41,7 @@ public class ArtifactMavenIT
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    public ArtifactMavenIT( final String nexusBundleCoordinates )
+    public ClientArtifactMavenIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

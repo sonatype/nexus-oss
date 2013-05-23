@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.testsuite;
+package org.sonatype.nexus.client;
 
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
@@ -24,7 +24,7 @@ import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
-public abstract class NexusClientITSupport
+public abstract class ClientITSupport
     extends NexusRunningParametrizedITSupport
 {
 
@@ -39,7 +39,7 @@ public abstract class NexusClientITSupport
         ).load();
     }
 
-    public NexusClientITSupport( final String nexusBundleCoordinates )
+    public ClientITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
