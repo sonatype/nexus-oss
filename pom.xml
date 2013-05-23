@@ -454,44 +454,38 @@
         </plugin>
 
         <!--
-        FIXME: Rebuild confiugration with new module paths.
+        See 'license-check' profile.
+
+        FIXME: This configuration omits org.sonatype.nexus.proxy.target (components/nexus-core)
+        FIXME: Need to manually maintain these headers until this package is renamed to avoid complex configuration
         -->
-        <!--<plugin>-->
-        <!--<groupId>com.mycila.maven-license-plugin</groupId>-->
-        <!--<artifactId>maven-license-plugin</artifactId>-->
-        <!--<configuration>-->
-        <!--&lt;!&ndash; caution do not append children excludes since we have 'target' package &ndash;&gt;-->
-        <!--<excludes>-->
-        <!--<exclude>**/.*/**</exclude>-->
-        <!--&lt;!&ndash; we have target pattern in this format because of target package in nexus-core modules &ndash;&gt;-->
-        <!--<exclude>**/nexus*/target/**</exclude>-->
-        <!--<exclude>**/ldap-common/target/**</exclude>-->
-        <!--<exclude>plugin*/**/target/**</exclude>-->
-        <!--<exclude>**/ext-3.4.1.1/**</exclude>-->
-        <!--<exclude>**/js/filetree/**</exclude>-->
-        <!--<exclude>**/editarea_0_8_2/**</exclude>-->
-        <!--<exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>-->
-        <!--&lt;!&ndash; FIXME is this really a good idea excluding all test resources? &ndash;&gt;-->
-        <!--<exclude>**/src/test/resources/**</exclude>-->
-        <!--<exclude>**/src/test/filtered-resources/**</exclude>-->
-        <!--<exclude>**/nexus-test-harness-its/resources/**</exclude>-->
-        <!--<exclude>**/gwt/ext/ui/**/*.js</exclude>-->
-        <!--<exclude>**/gwt/ext/ui/**/*.css</exclude>-->
-        <!--&lt;!&ndash; already has a lgpl license &ndash;&gt;-->
-        <!--<exclude>**/Ext.ux.form.LovCombo.css</exclude>-->
-        <!--&lt;!&ndash; temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check &ndash;&gt;-->
-        <!--<exclude>**/dependency-reduced-pom.xml</exclude>-->
-        <!--&lt;!&ndash; netbeans adds these &ndash;&gt;-->
-        <!--<exclude>**/nbactions*.xml</exclude>-->
-        <!--<exclude>**/nb-configuration.xml</exclude>-->
-        <!--&lt;!&ndash; IntelliJ IDEA files&ndash;&gt;-->
-        <!--<exclude>**/atlassian-ide-plugin.xml</exclude>-->
-        <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>-->
-        <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>-->
-        <!--<exclude>plugins/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>-->
-        <!--</excludes>-->
-        <!--</configuration>-->
-        <!--</plugin>-->
+        <plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <configuration>
+            <excludes combine.children="append">
+              <!--
+              Exclude test resource files, many of these need specific content w/o headers.
+              -->
+              <exclude>**/src/test/*resources/**</exclude>
+              <exclude>**/nexus-test-harness-its/resources/**</exclude>
+
+              <!--
+              Exclude third-party resources.
+              -->
+              <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/ext-3.*/**</exclude>
+              <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/ext-3.*/**</exclude>
+              <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
+              <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
+              <exclude>**/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
+
+              <!--
+              Excludes for specific classes which have compatible, yet different licences.
+              -->
+              <exclude>**/ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
 
         <!-- INTERNAL -->
 
@@ -708,6 +702,36 @@
       <modules>
         <module>testsuite</module>
       </modules>
+    </profile>
+
+    <!--
+    Verify license headers; use: mvn -Dlicense-check -N
+    -->
+    <profile>
+      <id>license-check</id>
+      <activation>
+        <property>
+          <name>license-check</name>
+        </property>
+      </activation>
+      <build>
+        <defaultGoal>com.mycila.maven-license-plugin:maven-license-plugin:check</defaultGoal>
+      </build>
+    </profile>
+
+    <!--
+    Format license headers; use: mvn -Dlicense-format -N
+    -->
+    <profile>
+      <id>license-format</id>
+      <activation>
+        <property>
+          <name>license-format</name>
+        </property>
+      </activation>
+      <build>
+        <defaultGoal>com.mycila.maven-license-plugin:maven-license-plugin:format</defaultGoal>
+      </build>
     </profile>
 
     <!--
