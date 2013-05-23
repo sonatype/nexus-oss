@@ -426,7 +426,7 @@ public class RoutingFilteringIT
         public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
             throws Exception
         {
-            if ( !request.getPathInfo().startsWith( "/.meta/prefixes.txt" ) )
+            if ( !request.getPathInfo().equals( "/.meta/prefixes.txt" ) )
             {
                 return true;
             }
