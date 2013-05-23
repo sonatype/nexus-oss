@@ -1,0 +1,82 @@
+<!--
+
+    Copyright (c) 2007-2013 Sonatype, Inc. All rights reserved.
+
+    This program is licensed to you under the Apache License Version 2.0,
+    and you may not use this file except in compliance with the Apache License Version 2.0.
+    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the Apache License Version 2.0 is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+      <groupId>org.sonatype.forge</groupId>
+      <artifactId>forge-parent</artifactId>
+      <version>35</version>
+    </parent>
+
+    <groupId>org.sonatype.sisu</groupId>
+    <artifactId>sisu-task-scheduler</artifactId>
+    <version>1.8.2-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Sisu Task Scheduler</name>
+
+    <scm>
+        <connection>scm:git:git://github.com/sonatype/sisu-task-scheduler.git</connection>
+        <developerConnection>scm:git:git@github.com:sonatype/sisu-task-scheduler.git</developerConnection>
+        <url>https://github.com/sonatype/sisu-task-scheduler</url>
+    </scm>
+
+    <ciManagement>
+        <system>hudson</system>
+        <url>https://builds.sonatype.org/job/sisu-task-scheduler/</url>
+    </ciManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sonatype.sisu.litmus</groupId>
+            <artifactId>litmus-testsupport</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>sisu-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>main-index</goal>
+                            <goal>test-index</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
