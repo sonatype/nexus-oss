@@ -53,16 +53,4 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>
-    <plugins>
-      <!--
-      TODO: Move to specific modules which use plexus, run build and look for components.xml to find which modules need this.
-      -->
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

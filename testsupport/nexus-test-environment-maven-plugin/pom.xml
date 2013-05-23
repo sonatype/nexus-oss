@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -21,6 +22,10 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
+  <!--
+  FIXME: This should not be using this groupId!
+  -->
+  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-test-environment-maven-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>maven-plugin</packaging>
@@ -120,6 +125,14 @@
 
   <build>
     <plugins>
+      <!--
+      FIXME: This module uses legacy Plexus components.
+      -->
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>

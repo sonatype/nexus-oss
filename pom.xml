@@ -95,7 +95,7 @@
     <module>assemblies</module>
 
     <!--
-    See 'include-plugins', 'include-testsuite' profile for addtional modules.
+    See 'include-plugins', 'include-testsuite' profile for additional modules.
     -->
   </modules>
 
