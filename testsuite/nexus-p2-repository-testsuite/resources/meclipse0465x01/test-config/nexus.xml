@@ -58,7 +58,7 @@
         <authentication>
           <!-- username and password must match the settings in resources/default-config/realm.properties -->
           <username>admin</username>
-          <password>adminpassword</password>
+          <password>admin</password>
         </authentication>
       </remoteStorage>
     </repository>

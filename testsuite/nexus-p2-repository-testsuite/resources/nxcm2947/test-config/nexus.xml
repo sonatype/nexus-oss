@@ -57,7 +57,7 @@
         <url>${proxy-repo-base-url}nxcm2947</url>
         <authentication>
           <username>admin</username>
-          <password>adminpassword</password>
+          <password>admin</password>
         </authentication>
       </remoteStorage>
     </repository>
