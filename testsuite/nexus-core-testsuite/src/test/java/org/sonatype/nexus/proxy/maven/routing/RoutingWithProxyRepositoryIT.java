@@ -125,4 +125,5 @@ public class RoutingWithProxyRepositoryIT
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
     }
+
 }

@@ -42,8 +42,12 @@ public abstract class NexusCoreITSupport
     @Parameterized.Parameters
     public static Collection<Object[]> data()
     {
-        return firstAvailableTestParameters( systemTestParameters(),
-            testParameters( $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" ) ) ).load();
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters(
+                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
+            )
+        ).load();
     }
 
     protected NexusCoreITSupport( final String nexusBundleCoordinates )
@@ -81,4 +85,5 @@ public abstract class NexusCoreITSupport
     {
         return client().getSubsystem( Content.class );
     }
+
 }

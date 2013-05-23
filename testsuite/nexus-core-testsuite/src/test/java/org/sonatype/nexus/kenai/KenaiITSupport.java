@@ -23,7 +23,6 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-
 import javax.inject.Inject;
 
 import org.junit.AfterClass;
@@ -40,21 +39,26 @@ import org.sonatype.tests.http.server.fluent.Server;
 
 /**
  * Support for Kenai integration tests.
- * 
+ *
  * @since 2.5
  */
-@NexusStartAndStopStrategy( EACH_TEST )
+@NexusStartAndStopStrategy(EACH_TEST)
 public class KenaiITSupport
     extends NexusRunningParametrizedITSupport
 {
+
     @Inject
     private FileTaskBuilder fileTaskBuilder;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data()
     {
-        return firstAvailableTestParameters( systemTestParameters(),
-            testParameters( $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" ) ) ).load();
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters(
+                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
+            )
+        ).load();
     }
 
     @Rule
@@ -68,12 +72,19 @@ public class KenaiITSupport
     @Override
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
-        return super.configureNexus( configuration ).setLogLevel( "org.sonatype.security.realms.kenai", "DEBUG" ).addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement( "org.sonatype.nexus.plugins",
-                "nexus-kenai-plugin" ) ).addOverlays(
-            fileTaskBuilder.copy().directory( file( testData().resolveFile( "preset-nexus" ) ) ).filterUsing(
-                "mock-kenai-port", String.valueOf( server.getPort() ) ).to().directory(
-                path( "sonatype-work/nexus/conf" ) ) );
+        return super.configureNexus( configuration )
+            .setLogLevel( "org.sonatype.security.realms.kenai", "DEBUG" )
+            .addPlugins(
+                artifactResolver().resolvePluginFromDependencyManagement(
+                    "org.sonatype.nexus.plugins", "nexus-kenai-plugin"
+                )
+            )
+            .addOverlays(
+                fileTaskBuilder.copy()
+                    .directory( file( testData().resolveFile( "preset-nexus" ) ) )
+                    .filterUsing( "mock-kenai-port", String.valueOf( server.getPort() ) )
+                    .to().directory( path( "sonatype-work/nexus/conf" ) )
+            );
     }
 
     private static Server server;
@@ -104,4 +115,5 @@ public class KenaiITSupport
     {
         return client().getSubsystem( Content.class );
     }
+
 }

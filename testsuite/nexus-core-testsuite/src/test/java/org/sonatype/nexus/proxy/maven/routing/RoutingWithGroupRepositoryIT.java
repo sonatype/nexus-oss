@@ -120,4 +120,5 @@ public class RoutingWithGroupRepositoryIT
         assertThat( noscrape( PREFIX_FILE_LOCATION ), is( false ) );
         content().delete( PREFIX_FILE_LOCATION );
     }
+
 }

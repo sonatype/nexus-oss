@@ -114,19 +114,19 @@ public class RoutingSmokeIT
     @Test( expected = NexusClientBadRequestException.class )
     public void checkReleasesHostedHasNoDiscoveryConfiguration()
     {
-        final DiscoveryConfiguration releasesConfiguration = routing().getDiscoveryConfigurationFor( "releases" );
+        routing().getDiscoveryConfigurationFor( "releases" );
     }
 
     @Test( expected = NexusClientBadRequestException.class )
     public void checkPublicGroupHasNoDiscoveryConfiguration()
     {
-        final DiscoveryConfiguration releasesConfiguration = routing().getDiscoveryConfigurationFor( "public" );
+        routing().getDiscoveryConfigurationFor( "public" );
     }
 
     @Test( expected = NexusClientBadRequestException.class )
     public void checkCentralM1ShadowHasNoDiscoveryConfiguration()
     {
-        final DiscoveryConfiguration releasesConfiguration = routing().getDiscoveryConfigurationFor( "central-m1" );
+        routing().getDiscoveryConfigurationFor( "central-m1" );
     }
 
     @Test( expected = NexusClientBadRequestException.class )
@@ -170,4 +170,5 @@ public class RoutingSmokeIT
             repositories().get( ProxyRepository.class, "central" ).unblock().save();
         }
     }
+
 }

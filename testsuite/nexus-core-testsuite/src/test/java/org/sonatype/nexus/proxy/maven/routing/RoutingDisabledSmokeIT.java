@@ -33,20 +33,21 @@ import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 /**
  * Simple smoke IT for automatic routing REST being responsive and is reporting the expected statuses when the feature is
  * DISABLED!
- * 
+ *
  * @author cstamas
  */
-@Category( Smoke.class )
+@Category(Smoke.class)
 public class RoutingDisabledSmokeIT
     extends RoutingITSupport
 {
+
     // we will timeout after 15 minutes, just as a safety net
     @Rule
     public Timeout timeout = new Timeout( 900000 );
 
     /**
      * Constructor.
-     * 
+     *
      * @param nexusBundleCoordinates
      */
     public RoutingDisabledSmokeIT( final String nexusBundleCoordinates )
@@ -58,8 +59,10 @@ public class RoutingDisabledSmokeIT
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
         // setting the system property to DISABLE feature
-        return super.configureNexus( configuration ).setSystemProperty(
-            "org.sonatype.nexus.proxy.maven.routing.Config.featureActive", Boolean.FALSE.toString() );
+        return super.configureNexus( configuration )
+            .setSystemProperty(
+                "org.sonatype.nexus.proxy.maven.routing.Config.featureActive", Boolean.FALSE.toString()
+            );
     }
 
     @Before
@@ -121,21 +124,21 @@ public class RoutingDisabledSmokeIT
         }
     }
 
-    @Test( expected = NexusClientBadRequestException.class )
+    @Test(expected = NexusClientBadRequestException.class)
     public void checkReleasesHostedHasNoDiscoveryConfiguration()
     {
-        final DiscoveryConfiguration releasesConfiguration = routing().getDiscoveryConfigurationFor( "releases" );
+        routing().getDiscoveryConfigurationFor( "releases" );
     }
 
-    @Test( expected = NexusClientBadRequestException.class )
+    @Test(expected = NexusClientBadRequestException.class)
     public void checkPublicGroupHasNoDiscoveryConfiguration()
     {
-        final DiscoveryConfiguration releasesConfiguration = routing().getDiscoveryConfigurationFor( "public" );
+        routing().getDiscoveryConfigurationFor( "public" );
     }
 
-    @Test( expected = NexusClientBadRequestException.class )
+    @Test(expected = NexusClientBadRequestException.class)
     public void checkCentralM1ShadowHasNoDiscoveryConfiguration()
     {
-        final DiscoveryConfiguration releasesConfiguration = routing().getDiscoveryConfigurationFor( "central-m1" );
+        routing().getDiscoveryConfigurationFor( "central-m1" );
     }
 }

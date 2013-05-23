@@ -27,7 +27,7 @@ import org.sonatype.nexus.client.core.subsystem.security.Roles;
 
 /**
  * This is a codified version of "smoke testing Kenai Realm", see below the wiki link.
- * 
+ *
  * @author cstamas
  * @see <a href="https://docs.sonatype.com/display/Nexus/Testing+Kenai+%28java.net%29+Security+Realm">Testing Kenai
  *      Realm</a> wiki page
@@ -50,8 +50,11 @@ public class KenaiIT
         }
         catch ( NexusClientNotFoundException e )
         {
-            roles.create( "kenai-base-role" ).withName( "Kenai Base Role" ).withDescription( "Kenai Base Role" ).withRole(
-                "nx-admin" ).save();
+            roles.create( "kenai-base-role" )
+                .withName( "Kenai Base Role" )
+                .withDescription( "Kenai Base Role" )
+                .withRole( "nx-admin" )
+                .save();
         }
     }
 
@@ -69,7 +72,7 @@ public class KenaiIT
         assertThat( existingRoles, not( empty() ) );
     }
 
-    @Test( expected = NexusClientResponseException.class )
+    @Test(expected = NexusClientResponseException.class)
     public void kenaiNotLogsInWithBadCredentials()
         throws Exception
     {

@@ -61,4 +61,5 @@ public class SmokeIT
         // assertThat( nexusStatus.getVersion(), is( nexus().getConfiguration(). nexusBundleArtifact.getBaseVersion() ) ); // version
         assertThat( nexusStatus.getEditionShort(), equalTo( "OSS" ) );
     }
+
 }

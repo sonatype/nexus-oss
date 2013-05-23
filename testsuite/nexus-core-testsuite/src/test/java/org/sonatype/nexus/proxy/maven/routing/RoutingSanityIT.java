@@ -33,7 +33,6 @@ import org.sonatype.nexus.client.core.subsystem.routing.Status;
 import org.sonatype.nexus.client.core.subsystem.routing.Status.Outcome;
 import org.sonatype.sisu.litmus.testsupport.group.External;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
-
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.InputSupplier;
@@ -41,19 +40,20 @@ import com.google.common.io.InputSupplier;
 /**
  * This IT will just boot up nexus, wait for WL to be discovered (only for Central, with default config), and then
  * download the central prefix file and sanity check it.
- * <p>
+ * <p/>
  * This is a slow test. Here, we check that on boot of a "virgin" Nexus, Central is being "remotely discovered" (today
  * -- 2013. 02. 08 -- scraped, but once prefix file published, it will be used instead of lengthy scrape). Warning, this
  * IT scraping Central for real! On my Mac (cstamas), this IT runs for 210seconds, hence, is marked as Slow.
- * <P>
+ * <p/>
  * Not anymore, as prefix file is deployed to central.
- * 
+ *
  * @author cstamas
  */
-@Category( { Slow.class, External.class } )
+@Category({ Slow.class, External.class })
 public class RoutingSanityIT
     extends RoutingITSupport
 {
+
     // we will timeout after 15 minutes, just as a safety net
     @Rule
     public Timeout timeout = new Timeout( 900000 );
@@ -67,8 +67,10 @@ public class RoutingSanityIT
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
         // we lessen the throttling as otherwise this test would run even longer
-        return super.configureNexus( configuration ).setSystemProperty(
-            "org.sonatype.nexus.proxy.maven.routing.internal.scrape.Scraper.pageSleepTimeMillis", "50" );
+        return super.configureNexus( configuration )
+            .setSystemProperty(
+                "org.sonatype.nexus.proxy.maven.routing.internal.scrape.Scraper.pageSleepTimeMillis", "50"
+            );
     }
 
     @Before
@@ -82,7 +84,7 @@ public class RoutingSanityIT
     /**
      * Testing initial boot of Nexus with WL feature. Asserting that Central (and hence Public group, that has Central
      * and only one proxy member) has WL published, since Central discovery succeeded.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -137,7 +139,7 @@ public class RoutingSanityIT
     /**
      * Fetches and compares prefix file from Nx and the "original" from Central and compares the two: they must be
      * binary equal, Nexus must not modify the content at all.
-     * 
+     *
      * @throws IOException
      */
     @Test
@@ -153,22 +155,23 @@ public class RoutingSanityIT
         try
         {
             ByteStreams.equal( new InputSupplier<InputStream>()
-            {
-                @Override
-                public InputStream getInput()
-                    throws IOException
-                {
-                    return nexusPrefixFile;
-                }
-            }, new InputSupplier<InputStream>()
-            {
-                @Override
-                public InputStream getInput()
-                    throws IOException
-                {
-                    return centralPrefixFile;
-                }
-            } );
+                               {
+                                   @Override
+                                   public InputStream getInput()
+                                       throws IOException
+                                   {
+                                       return nexusPrefixFile;
+                                   }
+                               }, new InputSupplier<InputStream>()
+                               {
+                                   @Override
+                                   public InputStream getInput()
+                                       throws IOException
+                                   {
+                                       return centralPrefixFile;
+                                   }
+                               }
+            );
         }
         finally
         {

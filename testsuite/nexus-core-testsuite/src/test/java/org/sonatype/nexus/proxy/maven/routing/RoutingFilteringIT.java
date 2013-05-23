@@ -173,12 +173,24 @@ public class RoutingFilteringIT
         final PathRecorder recorder = new PathRecorder();
         final PrefixesFile prefixesFile = new PrefixesFile();
         prefixesFile.setContent( null );
-        final Server server =
-            Server.withPort( 0 ).serve( "/*" ).withBehaviours( recorder, prefixesFile, Behaviours.get( remoteRepoRoot ) ).start();
+
+        final Server server = Server
+            .withPort( 0 )
+            .serve( "/*" )
+            .withBehaviours(
+                recorder,
+                prefixesFile,
+                Behaviours.get( remoteRepoRoot )
+            )
+            .start();
+
         // create the proxy
-        final MavenProxyRepository proxyRepository =
-            repositories().create( MavenProxyRepository.class, repositoryIdForTest( "someorgProxy1" ) ).asProxyOf(
-                server.getUrl().toExternalForm() ).doNotDownloadRemoteIndexes().save();
+        final MavenProxyRepository proxyRepository = repositories()
+            .create( MavenProxyRepository.class, repositoryIdForTest( "someorgProxy1" ) )
+            .asProxyOf( server.getUrl().toExternalForm() )
+            .doNotDownloadRemoteIndexes()
+            .save();
+
         routingTest().waitForAllRoutingUpdateJobToStop();
         // waitForWLPublishingOutcomes( proxyRepository.id() );
         client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
@@ -304,12 +316,23 @@ public class RoutingFilteringIT
         // now set the prefixes file that contains /org/someorg prefix only, and repeat
         prefixesFile.setContent( Files.toString( testData().resolveFile( "someorg-prefixes.txt" ),
             Charset.forName( "UTF-8" ) ) );
-        final Server server =
-            Server.withPort( 0 ).serve( "/*" ).withBehaviours( recorder, prefixesFile, Behaviours.get( remoteRepoRoot ) ).start();
+        final Server server = Server
+            .withPort( 0 )
+            .serve( "/*" )
+            .withBehaviours(
+                recorder,
+                prefixesFile,
+                Behaviours.get( remoteRepoRoot )
+            )
+            .start();
+
         // create the proxy
         final MavenProxyRepository proxyRepository =
-            repositories().create( MavenProxyRepository.class, repositoryIdForTest( "someorgProxy1" ) ).asProxyOf(
-                server.getUrl().toExternalForm() ).doNotDownloadRemoteIndexes().save();
+            repositories().create( MavenProxyRepository.class, repositoryIdForTest( "someorgProxy1" ) )
+                .asProxyOf( server.getUrl().toExternalForm() )
+                .doNotDownloadRemoteIndexes()
+                .save();
+
         routingTest().waitForAllRoutingUpdateJobToStop();
         // waitForWLPublishingOutcomes( proxyRepository.id() );
         client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
