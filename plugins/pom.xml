@@ -17,24 +17,43 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!--
-  FIXME: Merge plugin-parent into this module, avoid 2 pom roots in the same tree.
-  -->
-
-  <!--
-  All Nexus OSS plugins extend from the nexus-plugin-parent POM configuration.
-  -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-plugin-parent</artifactId>
+    <artifactId>nexus-oss</artifactId>
     <version>2.5.0-SNAPSHOT</version>
-    <relativePath>../plugin-parent/pom.xml</relativePath>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>plugins</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
+
+  <properties>
+    <!-- enunciate configuration -->
+    <enunciate.version>1.26.2</enunciate.version>
+    <copyright.year>2013</copyright.year>
+
+    <!-- nexus-plugin-bundle configuration -->
+    <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+
+    <!-- yuicompressor defaults; debug friendly, see 'optimize-js' profile -->
+    <maven.yuicompressor.jswarn>true</maven.yuicompressor.jswarn>
+    <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
+    <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+    <maven.yuicompressor.linebreakpos>0<!-- preserve linebreaks --></maven.yuicompressor.linebreakpos>
+  </properties>
+
+  <modules>
+    <module>basic</module>
+    <module>capabilities</module>
+    <module>indexer</module>
+    <module>maven</module>
+    <module>osgi</module>
+    <module>p2</module>
+    <module>restlet1x</module>
+    <module>security</module>
+  </modules>
 
   <dependencyManagement>
     <dependencies>
@@ -47,6 +66,41 @@
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
+      </dependency>
+
+      <!--
+      Here only to bring in 'org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature' so that Enunciate can understand
+      restlet1x plugins which have these annotations for documentation generation.
+
+      FIXME: Remove need for this dep once we have most bits on JAX-RS compatible resources.
+      FIXME: Short-term, may want to just include this in deps provided by nexus-restlet1x-plugin?
+      -->
+      <dependency>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>enunciate-core</artifactId>
+        <version>${enunciate.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>enunciate-core-rt</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.sf.apt-jelly</groupId>
+            <artifactId>apt-jelly-freemarker</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- INTERNAL -->
@@ -85,6 +139,13 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-crypto-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-crypto-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -135,10 +196,6 @@
         <type>${nexus-plugin.type}</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
-
-      <!--
-      FIXME: Remove need for this, due to legacy testsuite muck
-      -->
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
@@ -237,10 +294,37 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
+        <artifactId>nexus-restlet1x-model</artifactId>
         <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <type>jar</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <classifier>tests</classifier>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
         <classifier>bundle</classifier>
         <type>${nexus-plugin.type}</type>
+        <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -271,14 +355,14 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-site-repository-client</artifactId>
+        <artifactId>nexus-site-repository-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-site-repository-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <artifactId>nexus-site-repository-client</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -300,6 +384,13 @@
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ui-extjs3-plugin</artifactId>
+        <type>jar</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- unpack -->
 
       <dependency>
@@ -308,32 +399,139 @@
         <type>${nexus-plugin.type}</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
+
     </dependencies>
   </dependencyManagement>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <!--
+        Support for Nexus plugins which provide a UI.
+        -->
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <!--
+            yuicompressor warns when code is not in a shape that's optimized for minifying.
+            ATM this only pollutes the log (~9400 warnings)
+            -->
+            <jswarn>false</jswarn>
+            <nominify>${maven.yuicompressor.nocompress}</nominify>
+            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
+            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
+            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
+            <sourceDirectory>${project.build.sourceDirectory}/../resources/static</sourceDirectory>
+          </configuration>
+          <executions>
+            <execution>
+              <id>js</id>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/js</sourceDirectory>
+              </configuration>
+            </execution>
+            <execution>
+              <id>css</id>
+              <goals>
+                <goal>aggregate-css</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
+                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/css</sourceDirectory>
+                <required>false</required>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <!--
+      Support legacy Plexus components; remove this once Plexus is removed completely.
+      -->
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <!--
-    FIXME: Can probably remove this profile once long-running tests are under testsuite/*
+    Optimize javascript & css files, for use on production/release builds.
     -->
     <profile>
-      <id>plugins</id>
+      <id>optimize-js</id>
+      <properties>
+        <!--
+        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
+        -->
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+        <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
+        <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+        <maven.yuicompressor.linebreakpos>-1<!-- do not preserve linebreaks --></maven.yuicompressor.linebreakpos>
+      </properties>
+    </profile>
 
+    <!--
+    Generates Nexus plugin REST documentation, which is included in plugin bundles.
+    Enunciate is *only* used to generate documentation presently.
+    -->
+    <profile>
+      <id>enunciate</id>
       <activation>
-        <property>
-          <name>!skip-plugins</name>
-        </property>
+        <file>
+          <exists>enunciate.xml</exists>
+        </file>
       </activation>
-
-      <modules>
-        <module>basic</module>
-        <module>capabilities</module>
-        <module>indexer</module>
-        <module>maven</module>
-        <module>osgi</module>
-        <module>p2</module>
-        <module>restlet1x</module>
-        <module>security</module>
-      </modules>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>maven-enunciate-slim-plugin</artifactId>
+            <version>${enunciate.version}</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-docs</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
+              <!--
+              enunciate-xml module is needed to properly handle 'defaultRestSubcontext' configuration,
+              which is used to generate the mount point location in documentation.
+              when this dependency is included the module appears to be automatically enabled.
+              -->
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-xml</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>docs</goal>
+                </goals>
+                <configuration>
+                  <configFile>enunciate.xml</configFile>
+                  <docsDir>${project.build.outputDirectory}/docs</docsDir>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <profile>
@@ -355,20 +553,6 @@
                   <pluginExecutions>
                     <pluginExecution>
                       <pluginExecutionFilter>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <versionRange>[2.5.1,)</versionRange>
-                        <goals>
-                          <goal>copy</goal>
-                          <goal>unpack</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore />
-                      </action>
-                    </pluginExecution>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
                         <groupId>org.codehaus.enunciate</groupId>
                         <artifactId>maven-enunciate-slim-plugin</artifactId>
                         <versionRange>[1.26.2,)</versionRange>
@@ -377,7 +561,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
@@ -388,7 +572,6 @@
         </pluginManagement>
       </build>
     </profile>
-
   </profiles>
 
 </project>

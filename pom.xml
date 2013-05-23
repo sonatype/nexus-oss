@@ -63,7 +63,7 @@
   </repositories>
 
   <prerequisites>
-    <!-- Mostly meaningless, though site plugin uses this;  Minimum version controlled by enforcer plugin -->
+    <!-- Mostly meaningless, though site plugin uses this; Minimum version controlled by enforcer plugin -->
     <maven>3.0.4</maven>
   </prerequisites>
 
@@ -75,11 +75,6 @@
 
     <!-- See 'idea' profile -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
-
-    <!-- tattletale defaults -->
-    <tattletale.failOnInfo>false</tattletale.failOnInfo>
-    <tattletale.failOnWarn>false</tattletale.failOnWarn>
-    <tattletale.failOnError>true</tattletale.failOnError>
 
     <!-- logging configuration used in logback config files to control test logging -->
     <test.log.level>INFO</test.log.level>
@@ -97,16 +92,28 @@
     <module>buildsupport</module>
     <module>testsupport</module>
     <module>components</module>
-    <module>plugin-parent</module>
-    <module>plugins</module>
     <module>assemblies</module>
-    <module>testsuite</module>
+
+    <!--
+    See 'include-plugins', 'include-testsuite' profile for addtional modules.
+    -->
   </modules>
 
   <dependencyManagement>
     <dependencies>
 
       <!-- INTERNAL -->
+
+      <!--
+      DM entry here is used to allow the _bundle-launcher-style_ integration-tests to locate the appropriate Nexus bundle to test with.
+      -->
+      <dependency>
+        <groupId>${it.nexus.bundle.groupId}</groupId>
+        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <version>${it.nexus.bundle.version}</version>
+      </dependency>
 
       <!-- components -->
 
@@ -313,6 +320,9 @@
           <version>2.4</version>
         </plugin>
 
+        <!--
+        Additional configuration for release; enable additional profiles.
+        -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
@@ -321,6 +331,9 @@
           </configuration>
         </plugin>
 
+        <!--
+        Basic unit-test environment configuration.
+        -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -351,6 +364,9 @@
           </configuration>
         </plugin>
 
+        <!--
+        Basic integration-test environment configuration.
+        -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
@@ -387,6 +403,9 @@
           </configuration>
         </plugin>
 
+        <!--
+        For legacy-plugins which still need Plexus descriptors.
+        -->
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
@@ -414,17 +433,9 @@
           <version>1.5</version>
         </plugin>
 
-        <plugin>
-          <groupId>org.jboss.tattletale</groupId>
-          <artifactId>tattletale-maven</artifactId>
-          <version>1.1.2.Final</version>
-          <configuration>
-            <failOnInfo>${tattletale.failOnInfo}</failOnInfo>
-            <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
-            <failOnError>${tattletale.failOnError}</failOnError>
-          </configuration>
-        </plugin>
-
+        <!--
+        Support for nexus-plugin packaging.
+        -->
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
@@ -444,6 +455,9 @@
           <version>1.0</version>
         </plugin>
 
+        <!--
+        Support for bridging maven configuration to test-suite executions; see 'it' profile.
+        -->
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
@@ -492,6 +506,9 @@
 
         <!-- INTERNAL -->
 
+        <!--
+        Plugin supporting _legacy-style_ integration-tests.
+        -->
         <plugin>
           <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
@@ -711,22 +728,39 @@
   </build>
 
   <profiles>
+    <!--
+    Allows build of 'plugins' to be disabled; required for build-automation optimizations.
+    -->
     <profile>
-      <id>debug</id>
+      <id>include-plugins</id>
       <activation>
         <property>
-          <name>debug</name>
-          <value>true</value>
+          <name>!skip-plugins</name>
         </property>
       </activation>
-      <properties>
-        <!-- configure test logging properties to debug levels -->
-        <test.log.level>DEBUG</test.log.level>
-        <it.test.log.level>DEBUG</it.test.log.level>
-        <it.nexus.log.level>DEBUG</it.nexus.log.level>
-      </properties>
+      <modules>
+        <module>plugins</module>
+      </modules>
     </profile>
 
+    <!--
+    Allows build of 'testsuite' to be disabled; required for build-automation optimizations.
+    -->
+    <profile>
+      <id>include-testsuite</id>
+      <activation>
+        <property>
+          <name>!skip-testsuite</name>
+        </property>
+      </activation>
+      <modules>
+        <module>testsuite</module>
+      </modules>
+    </profile>
+
+    <!--
+    Enable running of integration-tests.
+    -->
     <profile>
       <id>it</id>
       <activation>
@@ -764,6 +798,75 @@
       </build>
     </profile>
 
+    <!--
+    Enable verbose logging for unit tests; defaults to DEBUG.
+    -->
+    <profile>
+      <id>test.debug</id>
+      <activation>
+        <property>
+          <name>test.debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <test.log.level>DEBUG</test.log.level>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <test.log.level>${test.log.level}</test.log.level>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Enable verbose logging for integration tests; defaults to DEBUG.
+    -->
+    <profile>
+      <id>it.debug</id>
+      <activation>
+        <property>
+          <name>it.debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <test.log.level>DEBUG</test.log.level>
+        <it.test.log.level>DEBUG</it.test.log.level>
+        <it.nexus.log.level>DEBUG</it.nexus.log.level>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <test.log.level>${test.log.level}</test.log.level>
+                  <it.test.log.level>${it.test.log.level}</it.test.log.level>
+                  <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Support for loading Nexus projects in Intellij IDEA; as it doesn't handle the 'nexus-plugin' packaging WRT to dependency calculations.
+    -->
     <profile>
       <id>idea</id>
       <properties>
@@ -771,6 +874,9 @@
       </properties>
     </profile>
 
+    <!--
+    Support for loading projects in Eclipse.
+    -->
     <profile>
       <id>m2e</id>
       <activation>
@@ -807,6 +913,7 @@
                         <artifactId>maven-dependency-plugin</artifactId>
                         <versionRange>[2.5.1,)</versionRange>
                         <goals>
+                          <goal>copy</goal>
                           <goal>unpack</goal>
                         </goals>
                       </pluginExecutionFilter>
@@ -836,6 +943,9 @@
       </build>
     </profile>
 
+    <!--
+    Enable animal sniffer to verify jdk compatibility.
+    -->
     <profile>
       <id>sniff</id>
       <build>

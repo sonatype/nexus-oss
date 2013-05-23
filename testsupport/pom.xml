@@ -56,7 +56,7 @@
   <build>
     <plugins>
       <!--
-      TODO: Move to specific modules which use plexus, we eventually want to remove the need for this
+      TODO: Move to specific modules which use plexus, run build and look for components.xml to find which modules need this.
       -->
       <plugin>
         <groupId>org.codehaus.plexus</groupId>

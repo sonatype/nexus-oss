@@ -23,9 +23,20 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
+  <!--
+  TODO: Update groupId before we release, so we can keep the namespace of these modules isolated.
+  -->
+  <!--<groupId>org.sonatype.nexus.assemblies</groupId>-->
   <artifactId>assemblies</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
+
+  <properties>
+    <!-- tattletale defaults -->
+    <tattletale.failOnInfo>false</tattletale.failOnInfo>
+    <tattletale.failOnWarn>false</tattletale.failOnWarn>
+    <tattletale.failOnError>true</tattletale.failOnError>
+  </properties>
 
   <modules>
     <module>nexus-oss-webapp</module>
@@ -46,5 +57,22 @@
 
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.jboss.tattletale</groupId>
+          <artifactId>tattletale-maven</artifactId>
+          <version>1.1.2.Final</version>
+          <configuration>
+            <failOnInfo>${tattletale.failOnInfo}</failOnInfo>
+            <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
+            <failOnError>${tattletale.failOnError}</failOnError>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

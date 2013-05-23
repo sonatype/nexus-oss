@@ -56,7 +56,7 @@
       <build>
         <plugins>
           <!--
-          Additional configuration required for integration-tests; nexus-plugin-parent defines the basic configuration.
+          Additional configuration required for integration-tests
           -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
