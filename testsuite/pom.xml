@@ -36,7 +36,6 @@
     <module>nexus-client-core-testsuite</module>
     <module>nexus-test-harness-its</module>
     <module>nexus-capabilities-testsuite</module>
-    <module>nexus-kenai-testsuite</module>
     <module>nexus-ldap-plugin-it</module>
     <module>nexus-obr-testsuite</module>
     <module>nexus-p2-repository-testsuite</module>
