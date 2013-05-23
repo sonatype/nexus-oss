@@ -41,7 +41,6 @@
     <module>nexus-obr-testsuite</module>
     <module>nexus-p2-repository-testsuite</module>
     <module>nexus-restlet1x-testsuite</module>
-    <module>nexus-site-repository-testsuite</module>
   </modules>
 
   <dependencyManagement>

@@ -28,6 +28,7 @@
   <logger name="org.sonatype.nexus.client" level="${test.log.level.org.sonatype.nexus.client:-INFO}"/>
 
   <logger name="org.sonatype.nexus.unpack" level="TRACE"/>
+  <logger name="org.sonatype.nexus.repository.site" level="TRACE"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

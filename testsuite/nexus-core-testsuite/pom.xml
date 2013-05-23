@@ -34,6 +34,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-site-repository-client</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
       <artifactId>server-provider</artifactId>
     </dependency>
@@ -96,8 +101,13 @@
                 <xml>org.apache.maven.plugins:maven-jar-plugin:2.3.2:maven-plugin</xml>
                 <xml>org.apache.maven.plugins:maven-install-plugin:2.3.1:maven-plugin</xml>
                 <xml>org.sonatype.plugins:maven-upload-plugin:0.0.1:maven-plugin</xml>
-                <xml>org.apache.maven.surefire:surefire-junit3:2.10:jar</xml>
-                <xml>org.codehaus.plexus:plexus-utils:1.5.1:jar</xml>
+                <xml>org.apache.maven.plugins:maven-project-info-reports-plugin:2.5.1:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-site-plugin:3.1:maven-plugin</xml>
+                <xml>org.apache.maven.surefire:surefire-junit3:2.10</xml>
+                <xml>org.codehaus.plexus:plexus-utils:1.5.1</xml>
+                <xml>org.apache.maven.skins:maven-default-skin:1.0</xml>
+                <xml>org.apache.maven.wagon:wagon-webdav-jackrabbit:2.2</xml>
+                <xml>org.slf4j:slf4j-api:1.6.1</xml>
               </extraArtifacts>
             </configuration>
             <executions>
