@@ -350,11 +350,6 @@
               <exclude>**/*$*</exclude>
             </excludes>
             <systemPropertyVariables>
-              <!-- logging configuration properties, see logback*.xml files -->
-              <test.log.level>${test.log.level}</test.log.level>
-              <it.test.log.level>${it.test.log.level}</it.test.log.level>
-              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
-
               <!-- carrotsearch junit-benchmarks configuration -->
               <jub.consumers>H2,CONSOLE</jub.consumers>
               <jub.db.file>.benchmarks</jub.db.file>
@@ -382,12 +377,6 @@
               <exclude>**/Abstract*</exclude>
               <exclude>**/*$*</exclude>
             </excludes>
-            <systemPropertyVariables>
-              <!-- logging configuration properties, see logback*.xml files -->
-              <test.log.level>${test.log.level}</test.log.level>
-              <it.test.log.level>${it.test.log.level}</it.test.log.level>
-              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
-            </systemPropertyVariables>
           </configuration>
         </plugin>
 
