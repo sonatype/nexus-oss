@@ -20,21 +20,20 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * @author velo
- * @goal setup-nexus-plugin-environment
- * @requiresDependencyResolution test
- * @phase pre-integration-test
  */
+@Mojo( name = "setup-nexus-plugin-environment", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST, requiresDependencyResolution = ResolutionScope.TEST )
 public class PluginEnvironmentMojo
     extends AbstractEnvironmentMojo
 {
 
-    /**
-     * @parameter expression="${nexus.version}"
-     * @required
-     */
+    @Parameter( property = "nexus.version", required = true )
     private String nexusVersion;
 
     @Override

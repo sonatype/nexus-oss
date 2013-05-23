@@ -20,6 +20,10 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.Archiver;
@@ -29,55 +33,37 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 
 /**
  * @author velo
- * @goal package
- * @phase package
  */
+@Mojo( name = "package", defaultPhase = LifecyclePhase.PACKAGE )
 public class PackageTestsMojo
     extends AbstractMojo
 {
 
-    /**
-     * @component
-     */
+    @Component
     private ArchiverManager archiverManager;
 
-    /**
-     * @component
-     */
+    @Component
     private MavenProjectHelper projectHelper;
 
     /**
      * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project}", readonly = true, required = true )
     private MavenProject project;
 
-    /**
-     * @parameter default-value="${project.build.testOutputDirectory}"
-     */
+    @Parameter( defaultValue = "${project.build.testOutputDirectory}" )
     private File testClasses;
 
-    /**
-     * @parameter default-value="${project.testResources}"
-     */
+    @Parameter( defaultValue = "${project.testResources}" )
     private List<Resource> testResources;
 
-    /**
-     * @parameter default-value="${basedir}/resources"
-     */
+    @Parameter( defaultValue = "${basedir}/resources" )
     private File resourcesSourceLocation;
 
-    /**
-     * @parameter default-value="${project.build.directory}/${project.build.finalName}-test-resources.zip"
-     */
+    @Parameter( defaultValue = "${project.build.directory}/${project.build.finalName}-test-resources.zip" )
     private File destinationFile;
 
-    /**
-     * @parameter expression="${maven.test.skip}"
-     */
+    @Parameter( property = "maven.test.skip" )
     private boolean testSkip;
 
     @SuppressWarnings( "unchecked" )

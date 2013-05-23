@@ -12,13 +12,15 @@
  */
 package org.sonatype.plugin.nexus.testenvironment;
 
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+
 
 /**
  * @author velo
- * @goal setup-environment
- * @requiresDependencyResolution test
- * @phase pre-integration-test
  */
+@Mojo( name = "setup-environment", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST, requiresDependencyResolution = ResolutionScope.TEST )
 public class EnvironmentMojo
     extends AbstractEnvironmentMojo
 {

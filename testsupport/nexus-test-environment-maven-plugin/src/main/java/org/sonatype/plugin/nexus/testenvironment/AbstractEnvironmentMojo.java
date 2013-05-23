@@ -43,6 +43,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
@@ -93,197 +95,160 @@ public class AbstractEnvironmentMojo
 
     protected static final String PROP_NEXUS_BASE_DIR = "nexus-base-dir";
 
-    /** @component */
+    @Component
     protected org.apache.maven.artifact.factory.ArtifactFactory artifactFactory;
 
-    /** @component */
+    @Component
     private org.apache.maven.artifact.resolver.ArtifactResolver resolver;
 
-    /** @parameter expression="${localRepository}" */
+    @Parameter( defaultValue="${localRepository}" )
     protected org.apache.maven.artifact.repository.ArtifactRepository localRepository;
 
-    /** @parameter expression="${project.remoteArtifactRepositories}" */
+    @Parameter( defaultValue="${project.remoteArtifactRepositories}" )
     protected java.util.List<ArtifactRepository> remoteRepositories;
 
-    /** @component */
+    @Component
     private MavenFileFilter mavenFileFilter;
 
-    /** @component */
+    @Component
     protected MavenProjectBuilder mavenProjectBuilder;
 
-    /** @component */
+    @Component
     private ArtifactMetadataSource artifactMetadataSource;
 
-    /**
-     * @parameter expression="${session}"
-     * @readonly
-     * @required
-     */
+    @Parameter( defaultValue = "${session}", readonly = true, required = true )
     protected MavenSession session;
 
     private PlexusContainer plexus;
 
     /**
      * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project}", readonly = true, required = true )
     protected MavenProject project;
 
     /**
      * Where nexus instance should be extracted
-     * 
-     * @parameter default-value="${project.build.directory}/nexus"
-     * @required
      */
+    @Parameter( defaultValue = "${project.build.directory}/nexus", required = true )
     private File destination;
 
     /**
      * Artifact file containing nexus bundle
-     * 
-     * @parameter
      */
+    @Parameter
     protected MavenArtifact nexusBundleArtifact;
 
     /**
      * Name of teh directory created out of nexus artifact bundle. Default is
      * ${nexusBundleArtifactId}-${nexusBundleArtifactVersion}.
-     * 
-     * @parameter
      */
+    @Parameter
     protected String nexusBundleName;
 
     /**
      * Nexus plugin artifacts to be installed into the Nexus instance under test.
-     * 
-     * @parameter
      */
+    @Parameter
     private MavenArtifact[] nexusPluginsArtifacts;
 
     /**
      * Resources to be unpacked and then contents copied into Nexus default-configs
-     * 
-     * @parameter
      */
+    @Parameter
     private MavenArtifact[] extraResourcesArtifacts;
 
     /**
      * When true setup a maven instance
-     * 
-     * @parameter default-value="true"
      */
+    @Parameter( defaultValue = "true" )
     private boolean setupMaven;
 
     /**
      * Maven used on ITs
      * 
-     * @parameter
      * @see EnvironmentMojo#setupMaven
      */
+    @Parameter
     private MavenArtifact mavenArtifact;
 
     /**
      * Where Maven instance should be created
      * 
-     * @parameter default-value="${project.build.directory}/maven"
      * @see EnvironmentMojo#setupMaven
      */
+    @Parameter( defaultValue = "${project.build.directory}/maven" )
     private File mavenLocation;
 
     /**
      * Resources in the test project can be added beneath this directory so that
-     * 
-     * @parameter default-value="${basedir}/resources"
      */
+    @Parameter( defaultValue = "${basedir}/resources" )
     protected File resourcesSourceLocation;
 
     /**
      * This directory is where the default-configs included inside the this plugin will be extracted to BEFORE they are
      * copied into the nexus work dir. A project property 'test-resources-folder' contains the absolute path of this
      * directory.
-     * 
-     * @parameter default-value="${project.build.directory}/resources"
      */
+    @Parameter( defaultValue = "${project.build.directory}/resources" )
     private File resourcesDestinationLocation;
 
-    /**
-     * @parameter expression="${maven.test.skip}"
-     */
+    @Parameter( property = "maven.test.skip" )
     protected boolean testSkip;
 
-    /**
-     * @parameter expression="${test-env.skip}"
-     */
+    @Parameter( property = "test-env.skip" )
     protected boolean pluginSkip;
 
-    /**
-     * @parameter default-value="false"
-     */
+    @Parameter( defaultValue = "false" )
     private boolean extractNexusPluginsJavascript;
 
-    /**
-     * @parameter default-value="${project.build.testOutputDirectory}"
-     */
+    @Parameter( defaultValue = "${project.build.testOutputDirectory}" )
     protected File testOutputDirectory;
 
-    /**
-     * @parameter default-value="${basedir}/src/test/resources"
-     */
+    @Parameter( defaultValue = "${basedir}/src/test/resources" )
     protected File testResourcesDirectory;
 
-    /**
-     * @parameter default-value="false"
-     */
+    @Parameter( defaultValue = "false" )
     private boolean promoteOptionalPlugin;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private String mavenBaseDir;
 
     /**
      * Known ports can be manually set as part of the configuration
-     * 
-     * @parameter
      */
+    @Parameter
     @SuppressWarnings( "rawtypes" )
     private Map staticPorts;
 
     /**
      * If true plugin won't include nexus-plugin dependencies with scope test
-     * 
-     * @parameter
      */
+    @Parameter
     private boolean excludeTestDependencies;
 
     /**
      * Comma separated list of patterns to delete from an unpacked Nexus bundle. Patterns are deleted before any
      * optional plugins or other external resources are installed
-     * 
-     * @parameter
      */
+    @Parameter
     private String nexusBundleExcludes;
 
     /**
      * If there is one or more *-webapp.zip files in runtime/apps/nexus/plugin-repository, then unpack that zip to nexus
      * base dir and delete the original file
-     * 
-     * @parameter
      */
+    @Parameter
     private boolean unpackPluginWebapps;
 
     /**
      * Prevents a given artifact to be copy into nexus plugin repository
-     * 
-     * @parameter
      */
+    @Parameter
     private String[] exclusions;
 
-    /**
-     * @parameter expression="${useBundlePluginsIfPresent}"
-     */
+    @Parameter( property = "useBundlePluginsIfPresent" )
     protected boolean useBundlePluginsIfPresent;
 
     public void execute()
