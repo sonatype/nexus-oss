@@ -97,8 +97,6 @@
     <!--
     See 'include-plugins', 'include-testsuite' profile for additional modules.
     -->
-
-    <module>import/sisu-task-scheduler</module>
   </modules>
 
   <dependencyManagement>
@@ -218,13 +216,19 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-repository-metadata-api</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-model</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-repository-metadata-api</artifactId>
+        <artifactId>nexus-scheduler</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -453,6 +457,23 @@
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
           <version>3.0</version>
+        </plugin>
+
+        <!--
+        Generate sisu index metadata.
+        -->
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>1.1</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>main-index</goal>
+                <goal>test-index</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <!--

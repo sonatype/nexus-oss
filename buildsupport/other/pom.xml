@@ -145,15 +145,6 @@
         <version>2.1</version>
       </dependency>
 
-      <!--
-      FIXME: Merging
-      -->
-      <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-task-scheduler</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
-      </dependency>
-
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
