@@ -660,8 +660,9 @@
 
                     <!--
                     Ban old jetty.
+                    FIXME: nexus-restlet-bridge tests depend on this, we can not exclude/ban it ATM.
                     -->
-                    <exclude>org.mortbay.jetty:*</exclude>
+                    <!--<exclude>org.mortbay.jetty:*</exclude>-->
                   </excludes>
                   <includes>
                     <!--
