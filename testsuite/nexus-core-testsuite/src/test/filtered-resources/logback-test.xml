@@ -33,6 +33,7 @@
   <logger name="org.sonatype.nexus.unpack" level="TRACE"/>
   <logger name="org.sonatype.nexus.repository.site" level="TRACE"/>
   <logger name="org.sonatype.security.realms.kenai" level="TRACE"/>
+  <logger name="org.sonatype.nexus.proxy.maven.routing" level="TRACE"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

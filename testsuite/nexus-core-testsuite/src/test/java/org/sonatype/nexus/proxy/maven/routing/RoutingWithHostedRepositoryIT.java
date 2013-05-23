@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package core.routing;
+package org.sonatype.nexus.proxy.maven.routing;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -31,8 +31,8 @@ import com.google.common.primitives.Ints;
  * 
  * @author cstamas
  */
-public class WithHostedRepositoryIT
-    extends ITSupport
+public class RoutingWithHostedRepositoryIT
+    extends RoutingITSupport
 {
     /**
      * This is a safety net, to have JUnit kill this test if it locks for any reason (remote scrape or such). This rule
@@ -46,7 +46,7 @@ public class WithHostedRepositoryIT
      * 
      * @param nexusBundleCoordinates
      */
-    public WithHostedRepositoryIT( final String nexusBundleCoordinates )
+    public RoutingWithHostedRepositoryIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

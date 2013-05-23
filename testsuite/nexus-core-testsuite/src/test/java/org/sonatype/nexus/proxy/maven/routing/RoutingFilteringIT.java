@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package core.routing;
+package org.sonatype.nexus.proxy.maven.routing;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -56,8 +56,8 @@ import com.google.common.primitives.Ints;
  * @author cstamas
  */
 @Category( Smoke.class )
-public class FilteringIT
-    extends ITSupport
+public class RoutingFilteringIT
+    extends RoutingITSupport
 {
     private static final String SOMEORG_ARTIFACT_POM_PATTERN = "/%s/someorg/artifact/%s/artifact-%s.%s";
 
@@ -89,7 +89,7 @@ public class FilteringIT
      * 
      * @param nexusBundleCoordinates
      */
-    public FilteringIT( final String nexusBundleCoordinates )
+    public RoutingFilteringIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

@@ -51,12 +51,6 @@ public abstract class NexusCoreITSupport
         super( nexusBundleCoordinates );
     }
 
-    @Override
-    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
-    {
-        return super.configureNexus( configuration ).setLogLevel( "DEBUG" );
-    }
-
     /**
      * Creates unique name with given prefix.
      *

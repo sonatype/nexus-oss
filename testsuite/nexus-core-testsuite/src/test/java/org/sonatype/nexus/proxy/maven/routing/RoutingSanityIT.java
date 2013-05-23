@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package core.routing;
+package org.sonatype.nexus.proxy.maven.routing;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -51,14 +51,14 @@ import com.google.common.io.InputSupplier;
  * @author cstamas
  */
 @Category( { Slow.class, External.class } )
-public class SanityIT
-    extends ITSupport
+public class RoutingSanityIT
+    extends RoutingITSupport
 {
     // we will timeout after 15 minutes, just as a safety net
     @Rule
     public Timeout timeout = new Timeout( 900000 );
 
-    public SanityIT( final String nexusBundleCoordinates )
+    public RoutingSanityIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
