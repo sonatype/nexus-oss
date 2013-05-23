@@ -338,7 +338,7 @@
           </plugin>
 
           <plugin>
-            <groupId>org.sonatype.nexus.plugins</groupId>
+            <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-test-environment-maven-plugin</artifactId>
             <executions>
               <execution>
