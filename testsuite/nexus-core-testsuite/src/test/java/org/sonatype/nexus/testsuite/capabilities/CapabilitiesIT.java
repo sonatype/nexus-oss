@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.capabilities.client.Filter.capabilitiesThat;
 
 import java.util.Collection;
 
@@ -284,7 +285,7 @@ public class CapabilitiesIT
             .save();
 
         final Collection<Capability> capabilities = capabilities().get(
-            Filter.capabilitiesThat().haveType( "[a]" )
+            capabilitiesThat().haveType( "[a]" )
         );
 
         assertThat( capabilities, is( notNullValue() ) );
@@ -310,7 +311,7 @@ public class CapabilitiesIT
 
         final Collection<CapabilityA> capabilities = capabilities().get(
             CapabilityA.class,
-            Filter.capabilitiesThat().haveType( "[a]" )
+            capabilitiesThat().haveType( "[a]" )
         );
 
         assertThat( capabilities, is( notNullValue() ) );
@@ -330,7 +331,7 @@ public class CapabilitiesIT
             .save();
 
         final Collection<Capability> capabilities = capabilities().get(
-            Filter.capabilitiesThat().haveType( "[a]" ).haveProperty( "a1", "bar" )
+            capabilitiesThat().haveType( "[a]" ).haveProperty( "a1", "bar" )
         );
 
         assertThat( capabilities, is( notNullValue() ) );
@@ -591,6 +592,8 @@ public class CapabilitiesIT
     @Test
     public void capabilityOfTypeExists()
     {
+        removeAllMessageCapabilities();
+
         Capability capability = capabilities().create( "[capabilityOfTypeExists]" )
             .save();
         MatcherAssert.assertThat( capability.isActive(), is( false ) );
@@ -611,6 +614,8 @@ public class CapabilitiesIT
     @Test
     public void capabilityOfTypeIsActive()
     {
+        removeAllMessageCapabilities();
+
         Capability capability = capabilities().create( "[capabilityOfTypeActive]" )
             .save();
         MatcherAssert.assertThat( capability.isActive(), is( false ) );
