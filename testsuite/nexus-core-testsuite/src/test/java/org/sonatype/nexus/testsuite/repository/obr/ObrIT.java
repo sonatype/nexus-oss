@@ -12,18 +12,33 @@
  */
 package org.sonatype.nexus.testsuite.repository.obr;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
+import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
 import org.junit.Test;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.repository.obr.client.ObrGroupRepository;
 import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
+import org.sonatype.nexus.repository.obr.client.ObrProxyRepository;
+import org.sonatype.nexus.repository.obr.client.ObrVirtualRepository;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
-public class ObrGroupIT
+public class ObrIT
     extends ObrITSupport
 {
 
-    public ObrGroupIT( final String nexusBundleCoordinates )
+    public ObrIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
@@ -101,6 +116,111 @@ public class ObrGroupIT
         assertThat( download( gRId, OSGI_COMPENDIUM ), exists() );
         assertThat( download( gRId, GERONIMO_SERVLET ), exists() );
         assertThat( download( gRId, PORTLET_API ), exists() );
+    }
+
+    @Test
+    public void downloadFromHosted()
+        throws Exception
+    {
+        final String hRId = repositoryIdForTest() + "-hosted";
+
+        repositories().create( ObrHostedRepository.class, hRId ).save();
+
+        upload( hRId, FELIX_WEBCONSOLE );
+        upload( hRId, OSGI_COMPENDIUM );
+        upload( hRId, GERONIMO_SERVLET );
+        upload( hRId, PORTLET_API );
+
+        deployUsingObrIntoFelix( hRId );
+    }
+
+    @Test
+    public void deployToHostedUsingMaven()
+        throws Exception
+    {
+        final String hRId = repositoryIdForTest() + "-hosted";
+
+        repositories().create( ObrHostedRepository.class, hRId ).save();
+
+        deployUsingMaven( "helloworld-hs", hRId );
+    }
+
+    @Test
+    public void downloadFromProxy()
+        throws Exception
+    {
+        final String hRId = repositoryIdForTest() + "-hosted";
+        final String pRId = repositoryIdForTest() + "-proxy";
+
+        repositories().create( ObrHostedRepository.class, hRId ).save();
+
+        upload( hRId, FELIX_WEBCONSOLE );
+        upload( hRId, OSGI_COMPENDIUM );
+        upload( hRId, GERONIMO_SERVLET );
+        upload( hRId, PORTLET_API );
+
+        repositories().create( ObrProxyRepository.class, pRId )
+            .asProxyOf( format( "%scontent/repositories/%s/.meta/obr.xml", nexus().getUrl().toExternalForm(), hRId ) )
+            .save();
+
+        deployUsingObrIntoFelix( pRId );
+
+        verifyExistenceInStorage( pRId, FELIX_WEBCONSOLE );
+        verifyExistenceInStorage( pRId, OSGI_COMPENDIUM );
+        verifyExistenceInStorage( pRId, GERONIMO_SERVLET );
+        verifyExistenceInStorage( pRId, PORTLET_API );
+    }
+
+
+    @Test
+    public void validateOBRProxyUrlChanges()
+        throws Exception
+    {
+        final String rId = repositoryIdForTest() + "-proxy";
+
+        // create the repo
+        final ObrProxyRepository proxyRepository = repositories().create( ObrProxyRepository.class, rId )
+            .asProxyOf( "http://sigil.codecauldron.org/spring-external.obr" )
+            .save();
+
+        // check for equality here
+        assertObrPath( rId, "http://sigil.codecauldron.org/", "/spring-external.obr" );
+
+        // note internal opposed to external
+        proxyRepository.asProxyOf( "http://sigil.codecauldron.org/spring-internal.obr" ).save();
+
+        // check again for equality here
+        assertObrPath( rId, "http://sigil.codecauldron.org/", "/spring-internal.obr" );
+
+        // note sigil2
+        proxyRepository.asProxyOf( "http://sigil2.codecauldron.org/spring-external.obr" ).save();
+
+        // check again for equality here
+        assertObrPath( rId, "http://sigil2.codecauldron.org/", "/spring-external.obr" );
+
+        // note sigil3 and external -> internal
+        proxyRepository.asProxyOf( "http://sigil3.codecauldron.org/spring-internal.obr" ).save();
+
+        // check again for equality here
+        assertObrPath( rId, "http://sigil3.codecauldron.org/", "/spring-internal.obr" );
+    }
+
+    @Test
+    public void downloadFromShadow()
+        throws Exception
+    {
+        final String mavenRId = repositoryIdForTest() + "-maven";
+        final String sRId = repositoryIdForTest() + "-shadow";
+
+        repositories().create( MavenHostedRepository.class, mavenRId ).save();
+
+        upload( mavenRId, FELIX_WEBCONSOLE );
+        upload( mavenRId, OSGI_COMPENDIUM );
+        upload( mavenRId, GERONIMO_SERVLET );
+        upload( mavenRId, PORTLET_API );
+
+        repositories().create( ObrVirtualRepository.class, sRId ).ofRepository( mavenRId ).save();
+        deployUsingObrIntoFelix( sRId );
     }
 
 }

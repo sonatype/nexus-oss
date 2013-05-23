@@ -12,11 +12,16 @@
  */
 package org.sonatype.nexus.testsuite.repository.obr;
 
+import static java.lang.String.format;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.goodies.common.Varargs.$;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +30,11 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
@@ -36,8 +46,10 @@ import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
+@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public abstract class ObrITSupport
     extends NexusRunningParametrizedITSupport
 {
@@ -213,7 +225,8 @@ public abstract class ObrITSupport
     protected void upload( final String repositoryId, final String path )
         throws IOException
     {
-        content().upload( new Location( repositoryId, path ), util.resolveFile( "target/felix-local-repository/" + path ) );
+        content().upload( new Location( repositoryId, path ),
+                          util.resolveFile( "target/felix-local-repository/" + path ) );
     }
 
     protected File download( final String repositoryId, final String path )
@@ -274,6 +287,42 @@ public abstract class ObrITSupport
             return methodName.substring( 0, methodName.indexOf( "[" ) );
         }
         return methodName;
+    }
+
+    protected void assertObrPath( final String repositoryId,
+                                  final String expectedRemoteUrl,
+                                  final String expectedObrPath )
+        throws Exception
+    {
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder db = dbf.newDocumentBuilder();
+        final Document doc = db.parse( new File( nexus().getWorkDirectory(), "conf/nexus.xml" ) );
+
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+
+        final Node url = (Node) xpath.evaluate(
+            "/nexusConfiguration/repositories/repository[id='" + repositoryId + "']/remoteStorage/url",
+            doc, XPathConstants.NODE
+        );
+        assertThat( url, is( notNullValue() ) );
+        assertThat( url.getTextContent(), is( expectedRemoteUrl ) );
+
+        final Node obrPath = (Node) xpath.evaluate(
+            "/nexusConfiguration/repositories/repository[id='" + repositoryId + "']/externalConfiguration/obrPath",
+            doc, XPathConstants.NODE
+        );
+        assertThat( obrPath, is( notNullValue() ) );
+        assertThat( obrPath.getTextContent(), is( expectedObrPath ) );
+    }
+
+    protected void verifyExistenceInStorage( final String repositoryId, final String filename )
+    {
+        assertThat(
+            new File(
+                nexus().getWorkDirectory(), format( "storage/%s/%s", repositoryId, filename )
+            ),
+            exists()
+        );
     }
 
 }

@@ -77,9 +77,9 @@ public abstract class CapabilitiesITSupport
         return client().getSubsystem( Repositories.class );
     }
 
-    protected CapabilityPropertyResource p( final String name, final String value )
+    protected void logRemote( final String message, Object... params )
     {
-        return new CapabilityPropertyResource().withKey( name ).withValue( value );
+        remoteLogger().info( "\n***************** " + message + " *****************", params );
     }
 
 }

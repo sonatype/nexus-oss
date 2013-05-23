@@ -34,6 +34,7 @@ import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
@@ -45,10 +46,12 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 /**
  * @since 2.5.1
  */
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
+@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public abstract class UnpackITSupport
     extends NexusRunningParametrizedITSupport
 {
+
+    protected static final String PASSWORD = "secret";
 
     @Parameterized.Parameters
     public static Collection<Object[]> data()
@@ -191,6 +194,18 @@ public abstract class UnpackITSupport
                 assertThat( new File( repositoryRootDirectory, fileName ), not( FileMatchers.exists() ) );
             }
         }
+    }
+
+    protected User createUser()
+    {
+        return users().create( uniqueName( "unpack" ) )
+            .withFirstName( testMethodName() )
+            .withLastName( "Bithub" )
+            .withEmail( testMethodName() + "@sonatype.com" )
+            .withPassword( PASSWORD )
+            .withRole( "nx-deployment" )
+            .withRole( "repository-any-full" )
+            .save();
     }
 
 }

@@ -12,8 +12,12 @@
  */
 package org.sonatype.nexus.testsuite.unpack;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientAccessForbiddenException;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.client.core.subsystem.security.User;
 
 /**
  * @since 2.5.1
@@ -25,6 +29,9 @@ public class UnpackIT
     private static final boolean EXISTS = true;
 
     private static final boolean DOES_NOT_EXIST = false;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     public UnpackIT( final String nexusBundleCoordinates )
     {
@@ -162,6 +169,49 @@ public class UnpackIT
             "foo/bar/META-INF/MANIFEST.MF",
             "foo/bar/META-INF/maven/org.sonatype.nexus.unpack/upload/pom.properties",
             "foo/bar/META-INF/maven/org.sonatype.nexus.unpack/upload/pom.xml"
+        );
+    }
+
+    /**
+     * Verify that uploading a zip, using a user that does not have the "unpack" role (privilege "content-compressed"),
+     * will fail with 403.
+     */
+    @Test
+    public void uploadUsingUserWithoutUnpackPrivilege()
+        throws Exception
+    {
+        final User user = createUser();
+
+        final MavenHostedRepository repository = repositories().create(
+            MavenHostedRepository.class, repositoryIdForTest()
+        ).save();
+
+        thrown.expect( NexusClientAccessForbiddenException.class );
+        upload(
+            createNexusClient( nexus(), user.id(), PASSWORD ),
+            repository.id(),
+            testData().resolveFile( "bundle.zip" )
+        );
+    }
+
+    /**
+     * Verify that uploading a zip, using a user that has the "unpack" role (privilege "content-compressed"),
+     * will succeed.
+     */
+    @Test
+    public void uploadUsingUserWithUnpackPrivilege()
+        throws Exception
+    {
+        final User user = createUser().withRole( "unpack" ).save();
+
+        final MavenHostedRepository repository = repositories().create(
+            MavenHostedRepository.class, repositoryIdForTest()
+        ).save();
+
+        upload(
+            createNexusClient( nexus(), user.id(), PASSWORD ),
+            repository.id(),
+            testData().resolveFile( "bundle.zip" )
         );
     }
 
