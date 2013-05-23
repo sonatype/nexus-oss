@@ -37,6 +37,11 @@
       <artifactId>maven-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <scope>compile</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -125,12 +130,17 @@
         <artifactId>maven-plugin-plugin</artifactId>
         <executions>
           <execution>
-            <id>generate-helpmojo</id>
+            <id>default-descriptor</id>
+            <phase>process-classes</phase>
             <goals>
+              <goal>descriptor</goal>
               <goal>helpmojo</goal>
             </goals>
           </execution>
         </executions>
+        <!-- configuration>
+          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+        </configuration--> 
       </plugin>
     </plugins>
   </build>
