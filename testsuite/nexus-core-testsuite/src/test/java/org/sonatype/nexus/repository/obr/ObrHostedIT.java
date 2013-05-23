@@ -10,37 +10,45 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.obr.testsuite;
+package org.sonatype.nexus.repository.obr;
 
 import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
-import org.sonatype.nexus.repository.obr.client.ObrVirtualRepository;
+import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
 
-public class ObrShadowIT
+public class ObrHostedIT
     extends ObrITSupport
 {
 
-    public ObrShadowIT( final String nexusBundleCoordinates )
+    public ObrHostedIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
     @Test
-    public void downloadFromShadow()
+    public void downloadFromHosted()
         throws Exception
     {
-        final String mavenRId = repositoryIdForTest() + "-maven";
-        final String sRId = repositoryIdForTest() + "-shadow";
+        final String hRId = repositoryIdForTest() + "-hosted";
 
-        repositories().create( MavenHostedRepository.class, mavenRId ).save();
+        repositories().create( ObrHostedRepository.class, hRId ).save();
 
-        upload( mavenRId, FELIX_WEBCONSOLE );
-        upload( mavenRId, OSGI_COMPENDIUM );
-        upload( mavenRId, GERONIMO_SERVLET );
-        upload( mavenRId, PORTLET_API );
+        upload( hRId, FELIX_WEBCONSOLE );
+        upload( hRId, OSGI_COMPENDIUM );
+        upload( hRId, GERONIMO_SERVLET );
+        upload( hRId, PORTLET_API );
 
-        repositories().create( ObrVirtualRepository.class, sRId ).ofRepository( mavenRId ).save();
-        deployUsingObrIntoFelix( sRId );
+        deployUsingObrIntoFelix( hRId );
+    }
+
+    @Test
+    public void deployToHostedUsingMaven()
+        throws Exception
+    {
+        final String hRId = repositoryIdForTest() + "-hosted";
+
+        repositories().create( ObrHostedRepository.class, hRId ).save();
+
+        deployUsingMaven( "helloworld-hs", hRId );
     }
 
 }

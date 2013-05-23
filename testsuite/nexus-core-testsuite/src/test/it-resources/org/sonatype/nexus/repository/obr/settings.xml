@@ -30,7 +30,7 @@
     <mirror>
       <id>nexus</id>
       <mirrorOf>*</mirrorOf>
-      <url>${nexus-base-url}content/repositories/fake-central</url>
+      <url>${nexus-base-url}content/repositories/fake</url>
     </mirror>
   </mirrors>
   <profiles>

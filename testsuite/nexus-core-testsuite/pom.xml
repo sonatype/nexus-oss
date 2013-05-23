@@ -41,6 +41,11 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-obr-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-site-repository-client</artifactId>
       <scope>test</scope>
     </dependency>
@@ -90,6 +95,13 @@
                       <classifier>bin</classifier>
                       <type>zip</type>
                     </artifactItem>
+                    <artifactItem>
+                      <groupId>org.apache.felix</groupId>
+                      <artifactId>org.apache.felix.main.distribution</artifactId>
+                      <classifier>project</classifier>
+                      <type>tar.gz</type>
+                      <version>3.2.2</version>
+                    </artifactItem>
                   </artifactItems>
                 </configuration>
               </execution>
@@ -99,31 +111,53 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <configuration>
-              <localRepositoryPath>${project.build.directory}/apache-maven-local-repository</localRepositoryPath>
-              <extraArtifacts>
-                <xml>org.apache.maven.plugins:maven-clean-plugin:2.4.1:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-resources-plugin:2.5:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.10:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-jar-plugin:2.3.2:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-install-plugin:2.3.1:maven-plugin</xml>
-                <xml>org.sonatype.plugins:maven-upload-plugin:0.0.1:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-project-info-reports-plugin:2.5.1:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-site-plugin:3.1:maven-plugin</xml>
-                <xml>org.apache.maven.surefire:surefire-junit3:2.10</xml>
-                <xml>org.codehaus.plexus:plexus-utils:1.5.1</xml>
-                <xml>org.apache.maven.skins:maven-default-skin:1.0</xml>
-                <xml>org.apache.maven.wagon:wagon-webdav-jackrabbit:2.2</xml>
-                <xml>org.slf4j:slf4j-api:1.6.1</xml>
-              </extraArtifacts>
-            </configuration>
             <executions>
               <execution>
+                <id>maven-fake-repo</id>
                 <phase>pre-integration-test</phase>
                 <goals>
                   <goal>install</goal>
                 </goals>
+                <configuration>
+                  <localRepositoryPath>${project.build.directory}/apache-maven-local-repository</localRepositoryPath>
+                  <extraArtifacts>
+                    <xml>org.apache.maven.plugins:maven-clean-plugin:2.4.1:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-resources-plugin:2.5:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-surefire-plugin:2.10:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-jar-plugin:2.3.2:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-install-plugin:2.3.1:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
+                    <xml>org.sonatype.plugins:maven-upload-plugin:0.0.1:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-project-info-reports-plugin:2.5.1:maven-plugin</xml>
+                    <xml>org.apache.maven.plugins:maven-site-plugin:3.1:maven-plugin</xml>
+                    <xml>org.apache.maven.surefire:surefire-junit3:2.10</xml>
+                    <xml>org.codehaus.plexus:plexus-utils:1.5.1</xml>
+                    <xml>org.apache.maven.skins:maven-default-skin:1.0</xml>
+                    <xml>org.apache.maven.wagon:wagon-webdav-jackrabbit:2.2</xml>
+                    <xml>org.slf4j:slf4j-api:1.6.1</xml>
+                    <xml>org.apache.felix:maven-bundle-plugin:2.3.7:maven-plugin</xml>
+                    <xml>org.osgi:org.osgi.core:4.0.1</xml>
+                    <xml>org.osgi:org.osgi.compendium:4.0.1</xml>
+                    <xml>javax.servlet:servlet-api:2.3</xml>
+                  </extraArtifacts>
+                </configuration>
+              </execution>
+              <execution>
+                <id>obr-fake-hosted</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+                <configuration>
+                  <localRepositoryPath>${project.build.directory}/felix-local-repository</localRepositoryPath>
+                  <extraArtifacts>
+                    <xml>org.apache.felix:org.apache.felix.webconsole:3.0.0</xml>
+                    <xml>org.apache.felix:org.osgi.compendium:1.4.0</xml>
+                    <xml>org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0</xml>
+                    <xml>org.apache.portals:portlet-api_2.0_spec:1.0</xml>
+                  </extraArtifacts>
+                </configuration>
               </execution>
             </executions>
           </plugin>

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.obr.testsuite;
+package org.sonatype.nexus.repository.obr;
 
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
@@ -94,7 +94,7 @@ public abstract class ObrITSupport
         throws Exception
     {
         final File felixHome = util.resolveFile( "target/org.apache.felix.main.distribution-3.2.2" );
-        final File felixRepo = util.resolveFile( "target/felix-repo" );
+        final File felixRepo = util.resolveFile( "target/felix-local-repository" );
         final File felixConfig = testData().resolveFile( "felix.properties" );
 
         // ensure we have an obr.xml
@@ -213,7 +213,7 @@ public abstract class ObrITSupport
     protected void upload( final String repositoryId, final String path )
         throws IOException
     {
-        content().upload( new Location( repositoryId, path ), util.resolveFile( "target/felix-repo/" + path ) );
+        content().upload( new Location( repositoryId, path ), util.resolveFile( "target/felix-local-repository/" + path ) );
     }
 
     protected File download( final String repositoryId, final String path )
@@ -245,7 +245,7 @@ public abstract class ObrITSupport
             .to().file( file( mavenSettingsTarget ) ).run();
 
         final File mavenHome = util.resolveFile( "target/apache-maven-3.0.4" );
-        final File localRepo = util.resolveFile( "target/maven/fake-repo" );
+        final File localRepo = util.resolveFile( "target/apache-maven-local-repository" );
 
         tasks().chmod( file( new File( mavenHome, "bin" ) ) ).include( "mvn" ).permissions( "755" ).run();
 
