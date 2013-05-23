@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.repository.obr;
+package org.sonatype.nexus.testsuite.obr;
 
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,21 +18,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
-import java.io.File;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.repository.obr.client.ObrGroupRepository;
 import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
 import org.sonatype.nexus.repository.obr.client.ObrProxyRepository;
 import org.sonatype.nexus.repository.obr.client.ObrVirtualRepository;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public class ObrIT
     extends ObrITSupport

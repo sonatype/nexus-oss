@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.proxy.maven.routing;
+package org.sonatype.nexus.testsuite.routing;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -24,34 +23,46 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.Timeout;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
-import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
 import org.sonatype.nexus.client.core.subsystem.routing.Status;
 import org.sonatype.nexus.client.core.subsystem.routing.Status.Outcome;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 
 /**
- * Simple smoke IT for Routing REST being responsive and is reporting the expected statuses.
- * 
+ * Simple smoke IT for automatic routing REST being responsive and is reporting the expected statuses when the feature is
+ * DISABLED!
+ *
  * @author cstamas
  */
-@Category( Smoke.class )
-public class RoutingSmokeIT
+@Category(Smoke.class)
+public class RoutingDisabledSmokeIT
     extends RoutingITSupport
 {
+
     // we will timeout after 15 minutes, just as a safety net
     @Rule
     public Timeout timeout = new Timeout( 900000 );
 
     /**
      * Constructor.
-     * 
+     *
      * @param nexusBundleCoordinates
      */
-    public RoutingSmokeIT( final String nexusBundleCoordinates )
+    public RoutingDisabledSmokeIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
+    }
+
+    @Override
+    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
+    {
+        // setting the system property to DISABLE feature
+        return super.configureNexus( configuration )
+            .setSystemProperty(
+                "org.sonatype.nexus.proxy.maven.routing.Config.featureActive", Boolean.FALSE.toString()
+            );
     }
 
     @Before
@@ -67,7 +78,8 @@ public class RoutingSmokeIT
     {
         // public
         final Status publicStatus = routing().getStatus( "public" );
-        assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
+        assertThat( publicStatus.getDiscoveryStatus(), is( nullValue() ) );
     }
 
     @Test
@@ -75,7 +87,7 @@ public class RoutingSmokeIT
     {
         // releases
         final Status releasesStatus = routing().getStatus( "releases" );
-        assertThat( releasesStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( releasesStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
         assertThat( releasesStatus.getDiscoveryStatus(), is( nullValue() ) );
     }
 
@@ -84,9 +96,9 @@ public class RoutingSmokeIT
     {
         // central
         final Status centralStatus = routing().getStatus( "central" );
-        assertThat( centralStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( centralStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
         assertThat( centralStatus.getDiscoveryStatus(), is( notNullValue() ) );
-        assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.UNDECIDED ) );
     }
 
     @Test
@@ -96,79 +108,37 @@ public class RoutingSmokeIT
         {
             final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor( "central" );
             assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
+            assertThat( centralConfiguration.isEnabled(), equalTo( false ) );
             assertThat( centralConfiguration.getIntervalHours(), equalTo( 24 ) );
-            // checked ok, set interval to 12h
+            // checked ok, set interval to 12h, and enable it
             centralConfiguration.setIntervalHours( 12 );
+            centralConfiguration.setEnabled( true );
             routing().setDiscoveryConfigurationFor( "central", centralConfiguration );
         }
-        // verify is set
+        // verify is set, but feature remains disabled
         {
             final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor( "central" );
             assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
+            assertThat( centralConfiguration.isEnabled(), equalTo( false ) );
             assertThat( centralConfiguration.getIntervalHours(), equalTo( 12 ) );
         }
     }
 
-    @Test( expected = NexusClientBadRequestException.class )
+    @Test(expected = NexusClientBadRequestException.class)
     public void checkReleasesHostedHasNoDiscoveryConfiguration()
     {
         routing().getDiscoveryConfigurationFor( "releases" );
     }
 
-    @Test( expected = NexusClientBadRequestException.class )
+    @Test(expected = NexusClientBadRequestException.class)
     public void checkPublicGroupHasNoDiscoveryConfiguration()
     {
         routing().getDiscoveryConfigurationFor( "public" );
     }
 
-    @Test( expected = NexusClientBadRequestException.class )
+    @Test(expected = NexusClientBadRequestException.class)
     public void checkCentralM1ShadowHasNoDiscoveryConfiguration()
     {
         routing().getDiscoveryConfigurationFor( "central-m1" );
     }
-
-    @Test( expected = NexusClientBadRequestException.class )
-    public void checkDiscoveryOnOutOfServiceRepository()
-    {
-        try
-        {
-            repositories().get( "central" ).putOutOfService().save();
-            routing().updatePrefixFile( "central" );
-        }
-        finally
-        {
-            repositories().get( "central" ).putInService().save();
-        }
-    }
-
-    @Test
-    public void checkDiscoveryOnBlockedProxyRepository()
-        throws InterruptedException
-    {
-        try
-        {
-            final Status statusBefore = routing().getStatus( "central" );
-            assertThat( statusBefore.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
-            assertThat( statusBefore.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
-
-            // block it
-            repositories().get( ProxyRepository.class, "central" ).block().save();
-            routing().updatePrefixFile( "central" );
-            routingTest().waitForAllRoutingUpdateJobToStop();
-            // waitForWLDiscoveryOutcome( "central" );
-
-            // recheck
-            final Status statusAfter = routing().getStatus( "central" );
-            assertThat( statusAfter.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
-            assertThat( statusAfter.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.FAILED ) );
-            assertThat( statusAfter.getDiscoveryStatus().getDiscoveryLastMessage(), containsString( "blocked" ) );
-        }
-        finally
-        {
-            repositories().get( ProxyRepository.class, "central" ).unblock().save();
-        }
-    }
-
 }
