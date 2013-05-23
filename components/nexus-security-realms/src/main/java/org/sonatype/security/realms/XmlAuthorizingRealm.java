@@ -73,12 +73,7 @@ public class XmlAuthorizingRealm
         this.securitySystem = securitySystem;
         this.userManagerMap = userManagerMap;
         setCredentialsMatcher( new Sha1CredentialsMatcher() );
-    }
-
-    @Override
-    public String getName()
-    {
-        return XmlAuthorizingRealm.class.getName();
+        setName( ROLE );
     }
 
     @Override

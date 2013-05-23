@@ -63,11 +63,13 @@ import com.google.common.collect.Lists;
  */
 @Singleton
 @Typed( Realm.class )
-@Named( "kenai" )
+@Named( KenaiRealm.ROLE )
 @Description( "Kenai Realm" )
 public class KenaiRealm
     extends AuthorizingRealm
 {
+    public static final String ROLE = "kenai";
+
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final KenaiRealmConfiguration kenaiRealmConfiguration;
@@ -80,15 +82,10 @@ public class KenaiRealm
     {
         this.kenaiRealmConfiguration = checkNotNull( kenaiRealmConfiguration );
         this.hc4Provider = checkNotNull( hc4Provider );
+        setName( ROLE );
 
         // TODO: write another test before enabling this
         // this.setAuthenticationCachingEnabled( true );
-    }
-
-    @Override
-    public String getName()
-    {
-        return "kenai";
     }
 
     // ------------ AUTHENTICATION ------------
