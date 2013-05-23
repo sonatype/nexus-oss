@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.testsuite;
+package org.sonatype.nexus.capabilities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -24,14 +25,14 @@ import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepo
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 
-public class ConditionsIT
+public class CapabilitiesConditionsIT
     extends CapabilitiesITSupport
 {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    public ConditionsIT( final String nexusBundleCoordinates )
+    public CapabilitiesConditionsIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
@@ -53,17 +54,17 @@ public class ConditionsIT
         Capability capability = capabilities().create( "[repositoryIsInService]" )
             .withProperty( "repository", rId )
             .save();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Put repository '{}' out of service", rId );
         repository.putOutOfService();
         capability.refresh();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Put repository '{}' back in service", rId );
         repository.putInService();
         capability.refresh();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
     }
 
     /**
@@ -83,12 +84,12 @@ public class ConditionsIT
         Capability capability = capabilities().create( "[repositoryIsInService]" )
             .withProperty( "repository", rId )
             .save();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Put repository '{}' back in service", rId );
         repository.putInService();
         capability.refresh();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
     }
 
     /**
@@ -110,11 +111,11 @@ public class ConditionsIT
         Capability capability = capabilities().create( "[repositoryIsInService]" )
             .withProperty( "repository", rIdActive )
             .save();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Change capability to use repository '{}'", rIdInactive );
         capability.withProperty( "repository", rIdInactive ).save();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
     }
 
     /**
@@ -134,17 +135,17 @@ public class ConditionsIT
         Capability capability = capabilities().create( "[repositoryIsNotBlocked]" )
             .withProperty( "repository", rId )
             .save();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Block repository '{}'", rId );
         repository.block();
         capability.refresh();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Unblock repository '{}'", rId );
         repository.unblock();
         capability.refresh();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
     }
 
     /**
@@ -164,12 +165,12 @@ public class ConditionsIT
         Capability capability = capabilities().create( "[repositoryIsNotBlocked]" )
             .withProperty( "repository", rId )
             .save();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Unblock repository '{}'", rId );
         repository.unblock();
         capability.refresh();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
     }
 
     /**
@@ -192,11 +193,11 @@ public class ConditionsIT
         Capability capability = capabilities().create( "[repositoryIsNotBlocked]" )
             .withProperty( "repository", rIdNotBlocked )
             .save();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Change capability to use repository '{}'", rIdBlocked );
         capability.withProperty( "repository", rIdBlocked ).save();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
     }
 
     /**
@@ -215,7 +216,7 @@ public class ConditionsIT
         Capability capability = capabilities().create( "[repositoryIsInService]" )
             .withProperty( "repository", rId )
             .save();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Remove repository '{}'", rId );
         repository.remove();
@@ -234,19 +235,19 @@ public class ConditionsIT
     {
         Capability capability = capabilities().create( "[capabilityOfTypeExists]" )
             .save();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Create a capability of type [message]" );
         final Capability messageCapability = capabilities().create( "[message]" )
             .withProperty( "repository", "releases" )
             .save();
         capability.refresh();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Remove capability of type [message]" );
         messageCapability.remove();
         capability.refresh();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
     }
 
     @Test
@@ -254,7 +255,7 @@ public class ConditionsIT
     {
         Capability capability = capabilities().create( "[capabilityOfTypeActive]" )
             .save();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Create a capability of type [message]" );
         final Capability messageCapability = capabilities().create( "[message]" )
@@ -262,22 +263,22 @@ public class ConditionsIT
             .save();
 
         capability.refresh();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Disable capability of type [message]" );
         messageCapability.disable();
         capability.refresh();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Enable capability of type [message]" );
         messageCapability.enable();
         capability.refresh();
-        assertThat( capability.isActive(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Remove capability of type [message]" );
         messageCapability.remove();
         capability.refresh();
-        assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
     }
 
     private void logRemote( final String message, Object... params )

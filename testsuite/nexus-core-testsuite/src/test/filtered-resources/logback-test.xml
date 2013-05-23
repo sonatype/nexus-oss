@@ -27,6 +27,8 @@
   <logger name="org.apache.http" level="${test.log.level.org.apache.http:-INFO}"/>
   <logger name="org.sonatype.nexus.client" level="${test.log.level.org.sonatype.nexus.client:-INFO}"/>
 
+  <logger name="org.sonatype.nexus.plugins.capabilities" level="TRACE"/>
+  <logger name="org.sonatype.nexus.capabilities" level="TRACE"/>
   <logger name="org.sonatype.nexus.unpack" level="TRACE"/>
   <logger name="org.sonatype.nexus.repository.site" level="TRACE"/>
   <logger name="org.sonatype.security.realms.kenai" level="TRACE"/>

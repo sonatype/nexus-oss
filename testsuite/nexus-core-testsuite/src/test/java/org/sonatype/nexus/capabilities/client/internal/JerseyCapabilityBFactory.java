@@ -10,24 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.testsuite.client;
+package org.sonatype.nexus.capabilities.client.internal;
 
-import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.capabilities.client.spi.CapabilityProperty;
-import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.capabilities.client.support.JerseyReflectiveCapabilityFactory;
+import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
+import org.sonatype.nexus.capabilities.client.CapabilityB;
 
 /**
  * @since 2.2
  */
-@CapabilityType( "[b]" )
-public interface CapabilityB
-    extends Capability<CapabilityB>
+@Named
+@Singleton
+public class JerseyCapabilityBFactory
+    extends JerseyReflectiveCapabilityFactory<CapabilityB>
+    implements JerseyCapabilityFactory<CapabilityB>
 {
 
-    @CapabilityProperty( "b1" )
-    String propertyB1();
-
-    @CapabilityProperty( "b1" )
-    CapabilityB withPropertyB1( String value );
+    public JerseyCapabilityBFactory()
+    {
+        super( CapabilityB.class );
+    }
 
 }

@@ -10,46 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.testsuite.client.internal;
+package org.sonatype.nexus.capabilities.client.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
+import org.sonatype.nexus.capabilities.client.support.JerseyCapability;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.plugins.capabilities.testsuite.client.CapabilityA;
+import org.sonatype.nexus.capabilities.client.CapabilityA;
 
 /**
  * @since 2.2
  */
-@Named
-@Singleton
-public class JerseyCapabilityAFactory
-    implements JerseyCapabilityFactory<CapabilityA>
+public class JerseyCapabilityA
+    extends JerseyCapability<CapabilityA>
+    implements CapabilityA
 {
 
-    public CapabilityA create( final JerseyNexusClient nexusClient )
+    public JerseyCapabilityA( final JerseyNexusClient nexusClient )
     {
-        return new JerseyCapabilityA( nexusClient );
+        super( nexusClient, "[a]" );
+    }
+
+    public JerseyCapabilityA( final JerseyNexusClient nexusClient, final CapabilityListItemResource resource )
+    {
+        super( nexusClient, resource );
     }
 
     @Override
-    public CapabilityA create( final JerseyNexusClient nexusClient, final CapabilityListItemResource resource )
+    public String propertyA1()
     {
-        return new JerseyCapabilityA( nexusClient, resource );
+        return property( "a1" );
     }
 
-    public boolean canCreate( final String type )
+    @Override
+    public CapabilityA withPropertyA1( final String value )
     {
-        return "[a]".equals( type );
+        withProperty( "a1", value );
+        return this;
     }
 
-    public boolean canCreate( final Class<Capability> type )
-    {
-        return CapabilityA.class.equals( type );
-    }
 
 }

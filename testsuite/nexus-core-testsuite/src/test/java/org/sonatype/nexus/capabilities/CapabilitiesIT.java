@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.testsuite;
+package org.sonatype.nexus.capabilities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -19,27 +19,28 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.sonatype.nexus.capabilities.client.Filter.capabilitiesThat;
 
 import java.util.Collection;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.capabilities.client.Filter;
 import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
-import org.sonatype.nexus.plugins.capabilities.testsuite.client.CapabilityA;
-import org.sonatype.nexus.plugins.capabilities.testsuite.client.CapabilityB;
+import org.sonatype.nexus.capabilities.client.CapabilityA;
+import org.sonatype.nexus.capabilities.client.CapabilityB;
 
-public class BasicIT
+public class CapabilitiesIT
     extends CapabilitiesITSupport
 {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    public BasicIT( final String nexusBundleCoordinates )
+    public CapabilitiesIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
@@ -281,14 +282,14 @@ public class BasicIT
             .save();
 
         final Collection<Capability> capabilities = capabilities().get(
-            capabilitiesThat().haveType( "[a]" )
+            Filter.capabilitiesThat().capabilitiesThat().haveType( "[a]" )
         );
 
         assertThat( capabilities, is( notNullValue() ) );
         assertThat( capabilities, hasSize( greaterThan( 0 ) ) );
         for ( Capability capability : capabilities )
         {
-            assertThat( capability, instanceOf( CapabilityA.class ) );
+            MatcherAssert.assertThat( capability, instanceOf( CapabilityA.class ) );
         }
     }
 
@@ -307,7 +308,7 @@ public class BasicIT
 
         final Collection<CapabilityA> capabilities = capabilities().get(
             CapabilityA.class,
-            capabilitiesThat().haveType( "[a]" )
+            Filter.capabilitiesThat().haveType( "[a]" )
         );
 
         assertThat( capabilities, is( notNullValue() ) );
@@ -327,15 +328,15 @@ public class BasicIT
             .save();
 
         final Collection<Capability> capabilities = capabilities().get(
-            capabilitiesThat().haveType( "[a]" ).haveProperty( "a1", "bar" )
+            Filter.capabilitiesThat().haveType( "[a]" ).haveProperty( "a1", "bar" )
         );
 
         assertThat( capabilities, is( notNullValue() ) );
         assertThat( capabilities, hasSize( greaterThan( 0 ) ) );
         for ( Capability capability : capabilities )
         {
-            assertThat( capability, instanceOf( CapabilityA.class ) );
-            assertThat( capability.property( "a1" ), is( "bar" ) );
+            MatcherAssert.assertThat( capability, instanceOf( CapabilityA.class ) );
+            MatcherAssert.assertThat( capability.property( "a1" ), is( "bar" ) );
         }
     }
 
@@ -386,9 +387,10 @@ public class BasicIT
     public void checkErrorOnActivation()
     {
         final Capability capability = capabilities().create( "[withActivationError]" ).save();
-        assertThat( capability.hasErrors(), is( true ) );
-        assertThat( capability.isActive(), is( false ) );
-        assertThat( capability.stateDescription(), containsString( "This capability always fails on activate" ) );
+        MatcherAssert.assertThat( capability.hasErrors(), is( true ) );
+        MatcherAssert.assertThat( capability.isActive(), is( false ) );
+        MatcherAssert.assertThat( capability.stateDescription(),
+                                  containsString( "This capability always fails on activate" ) );
     }
 
 }
