@@ -17,15 +17,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.management.MBeanServer;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
+import net.sf.ehcache.management.ManagementService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +100,15 @@ public class CacheManagerComponentImpl
         this.logger = logger;
         this.appContext = appContext;
         this.cacheManager = buildCacheManager( file );
+        try
+        {
+            final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            ManagementService.registerMBeans( cacheManager, mBeanServer, false, false, true, true );
+        }
+        catch ( final Exception e )
+        {
+            logger.warn( "Failed to register EHCache manager due to {}:{}", e.getClass(), e.getMessage() );
+        }
     }
 
     public synchronized void shutdown()
