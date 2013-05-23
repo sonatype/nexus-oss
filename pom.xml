@@ -350,7 +350,7 @@
               <exclude>**/*$*</exclude>
             </excludes>
             <systemPropertyVariables>
-              <!-- carrotsearch junit-benchmarks configuration -->
+              <!-- FIXME: remove carrotsearch junit-benchmarks configuration -->
               <jub.consumers>H2,CONSOLE</jub.consumers>
               <jub.db.file>.benchmarks</jub.db.file>
               <jub.customkey>${os.name}</jub.customkey>
