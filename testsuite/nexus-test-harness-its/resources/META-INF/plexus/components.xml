@@ -13,6 +13,10 @@
 
 -->
 <component-set>
+  <!--
+  FIXME: Sort out why we need this file, and how it relates to similar file in src/resources/**
+  -->
+
   <components>
     <component>
       <role>org.sonatype.jettytestsuite.ServletServer</role>
