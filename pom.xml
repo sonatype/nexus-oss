@@ -97,6 +97,8 @@
     <!--
     See 'include-plugins', 'include-testsuite' profile for additional modules.
     -->
+
+    <module>import/sisu-task-scheduler</module>
   </modules>
 
   <dependencyManagement>

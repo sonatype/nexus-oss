@@ -24,21 +24,8 @@
 
     <groupId>org.sonatype.sisu</groupId>
     <artifactId>sisu-task-scheduler</artifactId>
+    <name>${project.groupId}:${project.artifactId}</name>
     <version>1.8.2-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <name>Sisu Task Scheduler</name>
-
-    <scm>
-        <connection>scm:git:git://github.com/sonatype/sisu-task-scheduler.git</connection>
-        <developerConnection>scm:git:git@github.com:sonatype/sisu-task-scheduler.git</developerConnection>
-        <url>https://github.com/sonatype/sisu-task-scheduler</url>
-    </scm>
-
-    <ciManagement>
-        <system>hudson</system>
-        <url>https://builds.sonatype.org/job/sisu-task-scheduler/</url>
-    </ciManagement>
 
     <dependencies>
         <dependency>
