@@ -27,6 +27,7 @@ import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -72,7 +73,20 @@ public class SecurityModule
     @Override
     protected void bindSessionManager( AnnotatedBindingBuilder<SessionManager> bind )
     {
-        bind.toConstructor( ctor( DefaultSessionManager.class ) ).asEagerSingleton();
+        // workaround for NEXUS-5727 
+        final DefaultSessionManager sessionManager = new DefaultSessionManager();
+
+        // workaround:
+        // 1) pre-install the instance of session validation scheduler
+        // 2) set interval on it to be same as used by sessionManager
+        // 3) enable it
+        ExecutorServiceSessionValidationScheduler executorServiceSessionValidationScheduler =
+            new ExecutorServiceSessionValidationScheduler( sessionManager );
+        executorServiceSessionValidationScheduler.setInterval( sessionManager.getSessionValidationInterval() );
+        executorServiceSessionValidationScheduler.enableSessionValidation();
+        sessionManager.setSessionValidationScheduler( executorServiceSessionValidationScheduler );
+
+        bind.toInstance( sessionManager );
     }
 
     /**

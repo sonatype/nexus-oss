@@ -31,6 +31,7 @@ import org.apache.shiro.config.ConfigurationException;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -115,7 +116,21 @@ public class SecurityWebModule
     protected void bindSessionManager( AnnotatedBindingBuilder<SessionManager> bind )
     {
         // use native web session management instead of delegating to servlet container
-        bind.toConstructor( ctor( DefaultWebSessionManager.class ) ).asEagerSingleton();
+
+        // workaround for NEXUS-5727 
+        final DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+
+        // workaround:
+        // 1) pre-install the instance of session validation scheduler
+        // 2) set interval on it to be same as used by sessionManager
+        // 3) enable it
+        ExecutorServiceSessionValidationScheduler executorServiceSessionValidationScheduler =
+            new ExecutorServiceSessionValidationScheduler( sessionManager );
+        executorServiceSessionValidationScheduler.setInterval( sessionManager.getSessionValidationInterval() );
+        executorServiceSessionValidationScheduler.enableSessionValidation();
+        sessionManager.setSessionValidationScheduler( executorServiceSessionValidationScheduler );
+
+        bind.toInstance( sessionManager );
     }
 
     /**
