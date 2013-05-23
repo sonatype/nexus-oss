@@ -10,16 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.restlet1x.testsuite;
+package core.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 
-import com.sun.jersey.api.client.UniformInterfaceException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
@@ -28,19 +36,41 @@ import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Verify that default values are applied when a new repository is created with only the mandatory parameters.
  */
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
-public class Nxcm5131DefaultValuesOnRepoCreationIT
-    extends Restlet1xITSupport
+@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
+public class RepositoryDefaultValuesOnCreationIT
+    extends NexusRunningParametrizedITSupport
 {
 
-    public Nxcm5131DefaultValuesOnRepoCreationIT( final String nexusBundleCoordinates )
+    @Parameterized.Parameters
+    public static Collection<Object[]> data()
+    {
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters(
+                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
+            )
+        ).load();
+    }
+
+    public RepositoryDefaultValuesOnCreationIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
+    }
+
+    @Override
+    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
+    {
+        configuration.addPlugins( artifactResolver().resolvePluginFromDependencyManagement(
+            "org.sonatype.nexus.plugins", "nexus-restlet1x-testsupport-plugin" ) );
+
+        return configuration;
     }
 
     @Test
@@ -65,7 +95,8 @@ public class Nxcm5131DefaultValuesOnRepoCreationIT
     }
 
     @Test
-    public void createNonMaven2RepoWithDefaultValues(){
+    public void createNonMaven2RepoWithDefaultValues()
+    {
         final String id = uniqueName( "nxcm5131" );
 
         doCreateNxcm5131Repo( id );
@@ -137,6 +168,16 @@ public class Nxcm5131DefaultValuesOnRepoCreationIT
             }
             throw e;
         }
+    }
+
+    private static String uniqueName( final String prefix )
+    {
+        return prefix + "-" + new SimpleDateFormat( "yyyyMMdd-HHmmss-SSS" ).format( new Date() );
+    }
+
+    private Repositories repositories()
+    {
+        return client().getSubsystem( Repositories.class );
     }
 
 }
