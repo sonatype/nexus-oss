@@ -73,7 +73,7 @@ public class SecurityModule
     protected void bindSessionManager( AnnotatedBindingBuilder<SessionManager> bind )
     {
         // workaround for NEXUS-5727, see FixedDefaultSessionManager javadoc for clues
-        bind.to( FixedDefaultSessionManager.class ).asEagerSingleton();
+        bind.toConstructor( ctor( FixedDefaultSessionManager.class ) ).asEagerSingleton();
     }
 
     /**

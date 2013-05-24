@@ -12,11 +12,8 @@
  */
 package org.apache.shiro.nexus5727;
 
-import javax.inject.Inject;
-
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionValidationScheduler;
-import org.apache.shiro.session.mgt.eis.SessionDAO;
 
 /**
  * Fixed {@link DefaultSessionManager} for issue SHIRO-443. This subclass is put into package of Shiro to have
@@ -31,13 +28,6 @@ import org.apache.shiro.session.mgt.eis.SessionDAO;
 public class FixedDefaultSessionManager
     extends DefaultSessionManager
 {
-    @Override
-    @Inject
-    public void setSessionDAO( SessionDAO sessionDAO )
-    {
-        super.setSessionDAO( sessionDAO );
-    }
-
     @Override
     protected synchronized void enableSessionValidation()
     {

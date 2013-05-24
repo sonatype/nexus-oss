@@ -12,10 +12,7 @@
  */
 package org.apache.shiro.nexus5727;
 
-import javax.inject.Inject;
-
 import org.apache.shiro.session.mgt.SessionValidationScheduler;
-import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 
 /**
@@ -31,13 +28,6 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 public class FixedDefaultWebSessionManager
     extends DefaultWebSessionManager
 {
-    @Override
-    @Inject
-    public void setSessionDAO( SessionDAO sessionDAO )
-    {
-        super.setSessionDAO( sessionDAO );
-    }
-
     @Override
     protected synchronized void enableSessionValidation()
     {
