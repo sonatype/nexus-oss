@@ -14,17 +14,17 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
+    <groupId>org.sonatype.nexus.testsuite</groupId>
     <artifactId>testsuite</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-core-testsuite</artifactId>
+  <artifactId>modern-testsuite</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
@@ -72,6 +72,33 @@
   </dependencies>
 
   <profiles>
+    <profile>
+      <id>testsuite-genshards</id>
+      <properties>
+        <testsuite.shardCount>2</testsuite.shardCount>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>gmaven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>testsuite-gencustom</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>gmaven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <profile>
       <id>it</id>
       <activation>

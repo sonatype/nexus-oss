@@ -23,17 +23,18 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <!--
-  TODO: Update groupId before we release, so we can keep the namespace of these modules isolated.
-  -->
-  <!--<groupId>org.sonatype.nexus.testsuite</groupId>-->
+  <groupId>org.sonatype.nexus.testsuite</groupId>
   <artifactId>testsuite</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-core-testsuite</module>
-    <module>nexus-test-harness-its</module>
+    <module>modern-testsuite</module>
+    <module>legacy-testsuite</module>
+
+    <!--
+    FIXME: Merge into legacy-testsuite
+    -->
     <module>nexus-p2-repository-testsuite</module>
   </modules>
 
@@ -92,5 +93,138 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!--
+    Generate testsuite shard configurations in local repository.
+    -->
+    <profile>
+      <id>testsuite-genshards</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.gmaven</groupId>
+              <artifactId>gmaven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>process-test-sources</phase>
+                  <goals>
+                    <goal>execute</goal>
+                  </goals>
+                  <configuration>
+                    <providerSelection>1.7</providerSelection>
+                    <classpathIncludes>none</classpathIncludes>
+                    <source>file:${project.basedir}/../src/test/script/genshards.groovy</source>
+                    <defaults>
+                      <testsuite.shardDir>
+                        ${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards
+                      </testsuite.shardDir>
+                    </defaults>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Execute testsuite shard.
+    -->
+    <profile>
+      <id>testsuite-shard</id>
+      <activation>
+        <property>
+          <name>testsuite.shardId</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <includesFile>
+                  ${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards/shard-${testsuite.shardId}.txt
+                </includesFile>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Custom testsuite configuration.
+    -->
+    <profile>
+      <id>testsuite-gencustom</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.gmaven</groupId>
+              <artifactId>gmaven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>process-test-sources</phase>
+                  <goals>
+                    <goal>execute</goal>
+                  </goals>
+                  <configuration>
+                    <providerSelection>1.7</providerSelection>
+                    <classpathIncludes>none</classpathIncludes>
+                    <source>file:${project.basedir}/../src/test/script/gencustom.groovy</source>
+                    <defaults>
+                      <testsuite.customIncludes>**/*IT.java</testsuite.customIncludes>
+                      <testsuite.shardDir>${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards</testsuite.shardDir>
+                    </defaults>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Custom testsuite execution.
+    -->
+    <profile>
+      <id>testsuite-runcustom</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <includesFile>${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards/shard-custom.txt</includesFile>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Allow proper resolution of Groovy classes in IDEA.
+    -->
+    <profile>
+      <id>idea</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.codehaus.gmaven.runtime</groupId>
+          <artifactId>gmaven-runtime-1.7</artifactId>
+          <version>1.5</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
 </project>
