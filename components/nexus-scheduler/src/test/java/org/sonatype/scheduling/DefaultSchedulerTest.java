@@ -289,7 +289,7 @@ public class DefaultSchedulerTest
 
         long nearFuture = System.currentTimeMillis() + 500;
 
-        Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 2400 ) );
+        Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), null );
 
         ScheduledTask<Integer> task = defaultScheduler.schedule( "default", callable, schedule );
 
