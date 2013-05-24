@@ -27,6 +27,6 @@ Normalize line-endings (to UNIX LF style), from project root directory:
 
     groovy ./buildsupport/scripts/fixcrlf.groovy
 
-Same with extra configuration:
+Same with extra configuration ( -D must be _before_ script ):
 
-    groovy ./buildsupport/scripts/fixcrlf.groovy -Dfixlast=true
+    groovy -Dfixlast=true ./buildsupport/scripts/fixcrlf.groovy
