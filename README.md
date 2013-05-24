@@ -14,7 +14,7 @@
 -->
 # Sonatype Nexus OSS
 
-Sonatype Nexus OSS (Open Source Edition)
+Sonatype Nexus - Open Source Edition
 
 ## Building
 
