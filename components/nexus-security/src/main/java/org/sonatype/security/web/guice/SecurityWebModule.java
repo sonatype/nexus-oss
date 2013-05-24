@@ -30,8 +30,8 @@ import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.config.ConfigurationException;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.nexus5727.FixedDefaultWebSessionManager;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -41,7 +41,6 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.inject.BeanEntry;
 import org.sonatype.inject.Mediator;
@@ -116,21 +115,8 @@ public class SecurityWebModule
     protected void bindSessionManager( AnnotatedBindingBuilder<SessionManager> bind )
     {
         // use native web session management instead of delegating to servlet container
-
-        // workaround for NEXUS-5727 
-        final DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
-
-        // workaround:
-        // 1) pre-install the instance of session validation scheduler
-        // 2) set interval on it to be same as used by sessionManager
-        // 3) enable it
-        ExecutorServiceSessionValidationScheduler executorServiceSessionValidationScheduler =
-            new ExecutorServiceSessionValidationScheduler( sessionManager );
-        executorServiceSessionValidationScheduler.setInterval( sessionManager.getSessionValidationInterval() );
-        executorServiceSessionValidationScheduler.enableSessionValidation();
-        sessionManager.setSessionValidationScheduler( executorServiceSessionValidationScheduler );
-
-        bind.toInstance( sessionManager );
+        // workaround for NEXUS-5727, see FixedDefaultWebSessionManager javadoc for clues
+        bind.to( FixedDefaultWebSessionManager.class ).asEagerSingleton();
     }
 
     /**
