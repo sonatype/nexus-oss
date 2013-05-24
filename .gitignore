@@ -24,6 +24,5 @@ target/
 .DS_Store
 .clover
 build.log
-target
 atlassian-ide-plugin.xml
 dependency-reduced-pom.xml
