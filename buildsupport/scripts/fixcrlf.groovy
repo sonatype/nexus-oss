@@ -26,6 +26,13 @@ ant.fixcrlf(
     fixlast: fixlast
 ) {
     include(name: '**/*.java')
+    include(name: '**/*.groovy')
+    include(name: '**/*.js')
+    include(name: '**/*.css')
+    include(name: '**/*.vm')
+    include(name: '**/*.tpl')
     include(name: '**/*.properties')
     include(name: '**/*.xml')
+    include(name: '**/*.yml')
+    include(name: '**/*.txt')
 }
