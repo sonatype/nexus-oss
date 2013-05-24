@@ -14,9 +14,10 @@
 def ant = new AntBuilder()
 
 def basedir = System.getProperty('basedir', '.') as File
-def fixlast = System.getProperty('fixlast', 'false') as boolean
+def fixlast = System.getProperty('fixlast', 'false')
 
 println "Normalizing line-endings to LF in: ${basedir.canonicalFile}"
+println "    fixlast: $fixlast"
 
 ant.fixcrlf(
     srcDir: basedir,

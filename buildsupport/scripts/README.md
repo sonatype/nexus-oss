@@ -23,4 +23,10 @@
 
 ### Example Excecution
 
-    groovy buildsupport/scripts/fixcrlf.groovy -Dfixlast=true
+Normalize line-endings (to UNIX LF style), from project root directory:
+
+    groovy ./buildsupport/scripts/fixcrlf.groovy
+
+Same with extra configuration:
+
+    groovy ./buildsupport/scripts/fixcrlf.groovy -Dfixlast=true
