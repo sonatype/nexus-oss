@@ -135,6 +135,18 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-p2-repository-plugin</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- NEXUS-3082 -->
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
@@ -342,6 +354,13 @@
                 <plugin>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-it-helper-plugin</artifactId>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </plugin>
+                <plugin>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-p2-repository-plugin</artifactId>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                 </plugin>

@@ -35,11 +35,6 @@
   <modules>
     <module>modern-testsuite</module>
     <module>legacy-testsuite</module>
-
-    <!--
-    FIXME: Merge into legacy-testsuite
-    -->
-    <module>nexus-p2-repository-testsuite</module>
   </modules>
 
   <dependencyManagement>
