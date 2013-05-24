@@ -78,8 +78,7 @@ public class Nexus652Beta5To10UpgradeIT
         Assert.assertNotNull( "repo: snapshots", getNexusConfigUtil().getRepo( "snapshots" ) );
         Assert.assertNotNull( "repo: thirdparty", getNexusConfigUtil().getRepo( "thirdparty" ) );
 
-        // FIXME: This test is very fragile and can easily break the default security configuration changes
-        // FIXME: Not sure this is worth the ~30 seconds it takes to execute
+        // FIXME: These assertions are very fragile and can easily break when the default security configuration changes
 
         org.sonatype.security.model.Configuration secConfig = getSecurityConfigUtil().getSecurityConfig();
 
