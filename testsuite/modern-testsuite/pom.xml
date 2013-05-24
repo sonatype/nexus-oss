@@ -27,6 +27,10 @@
   <artifactId>modern-testsuite</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -77,18 +81,6 @@
       <properties>
         <testsuite.shardCount>2</testsuite.shardCount>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.gmaven</groupId>
-            <artifactId>gmaven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>testsuite-gencustom</id>
       <build>
         <plugins>
           <plugin>

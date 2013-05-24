@@ -26,6 +26,10 @@
   <artifactId>nexus-p2-repository-testsuite</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>

@@ -17,8 +17,14 @@ def testIncludes = project.properties['testsuite.customIncludes'] as String
 def shardDir = project.properties['testsuite.shardDir'] as File
 def shardFile = new File(shardDir, 'shard-custom.txt')
 
+// we need to make a fail for success and failure so surefire doesn't freak-out, create directory structure
+shardFile.parentFile.mkdirs()
+
+// generate dummy file if test directory missing
 if (!testDir.exists()) {
-    log.warn('Missing test directory; skipping: {}', testDir)
+    log.warn("Missing test directory: $testDir; creating dummy configuration: $shardFile")
+    // need to put at least one item into the file, or surefire will include defaults
+    shardFile.text = "WARNING_MissingTestDirectory.java"
     return
 }
 
@@ -43,11 +49,11 @@ scanner.includes = includes
 scanner.excludes = excludes
 scanner.scan()
 
-shardFile.parentFile.mkdirs()
-
+// generate dummy file if no test-classes found
 if (scanner.includedFilesCount == 0) {
-    log.warn("No test-classes matched include pattern; creating empty file: ${shardFile}")
-    shardFile.text = "# WARNING: No test-classes matched included pattern: ${testIncludes}"
+    log.warn("No test-classes matched include pattern; creating dummy configuration: $shardFile")
+    // need to put at least one item into the file, or surefire will include defaults
+    shardFile.text = "WARNING_NoMatchingTestClasses.java"
     return
 }
 

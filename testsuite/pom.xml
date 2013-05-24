@@ -28,6 +28,10 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
+  <properties>
+    <testsuite.basedir>${project.basedir}</testsuite.basedir>
+  </properties>
+
   <modules>
     <module>modern-testsuite</module>
     <module>legacy-testsuite</module>
@@ -163,31 +167,29 @@
     <profile>
       <id>testsuite-gencustom</id>
       <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.gmaven</groupId>
-              <artifactId>gmaven-plugin</artifactId>
-              <executions>
-                <execution>
-                  <phase>process-test-sources</phase>
-                  <goals>
-                    <goal>execute</goal>
-                  </goals>
-                  <configuration>
-                    <providerSelection>1.7</providerSelection>
-                    <classpathIncludes>none</classpathIncludes>
-                    <source>file:${project.basedir}/../src/test/script/gencustom.groovy</source>
-                    <defaults>
-                      <testsuite.customIncludes>**/*IT.java</testsuite.customIncludes>
-                      <testsuite.shardDir>${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards</testsuite.shardDir>
-                    </defaults>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>gmaven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <providerSelection>1.7</providerSelection>
+                  <classpathIncludes>none</classpathIncludes>
+                  <source>file:${testsuite.basedir}/src/test/script/gencustom.groovy</source>
+                  <defaults>
+                    <testsuite.customIncludes>**/*IT.java</testsuite.customIncludes>
+                    <testsuite.shardDir>${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards</testsuite.shardDir>
+                  </defaults>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
       </build>
     </profile>
 
