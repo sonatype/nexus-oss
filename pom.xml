@@ -69,6 +69,7 @@
   </prerequisites>
 
   <properties>
+    <!-- FIXME: Avoid using project.version -->
     <nexus.version>${project.version}</nexus.version>
 
     <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->

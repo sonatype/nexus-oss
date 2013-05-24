@@ -47,7 +47,8 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <!-- FIXME: Avoid using project.version -->
+      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.sonatype.nexus</groupId>
@@ -62,7 +63,8 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <!-- FIXME: Avoid using project.version -->
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

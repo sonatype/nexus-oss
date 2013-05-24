@@ -33,7 +33,8 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
-      <version>${nexus.version}</version>
+      <!-- FIXME: Avoid using project.version -->
+      <version>${project.version}</version>
     </dependency>
 
     <!-- = Other client dependencies = -->
