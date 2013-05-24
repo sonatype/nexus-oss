@@ -792,7 +792,7 @@
                 <configuration>
                   <rules>
                     <!--
-                    Require no SNAPSHOT dependencies.
+                    Disallow SNAPSHOT dependencies.
                     -->
                     <requireReleaseDeps>
                       <searchTransitive>true</searchTransitive>
@@ -800,7 +800,7 @@
                     </requireReleaseDeps>
 
                     <!--
-                    Require no SNAPSHOT, RELEASE, LATEST or pinned-version plugins.
+                    Disallow SNAPSHOT, RELEASE, LATEST or pinned-SNAPSHOT plugins.
                     -->
                     <requirePluginVersions>
                       <banSnapshots>true</banSnapshots>
