@@ -79,7 +79,7 @@
     <profile>
       <id>testsuite-genshards</id>
       <properties>
-        <testsuite.shardCount>2</testsuite.shardCount>
+        <testsuite.shardCount>1</testsuite.shardCount>
       </properties>
       <build>
         <plugins>
