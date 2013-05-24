@@ -453,16 +453,6 @@
 
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <!--
-      Support legacy Plexus components; remove this once Plexus is removed completely.
-      -->
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-    </plugins>
   </build>
 
   <profiles>

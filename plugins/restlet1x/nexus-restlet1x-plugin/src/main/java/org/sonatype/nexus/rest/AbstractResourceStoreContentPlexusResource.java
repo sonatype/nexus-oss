@@ -61,7 +61,6 @@ import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -333,9 +332,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
         // honor if-none-match
         if ( request.getConditions().getNoneMatch() != null && request.getConditions().getNoneMatch().size() > 0 )
         {
-            Tag tag = request.getConditions().getNoneMatch().get( 0 );
-
-            result.setIfNoneMatch( tag.getName() );
+            final Tag tag = request.getConditions().getNoneMatch().get( 0 );
+            // NEXUS-5704: 500 Internal Server Error when "If-None-Match" in header
+            // Restlet 1.1 is very strict about properly formatted ETags (must be quoted)
+            // If unquoted, their presence is detected (IF above evals to true), but will
+            // actually return null as parsing the tag
+            if ( tag != null && tag.getName() != null )
+            {
+                result.setIfNoneMatch( tag.getName() );
+            }
         }
 
         // stuff in the originating remote address
@@ -505,37 +510,22 @@ public abstract class AbstractResourceStoreContentPlexusResource
     Representation renderStorageFileItem( final Request req, final StorageFileItem file )
         throws ResourceException
     {
-        if ( req.getConditions().getModifiedSince() != null )
+        final StorageFileItemRepresentation fileRepresentation = new StorageFileItemRepresentation( file );
+        if ( file.getResourceStoreRequest().getIfModifiedSince() != 0
+            && file.getModified() <= file.getResourceStoreRequest().getIfModifiedSince() )
         {
-            // this is a conditional GET
-            if ( file.getModified() > req.getConditions().getModifiedSince().getTime() )
-            {
-                return new StorageFileItemRepresentation( file );
-            }
-            else
-            {
-                throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
-            }
+            // this is a conditional GET using time-stamp
+            throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
         }
-        else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
-            && file.getRepositoryItemAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
+        else if ( file.getResourceStoreRequest().getIfNoneMatch() != null && fileRepresentation.getTag() != null
+            && file.getResourceStoreRequest().getIfNoneMatch().equals( fileRepresentation.getTag().getName() ) )
         {
-            Tag tag = req.getConditions().getNoneMatch().get( 0 );
-
-            // this is a conditional get using ETag
-            if ( !file.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals(
-                tag.getName() ) )
-            {
-                return new StorageFileItemRepresentation( file );
-            }
-            else
-            {
-                throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
-            }
+            // this is a conditional GET using ETag
+            throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
         }
         else
         {
-            return new StorageFileItemRepresentation( file );
+            return fileRepresentation;
         }
     }
 

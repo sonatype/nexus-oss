@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -109,14 +110,14 @@
 
     <!-- Serialisation -->
     <dependency>
-       <groupId>com.thoughtworks.xstream</groupId>
-       <artifactId>xstream</artifactId>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
-    
+
     <!-- Local and remote storage techs -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -126,7 +127,7 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
-    
+
     <!-- Maven support -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -136,7 +137,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
     </dependency>
-    
+
     <!-- Security -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -188,17 +189,15 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-ehcache</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-task-scheduler</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-scheduler</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-mailer</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-charger</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
@@ -314,6 +313,14 @@
 
   <build>
     <plugins>
+      <!--
+      FIXME: This module uses legacy Plexus components.
+      -->
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
       <!--
       FIXME: Get rid of test-jar, these artifacts cause problems with transitive dependencies.
       -->
