@@ -66,8 +66,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-task-scheduler</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-scheduler</artifactId>
     </dependency>
 
     <dependency>

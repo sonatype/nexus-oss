@@ -146,12 +146,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-task-scheduler</artifactId>
-        <version>1.8.1</version>
-      </dependency>
-
-      <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>1.3.154</version>

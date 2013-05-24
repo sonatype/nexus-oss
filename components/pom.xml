@@ -30,25 +30,26 @@
   <modules>
     <module>base-configuration</module>
     <module>nexus-appcontext</module>
-    <module>nexus-jetty8</module>
-    <module>nexus-ehcache</module>
     <module>nexus-bootstrap</module>
-    <module>nexus-security</module>
-    <module>nexus-security-realms</module>
-    <module>nexus-plugin-api</module>
-    <module>nexus-plugin-test-api</module>
+    <module>nexus-client-core</module>
+    <module>nexus-compat</module>
+    <module>nexus-configuration-model</module>
     <module>nexus-core</module>
-    <module>nexus-web-utils</module>
+    <module>nexus-ehcache</module>
+    <module>nexus-jetty8</module>
     <module>nexus-logging-extras</module>
     <module>nexus-logging-extras-appender</module>
-    <module>nexus-repository-metadata-model</module>
-    <module>nexus-repository-metadata-api</module>
-    <module>nexus-compat</module>
     <module>nexus-oss-edition</module>
-    <module>nexus-configuration-model</module>
+    <module>nexus-plugin-api</module>
+    <module>nexus-plugin-test-api</module>
+    <module>nexus-repository-metadata-api</module>
+    <module>nexus-repository-metadata-model</module>
+    <module>nexus-scheduler</module>
+    <module>nexus-security</module>
+    <module>nexus-security-realms</module>
+    <module>nexus-web-utils</module>
     <module>nexus-webapp</module>
     <module>nexus-launcher</module>
-    <module>nexus-client-core</module>
   </modules>
 
   <dependencyManagement>
