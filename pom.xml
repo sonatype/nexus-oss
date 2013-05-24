@@ -491,7 +491,7 @@
               Exclude test resource files, many of these need specific content w/o headers.
               -->
               <exclude>**/src/test/*resources/**</exclude>
-              <exclude>**/nexus-test-harness-its/resources/**</exclude>
+              <exclude>**/legacy-testsuite/resources/**</exclude>
 
               <!--
               Exclude third-party resources.
@@ -529,7 +529,7 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <id>enforce-java</id>
+            <id>enforce-environment</id>
             <goals>
               <goal>enforce</goal>
             </goals>
@@ -559,13 +559,9 @@
             </goals>
             <configuration>
               <fail>true</fail>
-
-              <!--
-              TODO: Can we have one <bannedDependencies> with searchTransitive=true ?
-              -->
-
               <rules>
                 <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
                   <excludes>
                     <!--
                     Velocity 1.4 is banned, org.apache.velocity:velocity should be used instead.
@@ -621,18 +617,7 @@
                     Ban junit which includes old hamcrest.
                     -->
                     <exclude>junit:junit</exclude>
-                  </excludes>
-                  <includes>
-                    <!--
-                    Allow aether 1.8.1+
-                    -->
-                    <include>org.sonatype.aether:*:1.8.1</include>
-                  </includes>
-                </bannedDependencies>
 
-                <bannedDependencies>
-                  <searchTransitive>true</searchTransitive>
-                  <excludes>
                     <!--
                     Require junit 4.10+ for proper hamcrest dependencies.
                     -->
@@ -681,9 +666,18 @@
                     -->
                     <!--<exclude>org.mortbay.jetty:*</exclude>-->
                   </excludes>
+
+                  <!--
+                  Exceptions to excludes.
+                  -->
                   <includes>
                     <!--
-                    Include compatible versions of hamcrest.
+                    Allow aether 1.8.1+
+                    -->
+                    <include>org.sonatype.aether:*:1.8.1</include>
+
+                    <!--
+                    Allow hamcrest 1.3
                     -->
                     <include>org.hamcrest:*:1.3</include>
                   </includes>
@@ -725,6 +719,53 @@
       <modules>
         <module>testsuite</module>
       </modules>
+    </profile>
+
+    <!--
+    Strict configuration for enforcer to help catch dependency problems.
+    -->
+    <profile>
+      <id>enforce-strict</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>enforce-environment</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <!--
+                    Shows when DM and excludes might be incorrect.
+                    -->
+                    <dependencyConvergence/>
+
+                    <!--
+                    Shows where SNAPSHOT dependencies are used.
+                    -->
+                    <requireReleaseDeps>
+                      <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+                    </requireReleaseDeps>
+
+                    <!--
+                    Shows when repository is defined, allow the public RSO repo only.
+                    -->
+                    <requireNoRepositories>
+                      <allowedRepositories>
+                        <repository>rso-public-grid</repository>
+                      </allowedRepositories>
+                    </requireNoRepositories>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <!--

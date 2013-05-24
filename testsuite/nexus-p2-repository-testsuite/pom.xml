@@ -18,13 +18,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
+    <groupId>org.sonatype.nexus.testsuite</groupId>
     <artifactId>testsuite</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-p2-repository-testsuite</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+
+  <properties>
+    <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
+  </properties>
 
   <dependencies>
     <dependency>

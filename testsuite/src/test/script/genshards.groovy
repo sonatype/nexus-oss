@@ -12,11 +12,15 @@
  */
 import org.apache.tools.ant.DirectoryScanner
 
-def testDir = new File("${project.build.testSourceDirectory}")
-// NOTE: Stuffing this into the local repository, so that agents will have access to this w/o extra configuration
-def shardDir = new File("${settings.localRepository}/org/sonatype/nexus/${project.artifactId}/shards")
-def shardCount = 10
+def testDir = project.build.testSourceDirectory as File
+def shardDir = project.properties['testsuite.shardDir'] as File
+def shardCount = project.properties['testsuite.shardCount'] as int
 def shards = [:]
+
+if (!testDir.exists()) {
+    log.warn('Missing test directory; skipping: {}', testDir)
+    return
+}
 
 println "Scanning test-classes in ${testDir}"
 
@@ -25,9 +29,14 @@ scanner.basedir = testDir
 scanner.includes = [ '**/*IT.java' ]
 scanner.scan()
 
+if (scanner.includedFilesCount == 0) {
+    fail('No test-classes matched include pattern!')
+}
+
 println "Found ${scanner.includedFilesCount} test-classes"
 
-def iter = scanner.includedFiles.toList().sort().iterator() // sorting to help get consistent shards regardless of scanner order
+// sorting to help get consistent shards regardless of scanner order
+def iter = scanner.includedFiles.toList().sort().iterator()
 def running = true
 while (running) {
     for (i in 0 ..< shardCount) {
@@ -44,7 +53,7 @@ while (running) {
     }
 }
 
-println "Creating shard configurations in ${shardDir}"
+println "Creating ${shardCount} shard configurations in ${shardDir}"
 
 shards.each { key, value ->
     println "Shard [$key] size=${value.size()}"
