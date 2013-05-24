@@ -8,6 +8,7 @@ if [ -z "$newVersion" ]; then
     exit 1
 fi
 
+# FIXME: Use release version
 mvn org.eclipse.tycho:tycho-versions-plugin:0.18.0-SNAPSHOT:set-version \
     -Dtycho.mode=maven \
     -Dartifacts=nexus-oss \
