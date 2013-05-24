@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.testsuite.upgrade.nexus652;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,7 +20,11 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
-import org.sonatype.security.model.CRole;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+
+// FIXME: This test (according to javadoc) is for ancient nexus, why are we keeping this around and running it?!
 
 /**
  * Test nexus.xml after and upgrade from 1.0.0-beta-5 to 1.0.0.
@@ -32,7 +32,6 @@ import org.sonatype.security.model.CRole;
 public class Nexus652Beta5To10UpgradeIT
     extends AbstractNexusIntegrationTest
 {
-
     @BeforeClass
     public static void setSecureTest()
     {
@@ -79,27 +78,12 @@ public class Nexus652Beta5To10UpgradeIT
         Assert.assertNotNull( "repo: snapshots", getNexusConfigUtil().getRepo( "snapshots" ) );
         Assert.assertNotNull( "repo: thirdparty", getNexusConfigUtil().getRepo( "thirdparty" ) );
 
-        // everything else including everything above should be covered by unit tests.
-
-    }
-
-    @Test
-    public void checkSecurityConfig()
-        throws IOException
-    {
-        // FIXME: This is a pretty shitty integration test... not sure this is worth the ~30 seconds it takes to run this
+        // FIXME: This test is very fragile and can easily break the default security configuration changes
+        // FIXME: Not sure this is worth the ~30 seconds it takes to execute
 
         org.sonatype.security.model.Configuration secConfig = getSecurityConfigUtil().getSecurityConfig();
 
-        Assert.assertEquals( "User Count:", secConfig.getUsers().size(), 7 );
-        List<String> roleIds = new ArrayList<String>();
-        for ( CRole role : secConfig.getRoles() )
-        {
-            roleIds.add( role.getId() );
-        }
-        Assert.assertEquals( "Roles Count differs, expected: 30, found: " + roleIds, secConfig.getRoles().size(), 30 );
-
-        // again, everything should have been upgraded.
+        assertThat(secConfig.getUsers(), hasSize(7));
+        assertThat(secConfig.getRoles(), hasSize(31));
     }
-
 }
