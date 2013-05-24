@@ -201,10 +201,6 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-charger</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-resource-scanner</artifactId>
       <version>1.0.1</version>
     </dependency>

@@ -20,9 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
@@ -46,15 +43,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.charger.ChargerHolder;
-import org.sonatype.nexus.proxy.repository.charger.GroupItemRetrieveCallable;
-import org.sonatype.nexus.proxy.repository.charger.ItemRetrieveCallable;
 import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.sisu.charger.CallableExecutor;
-import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
-import org.sonatype.sisu.charger.internal.FirstArrivedInOrderChargeStrategy;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -65,20 +55,13 @@ import com.google.common.eventbus.Subscribe;
  */
 public abstract class AbstractGroupRepository
     extends AbstractRepository
-    implements GroupRepository, CallableExecutor
+    implements GroupRepository
 {
-    /** Secret switch that allows disabling use of Charger if needed */
-    private final boolean USE_CHARGER_FOR_GROUP_REQUESTS = SystemPropertiesHelper.getBoolean( getClass().getName()
-        + ".useParallelGroupRequests", false );
-
     @Requirement
     private RepositoryRegistry repoRegistry;
 
     @Requirement
     private RequestRepositoryMapper requestRepositoryMapper;
-
-    @Requirement
-    private ChargerHolder chargerHolder;
 
     @Requirement
     private ThreadPoolManager poolManager;
@@ -137,12 +120,6 @@ public abstract class AbstractGroupRepository
             // fire another event
             eventBus().post( new RepositoryGroupMembersChangedEvent( this, currentMemberIds, newMemberIds ) );
         }
-    }
-
-    @Override
-    public <T> Future<T> submit( Callable<T> task )
-    {
-        return poolManager.getRepositoryThreadPool( this ).submit( task );
     }
 
     @Override
@@ -311,100 +288,52 @@ public abstract class AbstractGroupRepository
 
             if ( !isRequestGroupLocalOnly )
             {
-                if ( USE_CHARGER_FOR_GROUP_REQUESTS )
+                for ( Repository repo : getRequestRepositories( request ) )
                 {
-                    List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
-
-                    for ( Repository repository : getRequestRepositories( request ) )
+                    if ( !request.getProcessedRepositories().contains( repo.getId() ) )
                     {
-                        if ( !request.getProcessedRepositories().contains( repository.getId() ) )
+                        try
                         {
-                            callables.add( new GroupItemRetrieveCallable( getLogger(), repository, request, this ) );
-                        }
-                        else
-                        {
-                            if ( getLogger().isDebugEnabled() )
+                            StorageItem item = repo.retrieveItem( request );
+
+                            if ( item instanceof StorageCollectionItem )
                             {
-                                getLogger().debug(
-                                    String.format(
-                                        "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                        RepositoryStringUtils.getHumanizedNameString( repository ),
-                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                                item = new DefaultStorageCollectionItem( this, request, true, false );
                             }
+
+                            return item;
+                        }
+                        catch ( IllegalOperationException e )
+                        {
+                            // ignored, but bookkeeping happens now
+                            memberThrowables.put( repo, e );
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            // ignored, but bookkeeping happens now
+                            memberThrowables.put( repo, e );
+                        }
+                        catch ( StorageException e )
+                        {
+                            // ignored, but bookkeeping happens now
+                            memberThrowables.put( repo, e );
+                        }
+                        catch ( AccessDeniedException e )
+                        {
+                            // cannot happen, since we add/check for AccessManager.REQUEST_AUTHORIZED flag
+                            // ignored, but bookkeeping happens now
+                            memberThrowables.put( repo, e );
                         }
                     }
-
-                    try
+                    else
                     {
-                        List<StorageItem> items =
-                            chargerHolder.getCharger().submit( callables,
-                                new FirstArrivedInOrderChargeStrategy<StorageItem>(), this ).getResult();
-
-                        if ( items.size() > 0 )
+                        if ( getLogger().isDebugEnabled() )
                         {
-                            return items.get( 0 );
-                        }
-                    }
-                    catch ( RejectedExecutionException e )
-                    {
-                        // this will not happen
-                    }
-                    catch ( Exception e )
-                    {
-                        // will not happen, see GroupItemRetrieveCallable class' javadoc, it supresses all of them
-                        // to make compiler happy
-                        throw new LocalStorageException( "Ouch!", e );
-                    }
-                }
-                else
-                {
-                    for ( Repository repo : getRequestRepositories( request ) )
-                    {
-                        if ( !request.getProcessedRepositories().contains( repo.getId() ) )
-                        {
-                            try
-                            {
-                                StorageItem item = repo.retrieveItem( request );
-
-                                if ( item instanceof StorageCollectionItem )
-                                {
-                                    item = new DefaultStorageCollectionItem( this, request, true, false );
-                                }
-
-                                return item;
-                            }
-                            catch ( IllegalOperationException e )
-                            {
-                                // ignored, but bookkeeping happens now
-                                memberThrowables.put( repo, e );
-                            }
-                            catch ( ItemNotFoundException e )
-                            {
-                                // ignored, but bookkeeping happens now
-                                memberThrowables.put( repo, e );
-                            }
-                            catch ( StorageException e )
-                            {
-                                // ignored, but bookkeeping happens now
-                                memberThrowables.put( repo, e );
-                            }
-                            catch ( AccessDeniedException e )
-                            {
-                                // cannot happen, since we add/check for AccessManager.REQUEST_AUTHORIZED flag
-                                // ignored, but bookkeeping happens now
-                                memberThrowables.put( repo, e );
-                            }
-                        }
-                        else
-                        {
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    String.format(
-                                        "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                        RepositoryStringUtils.getHumanizedNameString( repo ),
-                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
-                            }
+                            getLogger().debug(
+                                String.format(
+                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                    RepositoryStringUtils.getHumanizedNameString( repo ),
+                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
                         }
                     }
                 }
@@ -559,98 +488,52 @@ public abstract class AbstractGroupRepository
 
         if ( !isRequestGroupLocalOnly )
         {
-            if ( USE_CHARGER_FOR_GROUP_REQUESTS )
+            for ( Repository repository : getRequestRepositories( request ) )
             {
-                List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
-
-                for ( Repository repository : getRequestRepositories( request ) )
+                if ( !request.getProcessedRepositories().contains( repository.getId() ) )
                 {
-                    if ( !request.getProcessedRepositories().contains( repository.getId() ) )
+                    try
                     {
-                        callables.add( new ItemRetrieveCallable( getLogger(), repository, request ) );
+                        StorageItem item = repository.retrieveItem( false, request );
+
+                        items.add( item );
                     }
-                    else
+                    catch ( ItemNotFoundException e )
+                    {
+                        // ignored, but bookkeeping happens now
+                        memberThrowables.put( repository, e );
+                    }
+                    catch ( RepositoryNotAvailableException e )
                     {
                         if ( getLogger().isDebugEnabled() )
                         {
                             getLogger().debug(
-                                String.format(
-                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                    RepositoryStringUtils.getHumanizedNameString( repository ),
-                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                                RepositoryStringUtils.getFormattedMessage(
+                                    "Member repository %s is not available, request failed.", e.getRepository() ) );
                         }
+                        // ignored, but bookkeeping happens now
+                        memberThrowables.put( repository, e );
+                    }
+                    catch ( StorageException e )
+                    {
+                        throw e;
+                    }
+                    catch ( IllegalOperationException e )
+                    {
+                        getLogger().warn( "Member repository request failed", e );
+                        // ignored, but bookkeeping happens now
+                        memberThrowables.put( repository, e );
                     }
                 }
-
-                try
+                else
                 {
-                    return chargerHolder.getCharger().submit( callables, new AllArrivedChargeStrategy<StorageItem>(),
-                        this ).getResult();
-                }
-                catch ( RejectedExecutionException e )
-                {
-                    // this will not happen
-                }
-                catch ( StorageException e )
-                {
-                    throw e;
-                }
-                catch ( Exception e )
-                {
-                    // will not happen, ItemRetrieveCallable supresses all except StorageException!
-                    // just to make compiler happy
-                    throw new LocalStorageException( "Ouch!", e );
-                }
-            }
-            else
-            {
-                for ( Repository repository : getRequestRepositories( request ) )
-                {
-                    if ( !request.getProcessedRepositories().contains( repository.getId() ) )
+                    if ( getLogger().isDebugEnabled() )
                     {
-                        try
-                        {
-                            StorageItem item = repository.retrieveItem( false, request );
-
-                            items.add( item );
-                        }
-                        catch ( ItemNotFoundException e )
-                        {
-                            // ignored, but bookkeeping happens now
-                            memberThrowables.put( repository, e );
-                        }
-                        catch ( RepositoryNotAvailableException e )
-                        {
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    RepositoryStringUtils.getFormattedMessage(
-                                        "Member repository %s is not available, request failed.", e.getRepository() ) );
-                            }
-                            // ignored, but bookkeeping happens now
-                            memberThrowables.put( repository, e );
-                        }
-                        catch ( StorageException e )
-                        {
-                            throw e;
-                        }
-                        catch ( IllegalOperationException e )
-                        {
-                            getLogger().warn( "Member repository request failed", e );
-                            // ignored, but bookkeeping happens now
-                            memberThrowables.put( repository, e );
-                        }
-                    }
-                    else
-                    {
-                        if ( getLogger().isDebugEnabled() )
-                        {
-                            getLogger().debug(
-                                String.format(
-                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                    RepositoryStringUtils.getHumanizedNameString( repository ),
-                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
-                        }
+                        getLogger().debug(
+                            String.format(
+                                "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                RepositoryStringUtils.getHumanizedNameString( repository ),
+                                RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
                     }
                 }
             }
