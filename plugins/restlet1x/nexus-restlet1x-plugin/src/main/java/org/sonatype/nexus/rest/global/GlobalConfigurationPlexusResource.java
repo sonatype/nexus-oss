@@ -28,7 +28,7 @@ import com.thoughtworks.xstream.XStream;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;

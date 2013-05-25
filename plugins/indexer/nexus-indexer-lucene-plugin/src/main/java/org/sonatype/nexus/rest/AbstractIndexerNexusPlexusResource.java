@@ -19,7 +19,7 @@ import java.util.List;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorResultSet;
 import org.apache.maven.index.MatchHighlight;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;

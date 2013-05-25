@@ -16,7 +16,7 @@ import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.treeview.IndexTreeView;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeViewRequest;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.index.treeview.DefaultMergedTreeNodeFactory;
 import org.sonatype.nexus.proxy.repository.Repository;
 

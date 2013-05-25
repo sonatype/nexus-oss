@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.repository.WorkspaceRepository;

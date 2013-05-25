@@ -14,7 +14,7 @@ package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
@@ -180,7 +180,7 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
     {
         if ( StringUtils.isBlank( message ) )
         {
-            return StringUtils.capitalizeFirstLetter( append );
+            return StringUtils.capitalize( append );
         }
         else
         {

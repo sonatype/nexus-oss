@@ -18,7 +18,7 @@ import org.apache.maven.index.treeview.IndexTreeView;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNode.Type;
 import org.apache.maven.index.treeview.TreeViewRequest;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.AccessDeniedException;
