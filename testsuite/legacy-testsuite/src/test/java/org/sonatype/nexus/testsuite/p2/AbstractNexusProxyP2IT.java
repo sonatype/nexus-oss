@@ -87,7 +87,7 @@ public abstract class AbstractNexusProxyP2IT
     {
         super.copyTestResources();
 
-        final File source = new File( TestProperties.getString( "test.resources.source.folder" ), "proxyRepo" );
+        File source = getTestResourceAsFile( "proxy-repo" );
         if ( !source.exists() )
         {
             return;

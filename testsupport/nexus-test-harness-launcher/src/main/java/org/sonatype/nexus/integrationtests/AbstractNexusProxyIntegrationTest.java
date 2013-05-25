@@ -93,7 +93,7 @@ public abstract class AbstractNexusProxyIntegrationTest
     {
         super.copyTestResources();
 
-        File source = new File( TestProperties.getString( "test.resources.source.folder" ), "proxyRepo" );
+        File source = getTestResourceAsFile( "proxy-repo" );
         if ( !source.exists() )
         {
             return;

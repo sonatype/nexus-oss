@@ -183,7 +183,7 @@ public class AbstractEnvironmentMojo
     /**
      * Resources in the test project can be added beneath this directory so that
      */
-    @Parameter( defaultValue = "${basedir}/resources" )
+    @Parameter( defaultValue = "${basedir}/src/test/it-resources" )
     protected File resourcesSourceLocation;
 
     /**
