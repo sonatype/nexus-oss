@@ -22,7 +22,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.security.authorization.Privilege;

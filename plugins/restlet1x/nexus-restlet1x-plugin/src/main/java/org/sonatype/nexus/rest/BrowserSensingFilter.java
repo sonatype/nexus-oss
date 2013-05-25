@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.rest;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.Context;
 import org.restlet.Filter;
 import org.restlet.data.MediaType;
