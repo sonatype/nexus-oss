@@ -42,7 +42,7 @@
       <allowWrite>true</allowWrite>
       <repositoryPolicy>snapshot</repositoryPolicy>
       <localStorage>
-      	<url>${test-resources-folder}/nexus169/storage</url>
+      	<url>${test-resources-folder}/org/sonatype/nexus/testsuite/maven/nexus169/storage</url>
       </localStorage>
     </repository>
 
