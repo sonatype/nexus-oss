@@ -95,7 +95,7 @@ public abstract class AbstractNexusProxyP2IT
         }
 
         File source = getTestResourceAsFile( "proxy-repo" );
-        if ( !source.exists() )
+        if ( source == null || !source.exists() )
         {
             return;
         }
