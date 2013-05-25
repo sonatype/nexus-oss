@@ -139,18 +139,6 @@ public abstract class UnpackITSupport
         return prefix + "-" + new SimpleDateFormat( "yyyyMMdd-HHmmss-SSS" ).format( new Date() );
     }
 
-    protected void upload( final NexusClient client, final String repositoryId, final File target )
-        throws IOException
-    {
-        upload( client, repositoryId, target, null, false );
-    }
-
-    protected void uploadWithDelete( final NexusClient client, final String repositoryId, final File target )
-        throws IOException
-    {
-        upload( client, repositoryId, target, null, true );
-    }
-
     protected void upload( final NexusClient client, final String repositoryId, final File target, final String path,
                            final boolean useDeleteFlag )
         throws IOException
