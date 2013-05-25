@@ -24,7 +24,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;

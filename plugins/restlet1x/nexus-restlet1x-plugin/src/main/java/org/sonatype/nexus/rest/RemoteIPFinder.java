@@ -20,7 +20,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 

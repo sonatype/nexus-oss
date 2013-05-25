@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
