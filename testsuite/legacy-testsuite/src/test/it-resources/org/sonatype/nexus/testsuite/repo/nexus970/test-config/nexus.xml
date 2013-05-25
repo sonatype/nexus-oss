@@ -98,7 +98,7 @@
       <name>nexus970-overwrote</name>
       <allowWrite>true</allowWrite>
       <localStorage>
-        <url>${test-resources-folder}/nexus970/files/overwrote-repo</url>
+        <url>${test-resources-folder}/org/sonatype/nexus/testsuite/repo/nexus970/files/overwrote-repo</url>
       </localStorage>
     </repository>
 
