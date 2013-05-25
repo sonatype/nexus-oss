@@ -452,13 +452,13 @@ public abstract class AbstractNexusIntegrationTest
     protected void copyTestResources()
         throws IOException
     {
-        File source = new File( TestProperties.getString( "test.resources.source.folder" ), getTestId() );
+        File source = new File( TestProperties.getString( "test.resources.source.folder" ), getTestResource( null ) );
         if ( !source.exists() )
         {
             return;
         }
 
-        File destination = new File( TestProperties.getString( "test.resources.folder" ), getTestId() );
+        File destination = new File( TestProperties.getString( "test.resources.folder" ), getTestResource( null ) );
 
         FileTestingUtils.interpolationDirectoryCopy( source, destination, getTestProperties() );
     }
@@ -855,8 +855,13 @@ public abstract class AbstractNexusIntegrationTest
      */
     protected File getTestResourceAsFile( String relativePath )
     {
-        String resource = this.getTestId() + "/" + relativePath;
-        return getResource( resource );
+        return getResource( getTestResource( relativePath ) );
+    }
+
+    protected String getTestResource( String relativePath )
+    {
+        return this.getClass().getPackage().getName().replace( ".", "/" )
+            + ( relativePath == null || "/".equals( relativePath.trim() ) ? "" : "/" + relativePath );
     }
 
     protected String getTestId()
