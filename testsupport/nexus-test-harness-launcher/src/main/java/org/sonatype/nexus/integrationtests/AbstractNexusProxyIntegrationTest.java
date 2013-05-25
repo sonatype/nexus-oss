@@ -102,7 +102,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         }
 
         File source = getTestResourceAsFile( "proxy-repo" );
-        if ( !source.exists() )
+        if ( source == null || !source.exists() )
         {
             return;
         }
