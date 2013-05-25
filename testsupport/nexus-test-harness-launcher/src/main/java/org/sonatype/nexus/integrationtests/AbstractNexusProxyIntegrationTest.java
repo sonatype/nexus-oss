@@ -96,7 +96,10 @@ public abstract class AbstractNexusProxyIntegrationTest
 
         final File dest = new File( localStorageDir );
 
-        FileUtils.forceDelete( dest );
+        if ( dest.exists() )
+        {
+            FileUtils.forceDelete( dest );
+        }
 
         File source = getTestResourceAsFile( "proxy-repo" );
         if ( !source.exists() )
