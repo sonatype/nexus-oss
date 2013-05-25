@@ -297,14 +297,14 @@ public class AbstractEnvironmentMojo
         }
         getLog().info("Nexus bundle directory: " + nexusBaseDir);
 
-        File nexusWorkDir = new File( destination, "nexus-work-dir" );
+        File nexusWorkDir = new File( destination, "sonatype-work" );
         getLog().info("Nexus work directory: " + nexusWorkDir);
 
         project.getProperties().put( PROP_NEXUS_BASE_DIR, getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( nexusWorkDir ) );
 
         // conf dir
-        project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
+        project.getProperties().put( "application-conf", getPath( new File( destination, "sonatype-work/conf" ) ) );
 
         // final File plexusProps = new File( nexusBaseDir, "conf/plexus.properties" );
         final File plexusProps = new File( nexusBaseDir, "conf/nexus.properties" );
@@ -351,7 +351,7 @@ public class AbstractEnvironmentMojo
         {
             try
             {
-                // now if we have *-webapp.zip in pluginfolder, unpack that to nexus-work-dir and delete zip file
+                // now if we have *-webapp.zip in pluginfolder, unpack that to sonatype-work dir and delete zip file
                 @SuppressWarnings( "unchecked" )
                 List<File> webapps = FileUtils.getFiles( pluginFolder, "*-webapp.zip", null );
                 for ( File webapp : webapps )
