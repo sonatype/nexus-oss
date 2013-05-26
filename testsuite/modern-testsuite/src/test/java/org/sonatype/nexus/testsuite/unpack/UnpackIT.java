@@ -52,7 +52,9 @@ public class UnpackIT
         upload(
             client(),
             repository.id(),
-            testData().resolveFile( "bundle.zip" )
+            testData().resolveFile( "bundle.zip" ),
+            null,
+            false
         );
 
         assertFilesPresentOnStorage(
@@ -79,7 +81,7 @@ public class UnpackIT
             repository.id(),
             testData().resolveFile( "bundle.zip" ),
             "foo/bar",
-            true
+            false
         );
 
         assertFilesPresentOnStorage(
@@ -109,43 +111,49 @@ public class UnpackIT
         upload(
             client(),
             repository.id(),
-            testData().resolveFile( "bundle.zip" )
+            testData().resolveFile( "bundle.zip" ),
+            "foo",
+            false
         );
 
         assertFilesPresentOnStorage(
             repository.id(), EXISTS,
-            "nxcm1312/artifact/2.0/artifact-2.0.jar",
-            "org/nxcm1312/maven-deploy-released/1.0/maven-deploy-released-1.0.jar",
-            "org/nxcm1312/maven-mixed-released/1.0/maven-mixed-released-1.0.jar"
+            "foo/nxcm1312/artifact/2.0/artifact-2.0.jar",
+            "foo/org/nxcm1312/maven-deploy-released/1.0/maven-deploy-released-1.0.jar",
+            "foo/org/nxcm1312/maven-mixed-released/1.0/maven-mixed-released-1.0.jar"
         );
 
         upload(
             client(),
             repository.id(),
-            testData().resolveFile( "bundle1.zip" )
+            testData().resolveFile( "bundle1.zip" ),
+            "foo",
+            false
         );
 
         assertFilesPresentOnStorage(
             repository.id(), EXISTS,
-            "nxcm1312/artifact/2.0/artifact-2.0.jar",
-            "org/nxcm1312/maven-deploy-released/1.0/maven-deploy-released-1.0.jar",
-            "org/nxcm1312/maven-mixed-released/1.0/maven-mixed-released-1.0.jar"
+            "foo/nxcm1312/artifact/2.0/artifact-2.0.jar",
+            "foo/org/nxcm1312/maven-deploy-released/1.0/maven-deploy-released-1.0.jar",
+            "foo/org/nxcm1312/maven-mixed-released/1.0/maven-mixed-released-1.0.jar"
         );
 
-        uploadWithDelete(
+        upload(
             client(),
             repository.id(),
-            testData().resolveFile( "bundle1.zip" )
+            testData().resolveFile( "bundle1.zip" ),
+            "foo",
+            true
         );
 
         assertFilesPresentOnStorage(
             repository.id(), DOES_NOT_EXIST,
-            "nxcm1312/artifact/2.0/artifact-2.0.jar"
+            "foo/nxcm1312/artifact/2.0/artifact-2.0.jar"
         );
         assertFilesPresentOnStorage(
             repository.id(), EXISTS,
-            "org/nxcm1312/maven-deploy-released/1.0/maven-deploy-released-1.0.jar",
-            "org/nxcm1312/maven-mixed-released/1.0/maven-mixed-released-1.0.jar"
+            "foo/org/nxcm1312/maven-deploy-released/1.0/maven-deploy-released-1.0.jar",
+            "foo/org/nxcm1312/maven-mixed-released/1.0/maven-mixed-released-1.0.jar"
         );
     }
 
@@ -190,7 +198,9 @@ public class UnpackIT
         upload(
             createNexusClient( nexus(), user.id(), PASSWORD ),
             repository.id(),
-            testData().resolveFile( "bundle.zip" )
+            testData().resolveFile( "bundle.zip" ),
+            null,
+            false
         );
     }
 
@@ -211,7 +221,9 @@ public class UnpackIT
         upload(
             createNexusClient( nexus(), user.id(), PASSWORD ),
             repository.id(),
-            testData().resolveFile( "bundle.zip" )
+            testData().resolveFile( "bundle.zip" ),
+            null,
+            false
         );
     }
 

@@ -69,7 +69,10 @@
   </prerequisites>
 
   <properties>
-    <!-- FIXME: Avoid using project.version -->
+    <!--
+    Define nexus version, for use mainly by inheriting projects (and some edge-cases locally)
+    This is safe usage of project.version, as this will get replaced by set-version on release.
+    -->
     <nexus.version>${project.version}</nexus.version>
 
     <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
@@ -87,7 +90,7 @@
     <!-- nexus integration-testing bundle configuration -->
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
-    <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
+    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
   </properties>
 
   <modules>
@@ -771,6 +774,50 @@
     </profile>
 
     <!--
+    Strict configuration for enforcer for pre-release validation; should be executed post set-version.
+    -->
+    <profile>
+      <id>enforce-prerelease</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>enforce-environment</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <!--
+                    Disallow SNAPSHOT dependencies.
+                    -->
+                    <requireReleaseDeps>
+                      <searchTransitive>true</searchTransitive>
+                      <failWhenParentIsSnapshot>true</failWhenParentIsSnapshot>
+                    </requireReleaseDeps>
+
+                    <!--
+                    Disallow SNAPSHOT, RELEASE, LATEST or pinned-SNAPSHOT plugins.
+                    -->
+                    <requirePluginVersions>
+                      <banSnapshots>true</banSnapshots>
+                      <banRelease>true</banRelease>
+                      <banLatest>true</banLatest>
+                      <banTimestamps>true</banTimestamps>
+                    </requirePluginVersions>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
     Verify license headers; use: mvn -Dlicense-check -N
     -->
     <profile>
@@ -907,6 +954,28 @@
     </profile>
 
     <!--
+    Enable animal sniffer to verify jdk compatibility.
+    -->
+    <profile>
+      <id>sniff</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>animal-sniffer-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!--
     Support for loading Nexus projects in Intellij IDEA; as it doesn't handle the 'nexus-plugin' packaging WRT to dependency calculations.
     -->
     <profile>
@@ -982,28 +1051,6 @@
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-
-    <!--
-    Enable animal sniffer to verify jdk compatibility.
-    -->
-    <profile>
-      <id>sniff</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>animal-sniffer-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
       </build>
     </profile>
   </profiles>

@@ -83,6 +83,6 @@ public class Nexus652Beta5To10UpgradeIT
         org.sonatype.security.model.Configuration secConfig = getSecurityConfigUtil().getSecurityConfig();
 
         assertThat(secConfig.getUsers(), hasSize(7));
-        assertThat(secConfig.getRoles(), hasSize(31));
+        assertThat(secConfig.getRoles(), hasSize(34));
     }
 }

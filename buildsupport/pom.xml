@@ -32,6 +32,7 @@
     <module>apache-httpclient</module>
     <module>apache-maven</module>
     <module>apache-shiro</module>
+    <module>bouncycastle</module>
     <module>eclipse-jetty</module>
     <module>guice</module>
     <module>logging</module>
