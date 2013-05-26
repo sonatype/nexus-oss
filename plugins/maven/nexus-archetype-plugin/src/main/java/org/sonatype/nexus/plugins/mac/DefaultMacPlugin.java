@@ -40,11 +40,6 @@ public class DefaultMacPlugin
 
     /**
      * Lists available archatypes for given request.
-     * 
-     * @param request
-     * @return
-     * @throws NoSuchRepositoryException
-     * @throws IOException
      */
     protected IteratorSearchResponse listArchetypes( final MacRequest request, final IndexingContext ctx )
         throws IOException
