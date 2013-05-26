@@ -59,10 +59,10 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-annotations</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
+        <!--<exclusion>-->
+          <!--<groupId>org.codehaus.plexus</groupId>-->
+          <!--<artifactId>plexus-utils</artifactId>-->
+        <!--</exclusion>-->
       </exclusions>
     </dependency>
 
@@ -75,10 +75,10 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-annotations</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
+        <!--<exclusion>-->
+          <!--<groupId>org.codehaus.plexus</groupId>-->
+          <!--<artifactId>plexus-utils</artifactId>-->
+        <!--</exclusion>-->
         <exclusion>
           <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
