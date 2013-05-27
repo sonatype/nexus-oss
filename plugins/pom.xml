@@ -36,7 +36,7 @@
     <!-- nexus-plugin-bundle configuration -->
     <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
 
-    <!-- yuicompressor defaults; debug friendly, see 'optimize-js' profile -->
+    <!-- yuicompressor defaults; debug friendly, see 'optimize' profile -->
     <maven.yuicompressor.jswarn>true</maven.yuicompressor.jswarn>
     <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
     <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
@@ -542,7 +542,7 @@
     Optimize javascript & css files, for use on production/release builds.
     -->
     <profile>
-      <id>optimize-js</id>
+      <id>optimize</id>
       <properties>
         <!--
         'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
