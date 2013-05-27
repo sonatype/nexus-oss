@@ -54,12 +54,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>

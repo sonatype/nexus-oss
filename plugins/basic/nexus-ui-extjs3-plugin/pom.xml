@@ -49,12 +49,6 @@
       <scope>provided</scope>
       <type>${nexus-plugin.type}</type>
     </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
   <build>

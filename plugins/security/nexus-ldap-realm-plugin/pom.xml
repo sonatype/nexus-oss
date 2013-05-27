@@ -60,16 +60,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>ldap-common</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

@@ -45,12 +45,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet-bridge</artifactId>
     </dependency>
@@ -58,6 +52,14 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
+    </dependency>
+
+    <!--
+    Exposed here to allow dependent plugins to use annotations for API generation only.  This is excluded from the plugin bundle.
+    -->
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
     </dependency>
 
     <dependency>
@@ -95,10 +97,11 @@
           </sharedDependencies>
 
           <!--
-          Exclude dependencies which are provided by NX core.
+          Exclude dependencies which are provided by NX core, or unwanted from bundle.
           -->
           <classpathDependencyExcludes>
             <exclude>org.codehaus.plexus:plexus-utils</exclude>
+            <exclude>org.codehaus.enunciate:enunciate-core</exclude>
           </classpathDependencyExcludes>
         </configuration>
       </plugin>
