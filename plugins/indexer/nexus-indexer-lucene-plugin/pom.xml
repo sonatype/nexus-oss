@@ -31,7 +31,6 @@
     <pluginName>Nexus Indexer Lucene Plugin</pluginName>
     <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
     <mavenIndexer.version>5.1.2-bf3d48b</mavenIndexer.version>
-    <aether.version>1.13.1</aether.version>
   </properties>
 
   <dependencies>
@@ -54,16 +53,6 @@
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
       <version>${mavenIndexer.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-annotations</artifactId>
-        </exclusion>
-        <!--<exclusion>-->
-          <!--<groupId>org.codehaus.plexus</groupId>-->
-          <!--<artifactId>plexus-utils</artifactId>-->
-        <!--</exclusion>-->
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -71,14 +60,6 @@
       <artifactId>indexer-core</artifactId>
       <version>${mavenIndexer.version}</version>
       <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-annotations</artifactId>
-        </exclusion>
-        <!--<exclusion>-->
-          <!--<groupId>org.codehaus.plexus</groupId>-->
-          <!--<artifactId>plexus-utils</artifactId>-->
-        <!--</exclusion>-->
         <exclusion>
           <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
@@ -92,13 +73,11 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
-      <version>${aether.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-util</artifactId>
-      <version>${aether.version}</version>
     </dependency>
 
     <dependency>
@@ -156,6 +135,14 @@
             <sharedDependencies>org.sonatype.aether:aether-api</sharedDependencies>
             <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
           </sharedDependencies>
+
+          <!--
+          Exclude dependencies which are provided by NX core.
+          -->
+          <classpathDependencyExcludes>
+            <exclude>org.codehaus.plexus:plexus-utils</exclude>
+            <exclude>org.codehaus.plexus:plexus-component-annotations</exclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
 
