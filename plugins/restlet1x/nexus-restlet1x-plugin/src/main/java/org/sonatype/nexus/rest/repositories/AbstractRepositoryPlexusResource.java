@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;

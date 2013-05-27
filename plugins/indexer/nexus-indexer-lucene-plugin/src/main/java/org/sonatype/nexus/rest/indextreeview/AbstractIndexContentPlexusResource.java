@@ -20,7 +20,7 @@ import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;

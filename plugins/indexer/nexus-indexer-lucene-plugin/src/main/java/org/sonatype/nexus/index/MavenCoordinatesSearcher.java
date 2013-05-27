@@ -25,7 +25,7 @@ import org.apache.maven.index.SearchType;
 import org.apache.maven.index.UniqueArtifactFilterPostprocessor;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
