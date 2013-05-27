@@ -23,7 +23,7 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>testsupport</artifactId>
+  <artifactId>nexus-testsupport</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -33,7 +33,6 @@
     <module>nexus-testsuite-support</module>
     <module>nexus-it-helper-plugin</module>
     <module>nexus-test-environment-maven-plugin</module>
-    <module>nexus-test-utils</module>
     <module>nexus-test-harness-launcher</module>
   </modules>
 
@@ -44,7 +43,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>all</artifactId>
+        <artifactId>nexus-buildsupport-all</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>

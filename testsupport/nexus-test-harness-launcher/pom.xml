@@ -12,35 +12,38 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>testsupport</artifactId>
+    <artifactId>nexus-testsupport</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
+  <!--
+  TODO: Rename to nexus-legacy-testharness, or something to indicate this is only for _legacy_ tests.
+  -->
   <artifactId>nexus-test-harness-launcher</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-utils</artifactId>
-    </dependency>
-
-    <!-- All of Nexus needed on classpath -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
     </dependency>
 
-     <dependency>
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration-model</artifactId>
+      <artifactId>nexus-web-utils</artifactId>
     </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-configuration-model</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -68,11 +71,10 @@
       <artifactId>nexus-test-common</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
-    </dependency>
-    
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.sisu.litmus</groupId>-->
+      <!--<artifactId>litmus-testsupport</artifactId>-->
+    <!--</dependency>-->
 
     <!-- Starting up Jetty "fake remote" -->
     <dependency>
@@ -93,27 +95,27 @@
     </dependency>
 
     <!-- Logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>slf4j-api</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>jul-to-slf4j</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>ch.qos.logback</groupId>-->
+      <!--<artifactId>logback-classic</artifactId>-->
+    <!--</dependency>-->
 
     <!-- Deps needed by actual IT modules (like nexus-test-harness-its), and are here just to ease their life (to not have
       to add all these over and over as deps) -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.google.guava</groupId>-->
+      <!--<artifactId>guava</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>rome</groupId>
@@ -127,17 +129,9 @@
       <artifactId>xpp3_min</artifactId>
     </dependency>
 
-    <!-- The IT Helper Plugin -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-    </dependency>
-
-    <!-- Stupid nexus-test-environment-maven-plugin insists on this -->
+    <!--
+    FIXME: nexus-test-environment-maven-plugin insists on this entry being here.
+    -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>apache-maven</artifactId>
@@ -180,8 +174,16 @@
       </exclusions>
     </dependency>
 
-    <!-- Deps needed by some *Util classes (they use classes from these below) -->
-    <!-- To redirect j.u.Preferences -->
+    <!-- The IT Helper Plugin -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-it-helper-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+
+    <!-- Deps needed by some *Util classes (they use classes from these below), To redirect j.u.Preferences -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
@@ -189,6 +191,30 @@
       <version>${project.version}</version>
       <classifier>cp</classifier>
       <type>jar</type>
+    </dependency>
+
+    <!--
+    FIXME: Should not depend on a plugin here!
+    -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-jetty8</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--
+    FIXME: Should not depend on a plugin here! This is needed for TasksNexusRestClient via XStreamFactory.
+    -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
   </dependencies>

@@ -19,10 +19,11 @@ import static org.hamcrest.Matchers.sameInstance;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.nexus5727.FixedDefaultSessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.junit.After;
 import org.junit.Before;
@@ -59,6 +60,9 @@ public class SecurityModuleTest
     public void testInjectionIsSetupCorrectly()
     {
         SecuritySystem securitySystem = injector.getInstance( SecuritySystem.class );
+        // See DefaultSecuritySystem, that applies cache
+        // TODO: this should be done with Guice binding?
+        securitySystem.start();
 
         SecurityManager securityManager = injector.getInstance( SecurityManager.class );
 
@@ -70,9 +74,13 @@ public class SecurityModuleTest
         assertThat( securityManager, instanceOf( DefaultSecurityManager.class ) );
         DefaultSecurityManager defaultSecurityManager = (DefaultSecurityManager) securityManager;
 
-        assertThat( defaultSecurityManager.getSessionManager(), instanceOf( DefaultSessionManager.class ) );
-        DefaultSessionManager sessionManager = (DefaultSessionManager) defaultSecurityManager.getSessionManager();
+        assertThat( defaultSecurityManager.getSessionManager(), instanceOf( FixedDefaultSessionManager.class ) );
+        FixedDefaultSessionManager sessionManager =
+            (FixedDefaultSessionManager) defaultSecurityManager.getSessionManager();
         assertThat( sessionManager.getSessionDAO(), instanceOf( EnterpriseCacheSessionDAO.class ) );
+        assertThat(
+            ( (EhCacheManager) ( (EnterpriseCacheSessionDAO) sessionManager.getSessionDAO() ).getCacheManager() ).getCacheManager(),
+            sameInstance( injector.getInstance( CacheManagerComponent.class ).getCacheManager() ) );
     }
 
     @After

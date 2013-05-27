@@ -24,7 +24,7 @@
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>plugins</artifactId>
+  <artifactId>nexus-plugins</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -36,7 +36,7 @@
     <!-- nexus-plugin-bundle configuration -->
     <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
 
-    <!-- yuicompressor defaults; debug friendly, see 'optimize-js' profile -->
+    <!-- yuicompressor defaults; debug friendly, see 'optimize' profile -->
     <maven.yuicompressor.jswarn>true</maven.yuicompressor.jswarn>
     <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
     <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
@@ -62,48 +62,19 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>all</artifactId>
+        <artifactId>nexus-buildsupport-all</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
       </dependency>
 
-      <!--
-      Here only to bring in 'org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature' so that Enunciate can understand
-      restlet1x plugins which have these annotations for documentation generation.
-
-      FIXME: Remove need for this dep once we have most bits on JAX-RS compatible resources.
-      FIXME: Short-term, may want to just include this in deps provided by nexus-restlet1x-plugin?
-      -->
-      <dependency>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>enunciate-core</artifactId>
-        <version>${enunciate.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.enunciate</groupId>
-            <artifactId>enunciate-core-rt</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-digester</groupId>
-            <artifactId>commons-digester</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>net.sf.apt-jelly</groupId>
-            <artifactId>apt-jelly-freemarker</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
       <!-- INTERNAL -->
+
+      <!--
+      NOTE: Defining DM entries for Nexus plugin types 'nexus-plugin' and 'jar' w/o using '${nexus-plugin.type}'
+      NOTE: Some tooling (like IDEA) can not properly handle property definition in <type> element.
+      NOTE: References in <dependency> sections (not DM) should continue to use '${nexus-plugin.type}'.
+      -->
 
       <!-- capabilities -->
 
@@ -122,7 +93,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-capabilities-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -136,7 +107,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-capabilities-testsuite-helper</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-capabilities-testsuite-helper</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -145,7 +123,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-crypto-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -161,7 +139,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-h2-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-h2-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -182,7 +167,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-indexer-lucene-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -191,7 +183,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-kenai-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-kenai-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -200,7 +199,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-ldap-realm-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -230,7 +229,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-lvo-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-lvo-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -239,14 +245,28 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-archetype-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-archetype-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-maven-bridge-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-maven-bridge-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -261,7 +281,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-obr-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-obr-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -270,14 +297,21 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-p2-bridge-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-p2-bridge-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-p2-repository-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -293,7 +327,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-plugin-console-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-plugin-console-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -314,7 +355,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-restlet1x-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -327,16 +368,9 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-restlet1x-plugin</artifactId>
-        <classifier>tests</classifier>
-        <version>2.5.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
         <classifier>bundle</classifier>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -351,7 +385,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-rrb-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-rrb-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -360,7 +401,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-siesta-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-siesta-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -369,7 +417,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-site-repository-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-site-repository-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -384,7 +439,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-timeline-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-timeline-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -393,7 +455,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-ui-extjs3-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -409,7 +471,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-unpack-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-unpack-plugin</artifactId>
+        <type>jar</type>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
@@ -473,7 +542,7 @@
     Optimize javascript & css files, for use on production/release builds.
     -->
     <profile>
-      <id>optimize-js</id>
+      <id>optimize</id>
       <properties>
         <!--
         'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
