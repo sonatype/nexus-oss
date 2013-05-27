@@ -81,6 +81,14 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
+        <artifactId>goodies</artifactId>
+        <type>pom</type>
+        <version>2.5.0-SNAPSHOT</version>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.buildsupport</groupId>
         <artifactId>guice</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>

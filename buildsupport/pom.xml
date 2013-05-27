@@ -34,6 +34,7 @@
     <module>apache-shiro</module>
     <module>bouncycastle</module>
     <module>eclipse-jetty</module>
+    <module>goodies</module>
     <module>guice</module>
     <module>logging</module>
     <module>other</module>
