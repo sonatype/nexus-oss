@@ -433,7 +433,7 @@
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-          <version>1.0</version>
+          <version>1.0.1-SNAPSHOT</version>
           <extensions>true</extensions>
         </plugin>
 
