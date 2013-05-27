@@ -147,9 +147,9 @@
             </goals>
           </execution>
         </executions>
-        <!-- configuration>
-          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-        </configuration--> 
+        <!--<configuration>-->
+          <!--<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>-->
+        <!--</configuration> -->
       </plugin>
     </plugins>
   </build>
