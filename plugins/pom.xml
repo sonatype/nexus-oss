@@ -73,7 +73,6 @@
       restlet1x plugins which have these annotations for documentation generation.
 
       FIXME: Remove need for this dep once we have most bits on JAX-RS compatible resources.
-      FIXME: Short-term, may want to just include this in deps provided by nexus-restlet1x-plugin?
       -->
       <dependency>
         <groupId>org.codehaus.enunciate</groupId>
@@ -108,6 +107,7 @@
       <!--
       NOTE: Defining DM entries for Nexus plugin types 'nexus-plugin' and 'jar' w/o using '${nexus-plugin.type}'
       NOTE: Some tooling (like IDEA) can not properly handle property definition in <type> element.
+      NOTE: References in <dependency> sections (not DM) should continue to use '${nexus-plugin.type}'.
       -->
 
       <!-- capabilities -->
