@@ -30,11 +30,11 @@ import org.slf4j.Logger;
 import org.sonatype.guice.bean.containers.InjectedTest;
 
 import org.sonatype.nexus.test.util.StopWatch;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 public class ConfigurableInjectedTest
     extends InjectedTest
 {
-
     static
     {
         System.setProperty( "guice.disable.misplaced.annotation.check", "true" );
@@ -42,6 +42,14 @@ public class ConfigurableInjectedTest
         System.setProperty( "guava.executor.class", "NONE" );
         // http://code.google.com/p/google-guice/issues/detail?id=288#c30
         System.setProperty( "guice.executor.class", "NONE" );
+    }
+
+    protected final TestUtil util = new TestUtil(this);
+
+    // HACK: Force user.basedir to the detected directory by TestUtil for better IDE integration for execution of tests
+    // HACK: Many tests assume this directory is the maven module directory, when it may not be.
+    {
+        System.setProperty("user.dir", util.getBaseDir().getAbsolutePath());
     }
 
     @Rule

@@ -20,7 +20,7 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>maven</artifactId>
+    <artifactId>nexus-plugins-maven</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
@@ -43,15 +43,6 @@
     <dependency>
       <groupId>org.apache.maven.archetype</groupId>
       <artifactId>archetype-catalog</artifactId>
-      <exclusions>
-        <!--
-        Omit plexus-utils; this is provided by nexus framework.
-        -->
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -80,6 +71,14 @@
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <configuration>
+          <!--
+          Exclude dependencies which are provided by NX core.
+          -->
+          <classpathDependencyExcludes>
+            <exclude>org.codehaus.plexus:plexus-utils</exclude>
+          </classpathDependencyExcludes>
+        </configuration>
       </plugin>
 
       <!--

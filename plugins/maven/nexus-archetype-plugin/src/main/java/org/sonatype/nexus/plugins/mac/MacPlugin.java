@@ -26,11 +26,6 @@ public interface MacPlugin
 {
     /**
      * Returns the archetype catalog for given request and sourced from given indexing context.
-     * 
-     * @param request
-     * @param ctx
-     * @return
-     * @throws IOException
      */
     ArchetypeCatalog listArcherypesAsCatalog( MacRequest request, IndexingContext ctx )
         throws IOException;
