@@ -1,15 +1,9 @@
-# Ignores for Sonatype Nexus Core
-# Language is Java
-# Build tool is Apache Maven2/3
-# IDE used is Eclipse MSE
-# so, we have to ignore all the specifics of these above
-
-# Eclipse related (and M2e)
+# Eclipse
 .classpath
 .project
 .settings/
 
-# Maven related (and some plugins)
+# Maven
 target/
 *.ser
 *.ec
