@@ -22,6 +22,9 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
+  <!--
+  TODO: Rename to nexus-legacy-testharness, or something to indicate this is only for _legacy_ tests.
+  -->
   <artifactId>nexus-test-harness-launcher</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
