@@ -30,6 +30,7 @@
   <properties>
     <apache-maven.version>3.0.4</apache-maven.version>
     <aether.version>1.13.1</aether.version>
+    <wagon.version>2.1</wagon.version>
   </properties>
 
   <dependencyManagement>
@@ -108,14 +109,14 @@
 
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-file</artifactId>
+        <version>${wagon.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http-lightweight</artifactId>
-        <version>1.0-beta-5</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-component-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>${wagon.version}</version>
       </dependency>
 
       <dependency>
