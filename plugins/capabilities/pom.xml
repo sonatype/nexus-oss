@@ -23,7 +23,7 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>capabilities</artifactId>
+  <artifactId>nexus-plugins-capabilities</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 

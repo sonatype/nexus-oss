@@ -36,6 +36,9 @@
   </properties>
 
   <modules>
+    <!--
+    FIXME: Re-id to nexus-testsuite-<legacy|modern> and rename directory to <legacy|modern> for naming style consistency.
+    -->
     <module>modern-testsuite</module>
     <module>legacy-testsuite</module>
   </modules>

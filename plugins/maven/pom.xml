@@ -24,7 +24,7 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven</artifactId>
+  <artifactId>nexus-plugins-maven</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
