@@ -23,10 +23,7 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <!--
-  TODO: Update groupId before we release, so we can keep the namespace of these modules isolated.
-  -->
-  <!--<groupId>org.sonatype.nexus.assemblies</groupId>-->
+  <groupId>org.sonatype.nexus.assemblies</groupId>
   <artifactId>assemblies</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
