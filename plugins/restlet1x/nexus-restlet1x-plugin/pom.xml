@@ -42,12 +42,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -94,12 +88,18 @@
             <sharedDependency>org.restlet:org.restlet</sharedDependency>
             <sharedDependency>com.noelios.restlet:com.noelios.restlet</sharedDependency>
             <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
-            <!-- Used by org.sonatype.nexus.rest.ResourceSupport, but as it is copied from pluginkit, who knows what else uses it -->
-            <!-- Anyway, the rationale here (as this is ancient version) that no plugin will depend on TWO rest plugins in nexus, ever -->
+            <!-- Used by org.sonatype.nexus.rest.ResourceSupport -->
             <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
             <!-- Participates in public API of Plexus bridge for Restlet 1.x, is must for consumer to have it -->
             <sharedDependency>commons-fileupload:commons-fileupload</sharedDependency>
           </sharedDependencies>
+
+          <!--
+          Exclude dependencies which are provided by NX core.
+          -->
+          <classpathDependencyExcludes>
+            <exclude>org.codehaus.plexus:plexus-utils</exclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
 
