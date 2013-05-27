@@ -615,12 +615,12 @@
                     <!--
                     Ban junit which includes old hamcrest.
                     -->
-                    <exclude>junit:junit</exclude>
+                    <exclude>junit:junit:(,4.10]</exclude>
 
                     <!--
                     Require junit 4.10+ for proper hamcrest dependencies.
                     -->
-                    <exclude>junit:junit-dep:(,4.9]</exclude>
+                    <exclude>junit:junit-dep:(,4.10]</exclude>
 
                     <!--
                     Ban old servlet apis.

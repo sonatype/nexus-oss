@@ -19,7 +19,6 @@ import org.junit.Assert;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
-import org.sonatype.appcontext.lifecycle.Stoppable;
 import org.sonatype.appcontext.source.MapEntrySource;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 
@@ -49,21 +48,16 @@ public class CacheManagerComponentImplTest
     }
 
     @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        cacheManagerComponent = lookup( CacheManagerComponent.class );
-        appContext.getLifecycleManager().registerManaged( new CacheManagerLifecycleHandler( cacheManagerComponent ) );
-    }
-
-    @Override
     protected void tearDown()
         throws Exception
     {
         try
         {
-            appContext.getLifecycleManager().invokeHandler( Stoppable.class );
+            if ( cacheManagerComponent != null )
+            {
+                cacheManagerComponent.shutdown();
+                cacheManagerComponent = null;
+            }
         }
         finally
         {
@@ -75,10 +69,10 @@ public class CacheManagerComponentImplTest
         throws Exception
     {
         // look it up
-        CacheManagerComponentImpl cacheWrapper = (CacheManagerComponentImpl) cacheManagerComponent;
+        cacheManagerComponent = (CacheManagerComponentImpl) lookup( CacheManagerComponent.class );
 
         // check the store path, since the config from src/test/resources should be picked up
-        String storePath = cacheWrapper.getCacheManager().getDiskStorePath();
+        String storePath = cacheManagerComponent.getCacheManager().getDiskStorePath();
 
         // it has to be absolute
         Assert.assertTrue( "Invalid path " + storePath, new File( storePath ).isAbsolute() );
@@ -90,23 +84,18 @@ public class CacheManagerComponentImplTest
         // it has to point where we did set it (${basedir}/target/plexus-home/ehcache)
         Assert.assertEquals( "The store path does not point where we set it!", new File( getBasedir(),
             "target/plexus-home/ehcache" ).getAbsoluteFile().getPath().toLowerCase(), storePath.toLowerCase() );
-
-        // no need for this, this UT employs AppContext lifecycle, see #tearDown
-        // cacheWrapper.shutdown();
     }
 
     public void testConfigFromFile()
         throws Exception
     {
-        // stop the one created in setUp() method
-        cacheManagerComponent.shutdown();
-        
         // look it up
         final File file = new File( new File( getBasedir() ), "src/test/resources/ehcache.xml" );
-        CacheManagerComponentImpl cacheWrapper = new CacheManagerComponentImpl( appContext, file );
+        // craft it manually
+        cacheManagerComponent = new CacheManagerComponentImpl( appContext, file );
 
         // check the store path, since the config from src/test/resources should be picked up
-        String storePath = cacheWrapper.getCacheManager().getDiskStorePath();
+        String storePath = cacheManagerComponent.getCacheManager().getDiskStorePath();
 
         // it has to be absolute
         Assert.assertTrue( "Invalid path " + storePath, new File( storePath ).isAbsolute() );
@@ -118,9 +107,6 @@ public class CacheManagerComponentImplTest
         // it has to point where we did set it (${basedir}/target/plexus-home/ehcache)
         Assert.assertEquals( "The store path does not point where we set it!", new File( getBasedir(),
             "target/plexus-home/ehcache" ).getAbsoluteFile().getPath().toLowerCase(), storePath.toLowerCase() );
-
-        // no need for this, this UT employs AppContext lifecycle, see #tearDown
-        // cacheWrapper.shutdown();
     }
 
 }
