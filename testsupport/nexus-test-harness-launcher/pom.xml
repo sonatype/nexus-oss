@@ -37,8 +37,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration-model</artifactId>
+      <artifactId>nexus-web-utils</artifactId>
     </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-configuration-model</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -66,10 +71,10 @@
       <artifactId>nexus-test-common</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.sisu.litmus</groupId>-->
+      <!--<artifactId>litmus-testsupport</artifactId>-->
+    <!--</dependency>-->
 
     <!-- Starting up Jetty "fake remote" -->
     <dependency>
@@ -90,27 +95,27 @@
     </dependency>
 
     <!-- Logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>slf4j-api</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>jul-to-slf4j</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>ch.qos.logback</groupId>-->
+      <!--<artifactId>logback-classic</artifactId>-->
+    <!--</dependency>-->
 
     <!-- Deps needed by actual IT modules (like nexus-test-harness-its), and are here just to ease their life (to not have
       to add all these over and over as deps) -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.google.guava</groupId>-->
+      <!--<artifactId>guava</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>rome</groupId>
@@ -124,7 +129,9 @@
       <artifactId>xpp3_min</artifactId>
     </dependency>
 
-    <!-- Stupid nexus-test-environment-maven-plugin insists on this -->
+    <!--
+    FIXME: nexus-test-environment-maven-plugin insists on this entry being here.
+    -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>apache-maven</artifactId>
@@ -176,8 +183,7 @@
       <type>zip</type>
     </dependency>
 
-    <!-- Deps needed by some *Util classes (they use classes from these below) -->
-    <!-- To redirect j.u.Preferences -->
+    <!-- Deps needed by some *Util classes (they use classes from these below), To redirect j.u.Preferences -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
