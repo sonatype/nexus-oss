@@ -106,7 +106,8 @@
       <!-- INTERNAL -->
 
       <!--
-      NOTE: Defining DM entries for Nexus plugin types 'nexus-plugin' and 'jar' w/o using '${nexus-plugin.type}' as this can confuse some tooling.
+      NOTE: Defining DM entries for Nexus plugin types 'nexus-plugin' and 'jar' w/o using '${nexus-plugin.type}'
+      NOTE: Some tooling (like IDEA) can not properly handle property definition in <type> element.
       -->
 
       <!-- capabilities -->
