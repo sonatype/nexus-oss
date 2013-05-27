@@ -30,7 +30,6 @@
   <properties>
     <pluginName>Nexus Indexer Lucene Plugin</pluginName>
     <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
-    <mavenIndexer.version>5.1.2-bf3d48b</mavenIndexer.version>
   </properties>
 
   <dependencies>
@@ -52,19 +51,11 @@
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
-      <version>${mavenIndexer.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-core</artifactId>
-      <version>${mavenIndexer.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Aether is needed and will be published too (see applifecycle config) -->

@@ -31,6 +31,7 @@
     <apache-maven.version>3.0.4</apache-maven.version>
     <aether.version>1.13.1</aether.version>
     <wagon.version>2.1</wagon.version>
+    <maven-indexer.version>5.1.2-bf3d48b</maven-indexer.version>
   </properties>
 
   <dependencyManagement>
@@ -164,6 +165,25 @@
         <artifactId>aether-connector-wagon</artifactId>
         <version>${aether.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.indexer</groupId>
+        <artifactId>indexer-artifact</artifactId>
+        <version>${maven-indexer.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.indexer</groupId>
+        <artifactId>indexer-core</artifactId>
+        <version>${maven-indexer.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
