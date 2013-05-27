@@ -19,11 +19,11 @@
 
   <parent>
     <groupId>org.sonatype.nexus.buildsupport</groupId>
-    <artifactId>buildsupport</artifactId>
+    <artifactId>nexus-buildsupport</artifactId>
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>all</artifactId>
+  <artifactId>nexus-buildsupport-all</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -33,7 +33,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>apache-commons</artifactId>
+        <artifactId>nexus-buildsupport-commons</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -41,7 +41,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>apache-httpclient</artifactId>
+        <artifactId>nexus-buildsupport-httpclient</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -49,7 +49,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>apache-maven</artifactId>
+        <artifactId>nexus-buildsupport-maven</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -57,7 +57,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>apache-shiro</artifactId>
+        <artifactId>nexus-buildsupport-shiro</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -65,7 +65,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>bouncycastle</artifactId>
+        <artifactId>nexus-buildsupport-bouncycastle</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -73,7 +73,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>eclipse-jetty</artifactId>
+        <artifactId>nexus-buildsupport-jetty</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -81,7 +81,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>goodies</artifactId>
+        <artifactId>nexus-buildsupport-goodies</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -89,7 +89,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>guice</artifactId>
+        <artifactId>nexus-buildsupport-guice</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -97,7 +97,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>logging</artifactId>
+        <artifactId>nexus-buildsupport-logging</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -105,7 +105,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>other</artifactId>
+        <artifactId>nexus-buildsupport-other</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -113,7 +113,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>plexus</artifactId>
+        <artifactId>nexus-buildsupport-plexus</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -121,7 +121,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>testing</artifactId>
+        <artifactId>nexus-buildsupport-testing</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -129,7 +129,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>yammer-metrics</artifactId>
+        <artifactId>nexus-buildsupport-metrics</artifactId>
         <type>pom</type>
         <version>2.5.0-SNAPSHOT</version>
         <scope>import</scope>
