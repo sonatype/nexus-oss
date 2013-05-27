@@ -116,7 +116,9 @@ public class SecurityWebModule
     {
         // use native web session management instead of delegating to servlet container
         // workaround for NEXUS-5727, see FixedDefaultWebSessionManager javadoc for clues
-        bind.toConstructor( ctor( FixedDefaultWebSessionManager.class ) ).asEagerSingleton();
+        bind.to( FixedDefaultWebSessionManager.class ).asEagerSingleton();
+        // this is a PrivateModule, so explicitly binding the FixedDefaultSessionManager class
+        bind( FixedDefaultWebSessionManager.class );
     }
 
     /**
