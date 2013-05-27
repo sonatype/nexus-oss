@@ -39,6 +39,10 @@ import org.junit.Before;
 import com.google.inject.Module;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
+//
+// FIXME: This is a shitty class and should not exist... @Deprecate and trash this junk!
+//
+
 /**
  * A Support PlexusTestCase clone that does not extend JUnit TestCase, thereby allowing us to extend this class like we
  * did with JUnit 3x and use JUnit 4x annotations instead to design our tests.
@@ -53,6 +57,12 @@ import org.sonatype.sisu.litmus.testsupport.TestUtil;
 public abstract class PlexusTestCaseSupport
 {
     protected final TestUtil util = new TestUtil(this);
+
+    // HACK: Force user.basedir to the detected directory by TestUtil for better IDE integration for execution of tests
+    // HACK: Many tests assume this directory is the maven module directory, when it may not be.
+    {
+        System.setProperty("user.dir", util.getBaseDir().getAbsolutePath());
+    }
 
     public static final String BASE_DIR_KEY = "basedir";
 
@@ -301,26 +311,7 @@ public abstract class PlexusTestCaseSupport
 
     public String getBasedir()
     {
-        if ( basedir != null )
-        {
-            return basedir;
-        }
-
-        basedir = System.getProperty( BASE_DIR_KEY );
-
-        if ( basedir == null )
-        {
-            // Find the directory which this class is defined in.
-            final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-
-            // We expect the file to be in target/test-classes, so go up 2 dirs
-            final File baseDir = new File( path ).getParentFile().getParentFile();
-
-            // Set ${basedir}
-            System.setProperty( BASE_DIR_KEY, baseDir.getPath() );
-        }
-
-        return basedir;
+        return util.getBaseDir().getAbsolutePath();
     }
 
     public String getTestConfiguration()
@@ -339,8 +330,9 @@ public abstract class PlexusTestCaseSupport
      * Get a configured {@link LoggerManager}
      * <p>
      * The LoggerManager returned has its threshold influenced by the system property {@code 'test.log.level'}. The
-     * values of DEBUG, INFO, WARN, ERROR will set the threshold of the LoggerManager to the corresponding value. See
-     * {@link https://issues.sonatype.org/browse/NXCM-3230}.
+     * values of DEBUG, INFO, WARN, ERROR will set the threshold of the LoggerManager to the corresponding value.
+     *
+     * https://issues.sonatype.org/browse/NXCM-3230
      * 
      * @return LoggerManager with threshold influenced by system property
      * @throws ComponentLookupException if LoggerManager cannot be looked up
@@ -420,6 +412,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertTrue( boolean condition )
     {
         Assert.assertTrue( condition );
@@ -428,6 +421,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertTrue( String message, boolean condition )
     {
         Assert.assertTrue( message, condition );
@@ -436,6 +430,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertFalse( boolean condition )
     {
         Assert.assertFalse( condition );
@@ -444,6 +439,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertFalse( String message, boolean condition )
     {
         Assert.assertFalse( message, condition );
@@ -452,6 +448,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertNotNull( Object obj )
     {
         Assert.assertNotNull( obj );
@@ -460,6 +457,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertNotNull( String message, Object obj )
     {
         Assert.assertNotNull( message, obj );
@@ -468,6 +466,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertNull( Object obj )
     {
         Assert.assertNull( obj );
@@ -476,6 +475,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertNull( String message, Object obj )
     {
         Assert.assertNull( message, obj );
@@ -484,6 +484,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertEquals( String message, Object expected, Object actual )
     {
         // don't use junit framework Assert due to autoboxing bug
@@ -494,6 +495,7 @@ public abstract class PlexusTestCaseSupport
     /**
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
+    @Deprecated
     protected void assertEquals( Object expected, Object actual )
     {
         // don't use junit framework Assert
