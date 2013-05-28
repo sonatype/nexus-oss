@@ -116,13 +116,14 @@
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
           </exclusion>
-          <exclusion>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-          </exclusion>
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.sisu.jacksbee</groupId>
+        <artifactId>jacksbee-xjc</artifactId>
+        <version>1.1.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
