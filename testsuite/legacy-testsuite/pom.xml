@@ -343,12 +343,6 @@
                 <plugin>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-it-helper-plugin</artifactId>
-                  <classifier>cp</classifier>
-                  <type>jar</type>
-                </plugin>
-                <plugin>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-it-helper-plugin</artifactId>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                 </plugin>
