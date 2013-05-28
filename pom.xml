@@ -13,7 +13,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,8 +24,8 @@
     <version>2.5.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.yum</groupId>
   <artifactId>nexus-yum</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <version>3.0.3-SNAPSHOT</version>
@@ -109,18 +110,25 @@
         <artifactId>redline</artifactId>
         <version>1.1.9</version>
       </dependency>
-      
+
       <!-- INTERNAL -->
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
-        <type>${nexus-plugin.type}</type>
+        <type>nexus-plugin</type>
         <version>3.0.3-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.nexus.yum</groupId>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-yum-plugin</artifactId>
+        <type>jar</type>
+        <version>3.0.3-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-client</artifactId>
         <version>3.0.3-SNAPSHOT</version>
       </dependency>
