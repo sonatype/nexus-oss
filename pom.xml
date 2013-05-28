@@ -533,6 +533,7 @@
               <goal>enforce</goal>
             </goals>
             <configuration>
+              <fail>true</fail>
               <rules>
                 <!--
                 Require Maven 3.0.4+
@@ -613,13 +614,9 @@
                     <exclude>*:xml-apis</exclude>
 
                     <!--
-                    Ban junit which includes old hamcrest.
+                    Ban junit which includes old, or improper hamcrest.
                     -->
                     <exclude>junit:junit</exclude>
-
-                    <!--
-                    Require junit 4.10+ for proper hamcrest dependencies.
-                    -->
                     <exclude>junit:junit-dep:(,4.9]</exclude>
 
                     <!--
@@ -664,6 +661,14 @@
                     FIXME: nexus-restlet-bridge tests depend on this, we can not exclude/ban it ATM.
                     -->
                     <!--<exclude>org.mortbay.jetty:*</exclude>-->
+
+                    <!--
+                    Ban old bouncycastle.
+                    -->
+                    <exclude>org.bouncycastle:*-jdk14:*</exclude>
+                    <exclude>org.bouncycastle:*-jdk15:*</exclude>
+                    <exclude>bouncycastle:*-jdk14:*</exclude>
+                    <exclude>bouncycastle:*-jdk15:*</exclude>
                   </excludes>
 
                   <!--
