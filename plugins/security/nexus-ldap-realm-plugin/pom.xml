@@ -64,8 +64,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>ldap-common</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-ldap-common</artifactId>
     </dependency>
 
     <dependency>
