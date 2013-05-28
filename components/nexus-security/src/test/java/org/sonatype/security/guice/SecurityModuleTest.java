@@ -40,13 +40,13 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Verifies functionality of SecurityModule.
- * 
- * @since 2.7
  */
 public class SecurityModuleTest
+    extends TestSupport
 {
     private Injector injector;
 
@@ -110,8 +110,8 @@ public class SecurityModuleTest
             protected void configure()
             {
                 Map<String, Object> properties = new HashMap<String, Object>();
-                properties.put( "security-xml-file", "target/foo/security.xml" );
-                properties.put( "application-conf", "target/plexus-home/conf" );
+                properties.put( "security-xml-file", util.resolvePath("target/foo/security.xml") );
+                properties.put( "application-conf", util.resolvePath("target/plexus-home/conf") );
                 binder().bind( ParameterKeys.PROPERTIES ).toInstance( properties );
             }
         };
