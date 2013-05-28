@@ -285,6 +285,8 @@ public class DefaultSchedulerTest
     public void testChangeScheduleDuringRunCallable()
         throws Exception
     {
+        // FIXME: This test is unstable
+
         TestChangeScheduleDuringRunCallable callable = new TestChangeScheduleDuringRunCallable( 200000 );
 
         long nearFuture = System.currentTimeMillis() + 500;
@@ -317,6 +319,8 @@ public class DefaultSchedulerTest
     public void testCallableStepOnEachOtherToe()
         throws Exception
     {
+        // FIXME: This test is unstable
+
         TestCallable tr = null;
 
         // work that will sleep 3 seconds
