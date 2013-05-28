@@ -660,7 +660,7 @@
                     Ban junit which includes old, or improper hamcrest.
                     -->
                     <exclude>junit:junit:(,4.10]</exclude>
-                    <exclude>junit:junit-dep:(,4.10]</exclude>
+                    <exclude>junit:junit-dep</exclude>
 
                     <!--
                     Ban old servlet apis.
