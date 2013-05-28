@@ -54,7 +54,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

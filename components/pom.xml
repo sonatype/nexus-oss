@@ -41,7 +41,6 @@
     <module>nexus-logging-extras-appender</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
-    <module>nexus-plugin-test-api</module>
     <module>nexus-repository-metadata-api</module>
     <module>nexus-repository-metadata-model</module>
     <module>nexus-scheduler</module>
