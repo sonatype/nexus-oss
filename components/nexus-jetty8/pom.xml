@@ -77,6 +77,10 @@
     </dependency>
   </dependencies>
 
+  <!--
+  FIXME: tests should allocate ports themselves directly.  Configuration below is only for port allocation.
+  -->
+
   <build>
     <pluginManagement>
       <plugins>
@@ -84,9 +88,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <includes>
-              <include>**/*Test.java</include>
-            </includes>
             <systemProperties>
               <property>
                 <name>default-jetty-port</name>
@@ -108,7 +109,6 @@
 
     <plugins>
       <plugin>
-        <!-- FIXME tests should allocate ports themselves directly -->
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>port-allocator-maven-plugin</artifactId>
         <version>1.0</version>
@@ -137,4 +137,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

@@ -87,13 +87,20 @@ public abstract class AbstractNexusProxyP2IT
     {
         super.copyTestResources();
 
-        final File source = new File( TestProperties.getString( "test.resources.source.folder" ), "proxyRepo" );
-        if ( !source.exists() )
+        final File dest = new File( localStorageDir );
+
+        if ( dest.exists() )
+        {
+            FileUtils.forceDelete( dest );
+        }
+
+        File source = getTestResourceAsFile( "proxy-repo" );
+        if ( source == null || !source.exists() )
         {
             return;
         }
 
-        interpolationDirectoryCopy( source, new File( localStorageDir ), TestProperties.getAll() );
+        interpolationDirectoryCopy( source, dest, TestProperties.getAll() );
     }
 
 }

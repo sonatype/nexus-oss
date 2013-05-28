@@ -78,7 +78,10 @@
     <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
     <nexus.configuration.version>2.5.0</nexus.configuration.version>
 
-    <!-- See 'idea' profile -->
+    <!--
+    Configuration of 'nexus-plugin' packaging and bundles.
+    -->
+    <nexus-plugin-bundle.version>1.0.1-SNAPSHOT</nexus-plugin-bundle.version>
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
     <!-- logging configuration used in logback config files to control test logging -->
@@ -272,6 +275,22 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-it-helper-plugin</artifactId>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-it-helper-plugin</artifactId>
+        <classifier>cp</classifier>
+        <type>jar</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
@@ -427,13 +446,37 @@
           <version>1.5</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.jvnet.jaxb2.maven2</groupId>
+          <artifactId>maven-jaxb2-plugin</artifactId>
+          <version>0.8.2</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.sonatype.sisu.jacksbee</groupId>
+              <artifactId>jacksbee-xjc</artifactId>
+              <version>1.1.1</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <extension>true</extension>
+            <schemaDirectory>src/main/schema</schemaDirectory>
+            <plugins>
+              <plugin>
+                <groupId>org.sonatype.sisu.jacksbee</groupId>
+                <artifactId>jacksbee-xjc</artifactId>
+                <version>1.1.1</version>
+              </plugin>
+            </plugins>
+          </configuration>
+        </plugin>
+
         <!--
         Support for nexus-plugin packaging.
         -->
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-          <version>1.0.1-SNAPSHOT</version>
+          <version>${nexus-plugin-bundle.version}</version>
           <extensions>true</extensions>
         </plugin>
 
@@ -533,6 +576,7 @@
               <goal>enforce</goal>
             </goals>
             <configuration>
+              <fail>true</fail>
               <rules>
                 <!--
                 Require Maven 3.0.4+
@@ -613,13 +657,9 @@
                     <exclude>*:xml-apis</exclude>
 
                     <!--
-                    Ban junit which includes old hamcrest.
+                    Ban junit which includes old, or improper hamcrest.
                     -->
                     <exclude>junit:junit:(,4.10]</exclude>
-
-                    <!--
-                    Require junit 4.10+ for proper hamcrest dependencies.
-                    -->
                     <exclude>junit:junit-dep:(,4.10]</exclude>
 
                     <!--
@@ -664,6 +704,14 @@
                     FIXME: nexus-restlet-bridge tests depend on this, we can not exclude/ban it ATM.
                     -->
                     <!--<exclude>org.mortbay.jetty:*</exclude>-->
+
+                    <!--
+                    Ban old bouncycastle.
+                    -->
+                    <exclude>org.bouncycastle:*-jdk14:*</exclude>
+                    <exclude>org.bouncycastle:*-jdk15:*</exclude>
+                    <exclude>bouncycastle:*-jdk14:*</exclude>
+                    <exclude>bouncycastle:*-jdk15:*</exclude>
                   </excludes>
 
                   <!--
@@ -968,7 +1016,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <!--
     Support for loading Nexus projects in Intellij IDEA; as it doesn't handle the 'nexus-plugin' packaging WRT to dependency calculations.
     -->

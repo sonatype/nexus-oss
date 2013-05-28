@@ -40,11 +40,6 @@
       <artifactId>nexus-web-utils</artifactId>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus</groupId>-->
-      <!--<artifactId>nexus-configuration-model</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras</artifactId>
@@ -71,11 +66,6 @@
       <artifactId>nexus-test-common</artifactId>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.sisu.litmus</groupId>-->
-      <!--<artifactId>litmus-testsupport</artifactId>-->
-    <!--</dependency>-->
-
     <!-- Starting up Jetty "fake remote" -->
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
@@ -93,29 +83,6 @@
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
     </dependency>
-
-    <!-- Logging -->
-    <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>slf4j-api</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>jul-to-slf4j</artifactId>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>ch.qos.logback</groupId>-->
-      <!--<artifactId>logback-classic</artifactId>-->
-    <!--</dependency>-->
-
-    <!-- Deps needed by actual IT modules (like nexus-test-harness-its), and are here just to ease their life (to not have
-      to add all these over and over as deps) -->
-    <!--<dependency>-->
-      <!--<groupId>com.google.guava</groupId>-->
-      <!--<artifactId>guava</artifactId>-->
-    <!--</dependency>-->
 
     <dependency>
       <groupId>rome</groupId>
@@ -178,7 +145,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
@@ -187,8 +153,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
       <classifier>cp</classifier>
       <type>jar</type>
     </dependency>
@@ -216,7 +180,6 @@
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <version>${nexus.version}</version>
     </dependency>
-
   </dependencies>
 
 </project>

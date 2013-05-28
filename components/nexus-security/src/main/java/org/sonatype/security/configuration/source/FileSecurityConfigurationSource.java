@@ -31,6 +31,8 @@ import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The default configuration source powered by Modello. It will try to load configuration, upgrade if needed and
  * validate it. It also holds the one and only existing Configuration object.
@@ -191,7 +193,7 @@ public class FileSecurityConfigurationSource
 	     // backup the file
 	     File backup = new File( file.getParentFile(), file.getName() + ".bak" );
 	    
-	     FileUtils.copyFile( file, backup );
+	     FileUtils.copyFile(file, backup);
 	    
 	     // set the upgradeInstance to warn the application about this
 	     setConfigurationUpgraded( true );
@@ -201,10 +203,6 @@ public class FileSecurityConfigurationSource
 
     /**
      * Load configuration.
-     * 
-     * @param file the file
-     * @return the configuration
-     * @throws IOException Signals that an I/O exception has occurred.
      */
     private void loadConfiguration( File file )
         throws IOException
@@ -280,6 +278,7 @@ public class FileSecurityConfigurationSource
             }
 
             SecurityConfiguration configuration = getConfiguration();
+            checkNotNull(configuration, "Missing security configuration");
 
             String clearPassword = configuration.getAnonymousPassword();
             try
@@ -307,7 +306,7 @@ public class FileSecurityConfigurationSource
         }
 
         // if all went well, delete the bak file
-        backupFile.delete();
+        FileUtils.forceDelete(backupFile);
     }
 
     /**

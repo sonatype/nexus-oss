@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.proxy.mirror.DefaultDownloadMirrors;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
 import org.sonatype.nexus.proxy.repository.Mirror;

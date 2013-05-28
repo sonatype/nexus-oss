@@ -43,7 +43,7 @@ public class NEXUS5057EnsureEclipseBundleShapeIsSupportedIT
      * <code>*-p2Content.xml</code> file should include the correct instruction for whether the content has been zipped.
      * <p>
      * <ul>
-     * <li>repo location during test run = target/nexus/nexus-work-dir/storage/nexus5057/</li>
+     * <li>repo location during test run = target/nexus/sonatype-work/storage/nexus5057/</li>
      * <li>p2Artifact file = test/nexus5057/1.0.0/nexus5057-1.0.0-p2Artifacts.xml</li>
      * <li>p2Content file = test/nexus5057/1.0.0/nexus5057-1.0.0-p2Content.xml</li>
      * </ul>

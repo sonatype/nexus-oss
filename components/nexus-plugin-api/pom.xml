@@ -52,14 +52,6 @@
     </dependency>
 
     <!--
-      As long as we keep maven support in core, these will be in core too.
-    -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-    </dependency>
-
-    <!--
     FIXME: Sort out what if/any of this is already included via nexus-core.
     -->
 
@@ -101,11 +93,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-common</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
     </dependency>
 
     <dependency>

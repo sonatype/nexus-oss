@@ -15,7 +15,7 @@ package org.sonatype.security.rest.roles;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.security.rest.model.RoleAndPrivilegeListFilterResourceRequest;
 import org.sonatype.security.rest.model.RoleAndPrivilegeListResource;
 

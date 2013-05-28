@@ -77,44 +77,33 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
     </dependency>
 
     <!-- NEXUS-2810 references this -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
     </dependency>
 
     <!-- NEXUS-639 (Timeline) -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-timeline-plugin</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
     </dependency>
 
     <!-- NEXUS-156 (RRB perms) -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
     </dependency>
 
     <!-- NEXUS-3947 ArchetypeCatalog -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
     </dependency>
 
-    <!-- FIXME: Remove this, or sort out what its really needed for. -->
-    <!-- NEXUS-4218 -->
+    <!-- FIXME: Remove this, or sort out what its really needed for, if needed better comment than NEXUS-4218-->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
@@ -150,7 +139,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- NEXUS-3082 -->
+    <!-- FIXME: Needs better comment: NEXUS-3082 -->
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
@@ -366,7 +355,6 @@
                 <plugin>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-p2-repository-plugin</artifactId>
-                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                 </plugin>

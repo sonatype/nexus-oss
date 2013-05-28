@@ -24,7 +24,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
 import org.restlet.data.Form;

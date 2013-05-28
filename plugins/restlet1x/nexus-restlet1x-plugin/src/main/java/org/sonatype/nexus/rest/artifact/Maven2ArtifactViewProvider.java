@@ -15,7 +15,7 @@ package org.sonatype.nexus.rest.artifact;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
