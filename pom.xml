@@ -553,7 +553,7 @@
               <!--
               Excludes for specific classes which have compatible, yet different licences.
               -->
-              <exclude>**/ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
+              <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
             </excludes>
           </configuration>
         </plugin>
