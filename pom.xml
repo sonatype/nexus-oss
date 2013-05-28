@@ -78,7 +78,10 @@
     <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
     <nexus.configuration.version>2.5.0</nexus.configuration.version>
 
-    <!-- See 'idea' profile -->
+    <!--
+    Configuration of 'nexus-plugin' packaging and bundles.
+    -->
+    <nexus-plugin-bundle.version>1.0.1-SNAPSHOT</nexus-plugin-bundle.version>
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
     <!-- logging configuration used in logback config files to control test logging -->
@@ -449,7 +452,7 @@
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-          <version>1.0.1-SNAPSHOT</version>
+          <version>${nexus-plugin-bundle.version}</version>
           <extensions>true</extensions>
         </plugin>
 
