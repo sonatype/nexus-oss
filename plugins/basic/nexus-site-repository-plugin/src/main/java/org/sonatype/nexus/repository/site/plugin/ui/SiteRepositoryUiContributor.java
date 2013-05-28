@@ -34,6 +34,6 @@ public class SiteRepositoryUiContributor
     @Override
     public UiContribution contribute( final boolean debug )
     {
-        return new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID ).build( debug );
+        return new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID ).boot( ARTIFACT_ID + "-all" ).build( debug );
     }
 }
