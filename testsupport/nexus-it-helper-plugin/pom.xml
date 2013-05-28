@@ -39,12 +39,14 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+    HACK: Using nexus.version since DM not in scope.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 

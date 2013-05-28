@@ -30,12 +30,12 @@
   <dependencies>
     <!--
     FIXME: Should not be dependent on a plugin here.
+    HACK: Using nexus.version as a work-around to lack of DM in this context.
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!-- = Other client dependencies = -->
@@ -98,27 +98,18 @@
       <artifactId>commons-beanutils-core</artifactId>
     </dependency>
 
-    <!--
-    FIXME: Move to DM.
-    -->
-
-    <!-- For Jersey client -->
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>1.15</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <version>1.15</version>
       <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <!-- Exclude HC4 4.1.x and use 4.2.x instead, else Maven detects conflicts and will omit these required dependencies -->
+        <!--
+        Exclude HC4 4.1.x and use 4.2.x instead, else Maven detects conflicts and will omit these required dependencies
+        -->
         <exclusion>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
@@ -133,21 +124,6 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <version>1.15</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>avax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

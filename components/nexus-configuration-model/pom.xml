@@ -30,14 +30,11 @@
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
-
-    <!-- Model needs this -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>base-configuration</artifactId>
     </dependency>
-    
-    <!-- Modello classes needs this -->
+
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
@@ -83,6 +80,7 @@
               </models>
             </configuration>
           </execution>
+
           <execution>
             <id>nexus-old.xml</id>
             <goals>

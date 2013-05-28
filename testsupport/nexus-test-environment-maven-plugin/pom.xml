@@ -38,10 +38,10 @@
       <artifactId>maven-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -50,7 +50,7 @@
     </dependency>
 
     <!--
-    FIXME: Clean up these deps, newer versions available, avoid exclusions if they are not really needed
+    FIXME: Clean up these deps, newer versions available, avoid exclusions if they are not really needed, use DM
     -->
     <dependency>
       <groupId>org.apache.maven.shared</groupId>

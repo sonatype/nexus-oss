@@ -66,10 +66,6 @@
       <artifactId>nexus-core</artifactId>
       <classifier>tests</classifier>
       <exclusions>
-        <!--<exclusion>-->
-        <!--<groupId>org.sonatype.nexus</groupId>-->
-        <!--<artifactId>nexus-oss-edition</artifactId>-->
-        <!--</exclusion>-->
         <exclusion>
           <groupId>*</groupId>
           <artifactId>*</artifactId>
