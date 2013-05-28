@@ -98,6 +98,10 @@
       <artifactId>commons-beanutils-core</artifactId>
     </dependency>
 
+    <!--
+    FIXME: Move to DM.
+    -->
+
     <!-- For Jersey client -->
     <dependency>
       <groupId>com.sun.jersey</groupId>
@@ -149,7 +153,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-common</artifactId>
-      <version>1.4.1</version>
       <exclusions>
         <exclusion>
           <groupId>com.google.guava</groupId>

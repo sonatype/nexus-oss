@@ -30,8 +30,6 @@
   <properties>
     <pluginName>Nexus Siesta Plugin</pluginName>
     <pluginDescription>Support for Siesta (Jersey) REST API.</pluginDescription>
-
-    <siesta.version>1.4.1</siesta.version>
   </properties>
 
   <dependencies>
@@ -49,7 +47,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-common</artifactId>
-      <version>${siesta.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.google.guava</groupId>
@@ -65,12 +62,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-server</artifactId>
-      <version>${siesta.version}</version>
       <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>org.sonatype.sisu.inject</groupId>
           <artifactId>guice-servlet</artifactId>
@@ -81,12 +73,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-client</artifactId>
-      <version>${siesta.version}</version>
       <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
@@ -105,13 +92,11 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-jackson</artifactId>
-      <version>${siesta.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.sisu.jacksbee</groupId>
       <artifactId>jacksbee-runtime</artifactId>
-      <version>1.1.1</version>
       <exclusions>
         <exclusion>
           <groupId>javax.xml.bind</groupId>

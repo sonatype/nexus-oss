@@ -39,6 +39,7 @@
     <module>metrics</module>
     <module>other</module>
     <module>plexus</module>
+    <module>rest</module>
     <module>shiro</module>
     <module>testing</module>
 

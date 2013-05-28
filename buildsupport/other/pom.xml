@@ -29,6 +29,7 @@
 
   <properties>
     <jackson.version>1.9.10</jackson.version>
+    <siesta.version>1.4.1</siesta.version>
   </properties>
 
   <dependencyManagement>
@@ -124,42 +125,6 @@
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>1.3.170</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jsoup</groupId>
-        <artifactId>jsoup</artifactId>
-        <version>1.7.1</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>org.json</artifactId>
-        <version>2.0-NEXUS-3758</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-core-asl</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-mapper-asl</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.thoughtworks.xstream</groupId>
-        <artifactId>xstream</artifactId>
-        <version>1.4.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>xpp3</groupId>
-        <artifactId>xpp3_min</artifactId>
-        <version>1.1.4c</version>
       </dependency>
 
       <dependency>
