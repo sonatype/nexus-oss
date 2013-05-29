@@ -316,6 +316,14 @@
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-p2-repository-plugin</artifactId>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- plugin-console -->
 
       <dependency>
