@@ -27,6 +27,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.Version;
+import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -43,10 +47,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalkerProcessor;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
-import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
-import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
-import org.sonatype.nexus.proxy.maven.version.Version;
-import org.sonatype.nexus.proxy.maven.version.VersionParser;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -86,7 +86,7 @@ public class DefaultSnapshotRemover
 
     private ContentClass maven2ContentClass;
 
-    private VersionParser versionScheme = new GenericVersionParser();
+    private VersionScheme versionScheme = new GenericVersionScheme();
 
     @Inject
     public DefaultSnapshotRemover( final RepositoryRegistry repositoryRegistry,

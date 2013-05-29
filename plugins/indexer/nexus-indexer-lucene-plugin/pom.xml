@@ -64,19 +64,6 @@
       <artifactId>indexer-core</artifactId>
     </dependency>
 
-    <!-- Aether is needed and will be published too (see applifecycle config) -->
-    <!-- since sadly Maven Indexer exposes it's classes over it's public API -->
-    <!-- All this because of the presence of Version in ArtifactInfo -->
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-util</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
@@ -133,6 +120,8 @@
           <classpathDependencyExcludes>
             <exclude>org.codehaus.plexus:plexus-utils</exclude>
             <exclude>org.codehaus.plexus:plexus-component-annotations</exclude>
+            <exclude>org.sonatype.aether:aether-api</exclude>
+            <exclude>org.sonatype.aether:aether-util</exclude>
           </classpathDependencyExcludes>
         </configuration>
       </plugin>

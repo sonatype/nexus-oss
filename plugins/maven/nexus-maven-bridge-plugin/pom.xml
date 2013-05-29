@@ -93,6 +93,10 @@
             <exclude>org.sonatype.sisu:sisu-inject-plexus</exclude>
             <exclude>org.apache.httpcomponents</exclude>
             <exclude>org.slf4j</exclude>
+            <exclude>org.sonatype.aether:aether-api</exclude>
+            <exclude>org.sonatype.aether:aether-spi</exclude>
+            <exclude>org.sonatype.aether:aether-impl</exclude>
+            <exclude>org.sonatype.aether:aether-util</exclude>
           </classpathDependencyExcludes>
         </configuration>
       </plugin>
