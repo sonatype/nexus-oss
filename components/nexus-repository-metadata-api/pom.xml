@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -36,22 +37,6 @@
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
-    <!--
-    FIXME: WTF is restlet doing here?!
-    -->
-    <dependency>
-      <groupId>org.restlet</groupId>
-      <artifactId>org.restlet</artifactId>
-      <version>1.1.2</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>com.noelios.restlet</groupId>
-      <artifactId>com.noelios.restlet</artifactId>
-      <version>1.1.2</version>
-      <optional>true</optional>
-    </dependency>
   </dependencies>
 
   <build>
