@@ -132,7 +132,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- FIXME: Needs better comment: NEXUS-3082 -->
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
