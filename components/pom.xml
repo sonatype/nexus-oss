@@ -37,11 +37,12 @@
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
     <module>nexus-jetty8</module>
+    <module>nexus-launcher</module>
+    <module>nexus-ldap-common</module>
     <module>nexus-logging-extras</module>
     <module>nexus-logging-extras-appender</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
-    <module>nexus-plugin-test-api</module>
     <module>nexus-repository-metadata-api</module>
     <module>nexus-repository-metadata-model</module>
     <module>nexus-scheduler</module>
@@ -49,7 +50,6 @@
     <module>nexus-security-realms</module>
     <module>nexus-web-utils</module>
     <module>nexus-webapp</module>
-    <module>nexus-launcher</module>
   </modules>
 
   <dependencyManagement>

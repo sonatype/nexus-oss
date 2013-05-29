@@ -40,6 +40,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.rest.model.AliasingListConverter;
+import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -365,41 +366,6 @@ public abstract class AbstractSecurityPlexusResource
                     return input;
                 }
             } ));
-        }
-    }
-
-    private class HtmlUnescapeStringConverter
-        extends StringConverter
-    {
-        /**
-         * A flag denoting should we ignore flakey clients or not.
-         */
-        private final boolean nullResilient;
-
-        public HtmlUnescapeStringConverter()
-        {
-            this( false );
-        }
-
-        public HtmlUnescapeStringConverter( boolean nullResilient )
-        {
-            this.nullResilient = nullResilient;
-        }
-
-        @Override
-        public boolean canConvert( Class type )
-        {
-            if ( nullResilient && type == null )
-            {
-                return true;
-            }
-            return super.canConvert( type );
-        }
-
-        @Override
-        public Object fromString( String str )
-        {
-            return StringEscapeUtils.unescapeHtml( str );
         }
     }
 }

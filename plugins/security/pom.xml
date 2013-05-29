@@ -27,7 +27,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>ldap-common</module>
     <module>nexus-ldap-realm-plugin</module>
     <module>nexus-kenai-plugin</module>
   </modules>
