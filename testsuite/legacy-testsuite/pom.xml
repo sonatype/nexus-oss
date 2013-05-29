@@ -133,6 +133,19 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- 
+      This dependency entry is needed by nexus-test-env-m-p
+      setup-environment mojo, and it must have "raw" coordinates
+      as it has no idea what nexus-plugin packaging actually means
+    -->
+      <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-p2-repository-plugin</artifactId>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-client</artifactId>

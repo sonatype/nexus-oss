@@ -309,6 +309,23 @@
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
 
+      <!--
+        This is a duplicate entry of that above, but with
+        "raw" coordinates, as it's needed by legacy-testsuite
+        nexus-test-environment-plugin, as it does not know
+        to resolve "nexus-plugin" packaging.
+        FIXME: this probably needs a fix in plugin above
+        and this entry should be removed after that
+        to avoid duplication.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-p2-repository-plugin</artifactId>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-p2-repository-plugin</artifactId>
