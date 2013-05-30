@@ -12,32 +12,28 @@
  */
 package org.sonatype.nexus.repository.site.plugin.ui;
 
-import java.util.Map;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
-import org.sonatype.nexus.repository.site.plugin.SiteRepositoryPlugin;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
-@Named( "SiteRepositoryNexusIndexHtmlCustomizer" )
+/**
+ * @since 2.6
+ */
+@Named
 @Singleton
-public class SiteRepositoryNexusIndexHtmlCustomizer
-    extends AbstractNexusIndexHtmlCustomizer
+public class SiteRepositoryUiContributor
+    implements UiContributor
 {
 
-    private final SiteRepositoryPlugin owner;
+    private static final String ARTIFACT_ID = "nexus-site-repository-plugin";
 
-    @Inject
-    public SiteRepositoryNexusIndexHtmlCustomizer( final SiteRepositoryPlugin owner )
-    {
-        this.owner = owner;
-    }
+    public static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
     @Override
-    public String getPostHeadContribution( Map<String, Object> ctx )
+    public UiContribution contribute( final boolean debug )
     {
-        return "<script src=\"static/js/" + owner.getVersion() + "/" + owner.getId()  + "-all.js\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+        return new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID ).build( debug );
     }
-
 }

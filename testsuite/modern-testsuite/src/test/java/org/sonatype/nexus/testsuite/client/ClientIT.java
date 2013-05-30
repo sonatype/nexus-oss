@@ -61,6 +61,7 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.security.rest.model.UserListResourceResponse;
+
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 public class ClientIT
@@ -641,8 +642,12 @@ public class ClientIT
     @Test
     public void modifyDiscoveryConfig()
     {
+        final boolean defaultEnabled;
+        final int defaultIntervalHours;
         {
             final DiscoveryConfiguration config = routing().getDiscoveryConfigurationFor( "central" );
+            defaultEnabled = config.isEnabled();
+            defaultIntervalHours = config.getIntervalHours();
             config.setEnabled( false );
             config.setIntervalHours( 12 );
             routing().setDiscoveryConfigurationFor( "central", config );
@@ -651,6 +656,14 @@ public class ClientIT
             final DiscoveryConfiguration config = routing().getDiscoveryConfigurationFor( "central" );
             assertThat( config.isEnabled(), is( false ) );
             assertThat( config.getIntervalHours(), is( 12 ) );
+        }
+        {
+            // restore nx state as otherwise this disturbs tests like #getCentralDefaultConfig()
+            // if executed AFTER this test
+            final DiscoveryConfiguration config = routing().getDiscoveryConfigurationFor( "central" );
+            config.setEnabled( defaultEnabled );
+            config.setIntervalHours( defaultIntervalHours );
+            routing().setDiscoveryConfigurationFor( "central", config );
         }
     }
 

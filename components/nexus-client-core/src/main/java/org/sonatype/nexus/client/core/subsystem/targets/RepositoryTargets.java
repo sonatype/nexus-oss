@@ -13,7 +13,6 @@
 package org.sonatype.nexus.client.core.subsystem.targets;
 
 import org.sonatype.nexus.client.core.subsystem.EntityRepository;
-import org.sonatype.nexus.client.core.subsystem.security.Privilege;
 
 /**
  * A {@link RepositoryTarget} repository.
