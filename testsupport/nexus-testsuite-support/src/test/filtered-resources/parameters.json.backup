@@ -9,5 +9,5 @@
     [ "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:2.1" ],
     [ "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:2.1.1" ],
     [ "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:2.1.2" ],
-    [ "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" ]
+    [ "org.sonatype.nexus.assemblies:nexus-bundle-template:zip:bundle:${project.version}" ]
 ]

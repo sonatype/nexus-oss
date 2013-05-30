@@ -94,8 +94,6 @@ public abstract class AbstractPrivilegeDescriptor
             response.addValidationError( message );
         }
 
-        existingIds.add( privilege.getId() );
-
         return response;
     }
 }

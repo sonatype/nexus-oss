@@ -177,6 +177,8 @@ public class DefaultConfigurationValidator
             }
         }
 
+        ctx.getExistingPrivilegeIds().add(privilege.getId());
+
         return response;
     }
 
