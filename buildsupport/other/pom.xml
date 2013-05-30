@@ -158,7 +158,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-bundle-launcher</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
