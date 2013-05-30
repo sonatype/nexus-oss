@@ -22,3 +22,39 @@ Sonatype Nexus - Open Source Edition
 
 * Apache Maven 3.0.4+
 * Java 6+
+* Groovy 1.7+ (for advanced usage only)
+
+## HOWTO
+
+Some examples may require Groovy 1.7+
+
+## Skip Modules
+
+The plugins and testsuite modules can be skipped:
+
+    mvn -Dskip-plugins
+
+and:
+
+    mvn -Dskip-testsuite
+
+## Manage License Headers
+
+Check for violations:
+
+    mvn -Plicense-check -N
+
+Apply header format:
+
+    mvn -Plicense-format -N
+
+## Normalize Line Endings
+
+Normalize line-endings (to UNIX LF style), from project root directory:
+
+    groovy ./buildsupport/scripts/fixcrlf.groovy
+
+Same with extra configuration ( -D must be _before_ script ):
+
+    groovy -Dfixlast=true ./buildsupport/scripts/fixcrlf.groovy
+

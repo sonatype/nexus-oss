@@ -194,6 +194,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-ldap-common</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-logging-extras</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
@@ -539,7 +545,7 @@
               <!--
               Excludes for specific classes which have compatible, yet different licences.
               -->
-              <exclude>**/ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
+              <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
             </excludes>
           </configuration>
         </plugin>
