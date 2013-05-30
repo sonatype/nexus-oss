@@ -18,14 +18,14 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.VersionScheme;
+import org.sonatype.aether.version.Version;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
-import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
-import org.sonatype.nexus.proxy.maven.version.Version;
-import org.sonatype.nexus.proxy.maven.version.VersionParser;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -34,7 +34,7 @@ public class DefaultLvoPlugin
     extends AbstractLoggingComponent
     implements LvoPlugin
 {
-    private final VersionParser versionScheme = new GenericVersionParser();
+    private final VersionScheme versionScheme = new GenericVersionScheme();
 
     @Requirement
     private LvoPluginConfiguration lvoPluginConfiguration;
