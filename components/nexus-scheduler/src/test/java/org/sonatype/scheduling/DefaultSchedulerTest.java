@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
@@ -282,6 +283,7 @@ public class DefaultSchedulerTest
      * @throws Exception
      */
     @Test
+    @Ignore("FIXME: This test is unstable")
     public void testChangeScheduleDuringRunCallable()
         throws Exception
     {
@@ -315,6 +317,7 @@ public class DefaultSchedulerTest
         task.cancel( true );
     }
 
+    @Ignore("FIXME: This test is unstable")
     @Test
     public void testCallableStepOnEachOtherToe()
         throws Exception
