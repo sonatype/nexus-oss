@@ -486,7 +486,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>modello-plugin-upgrade</artifactId>
-          <version>1.0</version>
+          <version>1.1</version>
         </plugin>
 
         <!--
