@@ -64,9 +64,10 @@
       <artifactId>indexer-core</artifactId>
     </dependency>
 
-    <!-- Aether is needed and will be published too (see applifecycle config) -->
-    <!-- since sadly Maven Indexer exposes it's classes over it's public API -->
-    <!-- All this because of the presence of Version in ArtifactInfo -->
+    <!--
+    Aether is needed and will be published too (see applifecycle config) since sadly Maven Indexer exposes it's classes over it's public API
+    All this because of the presence of Version in ArtifactInfo
+    -->
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>

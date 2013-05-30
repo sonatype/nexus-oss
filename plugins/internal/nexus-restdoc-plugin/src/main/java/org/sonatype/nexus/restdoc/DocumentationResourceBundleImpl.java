@@ -10,26 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rest.docs;
 
-import org.codehaus.plexus.component.annotations.Component;
+package org.sonatype.nexus.restdoc;
+
 import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 
-@Component( role = NexusResourceBundle.class, hint = "TimelineDocumentationNexusResourceBundle" )
-public class TimelineDocumentationNexusResourceBundle
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+/**
+ * Provides URL to aggregated Nexus OSS REST documentation in the Plugin Console.
+ *
+ * @since 2.5
+ */
+@Named
+@Singleton
+public class DocumentationResourceBundleImpl
     extends AbstractDocumentationNexusResourceBundle
 {
-
     @Override
-    public String getPluginId()
-    {
-        return "nexus-timeline-plugin";
+    public String getPluginId() {
+        return "nexus-restdoc-plugin";
     }
 
     @Override
-    public String getDescription()
-    {
-        return "Timeline Plugin API";
+    public String getDescription() {
+        return "Nexus OSS REST API";
     }
 }

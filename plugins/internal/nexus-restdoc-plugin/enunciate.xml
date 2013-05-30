@@ -21,14 +21,17 @@
   </services>
 
   <modules>
+    <xml disabled="false"/>
+
     <docs disabled="false"
-          title="${pluginName} REST API"
+          title="Nexus OSS REST API"
           copyright="Sonatype, Inc. ${copyright.year}"
           includeExampleXml="true"
           includeExampleJson="true"
+          forceExampleJson="true"
           includeDefaultDownloads="false"
-          groupRestResources="byPath">
-    </docs>
+          groupRestResources="byPath"
+          disableRestMountpoint="false"/>
   </modules>
 
 </enunciate>

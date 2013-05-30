@@ -1,0 +1,296 @@
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-plugins-internal</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-restdoc-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>nexus-plugin</packaging>
+
+  <properties>
+    <pluginName>Nexus REST Documentation Plugin</pluginName>
+    <pluginDescription>Nexus OSS REST API documentation.</pluginDescription>
+
+    <!--
+    For Enunciate copyright year.
+    -->
+    <maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+    <copyright.year>${maven.build.timestamp}</copyright.year>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <version>${enunciate.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-digester</groupId>
+          <artifactId>commons-digester</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.sf.apt-jelly</groupId>
+          <artifactId>apt-jelly-freemarker</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--
+    Reference all plugins which produce documentation in scope=provided so that classpath is sane for apt.
+
+    TODO: Include the rest of the bundled plugins which provide REST resources, presently this is an incomplete set.
+    -->
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugin-console-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-rrb-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-timeline-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-unpack-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-p2-repository-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!--
+      Only compile restdoc classes, we do not want to re-compile aggregated sources.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>org/sonatype/nexus/restdoc/**/*.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+
+      <!--
+      Aggregate sources for Enunciate processing.
+
+      TODO: See if source:aggregate can help at all here?
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/java-sources</outputDirectory>
+              <includes>**/*.java</includes>
+              <artifactItems>
+                <!--
+                Include all sources for plugins which produce documentation.
+                -->
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-plugin-console-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-rrb-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-timeline-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-unpack-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-indexer-lucene-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-p2-repository-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-restlet1x-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+
+                <dependency>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-ldap-realm-plugin</artifactId>
+                  <classifier>sources</classifier>
+                  <version>${nexus.version}</version>
+                </dependency>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+      Attach aggregated sources, so Enunciate can find them.
+
+      FIXME: This confuses IDEA... fucking Enunciate shit.
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/java-sources</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+      Execute Enunciate, exclude restdoc classes as this causes apt to barf?
+      -->
+      <plugin>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>maven-enunciate-slim-plugin</artifactId>
+        <version>${enunciate.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>enunciate-docs</artifactId>
+            <version>${enunciate.version}</version>
+          </dependency>
+          <!--
+          enunciate-xml module is needed to properly handle 'defaultRestSubcontext' configuration,
+          which is used to generate the mount point location in documentation.
+          when this dependency is included the module appears to be automatically enabled.
+          -->
+          <dependency>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>enunciate-xml</artifactId>
+            <version>${enunciate.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>docs</goal>
+            </goals>
+            <configuration>
+              <configFile>enunciate.xml</configFile>
+              <docsDir>${project.build.outputDirectory}/docs</docsDir>
+              <excludes>
+                <exclude>**/org/sonatype/nexus/restdoc/**/*.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
