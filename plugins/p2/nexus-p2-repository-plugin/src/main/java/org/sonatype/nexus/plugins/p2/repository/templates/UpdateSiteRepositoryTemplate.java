@@ -24,7 +24,6 @@ import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteProxyReposi
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 
 public class UpdateSiteRepositoryTemplate
@@ -54,7 +53,7 @@ public class UpdateSiteRepositoryTemplate
         repo.setProviderHint( UpdateSiteProxyRepositoryImpl.ROLE_HINT );
 
         repo.setRemoteStorage( new CRemoteStorage() );
-        repo.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
+        repo.getRemoteStorage().setProvider( getTemplateProvider().getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
         repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
 
         final Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );

@@ -380,30 +380,6 @@
         </plugins>
       </build>
     </profile>
-
-    <profile>
-      <id>hc3-provider</id>
-      <activation>
-        <property>
-          <name>rrs</name>
-          <value>apacheHttpClient3x</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <nexus.default.http.provider>apacheHttpClient3x</nexus.default.http.provider>
-                <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
 </project>

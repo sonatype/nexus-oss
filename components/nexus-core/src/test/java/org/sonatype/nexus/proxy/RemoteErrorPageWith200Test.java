@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
+import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 
 public class RemoteErrorPageWith200Test
     extends AbstractProxyTestEnvironment
@@ -42,7 +42,7 @@ public class RemoteErrorPageWith200Test
     {
         super.setUp();
         this.remoteStorage =
-            this.lookup( RemoteRepositoryStorage.class, CommonsHttpClientRemoteStorage.PROVIDER_STRING );
+            this.lookup( RemoteRepositoryStorage.class, HttpClientRemoteStorage.PROVIDER_STRING );
         aProxyRepository =
             lookup( RepositoryRegistry.class ).getRepositoryWithFacet( "200ErrorTest", ProxyRepository.class );
     }
@@ -93,7 +93,7 @@ public class RemoteErrorPageWith200Test
 
         String expectedContent = "error page";
         ErrorServlet.CONTENT = expectedContent;
-        ErrorServlet.addHeader( CommonsHttpClientRemoteStorage.NEXUS_MISSING_ARTIFACT_HEADER, "true" );
+        ErrorServlet.addHeader( HttpClientRemoteStorage.NEXUS_MISSING_ARTIFACT_HEADER, "true" );
 
         // remote request
         ResourceStoreRequest storeRequest = new ResourceStoreRequest( "random/file.txt" );
