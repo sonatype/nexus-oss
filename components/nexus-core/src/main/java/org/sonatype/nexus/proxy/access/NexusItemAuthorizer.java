@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.access;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.proxy.targets.TargetSet;
 
 /**
  * Authorizes the Repository requests against permissions.

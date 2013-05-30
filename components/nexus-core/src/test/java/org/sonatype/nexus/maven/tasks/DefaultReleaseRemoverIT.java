@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.target.Target;
+import org.sonatype.nexus.proxy.targets.Target;
 
 /**
  * @since 2.5

@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.proxy.targets.TargetSet;
 
 /**
  * The base abstraction of Proximity. This interface is implemented by Repositories and also by Routers.
