@@ -91,8 +91,8 @@
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- nexus integration-testing bundle configuration -->
-    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
-    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.groupId>org.sonatype.nexus.assemblies</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-bundle-template</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
   </properties>
 
@@ -283,14 +283,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-it-helper-plugin</artifactId>
-        <classifier>cp</classifier>
-        <type>jar</type>
-        <version>2.5.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-testsupport</artifactId>
         <version>2.5.0-SNAPSHOT</version>
       </dependency>
@@ -322,8 +314,8 @@
       <!-- assemblies -->
 
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-oss-webapp</artifactId>
+        <groupId>org.sonatype.nexus.assemblies</groupId>
+        <artifactId>nexus-bundle-template</artifactId>
         <version>2.5.0-SNAPSHOT</version>
         <classifier>bundle</classifier>
         <type>zip</type>

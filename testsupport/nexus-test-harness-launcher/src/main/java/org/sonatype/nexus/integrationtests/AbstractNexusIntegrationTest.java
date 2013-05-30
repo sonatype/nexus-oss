@@ -61,7 +61,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
@@ -81,6 +80,7 @@ import org.sonatype.security.guice.SecurityModule;
 import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
+import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
@@ -156,14 +156,20 @@ public abstract class AbstractNexusIntegrationTest
 
     static
     {
+        // Configure slf4j JUL bridge
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        // Install the file preferences, to have them used from IT but also from embedded Nexus too.
-        System.setProperty( "java.util.prefs.PreferencesFactory", FilePreferencesFactory.class.getName() );
+        // Use in-memory preferences
+        System.setProperty( "java.util.prefs.PreferencesFactory", MemoryPreferencesFactory.class.getCanonicalName() );
 
         // guice finalizer turned OFF
         System.setProperty( "guice.executor.class", "NONE" );
+
+        // skip misplaced guice annotation checking, this causes failures due to use of guice annotations on interfaces
+        // ... which is commonly done on Nexus ExtensionPoints :-\
+        System.setProperty( "guice.disable.misplaced.annotation.check", "true" );
+
         // NEXUS-5660 test with ipv4 as app runs with this set now
         System.setProperty( "java.net.preferIPv4Stack", "true" );
     }
@@ -283,21 +289,6 @@ public abstract class AbstractNexusIntegrationTest
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
-
-        // redirect filePrefs
-        FilePreferencesFactory.setPreferencesFile( getFilePrefsFile( new File( getNexusBaseDir() ), getTestId() ) );
-    }
-
-    // ==
-
-    public static File getFilePrefsFile( File dir, String testId )
-    {
-        return new File( dir, getFilePrefsFileName( testId ) );
-    }
-
-    public static String getFilePrefsFileName( String testId )
-    {
-        return testId + "-filePrefs";
     }
 
     // == Test "lifecycle" (@Before/@After...)

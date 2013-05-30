@@ -64,7 +64,7 @@ public class DefaultErrorReportingManagerTest
     protected void setUp()
         throws Exception
     {
-        setupJiraMock( "src/test/resources/jira-mock.db" );
+        setupJiraMock( util.resolvePath( "src/test/resources/jira-mock.db" ));
 
         super.setUp();
 

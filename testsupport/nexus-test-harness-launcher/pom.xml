@@ -141,7 +141,6 @@
       </exclusions>
     </dependency>
 
-    <!-- The IT Helper Plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
@@ -149,12 +148,9 @@
       <type>zip</type>
     </dependency>
 
-    <!-- Deps needed by some *Util classes (they use classes from these below), To redirect j.u.Preferences -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
-      <classifier>cp</classifier>
-      <type>jar</type>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-prefs</artifactId>
     </dependency>
 
     <!--

@@ -12,27 +12,26 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import java.util.Comparator;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.Version;
+import org.sonatype.aether.version.VersionScheme;
 
-import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
-import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
-import org.sonatype.nexus.proxy.maven.version.Version;
-import org.sonatype.nexus.proxy.maven.version.VersionParser;
+import java.util.Comparator;
 
 /**
  * version comparator used elsewhere to keep version collections sorted
  * 
  * @author Oleg Gusakov
- * @version $Id: VersionComparator.java 744245 2009-02-13 21:23:44Z hboutemy $
  */
 public class VersionComparator
     implements Comparator<String>
 {
-    private final VersionParser versionParser;
+    private final VersionScheme versionScheme;
 
     public VersionComparator()
     {
-        this.versionParser = new GenericVersionParser();
+        this.versionScheme = new GenericVersionScheme();
     }
 
     public int compare( final String v1, final String v2 )
@@ -52,7 +51,7 @@ public class VersionComparator
     {
         try
         {
-            return versionParser.parseVersion( v );
+            return versionScheme.parseVersion( v );
         }
         catch ( InvalidVersionSpecificationException e )
         {

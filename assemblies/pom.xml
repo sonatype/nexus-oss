@@ -36,7 +36,7 @@
   </properties>
 
   <modules>
-    <module>nexus-oss-webapp</module>
+    <module>nexus-bundle-template</module>
   </modules>
 
   <dependencyManagement>
