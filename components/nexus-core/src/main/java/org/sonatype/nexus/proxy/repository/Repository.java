@@ -37,7 +37,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
-import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.proxy.targets.TargetSet;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 

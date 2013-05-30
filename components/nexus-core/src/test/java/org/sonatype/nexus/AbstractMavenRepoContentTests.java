@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.proxy.targets.TargetRegistry;
 
 /**
  * Tests that needs some repo content and are Maven related.
