@@ -71,38 +71,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
       </plugin>
-
-      <!--
-      TODO: Sort out WTF this odd configuration is actually for and document it.
-      FIXME: Used to make file-based prefs available on classpath, should replace with goodies implementation.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>org/sonatype/nexus/rt/**</exclude>
-            <exclude>org/sonatype/jsecurity/realms/**</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>org/sonatype/nexus/rt/**</include>
-                <include>org/sonatype/jsecurity/realms/**</include>
-              </includes>
-              <excludes>
-                <exclude>void/void/void</exclude>
-              </excludes>
-              <classifier>cp</classifier>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
