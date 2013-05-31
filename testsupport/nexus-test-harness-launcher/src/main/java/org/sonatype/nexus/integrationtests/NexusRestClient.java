@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.integrationtests;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,17 +24,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.SimpleHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthPolicy;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
@@ -51,16 +64,11 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static org.hamcrest.Matchers.notNullValue;
-
 /**
  * HTTP Request helper (trying to hide any mention of the actual request implementation.)
  * <p/>
- * <b>NOTE</b>: The do${HTTP_METHOD}* methods without a {@link org.hamcrest.Matcher} parameter will automatically assert that the
- * received response is successful.
+ * <b>NOTE</b>: The do${HTTP_METHOD}* methods without a {@link org.hamcrest.Matcher} parameter will automatically assert
+ * that the received response is successful.
  * <p/>
  * <b>IMPORTANT</b>: Any {@link org.restlet.data.Response} instances returned from methods here should have their
  * {@link org.restlet.data.Response#release()} method called in a finally block when you are done with it.
@@ -100,7 +108,7 @@ public class NexusRestClient
 
     /**
      * Extract text from response
-     *
+     * 
      * @param response
      * @return
      * @throws java.io.IOException
@@ -116,7 +124,7 @@ public class NexusRestClient
 
     /**
      * Extract status from response
-     *
+     * 
      * @param response
      * @return
      * @throws java.io.IOException
@@ -131,7 +139,7 @@ public class NexusRestClient
 
     /**
      * Null safe method to release a Response ( its streams and sockets )
-     *
+     * 
      * @param response release the response if not null
      */
     public void releaseResponse( final Response response )
@@ -144,7 +152,7 @@ public class NexusRestClient
 
     /**
      * Convert a serviceURIPart to a URL
-     *
+     * 
      * @param serviceURIPart
      * @return
      * @throws java.io.IOException
@@ -160,13 +168,14 @@ public class NexusRestClient
 
     /**
      * Sends a GET request to the specified uri and returns the text of the entity. This method asserts a successful
-     * response by passing {@link org.sonatype.nexus.test.utils.ResponseMatchers#isSuccessful()} to {@link #doGetForText(String, org.hamcrest.Matcher)}.
+     * response by passing {@link org.sonatype.nexus.test.utils.ResponseMatchers#isSuccessful()} to
+     * {@link #doGetForText(String, org.hamcrest.Matcher)}.
      * <p/>
      * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since this method
      * ensures proper cleanup of any sockets, streams, etc., by releasing the response.
      * <p/>
      * Of course the entire response text is buffered in memory so use this wisely.
-     *
+     * 
      * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
      * @return the complete response body text
      * @throws NullPointerException if serviceURIpart is null
@@ -186,7 +195,7 @@ public class NexusRestClient
     /**
      * Gets the response text, asserting that the entity is not null, and also applying any specified assertions on the
      * response instance.
-     *
+     * 
      * @param serviceURIpart
      * @param responseMatcher
      * @return
@@ -219,7 +228,7 @@ public class NexusRestClient
 
     /**
      * Make a request to the service uri specified and return the Status
-     *
+     * 
      * @param serviceURIpart
      * @return a non-null Status with no other assertions made on it.
      * @throws java.io.IOException
@@ -233,12 +242,13 @@ public class NexusRestClient
     /**
      * GET the status of a request at the specified uri part, asserting that the returned status is not null.
      * <p/>
-     * If matcher is non-null, the matcher is applied to the status before returning and this may throw an {@link AssertionError}.
-     *
+     * If matcher is non-null, the matcher is applied to the status before returning and this may throw an
+     * {@link AssertionError}.
+     * 
      * @param serviceURIpart url part to be appended to Nexus root url
      * @return a non-null Status with no other assertions made on it.
      * @throws java.io.IOException
-     * @throws AssertionError      if the matcher is non-null and it fails
+     * @throws AssertionError if the matcher is non-null and it fails
      */
     public Status doGetForStatus( final String serviceURIpart, Matcher<Status> matcher )
         throws IOException
@@ -290,8 +300,9 @@ public class NexusRestClient
     /**
      * FIXME this is used everywhere Send a message to a resource as a GET request and return the response.
      * <p/>
-     * Ensure you explicity clean up the response entity returned by this method by calling {@link org.restlet.data.Response#release()}
-     *
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link org.restlet.data.Response#release()}
+     * 
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
      * @return the response of the request
      * @throws java.io.IOException if there is a problem communicating the response
@@ -319,7 +330,7 @@ public class NexusRestClient
 
     /**
      * PUT a representation to the specified URI
-     *
+     * 
      * @param serviceURIpart
      * @param representation
      * @return
@@ -457,10 +468,11 @@ public class NexusRestClient
     /**
      * Send a message to a resource and return the response.
      * <p/>
-     * Ensure you explicity clean up the response entity returned by this method by calling {@link org.restlet.data.Response#release()}
-     *
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link org.restlet.data.Response#release()}
+     * 
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
-     * @param method         the method type of the request
+     * @param method the method type of the request
      * @return the response of the request
      * @throws java.io.IOException if there is a problem communicating the response
      */
@@ -473,16 +485,16 @@ public class NexusRestClient
     /**
      * Send a message to a resource and return the response.
      * <p/>
-     * Ensure you explicity clean up the response entity returned by this method by calling {@link org.restlet.data.Response#release()}
-     *
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link org.restlet.data.Response#release()}
+     * 
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
-     * @param method         the method type of the request
+     * @param method the method type of the request
      * @param representation the representation to map the response to, may be null
      * @return the response of the request
      * @throws java.io.IOException if there is a problem communicating the response
      */
-    public Response sendMessage( final String serviceURIpart, final Method method,
-                                 final Representation representation )
+    public Response sendMessage( final String serviceURIpart, final Method method, final Representation representation )
         throws IOException
     {
         return sendMessage( toNexusURL( serviceURIpart ), method, representation );
@@ -504,10 +516,11 @@ public class NexusRestClient
     /**
      * Send a message to a resource and return the response.
      * <p/>
-     * Ensure you explicity clean up the response entity returned by this method by calling {@link org.restlet.data.Response#release()}
-     *
-     * @param url            the absolute url of the resource to request
-     * @param method         the method type of the request
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link org.restlet.data.Response#release()}
+     * 
+     * @param url the absolute url of the resource to request
+     * @param method the method type of the request
      * @param representation the representation to map the response to, may be null
      * @return the response of the request
      * @throws java.io.IOException if there is a problem communicating the response
@@ -553,9 +566,7 @@ public class NexusRestClient
         {
             // ChallengeScheme scheme = new ChallengeScheme( "HTTP_NxBasic", "NxBasic", "Nexus Basic" );
             ChallengeResponse authentication =
-                new ChallengeResponse(
-                    ChallengeScheme.HTTP_BASIC, testContext.getUsername(), testContext.getPassword()
-                );
+                new ChallengeResponse( ChallengeScheme.HTTP_BASIC, testContext.getUsername(), testContext.getPassword() );
             request.setChallengeResponse( authentication );
         }
 
@@ -579,8 +590,8 @@ public class NexusRestClient
 
     /**
      * Download a file at a url and save it to the target file location specified by targetFile.
-     *
-     * @param url        the url to fetch the file from
+     * 
+     * @param url the url to fetch the file from
      * @param targetFile the location where to save the download
      * @return a File instance for the saved file
      * @throws java.io.IOException if there is a problem saving the file
@@ -622,13 +633,13 @@ public class NexusRestClient
     }
 
     /**
-     * Execute a HTTPClient method in the context of a test.
-     * make decisions how to execute.
+     * Execute a HTTPClient method in the context of a test. make decisions how to execute.
      * <p/>
-     * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on the {@link org.apache.commons.httpclient.HttpMethod} instance,
-     * therefore subsequent calls to get response body as string may return nulls.
+     * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on
+     * the {@link org.apache.commons.httpclient.HttpMethod} instance, therefore subsequent calls to get response body as
+     * string may return nulls.
      */
-    public HttpMethod executeHTTPClientMethod( HttpMethod method )
+    public HttpResponse executeHTTPClientMethod( HttpUriRequest method )
         throws IOException
     {
         return executeHTTPClientMethod( method, true );
@@ -637,61 +648,64 @@ public class NexusRestClient
     /**
      * Execute a HTTPClient method, optionally in the context of a test.
      * <p/>
-     * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on the {@link org.apache.commons.httpclient.HttpMethod} instance,
-     * therefore subsequent calls to get response body as string may return nulls.
-     *
-     * @param method         the method to execute
+     * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on
+     * the {@link org.apache.commons.httpclient.HttpMethod} instance, therefore subsequent calls to get response body as
+     * string may return nulls.
+     * 
+     * @param method the method to execute
      * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext
-     *                       settings
+     *            settings
      * @return the HttpMethod instance passed into this method
      * @throws java.io.IOException
      */
-    public HttpMethod executeHTTPClientMethod( final HttpMethod method, final boolean useTestContext )
+    public HttpResponse executeHTTPClientMethod( final HttpUriRequest method, final boolean useTestContext )
         throws IOException
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( 10000 );
-        httpClient.getHttpConnectionManager().getParams().setSoTimeout( 10000 );
+        final BasicHttpContext localcontext = new BasicHttpContext();
+        final DefaultHttpClient httpClient = new DefaultHttpClient();
+        httpClient.getParams().setIntParameter( CoreConnectionPNames.CONNECTION_TIMEOUT, 10000 );
+        httpClient.getParams().setIntParameter( CoreConnectionPNames.SO_TIMEOUT, 10000 );
 
         if ( useTestContext )
         {
             if ( testContext.isSecureTest() )
             {
-                httpClient.getState().setCredentials( AuthScope.ANY,
-                                                      new UsernamePasswordCredentials( testContext.getUsername(),
-                                                                                       testContext.getPassword() ) );
-
-                List<String> authPrefs = new ArrayList<String>( 1 );
-                authPrefs.add( AuthPolicy.BASIC );
-                httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
-                httpClient.getParams().setAuthenticationPreemptive( true );
+                final HttpHost targetHost =
+                    new HttpHost( method.getURI().getHost(), method.getURI().getPort(), method.getURI().getScheme() );
+                httpClient.getCredentialsProvider().setCredentials(
+                    new AuthScope( targetHost.getHostName(), targetHost.getPort() ),
+                    new UsernamePasswordCredentials( testContext.getUsername(), testContext.getPassword() ) );
+                AuthCache authCache = new BasicAuthCache();
+                BasicScheme basicAuth = new BasicScheme();
+                authCache.put( targetHost, basicAuth );
+                localcontext.setAttribute( ClientContext.AUTH_CACHE, authCache );
             }
         }
 
+        HttpEntity entity = null;
         try
         {
-            httpClient.executeMethod( method );
-            method.getResponseBodyAsString(); // forced consumption of response I guess
-            return method;
+            // execute and buffer response, as we deal with REST messages here, usually small sized ones
+            final HttpResponse response = httpClient.execute( method );
+            entity = response.getEntity();
+            final byte[] body = IOUtils.toByteArray( entity.getContent() );
+            ByteArrayEntity bae = new ByteArrayEntity( body, ContentType.get( response.getEntity() ) );
+            bae.setChunked( entity.isChunked() );
+            bae.setContentEncoding( entity.getContentEncoding() );
+            return response;
         }
         finally
         {
-            method.releaseConnection();
+            EntityUtils.consume( entity );
 
             // force socket cleanup
-            HttpConnectionManager mgr = httpClient.getHttpConnectionManager();
-
-            if ( mgr instanceof SimpleHttpConnectionManager )
-            {
-                ( (SimpleHttpConnectionManager) mgr ).shutdown();
-
-            }
+            httpClient.getConnectionManager().shutdown();
         }
     }
 
     /**
      * Clocks how much time it takes to download a give url
-     *
+     * 
      * @param url address to download
      * @return time in milliseconds
      * @throws Exception
@@ -704,8 +718,8 @@ public class NexusRestClient
 
     /**
      * Clocks how much time it takes to download a give url
-     *
-     * @param url        address to download
+     * 
+     * @param url address to download
      * @param speedLimit max speed while downloading in Kbps, -1 to no speed limit
      * @return time in milliseconds
      * @throws Exception
@@ -715,15 +729,15 @@ public class NexusRestClient
     {
         long t = System.currentTimeMillis();
 
-        GetMethod get = null;
+        HttpGet get = null;
         InputStream in = null;
         try
         {
-            HttpClient client = new HttpClient();
-            get = new GetMethod( url.toString() );
-            int result = client.executeMethod( get );
-            MatcherAssert.assertThat( result, ResponseMatchers.isSuccessfulCode() );
-            in = get.getResponseBodyAsStream();
+            final HttpClient client = new DefaultHttpClient();
+            get = new HttpGet( url.toString() );
+            final HttpResponse response = client.execute( get );
+            MatcherAssert.assertThat( response.getStatusLine().getStatusCode(), ResponseMatchers.isSuccessfulCode() );
+            in = response.getEntity().getContent();
             byte[] b;
             if ( speedLimit != -1 )
             {

@@ -84,22 +84,6 @@
       <artifactId>maven-verifier</artifactId>
     </dependency>
 
-    <!-- 
-      Used by many legacy "clients" and "message utils" in
-      this launcher but also in ITs 
-    -->
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1.SONATYPE</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>

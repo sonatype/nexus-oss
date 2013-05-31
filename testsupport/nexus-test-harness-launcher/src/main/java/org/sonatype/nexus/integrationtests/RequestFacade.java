@@ -16,8 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
+import javax.ws.rs.HttpMethod;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.hamcrest.Matcher;
 import org.restlet.data.Method;
@@ -351,8 +353,8 @@ public class RequestFacade
      * NOTE: Before being returned, {@link HttpMethod#releaseConnection()} is called on the {@link HttpMethod} instance,
      * therefore subsequent calls to get response body as string may return nulls.
      */
-    public static HttpMethod executeHTTPClientMethod( HttpMethod method )
-        throws HttpException, IOException
+    public static HttpResponse executeHTTPClientMethod( HttpUriRequest method )
+        throws IOException
     {
         return nexusRestClient.executeHTTPClientMethod( method );
     }
@@ -384,8 +386,8 @@ public class RequestFacade
      * @throws HttpException
      * @throws IOException
      */
-    public static HttpMethod executeHTTPClientMethod( final HttpMethod method, final boolean useTestContext )
-        throws HttpException, IOException
+    public static HttpResponse executeHTTPClientMethod( final HttpUriRequest method, final boolean useTestContext )
+        throws IOException
     {
         return nexusRestClient.executeHTTPClientMethod( method, useTestContext );
     }
