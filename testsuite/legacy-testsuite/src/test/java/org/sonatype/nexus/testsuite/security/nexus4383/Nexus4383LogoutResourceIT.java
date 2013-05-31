@@ -150,7 +150,7 @@ extends AbstractNexusIntegrationTest
         HttpGet failedGetMethod = new HttpGet( url );
         try
         {
-            final HttpResponse response = httpClient.execute( logoutGetMethod );
+            final HttpResponse response = httpClient.execute( failedGetMethod );
             Assert.assertEquals( response.getStatusLine().getStatusCode(), 401 );
         }
         finally

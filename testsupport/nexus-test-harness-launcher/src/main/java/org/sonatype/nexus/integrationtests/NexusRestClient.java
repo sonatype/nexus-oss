@@ -692,6 +692,7 @@ public class NexusRestClient
             ByteArrayEntity bae = new ByteArrayEntity( body, ContentType.get( response.getEntity() ) );
             bae.setChunked( entity.isChunked() );
             bae.setContentEncoding( entity.getContentEncoding() );
+            response.setEntity( bae );
             return response;
         }
         finally
