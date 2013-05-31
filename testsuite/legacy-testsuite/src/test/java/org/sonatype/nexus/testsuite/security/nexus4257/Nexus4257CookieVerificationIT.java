@@ -43,12 +43,17 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.security.StatelessAndStatefulWebSessionManager;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
 public class Nexus4257CookieVerificationIT
     extends AbstractNexusIntegrationTest
 {
+    /**
+     * Copied from deprecated org.sonatype.nexus.security.StatelessAndStatefulWebSessionManager to
+     * cut the direct plugin class dependency from ITs.
+     */
+    public static final String NO_SESSION_HEADER = "X-Nexus-Session";
+
     @BeforeClass
     public static void setSecureTest()
     {
@@ -214,7 +219,7 @@ public class Nexus4257CookieVerificationIT
 
         String url = this.getBaseNexusUrl() + "content/";
 
-        Header header = new BasicHeader( StatelessAndStatefulWebSessionManager.NO_SESSION_HEADER, "none" );
+        Header header = new BasicHeader( NO_SESSION_HEADER, "none" );
         Header usHeader = new BasicHeader( "User-Agent", "SomeStatefulClientThatKnowsAboutThisHeader/1.6" );
         DefaultHttpClient httpClient = new DefaultHttpClient();
 

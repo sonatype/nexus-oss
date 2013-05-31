@@ -28,7 +28,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <restlet.version>1.1.6-SONATYPE-5348-V8</restlet.version>
+    <restletBaseVersion.version>1.1.6</restletBaseVersion.version>
+    <restlet.version>${restletBaseVersion.version}-SONATYPE-5348-V8</restlet.version>
   </properties>
 
   <modules>
@@ -79,6 +80,12 @@
         <groupId>com.noelios.restlet</groupId>
         <artifactId>com.noelios.restlet</artifactId>
         <version>${restlet.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.noelios.restlet</groupId>
+        <artifactId>com.noelios.restlet.ext.net</artifactId>
+        <version>${restletBaseVersion.version}</version>
       </dependency>
 
       <dependency>
