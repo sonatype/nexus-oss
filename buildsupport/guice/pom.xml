@@ -28,8 +28,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <sisu-inject.version>2.3.2</sisu-inject.version>
-    <sisu-guice.version>3.1.2</sisu-guice.version>
+    <sisu-inject.version>2.3.4</sisu-inject.version>
+    <sisu-guice.version>3.1.4</sisu-guice.version>
   </properties>
 
   <dependencyManagement>
