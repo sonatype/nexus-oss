@@ -517,9 +517,6 @@
 
         <!--
         See 'license-check' profile.
-
-        FIXME: This configuration omits org.sonatype.nexus.proxy.target (components/nexus-core)
-        FIXME: Need to manually maintain these headers until this package is renamed to avoid complex configuration
         -->
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>

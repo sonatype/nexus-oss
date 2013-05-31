@@ -30,8 +30,7 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.proxy.target.Target;
-import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.proxy.walker.Walker;
 
 /**
