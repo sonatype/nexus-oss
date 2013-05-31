@@ -687,12 +687,16 @@ public class NexusRestClient
         {
             // execute and buffer response, as we deal with REST messages here, usually small sized ones
             final HttpResponse response = httpClient.execute( method );
-            entity = response.getEntity();
-            final byte[] body = IOUtils.toByteArray( entity.getContent() );
-            ByteArrayEntity bae = new ByteArrayEntity( body, ContentType.get( response.getEntity() ) );
-            bae.setChunked( entity.isChunked() );
-            bae.setContentEncoding( entity.getContentEncoding() );
-            response.setEntity( bae );
+            if ( response.getEntity() != null )
+            {
+                // buffer it completely to be able to close connection
+                entity = response.getEntity();
+                final byte[] body = IOUtils.toByteArray( entity.getContent() );
+                ByteArrayEntity bae = new ByteArrayEntity( body, ContentType.get( response.getEntity() ) );
+                bae.setChunked( entity.isChunked() );
+                bae.setContentEncoding( entity.getContentEncoding() );
+                response.setEntity( bae );
+            }
             return response;
         }
         finally
