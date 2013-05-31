@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.target;
+package org.sonatype.nexus.proxy.targets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,6 @@ import java.util.Collection;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;

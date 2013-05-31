@@ -35,6 +35,10 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.Version;
+import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
 import org.sonatype.guice.nexus.binders.NexusAnnotatedBeanModule;
@@ -51,10 +55,6 @@ import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
-import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
-import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
-import org.sonatype.nexus.proxy.maven.version.Version;
-import org.sonatype.nexus.proxy.maven.version.VersionParser;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.util.AlphanumComparator;
@@ -99,7 +99,7 @@ public class DefaultNexusPluginManager
 
     private final Map<GAVCoordinate, PluginResponse> pluginResponses = new HashMap<GAVCoordinate, PluginResponse>();
 
-    private final VersionParser versionParser = new GenericVersionParser();
+    private final VersionScheme versionParser = new GenericVersionScheme();
 
     @Inject
     public DefaultNexusPluginManager( final RepositoryTypeRegistry repositoryTypeRegistry,
