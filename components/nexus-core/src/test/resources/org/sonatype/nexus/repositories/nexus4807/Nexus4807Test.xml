@@ -64,7 +64,7 @@
           <field-name>cacheManager</field-name>
         </requirement>
         <requirement>
-          <role>org.sonatype.nexus.proxy.target.TargetRegistry</role>
+          <role>org.sonatype.nexus.proxy.targets.TargetRegistry</role>
           <role-hint></role-hint>
           <field-name>targetRegistry</field-name>
         </requirement>

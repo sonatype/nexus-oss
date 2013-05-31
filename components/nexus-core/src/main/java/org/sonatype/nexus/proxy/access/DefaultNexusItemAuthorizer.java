@@ -24,8 +24,8 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.target.TargetMatch;
-import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.proxy.targets.TargetMatch;
+import org.sonatype.nexus.proxy.targets.TargetSet;
 import org.sonatype.security.SecuritySystem;
 
 /**
