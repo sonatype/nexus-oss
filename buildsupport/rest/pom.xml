@@ -28,8 +28,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <jackson.version>1.9.10</jackson.version>
-    <siesta.version>1.4.1</siesta.version>
+    <jackson.version>1.9.12</jackson.version>
+    <siesta.version>1.5-SNAPSHOT</siesta.version>
   </properties>
 
   <dependencyManagement>
