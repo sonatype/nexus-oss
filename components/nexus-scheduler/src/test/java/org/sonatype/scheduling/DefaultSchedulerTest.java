@@ -20,16 +20,19 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import static org.junit.Assert.*;
 
 /**
  * Tests for {@link DefaultScheduler}.
  */
+@Category(Slow.class) // ~15s
 public class DefaultSchedulerTest
     extends TestSupport
 {
