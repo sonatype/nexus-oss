@@ -441,6 +441,9 @@
           <groupId>org.codehaus.gmaven</groupId>
           <artifactId>gmaven-plugin</artifactId>
           <version>1.5</version>
+          <configuration>
+            <providerSelection>1.7</providerSelection>
+          </configuration>
         </plugin>
 
         <plugin>
