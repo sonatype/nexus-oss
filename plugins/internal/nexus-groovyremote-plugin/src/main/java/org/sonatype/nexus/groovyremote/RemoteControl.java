@@ -153,7 +153,6 @@ public class RemoteControl
 
     private Map<String, Object> createContext() {
         Map<String, Object> context = Maps.newHashMap();
-        context.put("beanLocator", beanLocator);
         context.put("container", new ContainerHelper());
         context.put("logger", LoggerFactory.getLogger(RemoteScript.class));
 
