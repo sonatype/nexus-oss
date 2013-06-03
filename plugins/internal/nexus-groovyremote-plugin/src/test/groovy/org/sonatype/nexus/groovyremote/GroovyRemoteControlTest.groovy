@@ -24,6 +24,8 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
  * Trials of <a href="http://groovy.codehaus.org/modules/remote/">Groovy Remote Control</a>.
+ *
+ * This simply ensures that the basics of this library are functional from Groovy.
  */
 class GroovyRemoteControlTest
     extends TestSupport
@@ -59,7 +61,7 @@ class GroovyRemoteControlTest
         def remote = new RemoteControl(transport)
 
         def value = remote.exec {
-            println "${Thread.currentThread().name} -> sup bitch"
+            println "${Thread.currentThread().name} -> sup"
             return 12345
         }
 

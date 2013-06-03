@@ -1,7 +1,7 @@
-//package org.sonatype.nexus.groovyremote
+package org.sonatype.nexus.groovyremote
 
 // script must define a single closure
-def task = { name ->
+return { name ->
     println "${Thread.currentThread().name} -> sup $name"
     return 12345
 }

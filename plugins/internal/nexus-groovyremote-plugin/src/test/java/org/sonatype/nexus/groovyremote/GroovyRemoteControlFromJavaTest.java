@@ -41,6 +41,8 @@ import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Trials of <a href="http://groovy.codehaus.org/modules/remote/">Groovy Remote Control</a> from Java.
+ *
+ * This simply ensures that the basics of this library are functional from Java.
  */
 public class GroovyRemoteControlFromJavaTest
     extends TestSupport
@@ -135,7 +137,7 @@ public class GroovyRemoteControlFromJavaTest
         log("Result: {}", result);
 
         // try loading from a script file w/ curried params
-        closure = compile(util.resolveFile("src/test/resources/supbitch.groovy"));
+        closure = compile(util.resolveFile("src/test/resources/sup.groovy"));
         result = remote.call(closure.curry("dude"));
         log("Result: {}", result);
 
