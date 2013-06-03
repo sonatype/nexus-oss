@@ -46,13 +46,17 @@ public class DeployUtils
         this.wagonFactory = null;
     }
 
-    public DeployUtils( final NexusRestClient nexusRestClient, final WagonDeployer.Factory wagonFactory )
+    public DeployUtils( final NexusRestClient nexusRestClient,
+                        final WagonDeployer.Factory wagonFactory )
     {
         this.nexusRestClient = checkNotNull( nexusRestClient );
         this.wagonFactory = checkNotNull( wagonFactory );
     }
 
-    public void deployWithWagon( String wagonHint, String repositoryUrl, File fileToDeploy, String artifactPath )
+    public void deployWithWagon( final String wagonHint,
+                                 final String repositoryUrl,
+                                 final File fileToDeploy,
+                                 final String artifactPath )
         throws Exception
     {
         checkState( wagonFactory != null, "Wagon factory must be provided to be able to deploy" );
@@ -69,48 +73,77 @@ public class DeployUtils
             password = testContext.getPassword();
         }
 
-        new WagonDeployer( wagon, wagonHint, username, password, repositoryUrl, fileToDeploy, artifactPath,
+        new WagonDeployer(
+            wagon, wagonHint, username, password, repositoryUrl, fileToDeploy, artifactPath,
             nexusRestClient.getTestContext() ).deploy();
     }
 
-    public int deployUsingGavWithRest( final String repositoryId, final Gav gav, final File fileToDeploy )
-        throws IOException
-    {
-        return deployUsingGavWithRest(
-            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(), repositoryId, gav,
-            fileToDeploy );
-    }
-
-    public int deployUsingGavWithRest( final String restServiceURL, final String repositoryId, final Gav gav,
+    public int deployUsingGavWithRest( final String repositoryId,
+                                       final Gav gav,
                                        final File fileToDeploy )
         throws IOException
     {
-        return deployWithRest( repositoryId, gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-            gav.getClassifier(), gav.getExtension(), fileToDeploy );
+        return deployUsingGavWithRest(
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId,
+            gav,
+            fileToDeploy );
     }
 
-    public int deployUsingPomWithRest( final String repositoryId, final File fileToDeploy, final File pomFile,
-                                       final String classifier, final String extension )
+    public int deployUsingGavWithRest( final String restServiceURL,
+                                       final String repositoryId,
+                                       final Gav gav,
+                                       final File fileToDeploy )
+        throws IOException
+    {
+        return deployWithRest(
+            repositoryId,
+            gav.getGroupId(),
+            gav.getArtifactId(),
+            gav.getVersion(),
+            gav.getClassifier(),
+            gav.getExtension(),
+            fileToDeploy );
+    }
+
+    public int deployUsingPomWithRest( final String repositoryId,
+                                       final File fileToDeploy,
+                                       final File pomFile,
+                                       final String classifier,
+                                       final String extension )
         throws IOException
     {
         return deployUsingPomWithRest(
-            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(), repositoryId,
-            fileToDeploy, pomFile, classifier, extension );
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId,
+            fileToDeploy,
+            pomFile,
+            classifier,
+            extension );
     }
 
-    public HttpResponse deployUsingPomWithRestReturnResult( final String repositoryId, final File fileToDeploy,
-                                                            final File pomFile, final String classifier,
+    public HttpResponse deployUsingPomWithRestReturnResult( final String repositoryId,
+                                                            final File fileToDeploy,
+                                                            final File pomFile,
+                                                            final String classifier,
                                                             final String extension )
         throws IOException
     {
         return deployUsingPomWithRestReturnResult(
-            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(), repositoryId,
-            fileToDeploy, pomFile, classifier, extension );
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId,
+            fileToDeploy,
+            pomFile,
+            classifier,
+            extension );
     }
 
-    public HttpResponse deployUsingPomWithRestReturnResult( final String restServiceURL, final String repositoryId,
-                                                            final File fileToDeploy, final File pomFile,
-                                                            final String classifier, final String extension )
+    public HttpResponse deployUsingPomWithRestReturnResult( final String restServiceURL,
+                                                            final String repositoryId,
+                                                            final File fileToDeploy,
+                                                            final File pomFile,
+                                                            final String classifier,
+                                                            final String extension )
         throws IOException
     {
         // the method we are calling
@@ -141,15 +174,25 @@ public class DeployUtils
         return nexusRestClient.executeHTTPClientMethod( filePost );
     }
 
-    public int deployUsingPomWithRest( final String restServiceURL, final String repositoryId, final File fileToDeploy,
-                                       final File pomFile, final String classifier, final String extension )
+    public int deployUsingPomWithRest( final String restServiceURL,
+                                       final String repositoryId,
+                                       final File fileToDeploy,
+                                       final File pomFile,
+                                       final String classifier,
+                                       final String extension )
         throws IOException
     {
-        return deployUsingPomWithRestReturnResult( restServiceURL, repositoryId, fileToDeploy, pomFile, classifier,
+        return deployUsingPomWithRestReturnResult(
+            restServiceURL,
+            repositoryId,
+            fileToDeploy,
+            pomFile,
+            classifier,
             extension ).getStatusLine().getStatusCode();
     }
 
-    public HttpResponse deployPomWithRest( final String repositoryId, final File pomFile )
+    public HttpResponse deployPomWithRest( final String repositoryId,
+                                           final File pomFile )
         throws IOException
     {
         // the method we are calling
@@ -174,18 +217,34 @@ public class DeployUtils
         return nexusRestClient.executeHTTPClientMethod( filePost );
     }
 
-    public int deployWithRest( final String repositoryId, final String groupId, final String artifactId,
-                               final String version, final String classifier, final String extension,
+    public int deployWithRest( final String repositoryId,
+                               final String groupId,
+                               final String artifactId,
+                               final String version,
+                               final String classifier,
+                               final String extension,
                                final File fileToDeploy )
         throws IOException
     {
-        return deployWithRest( nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
-            repositoryId, groupId, artifactId, version, classifier, extension, fileToDeploy );
+        return deployWithRest(
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId,
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            extension,
+            fileToDeploy );
     }
 
-    public int deployWithRest( final String restServiceURL, final String repositoryId, final String groupId,
-                               final String artifactId, final String version, final String classifier,
-                               final String extension, final File fileToDeploy )
+    public int deployWithRest( final String restServiceURL,
+                               final String repositoryId,
+                               final String groupId,
+                               final String artifactId,
+                               final String version,
+                               final String classifier,
+                               final String extension,
+                               final File fileToDeploy )
         throws IOException
     {
         // the method we are calling

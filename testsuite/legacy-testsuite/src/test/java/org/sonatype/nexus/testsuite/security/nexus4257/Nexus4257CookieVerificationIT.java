@@ -119,9 +119,18 @@ public class Nexus4257CookieVerificationIT
     {
         setAnonymousAccess( false );
 
-        String[] statelessUserAgents =
-            { "Java", "Apache-Maven", "Apache Ivy", "curl", "Wget", "Nexus", "Artifactory", "Apache Archiva",
-                "M2Eclipse", "Aether" };
+        String[] statelessUserAgents = { 
+            "Java", 
+            "Apache-Maven", 
+            "Apache Ivy", 
+            "curl", 
+            "Wget", 
+            "Nexus", 
+            "Artifactory", 
+            "Apache Archiva", 
+            "M2Eclipse", 
+            "Aether"
+        };
 
         for ( String userAgent : statelessUserAgents )
         {
