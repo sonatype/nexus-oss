@@ -1,21 +1,23 @@
 /*
- * Copyright (c) 2007-2013 Sonatype, Inc. All rights reserved.
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2013 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.security.realms.tools;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.inject.Typed;
@@ -51,8 +53,8 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 public class ResourceMergingConfigurationManager
     extends AbstractConfigurationManager
 {
-	private final Logger logger = LoggerFactory.getLogger( getClass() );
-	
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     // This will handle all normal security.xml file loading/storing
     private final ConfigurationManager manager;
 
@@ -458,7 +460,7 @@ public class ResourceMergingConfigurationManager
     public void updateUser( CUser user )
         throws InvalidConfigurationException, UserNotFoundException
     {
-    	Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<String>();
         try
         {
             CUserRoleMapping userRoleMapping = this.readUserRoleMapping( user.getId(), SecurityXmlUserManager.SOURCE );
@@ -468,7 +470,7 @@ public class ResourceMergingConfigurationManager
         {
             this.logger.debug( "User: {} has no roles", user.getId());
         }        
-    	this.updateUser(user, new HashSet<String>( roles ));
+        this.updateUser(user, new HashSet<String>( roles ));
     }
 
     public void updateUser( CUser user, Set<String> roles )
@@ -514,21 +516,17 @@ public class ResourceMergingConfigurationManager
 
     // ==
 
-    protected EnhancedConfiguration getConfiguration()
+    @Override
+    protected boolean shouldRebuildConifuguration()
     {
         for ( DynamicSecurityResource resource : dynamicResources )
         {
             if ( resource.isDirty() )
             {
-                // forcing reload since some of static ones are "dirty"
-                // TODO: is this isDirty() method used at all? I did not find any references to real uses
-                // Note: not this.clearCache() since it would invoke delegate's clearCache too!
-                super.clearCache();
-                break;
+                return true;
             }
         }
-
-        return super.getConfiguration();
+        return false;
     }
 
     protected Configuration doGetConfiguration()
@@ -565,22 +563,27 @@ public class ResourceMergingConfigurationManager
             configuration.addPrivilege( privilege );
         }
 
+        // number of roles can be significant (>15K), so need to speedup lookup roles by roleId 
+        final Map<String, CRole> roles = new HashMap<String, CRole>();
+        for ( CRole role : configuration.getRoles() )
+        {
+            roles.put( role.getId(), role );
+        }
+
         for ( Iterator<CRole> iterator = config.getRoles().iterator(); iterator.hasNext(); )
         {
             CRole role = iterator.next();
 
             // need to check if we need to merge the static config
-            for ( CRole eachRole : configuration.getRoles() )
+            CRole eachRole = roles.get( role.getId() );
+            if ( eachRole != null )
             {
-                if ( eachRole.getId().equals( role.getId() ) )
-                {
-                    role = this.mergeRolesContents( role, eachRole );
-                    configuration.removeRole( eachRole );
-                    break;
-                }
+                role = this.mergeRolesContents( role, eachRole );
+                configuration.removeRole( eachRole );
             }
 
             configuration.addRole( role );
+            roles.put( role.getId(), role ); // deduplicate config roles
         }
 
         for ( CUser user : (List<CUser>) config.getUsers() )

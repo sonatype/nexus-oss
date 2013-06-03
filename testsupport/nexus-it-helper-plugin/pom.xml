@@ -12,14 +12,15 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>testsupport</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <artifactId>nexus-testsupport</artifactId>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-it-helper-plugin</artifactId>
@@ -38,60 +39,37 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+    HACK: Using nexus.version since DM not in scope.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
-      <!-- FIXME: Avoid using project.version -->
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!--
+      FIXME: This module uses legacy Plexus components.
+      -->
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <extensions>true</extensions>
-      </plugin>
-
-      <!--
-      TODO: Sort out WTF this odd configuration is actually for and document it.
-      FIXME: Used to make file-based prefs available on classpath, should replace with goodies implementation.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>org/sonatype/nexus/rt/**</exclude>
-            <exclude>org/sonatype/jsecurity/realms/**</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>org/sonatype/nexus/rt/**</include>
-                <include>org/sonatype/jsecurity/realms/**</include>
-              </includes>
-              <excludes>
-                <exclude>void/void/void</exclude>
-              </excludes>
-              <classifier>cp</classifier>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -19,8 +19,8 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>basic</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <artifactId>nexus-plugins-basic</artifactId>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-h2-plugin</artifactId>
@@ -42,12 +42,11 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.3.170</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

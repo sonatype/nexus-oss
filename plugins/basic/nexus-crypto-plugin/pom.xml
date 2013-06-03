@@ -19,8 +19,8 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>basic</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <artifactId>nexus-plugins-basic</artifactId>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-crypto-plugin</artifactId>
@@ -30,7 +30,6 @@
   <properties>
      <pluginName>Nexus Crypto Provider Plugin</pluginName>
      <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
-     <bouncycastle.version>1.48</bouncycastle.version>
   </properties>
 
   <dependencies>
@@ -43,24 +42,21 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
-      <version>${bouncycastle.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpg-jdk15on</artifactId>
-      <version>${bouncycastle.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
-      <version>${bouncycastle.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

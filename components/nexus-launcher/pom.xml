@@ -18,8 +18,8 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>components</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <artifactId>nexus-components</artifactId>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-launcher</artifactId>
@@ -29,7 +29,6 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-bundle-launcher</artifactId>
-      <version>1.5.1</version>
     </dependency>
 
     <dependency>

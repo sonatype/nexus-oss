@@ -1,15 +1,15 @@
 <!--
 
-    Copyright (c) 2012 Sonatype, Inc. All rights reserved.
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
-    This program is licensed to you under the Apache License Version 2.0,
-    and you may not use this file except in compliance with the Apache License Version 2.0.
-    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
 
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the Apache License Version 2.0 is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -20,20 +20,20 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-oss</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>testsupport</artifactId>
+  <artifactId>nexus-testsupport</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
   <modules>
     <module>nexus-test-common</module>
+    <module>nexus-plugin-testsupport</module>
     <module>nexus-testsuite-client</module>
     <module>nexus-testsuite-support</module>
     <module>nexus-it-helper-plugin</module>
     <module>nexus-test-environment-maven-plugin</module>
-    <module>nexus-test-utils</module>
     <module>nexus-test-harness-launcher</module>
   </modules>
 
@@ -44,9 +44,9 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>all</artifactId>
+        <artifactId>nexus-buildsupport-all</artifactId>
         <type>pom</type>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <scope>import</scope>
       </dependency>
 
@@ -55,12 +55,9 @@
 
   <build>
     <plugins>
-      <!--
-      TODO: Move to specific modules which use plexus, we eventually want to remove the need for this
-      -->
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

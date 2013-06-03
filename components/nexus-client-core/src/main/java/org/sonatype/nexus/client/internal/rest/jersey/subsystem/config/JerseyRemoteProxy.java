@@ -53,14 +53,14 @@ public class JerseyRemoteProxy
     public RemoteProxy disableHttpProxy()
     {
         settings().setHttpProxySettings( null );
-        return me();
+        return save();
     }
 
     @Override
     public RemoteProxy disableHttpsProxy()
     {
         settings().setHttpsProxySettings( null );
-        return me();
+        return save();
     }
 
 }

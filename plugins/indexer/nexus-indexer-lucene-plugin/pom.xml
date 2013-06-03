@@ -19,8 +19,8 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>indexer</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <artifactId>nexus-plugins-indexer</artifactId>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-indexer-lucene-plugin</artifactId>
@@ -30,8 +30,6 @@
   <properties>
     <pluginName>Nexus Indexer Lucene Plugin</pluginName>
     <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
-    <mavenIndexer.version>5.1.2-bf3d48b</mavenIndexer.version>
-    <aether.version>1.13.1</aether.version>
   </properties>
 
   <dependencies>
@@ -44,6 +42,12 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-model</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-restlet1x-model</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!--
@@ -53,52 +57,11 @@
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
-      <version>${mavenIndexer.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-annotations</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-core</artifactId>
-      <version>${mavenIndexer.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-annotations</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!-- Aether is needed and will be published too (see applifecycle config) -->
-    <!-- since sadly Maven Indexer exposes it's classes over it's public API -->
-    <!-- All this because of the presence of Version in ArtifactInfo -->
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-api</artifactId>
-      <version>${aether.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-util</artifactId>
-      <version>${aether.version}</version>
     </dependency>
 
     <dependency>
@@ -116,22 +79,20 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
 
-    <!-- FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal -->
+    <!--
+    FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal
+    HACK: Using ${nexus.version} here since we do not want to expose this crap in DM and proliferate usage.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <classifier>tests</classifier>
+      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -152,9 +113,22 @@
             <sharedDependencies>org.sonatype.aether:aether-api</sharedDependencies>
             <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
           </sharedDependencies>
+
+          <!--
+          Exclude dependencies which are provided by NX core.
+          -->
+          <classpathDependencyExcludes>
+            <exclude>org.codehaus.plexus:plexus-utils</exclude>
+            <exclude>org.codehaus.plexus:plexus-component-annotations</exclude>
+            <exclude>org.sonatype.aether:aether-api</exclude>
+            <exclude>org.sonatype.aether:aether-util</exclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
 
+      <!--
+      FIXME: This module uses legacy Plexus components.
+      -->
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>

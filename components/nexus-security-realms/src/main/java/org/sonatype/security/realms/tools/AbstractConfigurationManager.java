@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2007-2013 Sonatype, Inc. All rights reserved.
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2013 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.security.realms.tools;
 
@@ -28,29 +28,45 @@ public abstract class AbstractConfigurationManager
 
     //
 
-    private volatile EnhancedConfiguration configuration = null;
+    private volatile EnhancedConfiguration configurationCache = null;
 
-    // FIXME: Synchronized to avoid threads eating up cpu while re-building configuration.
-    // FIXME: Really need to revisit how the configuration is created and rebuilt to avoid a lock here.
-
-    public synchronized void clearCache()
+    public void clearCache()
     {
-        configuration = null;
+        configurationCache = null;
     }
 
-    protected synchronized EnhancedConfiguration getConfiguration()
+    protected EnhancedConfiguration getConfiguration()
     {
-        //Assign configuration to local variable first, as calls to clearCache
-        //can null it out at any time
-        EnhancedConfiguration config = configuration;
-        if(config == null)
+        // Assign configuration to local variable first, as calls to clearCache can null it out at any time
+        EnhancedConfiguration configuration = this.configurationCache;
+        if ( configuration == null || shouldRebuildConifuguration() )
         {
-            config = new EnhancedConfiguration(doGetConfiguration());
-            configuration = config;
+            synchronized ( this )
+            {
+                // double-checked locking of volatile is apparently OK with java5+
+                // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
+                configuration = this.configurationCache;
+                if ( configuration == null || shouldRebuildConifuguration() )
+                {
+                    configuration = new EnhancedConfiguration( doGetConfiguration() );
+                    this.configurationCache = configuration;
+                }
+            }
         }
-        
-        return config;
+        return configuration;
     }
 
+    /**
+     * Returns <code>true</code> if configuration needs to be rebuilt (by calling {@link #doGetConfiguration()}).
+     */
+    protected boolean shouldRebuildConifuguration()
+    {
+        return false;
+    }
+
+    /**
+     * Builds and returns fresh new Configuration instance. Implementation is expected to reset
+     * {@link #shouldRebuildConifuguration()} flag back to <code>false</code>.
+     */
     protected abstract Configuration doGetConfiguration();
 }

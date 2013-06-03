@@ -37,7 +37,7 @@ public class RepositoryCreationEventListener
     @Override
     public boolean accepts( final Event<?> evt )
     {
-        return applicationStatusSource.getSystemStatus().isNexusStarted() && evt instanceof RepositoryRegistryEventAdd;
+        return evt instanceof RepositoryRegistryEventAdd && applicationStatusSource.getSystemStatus().isNexusStarted();
     }
 
     @Override

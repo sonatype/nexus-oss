@@ -19,8 +19,8 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>basic</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <artifactId>nexus-plugins-basic</artifactId>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-ui-extjs3-plugin</artifactId>
@@ -48,12 +48,6 @@
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <scope>provided</scope>
       <type>${nexus-plugin.type}</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 

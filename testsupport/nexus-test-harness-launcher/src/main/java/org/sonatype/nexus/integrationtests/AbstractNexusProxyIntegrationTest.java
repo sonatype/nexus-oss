@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
@@ -93,13 +94,20 @@ public abstract class AbstractNexusProxyIntegrationTest
     {
         super.copyTestResources();
 
-        File source = new File( TestProperties.getString( "test.resources.source.folder" ), "proxyRepo" );
-        if ( !source.exists() )
+        final File dest = new File( localStorageDir );
+
+        if ( dest.exists() )
+        {
+            FileUtils.forceDelete( dest );
+        }
+
+        File source = getTestResourceAsFile( "proxy-repo" );
+        if ( source == null || !source.exists() )
         {
             return;
         }
 
-        FileTestingUtils.interpolationDirectoryCopy( source, new File( localStorageDir ), getTestProperties() );
+        FileTestingUtils.interpolationDirectoryCopy( source, dest, getTestProperties() );
 
     }
 
