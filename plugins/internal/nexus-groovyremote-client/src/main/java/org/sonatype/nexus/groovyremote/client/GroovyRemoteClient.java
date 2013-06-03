@@ -1,0 +1,189 @@
+package org.sonatype.nexus.groovyremote.client;
+
+import com.google.common.base.Throwables;
+import groovy.lang.Binding;
+import groovy.lang.Closure;
+import groovy.lang.GroovyCodeSource;
+import groovy.lang.GroovyShell;
+import groovyx.remote.client.RemoteControl;
+import groovyx.remote.transport.http.HttpTransport;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.io.PrintBuffer;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
+/**
+ * Groovy remote control client.
+ *
+ * @since 2.6
+ */
+public class GroovyRemoteClient
+{
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final GroovyShell shell;
+
+    private final RemoteControl remote;
+
+    public GroovyRemoteClient(final ClassLoader classLoader,
+                              final File classesDir,
+                              final URL url)
+        throws IOException
+    {
+        checkNotNull(classLoader);
+        log.debug("Class loader: {}", classLoader);
+
+        checkNotNull(classesDir);
+        log.debug("Classes dir: {}", classesDir);
+
+        checkNotNull(url);
+        log.debug("URL: {}", url);
+
+        Binding binding = new Binding();
+
+        CompilerConfiguration cc = new CompilerConfiguration();
+        cc.setTargetDirectory(classesDir);
+        this.shell = new GroovyShell(classLoader, binding, cc);
+
+        HttpTransport transport = new HttpTransport(url.toExternalForm());
+
+        // provide transport with custom class-loader which includes generated classes
+        ClassLoader cl = new URLClassLoader(new URL[]{classesDir.toURI().toURL()}, shell.getClassLoader());
+        this.remote = new RemoteControl(transport, cl);
+    }
+
+    public GroovyShell getShell() {
+        return shell;
+    }
+
+    public RemoteControl getRemote() {
+        return remote;
+    }
+
+    //
+    // Compilation
+    //
+
+    @SuppressWarnings("ConstantConditions")
+    private Closure asClosure(final Object obj) {
+        checkState(obj instanceof Closure);
+        return (Closure) obj;
+    }
+
+    public Closure compile(final String... lines) {
+        checkNotNull(lines);
+
+        PrintBuffer buff = new PrintBuffer();
+        buff.println("def task = {");
+        for (String line : lines) {
+            buff.println(line);
+        }
+        buff.println("}");
+
+        String script = buff.toString();
+        log.debug("Script: {}", script);
+
+        Object result = shell.evaluate(buff.toString());
+
+        log.trace("Result: {}", result);
+
+        return asClosure(result);
+    }
+
+    public Closure compile(final URL url) {
+        checkNotNull(url);
+
+        log.debug("Compile: {}", url);
+
+        Object result;
+        try {
+            result = shell.evaluate(new GroovyCodeSource(url));
+        }
+        catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
+
+        log.trace("Result: {}", result);
+
+        return asClosure(result);
+    }
+
+    public Closure compile(final File file) {
+        checkNotNull(file);
+
+        try {
+            return compile(file.toURI().toURL());
+        }
+        catch (MalformedURLException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    //
+    // Helpers
+    //
+
+    @SuppressWarnings("unchecked")
+    public <T> T call(final Closure... commands) {
+        checkNotNull(commands);
+        return (T) remote.call(commands);
+    }
+
+    public <T> T call(final String... script) {
+        return call(compile(script));
+    }
+
+    public <T> T call(final URL script) {
+        return call(compile(script));
+    }
+
+    public <T> T call(final File script) {
+        return call(compile(script));
+    }
+
+    //
+    // Builder
+    //
+
+    public static class Builder
+    {
+        private ClassLoader classLoader;
+
+        private File classesDir;
+
+        private URL url;
+
+        public Builder setClassLoader(final ClassLoader classLoader) {
+            this.classLoader = classLoader;
+            return this;
+        }
+
+        public Builder setClassesDir(final File classesDir) {
+            this.classesDir = classesDir;
+            return this;
+        }
+
+        public Builder setUrl(final URL url) {
+            this.url = url;
+            return this;
+        }
+
+        public GroovyRemoteClient build() {
+            try {
+                return new GroovyRemoteClient(classLoader, classesDir, url);
+            }
+            catch (IOException e) {
+                throw Throwables.propagate(e);
+            }
+        }
+    }
+}
