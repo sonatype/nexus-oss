@@ -53,6 +53,8 @@ public class RemoteControl
 
     private final BeanLocator beanLocator;
 
+    private final ClassLoader uberClassLoader;
+
     private final int port;
 
     private HttpServer server;
@@ -61,10 +63,11 @@ public class RemoteControl
 
     @Inject
     public RemoteControl(final BeanLocator beanLocator,
+                         final @Named("nexus-uber") ClassLoader uberClassLoader,
                          final @Named(CPREFIX + "port:-0}") int port)
     {
         this.beanLocator = checkNotNull(beanLocator);
-
+        this.uberClassLoader = checkNotNull(uberClassLoader);
         this.port = port;
         log.info("Port: {}", port);
     }
@@ -80,9 +83,7 @@ public class RemoteControl
         InetSocketAddress addr = new InetSocketAddress(port);
         this.server = HttpServer.create(addr, 0);
 
-        // FIXME: This probably should be the uber class-loader, TCL doesn't seem to be happy
-        ClassLoader cl = getClass().getClassLoader();
-        Receiver receiver = new Receiver(cl, createContext());
+        Receiver receiver = new Receiver(uberClassLoader, createContext());
         final RemoteControlHttpHandler handler = new RemoteControlHttpHandler(receiver);
 
         server.createContext("/", new HttpHandler()
