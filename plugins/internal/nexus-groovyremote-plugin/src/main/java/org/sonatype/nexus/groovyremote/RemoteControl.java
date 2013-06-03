@@ -69,6 +69,12 @@ public class RemoteControl
         log.info("Port: {}", port);
     }
 
+    //
+    // TODO: Consider using RemoteControlServlet implementation instead, and hooking up to NX proper w/security?
+    // TODO: ... then this plugin could be used more generally to script Nexus.
+    // TODO: May need both actually, as this method is defs easier for testing as it side-steps the rest of the NX abstractions here.
+    //
+
     @Override
     protected void doStart() throws Exception {
         InetSocketAddress addr = new InetSocketAddress(port);

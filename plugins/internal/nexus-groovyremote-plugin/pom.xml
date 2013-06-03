@@ -39,32 +39,19 @@
       <artifactId>goodies-lifecycle</artifactId>
     </dependency>
 
-    <!--
-    FIXME: DM
-    -->
-
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
-      <version>2.0.6</version>
     </dependency>
 
     <dependency>
       <groupId>org.codehaus.groovy.modules.remote</groupId>
       <artifactId>remote-core</artifactId>
-      <version>0.5</version>
     </dependency>
 
     <dependency>
       <groupId>org.codehaus.groovy.modules.remote</groupId>
       <artifactId>remote-transport-http</artifactId>
-      <version>0.5</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -91,35 +78,12 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-eclipse-compiler</artifactId>
-        <version>2.7.0-01</version>
-        <extensions>true</extensions>
-      </plugin>
-
-      <!--
-      NOTE: Must use latest compiler, as 3.0 does not work properly with the groovy-eclipse-compiler
-      -->
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-eclipse-compiler</artifactId>
-            <version>2.7.0-01</version>
-          </dependency>
-          <!--
-          This must be kept in sync with the groovy-all version.
-          -->
-          <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-eclipse-batch</artifactId>
-            <version>2.0.6-01</version>
-          </dependency>
-        </dependencies>
         <configuration>
+          <!--
+          This module has Groovy sources; enable Groovy compiler.
+          -->
           <compilerId>groovy-eclipse-compiler</compilerId>
         </configuration>
       </plugin>

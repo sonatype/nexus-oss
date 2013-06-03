@@ -329,9 +329,29 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <dependencies>
+            <!--
+            Keep versions in sync with buildsupport/groovy/pom.xml
+            -->
+            <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-eclipse-compiler</artifactId>
+              <version>2.7.0-01</version>
+            </dependency>
+            <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-eclipse-batch</artifactId>
+              <version>2.0.6-01</version>
+            </dependency>
+          </dependencies>
           <configuration>
             <source>1.6</source>
             <target>1.6</target>
+            <!--
+            Configure support for Groovy compilation, but leave it off by default.  Modules which need this should configure the compilerId.
+            -->
+            <!--<compilerId>groovy-eclipse-compiler</compilerId>-->
           </configuration>
         </plugin>
 
@@ -399,6 +419,13 @@
               <exclude>**/*$*</exclude>
             </excludes>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-eclipse-compiler</artifactId>
+          <version>2.7.0-01</version>
+          <extensions>true</extensions>
         </plugin>
 
         <plugin>
