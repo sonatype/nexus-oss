@@ -70,7 +70,8 @@
 
   <properties>
     <!--
-    Define nexus version, for use mainly by inheriting projects (and some edge-cases locally).
+    Define nexus versions.  The 'nexus.version' property always refers to the version of the current project.
+    These values must always be constants; 'nexus.version' will get update automatically by set-version.
     -->
     <nexus.version>2.6.0-SNAPSHOT</nexus.version>
 
@@ -441,6 +442,9 @@
           <groupId>org.codehaus.gmaven</groupId>
           <artifactId>gmaven-plugin</artifactId>
           <version>1.5</version>
+          <configuration>
+            <providerSelection>1.7</providerSelection>
+          </configuration>
         </plugin>
 
         <plugin>

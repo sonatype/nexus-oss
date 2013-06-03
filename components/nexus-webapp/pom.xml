@@ -319,6 +319,9 @@
         </executions>
       </plugin>
 
+      <!--
+      Ensure we have an index for all dependencies in the WAR.
+      -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>sisu-maven-plugin</artifactId>

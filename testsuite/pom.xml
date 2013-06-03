@@ -33,6 +33,7 @@
     Testsuite auto-sharding support.
     -->
     <testsuite.basedir>${project.basedir}</testsuite.basedir>
+    <autoshard.outputDir>${settings.localRepository}/autoshard/${project.groupId}/${project.artifactId}</autoshard.outputDir>
   </properties>
 
   <modules>
@@ -101,7 +102,7 @@
 
   <profiles>
     <!--
-    Generate testsuite shard configurations in local repository.
+    Generate testsuite shard configurations.
     -->
     <profile>
       <id>testsuite-genshards</id>
@@ -111,24 +112,13 @@
             <plugin>
               <groupId>org.codehaus.gmaven</groupId>
               <artifactId>gmaven-plugin</artifactId>
-              <executions>
-                <execution>
-                  <phase>process-test-sources</phase>
-                  <goals>
-                    <goal>execute</goal>
-                  </goals>
-                  <configuration>
-                    <providerSelection>1.7</providerSelection>
-                    <classpathIncludes>none</classpathIncludes>
-                    <source>file:${project.basedir}/../src/test/script/genshards.groovy</source>
-                    <defaults>
-                      <testsuite.shardDir>
-                        ${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards
-                      </testsuite.shardDir>
-                    </defaults>
-                  </configuration>
-                </execution>
-              </executions>
+              <configuration>
+                <classpathIncludes>none</classpathIncludes>
+                <scriptpath>
+                  <path>${testsuite.basedir}/src/test/script</path>
+                </scriptpath>
+                <source>file:${testsuite.basedir}/src/test/script/autoshard.groovy</source>
+              </configuration>
             </plugin>
           </plugins>
         </pluginManagement>
@@ -152,9 +142,7 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <includesFile>
-                  ${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards/shard-${testsuite.shardId}.txt
-                </includesFile>
+                <includesFile>${autoshard.outputDir}/shard-${testsuite.shardId}.txt</includesFile>
               </configuration>
             </plugin>
           </plugins>
@@ -179,13 +167,14 @@
                   <goal>execute</goal>
                 </goals>
                 <configuration>
-                  <providerSelection>1.7</providerSelection>
                   <classpathIncludes>none</classpathIncludes>
-                  <source>file:${testsuite.basedir}/src/test/script/gencustom.groovy</source>
-                  <defaults>
-                    <testsuite.customIncludes>**/*IT.java</testsuite.customIncludes>
-                    <testsuite.shardDir>${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards</testsuite.shardDir>
-                  </defaults>
+                  <scriptpath>
+                    <path>${testsuite.basedir}/src/test/script</path>
+                  </scriptpath>
+                  <source>file:${testsuite.basedir}/src/test/script/autoshard.groovy</source>
+                  <properties>
+                    <autoshard.mode>custom</autoshard.mode>
+                  </properties>
                 </configuration>
               </execution>
             </executions>
@@ -206,7 +195,7 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <includesFile>${settings.localRepository}/org/sonatype/nexus/testsuite/${project.artifactId}/shards/shard-custom.txt</includesFile>
+                <includesFile>${autoshard.outputDir}/shard-custom.txt</includesFile>
               </configuration>
             </plugin>
           </plugins>
@@ -227,6 +216,27 @@
           <scope>provided</scope>
         </dependency>
       </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/main/script</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 

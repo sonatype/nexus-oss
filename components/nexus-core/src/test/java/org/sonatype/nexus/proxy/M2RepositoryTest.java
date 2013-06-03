@@ -31,6 +31,7 @@ import java.util.Map;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
@@ -56,7 +57,9 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 import com.google.common.eventbus.Subscribe;
+import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
+@Category(Slow.class) // ~25s
 public class M2RepositoryTest
     extends M2ResourceStoreTest
 {

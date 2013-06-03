@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -43,7 +44,9 @@ import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
+@Category(Slow.class) // ~20s
 public class ProtectedRepositoryRegistryTest
     extends NexusAppTestSupport
 {

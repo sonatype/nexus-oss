@@ -68,27 +68,6 @@
   <repositoryTargets>
   </repositoryTargets>
 
-  <tasks>
-    <task>
-      <id>1</id>
-      <name>UpdateSiteMirrorTask</name>
-      <enabled>true</enabled>
-      <type>UpdateSiteMirrorTask</type>
-      <status>SUBMITTED</status>
-      <schedule>
-        <type>manual</type>
-      </schedule>
-      <properties>
-        <property>
-          <key>ForceMirror</key>
-          <value>true</value>
-        </property>
-        <property>
-          <key>repositoryOrGroupId</key>
-          <value>repo_nxcm1719</value>
-        </property>
-      </properties>
-    </task>
-  </tasks>
+  <tasks/>
 
 </nexusConfiguration>
