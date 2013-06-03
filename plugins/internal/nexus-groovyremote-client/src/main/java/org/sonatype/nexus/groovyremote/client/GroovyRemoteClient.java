@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.groovyremote.client;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import groovy.lang.Binding;
 import groovy.lang.Closure;
 import groovy.lang.GroovyCodeSource;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -48,6 +51,7 @@ public class GroovyRemoteClient
 
     public GroovyRemoteClient(final ClassLoader classLoader,
                               final File classesDir,
+                              final List<File> extraDirs,
                               final URL url)
         throws IOException
     {
@@ -69,7 +73,15 @@ public class GroovyRemoteClient
         HttpTransport transport = new HttpTransport(url.toExternalForm());
 
         // provide transport with custom class-loader which includes generated classes
-        ClassLoader cl = new URLClassLoader(new URL[]{classesDir.toURI().toURL()}, shell.getClassLoader());
+        List<URL> urls = Lists.newArrayList();
+        urls.add(classesDir.toURI().toURL());
+        for (File dir : extraDirs) {
+            urls.add(dir.toURI().toURL());
+        }
+
+        // TODO: Could probably use GCL here instead, would be simpler
+        ClassLoader cl = new URLClassLoader(urls.toArray(new URL[urls.size()]), shell.getClassLoader());
+
         this.remote = new RemoteControl(transport, cl);
     }
 
@@ -183,6 +195,8 @@ public class GroovyRemoteClient
 
         private File classesDir;
 
+        private List<File> extraDirs = Lists.newArrayList();
+
         private URL url;
 
         public Builder setClassLoader(final ClassLoader classLoader) {
@@ -195,6 +209,12 @@ public class GroovyRemoteClient
             return this;
         }
 
+        public Builder addExtraDir(final File dir) {
+            checkNotNull(dir);
+            this.extraDirs.add(dir);
+            return this;
+        }
+
         public Builder setUrl(final URL url) {
             this.url = url;
             return this;
@@ -202,7 +222,7 @@ public class GroovyRemoteClient
 
         public GroovyRemoteClient build() {
             try {
-                return new GroovyRemoteClient(classLoader, classesDir, url);
+                return new GroovyRemoteClient(classLoader, classesDir, extraDirs, url);
             }
             catch (IOException e) {
                 throw Throwables.propagate(e);
