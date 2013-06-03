@@ -64,6 +64,10 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
+// FIXME: Needed to clean up URLConnection auth cache, see below!
+import sun.net.www.protocol.http.AuthCacheValue;
+import sun.net.www.protocol.http.AuthCacheImpl;
+
 /**
  * HTTP Request helper (trying to hide any mention of the actual request implementation.)
  * <p/>
@@ -561,6 +565,9 @@ public class NexusRestClient
     {
         checkNotNull( request );
 
+        // FIXME: as we use java.net.URL, this is needed to clean up the
+        // cache, as it's underlying URLConnection caches auth stuff!
+        AuthCacheValue.setAuthCache( new AuthCacheImpl() );
         // check the text context to see if this is a secure test
         if ( testContext.isSecureTest() )
         {
