@@ -175,14 +175,55 @@
   <profiles>
     <profile>
       <id>testsuite-genshards</id>
-      <properties>
-        <testsuite.shardCount>10</testsuite.shardCount>
-      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>gmaven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default</id>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <autoshard.mode>normal</autoshard.mode>
+                    <autoshard.count>10</autoshard.count>
+
+                    <!--
+                    Exclude some slow tests for execution is slow shard.
+                    -->
+                    <autoshard.excludes>**/nexus3860/**</autoshard.excludes>
+                    <!-- cargo-based tests -->
+                  </properties>
+                </configuration>
+              </execution>
+
+              <!--
+              Generate special shard for slowly running tests.
+              -->
+              <execution>
+                <id>slow</id>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <autoshard.mode>custom</autoshard.mode>
+                    <autoshard.shardId>slow</autoshard.shardId>
+                    <autoshard.includes>**/nexus3860/**/*IT.java</autoshard.includes>
+
+                    <!--
+                    HACK: gmaven executions leak project.properties, force reconfiguration to avoid using excludes from default execution.
+                    -->
+                    <autoshard.excludes>ignore</autoshard.excludes>
+                  </properties>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

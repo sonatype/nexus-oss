@@ -33,8 +33,8 @@
       <!-- IMPORTS -->
 
       <dependency>
-        <groupId>com.sonatype.nexus.buildsupport</groupId>
-        <artifactId>nexuspro-buildsupport-all</artifactId>
+        <groupId>org.sonatype.nexus.buildsupport</groupId>
+        <artifactId>nexus-buildsupport-all</artifactId>
         <type>pom</type>
         <version>2.6.0-SNAPSHOT</version>
         <scope>import</scope>

@@ -34,6 +34,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.maven.index.SearchType;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
 import org.restlet.Context;
@@ -55,10 +56,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 /**
  * Test for SearchNGIndexPlexusResource
  */
+@Category(Slow.class) // ~27s
 public class SearchNGIndexPlexusResourceTest
     extends AbstractMavenRepoContentTests
 {
