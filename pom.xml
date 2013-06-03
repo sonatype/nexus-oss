@@ -422,13 +422,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy-eclipse-compiler</artifactId>
-          <version>2.7.0-01</version>
-          <extensions>true</extensions>
-        </plugin>
-
-        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>animal-sniffer-maven-plugin</artifactId>
           <configuration>
@@ -468,6 +461,9 @@
           <groupId>org.codehaus.gmaven</groupId>
           <artifactId>gmaven-plugin</artifactId>
           <version>1.5</version>
+          <configuration>
+            <providerSelection>2.0</providerSelection>
+          </configuration>
         </plugin>
 
         <plugin>
