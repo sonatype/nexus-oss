@@ -55,6 +55,7 @@ public class ConfigurableInjectedTest
     @Rule
     public TestName testName = new TestName();
 
+    // FIXME: Avoid injected loggers!
     @Inject
     private Logger log;
 
@@ -124,7 +125,7 @@ public class ConfigurableInjectedTest
      */
     @Override
     @Before
-    public final void setUp()
+    public final void setUp() throws Exception
     {
         System.out.println("setUp method");
         stopWatch = new StopWatch();
@@ -140,7 +141,7 @@ public class ConfigurableInjectedTest
      */
     @Override
     @After
-    public final void tearDown()
+    public final void tearDown() throws Exception
     {
         super.tearDown();
         final String info = String.format( "Running test %s took %s", testName.getMethodName(), stopWatch );

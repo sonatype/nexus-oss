@@ -28,8 +28,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <jackson.version>1.9.10</jackson.version>
-    <siesta.version>1.4.1</siesta.version>
+    <jackson.version>1.9.12</jackson.version>
+    <siesta.version>1.5-SNAPSHOT</siesta.version>
   </properties>
 
   <dependencyManagement>
@@ -38,7 +38,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2</version>
       </dependency>
 
       <dependency>
@@ -62,7 +62,7 @@
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
-        <version>1.4.3</version>
+        <version>1.4.4</version>
       </dependency>
 
       <dependency>
