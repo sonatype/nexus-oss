@@ -364,31 +364,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>hc4-provider</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                  <reportsDirectory>${project.build.directory}/surefire-reports-apacheHttpClient4x-provider</reportsDirectory>
-                  <systemPropertyVariables>
-                    <nexus.default.http.provider>apacheHttpClient4x</nexus.default.http.provider>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
 </project>
