@@ -93,7 +93,7 @@ public class RemoteControl
                 }
                 catch (Exception e) {
                     // HACK: Ignore this package-private exception as it seems to happen normally
-                    if ("StreamClosedException".equals(e.getClass().getCanonicalName())) {
+                    if ("sun.net.httpserver.StreamClosedException".equals(e.getClass().getCanonicalName())) {
                         log.trace("Ignoring exception", e);
                         return;
                     }
