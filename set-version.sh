@@ -9,7 +9,7 @@ if [ -z "$newVersion" ]; then
 fi
 
 # FIXME: Use release version (needs 0.18.0) changes for -Dproperties support
-mvn org.eclipse.tycho:tycho-versions-plugin:0.18.0-SNAPSHOT:set-version \
+mvn org.eclipse.tycho:tycho-versions-plugin:0.18.0:set-version \
     -Dtycho.mode=maven \
     -Dartifacts=nexus-oss \
     -Dproperties=nexus.version \
