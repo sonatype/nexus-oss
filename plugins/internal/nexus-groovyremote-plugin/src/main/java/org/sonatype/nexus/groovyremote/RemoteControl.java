@@ -14,7 +14,6 @@ package org.sonatype.nexus.groovyremote;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.net.httpserver.HttpExchange;
@@ -28,6 +27,7 @@ import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
