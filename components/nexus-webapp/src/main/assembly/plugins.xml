@@ -48,6 +48,7 @@
         <include>*:nexus-archetype-plugin</include>
         <include>*:nexus-maven-bridge-plugin</include>
         <include>*:nexus-ui-extjs3-plugin</include>
+        <include>*:nexus-capabilities-plugin</include>
       </includes>
     </dependencySet>
   </dependencySets>
