@@ -12,23 +12,26 @@
  */
 package org.sonatype.nexus.obr.ui;
 
-import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
-import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
-@Component( role = NexusIndexHtmlCustomizer.class, hint = "ObrNexusIndexHtmlCustomizer" )
-public class ObrNexusIndexHtmlCustomizer
-    extends AbstractNexusIndexHtmlCustomizer
+/**
+ * @since 2.6
+ */
+@Named
+@Singleton
+public class ObrUiContributor implements UiContributor
 {
-    @Override
-    public String getPostHeadContribution( final Map<String, Object> ctx )
-    {
-        final String version =
-            getVersionFromJarFile( "/META-INF/maven/com.sonatype.nexus.plugin/nexus-obr-plugin/pom.properties" );
 
-        return "<script src=\"static/js/nexus-obr-plugin-all.js" + ( version == null ? "" : "?" + version )
-            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+    public static final String ARTIFACT_ID = "nexus-obr-plugin";
+
+    @Override
+    public UiContribution contribute( final boolean debug )
+    {
+        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP,
+                                          ARTIFACT_ID ).boot( ARTIFACT_ID + "-all" ).build( debug );
     }
 }

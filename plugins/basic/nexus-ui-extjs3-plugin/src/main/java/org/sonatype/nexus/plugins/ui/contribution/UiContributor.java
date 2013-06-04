@@ -23,6 +23,8 @@ import java.util.List;
  */
 public interface UiContributor
 {
+    String OSS_PLUGIN_GROUP = "org.sonatype.nexus.plugins";
+    String PRO_PLUGIN_GROUP = "com.sonatype.nexus.plugins";
 
     /**
      * Called on Nexus UI page load.

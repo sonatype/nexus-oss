@@ -12,22 +12,27 @@
  */
 package org.sonatype.nexus.plugins.plugin.console.ui;
 
-import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
-import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
-@Component( role = NexusIndexHtmlCustomizer.class, hint = "PluginConsoleNexusIndexHtmlCustomizer" )
-public class PluginConsoleNexusIndexHtmlCustomizer
-    extends AbstractNexusIndexHtmlCustomizer
+/**
+ * @since 2.6
+ */
+@Named
+@Singleton
+public class PluginConsoleUiContributor
+    implements UiContributor
 {
-    @Override
-    public String getPostHeadContribution( Map<String, Object> ctx )
-    {
-        String version = getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-plugin-console-plugin/pom.properties" );
 
-        return "<script src=\"static/js/nexus-plugin-console-plugin-all.js"
-            + ( version == null ? "" : "?" + version ) + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+    public static final String ARTIFACT_ID = "nexus-plugin-console-plugin";
+
+    @Override
+    public UiContribution contribute( final boolean debug )
+    {
+        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP,
+                                          ARTIFACT_ID ).boot( ARTIFACT_ID + "-all" ).build( debug );
     }
 }

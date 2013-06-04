@@ -10,30 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.rrb;
-
-import java.util.Map;
-
-import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
-import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
+package org.sonatype.nexus.plugins.siesta.ui;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+
+/**
+ * @since 2.6
+ */
 @Named
 @Singleton
-public class RrbIndexHtmlCustomizer
-    extends AbstractNexusIndexHtmlCustomizer
-    implements NexusIndexHtmlCustomizer
+public class SiestaUiContributor  implements UiContributor
 {
 
-    @Override
-    public String getPostHeadContribution( Map<String, Object> ctx )
-    {
-        String version =
-            getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-rrb-plugin/pom.properties" );
+    public static final String ARTIFACT_ID = "nexus-siesta-plugin";
 
-        return "<script src=\"static/js/nexus-rrb-plugin-all.js" + ( version == null ? "" : "?" + version )
-            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+    @Override
+    public UiContribution contribute( final boolean debug )
+    {
+        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP,
+                                          ARTIFACT_ID ).boot( ARTIFACT_ID + "-all" ).build( debug );
     }
 }
