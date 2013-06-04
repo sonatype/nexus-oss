@@ -50,7 +50,7 @@ public class RpmScanner
             @Override
             public void onFile( final File file )
             {
-                if ( "rpm".equals( FileUtils.extension( file.getName() ) ) )
+                if ( "rpm".equalsIgnoreCase( FileUtils.extension( file.getName() ) ) )
                 {
                     rpms.add( file );
                 }
