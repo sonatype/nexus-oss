@@ -96,6 +96,7 @@
       <useStrictFiltering>true</useStrictFiltering>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
       <includes>
         <include>org.sonatype.nexus:nexus-webapp:war</include>
       </includes>
@@ -121,6 +122,7 @@
       <useStrictFiltering>true</useStrictFiltering>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
       <excludes>
         <exclude>org.sonatype.nexus:nexus-webapp</exclude>
       </excludes>
