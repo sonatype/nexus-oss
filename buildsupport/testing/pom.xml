@@ -49,13 +49,13 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.7</version>
+        <version>0.8-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>junit-runner</artifactId>
-        <version>0.7</version>
+        <version>0.8-SNAPSHOT</version>
       </dependency>
 
       <dependency>

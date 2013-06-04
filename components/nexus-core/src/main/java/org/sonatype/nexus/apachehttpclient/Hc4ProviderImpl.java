@@ -268,7 +268,7 @@ public class Hc4ProviderImpl
     {
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register( new Scheme( "http", 80, PlainSocketFactory.getSocketFactory() ) );
-        schemeRegistry.register( new Scheme( "https", 443, SSLSocketFactory.getSocketFactory() ) );
+        schemeRegistry.register( new Scheme( "https", 443, SSLSocketFactory.getSystemSocketFactory() ) );
 
         final PoolingClientConnectionManager connManager = new InstrumentedClientConnManager( schemeRegistry )
         {
