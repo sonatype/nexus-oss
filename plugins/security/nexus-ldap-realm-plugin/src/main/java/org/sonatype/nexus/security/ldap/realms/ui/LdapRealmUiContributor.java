@@ -26,9 +26,11 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 public class LdapRealmUiContributor implements UiContributor
 {
 
+    public static final String ARTIFACT_ID = "nexus-ldap-realm-plugin";
+
     @Override
     public UiContribution contribute( final boolean debug )
     {
-        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP, "nexus-ldap-realm-plugin" ).build( debug );
+        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP, ARTIFACT_ID ).boot( ARTIFACT_ID + "-all" ).build( debug );
     }
 }
