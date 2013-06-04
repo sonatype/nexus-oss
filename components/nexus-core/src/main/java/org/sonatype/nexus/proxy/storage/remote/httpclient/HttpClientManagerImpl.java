@@ -127,7 +127,7 @@ public class HttpClientManagerImpl
             {
                 if ( super.isRedirected( request, response, context ) )
                 {
-                    if ( response.getHeaders( "location" ) != null )
+                    if ( response.getFirstHeader( "location" ) != null )
                     {
                         final String sourceUri = getPreviousRequestUri( request );
                         final String targetUri = response.getFirstHeader( "location" ).getValue();
