@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.testsuite.client;
 
+import java.util.Map;
+
 import org.sonatype.nexus.testsuite.client.exception.TasksAreStillRunningException;
 import org.sonatype.nexus.testsuite.client.exception.TasksAreStillRunningException;
 import org.sonatype.sisu.goodies.common.Time;
@@ -23,6 +25,8 @@ import org.sonatype.sisu.goodies.common.Time;
  */
 public interface Scheduler
 {
+
+    void run( String type, Map<String,String> properties );
 
     void waitForAllTasksToStop()
         throws TasksAreStillRunningException;

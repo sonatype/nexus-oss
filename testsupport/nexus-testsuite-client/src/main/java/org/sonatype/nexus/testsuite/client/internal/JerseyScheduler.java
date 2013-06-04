@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.client.internal;
 
+import java.util.Map;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -21,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.testsuite.client.Scheduler;
-import org.sonatype.nexus.testsuite.client.exception.TasksAreStillRunningException;
 import org.sonatype.nexus.testsuite.client.exception.TasksAreStillRunningException;
 import org.sonatype.sisu.goodies.common.Time;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -44,6 +44,34 @@ public class JerseyScheduler
     public JerseyScheduler( final JerseyNexusClient nexusClient )
     {
         super( nexusClient );
+    }
+
+    @Override
+    public void run( final String type, final Map<String, String> properties )
+    {
+        try
+        {
+            final MultivaluedMap<String, String> params = new MultivaluedMapImpl();
+            if ( properties != null && !properties.isEmpty() )
+            {
+                for ( Map.Entry<String, String> entry : properties.entrySet() )
+                {
+                    params.add( entry.getKey(), entry.getValue() );
+                }
+            }
+
+            getNexusClient()
+                .serviceResource( "tasks/run/" + type, params )
+                .post();
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
