@@ -21,8 +21,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.apache.http.impl.client.RequestWrapper;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
@@ -102,10 +104,10 @@ public class HttpClientManagerImpl
     }
 
     /**
-     * Returns {@link RedirectStrategy} needed for given repository instnance. For now, it is "do not redirect to index
+     * Returns {@link RedirectStrategy} needed for given repository instance. For now, it is "do not redirect to index
      * pages (collections), but accept any other redirects". Usually, users will set up wrongly repositories to HTTP
      * URLs while the server is actually hosted at HTTPS (typical setup for Nexus, like RSO is). This is user
-     * configuration error, as every outbound request will bound back as redirect. In general, Nexus always followed
+     * configuration error, as every out-bound request will bounce back as redirect. In general, Nexus always followed
      * redirects, but the example for before is just a typical example where redirects are actually bad.
      * 
      * @param proxyRepository
@@ -115,7 +117,7 @@ public class HttpClientManagerImpl
     protected RedirectStrategy getProxyRepositoryRedirectStrategy( final ProxyRepository proxyRepository,
                                                                    final RemoteStorageContext ctx )
     {
-        // NEXUS-5125 do not redirect to index pages
+        // Prevent redirection to index pages
         final RedirectStrategy doNotRedirectToIndexPagesStrategy = new DefaultRedirectStrategy()
         {
             @Override
@@ -123,10 +125,40 @@ public class HttpClientManagerImpl
                                          final HttpContext context )
                 throws ProtocolException
             {
-                return super.isRedirected( request, response, context )
-                    && !response.getFirstHeader( "location" ).getValue().endsWith( "/" );
+                if ( super.isRedirected( request, response, context ) )
+                {
+                    if ( response.getHeaders( "location" ) != null )
+                    {
+                        final String sourceUri = getPreviousRequestUri( request );
+                        final String targetUri = response.getFirstHeader( "location" ).getValue();
+
+                        // is this an index page redirect?
+                        if ( targetUri.equals( sourceUri + "/" ) )
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
             }
         };
         return doNotRedirectToIndexPagesStrategy;
+    }
+
+    // ==
+
+    private String getPreviousRequestUri( final HttpRequest request )
+    {
+        // hacky way of retrieving
+        if ( request instanceof RequestWrapper )
+        {
+            return getPreviousRequestUri( ( (RequestWrapper) request ).getOriginal() );
+        }
+        if ( request instanceof HttpUriRequest )
+        {
+            return ( (HttpUriRequest) request ).getURI().toString();
+        }
+        return null;
     }
 }
