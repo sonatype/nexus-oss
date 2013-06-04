@@ -16,17 +16,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.Timeout;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.subsystem.content.Content.Directive;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
-
-import com.google.common.primitives.Ints;
 
 /**
  * Testing automatic routing publishing on group repositories.
@@ -36,12 +31,6 @@ import com.google.common.primitives.Ints;
 public class RoutingWithGroupRepositoryIT
     extends RoutingITSupport
 {
-    /**
-     * This is a safety net, to have JUnit kill this test if it locks for any reason (remote scrape or such). This rule
-     * will kill this test after 15 minutes.
-     */
-    @Rule
-    public Timeout timeout = new Timeout( Ints.checkedCast( TimeUnit.MINUTES.toMillis( 15L ) ) );
 
     /**
      * Constructor.

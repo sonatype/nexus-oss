@@ -24,15 +24,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.rules.Timeout;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.routing.Status;
@@ -43,11 +39,9 @@ import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
-import com.google.common.primitives.Ints;
 
 /**
  * Simple "smoke" IT that tests does proxy404 does it's job or not, by detecting what remote requests was made with and
@@ -76,13 +70,6 @@ public class RoutingFilteringIT
     private static final String FLUKE_ARTIFACT_POM = "/hu/fluke/artifact/1.0/artifact-1.0.pom";
 
     private static final String FLUKE_ARTIFACT_JAR = "/hu/fluke/artifact/1.0/artifact-1.0.jar";
-
-    /**
-     * This is a safety net, to have JUnit kill this test if it locks for any reason (remote scrape or such). This rule
-     * will kill this test after 15 minutes.
-     */
-    @Rule
-    public Timeout timeout = new Timeout( Ints.checkedCast( TimeUnit.MINUTES.toMillis( 15L ) ) );
 
     /**
      * Constructor.
