@@ -98,17 +98,17 @@ public class RemoteControl
                 try {
                     handler.handle(exchange);
                 }
-                catch (Exception e) {
+                catch (Throwable failure) {
                     // HACK: Ignore this package-private exception as it seems to happen normally
-                    if ("sun.net.httpserver.StreamClosedException".equals(e.getClass().getCanonicalName())) {
-                        log.trace("Ignoring exception", e);
+                    if ("sun.net.httpserver.StreamClosedException".equals(failure.getClass().getCanonicalName())) {
+                        log.trace("Ignoring", failure);
                         return;
                     }
 
-                    log.debug("Request failed", e);
+                    log.debug("Request failed", failure);
 
-                    Throwables.propagateIfPossible(e, IOException.class);
-                    throw Throwables.propagate(e);
+                    Throwables.propagateIfPossible(failure, IOException.class);
+                    throw Throwables.propagate(failure);
                 }
                 finally {
                     log.debug("Request finished");
@@ -136,7 +136,7 @@ public class RemoteControl
      */
     private final class ContainerHelper
     {
-        private <T> T lookup(final Key<T> key) {
+        public <T> T lookup(final Key<T> key) {
             final Iterator<? extends Entry<Annotation, T>> i = beanLocator.locate(key).iterator();
             return i.hasNext() ? i.next().getValue() : null;
         }
@@ -155,6 +155,20 @@ public class RemoteControl
 
         public <T> T lookup(final Class<T> type, final Annotation qualifier) {
             return lookup(Key.get(type, qualifier));
+        }
+
+        // String type-name helpers to avoid needing const class ref in closure
+
+        public Class<?> type(final String typeName) throws ClassNotFoundException {
+            return uberClassLoader.loadClass(typeName);
+        }
+
+        public Object lookup(final String typeName) throws ClassNotFoundException {
+            return lookup(type(typeName));
+        }
+
+        public Object lookup(final String typeName, final String name) throws ClassNotFoundException {
+            return lookup(type(typeName), name);
         }
     }
 
