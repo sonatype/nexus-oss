@@ -29,22 +29,6 @@
   <artifactId>nexus-test-harness-launcher</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
-  <dependencyManagement>
-    <dependencies>
-      <!--
-        Legacy IT clients are mostly written using Restlet Client, so
-        need Restlet bits on the classpath of ITs.
-      -->
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-plugins-restlet1x</artifactId>
-        <type>pom</type>
-        <version>2.6.0-SNAPSHOT</version>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -173,18 +157,14 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet-bridge</artifactId>
-    </dependency>
-
-    <!-- Restlet Client driver -->
-    <dependency>
-      <groupId>com.noelios.restlet</groupId>
-      <artifactId>com.noelios.restlet.ext.net</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!-- Model code used by clients -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!--
@@ -194,6 +174,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
   </dependencies>
 
