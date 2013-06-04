@@ -24,10 +24,8 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.rules.Timeout;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.routing.Status;
 import org.sonatype.nexus.client.core.subsystem.routing.Status.Outcome;
@@ -53,10 +51,6 @@ import com.google.common.io.InputSupplier;
 public class RoutingSanityIT
     extends RoutingITSupport
 {
-
-    // we will timeout after 15 minutes, just as a safety net
-    @Rule
-    public Timeout timeout = new Timeout( 900000 );
 
     public RoutingSanityIT( final String nexusBundleCoordinates )
     {
