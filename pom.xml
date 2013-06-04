@@ -330,9 +330,29 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <dependencies>
+            <!--
+            Keep versions in sync with buildsupport/groovy/pom.xml
+            -->
+            <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-eclipse-compiler</artifactId>
+              <version>2.7.0-01</version>
+            </dependency>
+            <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-eclipse-batch</artifactId>
+              <version>2.0.6-01</version>
+            </dependency>
+          </dependencies>
           <configuration>
             <source>1.6</source>
             <target>1.6</target>
+            <!--
+            Configure support for Groovy compilation, but leave it off by default.  Modules which need this should configure the compilerId.
+            -->
+            <!--<compilerId>groovy-eclipse-compiler</compilerId>-->
           </configuration>
         </plugin>
 
@@ -443,14 +463,14 @@
           <artifactId>gmaven-plugin</artifactId>
           <version>1.5</version>
           <configuration>
-            <providerSelection>1.7</providerSelection>
+            <providerSelection>2.0</providerSelection>
           </configuration>
         </plugin>
 
         <plugin>
           <groupId>org.jvnet.jaxb2.maven2</groupId>
           <artifactId>maven-jaxb2-plugin</artifactId>
-          <version>0.8.2</version>
+          <version>0.8.3</version>
           <dependencies>
             <dependency>
               <groupId>org.sonatype.sisu.jacksbee</groupId>
@@ -490,7 +510,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>modello-plugin-upgrade</artifactId>
-          <version>1.0</version>
+          <version>1.1</version>
         </plugin>
 
         <!--

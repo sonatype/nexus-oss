@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.plexus.rest;
+package org.sonatype.nexus.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,14 +23,21 @@ import java.util.Enumeration;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * ClassLoader which exposes all realms of a {@link ClassWorld}.
+ *
+ * @since 2.6
+ */
 public class WholeWorldClassloader
     extends ClassLoader
 {
     private final ClassWorld classWorld;
 
-    public WholeWorldClassloader( ClassWorld classWorld )
+    public WholeWorldClassloader( final ClassWorld classWorld )
     {
-        this.classWorld = classWorld;
+        this.classWorld = checkNotNull( classWorld );
     }
 
     protected ClassWorld getClassWorld()

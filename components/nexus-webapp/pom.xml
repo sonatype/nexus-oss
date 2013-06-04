@@ -92,9 +92,6 @@
     </dependency>
 
     <!--
-    There are problems with the Maven reactor that would require these modules.
-    However if we include as a test scope the reactor will be happy and the dependency pom will be correct.
-
     HACK: Using nexus.version since DM not in scope.
     -->
 
@@ -104,7 +101,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -113,7 +110,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -122,7 +119,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -131,7 +128,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -140,7 +137,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -149,7 +146,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -158,7 +155,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -167,7 +164,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -176,7 +173,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -185,7 +182,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -194,7 +191,7 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -203,7 +200,16 @@
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>test</scope>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -211,109 +217,20 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>unpack-plugins</id>
+            <id>plugins</id>
             <phase>prepare-package</phase>
             <goals>
-              <goal>unpack</goal>
+              <goal>single</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/plugin-repository</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-crypto-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-h2-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-restlet1x-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-siesta-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-lvo-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-plugin-console-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-ldap-realm-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-rrb-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-indexer-lucene-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-timeline-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-archetype-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-maven-bridge-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-ui-extjs3-plugin</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-              </artifactItems>
+              <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
+              <descriptors>
+                <descriptor>${project.basedir}/src/main/assembly/plugins.xml</descriptor>
+              </descriptors>
             </configuration>
           </execution>
         </executions>

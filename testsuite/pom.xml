@@ -210,9 +210,8 @@
       <id>idea</id>
       <dependencies>
         <dependency>
-          <groupId>org.codehaus.gmaven.runtime</groupId>
-          <artifactId>gmaven-runtime-1.7</artifactId>
-          <version>1.5</version>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
           <scope>provided</scope>
         </dependency>
       </dependencies>

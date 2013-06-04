@@ -31,6 +31,7 @@ import org.restlet.data.MediaType;
 import org.restlet.util.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.util.WholeWorldClassloader;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -76,6 +77,9 @@ public class PlexusRestletApplicationBridge
 
     @Requirement
     private Velocity velocity;
+
+    @Requirement( hint = "nexus-uber" )
+    private ClassLoader uberClassLoader;
 
     /** Date of creation of this application */
     private final Date createdOn;
@@ -297,7 +301,7 @@ public class PlexusRestletApplicationBridge
     {
         XStream xstream = new XStream( driver );
 
-        xstream.setClassLoader( new WholeWorldClassloader( getPlexusContainer().getContainerRealm().getWorld() ) );
+        xstream.setClassLoader( uberClassLoader );
 
         // let the application configure the XStream
         xstream = doConfigureXstream( xstream );

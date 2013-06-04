@@ -31,6 +31,7 @@
     <module>bouncycastle</module>
     <module>commons</module>
     <module>goodies</module>
+    <module>groovy</module>
     <module>guice</module>
     <module>httpclient</module>
     <module>jetty</module>
