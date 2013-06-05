@@ -13,16 +13,20 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
@@ -33,6 +37,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
+import com.google.common.collect.Maps;
 
 /**
  * Process maven metadata in snapshot version directory
@@ -42,6 +47,9 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
 public class VersionDirMetadataProcessor
     extends AbstractMetadataProcessor
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( VersionDirMetadataProcessor.class );
+
     public VersionDirMetadataProcessor( AbstractMetadataHelper metadataHelper )
     {
         super( metadataHelper );
@@ -66,6 +74,37 @@ public class VersionDirMetadataProcessor
     {
         Metadata md = createMetadata( path );
 
+        // NEXUS-4766
+        // To avoid wrong guessing of classifier / extension in case of classifier with dots,
+        // read existing metadata (assumed to be okay due to the fact that was uploaded by Maven)
+        // and for snapshot versions replace classifier / extension
+        try
+        {
+            final Metadata oldMd = MetadataBuilder.read(
+                metadataHelper.retrieveContent( path + AbstractMetadataHelper.METADATA_SUFFIX )
+            );
+            maybeFixClassifierAndExtension( md, oldMd );
+        }
+        catch ( FileNotFoundException ignore )
+        {
+            // old metadata file is not present, ignore
+        }
+        catch ( IOException e )
+        {
+            // oh well, we will use what we have if we cannot read existing metadata
+            if ( LOG.isDebugEnabled() )
+            {
+                LOG.warn( "Could not read maven metadata {}", path + AbstractMetadataHelper.METADATA_SUFFIX, e );
+            }
+            else
+            {
+                LOG.warn(
+                    "Could not read maven metadata {} due to {}/{}",
+                    path + AbstractMetadataHelper.METADATA_SUFFIX, e.getClass().getName(), e.getMessage()
+                );
+            }
+        }
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         MetadataBuilder.write( md, outputStream );
@@ -75,6 +114,41 @@ public class VersionDirMetadataProcessor
         outputStream.close();
 
         metadataHelper.store( mdString, path + AbstractMetadataHelper.METADATA_SUFFIX );
+    }
+
+    private void maybeFixClassifierAndExtension( final Metadata mdNew, final Metadata mdOld )
+    {
+        final Map<String, SnapshotVersion> svOld = createSnapshotVersionMap( mdOld );
+        if ( !svOld.isEmpty() )
+        {
+            final Map<String, SnapshotVersion> svNew = createSnapshotVersionMap( mdNew );
+            for ( final Map.Entry<String, SnapshotVersion> entry : svNew.entrySet() )
+            {
+                final SnapshotVersion vOld = svOld.get( entry.getKey() );
+                if ( vOld != null )
+                {
+                    final SnapshotVersion vNew = entry.getValue();
+                    vNew.setClassifier( vOld.getClassifier() );
+                    vNew.setExtension( vOld.getExtension() );
+                }
+            }
+        }
+    }
+
+    private Map<String, SnapshotVersion> createSnapshotVersionMap( final Metadata md )
+    {
+        final Map<String, SnapshotVersion> sv = Maps.newHashMap();
+        if ( md.getVersioning() != null && md.getVersioning().getSnapshotVersions() != null )
+        {
+            for ( final SnapshotVersion v : md.getVersioning().getSnapshotVersions() )
+            {
+                if ( v.getClassifier() != null )
+                {
+                    sv.put(  String.format( "%s-%s.%s", v.getVersion(), v.getClassifier(), v.getExtension() ), v );
+                }
+            }
+        }
+        return sv;
     }
 
     private Metadata createMetadata( String path )

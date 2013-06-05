@@ -56,10 +56,6 @@ public abstract class AbstractMetadataProcessor
 
                 return true;
             }
-            else
-            {
-                removedMetadata( path );
-            }
         }
 
         processMetadata( path );
