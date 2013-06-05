@@ -101,7 +101,6 @@ public class Nexus142UserPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update user
-        user.setUserId( "tesUpdatePermission" );
         response = this.userUtil.sendMessage( Method.PUT, user );
         Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
 
@@ -158,7 +157,6 @@ public class Nexus142UserPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update user
-        user.setUserId( "tesUpdatePermission" );
         response = this.userUtil.sendMessage( Method.PUT, user );
         Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
 
