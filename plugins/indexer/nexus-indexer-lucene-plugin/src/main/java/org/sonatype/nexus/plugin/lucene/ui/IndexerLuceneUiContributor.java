@@ -10,28 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.client;
+package org.sonatype.nexus.plugin.lucene.ui;
 
-import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.testsuite.client.exception.TasksAreStillRunningException;
-import org.sonatype.nexus.testsuite.client.exception.TasksAreStillRunningException;
-import org.sonatype.sisu.goodies.common.Time;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
 /**
- * Scheduler Nexus Client Subsystem.
- *
- * @since 2.3
+ * @since 2.6
  */
-public interface Scheduler
+@Named
+@Singleton
+public class IndexerLuceneUiContributor
+    implements UiContributor
 {
 
-    void run( String type, Map<String,String> properties );
+    public static final String ARTIFACT_ID = "nexus-indexer-lucene-plugin";
 
-    void waitForAllTasksToStop()
-        throws TasksAreStillRunningException;
-
-    void waitForAllTasksToStop( Time timeout )
-        throws TasksAreStillRunningException;
-
+    @Override
+    public UiContribution contribute( final boolean debug )
+    {
+        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP,
+                                          ARTIFACT_ID ).boot( ARTIFACT_ID + "-all" ).build( debug );
+    }
 }
