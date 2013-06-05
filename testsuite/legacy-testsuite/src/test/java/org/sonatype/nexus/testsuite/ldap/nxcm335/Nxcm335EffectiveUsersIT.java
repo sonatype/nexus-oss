@@ -18,7 +18,9 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -34,6 +36,12 @@ import org.sonatype.security.rest.model.UserToRoleResource;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Nxcm335EffectiveUsersIT
+ * <p>
+ * FIXME: @FixMethodOrder(MethodSorters.NAME_ASCENDING) needed as tests relies on execution order.
+ */
+@FixMethodOrder( MethodSorters.NAME_ASCENDING )
 public class Nxcm335EffectiveUsersIT
     extends AbstractLdapIntegrationIT
 {
