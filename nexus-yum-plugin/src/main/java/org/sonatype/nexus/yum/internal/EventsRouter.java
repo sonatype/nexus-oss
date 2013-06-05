@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
@@ -139,6 +140,7 @@ public class EventsRouter
     private boolean isRpmItemEvent( RepositoryItemEvent itemEvent )
     {
         return yumRegistryProvider.get().isRegistered( itemEvent.getRepository().getId() )
+            && !itemEvent.getItem().getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class )
             && itemEvent.getItem().getPath().toLowerCase().endsWith( ".rpm" );
     }
 

@@ -118,4 +118,41 @@ public class GenerateMetadataIT
         assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
     }
 
+    /**
+     * Verify that files under ".nexus/*" (hidden files) does not get indexed.
+     *
+     * @since 3.0.3
+     */
+    @Test
+    public void addRpmUnderDotNexus()
+        throws Exception
+    {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-rpm/5.6.7/test-rpm-5.6.7.rpm" ),
+            testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        {
+            final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+            assertThat( primaryXml, containsString( "test-rpm" ) );
+        }
+
+        content().upload(
+            repositoryLocation( repository.id(), ".nexus/test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        {
+            final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+            assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
+            assertThat( primaryXml, containsString( "test-rpm" ) );
+        }
+    }
+
 }
