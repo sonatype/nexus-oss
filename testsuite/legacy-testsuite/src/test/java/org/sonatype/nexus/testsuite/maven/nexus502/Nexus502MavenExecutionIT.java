@@ -17,11 +17,8 @@ import java.io.IOException;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -30,63 +27,62 @@ import org.sonatype.security.rest.model.UserResource;
 
 /**
  * Put a bunch of artifacts in a repo, and then run a maven project to download them
- * <p>
- * FIXME: @FixMethodOrder(MethodSorters.NAME_ASCENDING) needed as this UT seems to be intentionally written to depend on
- * method ordering, as each method builds upon a state left by previous method.
  */
-@FixMethodOrder( MethodSorters.NAME_ASCENDING )
 public class Nexus502MavenExecutionIT
     extends AbstractMavenNexusIT
 {
-
-    private Verifier verifier;
-
     @BeforeClass
     public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Before
-    public void createVerifier()
-        throws Exception
-    {
-        File mavenProject = getTestFile( "maven-project" );
-        File settings = getTestFile( "repositories.xml" );
-        verifier = createVerifier( mavenProject, settings );
-    }
-
     @Test
     public void t001_dependencyDownload()
         throws Exception
     {
-        try
+        final File mavenProject = getTestFile( "maven-project" );
+        final File settings = getTestFile( "repositories.xml" );
         {
+            final Verifier verifier = createVerifier( mavenProject, settings );
+            try
+            {
+                verifier.executeGoal( "dependency:resolve" );
+                verifier.verifyErrorFreeLog();
+            }
+            catch ( VerificationException e )
+            {
+                failTest( verifier );
+            }
+        }
+
+        {
+            final Verifier verifier = createVerifier( mavenProject, settings );
+            // Disable anonymous
+            disableUser( "anonymous" );
+
+            try
+            {
+                verifier.executeGoal( "dependency:resolve" );
+                verifier.verifyErrorFreeLog();
+                failTest( verifier );
+            }
+            catch ( VerificationException e )
+            {
+                // Expected exception
+            }
+        }
+
+        {
+            // Disable anonymous
+            disableUser( "anonymous" );
+
+            File mavenProjectWithauth = getTestFile( "maven-project" );
+            File settingsWithAuth = getTestFile( "repositoriesWithAuthentication.xml" );
+
+            Verifier verifier = createVerifier( mavenProjectWithauth, settingsWithAuth );
             verifier.executeGoal( "dependency:resolve" );
             verifier.verifyErrorFreeLog();
-        }
-        catch ( VerificationException e )
-        {
-            failTest( verifier );
-        }
-    }
-
-    @Test //( dependsOnMethods = { "dependencyDownload" } )
-    public void t002_dependencyDownloadPrivateServer()
-        throws Exception
-    {
-        // Disable anonymous
-        disableUser( "anonymous" );
-
-        try
-        {
-            verifier.executeGoal( "dependency:resolve" );
-            verifier.verifyErrorFreeLog();
-            failTest( verifier );
-        }
-        catch ( VerificationException e )
-        {
-            // Expected exception
         }
     }
 
@@ -96,21 +92,4 @@ public class Nexus502MavenExecutionIT
         UserMessageUtil util = new UserMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         return util.disableUser( userId );
     }
-
-    // Depends on nexus-508
-    @Test //( dependsOnMethods = { "dependencyDownloadPrivateServer" } )
-    public void t003_dependencyDownloadProtectedServer()
-        throws Exception
-    {
-        // Disable anonymous
-        disableUser( "anonymous" );
-
-        File mavenProject = getTestFile( "maven-project" );
-        File settings = getTestFile( "repositoriesWithAuthentication.xml" );
-
-        Verifier verifier = createVerifier( mavenProject, settings );
-        verifier.executeGoal( "dependency:resolve" );
-        verifier.verifyErrorFreeLog();
-    }
-
 }
