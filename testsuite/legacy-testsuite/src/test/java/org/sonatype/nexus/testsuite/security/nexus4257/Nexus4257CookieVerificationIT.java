@@ -18,28 +18,41 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.Collection;
 
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.security.StatelessAndStatefulWebSessionManager;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-
 
 public class Nexus4257CookieVerificationIT
     extends AbstractNexusIntegrationTest
 {
+    /**
+     * Copied from deprecated org.sonatype.nexus.security.StatelessAndStatefulWebSessionManager to
+     * cut the direct plugin class dependency from ITs.
+     */
+    public static final String NO_SESSION_HEADER = "X-Nexus-Session";
 
     @BeforeClass
     public static void setSecureTest()
@@ -57,34 +70,47 @@ public class Nexus4257CookieVerificationIT
         String username = context.getAdminUsername();
         String password = context.getPassword();
         String url = this.getBaseNexusUrl() + "content/";
+        URI nexusBaseURI = new URI( url );
 
-        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        httpClient.getParams().setParameter( CoreProtocolPNames.USER_AGENT, "SomeUAThatWillMakeMeLookStateful/1.0" );
+        final BasicHttpContext localcontext = new BasicHttpContext();
+        final HttpHost targetHost =
+            new HttpHost( nexusBaseURI.getHost(), nexusBaseURI.getPort(), nexusBaseURI.getScheme() );
+        httpClient.getCredentialsProvider().setCredentials(
+            new AuthScope( targetHost.getHostName(), targetHost.getPort() ),
+            new UsernamePasswordCredentials( username, password ) );
+        AuthCache authCache = new BasicAuthCache();
+        BasicScheme basicAuth = new BasicScheme();
+        authCache.put( targetHost, basicAuth );
+        localcontext.setAttribute( ClientContext.AUTH_CACHE, authCache );
 
         // stateful clients must login first, since other rest urls create no sessions
         String loginUrl = this.getBaseNexusUrl() + "service/local/authentication/login";
-        httpClient.getParams().setAuthenticationPreemptive( true ); // go straight to basic auth
-        assertThat( executeAndRelease( httpClient, new GetMethod( loginUrl ) ), equalTo( 200 ) );
+        assertThat( executeAndRelease( httpClient, new HttpGet( loginUrl ), localcontext ), equalTo( 200 ) );
 
-        GetMethod getMethod = new GetMethod( url );
-        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
-        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        // after login check content but make sure only cookie is used
+        httpClient.getCredentialsProvider().clear();
+        HttpGet getMethod = new HttpGet( url );
+        assertThat( executeAndRelease( httpClient, getMethod, null ), equalTo( 200 ) );
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getCookieStore().getCookies() );
         assertThat( "Session Cookie not set", sessionCookie, notNullValue() );
-        httpClient.getState().clear(); // remove cookies, credentials, etc
+        httpClient.getCookieStore().clear(); // remove cookies
 
         // do not set the cookie, expect failure
-        GetMethod failedGetMethod = new GetMethod( url );
-        assertThat( executeAndRelease( httpClient, failedGetMethod ), equalTo( 401 ) );
+        HttpGet failedGetMethod = new HttpGet( url );
+        assertThat( executeAndRelease( httpClient, failedGetMethod, null ), equalTo( 401 ) );
 
-        // set the cookie expect a 200, If a cookie is set, and cannot be found on the server, the response will fail with a 401
-        httpClient.getState().addCookie( sessionCookie );
-        getMethod = new GetMethod( url );
-        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
+        // set the cookie expect a 200, If a cookie is set, and cannot be found on the server, the response will fail
+        // with a 401
+        httpClient.getCookieStore().addCookie( sessionCookie );
+        getMethod = new HttpGet( url );
+        assertThat( executeAndRelease( httpClient, getMethod, null ), equalTo( 200 ) );
     }
 
     /**
      * Tests that session cookies are not set for the list of known stateless clients.
+     * 
      * @throws Exception
      */
     @Test
@@ -93,20 +119,20 @@ public class Nexus4257CookieVerificationIT
     {
         setAnonymousAccess( false );
 
-        String[] statelessUserAgents = {
-            "Java",
-            "Apache-Maven",
-            "Apache Ivy",
-            "curl",
-            "Wget",
-            "Nexus",
-            "Artifactory",
-            "Apache Archiva",
-            "M2Eclipse",
+        String[] statelessUserAgents = { 
+            "Java", 
+            "Apache-Maven", 
+            "Apache Ivy", 
+            "curl", 
+            "Wget", 
+            "Nexus", 
+            "Artifactory", 
+            "Apache Archiva", 
+            "M2Eclipse", 
             "Aether"
         };
 
-        for( String userAgent : statelessUserAgents )
+        for ( String userAgent : statelessUserAgents )
         {
             testCookieNotSetForKnownStateLessClients( userAgent );
         }
@@ -114,34 +140,43 @@ public class Nexus4257CookieVerificationIT
 
     /**
      * Makes a request after setting the user agent and verifies that the session cookie is NOT set.
+     * 
      * @param userAgent
-     * @throws Exception
      */
-    private void testCookieNotSetForKnownStateLessClients( String userAgent ) throws Exception
+    private void testCookieNotSetForKnownStateLessClients( final String userAgent )
+        throws Exception
     {
         TestContext context = TestContainer.getInstance().getTestContext();
         String username = context.getAdminUsername();
         String password = context.getPassword();
         String url = this.getBaseNexusUrl() + "content/";
+        URI uri = new URI( url );
 
-        Header header = new Header("User-Agent", userAgent + "/1.6" ); // user agent plus some version
+        Header header = new BasicHeader( "User-Agent", userAgent + "/1.6" ); // user agent plus some version
 
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
+        DefaultHttpClient httpClient = new DefaultHttpClient();
 
-        GetMethod getMethod = new GetMethod( url );
-        getMethod.addRequestHeader( header );
-        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
+        final BasicHttpContext localcontext = new BasicHttpContext();
+        final HttpHost targetHost =
+            new HttpHost( uri.getHost(), uri.getPort(), uri.getScheme() );
+        httpClient.getCredentialsProvider().setCredentials(
+            new AuthScope( targetHost.getHostName(), targetHost.getPort() ),
+            new UsernamePasswordCredentials( username, password ) );
+        AuthCache authCache = new BasicAuthCache();
+        BasicScheme basicAuth = new BasicScheme();
+        authCache.put( targetHost, basicAuth );
+        localcontext.setAttribute( ClientContext.AUTH_CACHE, authCache );
 
-        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        HttpGet getMethod = new HttpGet( url );
+        getMethod.addHeader( header );
+        assertThat( executeAndRelease( httpClient, getMethod, localcontext ), equalTo( 200 ) );
+
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getCookieStore().getCookies() );
         assertThat( "Session Cookie should not be set for user agent: " + userAgent, sessionCookie, nullValue() );
     }
 
-
     /**
      * Tests that an anonymous user with a stateless client does NOT receive a session cookie.
-     * @throws HttpException
-     * @throws IOException
      */
     @Test
     public void testCookieForStateFullClientForAnonUser()
@@ -151,20 +186,17 @@ public class Nexus4257CookieVerificationIT
 
         String url = this.getBaseNexusUrl() + "content/";
 
-        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
-        HttpClient httpClient = new HttpClient(); // anonymous access
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        
+        HttpGet getMethod = new HttpGet( url );
+        assertThat( executeAndRelease( httpClient, getMethod, null ), equalTo( 200 ) );
 
-        GetMethod getMethod = new GetMethod( url );
-        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
-
-        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getCookieStore().getCookies() );
         assertThat( "Session Cookie should not be set", sessionCookie, nullValue() );
     }
 
     /**
      * Tests that an anonymous user with a stateless client does NOT receive a session cookie.
-     * @throws HttpException
-     * @throws IOException
      */
     @Test
     public void testCookieForStateLessClientForAnonUser()
@@ -174,50 +206,50 @@ public class Nexus4257CookieVerificationIT
 
         String url = this.getBaseNexusUrl() + "content/";
 
-        Header header = new Header("User-Agent", "Java/1.6" );
+        Header header = new BasicHeader( "User-Agent", "Java/1.6" );
+        DefaultHttpClient httpClient = new DefaultHttpClient();
 
-        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
-        HttpClient httpClient = new HttpClient(); // anonymous access
+        HttpGet getMethod = new HttpGet( url );
+        getMethod.addHeader( header );
+        assertThat( executeAndRelease( httpClient, getMethod, null ), equalTo( 200 ) );
 
-        GetMethod getMethod = new GetMethod( url );
-        getMethod.addRequestHeader( header );
-        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
-
-        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getCookieStore().getCookies() );
         assertThat( "Session Cookie should not be set", sessionCookie, nullValue() );
     }
 
     /**
      * Verifies that requests with the header: X-Nexus-Session do not have session cookies set.
-     * @throws Exception
      */
     @Test
-    public void testNoSessionHeader() throws Exception
+    public void testNoSessionHeader()
+        throws Exception
     {
         setAnonymousAccess( true );
 
         String url = this.getBaseNexusUrl() + "content/";
 
-        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
-        HttpClient httpClient = new HttpClient(); // anonymous access
+        Header header = new BasicHeader( NO_SESSION_HEADER, "none" );
+        Header usHeader = new BasicHeader( "User-Agent", "SomeStatefulClientThatKnowsAboutThisHeader/1.6" );
+        DefaultHttpClient httpClient = new DefaultHttpClient();
 
-        Header header = new Header( StatelessAndStatefulWebSessionManager.NO_SESSION_HEADER, "none" );
+        HttpGet getMethod = new HttpGet( url );
+        getMethod.addHeader( header );
+        getMethod.addHeader( usHeader );
+        assertThat( executeAndRelease( httpClient, getMethod, null ), equalTo( 200 ) );
 
-        GetMethod getMethod = new GetMethod( url );
-        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
-
-        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getCookieStore().getCookies() );
         assertThat( "Session Cookie should not be set", sessionCookie, nullValue() );
     }
-    
-    private void setAnonymousAccess( boolean enabled ) throws Exception
+
+    private void setAnonymousAccess( boolean enabled )
+        throws Exception
     {
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
         settings.setSecurityAnonymousAccessEnabled( enabled );
         SettingsMessageUtil.save( settings );
     }
 
-    private Cookie getSessionCookie( Cookie[] cookies )
+    private Cookie getSessionCookie( Collection<Cookie> cookies )
     {
         for ( Cookie cookie : cookies )
         {
@@ -231,17 +263,24 @@ public class Nexus4257CookieVerificationIT
 
     }
 
-    private int executeAndRelease( HttpClient httpClient, HttpMethodBase method )
+    private int executeAndRelease( HttpClient httpClient, HttpGet method, HttpContext context )
         throws IOException
     {
         int status = 0;
         try
         {
-            status = httpClient.executeMethod( method );
+            if ( context != null )
+            {
+                status = httpClient.execute( method, context ).getStatusLine().getStatusCode();
+            }
+            else
+            {
+                status = httpClient.execute( method ).getStatusLine().getStatusCode();
+            }
         }
         finally
         {
-            method.releaseConnection();
+            method.reset();
         }
 
         return status;

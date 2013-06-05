@@ -17,8 +17,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.SystemState;
@@ -49,23 +50,20 @@ public class NexusStatusUtil
     {
         final String statusURI = AbstractNexusIntegrationTest.nexusBaseUrl + RequestFacade.SERVICE_LOCAL + "status";
         // by not using test context we are only checking anonymously - this may not be a good idea, not sure
-        org.apache.commons.httpclient.HttpMethod method = null;
+        HttpGet method = null;
+        HttpResponse response = null;
         try
         {
             try
             {
-                method = RequestFacade.executeHTTPClientMethod( new GetMethod( statusURI ), false );
-            }
-            catch ( HttpException ex )
-            {
-                throw new NexusIllegalStateException( "Problem executing status request: ", ex );
+                response = RequestFacade.executeHTTPClientMethod( new HttpGet( statusURI ), false );
             }
             catch ( IOException ex )
             {
                 throw new NexusIllegalStateException( "Problem executing status request: ", ex );
             }
 
-            final int statusCode = method.getStatusCode();
+            final int statusCode = response.getStatusLine().getStatusCode();
             // 200 if anonymous access is enabled
             // 401 if nexus is running but anonymous access is disabled
             if ( statusCode == 401 )
@@ -81,7 +79,7 @@ public class NexusStatusUtil
             String entityText;
             try
             {
-                entityText = method.getResponseBodyAsString();
+                entityText = EntityUtils.toString( response.getEntity() );
             }
             catch ( IOException e )
             {

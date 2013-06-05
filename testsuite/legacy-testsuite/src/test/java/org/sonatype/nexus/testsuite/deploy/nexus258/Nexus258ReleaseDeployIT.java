@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Date;
 
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpStatus;
 import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.BeforeClass;

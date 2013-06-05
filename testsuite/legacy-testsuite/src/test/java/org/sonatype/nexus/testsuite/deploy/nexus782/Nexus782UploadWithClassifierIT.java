@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.maven.index.artifact.Gav;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -48,7 +47,7 @@ public class Nexus782UploadWithClassifierIT
 
     @Test
     public void withSamePomNoExtention()
-        throws HttpException, IOException
+        throws IOException
     {
 
         File artifactFile = this.getTestFile( "same-pom/same-pom.jar" );

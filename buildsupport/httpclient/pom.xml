@@ -54,20 +54,6 @@
         <version>4.2.4</version>
       </dependency>
 
-      <!--
-      FIXME: Get rid of this dependency.
-      -->
-      <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>3.1.SONATYPE</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 

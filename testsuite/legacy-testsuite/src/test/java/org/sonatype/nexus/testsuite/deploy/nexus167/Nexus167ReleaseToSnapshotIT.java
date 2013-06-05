@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.HttpException;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.wagon.TransferFailedException;
 import org.junit.Assert;
@@ -86,8 +86,7 @@ public class Nexus167ReleaseToSnapshotIT
 
     @Test
     public void deployUsingRest()
-        throws HttpException,
-            Exception
+        throws Exception
     {
 
         Gav gav = new Gav(
@@ -113,8 +112,8 @@ public class Nexus167ReleaseToSnapshotIT
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
         // the method we are calling
-        PostMethod filePost = new PostMethod( uploadURL );
-        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+        HttpPost filePost = new HttpPost( uploadURL );
+        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
 
         int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_SNAPSHOT_REPO, gav, fileToDeploy );
 

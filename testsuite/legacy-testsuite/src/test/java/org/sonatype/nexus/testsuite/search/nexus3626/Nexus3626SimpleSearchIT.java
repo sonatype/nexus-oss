@@ -15,7 +15,7 @@ package org.sonatype.nexus.testsuite.search.nexus3626;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.http.HttpResponse;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
@@ -73,9 +73,9 @@ public class Nexus3626SimpleSearchIT
         throws Exception
     {
         final File pom = getTestFile( "rest.pom" );
-        HttpMethod r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
-        Assert.assertTrue( "Unable to deploy artifact " + r.getStatusCode()
-            + ": " + r.getStatusText(), Status.isSuccess( r.getStatusCode() ) );
+        HttpResponse r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
+        Assert.assertTrue( "Unable to deploy artifact " + r.getStatusLine().getStatusCode()
+            + ": " + r.getStatusLine().getReasonPhrase(), Status.isSuccess( r.getStatusLine().getStatusCode() ) );
         searchFor( pom );
     }
 

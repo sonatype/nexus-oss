@@ -28,6 +28,11 @@ import com.thoughtworks.xstream.XStream;
 
 public class SettingsMessageUtil
 {
+    /**
+     * A copy from org.sonatype.nexus.rest.AbstractNexusPlexusResource to not have plugin dependency in ITs!
+     */
+    public static final String PASSWORD_PLACE_HOLDER = "|$|N|E|X|U|S|$|";
+
     private static XStream xstream;
 
     static

@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
@@ -427,7 +426,7 @@ public class Nexus537RepoTargetsIT
     }
 
     private void upload( Gav gav, String repoId, File fileToDeploy, boolean shouldUpload )
-        throws InterruptedException, HttpException, IOException
+        throws InterruptedException, IOException
     {
         int status = getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy );
 

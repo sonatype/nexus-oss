@@ -15,8 +15,7 @@ package org.sonatype.nexus.testsuite.deploy.nexus950;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -26,15 +25,15 @@ public class Nexus950CorruptPomIT
 {
 
     @Test
-    public void uploadCorruptPomTest() throws HttpException, IOException
+    public void uploadCorruptPomTest() throws IOException
     {
         
         File jarFile = this.getTestFile( "bad-pom.jar" );
         File badPomFile = this.getTestFile( "pom.xml" );
         
-        HttpMethod resultMethod = getDeployUtils().deployUsingPomWithRestReturnResult( this.getTestRepositoryId(), jarFile, badPomFile, "", "jar" );
+        HttpResponse resultMethod = getDeployUtils().deployUsingPomWithRestReturnResult( this.getTestRepositoryId(), jarFile, badPomFile, "", "jar" );
         
-        Assert.assertEquals( "Expected a 400 error returned.", 400, resultMethod.getStatusCode() );        
+        Assert.assertEquals( "Expected a 400 error returned.", 400, resultMethod.getStatusLine().getStatusCode() );        
     }
     
 }

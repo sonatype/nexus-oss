@@ -60,11 +60,6 @@
 
     <dependency>
       <groupId>com.noelios.restlet</groupId>
-      <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.noelios.restlet</groupId>
       <artifactId>com.noelios.restlet.ext.servlet</artifactId>
     </dependency>
 

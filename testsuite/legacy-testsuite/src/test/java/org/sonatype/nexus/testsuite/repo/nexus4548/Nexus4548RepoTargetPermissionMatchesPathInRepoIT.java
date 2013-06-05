@@ -19,9 +19,10 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithSta
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.util.EntityUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,26 +78,24 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
                              respondsWithStatusCode( code ) );
     }
 
-    private HttpMethod put( final String gavPath, final int code )
+    private HttpResponse put( final String gavPath, final int code )
         throws Exception
     {
-        PutMethod putMethod = new PutMethod( getNexusTestRepoUrl() + gavPath );
-        putMethod.setRequestEntity( new FileRequestEntity( getTestFile( "pom-a.pom" ), "text/xml" ) );
+        HttpPut putMethod = new HttpPut( getNexusTestRepoUrl() + gavPath );
+        putMethod.setEntity( new FileEntity( getTestFile( "pom-a.pom" ), "text/xml" ) );
 
-        final HttpMethod httpMethod = RequestFacade.executeHTTPClientMethod( putMethod );
-        assertThat( httpMethod.getStatusCode(), Matchers.is( code ) );
-
-        return httpMethod;
+        final HttpResponse response = RequestFacade.executeHTTPClientMethod( putMethod );
+        assertThat( response.getStatusLine().getStatusCode(), Matchers.is( code ) );
+        return response;
     }
 
-    private HttpMethod putRest( final String artifactId, final int code )
+    private HttpResponse putRest( final String artifactId, final int code )
         throws IOException
     {
         File testFile = getTestFile( String.format( "pom-%s.pom", artifactId ) );
-        final HttpMethod httpMethod = getDeployUtils().deployPomWithRest( "releases", testFile );
-        assertThat( httpMethod.getStatusCode(), Matchers.is( code ) );
-
-        return httpMethod;
+        final HttpResponse response = getDeployUtils().deployPomWithRest( "releases", testFile );
+        assertThat( response.getStatusLine().getStatusCode(), Matchers.is( code ) );
+        return response;
     }
 
     @Test
@@ -116,8 +115,8 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
 
         put( "g/b/v/b-v-deploy.pom", 403 );
 
-        final HttpMethod httpMethod = putRest( "b", 403 );
-        final String responseBody = httpMethod.getResponseBodyAsString();
+        final HttpResponse response = putRest( "b", 403 );
+        final String responseBody = EntityUtils.toString( response.getEntity() );
         assertThat( responseBody, containsString( "<error>" ) );
     }
 }
