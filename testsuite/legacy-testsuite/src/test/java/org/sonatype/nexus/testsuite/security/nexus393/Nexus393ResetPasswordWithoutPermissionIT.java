@@ -47,12 +47,12 @@ public class Nexus393ResetPasswordWithoutPermissionIT
         // NOT Shouldn't be able to reset anyone password
         String username = "another-user";
         Response response = ResetPasswordUtils.resetPassword( username );
-        Assert.assertEquals("Status: "+ response.getStatus() +"\n"+ response.getEntity().getText(), response.getStatus().getCode(), 403 );
+        Assert.assertEquals("Status: "+ response.getStatus() +"\n"+ response.getEntity(), response.getStatus().getCode(), 403 );
 
         // NOT Should be able to reset my own password
         username = TEST_USER_NAME;
         response = ResetPasswordUtils.resetPassword( username );
-        Assert.assertEquals( "Status: "+ response.getStatus() +"\n"+ response.getEntity().getText(), response.getStatus().getCode(), 403 );
+        Assert.assertEquals( "Status: "+ response.getStatus() +"\n"+ response.getEntity(), response.getStatus().getCode(), 403 );
 
     }
     

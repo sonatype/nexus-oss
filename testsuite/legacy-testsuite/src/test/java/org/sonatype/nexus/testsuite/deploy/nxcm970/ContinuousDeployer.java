@@ -15,14 +15,15 @@ package org.sonatype.nexus.testsuite.deploy.nxcm970;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 public class ContinuousDeployer
     implements Runnable
 {
-    private HttpClient httpClient;
+    private final HttpClient httpClient;
 
     private volatile boolean deploying;
 
@@ -30,15 +31,12 @@ public class ContinuousDeployer
 
     private int result = -1;
 
-    public ContinuousDeployer( String targetUrl )
+    public ContinuousDeployer( final String targetUrl )
     {
         super();
-
         this.targetUrl = targetUrl;
-
         this.deploying = true;
-
-        this.httpClient = new HttpClient();
+        this.httpClient = new DefaultHttpClient();
     }
 
     public boolean isDeploying()
@@ -63,24 +61,22 @@ public class ContinuousDeployer
 
     public void run()
     {
-        PutMethod method = new PutMethod( targetUrl );
-
-        method.setRequestEntity( new InputStreamRequestEntity( new EndlessBlockingInputStream( this ) ) );
+        final HttpPut method = new HttpPut( targetUrl );
+        method.setEntity( new InputStreamEntity( new EndlessBlockingInputStream( this ), -1 ) );
 
         try
         {
-            result = httpClient.executeMethod( method );
+            result = httpClient.execute( method ).getStatusLine().getStatusCode();
         }
         catch ( Exception e )
         {
             result = -2;
-
             e.printStackTrace();
         }
     }
 
     /**
-     * This is an endless stream, that will sleep a little and then serve the 'O' character.
+     * This is an endless stream, that will sleep a little and then serve the 'T' character.
      * 
      * @author cstamas
      */
@@ -89,7 +85,7 @@ public class ContinuousDeployer
     {
         private final ContinuousDeployer continuousDeployer;
 
-        public EndlessBlockingInputStream( ContinuousDeployer deployer )
+        public EndlessBlockingInputStream( final ContinuousDeployer deployer )
         {
             this.continuousDeployer = deployer;
         }
@@ -103,7 +99,6 @@ public class ContinuousDeployer
                 try
                 {
                     Thread.sleep( 300 );
-
                     return 'T';
                 }
                 catch ( InterruptedException e )

@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -69,6 +67,8 @@ import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * The default Nexus implementation.
@@ -545,9 +545,6 @@ public class DefaultNexus
         securitySystem.stop();
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
-
-        // Now a cleanup, to kill dangling thread of HttpClients
-        CustomMultiThreadedHttpConnectionManager.shutdownAll();
 
         getLogger().info( "Stopped {}", getNexusNameForLogs());
     }

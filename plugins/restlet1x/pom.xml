@@ -83,18 +83,6 @@
 
       <dependency>
         <groupId>com.noelios.restlet</groupId>
-        <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-        <version>${restlet.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>com.noelios.restlet</groupId>
         <artifactId>com.noelios.restlet.ext.servlet</artifactId>
         <version>${restlet.version}</version>
         <exclusions>

@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.config.nexus2178;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
@@ -46,7 +45,7 @@ public class Nexus2178ErrorReportingConfigRestIT
         Assert.assertNotNull( "Error reporting should not be null", resource.getErrorReportingSettings() );
         Assert.assertEquals( resource.getErrorReportingSettings().getJiraUsername(), "someusername" );
         Assert.assertEquals( resource.getErrorReportingSettings().getJiraPassword(),
-                             AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER );
+            SettingsMessageUtil.PASSWORD_PLACE_HOLDER );
 
         // Clear them again
         resource.setErrorReportingSettings( null );
