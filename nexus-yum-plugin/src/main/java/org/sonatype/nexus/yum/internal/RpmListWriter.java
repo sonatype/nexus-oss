@@ -19,6 +19,7 @@ import static org.apache.commons.io.IOUtils.readLines;
 import static org.apache.commons.io.IOUtils.write;
 import static org.apache.commons.io.IOUtils.writeLines;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.nexus.yum.internal.RpmScanner.getRelativePath;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,7 +88,7 @@ public class RpmListWriter
     public File writeList()
         throws IOException
     {
-        if ( rpmListFile.exists() && !forceFullScan)
+        if ( rpmListFile.exists() && !forceFullScan )
         {
             LOG.debug( "Reuse existing rpm list file : {}", rpmListFile );
             List<String> rpmFileList = pruneToExistingRpms();
@@ -212,7 +213,7 @@ public class RpmListWriter
         }
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     private List<String> readRpmFileList()
         throws IOException
     {
@@ -245,7 +246,7 @@ public class RpmListWriter
         List<String> result = new ArrayList<String>( rpmFileList.size() );
         for ( File rpmFile : rpmFileList )
         {
-            result.add( getRelativePath( rpmFile ) );
+            result.add( getRelativePath( baseRpmDir, rpmFile ) );
         }
         return result;
     }
@@ -279,7 +280,7 @@ public class RpmListWriter
             File parentFile = file.getParentFile();
             if ( matchesRequestedVersion( parentFile ) )
             {
-                String parentDir = getRelativePath( parentFile );
+                String parentDir = getRelativePath( baseRpmDir, parentFile );
                 putLatestArtifactInMap( parentDir, file.getName(), fileMap );
             }
         }
@@ -292,17 +293,6 @@ public class RpmListWriter
         {
             fileMap.put( parentDir, filename );
         }
-    }
-
-    private String getRelativePath( final File file )
-    {
-        String baseDirPath = baseRpmDir.getAbsolutePath() + ( baseRpmDir.isDirectory() ? separator : "" );
-        String filePath = file.getAbsolutePath() + ( file.isDirectory() ? separator : "" );
-        if ( filePath.startsWith( baseDirPath ) )
-        {
-            filePath = filePath.substring( baseDirPath.length() );
-        }
-        return filePath;
     }
 
     private boolean matchesRequestedVersion( File parentFile )

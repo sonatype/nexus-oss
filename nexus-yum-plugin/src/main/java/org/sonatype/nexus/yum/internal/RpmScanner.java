@@ -13,6 +13,7 @@
 package org.sonatype.nexus.yum.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.io.File.separator;
 
 import java.io.File;
 import java.util.Set;
@@ -36,21 +37,22 @@ public class RpmScanner
     private final Scanner scanner;
 
     @Inject
-    public RpmScanner( final @Named( "serial" ) Scanner scanner )
+    public RpmScanner( final @Named("serial") Scanner scanner )
     {
         this.scanner = checkNotNull( scanner );
     }
 
-    public Set<File> scan( final File basedDir )
+    public Set<File> scan( final File baseDir )
     {
         final Set<File> rpms = Sets.newHashSet();
 
-        scanner.scan( basedDir, new ListenerSupport()
+        scanner.scan( baseDir, new ListenerSupport()
         {
             @Override
             public void onFile( final File file )
             {
-                if ( "rpm".equalsIgnoreCase( FileUtils.extension( file.getName() ) ) )
+                if ( "rpm".equalsIgnoreCase( FileUtils.extension( file.getName() ) )
+                    && !getRelativePath( baseDir, file ).startsWith( "." ) )
                 {
                     rpms.add( file );
                 }
@@ -58,6 +60,17 @@ public class RpmScanner
         } );
 
         return rpms;
+    }
+
+    static String getRelativePath( final File baseDir, final File file )
+    {
+        String baseDirPath = baseDir.getAbsolutePath() + ( baseDir.isDirectory() ? separator : "" );
+        String filePath = file.getAbsolutePath() + ( file.isDirectory() ? separator : "" );
+        if ( filePath.startsWith( baseDirPath ) )
+        {
+            filePath = filePath.substring( baseDirPath.length() );
+        }
+        return filePath;
     }
 
 }
