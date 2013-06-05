@@ -58,6 +58,8 @@ public class RpmListWriter
 
     private final boolean singleRpmPerDirectory;
 
+    private final boolean forceFullScan;
+
     private final ListFileFactory fileFactory;
 
     private final RpmScanner scanner;
@@ -67,6 +69,7 @@ public class RpmListWriter
                           final String addedFiles,
                           final String version,
                           final boolean singleRpmPerDirectory,
+                          final boolean forceFullScan,
                           final ListFileFactory fileFactory,
                           final RpmScanner scanner )
     {
@@ -75,6 +78,7 @@ public class RpmListWriter
         this.addedFiles = addedFiles;
         this.version = version;
         this.singleRpmPerDirectory = singleRpmPerDirectory;
+        this.forceFullScan = forceFullScan;
         this.fileFactory = fileFactory;
         this.scanner = scanner;
         this.rpmListFile = fileFactory.getRpmListFile( repositoryId );
@@ -83,7 +87,7 @@ public class RpmListWriter
     public File writeList()
         throws IOException
     {
-        if ( rpmListFile.exists() )
+        if ( rpmListFile.exists() && !forceFullScan)
         {
             LOG.debug( "Reuse existing rpm list file : {}", rpmListFile );
             List<String> rpmFileList = pruneToExistingRpms();

@@ -91,6 +91,8 @@ public class GenerateMetadataTask
 
     public static final String PARAM_SINGLE_RPM_PER_DIR = "singleRpmPerDir";
 
+    public static final String PARAM_FORCE_FULL_SCAN = "forceFullScan";
+
     private final RepositoryRegistry repositoryRegistry;
 
     private final RepositoryURLBuilder repositoryURLBuilder;
@@ -310,6 +312,7 @@ public class GenerateMetadataTask
             getAddedFiles(),
             getVersion(),
             isSingleRpmPerDirectory(),
+            shouldForceFullScan(),
             this,
             scanner
         ).writeList();
@@ -456,6 +459,11 @@ public class GenerateMetadataTask
     public boolean isSingleRpmPerDirectory()
     {
         return Boolean.valueOf( getParameter( PARAM_SINGLE_RPM_PER_DIR ) );
+    }
+
+    public boolean shouldForceFullScan()
+    {
+        return Boolean.valueOf( getParameter( PARAM_FORCE_FULL_SCAN ) );
     }
 
     public void setSingleRpmPerDirectory( boolean singleRpmPerDirectory )
