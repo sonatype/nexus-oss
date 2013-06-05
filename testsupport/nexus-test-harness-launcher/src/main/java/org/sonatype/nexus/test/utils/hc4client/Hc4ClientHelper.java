@@ -32,6 +32,9 @@ import org.restlet.data.Request;
 import com.noelios.restlet.http.HttpClientCall;
 import com.noelios.restlet.http.HttpClientHelper;
 
+/**
+ * HC4 backed Restlet 1.1 Client, used in legacy ITs only, as many of the IT clients were coded against {@link Client}.
+ */
 public class Hc4ClientHelper
     extends HttpClientHelper
 {
@@ -49,7 +52,6 @@ public class Hc4ClientHelper
     public HttpClientCall create( Request request )
     {
         HttpClientCall result = null;
-
         try
         {
             result = new Hc4MethodCall( this, request.getMethod().toString(),
@@ -131,13 +133,10 @@ public class Hc4ClientHelper
         params.setIntParameter( HttpConnectionParams.SO_TIMEOUT, getReadTimeout() );
         params.setParameter( ClientPNames.COOKIE_POLICY,
             CookiePolicy.IGNORE_COOKIES );
-
         final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager();
         connManager.setMaxTotal( getMaxTotalConnections() );
         connManager.setDefaultMaxPerRoute( getMaxConnectionsPerHost() );
-
         httpClient = new DefaultHttpClient( connManager, params );
-
         getLogger().info( "Starting the HTTP client" );
     }
 

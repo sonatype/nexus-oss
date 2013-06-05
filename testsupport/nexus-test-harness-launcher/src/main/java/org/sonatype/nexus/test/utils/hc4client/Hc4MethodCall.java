@@ -97,10 +97,8 @@ public class Hc4MethodCall
             }
             else if ( method.equalsIgnoreCase( Method.CONNECT.getName() ) )
             {
+                // CONNECT unsupported (and is unused by legacy ITs)
                 throw new UnsupportedOperationException( "Not implemented" );
-                // final HostConfiguration host = new HostConfiguration();
-                // host.setHost( new URI( requestUri, false ) );
-                // this.httpMethod = new HttpConnect( host );
             }
             else if ( method.equalsIgnoreCase( Method.OPTIONS.getName() ) )
             {
@@ -112,42 +110,13 @@ public class Hc4MethodCall
             }
             else
             {
+                // custom HTTP verbs unsupported (and is unused by legacy ITs)
                 throw new UnsupportedOperationException( "Not implemented" );
-                // this.httpMethod = new HttpRequestBase( requestUri )
-                // {
-                // @Override
-                // public String getName()
-                // {
-                // return method;
-                // }
-                // };
             }
 
             this.httpMethod.getParams().setBooleanParameter( ClientPNames.HANDLE_REDIRECTS, this.clientHelper
                 .isFollowRedirects() );
-            // this.httpMethod.setDoAuthentication( false );
-
-            // if ( this.clientHelper.getRetryHandler() != null )
-            // {
-            // try
-            // {
-            // this.httpMethod.getParams().setParameter(
-            // HttpMethodParams.RETRY_HANDLER,
-            // Engine.loadClass(
-            // this.clientHelper.getRetryHandler() )
-            // .newInstance() );
-            // }
-            // catch ( Exception e )
-            // {
-            // this.clientHelper
-            // .getLogger()
-            // .log(
-            // Level.WARNING,
-            // "An error occurred during the instantiation of the retry handler.",
-            // e );
-            // }
-            // }
-
+            // retry handler setting unsupported (legaacy ITs use default HC4 retry handler)
             this.responseHeadersAdded = false;
             setConfidential( this.httpMethod.getURI().getScheme()
                 .equalsIgnoreCase( Protocol.HTTPS.getSchemeName() ) );
@@ -220,8 +189,6 @@ public class Hc4MethodCall
 
         try
         {
-            // Return a wrapper filter that will release the connection when
-            // needed
             if ( getHttpResponse() != null && getHttpResponse().getEntity() != null )
             {
                 final InputStream responseBodyAsStream = getHttpResponse().getEntity().getContent();
@@ -242,16 +209,17 @@ public class Hc4MethodCall
         }
         catch ( IOException ioe )
         {
+            this.clientHelper
+                .getLogger()
+                .log(
+                    Level.WARNING,
+                    "An error occurred during the communication with the remote HTTP server.",
+                    ioe );
         }
 
         return result;
     }
 
-    /**
-     * Returns the modifiable list of response headers.
-     * 
-     * @return The modifiable list of response headers.
-     */
     @Override
     public Series<Parameter> getResponseHeaders()
     {
@@ -270,12 +238,6 @@ public class Hc4MethodCall
         return result;
     }
 
-    /**
-     * Returns the response address.<br>
-     * Corresponds to the IP address of the responding server.
-     * 
-     * @return The response address.
-     */
     @Override
     public String getServerAddress()
     {
@@ -296,13 +258,14 @@ public class Hc4MethodCall
             {
                 if ( "Content-Length".equalsIgnoreCase( header.getName() ) )
                 {
+                    // HC4 is picky about duplicate content-length header
                     continue;
                 }
                 getHttpMethod().setHeader( header.getName(),
                     header.getValue() );
             }
 
-            // For those method that accept enclosing entites, provide it
+            // For those method that accept enclosing entities, provide it if there is any
             if ( ( entity != null )
                 && ( getHttpMethod() instanceof HttpEntityEnclosingRequestBase ) )
             {
@@ -377,14 +340,8 @@ public class Hc4MethodCall
                     }
                 } );
             }
-
-            // Ensure that the connection is active
             httpResponse = this.clientHelper.getHttpClient().execute( getHttpMethod() );
-
-            // Now we can access the status code, this MUST happen after closing
-            // any open request stream.
             result = new Status( getStatusCode(), null, getReasonPhrase(), null );
-
             // If there is no response body, immediately release the connection
             if ( getHttpResponse().getEntity() == null )
             {
