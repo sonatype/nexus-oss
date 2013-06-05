@@ -23,6 +23,7 @@ import org.apache.http.ProtocolException;
 import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
 import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.message.BasicHeader;
@@ -71,9 +72,6 @@ public class HttpClientManagerTest
     private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
     @Mock
-    private HttpRequest request;
-
-    @Mock
     private HttpResponse response;
 
     @Mock
@@ -82,8 +80,7 @@ public class HttpClientManagerTest
     @Mock
     private StatusLine statusLine;
 
-    @Mock
-    private RequestLine requestLine;
+    private HttpGet request;
 
     private Hc4Provider hc4Provider;
 
@@ -102,7 +99,6 @@ public class HttpClientManagerTest
 
         when( proxyRepository.getId() ).thenReturn( "central" );
         when( response.getStatusLine() ).thenReturn( statusLine );
-        when( request.getRequestLine() ).thenReturn( requestLine );
 
         httpClientManager = new HttpClientManagerImpl( hc4Provider, userAgentBuilder );
     }
@@ -115,19 +111,43 @@ public class HttpClientManagerTest
             httpClientManager.getProxyRepositoryRedirectStrategy( proxyRepository, globalRemoteStorageContext );
 
         // no location header
-        when( requestLine.getMethod() ).thenReturn( "GET" );
+        request = new HttpGet( "http://localhost/dir/fileA" );
+        when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_OK );
         assertThat( underTest.isRedirected( request, response, httpContext ), is( false ) );
 
         // redirect to file
+        request = new HttpGet( "http://localhost/dir/fileA" );
         when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
         when( response.getFirstHeader( "location" ) ).thenReturn(
-            new BasicHeader( "location", "http://localhost/dir/file" ) );
+            new BasicHeader( "location", "http://localhost/dir/fileB" ) );
         assertThat( underTest.isRedirected( request, response, httpContext ), is( true ) );
 
         // redirect to dir
+        request = new HttpGet( "http://localhost/dir" );
         when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
         when( response.getFirstHeader( "location" ) ).thenReturn( new BasicHeader( "location", "http://localhost/dir/" ) );
         assertThat( underTest.isRedirected( request, response, httpContext ), is( false ) );
+    }
+
+    @Test
+    public void doFollowCrossSiteRedirects()
+        throws ProtocolException
+    {
+        final RedirectStrategy underTest =
+            httpClientManager.getProxyRepositoryRedirectStrategy( proxyRepository, globalRemoteStorageContext );
+
+        // simple cross redirect
+        request = new HttpGet( "http://hostA/dir" );
+        when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
+        when( response.getFirstHeader( "location" ) ).thenReturn(
+            new BasicHeader( "location", "http://hostB/dir" ) );
+        assertThat( underTest.isRedirected( request, response, httpContext ), is( true ) );
+
+        // cross redirect to dir (failed coz NEXUS-5744)
+        request = new HttpGet( "http://hostA/dir/" );
+        when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
+        when( response.getFirstHeader( "location" ) ).thenReturn( new BasicHeader( "location", "http://hostB/dir/" ) );
+        assertThat( underTest.isRedirected( request, response, httpContext ), is( true ) );
     }
 
     @Test

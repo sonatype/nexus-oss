@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.nexus.testsuite</groupId>
     <artifactId>nexus-testsuite</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-legacy-testsuite</artifactId>
@@ -103,13 +103,6 @@
       <artifactId>nexus-archetype-plugin</artifactId>
     </dependency>
 
-    <!-- FIXME: Remove this, or sort out what its really needed for, if needed better comment than NEXUS-4218-->
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy</artifactId>
-      <version>1.7.8</version>
-    </dependency>
-
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
@@ -133,26 +126,12 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- 
-      This dependency entry is needed by nexus-test-env-m-p
-      setup-environment mojo, and it must have "raw" coordinates
-      as it has no idea what nexus-plugin packaging actually means
-    -->
-      <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-p2-repository-plugin</artifactId>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
       <scope>test</scope>
     </dependency>
 
-    <!-- FIXME: Needs better comment: NEXUS-3082 -->
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
@@ -196,14 +175,55 @@
   <profiles>
     <profile>
       <id>testsuite-genshards</id>
-      <properties>
-        <testsuite.shardCount>10</testsuite.shardCount>
-      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>gmaven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default</id>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <autoshard.mode>normal</autoshard.mode>
+                    <autoshard.count>10</autoshard.count>
+
+                    <!--
+                    Exclude some slow tests for execution is slow shard.
+                    -->
+                    <autoshard.excludes>**/nexus3860/**</autoshard.excludes>
+                    <!-- cargo-based tests -->
+                  </properties>
+                </configuration>
+              </execution>
+
+              <!--
+              Generate special shard for slowly running tests.
+              -->
+              <execution>
+                <id>slow</id>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <autoshard.mode>custom</autoshard.mode>
+                    <autoshard.shardId>slow</autoshard.shardId>
+                    <autoshard.includes>**/nexus3860/**/*IT.java</autoshard.includes>
+
+                    <!--
+                    HACK: gmaven executions leak project.properties, force reconfiguration to avoid using excludes from default execution.
+                    -->
+                    <autoshard.excludes>ignore</autoshard.excludes>
+                  </properties>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
@@ -254,7 +274,6 @@
                 <xml>org.apache.maven:apache-maven:3.0.3:tar.gz:bin</xml>
                 <xml>org.apache.maven:apache-maven:2.0.6:tar.gz:bin</xml>
                 <xml>org.apache.ivy:apache-ivy:2.2.0:tar.gz:bin</xml>
-                <xml>org.codehaus.groovy:groovy:1.7.8</xml>
                 <!-- p2 -->
                 <xml>org.sonatype.maven.plugins:maven-p2-bridge-plugin:1.1.6</xml>
                 <xml>org.sonatype.p2.bridge:org.sonatype.p2.bridge.impl:1.1.6</xml>
@@ -356,12 +375,6 @@
                 <plugin>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-it-helper-plugin</artifactId>
-                  <classifier>cp</classifier>
-                  <type>jar</type>
-                </plugin>
-                <plugin>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-it-helper-plugin</artifactId>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                 </plugin>
@@ -370,56 +383,9 @@
                   <artifactId>nexus-p2-repository-plugin</artifactId>
                   <classifier>bundle</classifier>
                   <type>zip</type>
+                  <version>${nexus.version}</version>
                 </plugin>
               </nexusPluginsArtifacts>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>hc4-provider</id>
-      <activation>
-        <property>
-          <name>rrs</name>
-          <value>apacheHttpClient4x</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <nexus.default.http.provider>apacheHttpClient4x</nexus.default.http.provider>
-                <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>hc3-provider</id>
-      <activation>
-        <property>
-          <name>rrs</name>
-          <value>apacheHttpClient3x</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <nexus.default.http.provider>apacheHttpClient3x</nexus.default.http.provider>
-                <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
-              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

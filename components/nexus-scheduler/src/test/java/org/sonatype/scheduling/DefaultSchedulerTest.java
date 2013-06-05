@@ -18,17 +18,21 @@ import java.util.concurrent.Callable;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import static org.junit.Assert.*;
 
 /**
  * Tests for {@link DefaultScheduler}.
  */
+@Category(Slow.class) // ~15s
 public class DefaultSchedulerTest
     extends TestSupport
 {
@@ -282,9 +286,12 @@ public class DefaultSchedulerTest
      * @throws Exception
      */
     @Test
+    @Ignore("FIXME: This test is unstable")
     public void testChangeScheduleDuringRunCallable()
         throws Exception
     {
+        // FIXME: This test is unstable
+
         TestChangeScheduleDuringRunCallable callable = new TestChangeScheduleDuringRunCallable( 200000 );
 
         long nearFuture = System.currentTimeMillis() + 500;
@@ -313,10 +320,13 @@ public class DefaultSchedulerTest
         task.cancel( true );
     }
 
+    @Ignore("FIXME: This test is unstable")
     @Test
     public void testCallableStepOnEachOtherToe()
         throws Exception
     {
+        // FIXME: This test is unstable
+
         TestCallable tr = null;
 
         // work that will sleep 3 seconds

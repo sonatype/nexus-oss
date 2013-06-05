@@ -17,8 +17,8 @@ import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
 
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
@@ -89,9 +89,9 @@ public class NXCM4389FavIconIT
     private void assertExists( final String url )
         throws IOException
     {
-        final GetMethod get = new GetMethod( url );
-        final HttpMethod result = RequestFacade.executeHTTPClientMethod( get );
-        assertThat( result.getStatusCode(), is( 200 ) );
+        final HttpGet get = new HttpGet( url );
+        final HttpResponse result = RequestFacade.executeHTTPClientMethod( get );
+        assertThat( result.getStatusLine().getStatusCode(), is( 200 ) );
     }
 
 }

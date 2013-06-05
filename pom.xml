@@ -28,7 +28,7 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <version>2.5.0-SNAPSHOT</version>
+  <version>2.6.0-SNAPSHOT</version>
 
   <inceptionYear>2007</inceptionYear>
   <url>http://nexus.sonatype.org/</url>
@@ -70,10 +70,10 @@
 
   <properties>
     <!--
-    Define nexus version, for use mainly by inheriting projects (and some edge-cases locally)
-    This is safe usage of project.version, as this will get replaced by set-version on release.
+    Define nexus versions.  The 'nexus.version' property always refers to the version of the current project.
+    These values must always be constants; 'nexus.version' will get update automatically by set-version.
     -->
-    <nexus.version>${project.version}</nexus.version>
+    <nexus.version>2.6.0-SNAPSHOT</nexus.version>
 
     <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
     <nexus.configuration.version>2.5.0</nexus.configuration.version>
@@ -91,8 +91,8 @@
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- nexus integration-testing bundle configuration -->
-    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
-    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.groupId>org.sonatype.nexus.assemblies</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-bundle-template</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
   </properties>
 
@@ -128,147 +128,147 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>base-configuration</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-appcontext</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-client-core</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-compat</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration-model</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-core</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-core</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <classifier>tests</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-ehcache</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-jetty8</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-launcher</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-ldap-common</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-logging-extras</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-logging-extras-appender</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-api</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-api</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-model</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-scheduler</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-security</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-security-realms</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-web-utils</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
         <type>war</type>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <!-- testsupport -->
@@ -278,53 +278,45 @@
         <artifactId>nexus-it-helper-plugin</artifactId>
         <classifier>bundle</classifier>
         <type>zip</type>
-        <version>2.5.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-it-helper-plugin</artifactId>
-        <classifier>cp</classifier>
-        <type>jar</type>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-testsupport</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-harness-launcher</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-client</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-support</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
       </dependency>
 
       <!-- assemblies -->
 
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-oss-webapp</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <groupId>org.sonatype.nexus.assemblies</groupId>
+        <artifactId>nexus-bundle-template</artifactId>
+        <version>2.6.0-SNAPSHOT</version>
         <classifier>bundle</classifier>
         <type>zip</type>
       </dependency>
@@ -338,9 +330,29 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <dependencies>
+            <!--
+            Keep versions in sync with buildsupport/groovy/pom.xml
+            -->
+            <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-eclipse-compiler</artifactId>
+              <version>2.7.0-01</version>
+            </dependency>
+            <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-eclipse-batch</artifactId>
+              <version>2.0.6-01</version>
+            </dependency>
+          </dependencies>
           <configuration>
             <source>1.6</source>
             <target>1.6</target>
+            <!--
+            Configure support for Groovy compilation, but leave it off by default.  Modules which need this should configure the compilerId.
+            -->
+            <!--<compilerId>groovy-eclipse-compiler</compilerId>-->
           </configuration>
         </plugin>
 
@@ -450,12 +462,15 @@
           <groupId>org.codehaus.gmaven</groupId>
           <artifactId>gmaven-plugin</artifactId>
           <version>1.5</version>
+          <configuration>
+            <providerSelection>2.0</providerSelection>
+          </configuration>
         </plugin>
 
         <plugin>
           <groupId>org.jvnet.jaxb2.maven2</groupId>
           <artifactId>maven-jaxb2-plugin</artifactId>
-          <version>0.8.2</version>
+          <version>0.8.3</version>
           <dependencies>
             <dependency>
               <groupId>org.sonatype.sisu.jacksbee</groupId>
@@ -495,7 +510,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>modello-plugin-upgrade</artifactId>
-          <version>1.0</version>
+          <version>1.1</version>
         </plugin>
 
         <!--
@@ -526,9 +541,6 @@
 
         <!--
         See 'license-check' profile.
-
-        FIXME: This configuration omits org.sonatype.nexus.proxy.target (components/nexus-core)
-        FIXME: Need to manually maintain these headers until this package is renamed to avoid complex configuration
         -->
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
@@ -566,7 +578,7 @@
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>2.5.0-SNAPSHOT</version>
+          <version>2.6.0-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>

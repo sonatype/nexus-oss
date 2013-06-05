@@ -13,14 +13,24 @@
 package org.sonatype.nexus.testsuite.security.nexus4383;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.Collection;
 
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -62,82 +72,94 @@ extends AbstractNexusIntegrationTest
      * 2.) verify cookie works (do not send basic auth) </BR>
      * 3.) do logout  </BR>
      * 4.) repeat step 2 and expect failure.
-     * @throws HttpException
      * @throws IOException
      */
     @Test
     public void testLogout()
-        throws HttpException, IOException
+        throws Exception
     {
-
         TestContext context = TestContainer.getInstance().getTestContext();
         String username = context.getAdminUsername();
         String password = context.getPassword();
         String url = this.getBaseNexusUrl() + RequestFacade.SERVICE_LOCAL + "status";
         String logoutUrl = this.getBaseNexusUrl() + RequestFacade.SERVICE_LOCAL + "authentication/logout";
 
-        Header userAgentHeader = new Header("User-Agent", "Something Stateful" );
+        Header userAgentHeader = new BasicHeader("User-Agent", "Something Stateful" );
         
         // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
-        HttpClient httpClient = new HttpClient(); 
-        httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
-        httpClient.getParams().setAuthenticationPreemptive(true);
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        URI nexusBaseURI = new URI( url );
+        final BasicHttpContext localcontext = new BasicHttpContext();
+        final HttpHost targetHost =
+            new HttpHost( nexusBaseURI.getHost(), nexusBaseURI.getPort(), nexusBaseURI.getScheme() );
+        httpClient.getCredentialsProvider().setCredentials(
+            new AuthScope( targetHost.getHostName(), targetHost.getPort() ),
+            new UsernamePasswordCredentials( username, password ) );
+        AuthCache authCache = new BasicAuthCache();
+        BasicScheme basicAuth = new BasicScheme();
+        authCache.put( targetHost, basicAuth );
+        localcontext.setAttribute( ClientContext.AUTH_CACHE, authCache );
 
-        GetMethod getMethod = new GetMethod( url );
-        getMethod.addRequestHeader( userAgentHeader );
+        HttpGet getMethod = new HttpGet( url );
+        getMethod.addHeader( userAgentHeader );
         try
         {
-            Assert.assertEquals( httpClient.executeMethod( getMethod ), 200 );
+            Assert.assertEquals( httpClient.execute( getMethod, localcontext ).getStatusLine().getStatusCode(), 200 );
         }
         finally
         {
-            getMethod.releaseConnection();
+            getMethod.reset();
         }
         
-        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getCookieStore().getCookies() );
         Assert.assertNotNull( "Session Cookie not set", sessionCookie );
         
-        httpClient.getState().clear(); // remove cookies, credentials, etc
+        httpClient.getCookieStore().clear(); // remove cookies
+        httpClient.getCredentialsProvider().clear(); // remove auth
         
         // now with just the cookie
-        httpClient.getState().addCookie( sessionCookie );
-        getMethod = new GetMethod( url );
+        httpClient.getCookieStore().addCookie( sessionCookie );
+        getMethod = new HttpGet( url );
         try
         {
-            Assert.assertEquals( httpClient.executeMethod( getMethod ), 200 );
+            Assert.assertEquals( httpClient.execute( getMethod ).getStatusLine().getStatusCode(), 200 );
         }
         finally
         {
-            getMethod.releaseConnection();
+            getMethod.reset();
         }
         
         // do logout
-        GetMethod logoutGetMethod = new GetMethod( logoutUrl );
+        HttpGet logoutGetMethod = new HttpGet( logoutUrl );
         try
         {
-            Assert.assertEquals( httpClient.executeMethod( logoutGetMethod ), 200 );
-            Assert.assertEquals( "OK", logoutGetMethod.getResponseBodyAsString() );
+            final HttpResponse response = httpClient.execute( logoutGetMethod );
+            Assert.assertEquals( response.getStatusLine().getStatusCode(), 200 );
+            Assert.assertEquals( "OK", EntityUtils.toString( response.getEntity() ) );
         }
         finally
         {
-            logoutGetMethod.releaseConnection();
+            logoutGetMethod.reset();
         }
         
         // set cookie again
-        httpClient.getState().clear(); // remove cookies, credentials, etc
-        httpClient.getState().addCookie( sessionCookie );
-        GetMethod failedGetMethod = new GetMethod( url );
+        httpClient.getCookieStore().clear(); // remove cookies
+        httpClient.getCredentialsProvider().clear(); // remove auth
+
+        httpClient.getCookieStore().addCookie( sessionCookie );
+        HttpGet failedGetMethod = new HttpGet( url );
         try
         {
-            Assert.assertEquals( httpClient.executeMethod( failedGetMethod ), 401 );
+            final HttpResponse response = httpClient.execute( failedGetMethod );
+            Assert.assertEquals( response.getStatusLine().getStatusCode(), 401 );
         }
         finally
         {
-            failedGetMethod.releaseConnection();
+            failedGetMethod.reset();
         }        
     }
     
-    private Cookie getSessionCookie( Cookie[] cookies )
+    private Cookie getSessionCookie( Collection<Cookie> cookies )
     {
         for ( Cookie cookie : cookies )
         {

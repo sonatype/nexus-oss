@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.proxy.target.Target;
-import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.proxy.targets.Target;
+import org.sonatype.nexus.proxy.targets.TargetRegistry;
 
 /**
  * The event fired when a target is removed from registry.

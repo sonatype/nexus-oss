@@ -28,6 +28,10 @@ import javax.inject.Singleton;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.Version;
+import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -41,18 +45,14 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
-import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
-import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
-import org.sonatype.nexus.proxy.maven.version.Version;
-import org.sonatype.nexus.proxy.maven.version.VersionParser;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.target.Target;
-import org.sonatype.nexus.proxy.target.TargetRegistry;
-import org.sonatype.nexus.proxy.target.TargetStoreWalkerFilter;
+import org.sonatype.nexus.proxy.targets.Target;
+import org.sonatype.nexus.proxy.targets.TargetRegistry;
+import org.sonatype.nexus.proxy.targets.TargetStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.ConjunctionWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
@@ -80,7 +80,7 @@ public class DefaultReleaseRemover
 
     private final ContentClass maven2ContentClass;
 
-    private final VersionParser versionScheme = new GenericVersionParser();
+    private final VersionScheme versionScheme = new GenericVersionScheme();
 
     @Inject
     public DefaultReleaseRemover( final RepositoryRegistry repositoryRegistry, final TargetRegistry targetRegistry,
@@ -275,7 +275,7 @@ public class DefaultReleaseRemover
 
         private void doOnCollectionExit( final WalkerContext context, final StorageCollectionItem coll )
             throws ItemNotFoundException, StorageException, IllegalOperationException,
-            InvalidVersionSpecificationException
+                   InvalidVersionSpecificationException
         {
             deletableVersionsAndFiles.clear();
 

@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-testsupport</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
   </parent>
 
   <!--
@@ -141,7 +141,6 @@
       </exclusions>
     </dependency>
 
-    <!-- The IT Helper Plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
@@ -149,31 +148,28 @@
       <type>zip</type>
     </dependency>
 
-    <!-- Deps needed by some *Util classes (they use classes from these below), To redirect j.u.Preferences -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
-      <classifier>cp</classifier>
-      <type>jar</type>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-prefs</artifactId>
     </dependency>
 
-    <!--
-    FIXME: Should not depend on a plugin here!
-    -->
+    <!-- Code used by clients. Note: despite it's groupID, this is NOT a plugin -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <artifactId>nexus-restlet-bridge</artifactId>
       <version>${nexus.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-jetty8</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+
+    <!-- Model code used by clients -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-model</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!--
     FIXME: Should not depend on a plugin here! This is needed for TasksNexusRestClient via XStreamFactory.
+    Needed for models and one DTO that cannot be easily moved out from a plugin (into models).
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>

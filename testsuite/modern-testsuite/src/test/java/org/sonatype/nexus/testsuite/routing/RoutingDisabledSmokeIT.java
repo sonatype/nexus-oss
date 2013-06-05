@@ -19,10 +19,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.rules.Timeout;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
@@ -40,10 +38,6 @@ import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 public class RoutingDisabledSmokeIT
     extends RoutingITSupport
 {
-
-    // we will timeout after 15 minutes, just as a safety net
-    @Rule
-    public Timeout timeout = new Timeout( 900000 );
 
     /**
      * Constructor.

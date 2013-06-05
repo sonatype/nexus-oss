@@ -18,13 +18,12 @@ import static com.google.common.base.Preconditions.checkState;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.wagon.Wagon;
 import org.slf4j.Logger;
@@ -54,7 +53,10 @@ public class DeployUtils
         this.wagonFactory = checkNotNull( wagonFactory );
     }
 
-    public void deployWithWagon( String wagonHint, String repositoryUrl, File fileToDeploy, String artifactPath )
+    public void deployWithWagon( final String wagonHint,
+                                 final String repositoryUrl,
+                                 final File fileToDeploy,
+                                 final String artifactPath )
         throws Exception
     {
         checkState( wagonFactory != null, "Wagon factory must be provided to be able to deploy" );
@@ -73,8 +75,7 @@ public class DeployUtils
 
         new WagonDeployer(
             wagon, wagonHint, username, password, repositoryUrl, fileToDeploy, artifactPath,
-            nexusRestClient.getTestContext()
-        ).deploy();
+            nexusRestClient.getTestContext() ).deploy();
     }
 
     public int deployUsingGavWithRest( final String repositoryId,
@@ -86,8 +87,7 @@ public class DeployUtils
             nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
             repositoryId,
             gav,
-            fileToDeploy
-        );
+            fileToDeploy );
     }
 
     public int deployUsingGavWithRest( final String restServiceURL,
@@ -96,27 +96,14 @@ public class DeployUtils
                                        final File fileToDeploy )
         throws IOException
     {
-        // the method we are calling
-        final PostMethod filePost = new PostMethod( restServiceURL );
-        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
-
-        final String extension = gav.getExtension() != null ? gav.getExtension() : "";
-        final String classifier = gav.getClassifier() != null ? gav.getClassifier() : "";
-
-        final Part[] parts = {
-            new StringPart( "r", repositoryId ),
-            new StringPart( "g", gav.getGroupId() ),
-            new StringPart( "a", gav.getArtifactId() ),
-            new StringPart( "v", gav.getVersion() ),
-            new StringPart( "p", extension ),
-            new StringPart( "c", classifier ),
-            new FilePart( fileToDeploy.getName(), fileToDeploy )
-        };
-
-        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
-
-        return nexusRestClient.executeHTTPClientMethod( filePost ).getStatusCode();
-
+        return deployWithRest(
+            repositoryId,
+            gav.getGroupId(),
+            gav.getArtifactId(),
+            gav.getVersion(),
+            gav.getClassifier(),
+            gav.getExtension(),
+            fileToDeploy );
     }
 
     public int deployUsingPomWithRest( final String repositoryId,
@@ -128,49 +115,53 @@ public class DeployUtils
     {
         return deployUsingPomWithRest(
             nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
-            repositoryId, fileToDeploy, pomFile, classifier,
-            extension
-        );
+            repositoryId,
+            fileToDeploy,
+            pomFile,
+            classifier,
+            extension );
     }
 
-    public HttpMethod deployUsingPomWithRestReturnResult( final String repositoryId,
-                                                          final File fileToDeploy,
-                                                          final File pomFile,
-                                                          final String classifier,
-                                                          final String extension )
+    public HttpResponse deployUsingPomWithRestReturnResult( final String repositoryId,
+                                                            final File fileToDeploy,
+                                                            final File pomFile,
+                                                            final String classifier,
+                                                            final String extension )
         throws IOException
     {
         return deployUsingPomWithRestReturnResult(
             nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
-            repositoryId, fileToDeploy, pomFile, classifier, extension
-        );
+            repositoryId,
+            fileToDeploy,
+            pomFile,
+            classifier,
+            extension );
     }
 
-    public HttpMethod deployUsingPomWithRestReturnResult( final String restServiceURL,
-                                                          final String repositoryId,
-                                                          final File fileToDeploy,
-                                                          final File pomFile,
-                                                          final String classifier,
-                                                          final String extension )
+    public HttpResponse deployUsingPomWithRestReturnResult( final String restServiceURL,
+                                                            final String repositoryId,
+                                                            final File fileToDeploy,
+                                                            final File pomFile,
+                                                            final String classifier,
+                                                            final String extension )
         throws IOException
     {
         // the method we are calling
-        final PostMethod filePost = new PostMethod( restServiceURL );
-        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+        final HttpPost filePost = new HttpPost( restServiceURL );
+        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
+        final MultipartEntity multipartEntity = new MultipartEntity();
 
         final String fixedClassifier = ( classifier == null ) ? "" : classifier;
         final String fixedExtension = ( extension == null ) ? "" : extension;
 
-        final Part[] parts = {
-            new StringPart( "r", repositoryId ),
-            new StringPart( "e", fixedExtension ),
-            new StringPart( "c", fixedClassifier ),
-            new StringPart( "hasPom", "true" ),
-            new FilePart( pomFile.getName(), pomFile ),
-            new FilePart( fileToDeploy.getName(), fileToDeploy )
-        };
+        multipartEntity.addPart( "r", new StringBody( repositoryId ) );
+        multipartEntity.addPart( "e", new StringBody( fixedExtension ) );
+        multipartEntity.addPart( "c", new StringBody( fixedClassifier ) );
+        multipartEntity.addPart( "hasPom", new StringBody( Boolean.TRUE.toString() ) );
+        multipartEntity.addPart( pomFile.getName(), new FileBody( pomFile ) );
+        multipartEntity.addPart( fileToDeploy.getName(), new FileBody( fileToDeploy ) );
 
-        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+        filePost.setEntity( multipartEntity );
 
         LOG.debug( "URL:  " + restServiceURL );
         LOG.debug( "Method: Post" );
@@ -192,27 +183,29 @@ public class DeployUtils
         throws IOException
     {
         return deployUsingPomWithRestReturnResult(
-            restServiceURL, repositoryId, fileToDeploy, pomFile, classifier, extension
-        ).getStatusCode();
+            restServiceURL,
+            repositoryId,
+            fileToDeploy,
+            pomFile,
+            classifier,
+            extension ).getStatusLine().getStatusCode();
     }
 
-    public HttpMethod deployPomWithRest( final String repositoryId,
-                                         final File pomFile )
+    public HttpResponse deployPomWithRest( final String repositoryId,
+                                           final File pomFile )
         throws IOException
     {
         // the method we are calling
-        final PostMethod filePost = new PostMethod(
-            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm()
-        );
-        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+        final HttpPost filePost =
+            new HttpPost( nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm() );
+        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
+        final MultipartEntity multipartEntity = new MultipartEntity();
 
-        final Part[] parts = {
-            new StringPart( "r", repositoryId ),
-            new StringPart( "hasPom", "true" ),
-            new FilePart( pomFile.getName(), pomFile )
-        };
+        multipartEntity.addPart( "r", new StringBody( repositoryId ) );
+        multipartEntity.addPart( "hasPom", new StringBody( Boolean.TRUE.toString() ) );
+        multipartEntity.addPart( pomFile.getName(), new FileBody( pomFile ) );
 
-        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+        filePost.setEntity( multipartEntity );
 
         LOG.debug( "URL:  " + filePost.getURI() );
         LOG.debug( "Method: Post" );
@@ -241,8 +234,7 @@ public class DeployUtils
             version,
             classifier,
             extension,
-            fileToDeploy
-        );
+            fileToDeploy );
     }
 
     public int deployWithRest( final String restServiceURL,
@@ -256,23 +248,20 @@ public class DeployUtils
         throws IOException
     {
         // the method we are calling
-        final PostMethod filePost = new PostMethod( restServiceURL );
-        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+        final HttpPost filePost = new HttpPost( restServiceURL );
+        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
+        final MultipartEntity multipartEntity = new MultipartEntity();
 
-        final Part[] parts = {
-            new StringPart( "r", repositoryId ),
-            new StringPart( "g", groupId ),
-            new StringPart( "a", artifactId ),
-            new StringPart( "v", version ),
-            new StringPart( "p", extension == null ? "" : extension ),
-            new StringPart( "c", classifier == null ? "" : classifier ),
-            new FilePart( fileToDeploy.getName(), fileToDeploy )
-        };
+        multipartEntity.addPart( "r", new StringBody( repositoryId ) );
+        multipartEntity.addPart( "g", new StringBody( groupId ) );
+        multipartEntity.addPart( "a", new StringBody( artifactId ) );
+        multipartEntity.addPart( "v", new StringBody( version ) );
+        multipartEntity.addPart( "p", new StringBody( extension == null ? "" : extension ) );
+        multipartEntity.addPart( "c", new StringBody( classifier == null ? "" : classifier ) );
+        multipartEntity.addPart( fileToDeploy.getName(), new FileBody( fileToDeploy ) );
 
-        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+        filePost.setEntity( multipartEntity );
 
-        return nexusRestClient.executeHTTPClientMethod( filePost ).getStatusCode();
-
+        return nexusRestClient.executeHTTPClientMethod( filePost ).getStatusLine().getStatusCode();
     }
-
 }

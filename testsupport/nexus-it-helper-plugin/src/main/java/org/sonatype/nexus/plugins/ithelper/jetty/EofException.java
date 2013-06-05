@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.ithelper.jetty;
 
+// FIXME: Appears unused, verify and remove
+
 public class EofException
     extends Exception
 {

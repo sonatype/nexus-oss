@@ -61,9 +61,6 @@ public abstract class CapabilitiesITSupport
             .setSystemProperty( "guava.eventBus", "default" )
             .addPlugins(
                 artifactResolver().resolvePluginFromDependencyManagement(
-                    "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
-                ),
-                artifactResolver().resolvePluginFromDependencyManagement(
                     "org.sonatype.nexus.plugins", "nexus-capabilities-testsuite-helper"
                 )
             );
