@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.support.hamcrest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
 
 import java.io.File;
 
@@ -36,7 +35,7 @@ public class NexusMatcherTest
 {
 
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public ExpectedException thrown = ExpectedException.none().handleAssertionErrors();
 
     @Rule
     public TestInfoRule testInfo = new TestInfoRule();
