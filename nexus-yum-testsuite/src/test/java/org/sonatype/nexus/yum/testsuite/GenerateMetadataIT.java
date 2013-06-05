@@ -18,8 +18,11 @@ import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
 import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
 
+import java.util.Map;
+
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
+import com.google.common.collect.Maps;
 
 /**
  * ITs related to generating metadata.
@@ -116,6 +119,94 @@ public class GenerateMetadataIT
 
         final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
         assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
+    }
+
+    /**
+     * Verify that files under ".nexus/*" (hidden files) does not get indexed.
+     *
+     * @since 3.0.3
+     */
+    @Test
+    public void addRpmUnderDotNexus()
+        throws Exception
+    {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-rpm/5.6.7/test-rpm-5.6.7.rpm" ),
+            testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        {
+            final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+            assertThat( primaryXml, containsString( "test-rpm" ) );
+        }
+
+        content().upload(
+            repositoryLocation( repository.id(), ".nexus/test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        {
+            final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+            assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
+            assertThat( primaryXml, containsString( "test-rpm" ) );
+        }
+    }
+
+    /**
+     * Verify that files under ".nexus/*" (hidden files) does not get indexed after full re-indexing.
+     *
+     * @since 3.0.3
+     */
+    @Test
+    public void removeRpmAndRegenerate()
+        throws Exception
+    {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-rpm/5.6.7/test-rpm-5.6.7.rpm" ),
+            testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
+        );
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        {
+            final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+            assertThat( primaryXml, containsString( "test-rpm" ) );
+            assertThat( primaryXml, containsString( "test-artifact" ) );
+        }
+
+        content().delete(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        {
+            final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+            assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
+        }
+
+        final Map<String,String> properties = Maps.newHashMap();
+        properties.put( "repoId", repository.id() );
+        properties.put( "forceFullScan", Boolean.TRUE.toString() );
+
+        scheduler().run( "GenerateMetadataTask", properties );
+
+        {
+            final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+            assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
+        }
     }
 
 }

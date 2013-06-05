@@ -51,13 +51,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.mockito.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.RequestContext;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -355,10 +358,13 @@ public class YumNexusTestSupport
     public static StorageItem createItem( final String version, final String filename )
     {
         final StorageItem item = mock( StorageItem.class );
+        final RepositoryItemUid uid = mock( RepositoryItemUid.class  );
 
         when( item.getPath() ).thenReturn( "foo/" + version + "/" + filename );
         when( item.getParentPath() ).thenReturn( "foo/" + version );
         when( item.getItemContext() ).thenReturn( new RequestContext() );
+        when( item.getRepositoryItemUid()).thenReturn( uid );
+        when( uid.getBooleanAttributeValue( IsHiddenAttribute.class ) ).thenReturn( true );
 
         return item;
     }

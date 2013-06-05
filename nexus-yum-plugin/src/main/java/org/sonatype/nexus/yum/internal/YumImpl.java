@@ -258,8 +258,9 @@ public class YumImpl
     {
         try
         {
-            File rpmBaseDir = RepositoryUtils.getBaseDir( repository );
-            GenerateMetadataTask task = createTask();
+            LOG.debug( "Processing added rpm {}:{}", repository.getId(), filePath );
+            final File rpmBaseDir = RepositoryUtils.getBaseDir( repository );
+            final GenerateMetadataTask task = createTask();
             task.setRpmDir( rpmBaseDir.getAbsolutePath() );
             task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
             task.setRepositoryId( repository.getId() );
@@ -314,9 +315,9 @@ public class YumImpl
     {
         if ( shouldProcessDeletes() )
         {
+            LOG.debug( "Processing deleted rpm {}:{}", repository.getId(), path );
             if ( findDelayedParentDirectory( path ) == null )
             {
-                LOG.debug( "Delete rpm {} / {}", repository.getId(), path );
                 regenerate();
             }
         }
@@ -327,6 +328,7 @@ public class YumImpl
     {
         if ( shouldProcessDeletes() )
         {
+            LOG.debug( "Processing deleted dir {}:{}", repository.getId(), path );
             if ( findDelayedParentDirectory( path ) == null )
             {
                 schedule( new DelayedDirectoryDeletionTask( path ) );

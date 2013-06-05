@@ -138,11 +138,16 @@ public class YumITSupport
         return client().getSubsystem( Capabilities.class );
     }
 
+    public Scheduler scheduler()
+    {
+        return client().getSubsystem( Scheduler.class );
+    }
+
     protected void waitForNexusToSettleDown()
         throws Exception
     {
         client().getSubsystem( Events.class ).waitForCalmPeriod();
-        client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
+        scheduler().waitForAllTasksToStop();
     }
 
 }

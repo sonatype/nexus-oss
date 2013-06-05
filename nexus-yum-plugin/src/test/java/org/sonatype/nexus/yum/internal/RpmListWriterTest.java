@@ -72,6 +72,7 @@ public class RpmListWriterTest
             "/is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm",
             null,
             true,
+            false,
             listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
@@ -89,6 +90,7 @@ public class RpmListWriterTest
             null,
             null,
             true,
+            false,
             listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
@@ -115,6 +117,7 @@ public class RpmListWriterTest
             "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm",
             null,
             true,
+            false,
             listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
@@ -131,6 +134,7 @@ public class RpmListWriterTest
             rpmsDir(),
             NEW_RPM1 + pathSeparator + NEW_RPM2,
             null,
+            false,
             false,
             listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
@@ -151,6 +155,7 @@ public class RpmListWriterTest
             NO_ADDED_FILE,
             version,
             NO_SINGLE_RPM_PER_DIRECTORY,
+            false,
             listFileFactory( rpmListFile ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
