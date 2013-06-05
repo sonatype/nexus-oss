@@ -23,7 +23,9 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
@@ -35,7 +37,11 @@ import com.google.common.io.Closeables;
 
 /**
  * Test Search operations.
+ * <p>
+ * FIXME: @FixMethodOrder(MethodSorters.NAME_ASCENDING) needed as #crossRepositorySearch() deploys, thus, modifies repo
+ * and search results.
  */
+@FixMethodOrder( MethodSorters.NAME_ASCENDING )
 public class Nexus383SearchNGIT
     extends AbstractNexusIntegrationTest
 {
@@ -234,7 +240,7 @@ public class Nexus383SearchNGIT
     @Test //( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
         //"disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
     // 4. deploy same artifact to multiple repos, and search
-    public void crossRepositorySearch()
+    public void zzzz_crossRepositorySearch()
         throws Exception
     {
         // file to deploy
