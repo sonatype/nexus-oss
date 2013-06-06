@@ -21,10 +21,14 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.BasicHttpContext;
 import org.sonatype.jira.connector.internal.HttpClientConnector;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
@@ -40,16 +44,31 @@ public class NexusPRConnector
 
     private final Hc4Provider httpClientProvider;
 
+    private final RemoteStorageContext remoteStorageContext;
+
     @Inject
-    public NexusPRConnector( final Hc4Provider httpClientProvider )
+    public NexusPRConnector( final Hc4Provider httpClientProvider,
+                             final ApplicationConfiguration applicationConfiguration )
     {
         this.httpClientProvider = httpClientProvider;
+        this.remoteStorageContext = new DefaultRemoteStorageContext(
+            applicationConfiguration.getGlobalRemoteStorageContext()
+        );
     }
 
     @Override
     protected HttpClient client()
     {
-        return httpClientProvider.createHttpClient();
+        return httpClientProvider.createHttpClient( remoteStorageContext );
     }
+
+    @Override
+    public void setCredentials( final String username, final String password )
+    {
+        remoteStorageContext.setRemoteAuthenticationSettings(
+            new UsernamePasswordRemoteAuthenticationSettings( username, password )
+        );
+    }
+
 }
 
