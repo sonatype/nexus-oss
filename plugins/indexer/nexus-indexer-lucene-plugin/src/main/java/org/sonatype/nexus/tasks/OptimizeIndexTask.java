@@ -33,10 +33,10 @@ public class OptimizeIndexTask
      */
     public static final String ACTION = "OPTIMIZE_INDEX";
 
-    private IndexerManager indexManager;
+    private final IndexerManager indexManager;
 
     @Inject
-    public void setIndexManager( final IndexerManager indexManager )
+    public OptimizeIndexTask( final IndexerManager indexManager )
     {
         this.indexManager = checkNotNull( indexManager );
     }

@@ -36,10 +36,10 @@ public class SnapshotRemoverTask
 
     public static final int DEFAULT_GRACE_DAYS_AFTER_RELEASE = 0;
 
-    private SnapshotRemover snapshotRemover;
+    private final SnapshotRemover snapshotRemover;
 
     @Inject
-    public void setSnapshotRemover( final SnapshotRemover snapshotRemover )
+    public SnapshotRemoverTask( final SnapshotRemover snapshotRemover )
     {
         this.snapshotRemover = checkNotNull( snapshotRemover );
     }

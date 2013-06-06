@@ -39,19 +39,15 @@ public class PublishObrDescriptorTask
 
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-    private ObrMetadataSource obrMetadataSource;
+    private final ObrMetadataSource obrMetadataSource;
 
-    private Walker walker;
+    private final Walker walker;
 
     @Inject
-    public void setObrMetadataSource( final @Named( "obr-bindex" ) ObrMetadataSource obrMetadataSource )
+    public PublishObrDescriptorTask( final @Named( "obr-bindex" ) ObrMetadataSource obrMetadataSource,
+                                     final Walker walker )
     {
         this.obrMetadataSource = checkNotNull( obrMetadataSource );
-    }
-
-    @Inject
-    public void setWalker( final Walker walker )
-    {
         this.walker = checkNotNull( walker );
     }
 

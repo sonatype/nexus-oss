@@ -39,10 +39,10 @@ public class EmptyTrashTask
     /**
      * The Wastebasket component.
      */
-    private Wastebasket wastebasket;
+    private final Wastebasket wastebasket;
 
     @Inject
-    public void setWastebasket( final Wastebasket wastebasket )
+    public EmptyTrashTask( final Wastebasket wastebasket )
     {
         this.wastebasket = checkNotNull( wastebasket );
     }

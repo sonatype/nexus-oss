@@ -24,7 +24,6 @@ import org.sonatype.scheduling.SchedulerTask;
 @Named( P2RepositoryAggregatorTaskDescriptor.ID )
 public class P2RepositoryAggregatorTask
     extends AbstractNexusRepositoriesTask<Object>
-    implements SchedulerTask<Object>
 {
 
     private final P2RepositoryAggregator p2RepositoryAggregator;

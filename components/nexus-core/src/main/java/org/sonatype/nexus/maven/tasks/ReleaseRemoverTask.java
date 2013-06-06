@@ -28,10 +28,10 @@ public class ReleaseRemoverTask
     extends AbstractNexusRepositoriesTask<ReleaseRemovalResult>
 {
 
-    private ReleaseRemover releaseRemover;
+    private final ReleaseRemover releaseRemover;
 
     @Inject
-    public void setReleaseRemover( final ReleaseRemover releaseRemover )
+    public ReleaseRemoverTask( final ReleaseRemover releaseRemover )
     {
         this.releaseRemover = checkNotNull( releaseRemover );
     }

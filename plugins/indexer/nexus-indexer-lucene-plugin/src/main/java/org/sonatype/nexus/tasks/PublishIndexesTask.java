@@ -34,10 +34,10 @@ public class PublishIndexesTask
      */
     public static final String ACTION = "PUBLISHINDEX";
 
-    private IndexerManager indexerManager;
+    private final IndexerManager indexerManager;
 
     @Inject
-    public void setIndexerManager( final IndexerManager indexerManager )
+    public PublishIndexesTask( final IndexerManager indexerManager )
     {
         this.indexerManager = checkNotNull( indexerManager );
     }

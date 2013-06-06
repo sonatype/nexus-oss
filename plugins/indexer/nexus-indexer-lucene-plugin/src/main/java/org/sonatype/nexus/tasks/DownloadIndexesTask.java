@@ -34,10 +34,10 @@ public class DownloadIndexesTask
      */
     public static final String ACTION = "DOWNLOADINDEX";
 
-    private IndexerManager indexerManager;
+    private final IndexerManager indexerManager;
 
     @Inject
-    public void setIndexerManager( final IndexerManager indexerManager )
+    public DownloadIndexesTask( final IndexerManager indexerManager )
     {
         this.indexerManager = checkNotNull( indexerManager );
     }

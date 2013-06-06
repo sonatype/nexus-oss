@@ -34,14 +34,14 @@ public class DeleteRepositoryFoldersTask
      */
     public static final String ACTION = "REMOVE_REPO_FOLDER";
 
-    private RepositoryFolderRemover repositoryFolderRemover;
+    private final RepositoryFolderRemover repositoryFolderRemover;
 
     private boolean deleteForever = false;
 
     private Repository repository = null;
 
     @Inject
-    public void setRepositoryFolderRemover( final RepositoryFolderRemover repositoryFolderRemover )
+    public DeleteRepositoryFoldersTask( final RepositoryFolderRemover repositoryFolderRemover )
     {
         this.repositoryFolderRemover = checkNotNull( repositoryFolderRemover );
     }
