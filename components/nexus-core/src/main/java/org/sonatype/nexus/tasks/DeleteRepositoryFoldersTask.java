@@ -12,21 +12,20 @@
  */
 package org.sonatype.nexus.tasks;
 
-import java.io.IOException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import java.io.IOException;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderRemover;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
- * Delete repository folders
- * 
- * @author Juven Xu
+ * Delete repository folders.
  */
-@Component( role = SchedulerTask.class, hint = "DeleteRepositoryFoldersTask", instantiationStrategy = "per-lookup" )
+@Named( "DeleteRepositoryFoldersTask" )
 public class DeleteRepositoryFoldersTask
     extends AbstractNexusRepositoriesTask<Object>
 {
@@ -34,13 +33,18 @@ public class DeleteRepositoryFoldersTask
      * System event action: remove repository folder
      */
     public static final String ACTION = "REMOVE_REPO_FOLDER";
-    
-    @Requirement
+
     private RepositoryFolderRemover repositoryFolderRemover;
 
     private boolean deleteForever = false;
 
     private Repository repository = null;
+
+    @Inject
+    public void setRepositoryFolderRemover( final RepositoryFolderRemover repositoryFolderRemover )
+    {
+        this.repositoryFolderRemover = checkNotNull( repositoryFolderRemover );
+    }
 
     public void setRepository( Repository repository )
     {

@@ -12,13 +12,15 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -33,10 +35,9 @@ import org.sonatype.scheduling.SchedulerTask;
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-    @Requirement
+
     private PlexusContainer plexusContainer;
-    
-    @Requirement
+
     private RepositoryRegistry repositoryRegistry;
     
     @Deprecated
@@ -48,6 +49,18 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
 
         return null;
+    }
+
+    @Inject
+    public void setPlexusContainer( final PlexusContainer plexusContainer )
+    {
+        this.plexusContainer = checkNotNull( plexusContainer );
+    }
+
+    @Inject
+    public void setRepositoryRegistry( final RepositoryRegistry repositoryRegistry )
+    {
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
     }
 
     protected RepositoryRegistry getRepositoryRegistry()
@@ -238,4 +251,5 @@ public abstract class AbstractNexusRepositoriesTask<T>
             return false;
         }
     }
+
 }

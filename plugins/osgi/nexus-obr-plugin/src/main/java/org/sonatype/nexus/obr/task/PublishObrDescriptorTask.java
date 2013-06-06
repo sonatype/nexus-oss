@@ -12,10 +12,12 @@
  */
 package org.sonatype.nexus.obr.task;
 
-import java.util.List;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.obr.metadata.ObrMetadataSource;
 import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.StorageException;
@@ -24,9 +26,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.scheduling.SchedulerTask;
 
-@Component( role = SchedulerTask.class, hint = "PublishObrDescriptorTask", instantiationStrategy = "per-lookup" )
+@Named( "PublishObrDescriptorTask" )
 public class PublishObrDescriptorTask
     extends AbstractNexusRepositoriesTask<Object>
 {
@@ -38,11 +39,21 @@ public class PublishObrDescriptorTask
 
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-    @Requirement( hint = "obr-bindex" )
     private ObrMetadataSource obrMetadataSource;
 
-    @Requirement
     private Walker walker;
+
+    @Inject
+    public void setObrMetadataSource( final @Named( "obr-bindex" ) ObrMetadataSource obrMetadataSource )
+    {
+        this.obrMetadataSource = checkNotNull( obrMetadataSource );
+    }
+
+    @Inject
+    public void setWalker( final Walker walker )
+    {
+        this.walker = checkNotNull( walker );
+    }
 
     @Override
     protected String getRepositoryFieldId()

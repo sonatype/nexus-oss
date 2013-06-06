@@ -36,6 +36,9 @@ import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * Base class for all Nexus tasks.
+ */
 public abstract class AbstractNexusTask<T>
     extends AbstractSchedulerTask<T>
     implements NexusTask<T>

@@ -12,19 +12,19 @@
  */
 package org.sonatype.nexus.tasks;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * OptimizeIndex task.
- * 
- * @author cstamas
  */
-@Component( role = SchedulerTask.class, hint = OptimizeIndexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
+@Named( OptimizeIndexTaskDescriptor.ID )
 public class OptimizeIndexTask
     extends AbstractNexusRepositoriesTask<Object>
 {
@@ -33,8 +33,13 @@ public class OptimizeIndexTask
      */
     public static final String ACTION = "OPTIMIZE_INDEX";
 
-    @Requirement
     private IndexerManager indexManager;
+
+    @Inject
+    public void setIndexManager( final IndexerManager indexManager )
+    {
+        this.indexManager = checkNotNull( indexManager );
+    }
 
     @Override
     protected String getRepositoryFieldId()

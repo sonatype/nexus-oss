@@ -12,21 +12,29 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * @since 2.5
  */
-@Component( role = SchedulerTask.class, hint = ReleaseRemovalTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
-public class ReleaseRemoverTask extends AbstractNexusRepositoriesTask<ReleaseRemovalResult>
+@Named( ReleaseRemovalTaskDescriptor.ID )
+public class ReleaseRemoverTask
+    extends AbstractNexusRepositoriesTask<ReleaseRemovalResult>
 {
 
-    @Requirement
     private ReleaseRemover releaseRemover;
+
+    @Inject
+    public void setReleaseRemover( final ReleaseRemover releaseRemover )
+    {
+        this.releaseRemover = checkNotNull( releaseRemover );
+    }
 
     @Override
     protected String getRepositoryFieldId()
@@ -56,4 +64,5 @@ public class ReleaseRemoverTask extends AbstractNexusRepositoriesTask<ReleaseRem
     {
         return "Removing old releases from repository " + getRepositoryName();
     }
+
 }
