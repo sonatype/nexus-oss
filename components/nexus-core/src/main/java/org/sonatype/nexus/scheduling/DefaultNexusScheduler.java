@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
@@ -31,7 +30,6 @@ import org.sonatype.scheduling.schedules.Schedule;
 @Named
 @Singleton
 public class DefaultNexusScheduler
-    extends AbstractLoggingComponent
     implements NexusScheduler
 {
 
