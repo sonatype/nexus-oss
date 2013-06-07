@@ -180,7 +180,7 @@ public class TextFilePrefixSourceMarshaller
                 // dump empty files
                 if ( entries.isEmpty() )
                 {
-                    throw new InvalidInputException( "Prefix file has not entries, refusing to load it." );
+                    throw new InvalidInputException( "Prefix file has no entries, refusing to load it." );
                 }
 
                 // dump big files
