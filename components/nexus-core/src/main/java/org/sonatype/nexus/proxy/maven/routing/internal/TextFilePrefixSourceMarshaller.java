@@ -177,12 +177,6 @@ public class TextFilePrefixSourceMarshaller
                 }
                 line = reader.readLine();
 
-                // dump empty files
-                if ( entries.isEmpty() )
-                {
-                    throw new InvalidInputException( "Prefix file has no entries, refusing to load it." );
-                }
-
                 // dump big files
                 if ( entries.size() > prefixFileMaxEntryCount )
                 {
@@ -190,6 +184,13 @@ public class TextFilePrefixSourceMarshaller
                         + prefixFileMaxEntryCount + "), refusing to load it." );
                 }
             }
+
+            // dump empty files
+            if ( entries.isEmpty() )
+            {
+                throw new InvalidInputException( "Prefix file has no entries, refusing to load it." );
+            }
+
             return new Result()
             {
                 @Override
