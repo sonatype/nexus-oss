@@ -296,4 +296,25 @@ public class RemotePrefixFileIsGarbageTest
             server.stop();
         }
     }
+
+    @Test( expected = InvalidInputException.class )
+    public void discoverEmptyPrefixFile()
+        throws Exception
+    {
+        server.stop();
+        server =
+            Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                Behaviours.content( "# Just a comment" ) ).start();
+        try
+        {
+            final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
+            final StrategyResult result =
+                subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
+                    MavenProxyRepository.class ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
 }
