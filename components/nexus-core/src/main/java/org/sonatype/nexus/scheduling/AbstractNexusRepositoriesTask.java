@@ -36,8 +36,6 @@ public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
 
-    private PlexusContainer plexusContainer;
-
     private RepositoryRegistry repositoryRegistry;
     
     @Deprecated
@@ -49,12 +47,6 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
 
         return null;
-    }
-
-    @Inject
-    public void setPlexusContainer( final PlexusContainer plexusContainer )
-    {
-        this.plexusContainer = checkNotNull( plexusContainer );
     }
 
     @Inject
@@ -138,22 +130,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
         for ( String taskType : activeTasks.keySet() )
         {
-            // FIXME: Use nexus scheduler to perform any task lookups so the code can be isolated/managed in one place
-            // FIXME: avoid using plexus container apis directly
-
-            ComponentDescriptor<?> cd =
-                plexusContainer.getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
-                    taskType );
-
-            if ( cd == null )
+            try
             {
-                cd = plexusContainer.getComponentDescriptor( NexusTask.class, NexusTask.class.getName(), taskType );
-            }
-
-            if ( cd != null )
-            {
-                Class<?> taskClazz = cd.getImplementationClass();
-
+                final Class<?> taskClazz = getClass().getClassLoader().loadClass( taskType );
                 if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
                 {
                     List<ScheduledTask<?>> tasks = activeTasks.get( taskType );
@@ -177,10 +156,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
                     }
                 }
             }
-            else
+            catch ( ClassNotFoundException e )
             {
-                // this can happen due to mismatch between plexus and sisu naming, nothing we need to WARN the user about however
-                getLogger().debug( "Could not find component that implements SchedulerTask of type='" + taskType + "'!" );
+                getLogger().debug( "Could not load class that implements SchedulerTask of type='" + taskType + "'!" );
             }
         }
 
