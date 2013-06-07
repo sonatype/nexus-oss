@@ -12,11 +12,15 @@
  */
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
 import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -44,10 +48,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
-import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
-import org.sonatype.nexus.proxy.maven.routing.internal.InvalidInputException;
-import org.sonatype.nexus.proxy.maven.routing.internal.RemotePrefixFileStrategy;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -297,7 +298,7 @@ public class RemotePrefixFileIsGarbageTest
         }
     }
 
-    @Test( expected = InvalidInputException.class )
+    @Test
     public void discoverEmptyPrefixFile()
         throws Exception
     {
@@ -311,6 +312,9 @@ public class RemotePrefixFileIsGarbageTest
             final StrategyResult result =
                 subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
                     MavenProxyRepository.class ) );
+            assertThat( result.getMessage(), containsString( "empty prefix file" ) );
+            assertThat( result.getPrefixSource(), notNullValue() );
+            assertThat( result.getPrefixSource().supported(), is( false ) );
         }
         finally
         {
