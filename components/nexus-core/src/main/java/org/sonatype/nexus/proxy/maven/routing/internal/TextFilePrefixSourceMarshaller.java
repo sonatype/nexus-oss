@@ -177,6 +177,12 @@ public class TextFilePrefixSourceMarshaller
                 }
                 line = reader.readLine();
 
+                // dump empty files
+                if ( entries.isEmpty() )
+                {
+                    throw new InvalidInputException( "Prefix file has not entries, refusing to load it." );
+                }
+
                 // dump big files
                 if ( entries.size() > prefixFileMaxEntryCount )
                 {
