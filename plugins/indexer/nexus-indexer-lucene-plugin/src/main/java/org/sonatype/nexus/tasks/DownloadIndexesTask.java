@@ -12,29 +12,35 @@
  */
 package org.sonatype.nexus.tasks;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Publish indexes task.
- * 
- * @author cstamas
  */
-@Component( role = SchedulerTask.class, hint = DownloadIndexesTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
+@Named( DownloadIndexesTaskDescriptor.ID )
 public class DownloadIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+
     /**
      * System event action: download indexes
      */
     public static final String ACTION = "DOWNLOADINDEX";
 
-    @Requirement
-    private IndexerManager indexerManager;
+    private final IndexerManager indexerManager;
+
+    @Inject
+    public DownloadIndexesTask( final IndexerManager indexerManager )
+    {
+        this.indexerManager = checkNotNull( indexerManager );
+    }
 
     @Override
     protected String getRepositoryFieldId()

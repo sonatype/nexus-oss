@@ -34,8 +34,10 @@ import org.sonatype.guice.plexus.config.Hints;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class NexusTypeVisitorTest
+    extends TestSupport
 {
     interface BadInterface
     {
@@ -190,7 +192,7 @@ public class NexusTypeVisitorTest
     public void testNexusTypeScanning()
         throws MalformedURLException
     {
-        final URL[] testURLs = new URL[] { new File( "target/test-classes" ).toURI().toURL() };
+        final URL[] testURLs = new URL[] { new File( util.getTargetDir(), "test-classes" ).toURI().toURL() };
         final ClassSpace space = new URLClassSpace( getClass().getClassLoader(), testURLs );
 
         final Map<Component, DeferredClass<?>> components = new HashMap<Component, DeferredClass<?>>();
@@ -199,7 +201,7 @@ public class NexusTypeVisitorTest
 
         // nexus-core: squash of modules causes to have more than 11
         // TODO: review this to somehow isolate this
-        Assert.assertEquals( 19, components.size() );
+        Assert.assertEquals( 18, components.size() );
 
         // non-extension so no automatic hinting...
         Assert.assertEquals( BeanA.class,

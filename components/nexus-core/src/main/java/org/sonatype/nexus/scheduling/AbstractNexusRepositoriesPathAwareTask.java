@@ -38,4 +38,5 @@ public abstract class AbstractNexusRepositoriesPathAwareTask<T>
             getParameters().put( id, resourceStorePath );
         }
     }
+
 }

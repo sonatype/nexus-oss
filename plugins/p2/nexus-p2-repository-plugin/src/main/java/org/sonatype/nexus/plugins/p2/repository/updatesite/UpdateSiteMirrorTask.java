@@ -14,6 +14,8 @@ package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -26,10 +28,14 @@ import org.sonatype.scheduling.SchedulerTask;
 
 import com.google.common.collect.Lists;
 
-@Component( role = SchedulerTask.class, hint = UpdateSiteMirrorTask.ROLE_HINT, instantiationStrategy = "per-lookup" )
+/**
+ * Update Site mirror task.
+ */
+@Named( UpdateSiteMirrorTask.ROLE_HINT )
 public class UpdateSiteMirrorTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+
     public static final String ROLE_HINT = "UpdateSiteMirrorTask";
 
     public static ScheduledTask<?> submit( final NexusScheduler scheduler, final UpdateSiteProxyRepository updateSite,
@@ -160,4 +166,5 @@ public class UpdateSiteMirrorTask
     {
         return Boolean.parseBoolean( getParameter( UpdateSiteMirrorTaskDescriptor.FORCE_MIRROR_FIELD_ID ) );
     }
+
 }

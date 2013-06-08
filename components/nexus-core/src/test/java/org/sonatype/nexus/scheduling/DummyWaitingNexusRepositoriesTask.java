@@ -15,6 +15,7 @@ package org.sonatype.nexus.scheduling;
 public class DummyWaitingNexusRepositoriesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+
     private long sleepTime = 10000;
     
     @Override

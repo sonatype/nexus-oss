@@ -12,24 +12,23 @@
  */
 package org.sonatype.nexus.timeline.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.timeline.NexusTimeline;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Purge timeline.
- * 
- * @author cstamas
  */
-@Component( role = SchedulerTask.class, hint = PurgeTimelineTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
-public class PurgeTimeline
+@Named( PurgeTimelineTaskDescriptor.ID )
+public class PurgeTimelineTask
     extends AbstractNexusTask<Object>
 {
     /**
@@ -41,9 +40,14 @@ public class PurgeTimeline
 
     public static final String SUBTYPES_KEY = "subTypes";
 
-    @Requirement
-    private NexusTimeline timeline;
-    
+    private final NexusTimeline timeline;
+
+    @Inject
+    public PurgeTimelineTask( final NexusTimeline timeline )
+    {
+        this.timeline = checkNotNull( timeline );
+    }
+
     public int getPurgeOlderThan()
     {
         return Integer.parseInt( getParameters().get( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID ) );

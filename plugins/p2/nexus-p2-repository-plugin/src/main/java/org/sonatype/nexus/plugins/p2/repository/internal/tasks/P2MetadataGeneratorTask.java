@@ -22,13 +22,12 @@ import org.sonatype.scheduling.SchedulerTask;
 @Named( P2MetadataGeneratorTaskDescriptor.ID )
 public class P2MetadataGeneratorTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
-    implements SchedulerTask<Object>
 {
 
     private final P2MetadataGenerator p2MetadataGenerator;
 
     @Inject
-    P2MetadataGeneratorTask( final P2MetadataGenerator p2MetadataGenerator )
+    public P2MetadataGeneratorTask( final P2MetadataGenerator p2MetadataGenerator )
     {
         this.p2MetadataGenerator = p2MetadataGenerator;
     }

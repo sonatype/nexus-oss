@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -28,17 +28,13 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-    @Requirement
-    private PlexusContainer plexusContainer;
-    
-    @Requirement
+
     private RepositoryRegistry repositoryRegistry;
-    
+
     @Deprecated
     public static String getIdFromPrefixedString( String prefix, String prefixedString )
     {
@@ -48,6 +44,12 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
 
         return null;
+    }
+
+    @Inject
+    public void setRepositoryRegistry( final RepositoryRegistry repositoryRegistry )
+    {
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
     }
 
     protected RepositoryRegistry getRepositoryRegistry()
@@ -123,51 +125,25 @@ public abstract class AbstractNexusRepositoriesTask<T>
     protected boolean hasIntersectingTasksThatRuns( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
-        for ( String taskType : activeTasks.keySet() )
+        for ( List<ScheduledTask<?>> scheduledTasks : activeTasks.values() )
         {
-            // FIXME: Use nexus scheduler to perform any task lookups so the code can be isolated/managed in one place
-            // FIXME: avoid using plexus container apis directly
-
-            ComponentDescriptor<?> cd =
-                plexusContainer.getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
-                    taskType );
-
-            if ( cd == null )
+            for ( ScheduledTask<?> task : scheduledTasks )
             {
-                cd = plexusContainer.getComponentDescriptor( NexusTask.class, NexusTask.class.getName(), taskType );
-            }
-
-            if ( cd != null )
-            {
-                Class<?> taskClazz = cd.getImplementationClass();
-
-                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
+                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( task.getTask().getClass() ) )
                 {
-                    List<ScheduledTask<?>> tasks = activeTasks.get( taskType );
-
-                    for ( ScheduledTask<?> task : tasks )
+                    // check against RUNNING or CANCELLING intersection
+                    if ( task.getTaskState().isExecuting()
+                        && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
+                        && repositorySetIntersectionIsNotEmpty(
+                        task.getTaskParams().get( getRepositoryFieldId() ) ) )
                     {
-                        // check against RUNNING or CANCELLING intersection
-                        if ( task.getTaskState().isExecuting()
-                            && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
-                            && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get( getRepositoryFieldId() ) ) )
-                        {
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    "Task " + task.getName() + " is already running and is conflicting with task "
-                                        + this.getClass().getName() );
-                            }
-
-                            return true;
-                        }
+                        getLogger().debug(
+                            "Task {} is already running and is conflicting with task {}",
+                            task.getName(), this.getClass().getSimpleName()
+                        );
+                        return true;
                     }
                 }
-            }
-            else
-            {
-                // this can happen due to mismatch between plexus and sisu naming, nothing we need to WARN the user about however
-                getLogger().debug( "Could not find component that implements SchedulerTask of type='" + taskType + "'!" );
             }
         }
 
@@ -238,4 +214,5 @@ public abstract class AbstractNexusRepositoriesTask<T>
             return false;
         }
     }
+
 }
