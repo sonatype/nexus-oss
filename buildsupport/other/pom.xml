@@ -62,7 +62,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.pr</groupId>
         <artifactId>sisu-problem-reporter</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.4-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>javax.inject</groupId>
