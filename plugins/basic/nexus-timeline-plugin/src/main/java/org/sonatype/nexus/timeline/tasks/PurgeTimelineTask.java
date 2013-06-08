@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -41,6 +42,7 @@ public class PurgeTimelineTask
 
     private final NexusTimeline timeline;
 
+    @Inject
     public PurgeTimelineTask( final NexusTimeline timeline )
     {
         this.timeline = checkNotNull( timeline );
