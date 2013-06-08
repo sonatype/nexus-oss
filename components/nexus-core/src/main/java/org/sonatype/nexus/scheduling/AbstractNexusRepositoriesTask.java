@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -30,14 +28,13 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
 
     private RepositoryRegistry repositoryRegistry;
-    
+
     @Deprecated
     public static String getIdFromPrefixedString( String prefix, String prefixedString )
     {
@@ -128,37 +125,25 @@ public abstract class AbstractNexusRepositoriesTask<T>
     protected boolean hasIntersectingTasksThatRuns( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
-        for ( String taskType : activeTasks.keySet() )
+        for ( List<ScheduledTask<?>> scheduledTasks : activeTasks.values() )
         {
-            try
+            for ( ScheduledTask<?> task : scheduledTasks )
             {
-                final Class<?> taskClazz = getClass().getClassLoader().loadClass( taskType );
-                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
+                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( task.getTask().getClass() ) )
                 {
-                    List<ScheduledTask<?>> tasks = activeTasks.get( taskType );
-
-                    for ( ScheduledTask<?> task : tasks )
+                    // check against RUNNING or CANCELLING intersection
+                    if ( task.getTaskState().isExecuting()
+                        && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
+                        && repositorySetIntersectionIsNotEmpty(
+                        task.getTaskParams().get( getRepositoryFieldId() ) ) )
                     {
-                        // check against RUNNING or CANCELLING intersection
-                        if ( task.getTaskState().isExecuting()
-                            && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
-                            && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get( getRepositoryFieldId() ) ) )
-                        {
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    "Task " + task.getName() + " is already running and is conflicting with task "
-                                        + this.getClass().getName() );
-                            }
-
-                            return true;
-                        }
+                        getLogger().debug(
+                            "Task {} is already running and is conflicting with task {}",
+                            task.getName(), this.getClass().getSimpleName()
+                        );
+                        return true;
                     }
                 }
-            }
-            catch ( ClassNotFoundException e )
-            {
-                getLogger().debug( "Could not load class that implements SchedulerTask of type='" + taskType + "'!" );
             }
         }
 
