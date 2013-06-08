@@ -14,12 +14,14 @@ package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "DownloadIndexes", description = "Download Indexes" )
+@Named( "DownloadIndexes" )
+@Singleton
 public class DownloadIndexesTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {

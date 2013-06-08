@@ -14,13 +14,15 @@ package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "EvictUnusedItems", description = "Evict Unused Proxied Items From Repository Caches" )
+@Named( "EvictUnusedItems" )
+@Singleton
 public class EvictUnusedItemsTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {

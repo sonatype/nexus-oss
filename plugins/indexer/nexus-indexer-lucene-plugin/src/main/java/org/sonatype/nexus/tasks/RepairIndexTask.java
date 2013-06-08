@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.tasks;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+
 import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Repair index task.
- * 
- * @author velo
  */
-@Component( role = SchedulerTask.class, hint = RepairIndexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
+@Named( RepairIndexTaskDescriptor.ID )
 public class RepairIndexTask
     extends AbstractIndexerTask
 {

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -22,15 +24,14 @@ import org.sonatype.scheduling.SchedulerTask;
 @Named( P2RepositoryAggregatorTaskDescriptor.ID )
 public class P2RepositoryAggregatorTask
     extends AbstractNexusRepositoriesTask<Object>
-    implements SchedulerTask<Object>
 {
 
     private final P2RepositoryAggregator p2RepositoryAggregator;
 
     @Inject
-    P2RepositoryAggregatorTask( final P2RepositoryAggregator p2RepositoryAggregator )
+    public P2RepositoryAggregatorTask( final P2RepositoryAggregator p2RepositoryAggregator )
     {
-        this.p2RepositoryAggregator = p2RepositoryAggregator;
+        this.p2RepositoryAggregator = checkNotNull( p2RepositoryAggregator );
     }
 
     @Override
