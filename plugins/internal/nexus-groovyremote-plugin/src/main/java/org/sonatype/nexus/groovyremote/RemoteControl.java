@@ -24,6 +24,7 @@ import groovyx.remote.transport.http.RemoteControlHttpHandler;
 import org.slf4j.LoggerFactory;
 import org.sonatype.gossip.support.DC;
 import org.sonatype.guice.bean.locators.BeanLocator;
+import org.sonatype.inject.BeanEntry;
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -169,6 +170,14 @@ public class RemoteControl
 
         public Object lookup(final String typeName, final String name) throws ClassNotFoundException {
             return lookup(type(typeName), name);
+        }
+
+        public <Q extends Annotation, T> Iterable<BeanEntry<Q, T>> locate(final Key<T> key) {
+            return beanLocator.locate(key);
+        }
+
+        public <Q extends Annotation, T> Iterable<BeanEntry<Q, T>> locate(final Class<T> type) {
+            return beanLocator.locate(Key.get(type));
         }
     }
 
