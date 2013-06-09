@@ -69,41 +69,16 @@ public class VersionDirMetadataProcessor
     }
 
     @Override
-    public void processMetadata( String path )
+    public void processMetadata( final String path, final Metadata oldMd )
         throws IOException
     {
-        Metadata md = createMetadata( path );
+        final Metadata md = createMetadata( path );
 
         // NEXUS-4766
         // To avoid wrong guessing of classifier / extension in case of classifier with dots,
         // read existing metadata (assumed to be okay due to the fact that was uploaded by Maven)
         // and for snapshot versions replace classifier / extension
-        try
-        {
-            final Metadata oldMd = MetadataBuilder.read(
-                metadataHelper.retrieveContent( path + AbstractMetadataHelper.METADATA_SUFFIX )
-            );
-            maybeFixClassifierAndExtension( md, oldMd );
-        }
-        catch ( FileNotFoundException ignore )
-        {
-            // old metadata file is not present, ignore
-        }
-        catch ( IOException e )
-        {
-            // oh well, we will use what we have if we cannot read existing metadata
-            if ( LOG.isDebugEnabled() )
-            {
-                LOG.warn( "Could not read maven metadata {}", path + AbstractMetadataHelper.METADATA_SUFFIX, e );
-            }
-            else
-            {
-                LOG.warn(
-                    "Could not read maven metadata {} due to {}/{}",
-                    path + AbstractMetadataHelper.METADATA_SUFFIX, e.getClass().getName(), e.getMessage()
-                );
-            }
-        }
+        maybeFixClassifierAndExtension( md, oldMd );
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -118,18 +93,21 @@ public class VersionDirMetadataProcessor
 
     private void maybeFixClassifierAndExtension( final Metadata mdNew, final Metadata mdOld )
     {
-        final Map<String, SnapshotVersion> svOld = createSnapshotVersionMap( mdOld );
-        if ( !svOld.isEmpty() )
+        if ( mdNew != null && mdOld != null )
         {
-            final Map<String, SnapshotVersion> svNew = createSnapshotVersionMap( mdNew );
-            for ( final Map.Entry<String, SnapshotVersion> entry : svNew.entrySet() )
+            final Map<String, SnapshotVersion> svOld = createSnapshotVersionMap( mdOld );
+            if ( !svOld.isEmpty() )
             {
-                final SnapshotVersion vOld = svOld.get( entry.getKey() );
-                if ( vOld != null )
+                final Map<String, SnapshotVersion> svNew = createSnapshotVersionMap( mdNew );
+                for ( final Map.Entry<String, SnapshotVersion> entry : svNew.entrySet() )
                 {
-                    final SnapshotVersion vNew = entry.getValue();
-                    vNew.setClassifier( vOld.getClassifier() );
-                    vNew.setExtension( vOld.getExtension() );
+                    final SnapshotVersion vOld = svOld.get( entry.getKey() );
+                    if ( vOld != null )
+                    {
+                        final SnapshotVersion vNew = entry.getValue();
+                        vNew.setClassifier( vOld.getClassifier() );
+                        vNew.setExtension( vOld.getExtension() );
+                    }
                 }
             }
         }
