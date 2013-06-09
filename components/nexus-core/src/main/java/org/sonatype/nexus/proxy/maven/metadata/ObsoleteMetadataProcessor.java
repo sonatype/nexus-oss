@@ -47,13 +47,6 @@ public class ObsoleteMetadataProcessor
     }
 
     @Override
-    protected void processMetadata( String path )
-        throws IOException
-    {
-        // do nothing
-    }
-
-    @Override
     protected boolean shouldProcessMetadata( String path )
     {
         return true;

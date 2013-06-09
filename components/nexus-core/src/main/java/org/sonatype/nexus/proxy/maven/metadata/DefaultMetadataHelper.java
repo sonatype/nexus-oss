@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -160,7 +161,9 @@ public class DefaultMetadataHelper
         }
         catch ( ItemNotFoundException e )
         {
-            throw new IOException( "Item not found!", e );
+            final FileNotFoundException exception = new FileNotFoundException( "Item not found!" );
+            exception.initCause( e );
+            throw exception;
         }
     }
 

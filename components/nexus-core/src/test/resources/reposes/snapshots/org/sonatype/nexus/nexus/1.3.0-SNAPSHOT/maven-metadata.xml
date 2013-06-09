@@ -9,5 +9,13 @@
 			<buildNumber>375</buildNumber>
 		</snapshot>
 		<lastUpdated>20090213123211</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <classifier>classifier.with.dots</classifier>
+        <extension>pom.xml</extension>
+        <value>1.3.0-20090210.090218-375</value>
+        <updated>20090210090218</updated>
+      </snapshotVersion>
+    </snapshotVersions>
 	</versioning>
 </metadata>
