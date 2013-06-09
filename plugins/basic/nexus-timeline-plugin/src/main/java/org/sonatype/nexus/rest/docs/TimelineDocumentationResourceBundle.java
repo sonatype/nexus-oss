@@ -10,31 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.restlet1x;
+package org.sonatype.nexus.rest.docs;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 
-/**
- * @since 2.3
- */
 @Named
 @Singleton
-public class DocumentationResourceBundleImpl
+public class TimelineDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
+
     @Override
     public String getPluginId()
     {
-        return "nexus-restlet1x-plugin";
+        return "nexus-timeline-plugin";
     }
 
     @Override
     public String getDescription()
     {
-        return "Restlet 1.x API";
+        return "Timeline Plugin API";
     }
 
 }
