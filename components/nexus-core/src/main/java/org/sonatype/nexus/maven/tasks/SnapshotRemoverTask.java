@@ -12,19 +12,19 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
- * SnapshotRemoverTask
- * 
- * @author cstamas
+ * Snapshot Remover Task.
  */
-@Component( role = SchedulerTask.class, hint = SnapshotRemovalTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
+@Named( SnapshotRemovalTaskDescriptor.ID )
 public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
@@ -36,8 +36,13 @@ public class SnapshotRemoverTask
 
     public static final int DEFAULT_GRACE_DAYS_AFTER_RELEASE = 0;
 
-    @Requirement
-    private SnapshotRemover snapshotRemover;
+    private final SnapshotRemover snapshotRemover;
+
+    @Inject
+    public SnapshotRemoverTask( final SnapshotRemover snapshotRemover )
+    {
+        this.snapshotRemover = checkNotNull( snapshotRemover );
+    }
 
     @Override
     protected String getRepositoryFieldId()

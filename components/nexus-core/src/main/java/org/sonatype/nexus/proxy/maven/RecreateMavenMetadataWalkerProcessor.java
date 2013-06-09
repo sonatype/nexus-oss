@@ -79,7 +79,7 @@ public class RecreateMavenMetadataWalkerProcessor
         }
         catch ( Exception e )
         {
-            logger.warn( "Error occured while entering collection '" + coll.getPath() + "'.", e );
+            logger.warn( "Error occurred while entering collection '" + coll.getPath() + "'.", e );
         }
     }
 
@@ -94,7 +94,7 @@ public class RecreateMavenMetadataWalkerProcessor
             }
             catch ( Exception e )
             {
-                logger.warn( "Error occured while processing item '" + item.getPath() + "'.", e );
+                logger.warn( "Error occurred while processing item '" + item.getPath() + "'.", e );
             }
         }
     }
@@ -119,7 +119,7 @@ public class RecreateMavenMetadataWalkerProcessor
         }
         catch ( Exception e )
         {
-            logger.warn( "Error occured while existing collection '" + coll.getPath() + "'.", e );
+            logger.warn( "Error occurred while existing collection '" + coll.getPath() + "'.", e );
         }
     }
 }

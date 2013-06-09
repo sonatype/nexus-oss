@@ -12,21 +12,20 @@
  */
 package org.sonatype.nexus.tasks;
 
-import java.io.IOException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import java.io.IOException;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
-import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Publish indexes task.
- * 
- * @author cstamas
  */
-@Component( role = SchedulerTask.class, hint = PublishIndexesTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
+@Named( PublishIndexesTaskDescriptor.ID )
 public class PublishIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
@@ -35,8 +34,13 @@ public class PublishIndexesTask
      */
     public static final String ACTION = "PUBLISHINDEX";
 
-    @Requirement
-    private IndexerManager indexerManager;
+    private final IndexerManager indexerManager;
+
+    @Inject
+    public PublishIndexesTask( final IndexerManager indexerManager )
+    {
+        this.indexerManager = checkNotNull( indexerManager );
+    }
 
     @Override
     protected String getRepositoryFieldId()

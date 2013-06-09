@@ -10,23 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.tasks;
+package org.sonatype.nexus.testsuite.pr.nexus5742;
 
-import javax.inject.Named;
+import org.sonatype.nexus.testsuite.pr.nexus5026.Nexus5026GenerateProblemReportViaWebProxyIT;
 
-import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
-
-/**
- * Update index task.
- */
-@Named( UpdateIndexTaskDescriptor.ID )
-public class UpdateIndexTask
-    extends AbstractIndexerTask
+public class Nexus5742GenerateProblemReportViaSecureWebProxyIT
+    extends Nexus5026GenerateProblemReportViaWebProxyIT
 {
 
-    public UpdateIndexTask()
+    @Override
+    public void startWebProxy()
+        throws Exception
     {
-        super( "Updating", false );
+        super.startWebProxy();
+        server.getProxyServlet().setUseAuthentication( true );
+        server.getProxyServlet().getAuthentications().put( "admin", "123" );
     }
 
 }
