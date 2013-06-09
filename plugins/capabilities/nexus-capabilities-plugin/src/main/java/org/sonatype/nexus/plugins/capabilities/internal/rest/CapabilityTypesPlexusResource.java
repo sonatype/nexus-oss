@@ -20,6 +20,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -79,6 +80,9 @@ public class CapabilityTypesPlexusResource
      */
     @Override
     @GET
+    @ResourceMethodSignature(
+        output = CapabilityTypeResourceResponse.class
+    )
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {

@@ -24,8 +24,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -37,6 +39,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusRequestResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -84,6 +87,12 @@ public class CapabilityStatusPlexusResource
 
     @Override
     @GET
+    @ResourceMethodSignature(
+        pathParams = {
+            @PathParam( CAPABILITIES_ID_KEY )
+        },
+        output = CapabilityStatusResponseResource.class
+    )
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
@@ -108,6 +117,13 @@ public class CapabilityStatusPlexusResource
      */
     @Override
     @PUT
+    @ResourceMethodSignature(
+        pathParams = {
+            @PathParam( CAPABILITIES_ID_KEY )
+        },
+        input = CapabilityStatusRequestResource.class,
+        output = CapabilityStatusResponseResource.class
+    )
     public Object put( final Context context, final Request request, final Response response, final Object payload )
         throws ResourceException
     {
