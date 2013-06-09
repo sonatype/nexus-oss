@@ -12,15 +12,19 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 public class RebuildMavenMetadataTaskTest
     extends AbstractMavenRepoContentTests
@@ -147,4 +151,20 @@ public class RebuildMavenMetadataTaskTest
             "We should have same change on total level as we have on processed ones, since we have some of them missing!",
             ( countTotalAfter - countTotalBefore ) == ( countProcessedSubAfter - countProcessedSubBefore ) );
     }
+
+    @Test
+    public void testClassifierWithDots()
+        throws Exception
+    {
+        fillInRepo();
+
+        final RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( RebuildMavenMetadataTask.class );
+        task.setRepositoryId( snapshots.getId() );
+        nexusScheduler.submit( "task", task ).get();
+
+        final File mdFile = retrieveFile( snapshots, "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/maven-metadata.xml" );
+        assertThat( mdFile, FileMatchers.exists() );
+        assertThat( mdFile, FileMatchers.contains( "<classifier>classifier.with.dots</classifier>" ) );
+    }
+
 }

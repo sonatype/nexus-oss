@@ -30,7 +30,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
@@ -45,6 +47,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -111,6 +114,16 @@ public class CapabilitiesPlexusResource
      */
     @Override
     @GET
+    @ResourceMethodSignature(
+        queryParams = {
+            @QueryParam( $TYPE ),
+            @QueryParam( $ENABLED ),
+            @QueryParam( $ACTIVE ),
+            @QueryParam( $INCLUDE_NOT_EXPOSED ),
+            @QueryParam( $PROPERTY_PREFIX + "{property name}" )
+        },
+        output = CapabilitiesListResponseResource.class
+    )
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
@@ -138,6 +151,10 @@ public class CapabilitiesPlexusResource
      */
     @Override
     @POST
+    @ResourceMethodSignature(
+        input = CapabilityRequestResource.class,
+        output = CapabilityStatusResponseResource.class
+    )
     public Object post( final Context context, final Request request, final Response response, final Object payload )
         throws ResourceException
     {

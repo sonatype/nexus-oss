@@ -46,11 +46,13 @@ public abstract class AbstractMetadataProcessor
             return false;
         }
 
+        Metadata oldMetadata = null;
+
         if ( isMetadataExisted( path ) )
         {
-            Metadata metadata = readMetadata( path );
+            oldMetadata = readMetadata( path );
 
-            if ( metadata != null && isMetadataCorrect( metadata, path ) )
+            if ( oldMetadata != null && isMetadataCorrect( oldMetadata, path ) )
             {
                 postProcessMetadata( path );
 
@@ -62,7 +64,7 @@ public abstract class AbstractMetadataProcessor
             }
         }
 
-        processMetadata( path );
+        processMetadata( path, oldMetadata );
 
         postProcessMetadata( path );
 
@@ -125,8 +127,20 @@ public abstract class AbstractMetadataProcessor
 
     protected abstract boolean shouldProcessMetadata( String path );
 
-    protected abstract void processMetadata( String path )
-        throws IOException;
+    protected void processMetadata( final String path )
+        throws IOException
+    {
+        // do nothing
+    }
+
+    /**
+     * @since 2.6
+     */
+    protected void processMetadata( final String path, final Metadata oldMetadata )
+        throws IOException
+    {
+        processMetadata( path );
+    }
 
     protected abstract void postProcessMetadata( String path );
 }
