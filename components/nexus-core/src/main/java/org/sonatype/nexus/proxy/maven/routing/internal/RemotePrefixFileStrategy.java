@@ -120,6 +120,10 @@ public class RemotePrefixFileStrategy
                 {
                     return new StrategyResult( "Remote disabled automatic routing", UNSUPPORTED_PREFIXSOURCE, false );
                 }
+                if ( unmarshalled.entries().isEmpty() )
+                {
+                    return new StrategyResult( "Remote publishes empty prefix file", UNSUPPORTED_PREFIXSOURCE, false );
+                }
 
                 final PrefixSource prefixSource = new FilePrefixSource( mavenProxyRepository, path, config );
                 if ( prefixFileAgeInDays < 1 )
