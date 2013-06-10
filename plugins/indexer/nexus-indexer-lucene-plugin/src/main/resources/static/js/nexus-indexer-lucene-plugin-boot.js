@@ -10,27 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.siesta.ui;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
-
-/**
- * @since 2.6
- */
-@Named
-@Singleton
-public class SiestaUiContributor  implements UiContributor
-{
-
-    public static final String ARTIFACT_ID = "nexus-siesta-plugin";
-
-    @Override
-    public UiContribution contribute( final boolean debug )
-    {
-        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP, ARTIFACT_ID ).build( debug );
-    }
-}
+/*global Ext, Sonatype, Nexus*/
+define('nexus-indexer-lucene-plugin-boot', [
+  'Sonatype/repoServer/ArtifactInformationPanel',
+  'Sonatype/repoServer/IndexBrowserPanel',
+  'Sonatype/repoServer/RepositoryIndexBrowserContainer',
+  'Sonatype/repoServer/searchLeftNav',
+  'Sonatype/repoServer/SearchPanel',
+  'Sonatype/repoServer/SearchResultGrid',
+  'repoContextMenuContributions'
+]);
