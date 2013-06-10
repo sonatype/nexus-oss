@@ -58,36 +58,25 @@ public class MavenFileTypeValidator
     private static final boolean XML_DETECTION_LAX = SystemPropertiesHelper.getBoolean( XML_DETECTION_LAX_KEY,
         XML_DETECTION_LAX_DEFAULT );
 
-    private Map<String, List<String>> supportedTypeMap = new HashMap<String, List<String>>();
-
-    private final NexusMimeTypes mimeTypes;
-
     @Inject
     public MavenFileTypeValidator( final MimeSupport mimeSupport )
     {
         super( mimeSupport );
-        this.mimeTypes = new NexusMimeTypes();
     }
 
     @VisibleForTesting
     public MavenFileTypeValidator( final NexusMimeTypes mimeTypes, final MimeSupport mimeSupport )
     {
-        super( mimeSupport );
-        this.mimeTypes = mimeTypes;
+        super( mimeTypes, mimeSupport );
     }
 
     @Override
     public FileTypeValidity isExpectedFileType( final StorageFileItem file )
     {
-        // Note: this here is an ugly hack: enables per-request control of
-        // LAX XML validation: if key not present, "system wide" settings used.
-        // If key present, it's interpreted as Boolean and it's value is used to
-        // drive LAX XML validation enable/disable.
-        boolean xmlLaxValidation = XML_DETECTION_LAX;
-        if ( file.getItemContext().containsKey( XML_DETECTION_LAX_KEY ) )
+        // only check content from maven repositories
+        if ( file.getRepositoryItemUid().getRepository().adaptToFacet( MavenRepository.class ) == null )
         {
-            xmlLaxValidation =
-                Boolean.parseBoolean( String.valueOf( file.getItemContext().get( XML_DETECTION_LAX_KEY ) ) );
+            return FileTypeValidity.NEUTRAL;
         }
 
         final String filePath = file.getPath().toLowerCase();
@@ -122,48 +111,6 @@ public class MavenFileTypeValidator
                 return FileTypeValidity.NEUTRAL;
             }
         }
-        else if ( xmlLaxValidation && filePath.endsWith( ".xml" ) )
-        {
-            getLogger().debug( "Checking if XML {} is of the correct MIME type (lax=enabled).",
-                file.getRepositoryItemUid() );
-
-            Set<String> expectedMimeTypes = new HashSet<String>();
-
-            for ( Entry<String, List<String>> entry : supportedTypeMap.entrySet() )
-            {
-                if ( filePath.endsWith( entry.getKey() ) )
-                {
-                    expectedMimeTypes.addAll( entry.getValue() );
-                }
-            }
-
-            try
-            {
-                final FileTypeValidity mimeDetectionResult =
-                    isExpectedFileTypeByDetectedMimeType( file, expectedMimeTypes );
-
-                if ( FileTypeValidity.INVALID.equals( mimeDetectionResult ) )
-                {
-                    // we go LAX way, if MIME detection says INVALID (does for XMLs missing preamble too)
-                    // we just stay put saying we are "neutral" on this question
-                    // If LAX disabled, the strict check will happen at the end of this if-else anyway
-                    // doing proper checks and proper INVALID
-                    return FileTypeValidity.NEUTRAL;
-                }
-                else
-                {
-                    return mimeDetectionResult;
-                }
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn(
-                    "Cannot detect MIME type and validate content of StorageFileItem: " + file.getRepositoryItemUid(),
-                    e );
-
-                return FileTypeValidity.NEUTRAL;
-            }
-        }
         else if ( filePath.endsWith( ".sha1" ) || filePath.endsWith( ".md5" ) )
         {
             getLogger().debug( "Checking if Maven checksum {} is valid.", file.getRepositoryItemUid() );
@@ -194,36 +141,31 @@ public class MavenFileTypeValidator
         }
         else
         {
-            Set<String> expectedMimeTypes = new HashSet<String>();
-
-            for ( Entry<String, List<String>> entry : supportedTypeMap.entrySet() )
-            {
-                if ( filePath.endsWith( entry.getKey() ) )
-                {
-                    expectedMimeTypes.addAll( entry.getValue() );
-                }
-            }
-
-            final NexusMimeTypes.NexusMimeType type = mimeTypes.getMimeTypes( MimeUtil2.getExtension( filePath ) );
-            if ( type != null )
-            {
-                expectedMimeTypes.addAll( type.getMimetypes() );
-            }
-
-            try
-            {
-                // the expectedMimeTypes will be empty, see map in constructor which extensions we check at all.
-                // The isExpectedFileTypeByDetectedMimeType() method will claim NEUTRAL when expectancies are empty/null
-                return isExpectedFileTypeByDetectedMimeType( file, expectedMimeTypes );
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn(
-                    "Cannot detect MIME type and validate content of StorageFileItem: " + file.getRepositoryItemUid(),
-                    e );
-
-                return FileTypeValidity.NEUTRAL;
-            }
+            return super.isExpectedFileType( file );
         }
     }
+
+    @Override
+    protected boolean isXmlLaxValidation( final StorageFileItem file )
+    {
+        // if no maven specific key is present for lax xml validator, use the generic one
+        if ( SystemPropertiesHelper.getString( XML_DETECTION_LAX_KEY, null ) == null
+            && !file.getItemContext().containsKey( XML_DETECTION_LAX_KEY ) )
+        {
+            return super.isXmlLaxValidation( file );
+        }
+        // Note: this here is an ugly hack: enables per-request control of
+        // LAX XML validation: if key not present, "system wide" settings used.
+        // If key present, it's interpreted as Boolean and it's value is used to
+        // drive LAX XML validation enable/disable.
+        boolean xmlLaxValidation = XML_DETECTION_LAX;
+        if ( file.getItemContext().containsKey( XML_DETECTION_LAX_KEY ) )
+        {
+            xmlLaxValidation = Boolean.parseBoolean(
+                String.valueOf( file.getItemContext().get( XML_DETECTION_LAX_KEY ) )
+            );
+        }
+        return xmlLaxValidation;
+    }
+
 }
