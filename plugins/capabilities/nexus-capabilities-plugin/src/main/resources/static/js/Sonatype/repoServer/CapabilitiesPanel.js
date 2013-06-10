@@ -14,7 +14,7 @@
  * Capabilities Edit/Create panel layout and controller
  */
 
-/*global Ext, Sonatype, FormFieldGenerator, FormFieldExporter, FormFieldImporter*/
+/*global Ext, Sonatype, FormFieldGenerator, FormFieldExporter, FormFieldImporter, Nexus*/
 /*jslint newcap:true*/
 
 define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons'], function() {

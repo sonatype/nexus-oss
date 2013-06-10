@@ -32,7 +32,6 @@ public class IndexerLuceneUiContributor
     @Override
     public UiContribution contribute( final boolean debug )
     {
-        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP,
-                                          ARTIFACT_ID ).boot( ARTIFACT_ID + "-all" ).build( debug );
+        return new UiContributionBuilder( this, OSS_PLUGIN_GROUP, ARTIFACT_ID ).build( debug );
     }
 }
