@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -21,12 +23,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.inject.Inject;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.mime.MimeSupport;
-
 import com.google.common.annotations.VisibleForTesting;
 
 public abstract class AbstractDocumentationNexusResourceBundle
@@ -34,7 +35,6 @@ public abstract class AbstractDocumentationNexusResourceBundle
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Requirement
     private MimeSupport mimeSupport;
 
     protected AbstractDocumentationNexusResourceBundle()
@@ -45,6 +45,12 @@ public abstract class AbstractDocumentationNexusResourceBundle
     protected AbstractDocumentationNexusResourceBundle( final MimeSupport mimeSupport )
     {
         this.mimeSupport = mimeSupport;
+    }
+
+    @Inject
+    public void setMimeSupport( final MimeSupport mimeSupport )
+    {
+        this.mimeSupport = checkNotNull( mimeSupport );
     }
 
     public List<StaticResource> getContributedResouces()

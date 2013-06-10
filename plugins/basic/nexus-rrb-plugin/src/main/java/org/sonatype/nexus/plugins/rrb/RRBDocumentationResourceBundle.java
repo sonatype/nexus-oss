@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.plugins.rrb;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component( role = NexusResourceBundle.class, hint = "RRBDocumentationResourceBundle" )
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+
+@Named
+@Singleton
 public class RRBDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
@@ -32,4 +34,5 @@ public class RRBDocumentationResourceBundle
     {
         return "RRB Plugin API";
     }
+
 }
