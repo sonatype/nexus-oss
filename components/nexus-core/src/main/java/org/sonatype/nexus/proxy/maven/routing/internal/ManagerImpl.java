@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -77,6 +78,8 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -156,11 +159,11 @@ public class ManagerImpl
      */
     @Inject
     public ManagerImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
-                          final ApplicationConfiguration applicationConfiguration,
-                          final RepositoryRegistry repositoryRegistry, final Config config,
-                          final LocalContentDiscoverer localContentDiscoverer,
-                          final RemoteContentDiscoverer remoteContentDiscoverer,
-                          @Named( RemotePrefixFileStrategy.ID ) final RemoteStrategy quickRemoteStrategy )
+                        final ApplicationConfiguration applicationConfiguration,
+                        final RepositoryRegistry repositoryRegistry, final Config config,
+                        final LocalContentDiscoverer localContentDiscoverer,
+                        final RemoteContentDiscoverer remoteContentDiscoverer,
+                        @Named( RemotePrefixFileStrategy.ID ) final RemoteStrategy quickRemoteStrategy )
     {
         this.eventBus = checkNotNull( eventBus );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
@@ -228,7 +231,7 @@ public class ManagerImpl
                     mayUpdateAllProxyPrefixFiles();
                     periodicUpdaterDidRunAtLeastOnce = true;
                 }
-            }, 0L /*no initial delay*/, TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
+            }, 0L /* no initial delay */, TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
 
             // register event dispatcher, to start receiving events
             eventBus.register( eventDispatcher );
@@ -607,13 +610,14 @@ public class ManagerImpl
         catch ( IllegalStateException e )
         {
             // just ack it, log it and return peacefully
-            getLogger().info( "Maven repository {} not in state for prefix file update: {}", mavenRepository, e.getMessage() );
+            getLogger().info( "Maven repository {} not in state for prefix file update: {}", mavenRepository,
+                e.getMessage() );
             return;
         }
     }
 
     protected PrefixSource updateProxyPrefixFile( final MavenProxyRepository mavenProxyRepository,
-                                                 final List<RemoteStrategy> remoteStrategies )
+                                                  final List<RemoteStrategy> remoteStrategies )
         throws IllegalStateException, IOException
     {
         checkUpdateConditions( mavenProxyRepository );
@@ -653,7 +657,27 @@ public class ManagerImpl
 
             if ( discoveryResult.isSuccessful() )
             {
-                prefixSource = discoveryResult.getPrefixSource();
+                final PrefixSource remotePrefixSource = discoveryResult.getPrefixSource();
+                if ( remotePrefixSource.supported() )
+                {
+                    // grab local too and merge them
+                    final DiscoveryResult<MavenRepository> localDiscoveryResult =
+                        localContentDiscoverer.discoverLocalContent( mavenProxyRepository );
+                    if ( localDiscoveryResult.isSuccessful() )
+                    {
+                        final HashSet<String> mergedEntries = Sets.newHashSet();
+                        mergedEntries.addAll( remotePrefixSource.readEntries() );
+                        mergedEntries.addAll( localDiscoveryResult.getPrefixSource().readEntries() );
+                        final ArrayListPrefixSource mergedPrefixSource =
+                            new ArrayListPrefixSource( Lists.newArrayList( mergedEntries ),
+                                remotePrefixSource.getLostModifiedTimestamp() );
+                        prefixSource = mergedPrefixSource;
+                    }
+                    else
+                    {
+                        getLogger().debug( "{} local discovery unsuccessful", mavenProxyRepository );
+                    }
+                }
             }
             final Outcome lastOutcome = discoveryResult.getLastResult();
 
@@ -691,7 +715,7 @@ public class ManagerImpl
     {
         checkUpdateConditions( mavenHostedRepository );
         PrefixSource prefixSource = null;
-        final DiscoveryResult<MavenHostedRepository> discoveryResult =
+        final DiscoveryResult<MavenRepository> discoveryResult =
             localContentDiscoverer.discoverLocalContent( mavenHostedRepository );
         if ( discoveryResult.isSuccessful() )
         {

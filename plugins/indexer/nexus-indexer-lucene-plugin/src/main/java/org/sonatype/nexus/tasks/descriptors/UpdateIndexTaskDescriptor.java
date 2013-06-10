@@ -12,9 +12,11 @@
  */
 package org.sonatype.nexus.tasks.descriptors;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "UpdateIndex", description = "Update Repositories Index" )
+@Named( "UpdateIndex" )
+@Singleton
 public class UpdateIndexTaskDescriptor
     extends AbstractIndexTaskDescriptor
 {

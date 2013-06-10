@@ -10,23 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.tasks;
+package org.sonatype.nexus.rest.docs;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 
-/**
- * Update index task.
- */
-@Named( UpdateIndexTaskDescriptor.ID )
-public class UpdateIndexTask
-    extends AbstractIndexerTask
+@Named
+@Singleton
+public class TimelineDocumentationResourceBundle
+    extends AbstractDocumentationNexusResourceBundle
 {
 
-    public UpdateIndexTask()
+    @Override
+    public String getPluginId()
     {
-        super( "Updating", false );
+        return "nexus-timeline-plugin";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "Timeline Plugin API";
     }
 
 }

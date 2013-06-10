@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.security.ldap.realms;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component( role = NexusResourceBundle.class, hint = "LdapDocumentationResourceBundle" )
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+
+@Named
+@Singleton
 public class LdapDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
@@ -32,4 +34,5 @@ public class LdapDocumentationResourceBundle
     {
         return "OSS LDAP Realm API";
     }
+
 }
