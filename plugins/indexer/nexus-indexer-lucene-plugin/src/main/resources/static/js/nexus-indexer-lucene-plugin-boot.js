@@ -10,10 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global requirejs*/
-
-// This file must be last in the aggregate plugin javascript file
-
-requirejs([
-    'nexus/siesta'
+/*global Ext, Sonatype, Nexus*/
+define('nexus-indexer-lucene-plugin-boot', [
+  'Sonatype/repoServer/ArtifactInformationPanel',
+  'Sonatype/repoServer/IndexBrowserPanel',
+  'Sonatype/repoServer/RepositoryIndexBrowserContainer',
+  'Sonatype/repoServer/searchLeftNav',
+  'Sonatype/repoServer/SearchPanel',
+  'Sonatype/repoServer/SearchResultGrid',
+  'repoContextMenuContributions'
 ]);

@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.unpack.internal.ui;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component( role = NexusResourceBundle.class, hint = "UnpackDocumentationResourceBundle" )
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+
+@Named
+@Singleton
 public class UnpackDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {

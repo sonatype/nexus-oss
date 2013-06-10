@@ -10,27 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.discovery;
+package org.sonatype.nexus.rest.docs;
 
-import java.io.IOException;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 
-/**
- * Component used to perform local content discovery.
- * 
- * @author cstamas
- * @since 2.4
- */
-public interface LocalContentDiscoverer
+@Named
+@Singleton
+public class TimelineDocumentationResourceBundle
+    extends AbstractDocumentationNexusResourceBundle
 {
-    /**
-     * Performs the discovery and returns the results.
-     * 
-     * @param mavenRepository to discover local content.
-     * @return the result of discovery,
-     * @throws IOException in case of IO problem.
-     */
-    DiscoveryResult<MavenRepository> discoverLocalContent( MavenRepository mavenRepository )
-        throws IOException;
+
+    @Override
+    public String getPluginId()
+    {
+        return "nexus-timeline-plugin";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "Timeline Plugin API";
+    }
+
 }

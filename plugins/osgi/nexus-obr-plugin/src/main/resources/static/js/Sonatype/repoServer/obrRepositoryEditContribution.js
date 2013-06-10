@@ -13,20 +13,23 @@
 /*
  * Use anonymous closure to augment the current class behaviour
  */
-(function() {
-  var originalHandler = Sonatype.repoServer.VirtualRepositoryEditor.prototype.afterProviderSelectHandler;
+define('Sonatype/repoServer/obrRepositoryEditContribution', function() {
 
-  Ext.override(Sonatype.repoServer.VirtualRepositoryEditor, {
-    afterProviderSelectHandler : function(combo, rec, index) {
+  (function() {
+    var originalHandler = Sonatype.repoServer.VirtualRepositoryEditor.prototype.afterProviderSelectHandler;
 
-      // first invoke the original behaviour
-      originalHandler.apply(this, arguments);
+    Ext.override(Sonatype.repoServer.VirtualRepositoryEditor, {
+      afterProviderSelectHandler : function(combo, rec, index) {
 
-      // virtual OBR can be applied on top of any non-virtual, non-OBR repository
-      if (rec.data.provider == 'obr-shadow') {
-        this.form.findField('shadowOf').store.filterBy(function fn(rec, id) {
-            return rec.data.repoType != 'virtual' && rec.data.format != 'obr';
-          });}
-    }
-  });
-})();
+        // first invoke the original behaviour
+        originalHandler.apply(this, arguments);
+
+        // virtual OBR can be applied on top of any non-virtual, non-OBR repository
+        if (rec.data.provider == 'obr-shadow') {
+          this.form.findField('shadowOf').store.filterBy(function fn(rec, id) {
+              return rec.data.repoType != 'virtual' && rec.data.format != 'obr';
+            });}
+      }
+    });
+  })();
+});

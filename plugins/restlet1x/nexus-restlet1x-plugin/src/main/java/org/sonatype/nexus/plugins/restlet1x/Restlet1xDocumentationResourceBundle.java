@@ -12,17 +12,17 @@
  */
 package org.sonatype.nexus.plugins.restlet1x;
 
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 
 /**
  * @since 2.3
  */
 @Named
 @Singleton
-public class DocumentationResourceBundleImpl
+public class Restlet1xDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
     @Override
@@ -36,4 +36,5 @@ public class DocumentationResourceBundleImpl
     {
         return "Restlet 1.x API";
     }
+
 }
