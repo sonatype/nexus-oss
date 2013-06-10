@@ -26,7 +26,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.routing.discovery.LocalContentDiscoverer;
@@ -71,11 +71,11 @@ public class LocalContentDiscovererImpl
     }
 
     @Override
-    public DiscoveryResult<MavenHostedRepository> discoverLocalContent( final MavenHostedRepository mavenRepository )
+    public DiscoveryResult<MavenRepository> discoverLocalContent( final MavenRepository mavenRepository )
         throws IOException
     {
-        final DiscoveryResult<MavenHostedRepository> discoveryResult =
-            new DiscoveryResult<MavenHostedRepository>( mavenRepository );
+        final DiscoveryResult<MavenRepository> discoveryResult =
+            new DiscoveryResult<MavenRepository>( mavenRepository );
         final WalkerContext context =
             new DefaultWalkerContext( mavenRepository, new ResourceStoreRequest( "/" ), new DefaultStoreWalkerFilter(),
                 true );

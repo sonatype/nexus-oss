@@ -13,10 +13,10 @@
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -34,7 +34,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -46,9 +45,14 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
 
-public class PrefixFileForProxiesAreUnmodifiedTest
+/**
+ * Test for NEXUS-5661 Proxy repo prefix file does not include paths only available from local storage.
+ * 
+ * @author cstamas
+ */
+public class PrefixFileContainsMergedLocalAndRemotePrefixesTest
     extends AbstractRoutingProxyTest
 {
     private static final String PROXY_REPO_ID = "proxy";
@@ -57,7 +61,7 @@ public class PrefixFileForProxiesAreUnmodifiedTest
 
     private EnvironmentBuilder environmentBuilder;
 
-    public PrefixFileForProxiesAreUnmodifiedTest()
+    public PrefixFileContainsMergedLocalAndRemotePrefixesTest()
         throws Exception
     {
         // fluke server to not have proxy autoblock, as remote connection refused IS a valid reason to auto block
@@ -84,7 +88,7 @@ public class PrefixFileForProxiesAreUnmodifiedTest
         {
             server =
                 Server.withPort( 0 ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                    Behaviours.content( prefixFile1( true ) ) );
+                    Behaviours.content( remotePrefixFile() ) );
             server.start();
 
             // we need one hosted repo only, so build it
@@ -104,6 +108,13 @@ public class PrefixFileForProxiesAreUnmodifiedTest
                 public void buildEnvironment( AbstractProxyTestEnvironment env )
                     throws ConfigurationException, IOException, ComponentLookupException
                 {
+                    // deploy a file into cache of proxy repo, that is NOT on remote
+                    final File repoRoot =
+                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + PROXY_REPO_ID );
+                    final File fakeArtifact = new File( repoRoot, "com/sonatype/foo/1.0/foo-1.0.pom" );
+                    Files.createParentDirs( fakeArtifact );
+                    Files.write( "dummy content".getBytes(), fakeArtifact );
+
                     final PlexusContainer container = env.getPlexusContainer();
                     final List<String> reposes = new ArrayList<String>();
                     {
@@ -146,20 +157,14 @@ public class PrefixFileForProxiesAreUnmodifiedTest
         return true;
     }
 
-    protected String prefixFile1( boolean withComments )
+    protected String remotePrefixFile()
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
-        if ( withComments )
-        {
-            pw.println( "# This is mighty prefix file!" );
-        }
+        pw.println( "# This is mighty prefix file!" );
         pw.println( "/org/apache/maven" );
         pw.println( "/org/sonatype" );
-        if ( withComments )
-        {
-            pw.println( " # Added later" );
-        }
+        pw.println( " # Added later" );
         pw.println( "/eu/flatwhite" );
         return sw.toString();
     }
@@ -168,7 +173,7 @@ public class PrefixFileForProxiesAreUnmodifiedTest
     public void proxyPrefixFileIsUnchanged()
         throws Exception
     {
-        // all is settled now, proxy should have prefix file pulled from remote
+        // all is settled now, proxy should have prefix file pulled from remote AND merged with cache content
         final MavenProxyRepository proxyRepository =
             getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID, MavenProxyRepository.class );
 
@@ -179,11 +184,10 @@ public class PrefixFileForProxiesAreUnmodifiedTest
         assertThat( "Prefix file for proxy repository should be discovered", proxyPrefixSource.supported() );
         assertThat( "Prefix file should be instanceof FilePrefixSource", proxyPrefixSource instanceof FilePrefixSource );
 
-        final FilePrefixSource filePrefixSource = (FilePrefixSource) proxyPrefixSource;
-        final StorageFileItem fileItem = filePrefixSource.getFileItem();
-
-        final String onDisk = CharStreams.toString( new InputStreamReader( fileItem.getInputStream() ) );
-
-        assertThat( "The remote and local content must be equal", onDisk, equalTo( prefixFile1( true ) ) );
+        final List<String> entries = proxyPrefixSource.readEntries();
+        // first 3 entries are from remote prefix file, see remotePrefixFile() method
+        // last 4th entry was "sneaked" in to storage (simulating locally but not remotely available file)
+        assertThat( entries,
+            containsInAnyOrder( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite", "/com/sonatype" ) );
     }
 }

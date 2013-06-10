@@ -143,7 +143,7 @@ public class LocalContentDiscovererImplTest
         addSomeContent( mavenRepository, PATHS1 );
 
         {
-            final DiscoveryResult<MavenHostedRepository> result =
+            final DiscoveryResult<MavenRepository> result =
                 localContentDiscoverer.discoverLocalContent( mavenRepository );
             assertThat( result, notNullValue() );
             assertThat( result.isSuccessful(), is( true ) );
@@ -161,7 +161,7 @@ public class LocalContentDiscovererImplTest
         addSomeContent( mavenRepository, PATHS2 );
 
         {
-            final DiscoveryResult<MavenHostedRepository> result =
+            final DiscoveryResult<MavenRepository> result =
                 localContentDiscoverer.discoverLocalContent( mavenRepository );
             assertThat( result, notNullValue() );
             assertThat( result.isSuccessful(), is( true ) );
@@ -178,7 +178,7 @@ public class LocalContentDiscovererImplTest
         removeSomeContent( mavenRepository, PATHS3 );
 
         {
-            final DiscoveryResult<MavenHostedRepository> result =
+            final DiscoveryResult<MavenRepository> result =
                 localContentDiscoverer.discoverLocalContent( mavenRepository );
             assertThat( result, notNullValue() );
             assertThat( result.isSuccessful(), is( true ) );
