@@ -184,6 +184,7 @@ public class TextFilePrefixSourceMarshaller
                         + prefixFileMaxEntryCount + "), refusing to load it." );
                 }
             }
+
             return new Result()
             {
                 @Override
