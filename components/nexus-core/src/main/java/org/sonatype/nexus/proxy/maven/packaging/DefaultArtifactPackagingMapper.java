@@ -60,6 +60,7 @@ public class DefaultArtifactPackagingMapper
         defaults.put( "java-source", "jar" );
         defaults.put( "javadoc", "jar" );
         defaults.put( "test-jar", "jar" );
+        defaults.put( "bundle", "jar" );
     }
 
     public void setPropertiesFile( File propertiesFile )
