@@ -12,26 +12,40 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.proxy;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.proxy.validator.P2ChecksumContentValidator;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.validator.FileTypeItemContentValidator;
 
-@Component( role = P2ProxyRepositoryConfigurator.class )
+@Named
+@Singleton
 public class P2ProxyRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
 
-    @Requirement( hint = "P2ChecksumContentValidator" )
-    private ItemContentValidator checksumValidator;
+    private final ItemContentValidator checksumValidator;
 
-    @Requirement( hint = "Pack200ContentValidator" )
-    private ItemContentValidator pack200Validator;
+    private final ItemContentValidator fileTypeItemContentValidator;
+
+    @Inject
+    public P2ProxyRepositoryConfigurator(
+        final @Named( P2ChecksumContentValidator.ID ) ItemContentValidator checksumValidator,
+        final @Named( FileTypeItemContentValidator.ID ) ItemContentValidator fileTypeItemContentValidator )
+    {
+        this.checksumValidator = checkNotNull( checksumValidator );
+        this.fileTypeItemContentValidator = checkNotNull( fileTypeItemContentValidator );
+    }
 
     @Override
     public void doApplyConfiguration( final Repository repository, final ApplicationConfiguration configuration,
@@ -45,7 +59,7 @@ public class P2ProxyRepositoryConfigurator
             final ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
 
             proxy.getItemContentValidators().put( "checksum", checksumValidator );
-            proxy.getItemContentValidators().put( "pack200", pack200Validator );
+            proxy.getItemContentValidators().put( "filetypevalidator", fileTypeItemContentValidator );
         }
     }
 }

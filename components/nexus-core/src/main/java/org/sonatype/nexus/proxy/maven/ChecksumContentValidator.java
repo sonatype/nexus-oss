@@ -13,8 +13,9 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -38,11 +39,15 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * 
  * @author cstamas
  */
-@Component( role = ItemContentValidator.class, hint = "ChecksumContentValidator" )
+@Named( ChecksumContentValidator.ID )
+@Singleton
 public class ChecksumContentValidator
     extends AbstractChecksumContentValidator
     implements ItemContentValidator
 {
+
+    public static final String  ID = "ChecksumContentValidator";
+
     public static final String SUFFIX_MD5 = ".md5";
 
     public static final String SUFFIX_SHA1 = ".sha1";

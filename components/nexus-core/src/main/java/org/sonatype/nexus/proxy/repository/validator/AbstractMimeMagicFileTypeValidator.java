@@ -12,13 +12,17 @@
  */
 package org.sonatype.nexus.proxy.repository.validator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
+import eu.medsea.mimeutil.MimeUtil2;
 
 /**
  * Helper base class for implementing {@link FileTypeValidator} components that want to verify the content's MIME magic
@@ -26,26 +30,37 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
  * implemented by implementor in a way it collects it's "expectations" from some source (internal state, some config,
  * whatever) and invokes the {@link #isExpectedFileTypeByDetectedMimeType(StorageFileItem, Set)} method with the file
  * item and the set of "expectations". If the set has intersection, file is claimed valid, otherwise invalid.
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public abstract class AbstractMimeMagicFileTypeValidator
     extends AbstractFileTypeValidator
 {
-    @Requirement
-    private MimeSupport mimeSupport;
 
-    /**
-     * Only use with plexus injection.
-     */
-    protected AbstractMimeMagicFileTypeValidator()
-    {
-    }
+    public static final String XML_DETECTION_LAX_KEY = FileTypeValidator.class.getName() + ".relaxedXmlValidation";
+
+    private static final boolean XML_DETECTION_LAX_DEFAULT = true;
+
+    private static final boolean XML_DETECTION_LAX = SystemPropertiesHelper.getBoolean(
+        XML_DETECTION_LAX_KEY, XML_DETECTION_LAX_DEFAULT
+    );
+
+    private final MimeSupport mimeSupport;
+
+    private final NexusMimeTypes mimeTypes;
 
     protected AbstractMimeMagicFileTypeValidator( final MimeSupport mimeSupport )
     {
-        this.mimeSupport = mimeSupport;
+        this.mimeSupport = checkNotNull( mimeSupport );
+        this.mimeTypes = new NexusMimeTypes();
+    }
+
+    protected AbstractMimeMagicFileTypeValidator( final NexusMimeTypes mimeTypes,
+                                                  final MimeSupport mimeSupport )
+    {
+        this.mimeSupport = checkNotNull( mimeSupport );
+        this.mimeTypes = checkNotNull( mimeTypes );
     }
 
     /**
@@ -53,11 +68,11 @@ public abstract class AbstractMimeMagicFileTypeValidator
      * match against. If the detected set of MIME types and passed in set of MIME types has intersection, file is
      * claimed VALID, otherwise INVALID. If the passed in set of expectations is empty of {@code null}, NEUTRAL stance
      * is claimed and nothing is done.
-     * 
-     * @param file to have checked content.
+     *
+     * @param file              to have checked content.
      * @param expectedMimeTypes the "expectations" against detected MIME types.
-     * @return {@link FileTypeValidity.VALID} if detected MIME types and passed in expectations has intersection,
-     *         {@link FileTypeValidity.INVALID} otherwise. {@link FileTypeValidity.NEUTRAL} if passed in expectations
+     * @return {@link FileTypeValidity#VALID} if detected MIME types and passed in expectations has intersection,
+     *         {@link FileTypeValidity#INVALID} otherwise. {@link FileTypeValidity#NEUTRAL} if passed in expectations
      *         are {@code null} or empty.
      * @throws IOException in case of some IO problem.
      */
@@ -77,7 +92,8 @@ public abstract class AbstractMimeMagicFileTypeValidator
         {
             getLogger().debug(
                 "Checking StorageFileItem {} is one of the expected mime types: {}, detected mime types are: {}",
-                new Object[] { file.getRepositoryItemUid(), expectedMimeTypes, magicMimeTypes } );
+                file.getRepositoryItemUid(), expectedMimeTypes, magicMimeTypes
+            );
         }
 
         for ( String magicMimeType : magicMimeTypes )
@@ -90,8 +106,70 @@ public abstract class AbstractMimeMagicFileTypeValidator
 
         getLogger().info(
             "StorageFileItem {} MIME-magic validation failed: expected MIME types: {}, detected MIME types: {}",
-            new Object[] { file.getRepositoryItemUid(), expectedMimeTypes, magicMimeTypes } );
+            file.getRepositoryItemUid(), expectedMimeTypes, magicMimeTypes
+        );
 
         return FileTypeValidity.INVALID;
     }
+
+    @Override
+    public FileTypeValidity isExpectedFileType( final StorageFileItem file )
+    {
+        boolean xmlLaxValidation = isXmlLaxValidation( file );
+
+        final String filePath = file.getPath().toLowerCase();
+
+        final Set<String> expectedMimeTypes = new HashSet<String>();
+
+        final NexusMimeTypes.NexusMimeType type = mimeTypes.getMimeTypes( MimeUtil2.getExtension( filePath ) );
+        if ( type != null )
+        {
+            expectedMimeTypes.addAll( type.getMimetypes() );
+        }
+
+        try
+        {
+            // the expectedMimeTypes will be empty, see map in constructor which extensions we check at all.
+            // The isExpectedFileTypeByDetectedMimeType() method will claim NEUTRAL when expectancies are empty/null
+            final FileTypeValidity mimeDetectionResult = isExpectedFileTypeByDetectedMimeType(
+                file, expectedMimeTypes
+            );
+
+            if ( FileTypeValidity.INVALID.equals( mimeDetectionResult )
+                && xmlLaxValidation
+                && filePath.endsWith( ".xml" ) )
+            {
+                // we go LAX way, if MIME detection says INVALID (does for XMLs missing preamble too)
+                // we just stay put saying we are "neutral" on this question
+                return FileTypeValidity.NEUTRAL;
+            }
+
+            return mimeDetectionResult;
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn(
+                "Cannot detect MIME type and validate content of StorageFileItem: " + file.getRepositoryItemUid(),
+                e );
+
+            return FileTypeValidity.NEUTRAL;
+        }
+    }
+
+    protected boolean isXmlLaxValidation( final StorageFileItem file )
+    {
+        // Note: this here is an ugly hack: enables per-request control of
+        // LAX XML validation: if key not present, "system wide" settings used.
+        // If key present, it's interpreted as Boolean and it's value is used to
+        // drive LAX XML validation enable/disable.
+        boolean xmlLaxValidation = XML_DETECTION_LAX;
+        if ( file.getItemContext().containsKey( XML_DETECTION_LAX_KEY ) )
+        {
+            xmlLaxValidation = Boolean.parseBoolean(
+                String.valueOf( file.getItemContext().get( XML_DETECTION_LAX_KEY ) )
+            );
+        }
+        return xmlLaxValidation;
+    }
+
 }

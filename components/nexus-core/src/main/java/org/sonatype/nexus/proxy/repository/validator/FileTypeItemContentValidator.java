@@ -13,9 +13,10 @@
 package org.sonatype.nexus.proxy.repository.validator;
 
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
@@ -23,12 +24,21 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
-@Component( role = ItemContentValidator.class, hint = "FileTypeItemContentValidator" )
+@Named( FileTypeItemContentValidator.ID )
+@Singleton
 public class FileTypeItemContentValidator
     implements ItemContentValidator
 {
-    @Requirement
-    private FileTypeValidatorHub validatorHub;
+
+    public static final String ID = "FileTypeItemContentValidator";
+
+    private final FileTypeValidatorHub validatorHub;
+
+    @Inject
+    public FileTypeItemContentValidator( final FileTypeValidatorHub validatorHub )
+    {
+        this.validatorHub = validatorHub;
+    }
 
     public boolean isRemoteItemContentValid( final ProxyRepository proxy, final ResourceStoreRequest request,
                                              final String baseUrl, final AbstractStorageItem item,

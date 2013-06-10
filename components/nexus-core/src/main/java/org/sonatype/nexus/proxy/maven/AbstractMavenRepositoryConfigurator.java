@@ -20,14 +20,15 @@ import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.validator.FileTypeItemContentValidator;
 
 public abstract class AbstractMavenRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
-    @Requirement( hint = "ChecksumContentValidator" )
+    @Requirement( hint = ChecksumContentValidator.ID )
     private ItemContentValidator checksumValidator;
 
-    @Requirement( hint = "FileTypeItemContentValidator" )
+    @Requirement( hint = FileTypeItemContentValidator.ID )
     private ItemContentValidator fileTypeItemContentValidator;
     
     @Override
