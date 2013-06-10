@@ -14,6 +14,7 @@ package org.sonatype.nexus.testsuite.misc.nexus4301;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,6 +22,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.ITHelperLogUtils;
 
+import com.google.common.collect.Maps;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -101,17 +103,19 @@ public class Nexus4301WarnErrorLogsLoadTestIT
 
         // logging is asynchronous so give it a bit of time
         getEventInspectorsUtil().waitForCalmPeriod();
-        
-        SyndFeed feed = FeedUtil.getFeed( "errorWarning", 0, Integer.MAX_VALUE );
+
+        final Map<String, String> params = Maps.newHashMap();
+        params.put( "lts", String.valueOf( Integer.MAX_VALUE ) );
+        final SyndFeed feed = FeedUtil.getFeed( "errorWarning", 0, Integer.MAX_VALUE, params );
 
         for ( String message : messagesError )
         {
-            assertFeedContainsEntryFor(feed, message );
+            assertFeedContainsEntryFor( feed, message );
         }
 
         for ( String message : messagesWarn )
         {
-            assertFeedContainsEntryFor(feed, message );
+            assertFeedContainsEntryFor( feed, message );
         }
     }
 
@@ -120,7 +124,7 @@ public class Nexus4301WarnErrorLogsLoadTestIT
         return this.getClass().getName() + "-" + System.currentTimeMillis() + "(" + id + ")";
     }
 
-    private void assertFeedContainsEntryFor(SyndFeed feed, String message )
+    private void assertFeedContainsEntryFor( SyndFeed feed, String message )
         throws Exception
     {
         @SuppressWarnings( "unchecked" )
@@ -128,7 +132,7 @@ public class Nexus4301WarnErrorLogsLoadTestIT
         for ( SyndEntry entry : entries )
         {
             SyndContent description = entry.getDescription();
-            if ( description != null && description.getValue().startsWith( message ) )
+            if ( description != null && description.getValue().contains( message ) )
             {
                 return;
             }

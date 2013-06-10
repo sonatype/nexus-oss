@@ -150,7 +150,7 @@ public class Nexus4427WarnErrorLogsToFeedsIT
         for ( SyndEntry entry : entries )
         {
             SyndContent description = entry.getDescription();
-            if ( description != null && description.getValue().startsWith( message ) )
+            if ( description != null && description.getValue().contains( message ) )
             {
                 return;
             }
@@ -167,7 +167,7 @@ public class Nexus4427WarnErrorLogsToFeedsIT
         for ( SyndEntry entry : entries )
         {
             SyndContent description = entry.getDescription();
-            if ( description != null && description.getValue().startsWith( message ) )
+            if ( description != null && description.getValue().contains( message ) )
             {
                 Assert.fail( "Feed contains entry for " + message );
             }
