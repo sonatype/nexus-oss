@@ -214,13 +214,6 @@ public class FilePrefixSource
         throws IOException
     {
         checkNotNull( prefixSource );
-        if ( prefixSource instanceof FilePrefixSource
-            && getRepositoryItemUid().equals( ( (FilePrefixSource) prefixSource ).getRepositoryItemUid() ) )
-        {
-            // we don't want to read and then write to same file
-            // as basically doing that operation would not change anything
-            return;
-        }
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         getPrefixSourceMarshaller().write( prefixSource.readEntries(), bos );
         putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
@@ -260,12 +253,6 @@ public class FilePrefixSource
             lock.unlock();
         }
         return null; // to make compiler happy. but is unreachable
-    }
-
-    protected boolean equals( final FilePrefixSource prefixesEntrySource )
-    {
-        return getMavenRepository().getId().equals( prefixesEntrySource.getMavenRepository().getId() )
-            && getFilePath().equals( prefixesEntrySource.getFilePath() );
     }
 
     protected StorageFileItem getFileItem()

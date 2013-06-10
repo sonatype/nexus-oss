@@ -182,6 +182,9 @@ public class RoutingFilteringIT
         // waitForWLPublishingOutcomes( proxyRepository.id() );
         client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
 
+        // nuke the repo cache
+        nukeProxyCaches( proxyRepository.id() );
+
         try
         {
             // clear recorder
@@ -192,8 +195,6 @@ public class RoutingFilteringIT
                 assertThat( routing().getStatus( proxyRepository.id() ).getPublishedStatus(),
                     equalTo( Outcome.FAILED ) );
 
-                // nuke the repo cache
-                nukeProxyCaches( proxyRepository.id() );
                 // and because no WL, we can fetch whatever we want (com and org)
                 // all these will go remotely
                 fetchAndAssert( downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_POM, true );
@@ -224,6 +225,9 @@ public class RoutingFilteringIT
                         ORG_SOMEORG_ARTIFACT_10_JAR, ORG_SOMEORG_ARTIFACT_10_JAR + ".sha1", FLUKE_ARTIFACT_POM,
                         FLUKE_ARTIFACT_JAR ) );
             }
+
+            // nuke the repo cache
+            nukeProxyCaches( proxyRepository.id() );
 
             // now set the prefixes file that contains /org/someorg prefix only, and repeat
             prefixesFile.setContent( Files.toString( testData().resolveFile( "someorg-prefixes.txt" ),
