@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.p2.nexus5741;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.LogFileMatcher;
 
 /**
  * ITs related to validation of proxied items content for P2 repositories.
@@ -47,15 +51,31 @@ public class Nexus5741P2RepositoryContentValidationIT
     public void jarWithXmlContentShouldBeInvalid()
         throws IOException
     {
-        thrown.expect( FileNotFoundException.class );
-        thrown.expectMessage(
-            "content/repositories/nexus5741/org.eclipse.mylyn.commons.core_3.8.4.v20130429-0100.jar"
-        );
+        try
+        {
+            downloadFile(
+                new URL( getNexusTestRepoUrl() + "org.eclipse.mylyn.commons.core_3.8.4.v20130429-0100.jar" ),
+                new File( "target/downloads/nexus5741/org.eclipse.mylyn.commons.core_3.8.4.v20130429-0100.jar" )
+                    .getCanonicalPath()
+            );
 
-        downloadFile(
-            new URL( getNexusTestRepoUrl() + "org.eclipse.mylyn.commons.core_3.8.4.v20130429-0100.jar" ),
-            new File( "target/downloads/nexus5741/org.eclipse.mylyn.commons.core_3.8.4.v20130429-0100.jar" )
-                .getCanonicalPath()
+            assertThat( "Expected to fail with " + FileNotFoundException.class.getSimpleName(), false );
+        }
+        catch ( final FileNotFoundException e )
+        {
+            assertThat(
+                e.getMessage(),
+                containsString(
+                    "content/repositories/nexus5741/org.eclipse.mylyn.commons.core_3.8.4.v20130429-0100.jar"
+                )
+            );
+        }
+
+        assertThat(
+            getNexusLogFile(),
+            LogFileMatcher.hasText(
+                "Proxied item nexus5741:/org.eclipse.mylyn.commons.core_3.8.4.v20130429-0100.jar evaluated as INVALID during content validation (validator=filetypevalidator"
+            )
         );
     }
 
