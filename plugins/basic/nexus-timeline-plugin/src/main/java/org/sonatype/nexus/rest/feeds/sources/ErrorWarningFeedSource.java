@@ -23,6 +23,8 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.log.LogManager;
 
 import com.google.common.collect.Lists;
@@ -73,7 +75,28 @@ public class ErrorWarningFeedSource
         return getDescription();
     }
 
-    public SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
+    protected int getLinesToScan( final Map<String, String> params )
+        throws ResourceException
+    {
+        int linesToScan = LINES_TO_SCAN;
+        try
+        {
+            if ( params.containsKey( "lts" ) )
+            {
+                linesToScan = Integer.valueOf( params.get( "lts" ) );
+            }
+        }
+        catch ( NumberFormatException e )
+        {
+            throw new ResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "The 'lts' parameters must be number!",
+                e );
+        }
+        return linesToScan;
+    }
+
+    public SyndFeed getFeed( final Integer from, final Integer count, final Map<String, String> params )
         throws IOException
     {
         final SyndFeedImpl feed = new SyndFeedImpl();
@@ -97,9 +120,10 @@ public class ErrorWarningFeedSource
                     new LineNumberReader( Files.newReader( logFile, Charset.forName( "UTF-8" ) ) );
                 reader.setLineNumber( Integer.MAX_VALUE );
                 final int totalLines = reader.getLineNumber();
-                if ( totalLines > LINES_TO_SCAN )
+                final int linesToScan = getLinesToScan( params );
+                if ( totalLines > linesToScan )
                 {
-                    reader.setLineNumber( totalLines - LINES_TO_SCAN );
+                    reader.setLineNumber( totalLines - linesToScan );
                 }
                 else
                 {
