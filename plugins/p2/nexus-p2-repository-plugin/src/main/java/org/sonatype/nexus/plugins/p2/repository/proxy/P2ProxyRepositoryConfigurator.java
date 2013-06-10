@@ -21,10 +21,12 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.proxy.validator.P2ChecksumContentValidator;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.validator.FileTypeItemContentValidator;
 
 @Named
 @Singleton
@@ -38,8 +40,8 @@ public class P2ProxyRepositoryConfigurator
 
     @Inject
     public P2ProxyRepositoryConfigurator(
-        final @Named( "P2ChecksumContentValidator" ) ItemContentValidator checksumValidator,
-        final @Named( "FileTypeItemContentValidator" ) ItemContentValidator fileTypeItemContentValidator )
+        final @Named( P2ChecksumContentValidator.ID ) ItemContentValidator checksumValidator,
+        final @Named( FileTypeItemContentValidator.ID ) ItemContentValidator fileTypeItemContentValidator )
     {
         this.checksumValidator = checkNotNull( checksumValidator );
         this.fileTypeItemContentValidator = checkNotNull( fileTypeItemContentValidator );
