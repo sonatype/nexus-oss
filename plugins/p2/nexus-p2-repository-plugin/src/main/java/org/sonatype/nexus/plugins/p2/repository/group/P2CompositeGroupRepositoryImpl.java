@@ -132,7 +132,7 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) )
         {
-            createP2CompositeXmls( toUri( event.getNewRepositoryMemberIds() ) );
+            createP2CompositeXmls( event.getNewRepositoryMemberIds() );
         }
     }
 
@@ -141,14 +141,14 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) )
         {
-            createP2CompositeXmls( toUri( getMemberRepositoryIds() ) );
+            createP2CompositeXmls( getMemberRepositoryIds() );
         }
     }
 
     @Subscribe
     public void onEvent( final NexusStartedEvent event )
     {
-        createP2CompositeXmls( toUri( getMemberRepositoryIds() ) );
+        createP2CompositeXmls( getMemberRepositoryIds() );
     }
 
     @Subscribe
@@ -156,32 +156,11 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) && event.getNewLocalStatus().shouldServiceRequest() )
         {
-            createP2CompositeXmls( toUri( getMemberRepositoryIds() ) );
+            createP2CompositeXmls( getMemberRepositoryIds() );
         }
     }
 
-    private URI[] toUri( final List<String> memberRepositoryIds )
-    {
-        if ( memberRepositoryIds == null || memberRepositoryIds.isEmpty() )
-        {
-            return new URI[0];
-        }
-        final URI[] uris = new URI[memberRepositoryIds.size()];
-        for ( int i = 0; i < memberRepositoryIds.size(); i++ )
-        {
-            try
-            {
-                uris[i] = new URI( memberRepositoryIds.get( i ) );
-            }
-            catch ( URISyntaxException e )
-            {
-                throw Throwables.propagate( e );
-            }
-        }
-        return uris;
-    }
-
-    private void createP2CompositeXmls( final URI... memberRepositoryIds )
+    private void createP2CompositeXmls( final List<String> memberRepositoryIds )
     {
         if ( !getLocalStatus().shouldServiceRequest()
             || !applicationStatusSource.getSystemStatus().isNexusStarted() )
@@ -195,8 +174,11 @@ public class P2CompositeGroupRepositoryImpl
             try
             {
                 tempP2Repository = createTemporaryP2Repository();
-                compositeRepository.addArtifactsRepository( tempP2Repository.toURI(), memberRepositoryIds );
-                compositeRepository.addMetadataRepository( tempP2Repository.toURI(), memberRepositoryIds );
+
+                final URI[] memberRepositoryUris = toUris( memberRepositoryIds );
+
+                compositeRepository.addArtifactsRepository( tempP2Repository.toURI(), memberRepositoryUris );
+                compositeRepository.addMetadataRepository( tempP2Repository.toURI(), memberRepositoryUris );
 
                 final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
                 final RepositoryItemUidLock lock = uid.getLock();
@@ -238,6 +220,27 @@ public class P2CompositeGroupRepositoryImpl
         {
             throw Throwables.propagate( e );
         }
+    }
+
+    private URI[] toUris( final List<String> memberRepositoryIds )
+    {
+        if ( memberRepositoryIds == null || memberRepositoryIds.isEmpty() )
+        {
+            return new URI[0];
+        }
+        final URI[] uris = new URI[memberRepositoryIds.size()];
+        for ( int i = 0; i < memberRepositoryIds.size(); i++ )
+        {
+            try
+            {
+                uris[i] = new URI( memberRepositoryIds.get( i ) );
+            }
+            catch ( URISyntaxException e )
+            {
+                throw Throwables.propagate( e );
+            }
+        }
+        return uris;
     }
 
     @Override
