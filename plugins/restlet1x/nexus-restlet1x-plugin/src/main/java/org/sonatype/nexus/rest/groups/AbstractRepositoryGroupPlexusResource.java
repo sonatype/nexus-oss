@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.rest.groups;
 
+import static org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate.ProviderHint;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
+import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
@@ -210,9 +213,9 @@ public abstract class AbstractRepositoryGroupPlexusResource
             ContentClass contentClass =
                 repositoryTypeRegistry.getRepositoryContentClass( GroupRepository.class, model.getProvider() );
 
-            RepositoryTemplate template =
-                (RepositoryTemplate) getNexus().getRepositoryTemplates().getTemplates( GroupRepository.class,
-                                                                                       contentClass ).pick();
+            RepositoryTemplate template = (RepositoryTemplate) getNexus().getRepositoryTemplates().getTemplates(
+                GroupRepository.class, contentClass, new ProviderHint( model.getProvider() )
+            ).pick();
 
             template.getConfigurableRepository().setId( model.getId() );
 
