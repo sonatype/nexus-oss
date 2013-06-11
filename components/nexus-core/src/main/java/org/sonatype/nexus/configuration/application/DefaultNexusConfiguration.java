@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -354,7 +354,7 @@ public class DefaultNexusConfiguration
     {
         try
         {
-            final Subject subject = ThreadContext.getSubject();
+            final Subject subject = SecurityUtils.getSubject();
             if ( subject != null && subject.getPrincipal() != null )
             {
                 return subject.getPrincipal().toString();
