@@ -27,6 +27,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -40,6 +41,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -82,6 +84,9 @@ public class P2CompositeGroupRepositoryImpl
 
     @Requirement
     private CompositeRepository compositeRepository;
+
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
     private RepositoryKind repositoryKind;
 
@@ -141,6 +146,12 @@ public class P2CompositeGroupRepositoryImpl
     }
 
     @Subscribe
+    public void onEvent( final NexusStartedEvent event )
+    {
+        createP2CompositeXmls( toUri( getMemberRepositoryIds() ) );
+    }
+
+    @Subscribe
     public void onEvent( final RepositoryEventLocalStatusChanged event )
     {
         if ( this.equals( event.getRepository() ) && event.getNewLocalStatus().shouldServiceRequest() )
@@ -172,7 +183,8 @@ public class P2CompositeGroupRepositoryImpl
 
     private void createP2CompositeXmls( final URI... memberRepositoryIds )
     {
-        if ( !getLocalStatus().shouldServiceRequest() )
+        if ( !getLocalStatus().shouldServiceRequest()
+            || !applicationStatusSource.getSystemStatus().isNexusStarted() )
         {
             return;
         }
