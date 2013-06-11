@@ -12,11 +12,10 @@
  */
 package org.sonatype.nexus.plugins.p2.repository;
 
-import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
 public interface P2GroupRepository
     extends GroupRepository, P2Repository
 {
-    P2MetadataSource<P2GroupRepository> getMetadataSource();
+
 }

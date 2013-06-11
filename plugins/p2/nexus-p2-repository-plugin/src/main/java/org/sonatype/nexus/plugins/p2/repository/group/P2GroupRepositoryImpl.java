@@ -58,12 +58,6 @@ public class P2GroupRepositoryImpl
     private RepositoryKind repositoryKind;
 
     @Override
-    public P2MetadataSource<P2GroupRepository> getMetadataSource()
-    {
-        return metadataSource;
-    }
-
-    @Override
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
