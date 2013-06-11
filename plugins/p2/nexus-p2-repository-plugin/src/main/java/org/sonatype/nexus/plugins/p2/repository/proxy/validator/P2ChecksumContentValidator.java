@@ -13,8 +13,9 @@
 package org.sonatype.nexus.plugins.p2.repository.proxy.validator;
 
 import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactMapping;
@@ -35,14 +36,15 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 /**
  * P2 checksum content validator.
- * 
- * @author velo
  */
-@Component( role = ItemContentValidator.class, hint = "P2ChecksumContentValidator" )
+@Named( P2ChecksumContentValidator.ID )
+@Singleton
 public class P2ChecksumContentValidator
     extends AbstractChecksumContentValidator
     implements ItemContentValidator
 {
+
+    public static final String ID = "P2ChecksumContentValidator";
 
     @Override
     protected ChecksumPolicy getChecksumPolicy( final ProxyRepository proxy, final AbstractStorageItem item )

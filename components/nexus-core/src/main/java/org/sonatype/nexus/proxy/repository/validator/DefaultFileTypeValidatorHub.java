@@ -13,22 +13,29 @@
 package org.sonatype.nexus.proxy.repository.validator;
 
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator.FileTypeValidity;
 
-@Component( role = FileTypeValidatorHub.class )
+@Named
+@Singleton
 public class DefaultFileTypeValidatorHub
     extends AbstractLoggingComponent
     implements FileTypeValidatorHub
 {
 
-    @Requirement( role = FileTypeValidator.class )
-    private Map<String, FileTypeValidator> fileTypeValidators;
+    private final Map<String, FileTypeValidator> fileTypeValidators;
+
+    @Inject
+    public DefaultFileTypeValidatorHub( final Map<String, FileTypeValidator> fileTypeValidators )
+    {
+        this.fileTypeValidators = fileTypeValidators;
+    }
 
     @Override
     public boolean isExpectedFileType( final StorageItem item )
