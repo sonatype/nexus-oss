@@ -13,12 +13,16 @@
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -29,8 +33,10 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 
-class NexusUtils
+public class NexusUtils
 {
+
+    private static final String GENERATED_AT_ATTRIBUTE = "p2Repository.generated.timestamp";
 
     private static final String DOT = ".";
 
@@ -79,7 +85,7 @@ class NexusUtils
         }
     }
 
-    static void storeItem( final Repository repository, final ResourceStoreRequest request, final InputStream in,
+    public static void storeItem( final Repository repository, final ResourceStoreRequest request, final InputStream in,
                            final String mimeType, final Map<String, String> userAttributes )
         throws Exception
     {
@@ -162,6 +168,39 @@ class NexusUtils
             return false;
         }
         return path.startsWith( DOT ) || path.startsWith( "/" + DOT ) || path.startsWith( File.separator + DOT );
+    }
+
+    public static File createTemporaryP2Repository()
+        throws IOException
+    {
+        File tempP2Repository;
+        tempP2Repository = File.createTempFile( "nexus-p2-repository-plugin", "" );
+        tempP2Repository.delete();
+        tempP2Repository.mkdirs();
+        return tempP2Repository;
+    }
+
+    public static void storeItemFromFile( final String path,
+                                          final File file,
+                                          final Repository repository,
+                                          final String mimeType )
+        throws Exception
+    {
+        InputStream in = null;
+        try
+        {
+            in = new FileInputStream( file );
+            final Map<String, String> attributes = new HashMap<String, String>();
+            attributes.put( GENERATED_AT_ATTRIBUTE, new Date().toString() );
+
+            final ResourceStoreRequest request = new ResourceStoreRequest( path );
+
+            storeItem( repository, request, in, mimeType, attributes );
+        }
+        finally
+        {
+            IOUtil.close( in );
+        }
     }
 
     private static String[] getReversePathSegments( final File file )
