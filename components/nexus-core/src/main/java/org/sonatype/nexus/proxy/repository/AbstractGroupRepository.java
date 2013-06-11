@@ -260,14 +260,17 @@ public abstract class AbstractGroupRepository
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
-        try
+        if ( !request.isRequestGroupMembersOnly() )
         {
-            // local always wins
-            return super.doRetrieveItem( request );
-        }
-        catch ( ItemNotFoundException ignored )
-        {
-            // ignored
+            try
+            {
+                // local always wins
+                return super.doRetrieveItem( request );
+            }
+            catch ( ItemNotFoundException ignored )
+            {
+                // ignored
+            }
         }
 
         boolean hasRequestAuthorizedFlag = request.getRequestContext().containsKey( AccessManager.REQUEST_AUTHORIZED );

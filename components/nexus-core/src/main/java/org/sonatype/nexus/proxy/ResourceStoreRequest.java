@@ -228,6 +228,16 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Checks if is request group members only.
+     *
+     * @return true, if is request group members only
+     */
+    public boolean isRequestGroupMembersOnly()
+    {
+        return getRequestContext().isRequestGroupMembersOnly();
+    }
+
+    /**
      * Sets the request as expired.
      * 
      * @param asExpired the new request asExpired value
@@ -256,6 +266,17 @@ public class ResourceStoreRequest
     public ResourceStoreRequest setRequestGroupLocalOnly( boolean requestGroupLocal )
     {
         getRequestContext().setRequestGroupLocalOnly( requestGroupLocal );
+        return this;
+    }
+
+    /**
+     * Sets the request group members only.
+     *
+     * @param requestGroupMembers the new request group local only
+     */
+    public ResourceStoreRequest setRequestGroupMembersOnly( boolean requestGroupMembers )
+    {
+        getRequestContext().setRequestGroupMembersOnly( requestGroupMembers );
         return this;
     }
 

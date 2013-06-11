@@ -58,6 +58,12 @@ public class RequestContext
     public static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
 
     /**
+     * Context flag to mark a request group members only. For {@link GroupRepository} instances: do not look in local
+     * storage, only into into members, else: no effect.
+     */
+    public static final String CTX_GROUP_MEMEBRS_ONLY_FLAG = "request.groupMembersOnly";
+
+    /**
      * Context flag to mark a request be processed as the item would be expired. For {@link ProxyRepository} instances:
      * do check remote for newer but take into account local cache content, else: no effect.
      */
@@ -235,7 +241,7 @@ public class RequestContext
 
     /**
      * Checks if is request group local only.
-     * 
+     *
      * @return true, if is request group local only
      */
     public boolean isRequestGroupLocalOnly()
@@ -258,6 +264,33 @@ public class RequestContext
     public void setRequestGroupLocalOnly( boolean requestGroupLocal )
     {
         put( CTX_GROUP_LOCAL_ONLY_FLAG, requestGroupLocal );
+    }
+
+    /**
+     * Checks if is request group members only.
+     *
+     * @return true, if is request group members only
+     */
+    public boolean isRequestGroupMembersOnly()
+    {
+        if ( containsKey( CTX_GROUP_MEMEBRS_ONLY_FLAG ) )
+        {
+            return (Boolean) get( CTX_GROUP_MEMEBRS_ONLY_FLAG );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Sets the request group members only.
+     *
+     * @param requestGroupMembers the new request group memebrs only
+     */
+    public void setRequestGroupMembersOnly( boolean requestGroupMembers )
+    {
+        put( CTX_GROUP_MEMEBRS_ONLY_FLAG, requestGroupMembers );
     }
 
     /**
