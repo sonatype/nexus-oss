@@ -32,7 +32,7 @@ public class NXCM0128P2GroupIT
         this( "nxcm0128" );
     }
 
-    public NXCM0128P2GroupIT( final String testRepositoryId )
+    NXCM0128P2GroupIT( final String testRepositoryId )
     {
         super( testRepositoryId );
     }

@@ -36,7 +36,7 @@ public class NXCM3339P2GroupMemberRetrieveErrorIT
         this( "nxcm3339" );
     }
 
-    public NXCM3339P2GroupMemberRetrieveErrorIT( final String testRepositoryId )
+    NXCM3339P2GroupMemberRetrieveErrorIT( final String testRepositoryId )
     {
         super( testRepositoryId );
         repositoryMessageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );

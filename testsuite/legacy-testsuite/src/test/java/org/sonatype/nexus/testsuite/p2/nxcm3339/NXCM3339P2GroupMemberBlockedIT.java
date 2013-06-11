@@ -34,7 +34,7 @@ public class NXCM3339P2GroupMemberBlockedIT
         this( "nxcm3339" );
     }
 
-    public NXCM3339P2GroupMemberBlockedIT( final String testRepositoryId )
+    NXCM3339P2GroupMemberBlockedIT( final String testRepositoryId )
     {
         super( testRepositoryId );
         repositoryMessageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
