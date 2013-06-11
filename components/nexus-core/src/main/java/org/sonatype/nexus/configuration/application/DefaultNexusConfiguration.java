@@ -352,16 +352,21 @@ public class DefaultNexusConfiguration
 
     protected String getCurrentUserId()
     {
-        Subject subject = ThreadContext.getSubject(); // Use ThreadContext directly, SecurityUtils will associate a
-                                                      // new Subject with the thread.
-        if ( subject != null && subject.getPrincipal() != null )
+        try
         {
-            return subject.getPrincipal().toString();
+            final Subject subject = ThreadContext.getSubject();
+            if ( subject != null && subject.getPrincipal() != null )
+            {
+                return subject.getPrincipal().toString();
+            }
         }
-        else
+        catch ( final Exception e )
         {
-            return null;
+            // NEXUS-5749: Prevent interruption of configuration save (and hence, data loss) for any
+            // exception thrown while gathering userId for logging purposes.
+            getLogger().warn( "Could not obtain Shiro subject:", e );
         }
+        return null;
     }
 
     public synchronized boolean applyConfiguration()
