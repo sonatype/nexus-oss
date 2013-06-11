@@ -132,7 +132,7 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) )
         {
-            createP2CompositeXmls( event.getNewRepositoryMemberIds() );
+            createP2CompositeXmls( event.getNewRepositoryMemberIds(), true );
         }
     }
 
@@ -141,14 +141,14 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) )
         {
-            createP2CompositeXmls( getMemberRepositoryIds() );
+            createP2CompositeXmls( getMemberRepositoryIds(), false );
         }
     }
 
     @Subscribe
     public void onEvent( final NexusStartedEvent event )
     {
-        createP2CompositeXmls( getMemberRepositoryIds() );
+        createP2CompositeXmls( getMemberRepositoryIds(), false );
     }
 
     @Subscribe
@@ -156,16 +156,30 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) && event.getNewLocalStatus().shouldServiceRequest() )
         {
-            createP2CompositeXmls( getMemberRepositoryIds() );
+            createP2CompositeXmls( getMemberRepositoryIds(), true );
         }
     }
 
-    private void createP2CompositeXmls( final List<String> memberRepositoryIds )
+    private void createP2CompositeXmls( final List<String> memberRepositoryIds,
+                                        final boolean forced )
     {
         if ( !getLocalStatus().shouldServiceRequest()
             || !applicationStatusSource.getSystemStatus().isNexusStarted() )
         {
             return;
+        }
+        if ( !forced )
+        {
+            try
+            {
+                retrieveItem( true, new ResourceStoreRequest( COMPOSITE_ARTIFACTS_XML ) );
+                // xmls are present, so bailout
+                return;
+            }
+            catch ( Exception e )
+            {
+                // will regenerate
+            }
         }
 
         try
