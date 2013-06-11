@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.p2.nxcm3339;
 
+/**
+ * @since 2.6
+ */
 public class NXCM3339P2CompositeGroupMemberRetrieveErrorIT
     extends NXCM3339P2GroupMemberRetrieveErrorIT
 {

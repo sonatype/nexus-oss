@@ -50,7 +50,6 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.p2.bridge.CompositeRepository;
@@ -58,6 +57,11 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 
+/**
+ * P2 group using P2 composite repositories.
+ *
+ * @since 2.6
+ */
 @Component( role = GroupRepository.class, hint = P2CompositeGroupRepositoryImpl.ROLE_HINT,
             instantiationStrategy = "per-lookup", description = "Eclipse P2 Composite" )
 public class P2CompositeGroupRepositoryImpl

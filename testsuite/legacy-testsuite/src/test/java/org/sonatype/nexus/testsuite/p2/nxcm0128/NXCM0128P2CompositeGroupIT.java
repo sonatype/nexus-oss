@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.p2.nxcm0128;
 
+/**
+ * @since 2.6
+ */
 public class NXCM0128P2CompositeGroupIT
     extends NXCM0128P2GroupIT
 {

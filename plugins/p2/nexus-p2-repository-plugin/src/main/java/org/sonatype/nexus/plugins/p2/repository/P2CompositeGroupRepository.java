@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.plugins.p2.repository;
 
+/**
+ * P2 group using P2 composite repositories.
+ *
+ * @since 2.6
+ */
 public interface P2CompositeGroupRepository
     extends P2GroupRepository
 {

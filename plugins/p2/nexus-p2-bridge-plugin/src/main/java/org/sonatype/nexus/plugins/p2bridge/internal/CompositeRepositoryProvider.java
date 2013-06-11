@@ -17,8 +17,11 @@ import javax.inject.Provider;
 
 import org.sonatype.p2.bridge.CompositeRepository;
 
-//@Named
-//@Singleton
+/**
+ * Provider of P2 bridged {@link CompositeRepository}.
+ *
+ * @since 2.6
+ */
 public class CompositeRepositoryProvider
     implements Provider<CompositeRepository>
 {
