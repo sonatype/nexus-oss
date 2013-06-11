@@ -14,7 +14,6 @@ package org.sonatype.nexus.testsuite.misc.nexus4301;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,7 +21,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.ITHelperLogUtils;
 
-import com.google.common.collect.Maps;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -104,9 +102,7 @@ public class Nexus4301WarnErrorLogsLoadTestIT
         // logging is asynchronous so give it a bit of time
         getEventInspectorsUtil().waitForCalmPeriod();
 
-        final Map<String, String> params = Maps.newHashMap();
-        params.put( "lts", String.valueOf( Integer.MAX_VALUE ) );
-        final SyndFeed feed = FeedUtil.getFeed( "errorWarning", 0, Integer.MAX_VALUE, params );
+        final SyndFeed feed = FeedUtil.getFeed( "errorWarning", 0, Integer.MAX_VALUE );
 
         for ( String message : messagesError )
         {

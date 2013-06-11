@@ -82,42 +82,6 @@ public class Nexus4427WarnErrorLogsToFeedsIT
     }
 
     /**
-     * When an ERROR/WARN org.sonatype.timeline.TimelineException there should be no corresponding entry feed.
-     */
-    @Test
-    public void timelineException()
-        throws Exception
-    {
-        String message = generateMessage( "org.sonatype.timeline.TimelineException" );
-        ITHelperLogUtils.warn( message, "org.sonatype.timeline.TimelineException", "warn" );
-        ITHelperLogUtils.error( message, "org.sonatype.timeline.TimelineException" , "error" );
-
-        // logging is asynchronous so give it a bit of time
-        getEventInspectorsUtil().waitForCalmPeriod();
-
-        assertFeedDoesNotContainEntryFor( message );
-    }
-
-    /**
-     * When an ERROR/WARN org.eclipse.jetty.io.EofException there should be no corresponding entry feed.
-     * 
-     * !!!! We use a fake EofException as the classloader of Nexus does not see anymore jetty classes.
-     */
-    @Test
-    public void eofException()
-        throws Exception
-    {
-        String message = generateMessage( "org.eclipse.jetty.io.EofException" );
-        ITHelperLogUtils.warn( message, "org.sonatype.nexus.plugins.ithelper.jetty.EofException", "warn" ) ;
-        ITHelperLogUtils.error( message, "org.sonatype.nexus.plugins.ithelper.jetty.EofException",  "error" ) ;
-
-        // logging is asynchronous so give it a bit of time
-        getEventInspectorsUtil().waitForCalmPeriod();
-
-        assertFeedDoesNotContainEntryFor( message );
-    }
-
-    /**
      * When an ERROR/WARN logs with specific messages there should be no corresponding entry feed.
      */
     @Test
