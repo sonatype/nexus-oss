@@ -391,13 +391,6 @@
               <exclude>**/Abstract*</exclude>
               <exclude>**/*$*</exclude>
             </excludes>
-            <systemPropertyVariables>
-              <!-- FIXME: remove carrotsearch junit-benchmarks configuration -->
-              <jub.consumers>H2,CONSOLE</jub.consumers>
-              <jub.db.file>.benchmarks</jub.db.file>
-              <jub.customkey>${os.name}</jub.customkey>
-              <jub.charts.dir>${project.build.directory}/junit-benchmarks</jub.charts.dir>
-            </systemPropertyVariables>
           </configuration>
         </plugin>
 
