@@ -18,7 +18,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -37,7 +36,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author cstamas
  */
-@RepositoryType( pathPrefix = "repositories" )
 @Component( role = Repository.class, hint = M1Repository.ID, instantiationStrategy = "per-lookup", description = "Maven1 Repository" )
 public class M1Repository
     extends AbstractMavenRepository

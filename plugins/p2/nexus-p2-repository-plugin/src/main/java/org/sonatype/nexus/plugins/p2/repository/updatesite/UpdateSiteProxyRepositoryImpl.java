@@ -39,7 +39,6 @@ import org.eclipse.tycho.model.UpdateSite.SiteFeatureRef;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
@@ -74,7 +73,6 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.p2.bridge.Publisher;
 
-@RepositoryType( pathPrefix = "repositories" )
 @Component( role = Repository.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse Update Site" )
 public class UpdateSiteProxyRepositoryImpl
     extends AbstractProxyRepository

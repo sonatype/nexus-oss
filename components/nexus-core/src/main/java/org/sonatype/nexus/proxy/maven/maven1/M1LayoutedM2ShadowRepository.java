@@ -20,7 +20,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
 import org.sonatype.nexus.proxy.maven.gav.M1ArtifactRecognizer;
@@ -33,7 +32,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  * 
  * @author cstamas
  */
-@RepositoryType( pathPrefix = "shadows" )
 @Component( role = ShadowRepository.class, hint = M1LayoutedM2ShadowRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2 to Maven1" )
 public class M1LayoutedM2ShadowRepository
     extends LayoutConverterShadowRepository

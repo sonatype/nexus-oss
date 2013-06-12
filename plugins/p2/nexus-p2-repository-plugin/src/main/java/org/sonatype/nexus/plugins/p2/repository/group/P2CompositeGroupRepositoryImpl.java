@@ -31,7 +31,6 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.plugins.p2.repository.P2CompositeGroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
@@ -65,8 +64,8 @@ import com.google.common.eventbus.Subscribe;
  *
  * @since 2.6
  */
-@RepositoryType( pathPrefix = "groups" )
-@Component( role = GroupRepository.class, hint = P2CompositeGroupRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Composite" )
+@Component( role = GroupRepository.class, hint = P2CompositeGroupRepositoryImpl.ROLE_HINT,
+            instantiationStrategy = "per-lookup", description = "Eclipse P2 Composite" )
 public class P2CompositeGroupRepositoryImpl
     extends AbstractGroupRepository
     implements P2CompositeGroupRepository, GroupRepository

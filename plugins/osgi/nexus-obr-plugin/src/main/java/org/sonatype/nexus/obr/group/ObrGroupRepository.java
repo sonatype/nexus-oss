@@ -31,7 +31,6 @@ import org.sonatype.nexus.obr.metadata.ObrMetadataSource;
 import org.sonatype.nexus.obr.metadata.ObrResourceReader;
 import org.sonatype.nexus.obr.metadata.ObrResourceWriter;
 import org.sonatype.nexus.obr.util.ObrUtils;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -49,7 +48,6 @@ import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-@RepositoryType( pathPrefix = "groups" )
 @Component( role = GroupRepository.class, hint = ObrGroupRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "OBR Group" )
 public class ObrGroupRepository
     extends AbstractGroupRepository
