@@ -206,12 +206,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-logging-extras-appender</artifactId>
-        <version>2.6.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
         <version>2.6.0-SNAPSHOT</version>
       </dependency>
@@ -391,13 +385,6 @@
               <exclude>**/Abstract*</exclude>
               <exclude>**/*$*</exclude>
             </excludes>
-            <systemPropertyVariables>
-              <!-- FIXME: remove carrotsearch junit-benchmarks configuration -->
-              <jub.consumers>H2,CONSOLE</jub.consumers>
-              <jub.db.file>.benchmarks</jub.db.file>
-              <jub.customkey>${os.name}</jub.customkey>
-              <jub.charts.dir>${project.build.directory}/junit-benchmarks</jub.charts.dir>
-            </systemPropertyVariables>
           </configuration>
         </plugin>
 

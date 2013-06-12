@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.restlet.data.Method;
@@ -37,36 +38,50 @@ public class FeedUtil
     public static SyndFeed getFeed( String feedId )
         throws IllegalArgumentException, MalformedURLException, FeedException, IOException
     {
-        SyndFeedInput input = new SyndFeedInput();
-
-        Response response =
-            RequestFacade.sendMessage( FEED_URL_PART + feedId + "?_dc=" + System.currentTimeMillis(), Method.GET );
-
-        String text = response.getEntity().getText();
-        Assert.assertTrue( "Unexpected content: " + text, response.getStatus().isSuccess() );
-
-        SyndFeed feed = input.build( new XmlReader( new ByteArrayInputStream( text.getBytes() ) ) );
-        return feed;
+        return getFeed( feedId, null, null, null );
     }
 
     public static SyndFeed getFeed( String feedId, int from, int count )
         throws IllegalArgumentException, MalformedURLException, FeedException, IOException
     {
-        SyndFeedInput input = new SyndFeedInput();
+        return getFeed( feedId, from, count, null );
+    }
 
-        Response response =
-            RequestFacade.sendMessage( FEED_URL_PART + feedId + "?_dc=" + System.currentTimeMillis() + "&from=" + from
-                + "&count=" + count, Method.GET );
+    public static SyndFeed getFeed( final String feedId, final Integer from, final Integer count,
+                                    final Map<String, String> params )
+        throws IllegalArgumentException, MalformedURLException, FeedException, IOException
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append( "?_dc=" + System.currentTimeMillis() );
+        if ( from != null )
+        {
+            sb.append( "&from=" + from );
+        }
+        if ( count != null )
+        {
+            sb.append( "&count=" + count );
+        }
+        if ( params != null && !params.isEmpty() )
+        {
+            for ( Map.Entry<String, String> entry : params.entrySet() )
+            {
+                sb.append( "&" + entry.getKey() );
+                if ( entry.getValue() != null )
+                {
+                    sb.append( "=" + entry.getValue() );
+                }
+            }
+        }
+        final Response response =
+            RequestFacade.sendMessage( FEED_URL_PART + feedId + sb.toString(), Method.GET );
+        final String text = response.getEntity().getText();
+        Assert.assertTrue( "Unexpected response: " + text, response.getStatus().isSuccess() );
 
-        String text = response.getEntity().getText();
-        Assert.assertTrue( "Unexpected content: " + text, response.getStatus().isSuccess() );
-
-        SyndFeed feed = input.build( new XmlReader( new ByteArrayInputStream( text.getBytes() ) ) );
-        return feed;
+        return new SyndFeedInput().build( new XmlReader( new ByteArrayInputStream( text.getBytes() ) ) );
     }
 
     @SuppressWarnings( "unchecked" )
-    public static void sortSyndEntryOrderByPublishedDate( SyndFeed feed )
+    public static void sortSyndEntryOrderByPublishedDate( final SyndFeed feed )
     {
         Collections.sort( feed.getEntries(), new Comparator<SyndEntry>()
         {
