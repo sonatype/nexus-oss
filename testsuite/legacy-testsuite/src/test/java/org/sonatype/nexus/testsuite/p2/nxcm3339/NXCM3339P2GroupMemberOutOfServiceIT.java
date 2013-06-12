@@ -27,11 +27,16 @@ public class NXCM3339P2GroupMemberOutOfServiceIT
     extends AbstractNexusProxyP2IT
 {
 
-    private RepositoryMessageUtil repositoryMessageUtil;
+    private final RepositoryMessageUtil repositoryMessageUtil;
 
     public NXCM3339P2GroupMemberOutOfServiceIT()
     {
-        super( "nxcm3339" );
+        this( "nxcm3339" );
+    }
+
+    NXCM3339P2GroupMemberOutOfServiceIT( final String testRepositoryId )
+    {
+        super( testRepositoryId );
         repositoryMessageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
@@ -47,7 +52,7 @@ public class NXCM3339P2GroupMemberOutOfServiceIT
     {
         repositoryMessageUtil.setOutOfServiceProxy( "nxcm3339-2", true );
 
-        final File installDir = new File( "target/eclipse/nxcm3339" );
+        final File installDir = new File( "target/eclipse/" + getTestRepositoryId() );
 
         installUsingP2(
             getGroupUrl( getTestRepositoryId() ),

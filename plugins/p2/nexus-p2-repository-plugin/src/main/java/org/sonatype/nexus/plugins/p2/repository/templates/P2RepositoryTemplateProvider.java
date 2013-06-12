@@ -16,6 +16,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.sonatype.nexus.plugins.p2.repository.P2CompositeGroupRepository;
+import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
+import org.sonatype.nexus.plugins.p2.repository.group.P2CompositeGroupRepositoryImpl;
 import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryImpl;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepositoryImpl;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteProxyRepositoryImpl;
@@ -40,6 +43,8 @@ public class P2RepositoryTemplateProvider
 
     private static final String P2_GROUP = "p2_group";
 
+    private static final String P2_COMPOSITE_GROUP = "p2_composite_group";
+
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
@@ -52,7 +57,14 @@ public class P2RepositoryTemplateProvider
         {
             templates.add( new P2ProxyRepositoryTemplate( this, P2_PROXY, "P2 (proxy)" ) );
             templates.add( new UpdateSiteRepositoryTemplate( this, P2_UPDATE_SITE, "P2 Update Site (proxy)" ) );
-            templates.add( new P2GroupRepositoryTemplate( this, P2_GROUP, "P2 (group)" ) );
+            templates.add( new P2GroupRepositoryTemplate(
+                this, P2_GROUP, "P2 (group)",
+                P2GroupRepository.class, P2GroupRepositoryImpl.ROLE_HINT
+            ) );
+            templates.add( new P2GroupRepositoryTemplate(
+                this, P2_COMPOSITE_GROUP, "P2 Composite (group)",
+                P2CompositeGroupRepository.class, P2CompositeGroupRepositoryImpl.ROLE_HINT
+            ) );
         }
         catch ( final Exception e )
         {
@@ -66,14 +78,17 @@ public class P2RepositoryTemplateProvider
     public void initialize()
         throws InitializationException
     {
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor( Repository.class,
-            P2ProxyRepositoryImpl.ROLE_HINT, "repositories" ) );
-
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor( Repository.class,
-            UpdateSiteProxyRepositoryImpl.ROLE_HINT, "repositories" ) );
-
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor( GroupRepository.class,
-            P2GroupRepositoryImpl.ROLE_HINT, "groups" ) );
-
+        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
+            new RepositoryTypeDescriptor( Repository.class, P2ProxyRepositoryImpl.ROLE_HINT, "repositories" )
+        );
+        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
+            new RepositoryTypeDescriptor( Repository.class, UpdateSiteProxyRepositoryImpl.ROLE_HINT, "repositories" )
+        );
+        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
+            new RepositoryTypeDescriptor( GroupRepository.class, P2GroupRepositoryImpl.ROLE_HINT, "groups" )
+        );
+        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
+            new RepositoryTypeDescriptor( GroupRepository.class, P2CompositeGroupRepositoryImpl.ROLE_HINT, "groups" )
+        );
     }
 }

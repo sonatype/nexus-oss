@@ -12,10 +12,13 @@
  */
 package org.sonatype.nexus.plugins.p2.repository;
 
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-
-public interface P2GroupRepository
-    extends GroupRepository, P2Repository
+/**
+ * P2 group using P2 composite repositories.
+ *
+ * @since 2.6
+ */
+public interface P2CompositeGroupRepository
+    extends P2GroupRepository
 {
 
 }

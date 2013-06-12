@@ -29,14 +29,19 @@ public class NXCM0128P2GroupIT
 
     public NXCM0128P2GroupIT()
     {
-        super( "nxcm0128" );
+        this( "nxcm0128" );
+    }
+
+    NXCM0128P2GroupIT( final String testRepositoryId )
+    {
+        super( testRepositoryId );
     }
 
     @Test
     public void test()
         throws Exception
     {
-        final File installDir = new File( "target/eclipse/nxcm0128" );
+        final File installDir = new File( "target/eclipse/" + getTestRepositoryId() );
 
         installUsingP2(
             getGroupUrl( getTestRepositoryId() ),

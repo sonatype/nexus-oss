@@ -12,21 +12,19 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
-import static org.sonatype.nexus.plugins.p2.repository.internal.DefaultP2RepositoryAggregator.createTemporaryP2Repository;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createTemporaryP2Repository;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.storeItemFromFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.getP2Type;
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.parseP2Artifact;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
@@ -34,12 +32,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -59,8 +55,6 @@ public class DefaultP2MetadataGenerator
     implements P2MetadataGenerator
 {
 
-    private static final String GENERATED_AT_ATTRIBUTE = "p2Repository.generated.timestamp";
-
     @Inject
     private Logger logger;
 
@@ -74,15 +68,15 @@ public class DefaultP2MetadataGenerator
 
     private final Publisher publisher;
 
-    private final MimeUtil mimeUtil;
+    private final MimeSupport mimeSupport;
 
     @Inject
-    public DefaultP2MetadataGenerator( final RepositoryRegistry repositories, final MimeUtil mimeUtil,
+    public DefaultP2MetadataGenerator( final RepositoryRegistry repositories, final MimeSupport mimeSupport,
                                        final ArtifactRepository artifactRepository,
                                        final MetadataRepository metadataRepository, final Publisher publisher )
     {
         this.repositories = repositories;
-        this.mimeUtil = mimeUtil;
+        this.mimeSupport = mimeSupport;
         this.artifactRepository = artifactRepository;
         this.metadataRepository = metadataRepository;
         this.publisher = publisher;
@@ -218,7 +212,12 @@ public class DefaultP2MetadataGenerator
                                                         artifact.getRepositoryPath().length() - extension.length() - 1 )
                     + "-p2Artifacts.xml";
 
-            storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
+            storeItemFromFile(
+                p2ArtifactsPath,
+                new File( tempP2Repository, "artifacts.xml" ),
+                repository,
+                mimeSupport.guessMimeTypeFromPath( p2ArtifactsPath )
+            );
 
             metadataRepository.write( tempP2Repository.toURI(), ius, artifact.getId(), null /** repository properties */
             );
@@ -228,7 +227,12 @@ public class DefaultP2MetadataGenerator
                                                         artifact.getRepositoryPath().length() - extension.length() - 1 )
                     + "-p2Content.xml";
 
-            storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
+            storeItemFromFile(
+                p2ContentPath,
+                new File( tempP2Repository, "content.xml" ),
+                repository,
+                mimeSupport.guessMimeTypeFromPath( p2ContentPath )
+            );
         }
         finally
         {
@@ -311,27 +315,6 @@ public class DefaultP2MetadataGenerator
         for ( final Repository repository : repositories.getRepositories() )
         {
             scanAndRebuild( repository.getId(), resourceStorePath );
-        }
-    }
-
-    private void storeItemFromFile( final String path, final File file, final Repository repository )
-        throws Exception
-    {
-        InputStream in = null;
-        try
-        {
-            in = new FileInputStream( file );
-            final Map<String, String> attributes = new HashMap<String, String>();
-            attributes.put( GENERATED_AT_ATTRIBUTE, new Date().toString() );
-
-            final ResourceStoreRequest request = new ResourceStoreRequest( path );
-
-            NexusUtils.storeItem( repository, request, in, mimeUtil.getMimeType( request.getRequestPath() ),
-                                  attributes );
-        }
-        finally
-        {
-            IOUtil.close( in );
         }
     }
 
