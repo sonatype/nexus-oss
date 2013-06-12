@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.templates;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -20,7 +22,6 @@ import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryConfiguration;
-import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryImpl;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
@@ -28,10 +29,17 @@ import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 public class P2GroupRepositoryTemplate
     extends AbstractRepositoryTemplate
 {
-    public P2GroupRepositoryTemplate( final P2RepositoryTemplateProvider provider, final String id,
-                                      final String description )
+
+    private final String providerHint;
+
+    public P2GroupRepositoryTemplate( final P2RepositoryTemplateProvider provider,
+                                      final String id,
+                                      final String description,
+                                      final Class<? extends P2GroupRepository> mainFacet,
+                                      final String providerHint )
     {
-        super( provider, id, description, new P2ContentClass(), P2GroupRepository.class );
+        super( provider, id, description, new P2ContentClass(), mainFacet );
+        this.providerHint = checkNotNull( providerHint );
     }
 
     public P2GroupRepositoryConfiguration getExternalConfiguration( final boolean forWrite )
@@ -49,7 +57,7 @@ public class P2GroupRepositoryTemplate
         repo.setName( "" );
 
         repo.setProviderRole( GroupRepository.class.getName() );
-        repo.setProviderHint( P2GroupRepositoryImpl.ROLE_HINT );
+        repo.setProviderHint( providerHint );
 
         final Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );

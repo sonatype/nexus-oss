@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.templates.repository;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -20,6 +22,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.AbstractConfigurableTemplate;
+import com.google.common.base.Preconditions;
 
 public abstract class AbstractRepositoryTemplate
     extends AbstractConfigurableTemplate
@@ -55,8 +58,10 @@ public abstract class AbstractRepositoryTemplate
     @Override
     public boolean targetFits( Object clazz )
     {
-        return super.targetFits( clazz ) || targetIsClassAndFitsClass( clazz, getMainFacet() )
-            || ( targetIsClassAndFitsClass( clazz, getContentClass().getClass() ) || getContentClass().equals( clazz ) );
+        return super.targetFits( clazz )
+            || targetIsClassAndFitsClass( clazz, getMainFacet() )
+            || ( targetIsClassAndFitsClass( clazz, getContentClass().getClass() ) || getContentClass().equals( clazz ) )
+            || ( clazz instanceof ProviderHint && ((ProviderHint)clazz).getValue().equals( getRepositoryProviderHint() ) );
     }
 
     @Override
@@ -133,4 +138,22 @@ public abstract class AbstractRepositoryTemplate
 
     @Override
     protected abstract CRepositoryCoreConfiguration initCoreConfiguration();
+
+    public static class ProviderHint
+    {
+
+        private final String value;
+
+        public ProviderHint( final String value )
+        {
+            this.value = checkNotNull( value );
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
+
+    }
+
 }

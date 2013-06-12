@@ -75,9 +75,18 @@
   <repositoryGrouping>
     <repositoryGroups>
       <repositoryGroup>
-	    <groupId>nxcm3339</groupId>
+	      <groupId>nxcm3339</groupId>
         <type>p2</type>
 	      <name>nxcm3339</name>
+        <repositories>
+          <repository>nxcm3339-1</repository>
+          <repository>nxcm3339-2</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nxcm3339-composite</groupId>
+        <type>p2-composite</type>
+        <name>nxcm3339</name>
         <repositories>
           <repository>nxcm3339-1</repository>
           <repository>nxcm3339-2</repository>

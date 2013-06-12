@@ -75,9 +75,18 @@
   <repositoryGrouping>
     <repositoryGroups>
       <repositoryGroup>
-	    <groupId>nxcm0128</groupId>
+	      <groupId>nxcm0128</groupId>
         <type>p2</type>
-	    <name>nxcm0128</name>
+	      <name>nxcm0128</name>
+        <repositories>
+          <repository>nxcm0128-1</repository>
+          <repository>nxcm0128-2</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nxcm0128-composite</groupId>
+        <type>p2-composite</type>
+        <name>nxcm0128</name>
         <repositories>
           <repository>nxcm0128-1</repository>
           <repository>nxcm0128-2</repository>

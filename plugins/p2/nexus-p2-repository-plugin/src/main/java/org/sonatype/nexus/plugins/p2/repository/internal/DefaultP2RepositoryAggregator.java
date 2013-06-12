@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createLink;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createTemporaryP2Repository;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
@@ -23,14 +24,11 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retri
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.safeRetrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.safeRetrieveItem;
-import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.storeItem;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.storeItemFromFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactsEventsInspector.isP2ArtifactsXML;
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2MetadataEventsInspector.isP2ContentXML;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,9 +38,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
@@ -78,19 +75,20 @@ public class DefaultP2RepositoryAggregator
 
     private final RepositoryRegistry repositories;
 
-    private final MimeUtil mimeUtil;
+    private final MimeSupport mimeSupport;
 
     private final ArtifactRepository artifactRepository;
 
     private final MetadataRepository metadataRepository;
 
     @Inject
-    public DefaultP2RepositoryAggregator( final RepositoryRegistry repositories, final MimeUtil mimeUtil,
+    public DefaultP2RepositoryAggregator( final RepositoryRegistry repositories,
+                                          final MimeSupport mimeSupport,
                                           final ArtifactRepository artifactRepository,
                                           final MetadataRepository metadataRepository )
     {
         this.repositories = repositories;
-        this.mimeUtil = mimeUtil;
+        this.mimeSupport = mimeSupport;
         this.artifactRepository = artifactRepository;
         this.metadataRepository = metadataRepository;
         configurations = new HashMap<String, P2RepositoryAggregatorConfiguration>();
@@ -517,25 +515,6 @@ public class DefaultP2RepositoryAggregator
         }
     }
 
-    private void storeItemFromFile( final String path, final File file, final Repository repository )
-        throws Exception
-    {
-        InputStream in = null;
-        try
-        {
-            in = new FileInputStream( file );
-
-            final ResourceStoreRequest request = new ResourceStoreRequest( path );
-
-            storeItem( repository, request, in, mimeUtil.getMimeType( request.getRequestPath() ), null
-                       /* attributes */ );
-        }
-        finally
-        {
-            IOUtil.close( in );
-        }
-    }
-
     private File getP2Artifacts( final P2RepositoryAggregatorConfiguration configuration, final Repository repository )
         throws Exception
     {
@@ -578,7 +557,12 @@ public class DefaultP2RepositoryAggregator
 
             final String p2ArtifactsPath = P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML;
 
-            storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
+            storeItemFromFile(
+                p2ArtifactsPath,
+                new File( tempP2Repository, "artifacts.xml" ),
+                repository,
+                mimeSupport.guessMimeTypeFromPath( p2ArtifactsPath )
+            );
 
             metadataRepository.write( tempP2Repository.toURI(), Collections.<InstallableUnit>emptyList(),
                                       repository.getId(), null /** repository properties */
@@ -586,22 +570,17 @@ public class DefaultP2RepositoryAggregator
 
             final String p2ContentPath = P2_REPOSITORY_ROOT_PATH + "/" + P2Constants.CONTENT_XML;
 
-            storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
+            storeItemFromFile(
+                p2ContentPath,
+                new File( tempP2Repository, "content.xml" ),
+                repository,
+                mimeSupport.guessMimeTypeFromPath( p2ContentPath )
+            );
         }
         finally
         {
             FileUtils.deleteDirectory( tempP2Repository );
         }
-    }
-
-    static File createTemporaryP2Repository()
-        throws IOException
-    {
-        File tempP2Repository;
-        tempP2Repository = File.createTempFile( "nexus-p2-repository-plugin", "" );
-        tempP2Repository.delete();
-        tempP2Repository.mkdirs();
-        return tempP2Repository;
     }
 
 }
