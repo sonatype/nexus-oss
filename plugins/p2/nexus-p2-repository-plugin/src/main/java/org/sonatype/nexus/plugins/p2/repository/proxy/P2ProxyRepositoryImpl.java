@@ -76,7 +76,7 @@ import org.sonatype.nexus.util.DigesterUtils;
 @Component( role = Repository.class, hint = P2ProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Proxy Repository" )
 public class P2ProxyRepositoryImpl
     extends AbstractProxyRepository
-    implements P2ProxyRepository
+    implements P2ProxyRepository , Repository
 {
     public static final String ROLE_HINT = "p2";
 
