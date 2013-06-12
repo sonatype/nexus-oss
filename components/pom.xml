@@ -40,7 +40,6 @@
     <module>nexus-launcher</module>
     <module>nexus-ldap-common</module>
     <module>nexus-logging-extras</module>
-    <module>nexus-logging-extras-appender</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
     <module>nexus-repository-metadata-api</module>
