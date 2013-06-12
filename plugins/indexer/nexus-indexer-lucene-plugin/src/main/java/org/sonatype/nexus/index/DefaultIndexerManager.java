@@ -44,6 +44,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.BooleanClause;
@@ -94,7 +95,6 @@ import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -2633,8 +2633,8 @@ public class DefaultIndexerManager
     {
         if ( luceneFSDirectoryType == null )
         {
-            // let Lucene select implementation
-            return FSDirectory.open( location );
+            // NEXUS-5752: default: nio
+            return new NIOFSDirectory( location );
         }
         else if ( "mmap".equals( luceneFSDirectoryType ) )
         {
