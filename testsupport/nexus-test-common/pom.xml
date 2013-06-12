@@ -46,14 +46,6 @@
       <artifactId>litmus-testsupport</artifactId>
     </dependency>
 
-    <!-- TODO: move benchmarking libs out into another module since we should not force as dependency here -->
-    <!-- TODO: remove carrotsearch and replace with contiperf; carrotsearch used by DefaultAttributeStorageIT -->
-
-    <dependency>
-      <groupId>com.carrotsearch</groupId>
-      <artifactId>junit-benchmarks</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
