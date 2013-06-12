@@ -108,7 +108,6 @@
           <exclude>WEB-INF/lib/slf4j-api*.jar</exclude>
           <exclude>WEB-INF/lib/logback-core*.jar</exclude>
           <exclude>WEB-INF/lib/logback-classic*.jar</exclude>
-          <exclude>WEB-INF/lib/nexus-logging-extras-appender*.jar</exclude>
           <exclude>WEB-INF/lib/metrics-core*.jar</exclude>
           <exclude>WEB-INF/classes/logback.xml</exclude>
         </excludes>

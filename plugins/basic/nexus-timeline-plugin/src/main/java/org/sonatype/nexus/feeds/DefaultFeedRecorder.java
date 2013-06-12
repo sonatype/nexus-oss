@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.feeds.record.NexusItemInfo;
@@ -96,17 +95,6 @@ public class DefaultFeedRecorder
 
     {
         AUTHC_AUTHZ_EVENT_TYPE_SET.add( AUTHC_AUTHZ_EVENT_TYPE );
-    }
-
-    /**
-     * Event type: error
-     */
-    private static final String ERROR_WARNING_EVENT_TYPE = "ERROR_WARNING";
-
-    private static final Set<String> ERROR_WARNING_EVENT_TYPE_SET = new HashSet<String>( 1 );
-
-    {
-        ERROR_WARNING_EVENT_TYPE_SET.add( ERROR_WARNING_EVENT_TYPE );
     }
 
     /**
@@ -265,36 +253,6 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    protected List<ErrorWarningEvent> getEwesFromMaps( List<Entry> data )
-    {
-        List<ErrorWarningEvent> result = new ArrayList<ErrorWarningEvent>();
-
-        for ( Entry record : data )
-        {
-            Map<String, String> map = record.getData();
-
-            HashMap<String, Object> ctx = new HashMap<String, Object>();
-
-            for ( String key : map.keySet() )
-            {
-                if ( key.startsWith( CTX_PREFIX ) )
-                {
-                    ctx.put( key.substring( 4 ), map.get( key ) );
-                }
-            }
-
-            ErrorWarningEvent evt =
-                new ErrorWarningEvent( getEventDate( map ), map.get( ACTION ), map.get( MESSAGE ),
-                    map.get( STACK_TRACE ) );
-
-            evt.addEventContext( ctx );
-
-            result.add( evt );
-        }
-
-        return result;
-    }
-
     // ==
 
     public List<Entry> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
@@ -335,14 +293,6 @@ public class DefaultFeedRecorder
         List<Entry> result = getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter );
 
         return getAaesFromMaps( result );
-    }
-
-    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
-                                                          Predicate<Entry> filter )
-    {
-        List<Entry> result = getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter );
-
-        return getEwesFromMaps( result );
     }
 
     // ==
@@ -474,40 +424,4 @@ public class DefaultFeedRecorder
     {
         nexusTimeline.add( System.currentTimeMillis(), t1, t2, map );
     }
-
-    public void addErrorWarningEvent( String action, String message )
-    {
-        addErrorWarningEvent( new ErrorWarningEvent( new Date(), action, message, null ) );
-    }
-
-    public void addErrorWarningEvent( String action, String message, Throwable throwable )
-    {
-        String stackTrace = ExceptionUtils.getFullStackTrace( throwable );
-
-        addErrorWarningEvent( new ErrorWarningEvent( new Date(), action, message, stackTrace ) );
-    }
-
-    protected void addErrorWarningEvent( ErrorWarningEvent errorEvt )
-    {
-        Map<String, String> map = new HashMap<String, String>();
-
-        putContext( map, CTX_PREFIX, errorEvt.getEventContext() );
-
-        map.put( ACTION, errorEvt.getAction() );
-
-        map.put( DATE, getDateFormat().format( errorEvt.getEventDate() ) );
-
-        if ( errorEvt.getMessage() != null )
-        {
-            map.put( MESSAGE, errorEvt.getMessage() );
-        }
-
-        if ( errorEvt.getStackTrace() != null )
-        {
-            map.put( STACK_TRACE, errorEvt.getStackTrace() );
-        }
-
-        addToTimeline( map, ERROR_WARNING_EVENT_TYPE, errorEvt.getAction() );
-    }
-
 }

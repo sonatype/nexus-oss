@@ -101,17 +101,17 @@ public class Nexus4301WarnErrorLogsLoadTestIT
 
         // logging is asynchronous so give it a bit of time
         getEventInspectorsUtil().waitForCalmPeriod();
-        
-        SyndFeed feed = FeedUtil.getFeed( "errorWarning", 0, Integer.MAX_VALUE );
+
+        final SyndFeed feed = FeedUtil.getFeed( "errorWarning", 0, Integer.MAX_VALUE );
 
         for ( String message : messagesError )
         {
-            assertFeedContainsEntryFor(feed, message );
+            assertFeedContainsEntryFor( feed, message );
         }
 
         for ( String message : messagesWarn )
         {
-            assertFeedContainsEntryFor(feed, message );
+            assertFeedContainsEntryFor( feed, message );
         }
     }
 
@@ -120,7 +120,7 @@ public class Nexus4301WarnErrorLogsLoadTestIT
         return this.getClass().getName() + "-" + System.currentTimeMillis() + "(" + id + ")";
     }
 
-    private void assertFeedContainsEntryFor(SyndFeed feed, String message )
+    private void assertFeedContainsEntryFor( SyndFeed feed, String message )
         throws Exception
     {
         @SuppressWarnings( "unchecked" )
@@ -128,7 +128,7 @@ public class Nexus4301WarnErrorLogsLoadTestIT
         for ( SyndEntry entry : entries )
         {
             SyndContent description = entry.getDescription();
-            if ( description != null && description.getValue().startsWith( message ) )
+            if ( description != null && description.getValue().contains( message ) )
             {
                 return;
             }

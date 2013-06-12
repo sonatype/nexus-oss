@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
-import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.timeline.Entry;
+
 import com.google.common.base.Predicate;
 
 public class DummyFeedRecorder
@@ -37,18 +37,6 @@ public class DummyFeedRecorder
     public void setReceivedEventCount( int receivedEventCount )
     {
         this.receivedEventCount = receivedEventCount;
-    }
-
-    @Override
-    public void addErrorWarningEvent( final String action, final String message )
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void addErrorWarningEvent( final String action, final String message, final Throwable throwable )
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -115,13 +103,4 @@ public class DummyFeedRecorder
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
-    @Override
-    public List<ErrorWarningEvent> getErrorWarningEvents( final Set<String> subtypes, final Integer from,
-                                                          final Integer count,
-                                                          final Predicate<Entry> filter )
-    {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
 }

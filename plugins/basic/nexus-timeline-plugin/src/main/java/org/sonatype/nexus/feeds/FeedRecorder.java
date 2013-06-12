@@ -63,10 +63,6 @@ public interface FeedRecorder
 
     // creating
 
-    void addErrorWarningEvent( String action, String message);
-    
-    void addErrorWarningEvent( String action, String message, Throwable throwable);
-    
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 
     void addSystemEvent( String action, String message );
@@ -89,6 +85,4 @@ public interface FeedRecorder
     List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
 
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
-    
-    List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
 }
