@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.shiro.concurrent.SubjectAwareExecutorService;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -42,17 +43,20 @@ public class DefaultThreadPoolManager
 
     public DefaultThreadPoolManager()
     {
-        // direct hand-off used! Proxy pool will use caller thread to execute the task when full!
-        this.groupRepositoryThreadPool =
+        // direct hand-off used! Group pool will use caller thread to execute the task when full!
+       final ExecutorService gTarget =
             new ThreadPoolExecutor( 0, GROUP_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(), new NexusThreadFactory( "group", "Group TPool" ),
                 new CallerRunsPolicy() );
 
         // direct hand-off used! Proxy pool will use caller thread to execute the task when full!
-        this.proxyRepositoryThreadPool =
+       final ExecutorService pTarget =
             new ThreadPoolExecutor( 0, PROXY_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(), new NexusThreadFactory( "proxy", "Proxy TPool" ),
                 new CallerRunsPolicy() );
+       
+       this.groupRepositoryThreadPool = new SubjectAwareExecutorService( gTarget );
+       this.proxyRepositoryThreadPool = new SubjectAwareExecutorService( pTarget );
     }
 
     @Override

@@ -73,6 +73,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.NexusThreadFactory;
+import org.sonatype.scheduling.shiro.FakeAlmightySubject;
+import org.sonatype.scheduling.shiro.ShiroFixedSubjectScheduledExecutorService;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -173,9 +175,10 @@ public class ManagerImpl
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
         this.quickRemoteStrategy = checkNotNull( quickRemoteStrategy );
-        this.executor =
+        final ScheduledExecutorService target =
             new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "ar", "AR-Updater" ),
                 new ThreadPoolExecutor.AbortPolicy() );
+        this.executor = new ShiroFixedSubjectScheduledExecutorService( target, FakeAlmightySubject.TASK_SUBJECT );
         this.constrainedExecutor = new ConstrainedExecutorImpl( executor );
         // register event dispatcher
         this.eventDispatcher = new EventDispatcher( this );
