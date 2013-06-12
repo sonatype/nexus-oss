@@ -76,7 +76,7 @@ import org.sonatype.p2.bridge.Publisher;
 @Component( role = Repository.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse Update Site" )
 public class UpdateSiteProxyRepositoryImpl
     extends AbstractProxyRepository
-    implements UpdateSiteProxyRepository, Initializable
+    implements UpdateSiteProxyRepository, Repository, Initializable
 {
     private static final String DEFAULT_FEATURES_DIR = "features/";
 

@@ -12,29 +12,22 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.templates;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.plugins.p2.repository.P2CompositeGroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.group.P2CompositeGroupRepositoryImpl;
 import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryImpl;
-import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepositoryImpl;
-import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteProxyRepositoryImpl;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
-@Component( role = TemplateProvider.class, hint = P2RepositoryTemplateProvider.PROVIDER_ID )
+@Named( P2RepositoryTemplateProvider.PROVIDER_ID )
+@Singleton
 public class P2RepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
-    implements Initializable
 {
+
     public static final String PROVIDER_ID = "p2-repository";
 
     private static final String P2_PROXY = "p2_proxy";
@@ -44,9 +37,6 @@ public class P2RepositoryTemplateProvider
     private static final String P2_GROUP = "p2_group";
 
     private static final String P2_COMPOSITE_GROUP = "p2_composite_group";
-
-    @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Override
     public TemplateSet getTemplates()
@@ -74,21 +64,4 @@ public class P2RepositoryTemplateProvider
         return templates;
     }
 
-    @Override
-    public void initialize()
-        throws InitializationException
-    {
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
-            new RepositoryTypeDescriptor( Repository.class, P2ProxyRepositoryImpl.ROLE_HINT, "repositories" )
-        );
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
-            new RepositoryTypeDescriptor( Repository.class, UpdateSiteProxyRepositoryImpl.ROLE_HINT, "repositories" )
-        );
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
-            new RepositoryTypeDescriptor( GroupRepository.class, P2GroupRepositoryImpl.ROLE_HINT, "groups" )
-        );
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors(
-            new RepositoryTypeDescriptor( GroupRepository.class, P2CompositeGroupRepositoryImpl.ROLE_HINT, "groups" )
-        );
-    }
 }

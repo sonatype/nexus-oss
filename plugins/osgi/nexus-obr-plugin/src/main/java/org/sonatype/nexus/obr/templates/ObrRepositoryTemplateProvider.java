@@ -12,27 +12,18 @@
  */
 package org.sonatype.nexus.obr.templates;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.obr.group.ObrGroupRepository;
-import org.sonatype.nexus.obr.proxy.ObrRepository;
-import org.sonatype.nexus.obr.shadow.ObrShadowRepository;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.templates.TemplateProvider;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
-@Component( role = TemplateProvider.class, hint = ObrRepositoryTemplateProvider.PROVIDER_ID )
+@Named( ObrRepositoryTemplateProvider.PROVIDER_ID )
+@Singleton
 public class ObrRepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
-    implements Initializable
 {
+
     public static final String PROVIDER_ID = "obr-repository";
 
     private static final String OBR_PROXY = "obr_proxy";
@@ -42,9 +33,6 @@ public class ObrRepositoryTemplateProvider
     private static final String OBR_SHADOW = "obr_shadow";
 
     private static final String OBR_GROUP = "obr_group";
-
-    @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     public TemplateSet getTemplates()
     {
@@ -65,22 +53,4 @@ public class ObrRepositoryTemplateProvider
         return templates;
     }
 
-    public void initialize()
-        throws InitializationException
-    {
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor(
-                                                                                                Repository.class,
-                                                                                                ObrRepository.ROLE_HINT,
-                                                                                                "repositories" ) );
-
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor(
-                                                                                                ShadowRepository.class,
-                                                                                                ObrShadowRepository.ROLE_HINT,
-                                                                                                "shadows" ) );
-
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor(
-                                                                                                GroupRepository.class,
-                                                                                                ObrGroupRepository.ROLE_HINT,
-                                                                                                "groups" ) );
-    }
 }

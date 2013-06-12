@@ -12,15 +12,24 @@
  */
 package org.sonatype.nexus.templates;
 
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public abstract class AbstractTemplateProvider<T extends Template>
     implements TemplateProvider
 {
-    @Requirement
+
     private ApplicationConfiguration applicationConfiguration;
+
+    @Inject
+    public void setApplicationConfiguration( final ApplicationConfiguration applicationConfiguration )
+    {
+        this.applicationConfiguration = checkNotNull( applicationConfiguration );
+    }
 
     public ApplicationConfiguration getApplicationConfiguration()
     {
@@ -42,4 +51,5 @@ public abstract class AbstractTemplateProvider<T extends Template>
 
         throw new NoSuchTemplateIdException( "Template for Id='" + id + "' not found!" );
     }
+
 }

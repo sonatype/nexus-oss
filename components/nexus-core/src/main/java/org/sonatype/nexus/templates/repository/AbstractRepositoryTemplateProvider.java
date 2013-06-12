@@ -12,9 +12,11 @@
  */
 package org.sonatype.nexus.templates.repository;
 
-import java.io.IOException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.codehaus.plexus.component.annotations.Requirement;
+import java.io.IOException;
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -35,14 +37,30 @@ import org.sonatype.nexus.templates.TemplateSet;
 public abstract class AbstractRepositoryTemplateProvider
     extends AbstractTemplateProvider<RepositoryTemplate>
 {
-    @Requirement
+
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    @Requirement
     private NexusConfiguration nexusConfiguration;
 
-    @Requirement
     private RemoteProviderHintFactory remoteProviderHintFactory;
+
+    @Inject
+    public void setNexusConfiguration( final NexusConfiguration nexusConfiguration )
+    {
+        this.nexusConfiguration = checkNotNull( nexusConfiguration );
+    }
+
+    @Inject
+    public void setRemoteProviderHintFactory( final RemoteProviderHintFactory remoteProviderHintFactory )
+    {
+        this.remoteProviderHintFactory = checkNotNull( remoteProviderHintFactory );
+    }
+
+    @Inject
+    public void setRepositoryTypeRegistry( final RepositoryTypeRegistry repositoryTypeRegistry )
+    {
+        this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
+    }
 
     protected Repository createRepository( CRepository repository )
         throws ConfigurationException, IOException
@@ -95,4 +113,5 @@ public abstract class AbstractRepositoryTemplateProvider
         return new ManuallyConfiguredRepositoryTemplate( this, "manual", "Manually created template", contentClass,
             null, configuration );
     }
+
 }

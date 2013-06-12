@@ -12,24 +12,21 @@
  */
 package org.sonatype.nexus.repositories.nexus4807;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
 // see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
-//@Component( role = TemplateProvider.class, hint = Nexus4807RepositoryTemplateProvider.PROVIDER_ID )
 public class Nexus4807RepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
 {
-    public static final String PROVIDER_ID = "nexus4807";
 
     public TemplateSet getTemplates()
     {
         TemplateSet templates = new TemplateSet( null );
 
         templates.add( new Nexus4807RepositoryTemplate( this, "nexus4807", "NEXUS-4807 (test repository)" ) );
-        
+
         return templates;
     }
+
 }
