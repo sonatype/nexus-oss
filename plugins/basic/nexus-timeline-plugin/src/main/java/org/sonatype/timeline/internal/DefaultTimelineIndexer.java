@@ -130,8 +130,8 @@ public class DefaultTimelineIndexer
     {
         if ( luceneFSDirectoryType == null )
         {
-            // let Lucene select implementation
-            return FSDirectory.open( location );
+            // NEXUS-5752: default: nio
+            return new NIOFSDirectory( location );
         }
         else if ( "mmap".equals( luceneFSDirectoryType ) )
         {
