@@ -30,6 +30,7 @@ import org.sonatype.nexus.obr.metadata.ObrMetadataSource;
 import org.sonatype.nexus.obr.metadata.ObrResourceReader;
 import org.sonatype.nexus.obr.metadata.ObrResourceWriter;
 import org.sonatype.nexus.obr.util.ObrUtils;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -53,6 +54,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
+@RepositoryType( pathPrefix = "repositories" )
 @Component( role = Repository.class, hint = ObrRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "OBR" )
 public class ObrRepository
     extends AbstractProxyRepository

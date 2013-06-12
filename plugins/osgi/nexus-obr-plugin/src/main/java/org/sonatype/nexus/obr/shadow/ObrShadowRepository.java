@@ -24,6 +24,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHo
 import org.sonatype.nexus.obr.ObrContentClass;
 import org.sonatype.nexus.obr.metadata.ObrMetadataSource;
 import org.sonatype.nexus.obr.util.ObrUtils;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -40,6 +41,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
+@RepositoryType( pathPrefix = "shadows" )
 @Component( role = ShadowRepository.class, hint = ObrShadowRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "OBR" )
 public class ObrShadowRepository
     extends AbstractShadowRepository

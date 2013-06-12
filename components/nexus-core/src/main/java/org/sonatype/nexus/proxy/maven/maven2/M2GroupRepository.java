@@ -30,6 +30,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -61,6 +62,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.DigesterUtils;
 
+@RepositoryType( pathPrefix = "groups" )
 @Component( role = GroupRepository.class, hint = M2GroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
 public class M2GroupRepository
     extends AbstractMavenGroupRepository

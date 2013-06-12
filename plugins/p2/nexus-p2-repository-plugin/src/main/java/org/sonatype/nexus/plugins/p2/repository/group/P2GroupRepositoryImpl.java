@@ -21,6 +21,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
@@ -39,6 +40,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
+@RepositoryType( pathPrefix = "groups" )
 @Component( role = GroupRepository.class, hint = P2GroupRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Artifacts" )
 public class P2GroupRepositoryImpl
     extends AbstractGroupRepository

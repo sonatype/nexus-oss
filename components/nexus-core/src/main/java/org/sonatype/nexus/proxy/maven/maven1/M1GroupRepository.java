@@ -18,12 +18,14 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
 import org.sonatype.nexus.proxy.maven.gav.M1ArtifactRecognizer;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
+@RepositoryType( pathPrefix = "groups" )
 @Component( role = GroupRepository.class, hint = M1GroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven1 Repository Group" )
 public class M1GroupRepository
     extends AbstractMavenGroupRepository
