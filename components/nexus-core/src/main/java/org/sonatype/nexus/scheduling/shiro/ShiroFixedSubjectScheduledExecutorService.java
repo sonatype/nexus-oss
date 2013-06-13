@@ -42,6 +42,7 @@ public class ShiroFixedSubjectScheduledExecutorService
      * Override, as we don't "pass over" the subject from caller, but for {@link Scheduler} threads we use a common fake
      * subject.
      */
+    @Override
     protected Subject getSubject()
     {
         return subject;
