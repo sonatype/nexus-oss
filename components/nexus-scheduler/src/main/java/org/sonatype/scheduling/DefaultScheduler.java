@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -67,10 +66,10 @@ public class DefaultScheduler
     @Deprecated
     public DefaultScheduler( final TaskConfigManager taskConfig )
     {
-        this( taskConfig, new Provider<ScheduledExecutorService>()
+        this( taskConfig, new TaskExecutorProvider()
         {
             @Override
-            public ScheduledExecutorService get()
+            public ScheduledExecutorService getTaskExecutor()
             {
                 final ScheduledThreadPoolExecutor scheduledExecutorService =
                     (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
@@ -83,10 +82,10 @@ public class DefaultScheduler
     }
 
     @Inject
-    public DefaultScheduler( final TaskConfigManager taskConfig, @Named("DefaultScheduler") final Provider<ScheduledExecutorService> scheduledExecutorServiceProvider )
+    public DefaultScheduler( final TaskConfigManager taskConfig, TaskExecutorProvider scheduledExecutorServiceProvider )
     {
         this.taskConfig = taskConfig;
-        this.scheduledExecutorService = scheduledExecutorServiceProvider.get();
+        this.scheduledExecutorService = scheduledExecutorServiceProvider.getTaskExecutor();
         this.idGen = new AtomicInteger( 0 );
         this.tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
     }

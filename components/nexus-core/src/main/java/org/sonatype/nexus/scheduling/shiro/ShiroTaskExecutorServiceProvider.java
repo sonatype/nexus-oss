@@ -16,24 +16,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
+import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.scheduling.TaskExecutorProvider;
 import org.sonatype.scheduling.ThreadFactoryImpl;
 
 /**
- * {@link TaskExecutorServiceProvider} implementation that provides Shiro specific
+ * {@link TaskExecutorProvider} implementation that provides Shiro specific
  * {@link ShiroFixedSubjectScheduledExecutorService} implementation task executors, to make scheduled task share a valid
  * subject.
  * 
  * @author cstamas
  * @since 2.6
  */
-@Singleton
-@Named("DefaultScheduler")
+@Component( role = TaskExecutorProvider.class )
 public class ShiroTaskExecutorServiceProvider
-    implements Provider<ScheduledExecutorService>
+    implements TaskExecutorProvider
 {
     private final ShiroFixedSubjectScheduledExecutorService shiroFixedSubjectScheduledExecutorService;
 
@@ -49,7 +46,7 @@ public class ShiroTaskExecutorServiceProvider
     }
 
     @Override
-    public ScheduledExecutorService get()
+    public ScheduledExecutorService getTaskExecutor()
     {
         return shiroFixedSubjectScheduledExecutorService;
     }
