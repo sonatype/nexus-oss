@@ -39,7 +39,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.micromailer.Address;
-import org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
@@ -303,7 +303,7 @@ public class GlobalConfigurationPlexusResource
                         getGlobalRemoteConnectionSettings().setUserAgentCustomizationString( s.getUserAgentString() );
                     }
 
-                    setGlobalProxySettings( resource.getRemoteProxySettings(), getRemoteProxySettingsConfiguration() );
+                    setGlobalProxySettings( resource.getRemoteProxySettings(), getGlobalRemoteProxySettings() );
 
                     getNexusConfiguration().setRealms( resource.getSecurityRealms() );
                     getNexusConfiguration().setSecurityEnabled( resource.isSecurityEnabled() );
@@ -390,7 +390,7 @@ public class GlobalConfigurationPlexusResource
                     // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are
                     boolean remoteConnectionSettingsIsDirty = getGlobalRemoteConnectionSettings().isDirty();
 
-                    boolean remoteProxySettingsIsDirty = getRemoteProxySettingsConfiguration().isDirty();
+                    boolean remoteProxySettingsIsDirty = getGlobalRemoteProxySettings().isDirty();
 
                     getNexusConfiguration().saveConfiguration();
 
@@ -407,7 +407,7 @@ public class GlobalConfigurationPlexusResource
                     if ( remoteProxySettingsIsDirty )
                     {
                         getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteProxySettings(
-                            getRemoteProxySettingsConfiguration()
+                            getGlobalRemoteProxySettings()
                         );
                     }
                 }
@@ -438,7 +438,7 @@ public class GlobalConfigurationPlexusResource
     }
 
     private void setGlobalProxySettings( final RemoteProxySettingsDTO remoteProxySettings,
-                                         final RemoteProxySettingsConfiguration remoteProxySettingsConfiguration )
+                                         final GlobalRemoteProxySettings remoteProxySettingsConfiguration )
         throws ConfigurationException
     {
         if ( remoteProxySettings != null
@@ -549,7 +549,7 @@ public class GlobalConfigurationPlexusResource
 
         resource.setGlobalConnectionSettings( convert( getGlobalRemoteConnectionSettings() ) );
 
-        resource.setRemoteProxySettings( convert( getRemoteProxySettingsConfiguration() ) );
+        resource.setRemoteProxySettings( convert( getGlobalRemoteProxySettings() ) );
 
         RestApiSettings restApiSettings = convert( getGlobalRestApiSettings() );
         if ( restApiSettings != null && StringUtils.isEmpty( restApiSettings.getBaseUrl() ) )

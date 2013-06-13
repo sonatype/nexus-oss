@@ -23,23 +23,21 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.events.RemoteProxySettingsConfigurationChangedEvent;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettingsCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
-import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import com.google.common.base.Throwables;
 
 /**
  * @since 2.6
  */
-@Component( role = RemoteProxySettingsConfiguration.class )
-public class DefaultRemoteProxySettingsConfiguration
+@Component( role = GlobalRemoteProxySettings.class )
+public class DefaultGlobalRemoteProxySettings
     extends AbstractConfigurable
-    implements RemoteProxySettingsConfiguration
+    implements GlobalRemoteProxySettings
 {
 
     @Requirement
@@ -161,25 +159,6 @@ public class DefaultRemoteProxySettingsConfiguration
         ) );
     }
 
-    public RemoteProxySettings convertAndValidateFromModel( CRemoteProxySettings model )
-        throws ConfigurationException
-    {
-        ( (CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).doValidateChanges( model );
-
-        if ( model == null )
-        {
-            return null;
-        }
-
-        final RemoteProxySettings settings = new DefaultRemoteProxySettings();
-
-        settings.setHttpProxySettings( convertFromModel( model.getHttpProxySettings() ) );
-        settings.setHttpsProxySettings( convertFromModel( model.getHttpsProxySettings() ) );
-        settings.setNonProxyHosts( new HashSet<String>( model.getNonProxyHosts() ) );
-
-        return settings;
-    }
-
     private RemoteHttpProxySettings convertFromModel( CRemoteHttpProxySettings model )
         throws ConfigurationException
     {
@@ -197,22 +176,6 @@ public class DefaultRemoteProxySettingsConfiguration
         );
 
         return settings;
-    }
-
-    public CRemoteProxySettings convertToModel( RemoteProxySettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
-
-        final CRemoteProxySettings model = new CRemoteProxySettings();
-
-        model.setHttpProxySettings( convertToModel( settings.getHttpProxySettings() ) );
-        model.setHttpsProxySettings( convertToModel( settings.getHttpsProxySettings() ) );
-        model.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
-
-        return model;
     }
 
     public CRemoteHttpProxySettings convertToModel( RemoteHttpProxySettings settings )
@@ -256,7 +219,7 @@ public class DefaultRemoteProxySettingsConfiguration
 
         if ( wasDirty )
         {
-            eventBus().post( new RemoteProxySettingsConfigurationChangedEvent( this ) );
+            eventBus().post( new GlobalRemoteProxySettingsChangedEvent( this ) );
         }
 
         return wasDirty;

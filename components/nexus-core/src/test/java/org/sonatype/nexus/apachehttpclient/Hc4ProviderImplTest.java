@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -52,6 +52,9 @@ public class Hc4ProviderImplTest
     private RemoteStorageContext globalRemoteStorageContext;
 
     @Mock
+    private RemoteProxySettings remoteProxySettings;
+
+    @Mock
     private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
     @Before
@@ -60,7 +63,7 @@ public class Hc4ProviderImplTest
         final DefaultRemoteConnectionSettings rcs = new DefaultRemoteConnectionSettings();
         rcs.setConnectionTimeout( 1234 );
         when( globalRemoteStorageContext.getRemoteConnectionSettings() ).thenReturn( rcs );
-        when( globalRemoteStorageContext.getRemoteProxySettings() ).thenReturn( new DefaultRemoteProxySettings() );
+        when( globalRemoteStorageContext.getRemoteProxySettings() ).thenReturn( remoteProxySettings );
         when( applicationConfiguration.getGlobalRemoteStorageContext() ).thenReturn( globalRemoteStorageContext );
     }
 
