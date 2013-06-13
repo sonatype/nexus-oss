@@ -15,7 +15,7 @@ package org.sonatype.nexus.configuration.application;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.configuration.application.events.RemoteProxySettingsConfigurationChangedEvent;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -24,7 +24,7 @@ import com.google.common.eventbus.Subscribe;
 /**
  * @since 2.6
  */
-public class DefaultRemoteProxySettingsConfigurationTest
+public class DefaultGlobalRemoteProxySettingsTest
     extends NexusAppTestSupport
 {
 
@@ -36,17 +36,17 @@ public class DefaultRemoteProxySettingsConfigurationTest
         NexusConfiguration cfg = lookup( NexusConfiguration.class );
         cfg.loadConfiguration();
 
-        final Event<RemoteProxySettingsConfiguration>[] event = new Event[1];
+        final Event<GlobalRemoteProxySettings>[] event = new Event[1];
         lookup( EventBus.class ).register( new Object()
         {
             @Subscribe
-            public void onEvent( RemoteProxySettingsConfigurationChangedEvent evt )
+            public void onEvent( GlobalRemoteProxySettingsChangedEvent evt )
             {
                     event[0] = evt;
             }
         } );
 
-        RemoteProxySettingsConfiguration settings = lookup( RemoteProxySettingsConfiguration.class );
+        GlobalRemoteProxySettings settings = lookup( GlobalRemoteProxySettings.class );
 
         final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
         httpProxySettings.setHostname( "foo.bar.com" );

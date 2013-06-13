@@ -122,7 +122,7 @@ public class DefaultNexusConfiguration
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
     @Requirement
-    private RemoteProxySettingsConfiguration remoteProxySettingsConfiguration;
+    private GlobalRemoteProxySettings globalRemoteProxySettings;
 
     /**
      * The config validator.
@@ -275,9 +275,9 @@ public class DefaultNexusConfiguration
 
             globalRemoteStorageContext.setRemoteConnectionSettings( globalRemoteConnectionSettings );
 
-            remoteProxySettingsConfiguration.configure( this );
+            globalRemoteProxySettings.configure( this );
 
-            globalRemoteStorageContext.setRemoteProxySettings( remoteProxySettingsConfiguration );
+            globalRemoteStorageContext.setRemoteProxySettings( globalRemoteProxySettings );
 
             ConfigurationPrepareForLoadEvent loadEvent = new ConfigurationPrepareForLoadEvent( this );
 

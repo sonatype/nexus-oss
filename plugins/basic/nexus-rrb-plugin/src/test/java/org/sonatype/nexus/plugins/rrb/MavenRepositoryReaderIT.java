@@ -42,8 +42,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -68,6 +68,9 @@ public class MavenRepositoryReaderIT
 
     @Mock
     private QueryStringBuilder queryStringBuilder;
+
+    @Mock
+    private RemoteProxySettings remoteProxySettings;
 
     @Before
     public void setUp()
@@ -155,11 +158,11 @@ public class MavenRepositoryReaderIT
     }
 
     private ProxyRepository getFakeProxyRepository(final String remoteUrl) {
-        final ProxyRepository repository = Mockito.mock(ProxyRepository.class);
+        final ProxyRepository repository = Mockito.mock( ProxyRepository.class );
         Mockito.when(repository.getRemoteUrl()).thenReturn(remoteUrl);
 
         final DefaultRemoteStorageContext rsc = new DefaultRemoteStorageContext(null);
-        rsc.setRemoteProxySettings(new DefaultRemoteProxySettings());
+        rsc.setRemoteProxySettings( remoteProxySettings );
         rsc.setRemoteConnectionSettings(new DefaultRemoteConnectionSettings());
         Mockito.when(repository.getRemoteStorageContext()).thenReturn(rsc);
 

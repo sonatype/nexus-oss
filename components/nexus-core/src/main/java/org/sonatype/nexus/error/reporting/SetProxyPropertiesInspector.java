@@ -20,8 +20,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration;
-import org.sonatype.nexus.configuration.application.events.RemoteProxySettingsConfigurationChangedEvent;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -42,18 +42,18 @@ public class SetProxyPropertiesInspector
     implements EventInspector
 {
 
-    private final RemoteProxySettingsConfiguration remoteProxySettingsConfiguration;
+    private final GlobalRemoteProxySettings globalRemoteProxySettings;
 
     @Inject
-    public SetProxyPropertiesInspector( final RemoteProxySettingsConfiguration remoteProxySettingsConfiguration )
+    public SetProxyPropertiesInspector( final GlobalRemoteProxySettings remoteProxySettingsConfiguration )
     {
-        this.remoteProxySettingsConfiguration = checkNotNull( remoteProxySettingsConfiguration );
+        this.globalRemoteProxySettings = checkNotNull( remoteProxySettingsConfiguration );
     }
 
     @Override
     public boolean accepts( final Event<?> evt )
     {
-        return evt instanceof RemoteProxySettingsConfigurationChangedEvent
+        return evt instanceof GlobalRemoteProxySettingsChangedEvent
             || evt instanceof NexusStartedEvent;
     }
 
@@ -65,18 +65,18 @@ public class SetProxyPropertiesInspector
             return;
         }
 
-        if ( remoteProxySettingsConfiguration.getHttpProxySettings() != null
-            && remoteProxySettingsConfiguration.getHttpProxySettings().isEnabled() )
+        if ( globalRemoteProxySettings.getHttpProxySettings() != null
+            && globalRemoteProxySettings.getHttpProxySettings().isEnabled() )
         {
-            setProperties( remoteProxySettingsConfiguration.getHttpProxySettings(), "http" );
-            if ( remoteProxySettingsConfiguration.getHttpsProxySettings() != null
-                && remoteProxySettingsConfiguration.getHttpsProxySettings().isEnabled() )
+            setProperties( globalRemoteProxySettings.getHttpProxySettings(), "http" );
+            if ( globalRemoteProxySettings.getHttpsProxySettings() != null
+                && globalRemoteProxySettings.getHttpsProxySettings().isEnabled() )
             {
-                setProperties( remoteProxySettingsConfiguration.getHttpsProxySettings(), "https" );
+                setProperties( globalRemoteProxySettings.getHttpsProxySettings(), "https" );
             }
             else
             {
-                setProperties( remoteProxySettingsConfiguration.getHttpProxySettings(), "https" );
+                setProperties( globalRemoteProxySettings.getHttpProxySettings(), "https" );
             }
         }
         else
@@ -106,7 +106,7 @@ public class SetProxyPropertiesInspector
 
         final String hostname = remoteHttpProxySettings.getHostname();
         final int port = remoteHttpProxySettings.getPort();
-        final Set<String> nonProxyHosts = remoteProxySettingsConfiguration.getNonProxyHosts();
+        final Set<String> nonProxyHosts = globalRemoteProxySettings.getNonProxyHosts();
 
         getLogger().debug(
             "Configure proxy using global {} proxy settings: hostname={}, port={}, username={}, nonProxyHosts={}",
