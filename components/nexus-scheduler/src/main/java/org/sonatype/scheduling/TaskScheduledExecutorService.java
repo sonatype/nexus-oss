@@ -12,17 +12,16 @@
  */
 package org.sonatype.scheduling;
 
-import java.util.concurrent.ScheduledExecutorService;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-import javax.inject.Provider;
+import javax.inject.Qualifier;
 
-/**
- * Typed provider for {@link ScheduledExecutorService} to be used with {@link DefaultScheduler}.
- * 
- * @author cstamas
- * @since 2.6
- */
-public interface TaskExecutorServiceProvider
-    extends Provider<ScheduledExecutorService>
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Qualifier
+public @interface TaskScheduledExecutorService
 {
+
 }

@@ -16,11 +16,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.scheduling.TaskExecutorServiceProvider;
+import org.sonatype.scheduling.TaskScheduledExecutorService;
 import org.sonatype.scheduling.ThreadFactoryImpl;
 
 /**
@@ -33,12 +33,12 @@ import org.sonatype.scheduling.ThreadFactoryImpl;
  */
 @Singleton
 @Named
+@TaskScheduledExecutorService
 public class ShiroTaskExecutorServiceProvider
-    implements TaskExecutorServiceProvider
+    implements Provider<ScheduledExecutorService>
 {
     private final ShiroFixedSubjectScheduledExecutorService shiroFixedSubjectScheduledExecutorService;
 
-    @Inject
     public ShiroTaskExecutorServiceProvider()
     {
         final ScheduledThreadPoolExecutor target =
