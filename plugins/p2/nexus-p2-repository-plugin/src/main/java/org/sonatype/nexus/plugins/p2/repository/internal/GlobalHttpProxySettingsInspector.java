@@ -88,7 +88,7 @@ public class GlobalHttpProxySettingsInspector
 
             getLogger().debug(
                 "Configure P2 proxy using global http proxy settings: hostname={}, port={}, username={}, nonProxyHosts={}",
-                new Object[] {hostname, port, username, nonProxyHosts}
+                hostname, port, username, nonProxyHosts
             );
 
             httpProxy.setProxySettings( hostname, port, username, password, nonProxyHosts );

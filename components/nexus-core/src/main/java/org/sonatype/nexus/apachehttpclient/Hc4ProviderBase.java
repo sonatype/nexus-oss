@@ -216,7 +216,7 @@ public class Hc4ProviderBase
     }
 
     /**
-     * @since 2.5
+     * @since 2.6
      */
     protected void configureProxy( final DefaultHttpClient httpClient,
                                    final RemoteProxySettings remoteProxySettings)

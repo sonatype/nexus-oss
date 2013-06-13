@@ -24,7 +24,7 @@ public interface ServerConfiguration
 
     /**
      * @return Remote Proxy configuration segment.
-     * @since 2.5
+     * @since 2.6
      */
     RemoteProxy remoteProxySettings();
 

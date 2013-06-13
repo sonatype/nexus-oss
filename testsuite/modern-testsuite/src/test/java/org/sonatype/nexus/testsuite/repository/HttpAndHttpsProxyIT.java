@@ -44,7 +44,7 @@ import org.sonatype.tests.http.server.fluent.Server;
 /**
  * ITs related to which proxy is used (global or repository level defined ones), depending on url scheme (http / https).
  *
- * @since 2.5
+ * @since 2.6
  */
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class HttpAndHttpsProxyIT

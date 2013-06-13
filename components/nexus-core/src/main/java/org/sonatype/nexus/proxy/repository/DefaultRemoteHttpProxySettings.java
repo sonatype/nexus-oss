@@ -17,7 +17,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * Default {@link RemoteHttpProxySettings} implementation.
  *
- * @since 2.5
+ * @since 2.6
  */
 public class DefaultRemoteHttpProxySettings
     implements RemoteHttpProxySettings

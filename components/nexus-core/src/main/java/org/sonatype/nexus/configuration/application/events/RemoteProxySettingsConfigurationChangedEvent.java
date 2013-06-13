@@ -20,7 +20,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * this event will reflect the NEW values, but if you have the {@link org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration} component, you can
  * query it too <em>after</em> you received this event .
  *
- * @since 2.5
+ * @since 2.6
  */
 public class RemoteProxySettingsConfigurationChangedEvent
     extends AbstractEvent<RemoteProxySettingsConfiguration>

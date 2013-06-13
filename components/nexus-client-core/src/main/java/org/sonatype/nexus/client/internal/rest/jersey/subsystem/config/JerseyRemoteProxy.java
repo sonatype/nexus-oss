@@ -18,7 +18,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 
 /**
- * @since 2.5
+ * @since 2.6
  */
 public class JerseyRemoteProxy
     extends JerseySegmentSupport<RemoteProxy, RemoteProxySettingsDTO>

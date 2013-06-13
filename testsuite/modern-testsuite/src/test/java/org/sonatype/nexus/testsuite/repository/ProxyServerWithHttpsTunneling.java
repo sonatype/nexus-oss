@@ -24,7 +24,7 @@ import org.sonatype.tests.http.server.jetty.impl.ProxyServlet;
 /**
  * An test proxy sever which works also for HTTPS.
  *
- * @since 2.5
+ * @since 2.6
  */
 public class ProxyServerWithHttpsTunneling
 {
