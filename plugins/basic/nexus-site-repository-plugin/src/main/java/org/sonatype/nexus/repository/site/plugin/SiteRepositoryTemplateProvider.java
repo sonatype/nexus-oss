@@ -12,36 +12,19 @@
  */
 package org.sonatype.nexus.repository.site.plugin;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named( SiteRepositoryTemplateProvider.PROVIDER_ID )
 @Singleton
 public class SiteRepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
-    implements Initializable
 {
 
     public static final String PROVIDER_ID = "site-repository";
-
-    private final RepositoryTypeRegistry repositoryTypeRegistry;
-
-    @Inject
-    public SiteRepositoryTemplateProvider( final RepositoryTypeRegistry repositoryTypeRegistry )
-    {
-        this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
-    }
 
     public TemplateSet getTemplates()
     {
@@ -59,10 +42,4 @@ public class SiteRepositoryTemplateProvider
         return templates;
     }
 
-    public void initialize()
-        throws InitializationException
-    {
-        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor(
-            WebSiteRepository.class, "site", "sites" ) );
-    }
 }
