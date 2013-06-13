@@ -17,7 +17,7 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
- * @since 2.5
+ * @since 2.6
  */
 public class CRemoteProxySettingsCoreConfiguration
     extends AbstractCoreConfiguration

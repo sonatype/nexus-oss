@@ -18,7 +18,7 @@ import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 
 /**
- * @since 2.5
+ * @since 2.6
  */
 public interface RemoteProxySettingsConfiguration
     extends Configurable, RemoteProxySettings

@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import com.google.common.base.Throwables;
 
 /**
- * @since 2.5
+ * @since 2.6
  */
 @Component( role = RemoteProxySettingsConfiguration.class )
 public class DefaultRemoteProxySettingsConfiguration

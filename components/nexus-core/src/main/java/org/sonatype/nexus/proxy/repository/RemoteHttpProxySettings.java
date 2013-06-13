@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 /**
  * HTTP/HTTPS proxy settings.
  *
- * @since 2.5
+ * @since 2.6
  */
 public interface RemoteHttpProxySettings
 {

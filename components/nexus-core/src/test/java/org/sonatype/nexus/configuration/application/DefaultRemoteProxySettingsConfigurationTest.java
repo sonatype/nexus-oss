@@ -22,7 +22,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 /**
- * @since 2.5
+ * @since 2.6
  */
 public class DefaultRemoteProxySettingsConfigurationTest
     extends NexusAppTestSupport

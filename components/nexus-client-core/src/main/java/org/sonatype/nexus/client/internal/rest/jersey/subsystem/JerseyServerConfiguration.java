@@ -38,7 +38,7 @@ public class JerseyServerConfiguration
     }
 
     /**
-     * @since 2.5
+     * @since 2.6
      */
     @Override
     public RemoteProxy remoteProxySettings()

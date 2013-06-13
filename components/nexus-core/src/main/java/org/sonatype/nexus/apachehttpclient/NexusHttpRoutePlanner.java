@@ -34,7 +34,7 @@ import org.apache.http.protocol.HttpContext;
  * An {@link HttpRoutePlanner} that uses different proxies / url scheme (http/https) and bypasses proxy for specific
  * hosts (non proxy hosts).
  *
- * @since 2.5
+ * @since 2.6
  */
 class NexusHttpRoutePlanner
     extends DefaultHttpRoutePlanner

@@ -17,7 +17,7 @@ import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 /**
  * Remote Proxy configuration segment.
  *
- * @since 2.5
+ * @since 2.6
  */
 public interface RemoteProxy
     extends Segment<RemoteProxy, RemoteProxySettingsDTO>
