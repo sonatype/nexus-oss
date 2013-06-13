@@ -83,7 +83,7 @@ public class DefaultScheduler
     }
 
     @Inject
-    public DefaultScheduler( final TaskConfigManager taskConfig, @TaskScheduledExecutorService final Provider<ScheduledExecutorService> scheduledExecutorServiceProvider )
+    public DefaultScheduler( final TaskConfigManager taskConfig, @Named("DefaultScheduler") final Provider<ScheduledExecutorService> scheduledExecutorServiceProvider )
     {
         this.taskConfig = taskConfig;
         this.scheduledExecutorService = scheduledExecutorServiceProvider.get();

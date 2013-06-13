@@ -20,7 +20,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.scheduling.TaskScheduledExecutorService;
 import org.sonatype.scheduling.ThreadFactoryImpl;
 
 /**
@@ -32,8 +31,7 @@ import org.sonatype.scheduling.ThreadFactoryImpl;
  * @since 2.6
  */
 @Singleton
-@Named
-@TaskScheduledExecutorService
+@Named("DefaultScheduler")
 public class ShiroTaskExecutorServiceProvider
     implements Provider<ScheduledExecutorService>
 {

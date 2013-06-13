@@ -14,7 +14,6 @@ package org.sonatype.nexus;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
@@ -22,10 +21,7 @@ import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.scheduling.shiro.ShiroFixedSubjectScheduledExecutorService;
-import org.sonatype.nexus.scheduling.shiro.ShiroTaskExecutorServiceProvider;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskScheduledExecutorService;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
@@ -56,7 +52,6 @@ public abstract class NexusAppTestSupport
             public void configure( final Binder binder )
             {
                 binder.bind( Config.class ).toInstance( new ConfigImpl( enableAutomaticRoutingFeature() ) );
-                binder.bind( ScheduledExecutorService.class ).annotatedWith( TaskScheduledExecutorService.class ).toProvider( ShiroTaskExecutorServiceProvider.class );
             }
         } );
     }

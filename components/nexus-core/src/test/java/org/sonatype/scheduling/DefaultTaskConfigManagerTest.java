@@ -25,13 +25,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.scheduling.shiro.ShiroTaskExecutorServiceProvider;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -41,7 +39,6 @@ import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 import org.sonatype.security.guice.SecurityModule;
 
-import com.google.inject.Binder;
 import com.google.inject.Module;
 
 public class DefaultTaskConfigManagerTest
@@ -88,15 +85,7 @@ public class DefaultTaskConfigManagerTest
     @Override
     protected Module[] getTestCustomModules()
     {
-        return new Module[] { new SecurityModule(), new Module()
-        {
-            @Override
-            public void configure( final Binder binder )
-            {
-                binder.bind( ScheduledExecutorService.class ).annotatedWith( TaskScheduledExecutorService.class ).toProvider(
-                    ShiroTaskExecutorServiceProvider.class );
-            }
-        } };
+        return new Module[] { new SecurityModule() };
     }
 
     public void setUp()
