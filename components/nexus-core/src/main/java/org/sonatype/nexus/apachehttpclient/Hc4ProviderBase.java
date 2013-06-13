@@ -121,7 +121,7 @@ public class Hc4ProviderBase
         params.setIntParameter( HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024 );
         params.setIntParameter( HttpConnectionParams.CONNECTION_TIMEOUT, getConnectionTimeout( context ) );
         params.setIntParameter( HttpConnectionParams.SO_TIMEOUT, getSoTimeout( context ) );
-        params.setParameter( HttpProtocolParams.USER_AGENT, userAgentBuilder.formatGenericUserAgentString() );
+        params.setParameter( HttpProtocolParams.USER_AGENT, userAgentBuilder.formatUserAgentString( context ) );
         return params;
     }
 
