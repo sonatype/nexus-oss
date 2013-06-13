@@ -87,8 +87,8 @@ public class DefaultScheduler
     {
         this.taskConfig = taskConfig;
         this.scheduledExecutorService = scheduledExecutorServiceProvider.get();
-        idGen = new AtomicInteger( 0 );
-        tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
+        this.idGen = new AtomicInteger( 0 );
+        this.tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
     }
 
     protected Logger getLogger()
