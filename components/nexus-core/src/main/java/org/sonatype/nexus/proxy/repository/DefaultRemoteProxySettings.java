@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.HashSet;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.net.URL;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -62,6 +64,40 @@ public class DefaultRemoteProxySettings
         {
             this.nonProxyHosts.addAll( nonProxyHosts );
         }
+    }
+
+    @Override
+    public RemoteHttpProxySettings getRemoteHttpProxySettingsFor( final URL url )
+    {
+        return getRemoteHttpProxySettingsFor( url, this );
+    }
+
+    public static RemoteHttpProxySettings getRemoteHttpProxySettingsFor( final URL url,
+                                                                         final RemoteProxySettings settings )
+    {
+        checkNotNull( url );
+        checkNotNull( settings );
+
+        // if we have a secure url, try to use a secure proxy
+        if ( "https".equals( url.getProtocol() ) )
+        {
+            RemoteHttpProxySettings httpsProxySettings = settings.getHttpsProxySettings();
+            if ( httpsProxySettings != null && httpsProxySettings.isEnabled() )
+            {
+                return httpsProxySettings;
+            }
+        }
+        else if ( "http".equals( url.getProtocol() ) )
+        {
+            // if no secure proxy is available, or the url is not secure, use normal proxy
+            RemoteHttpProxySettings httpProxySettings = settings.getHttpProxySettings();
+            if ( httpProxySettings != null && httpProxySettings.isEnabled() )
+            {
+                return httpProxySettings;
+            }
+        }
+
+        return null; // no proxies are enabled
     }
 
 }
