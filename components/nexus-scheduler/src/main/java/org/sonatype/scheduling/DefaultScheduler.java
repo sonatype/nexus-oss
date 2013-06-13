@@ -36,8 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
-import org.sonatype.scheduling.shiro.FakeAlmightySubject;
-import org.sonatype.scheduling.shiro.ShiroFixedSubjectScheduledExecutorService;
 
 /**
  * A simple facade to ScheduledThreadPoolExecutor.
@@ -59,18 +57,37 @@ public class DefaultScheduler
 
     private final ConcurrentHashMap<String, List<ScheduledTask<?>>> tasksMap;
 
-    @Inject
+    /**
+     * Deprecated constructor.
+     * 
+     * @param taskConfig
+     * @deprecated Use another constructor. Left only for some UTs use.
+     */
+    @Deprecated
     public DefaultScheduler( final TaskConfigManager taskConfig )
     {
+        this( taskConfig, new TaskExecutorServiceProvider()
+        {
+            @Override
+            public ScheduledExecutorService get()
+            {
+                final ScheduledThreadPoolExecutor scheduledExecutorService =
+                    (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
+                        Thread.MIN_PRIORITY ) );
+                scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
+                scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
+                return scheduledExecutorService;
+            }
+        } );
+    }
+
+    @Inject
+    public DefaultScheduler( final TaskConfigManager taskConfig, final TaskExecutorServiceProvider taskServiceProvider )
+    {
         this.taskConfig = taskConfig;
+        this.scheduledExecutorService = taskServiceProvider.get();
         idGen = new AtomicInteger( 0 );
         tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
-        final ScheduledThreadPoolExecutor target =
-            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
-                Thread.MIN_PRIORITY ) );
-        target.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
-        target.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
-        this.scheduledExecutorService = new ShiroFixedSubjectScheduledExecutorService( target, FakeAlmightySubject.TASK_SUBJECT );
     }
 
     protected Logger getLogger()
@@ -112,19 +129,15 @@ public class DefaultScheduler
     public void shutdown()
     {
         getLogger().info( "Shutting down Scheduler..." );
-
-        getScheduledExecutorService().shutdown();
         try
         {
-            boolean stopped = getScheduledExecutorService().awaitTermination( 1, TimeUnit.SECONDS );
-
+            boolean stopped = scheduledExecutorService.awaitTermination( 1, TimeUnit.SECONDS );
             if ( !stopped )
             {
                 final Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
-
                 if ( !runningTasks.isEmpty() )
                 {
-                    getScheduledExecutorService().shutdownNow();
+                    scheduledExecutorService.shutdownNow();
                     getLogger().warn( "Scheduler shut down forcibly with tasks running." );
                 }
                 else

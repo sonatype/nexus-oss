@@ -28,7 +28,6 @@ import org.junit.experimental.categories.Category;
 import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
-import org.sonatype.scheduling.shiro.ShiroFixedSubjectScheduledExecutorService;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
@@ -340,15 +339,16 @@ public class DefaultSchedulerTest
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
         ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
-
+        
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
         Thread.sleep( 1200 );
         
         int count = 0;
 
+        // hack: we used deprecated constructor, so we know actual imple here
         while ( ( count =
-            ( (ScheduledThreadPoolExecutor) ( (ShiroFixedSubjectScheduledExecutorService) defaultScheduler.getScheduledExecutorService() ).getTargetScheduledExecutorService() ).getActiveCount() ) > 0 )
+            ( (ScheduledThreadPoolExecutor) defaultScheduler.getScheduledExecutorService() ).getActiveCount() ) > 0 )
         {
             assertEquals( "We scheduled one task, but more than one is executing?", 1,
                 count );

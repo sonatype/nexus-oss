@@ -72,9 +72,9 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.scheduling.shiro.FakeAlmightySubject;
+import org.sonatype.nexus.scheduling.shiro.ShiroFixedSubjectScheduledExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
-import org.sonatype.scheduling.shiro.FakeAlmightySubject;
-import org.sonatype.scheduling.shiro.ShiroFixedSubjectScheduledExecutorService;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
