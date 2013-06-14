@@ -31,7 +31,6 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -42,7 +41,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -58,9 +56,6 @@ public abstract class AbstractProxyTestEnvironment
 
     /** The config */
     private ApplicationConfiguration applicationConfiguration;
-
-    /** The app event hub */
-    private EventBus eventBus;
 
     /** The repository registry. */
     private RepositoryRegistry repositoryRegistry;
@@ -88,11 +83,6 @@ public abstract class AbstractProxyTestEnvironment
     public ApplicationConfiguration getApplicationConfiguration()
     {
         return applicationConfiguration;
-    }
-
-    public EventBus eventBus()
-    {
-        return eventBus;
     }
 
     /**
@@ -207,13 +197,11 @@ public abstract class AbstractProxyTestEnvironment
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
 
-        eventBus = lookup( EventBus.class );
-
         repositoryRegistry = lookup( RepositoryRegistry.class );
 
         testEventListener = new TestItemEventListener();
 
-        eventBus.register( testEventListener );
+        eventBus().register( testEventListener );
 
         attributesHandler = lookup( AttributesHandler.class );
 
@@ -228,10 +216,10 @@ public abstract class AbstractProxyTestEnvironment
 
         getEnvironmentBuilder().buildEnvironment( this );
 
-        eventBus.post( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
+        eventBus().post( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
 
-        eventBus.post( new NexusStartedEvent( null ) );
-
+        eventBus().post( new NexusStartedEvent( null ) );
+        
         getEnvironmentBuilder().startService();
     }
 
@@ -243,7 +231,6 @@ public abstract class AbstractProxyTestEnvironment
     public void tearDown()
         throws Exception
     {
-        eventBus.post( new NexusStoppedEvent( null ) );
         getEnvironmentBuilder().stopService();
         super.tearDown();
     }

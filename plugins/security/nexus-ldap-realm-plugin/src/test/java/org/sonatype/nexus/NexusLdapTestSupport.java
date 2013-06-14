@@ -37,14 +37,8 @@ import org.sonatype.sisu.ehcache.CacheManagerComponent;
 import com.google.inject.Module;
 
 public abstract class NexusLdapTestSupport
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
-    @Override
-    protected Module[] getTestCustomModules()
-    {
-        return new Module[] { new SecurityModule() };
-    }
-
     /**
      * The ldap server.
      */

@@ -14,13 +14,11 @@ package org.sonatype.nexus.configuration.application;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.Subscribe;
 
 public class DefaultGlobalRemoteConnectionSettingsTest

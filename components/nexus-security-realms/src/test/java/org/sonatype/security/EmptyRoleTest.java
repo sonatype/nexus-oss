@@ -31,7 +31,6 @@ import org.sonatype.security.realms.XmlAuthorizingRealm;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
-import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -51,8 +50,6 @@ public class EmptyRoleTest
         throws Exception
     {
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-        securitySystem.start();
-
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 
         // create an empty role
@@ -79,9 +76,7 @@ public class EmptyRoleTest
     public void testReloadSecurityWithEmptyRole()
         throws Exception
     {
-
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-        securitySystem.start();
 
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 
@@ -91,8 +86,8 @@ public class EmptyRoleTest
         authManager.addRole( emptyRole );
 
         // restart
-        securitySystem.stop();
-        securitySystem.start();
+        //securitySystem.stop();
+        //securitySystem.start();
 
         // make sure the role is still there
         Assert.assertNotNull( authManager.getRole( emptyRole.getRoleId() ) );
@@ -103,7 +98,6 @@ public class EmptyRoleTest
     {
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         securitySystem.setRealms( Arrays.asList( XmlAuthenticatingRealm.ROLE, XmlAuthorizingRealm.ROLE ) );
-        securitySystem.start();
 
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 
@@ -136,9 +130,7 @@ public class EmptyRoleTest
     public void testSearchForUserWithEmptyRole()
         throws Exception
     {
-
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-        securitySystem.start();
 
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 

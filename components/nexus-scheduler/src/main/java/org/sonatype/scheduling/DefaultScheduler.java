@@ -131,7 +131,8 @@ public class DefaultScheduler
         getLogger().info( "Shutting down Scheduler..." );
         try
         {
-            boolean stopped = scheduledExecutorService.awaitTermination( 1, TimeUnit.SECONDS );
+            scheduledExecutorService.shutdown();
+            boolean stopped = scheduledExecutorService.awaitTermination( 3L, TimeUnit.SECONDS );
             if ( !stopped )
             {
                 final Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();

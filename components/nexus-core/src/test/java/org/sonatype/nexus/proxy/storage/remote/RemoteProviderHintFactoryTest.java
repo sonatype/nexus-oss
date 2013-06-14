@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
@@ -22,11 +23,10 @@ public class RemoteProviderHintFactoryTest
 {
     private static final String FAKE_VALUE = "Foo-Bar";
 
-    protected void tearDown()
+    @After
+    public void cleanup()
         throws Exception
     {
-        super.tearDown();
-
         // clear the property
         System.clearProperty( DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY );
     }

@@ -35,12 +35,12 @@ import org.sonatype.guice.bean.reflect.URLClassSpace;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Verifies functionality of SecurityModule.

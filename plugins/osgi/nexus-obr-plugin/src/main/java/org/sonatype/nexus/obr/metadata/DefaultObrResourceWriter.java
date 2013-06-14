@@ -25,7 +25,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.osgi.impl.bundle.obr.resource.ResourceImpl;
 import org.osgi.impl.bundle.obr.resource.ResourceImpl.UrlTransformer;
 import org.osgi.service.obr.Resource;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -45,7 +45,7 @@ public class DefaultObrResourceWriter
 {
     private final File file;
 
-    private final MimeUtil mimeUtil;
+    private final MimeSupport mimeSupport;
 
     private final PrintWriter pw;
 
@@ -64,10 +64,10 @@ public class DefaultObrResourceWriter
      * @param temporaryDirectory
      * @throws IOException
      */
-    public DefaultObrResourceWriter( final RepositoryItemUid uid, final File temporaryDirectory, final MimeUtil mimeUtil )
+    public DefaultObrResourceWriter( final RepositoryItemUid uid, final File temporaryDirectory, final MimeSupport mimeSupport )
         throws IOException
     {
-        this.mimeUtil = mimeUtil;
+        this.mimeSupport = mimeSupport;
 
         // use a temporary file while we are streaming resources
         file = File.createTempFile( "obr", ".xml", temporaryDirectory );
@@ -139,7 +139,7 @@ public class DefaultObrResourceWriter
         }
 
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        final ContentLocator content = new FileContentLocator( file, mimeUtil.getMimeType( file ) );
+        final ContentLocator content = new FileContentLocator( file, mimeSupport.guessMimeTypeFromPath( file.getAbsolutePath() ) );
 
         try
         {

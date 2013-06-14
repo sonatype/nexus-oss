@@ -74,7 +74,6 @@ public class ExternalRoleMappedTest
         realms.add( "Mock" );
         realms.add( XmlAuthorizingRealm.ROLE );
         securitySystem.setRealms( realms );
-        securitySystem.start();
 
         // jcohen has the role mockrole1, there is also xml role with the same ID, which means jcohen automaticly has
         // this xml role

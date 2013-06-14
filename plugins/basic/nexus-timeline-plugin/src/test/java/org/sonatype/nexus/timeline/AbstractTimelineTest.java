@@ -12,19 +12,12 @@
  */
 package org.sonatype.nexus.timeline;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.inject.Module;
-import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.security.guice.SecurityModule;
 
+import com.google.inject.Module;
+
 public abstract class AbstractTimelineTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
-    @Override
-    protected Module[] getTestCustomModules()
-    {
-        return new Module[] { new SecurityModule() };
-    }
 }

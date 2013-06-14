@@ -33,6 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -40,21 +41,14 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.maven.routing.Config;
-import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
-import org.sonatype.nexus.test.NexusTestSupport;
-import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Proxy;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.Record;
-
-import com.google.inject.Binder;
-import com.google.inject.Module;
 
 /**
  * Unit test testing Nexus behaviour (with regard to remote fetches) with default behaviour, and then with the presence
@@ -65,25 +59,11 @@ import com.google.inject.Module;
  * @since 2.4
  */
 public class RequestFlagsTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
     public static final String PATH = "/test.txt";
 
     public static final String CONTENT = "foobar123";
-
-    @Override
-    protected Module[] getTestCustomModules()
-    {
-        return new Module[] { new SecurityModule(), new Module()
-        {
-            @Override
-            public void configure( Binder binder )
-            {
-                // this test will load default config, so disable WL feature to not scrape Central in this UT
-                binder.bind( Config.class ).toInstance( new ConfigImpl( false ) );
-            }
-        } };
-    }
 
     private Server server;
 

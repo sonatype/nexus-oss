@@ -72,8 +72,6 @@ public class XmlAuthorizingRealmTest
         configurationManager.clearCache();
 
         configFile.delete();
-
-        this.lookup( SecuritySystem.class ).start();
     }
 
     public void testAuthorization()

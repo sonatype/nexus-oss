@@ -61,7 +61,6 @@ public class DefaultSecuritySystemTest
     {
 
         SecuritySystem securitySystem = this.getSecuritySystem();
-        securitySystem.start();
 
         // bind to a servlet request/response
         // this.setupLoginContext( "test" );

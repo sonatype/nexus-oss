@@ -363,7 +363,7 @@ public class UserManagerTest
         }
 
         // now restart the security
-        this.getSecuritySystem().start();
+        // this.getSecuritySystem().start();
 
         // that should have went well,
         User user = this.getSecuritySystem().getUser( userId, "default" );

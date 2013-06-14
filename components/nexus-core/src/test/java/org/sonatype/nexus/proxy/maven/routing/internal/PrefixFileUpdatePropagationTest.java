@@ -213,7 +213,6 @@ public class PrefixFileUpdatePropagationTest
         {
             try
             {
-                server.start();
                 final PrefixSource hostedEntrySource =
                     wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( HOSTED_REPO_ID,
                         MavenRepository.class ) );
@@ -236,7 +235,6 @@ public class PrefixFileUpdatePropagationTest
         }
 
         {
-            server.stop();
             server =
                 Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt" ).withBehaviours(
                     Behaviours.content( prefixFile1( true ) ) );

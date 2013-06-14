@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
@@ -82,21 +84,43 @@ public class DefaultTaskConfigManagerTest
     // typeClassMap.put( SCHEDULE_TYPE_ADVANCED, CAdvancedSchedule.class );
     // }
 
-    @Override
-    protected Module[] getTestCustomModules()
-    {
-        return new Module[] { new SecurityModule() };
-    }
+    /**
+     * This method is commented out, due to that test logs will be full of WARNs:
+     * 
+     * <pre>
+     * WARN o.s.n.c.a.DefaultNexusConfiguration - Could not obtain Shiro subject:
+     * org.apache.shiro.UnavailableSecurityManagerException: No SecurityManager accessible to the calling code, either
+     * bound to the org.apache.shiro.util.ThreadContext or as a vm static singleton. This is an invalid application
+     * configuration.
+     * </pre>
+     * 
+     * But this WARN happens in DefaultNexusConfig, while the userId is tried to be fetched for logging purposes
+     * only (... config is changed by XXX), and is not directly related to this test. Other solution would be to
+     * enable this method below, but then a lot of extra cruft would be needed to manage (start and stop)
+     * SecurityManager and CacheManager.... which really would not belong to this test.
+     * 
+     * @throws Exception
+     */
+    // @Override
+    // protected Module[] getTestCustomModules()
+    // {
+    // return new Module[] { new SecurityModule() };
+    // }
 
-    public void setUp()
+    @Before
+    public void prepare()
         throws Exception
     {
-        super.setUp();
-
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
         defaultManager = (DefaultTaskConfigManager) lookup( TaskConfigManager.class.getName() );
         applicationConfiguration = lookup( NexusConfiguration.class );
         applicationConfiguration.loadConfiguration();
+    }
+    
+    @After
+    public void cleanup()
+    {
+        defaultScheduler.shutdown();
     }
 
     @Test

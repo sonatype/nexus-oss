@@ -32,9 +32,12 @@ import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+
+import com.google.inject.Binder;
 
 public abstract class AbstractSecurityTestCase
     extends InjectedTestCase
@@ -55,6 +58,12 @@ public abstract class AbstractSecurityTestCase
         properties.put( "application-conf", CONFIG_DIR.getAbsolutePath() );
         properties.put( "security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml" );
         super.configure( properties );
+    }
+
+    @Override
+    public void configure( final Binder binder )
+    {
+        binder.install( new SecurityModule() );
     }
 
     @Override

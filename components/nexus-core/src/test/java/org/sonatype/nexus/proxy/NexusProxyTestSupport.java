@@ -19,6 +19,7 @@ import com.google.inject.Module;
 import org.codehaus.plexus.context.Context;
 import org.junit.After;
 import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
@@ -27,18 +28,6 @@ public abstract class NexusProxyTestSupport
 {
 
     public static final String PROXY_SERVER_PORT = "proxy.server.port";
-
-    @After
-    public void shutdownCacheManager() throws Exception {
-        // HACK: Force the cache manager to shutdown after each test, as this doesn't always get cleaned up properly
-        lookup(CacheManagerComponent.class).shutdown();
-    }
-
-    @Override
-    protected Module[] getTestCustomModules()
-    {
-        return new Module[] { new SecurityModule() };
-    }
 
     @Override
     protected void customizeContext( Context ctx )

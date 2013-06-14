@@ -25,6 +25,7 @@ import java.util.List;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.After;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -80,6 +81,13 @@ public class RoutingAndLocalStatusTest
             Server.withPort( 0 ).serve( "/" ).withBehaviours( Behaviours.error( 404, "don't bother yourself" ) ).serve(
                 "/.meta/prefixes.txt" ).withBehaviours( Behaviours.content( prefixFile() ) );
         server.start();
+    }
+
+    @After
+    public void stopServer()
+        throws Exception
+    {
+        server.stop();
     }
 
     protected String prefixFile()
