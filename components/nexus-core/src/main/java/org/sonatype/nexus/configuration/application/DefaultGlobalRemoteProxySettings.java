@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.configuration.application;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettingsCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import com.google.common.base.Throwables;
 
@@ -157,6 +159,12 @@ public class DefaultGlobalRemoteProxySettings
         getCurrentConfiguration( true ).setNonProxyHosts( new ArrayList<String>(
             nonProxyHosts == null ? Collections.<String>emptySet() : nonProxyHosts
         ) );
+    }
+
+    @Override
+    public RemoteHttpProxySettings getRemoteHttpProxySettingsFor( final URL url )
+    {
+        return DefaultRemoteProxySettings.getRemoteHttpProxySettingsFor( url, this );
     }
 
     private RemoteHttpProxySettings convertFromModel( CRemoteHttpProxySettings model )

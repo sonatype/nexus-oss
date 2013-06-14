@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.net.URL;
 import java.util.Set;
 
 /**
@@ -47,11 +48,18 @@ public interface RemoteProxySettings
     /**
      * @return set of hosts for which proxy should not be used
      */
-    public Set<String> getNonProxyHosts();
+    Set<String> getNonProxyHosts();
 
     /**
      * @param nonProxyHosts set of hosts for which proxy should not be used
      */
-    public void setNonProxyHosts( Set<String> nonProxyHosts );
+    void setNonProxyHosts( Set<String> nonProxyHosts );
+
+    /**
+     * Determines the {@link RemoteHttpProxySettings} to be used for provided URL.
+     * @param url for which the {@link RemoteHttpProxySettings} should be determined
+     * @return {@link RemoteHttpProxySettings} to be used or null if http proxy is not configured/enabled
+     */
+    RemoteHttpProxySettings getRemoteHttpProxySettingsFor( final URL url );
 
 }
