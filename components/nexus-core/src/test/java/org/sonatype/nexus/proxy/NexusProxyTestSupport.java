@@ -15,13 +15,8 @@ package org.sonatype.nexus.proxy;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import com.google.inject.Module;
 import org.codehaus.plexus.context.Context;
-import org.junit.After;
 import org.sonatype.nexus.test.NexusTestSupport;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.guice.SecurityModule;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 public abstract class NexusProxyTestSupport
     extends NexusTestSupport
