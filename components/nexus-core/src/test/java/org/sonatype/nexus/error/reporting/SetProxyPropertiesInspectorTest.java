@@ -24,8 +24,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration;
-import org.sonatype.nexus.configuration.application.events.RemoteProxySettingsConfigurationChangedEvent;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -38,7 +38,7 @@ public class SetProxyPropertiesInspectorTest
 {
 
     @Mock
-    private RemoteProxySettingsConfiguration remoteProxySettingsConfiguration;
+    private GlobalRemoteProxySettings globalRemoteProxySettings;
 
     @Mock
     private RemoteHttpProxySettings httpProxySettings;
@@ -47,7 +47,7 @@ public class SetProxyPropertiesInspectorTest
     private RemoteHttpProxySettings httpsProxySettings;
 
     @Mock
-    private RemoteProxySettingsConfigurationChangedEvent evt;
+    private GlobalRemoteProxySettingsChangedEvent evt;
 
     @Mock
     private UsernamePasswordRemoteAuthenticationSettings auth;
@@ -59,9 +59,9 @@ public class SetProxyPropertiesInspectorTest
     @Before
     public void setup()
     {
-        when( remoteProxySettingsConfiguration.getHttpProxySettings() ).thenReturn( httpProxySettings );
-        when( remoteProxySettingsConfiguration.getHttpsProxySettings() ).thenReturn( httpsProxySettings );
-        underTest = new SetProxyPropertiesInspector( remoteProxySettingsConfiguration );
+        when( globalRemoteProxySettings.getHttpProxySettings() ).thenReturn( httpProxySettings );
+        when( globalRemoteProxySettings.getHttpsProxySettings() ).thenReturn( httpsProxySettings );
+        underTest = new SetProxyPropertiesInspector( globalRemoteProxySettings );
     }
 
     @Before
@@ -100,7 +100,7 @@ public class SetProxyPropertiesInspectorTest
     @Test
     public void testNoProxyHosts()
     {
-        when( remoteProxySettingsConfiguration.getNonProxyHosts() ).thenReturn(
+        when( globalRemoteProxySettings.getNonProxyHosts() ).thenReturn(
             Sets.newTreeSet( Sets.newHashSet( "host1", "host2" ) )
         );
 
@@ -140,7 +140,7 @@ public class SetProxyPropertiesInspectorTest
         when( auth.getUsername() ).thenReturn( "user" );
         when( auth.getPassword() ).thenReturn( "password" );
 
-        when( remoteProxySettingsConfiguration.getNonProxyHosts() ).thenReturn(
+        when( globalRemoteProxySettings.getNonProxyHosts() ).thenReturn(
             Sets.newTreeSet( Sets.newHashSet( "host1", "host2" ) )
         );
 

@@ -16,11 +16,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.ProtocolException;
-import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpGet;
@@ -37,9 +35,8 @@ import org.sonatype.nexus.apachehttpclient.Hc4ProviderImpl;
 import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
-import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -69,6 +66,9 @@ public class HttpClientManagerTest
     private RemoteStorageContext globalRemoteStorageContext;
 
     @Mock
+    private RemoteProxySettings remoteProxySettings;
+
+    @Mock
     private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
     @Mock
@@ -92,7 +92,7 @@ public class HttpClientManagerTest
         final DefaultRemoteConnectionSettings rcs = new DefaultRemoteConnectionSettings();
         rcs.setConnectionTimeout( 10000 );
         when( globalRemoteStorageContext.getRemoteConnectionSettings() ).thenReturn( rcs );
-        when( globalRemoteStorageContext.getRemoteProxySettings() ).thenReturn( new DefaultRemoteProxySettings() );
+        when( globalRemoteStorageContext.getRemoteProxySettings() ).thenReturn( remoteProxySettings );
         when( applicationConfiguration.getGlobalRemoteStorageContext() ).thenReturn( globalRemoteStorageContext );
 
         hc4Provider = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null );

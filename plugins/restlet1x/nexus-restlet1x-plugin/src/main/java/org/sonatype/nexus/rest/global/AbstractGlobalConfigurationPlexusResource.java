@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.application.RemoteProxySettingsConfiguration;
+import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -66,7 +66,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     private NexusEmailer nexusEmailer;
 
     @Requirement
-    private RemoteProxySettingsConfiguration remoteProxySettingsConfiguration;
+    private GlobalRemoteProxySettings globalRemoteProxySettings;
 
     @Requirement
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
@@ -85,9 +85,9 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         return nexusEmailer;
     }
 
-    protected RemoteProxySettingsConfiguration getRemoteProxySettingsConfiguration()
+    protected GlobalRemoteProxySettings getGlobalRemoteProxySettings()
     {
-        return remoteProxySettingsConfiguration;
+        return globalRemoteProxySettings;
     }
 
     protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
@@ -223,7 +223,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     /**
      * Externalized Nexus object to DTO's conversion.
      */
-    public static RemoteProxySettingsDTO convert( RemoteProxySettingsConfiguration settings )
+    public static RemoteProxySettingsDTO convert( GlobalRemoteProxySettings settings )
     {
         if ( settings == null )
         {

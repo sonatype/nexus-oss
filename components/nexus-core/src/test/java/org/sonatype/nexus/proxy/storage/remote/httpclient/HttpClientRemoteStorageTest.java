@@ -33,8 +33,8 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -166,7 +166,7 @@ public class HttpClientRemoteStorageTest
             final DefaultRemoteConnectionSettings rcs = new DefaultRemoteConnectionSettings();
             rcs.setConnectionTimeout( 86400000 );
             globalRemoteStorageContext.setRemoteConnectionSettings( new DefaultRemoteConnectionSettings() );
-            globalRemoteStorageContext.setRemoteProxySettings( new DefaultRemoteProxySettings() );
+            globalRemoteStorageContext.setRemoteProxySettings( mock( RemoteProxySettings.class ) );
             final ApplicationConfiguration applicationConfiguration = mock( ApplicationConfiguration.class );
             when( applicationConfiguration.getGlobalRemoteStorageContext() ).thenReturn( globalRemoteStorageContext );
 
