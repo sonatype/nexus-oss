@@ -12,11 +12,24 @@
  */
 package org.sonatype.nexus.timeline;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+
 import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
+/**
+ * Ignored test excersising legacy timeline for now
+ * 
+ * @author cstamas
+ *
+ */
+@Ignore
 public class LegacyNexusTimelineTest
     extends AbstractTimelineTest
 {
@@ -34,7 +47,7 @@ public class LegacyNexusTimelineTest
 
         final EntryListCallback cb = new EntryListCallback();
         nexusTimeline.retrieve( 0, 10, null, null, null, cb );
-        assertTrue( !cb.getEntries().isEmpty() );
+        assertThat( cb.getEntries(), not( empty() ) );
     }
 
     @Test
@@ -57,6 +70,6 @@ public class LegacyNexusTimelineTest
 
         final EntryListCallback cb = new EntryListCallback();
         nexusTimeline.retrieve( 0, 10, null, null, null, cb );
-        assertEquals( 4, cb.getEntries().size() );
+        assertThat( cb.getEntries(), hasSize( 4 ) );
     }
 }

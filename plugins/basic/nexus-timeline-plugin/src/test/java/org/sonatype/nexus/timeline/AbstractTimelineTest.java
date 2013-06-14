@@ -13,9 +13,6 @@
 package org.sonatype.nexus.timeline;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.security.guice.SecurityModule;
-
-import com.google.inject.Module;
 
 public abstract class AbstractTimelineTest
     extends NexusAppTestSupport
