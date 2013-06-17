@@ -87,7 +87,8 @@ public class DefaultRemoteProxySettings
                 return httpsProxySettings;
             }
         }
-        else if ( "http".equals( url.getProtocol() ) )
+
+        if ( "http".equals( url.getProtocol() ) || "https".equals( url.getProtocol() ))
         {
             // if no secure proxy is available, or the url is not secure, use normal proxy
             RemoteHttpProxySettings httpProxySettings = settings.getHttpProxySettings();
