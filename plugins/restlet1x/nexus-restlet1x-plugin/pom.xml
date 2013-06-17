@@ -28,8 +28,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <pluginName>Nexus Restlet 1.x Plugin</pluginName>
-    <pluginDescription>Provides Restlet 1.x REST API.</pluginDescription>
+    <pluginName>Nexus Core API (Restlet 1.x Plugin)</pluginName>
+    <pluginDescription>Provides Nexus Core REST API.</pluginDescription>
   </properties>
 
   <dependencies>
