@@ -42,7 +42,7 @@ public class NXCM2124CheckConsoleDocumentationIT
     public void checkDoc()
         throws IOException
     {
-        String pluginName = "Nexus Restlet 1.x Plugin";
+        String pluginName = "Nexus Core API (Restlet 1.x Plugin)";
 
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
