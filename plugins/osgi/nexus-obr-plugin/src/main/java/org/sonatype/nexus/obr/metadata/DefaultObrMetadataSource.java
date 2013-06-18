@@ -22,7 +22,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.osgi.impl.bundle.obr.resource.BundleInfo;
 import org.osgi.service.obr.Resource;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.obr.ObrPluginConfiguration;
 import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.StorageException;
@@ -44,7 +44,7 @@ public class DefaultObrMetadataSource
     private NexusConfiguration nexusConfiguration;
 
     @Requirement
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     public ObrResourceReader getReader( final ObrSite site )
         throws StorageException
@@ -98,7 +98,7 @@ public class DefaultObrMetadataSource
     {
         try
         {
-            return new DefaultObrResourceWriter( uid, nexusConfiguration.getTemporaryDirectory(), mimeUtil );
+            return new DefaultObrResourceWriter( uid, nexusConfiguration.getTemporaryDirectory(), mimeSupport );
         }
         catch ( final IOException e )
         {

@@ -13,7 +13,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
@@ -27,7 +27,7 @@ public abstract class AbstractNexusTestEnvironment
 
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     protected void setUp()
         throws Exception
@@ -41,7 +41,7 @@ public abstract class AbstractNexusTestEnvironment
         // rebuild cache
         lookup( RepositoryItemUidAttributeManager.class ).reset();
 
-        mimeUtil = lookup( MimeUtil.class );
+        mimeSupport = lookup( MimeSupport.class );
 
         this.lookup( SecuritySystem.class ).setSecurityEnabled( false );
     }
@@ -61,9 +61,9 @@ public abstract class AbstractNexusTestEnvironment
         return repositoryItemUidFactory;
     }
 
-    protected MimeUtil getMimeUtil()
+    protected MimeSupport getMimeSupport()
     {
-        return mimeUtil;
+        return mimeSupport;
     }
 
 }

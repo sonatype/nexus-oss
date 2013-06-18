@@ -27,7 +27,7 @@ import org.apache.maven.index.creator.MavenArchetypeArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
 import org.junit.Test;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -46,7 +46,7 @@ public class Nexus3578IndexerManagerIT
 
     protected String jarPath;
 
-    protected MimeUtil mimeUtil;
+    protected MimeSupport mimeSupport;
 
     @Override
     protected void setUp()
@@ -57,7 +57,7 @@ public class Nexus3578IndexerManagerIT
         hackContext( (DefaultIndexingContext) ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext(
             snapshots.getId() ) );
 
-        this.mimeUtil = lookup( MimeUtil.class );
+        this.mimeSupport = lookup( MimeSupport.class );
 
         pomFile = getTestFile( "src/test/resources/nexus-3578/maven-pmd-plugin-2.6-20100607.233625-29.pom" );
 
@@ -113,7 +113,7 @@ public class Nexus3578IndexerManagerIT
     {
         ResourceStoreRequest request = new ResourceStoreRequest( path );
 
-        FileContentLocator fc = new FileContentLocator( file, mimeUtil.getMimeType( file ) );
+        FileContentLocator fc = new FileContentLocator( file, mimeSupport.guessMimeTypeFromPath( file.getName() ) );
 
         StorageFileItem item = new DefaultStorageFileItem( snapshots, request, true, true, fc );
 
