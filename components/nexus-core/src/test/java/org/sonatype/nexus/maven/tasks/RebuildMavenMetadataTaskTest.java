@@ -17,7 +17,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.File;
 
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;

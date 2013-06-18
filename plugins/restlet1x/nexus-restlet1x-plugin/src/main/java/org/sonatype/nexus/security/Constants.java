@@ -10,11 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
+package org.sonatype.nexus.security;
 
-import org.sonatype.nexus.NexusAppTestSupport;
-
-public abstract class AbstractTimelineTest
-    extends NexusAppTestSupport
+/**
+ * Place for security constants. Some of these are used by current classes but were actually defined in some deprecated,
+ * and hence, removed classes.
+ * 
+ * @author cstamas
+ * @since 2.6
+ */
+public interface Constants
 {
+    String REQUEST_IS_AUTHZ_REJECTED = "request.is.authz.rejected";
 }

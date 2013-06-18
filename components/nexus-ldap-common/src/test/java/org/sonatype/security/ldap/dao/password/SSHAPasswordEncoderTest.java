@@ -12,15 +12,12 @@
  */
 package org.sonatype.security.ldap.dao.password;
 
-import java.io.UnsupportedEncodingException;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class SSHAPasswordEncoderTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
     @Test
     public void testVerify()

@@ -119,7 +119,6 @@ public class DefaultRepositoryRouterTest
         // setup security
         this.securitySystem = this.lookup( SecuritySystem.class );
         this.securitySystem.setRealms( Collections.singletonList( "default" ) );
-        this.securitySystem.start();
     }
 
     @Override

@@ -15,13 +15,17 @@ package org.sonatype.nexus;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.util.ThreadContext;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
@@ -34,6 +38,8 @@ public abstract class NexusAppTestSupport
     private NexusScheduler nexusScheduler;
 
     private EventInspectorHost eventInspectorHost;
+    
+    private EventBus eventBus;
 
     protected NexusConfiguration nexusConfiguration;
 
@@ -45,8 +51,13 @@ public abstract class NexusAppTestSupport
     @Override
     protected Module[] getTestCustomModules()
     {
-        final Module[] modules = super.getTestCustomModules();
-        return ObjectArrays.concat( modules, new Module()
+        Module[] modules = super.getTestCustomModules();
+        if ( modules == null )
+        {
+            modules = new Module[0];
+        }
+        modules = ObjectArrays.concat( modules, new SecurityModule() );
+        modules = ObjectArrays.concat( modules, new Module()
         {
             @Override
             public void configure( final Binder binder )
@@ -54,6 +65,7 @@ public abstract class NexusAppTestSupport
                 binder.bind( Config.class ).toInstance( new ConfigImpl( enableAutomaticRoutingFeature() ) );
             }
         } );
+        return modules;
     }
 
     protected boolean enableAutomaticRoutingFeature()
@@ -65,10 +77,13 @@ public abstract class NexusAppTestSupport
     protected void setUp()
         throws Exception
     {
+        // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
+        ThreadContext.remove();
         super.setUp();
 
         nexusScheduler = lookup( NexusScheduler.class );
         eventInspectorHost = lookup( EventInspectorHost.class );
+        eventBus = lookup( EventBus.class );
 
         if ( loadConfigurationAtSetUp() )
         {
@@ -80,8 +95,15 @@ public abstract class NexusAppTestSupport
     protected void tearDown()
         throws Exception
     {
+        // FIXME: This needs to be fired as many component relies on this to cleanup (like EHCache)
+        eventBus.post( new NexusStoppedEvent( null ) );
         waitForTasksToStop();
         super.tearDown();
+    }
+
+    protected EventBus eventBus()
+    {
+        return eventBus;
     }
 
     protected void shutDownSecurity()

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import com.google.inject.Module;
+import org.junit.After;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
@@ -38,8 +38,25 @@ import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
-import org.sonatype.security.guice.SecurityModule;
 
+/**
+ * Note: This test logs will be full of WARNs like these:
+ * 
+ * <pre>
+ * WARN o.s.n.c.a.DefaultNexusConfiguration - Could not obtain Shiro subject:
+ * org.apache.shiro.UnavailableSecurityManagerException: No SecurityManager accessible to the calling code, either
+ * bound to the org.apache.shiro.util.ThreadContext or as a vm static singleton. This is an invalid application
+ * configuration.
+ * </pre>
+ * 
+ * But this WARN happens in DefaultNexusConfig, while the userId is tried to be fetched for logging purposes only (...
+ * config is changed by XXX), and is not directly related to this test. Other solution would be to add security to this
+ * test below, but then a lot of extra cruft would be needed to manage (start and stop) SecurityManager and
+ * CacheManager, cleanup.... which really would not belong to this test. As the config logging change (and on who's behalf
+ * it happens) is really not the concern of this test, it's left to rather spam the logs.
+ * 
+ * @author cstamas
+ */
 public class DefaultTaskConfigManagerTest
     extends NexusTestSupport
 {
@@ -69,24 +86,6 @@ public class DefaultTaskConfigManagerTest
 
     private static final String CRON_EXPRESSION = "0 0/5 14,18,3-9,2 ? JAN,MAR,SEP MON-FRI 2002-2010";
 
-    // private static final HashMap<String, Class> typeClassMap;
-
-    // static
-    // {
-    // typeClassMap = new HashMap<String, Class>();
-    // typeClassMap.put( SCHEDULE_TYPE_ONCE, COnceSchedule.class );
-    // typeClassMap.put( SCHEDULE_TYPE_DAILY, CDailySchedule.class );
-    // typeClassMap.put( SCHEDULE_TYPE_WEEKLY, CWeeklySchedule.class );
-    // typeClassMap.put( SCHEDULE_TYPE_MONTHLY, CMonthlySchedule.class );
-    // typeClassMap.put( SCHEDULE_TYPE_ADVANCED, CAdvancedSchedule.class );
-    // }
-
-    @Override
-    protected Module[] getTestCustomModules()
-    {
-        return new Module[] { new SecurityModule() };
-    }
-
     public void setUp()
         throws Exception
     {
@@ -98,6 +97,13 @@ public class DefaultTaskConfigManagerTest
         applicationConfiguration.loadConfiguration();
     }
 
+    @After
+    public void cleanup()
+    {
+        // kill the pool
+        defaultScheduler.shutdown();
+    }
+     
     @Test
     public void testStoreOnceSchedule()
         throws Exception
