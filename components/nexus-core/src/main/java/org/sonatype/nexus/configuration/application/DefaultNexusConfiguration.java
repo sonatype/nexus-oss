@@ -350,6 +350,15 @@ public class DefaultNexusConfiguration
         }
     }
 
+    /**
+     * Returns the userId ("main principal" in Shiro lingo) of the user that is the principal of currently executing
+     * activity (like configuration save) for logging purposes only. It uses Shiro API to get the information, and will
+     * return the String userId, or {@code null} if it's impossible to determine it, as current thread (the one invoking
+     * this method) does not have bound Subject. If more information needed about current user, Shiro and/or Security
+     * API of Nexus should be used, this method is not a definitive source of users in Nexus Security.
+     * 
+     * @return
+     */
     protected String getCurrentUserId()
     {
         try
