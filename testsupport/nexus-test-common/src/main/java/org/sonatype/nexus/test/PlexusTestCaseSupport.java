@@ -35,9 +35,9 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import com.google.inject.Module;
-import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 //
 // FIXME: This is a shitty class and should not exist... @Deprecate and trash this junk!
