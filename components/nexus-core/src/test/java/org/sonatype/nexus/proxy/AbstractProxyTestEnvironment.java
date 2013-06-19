@@ -219,7 +219,7 @@ public abstract class AbstractProxyTestEnvironment
         eventBus().post( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
 
         eventBus().post( new NexusStartedEvent( null ) );
-        
+
         getEnvironmentBuilder().startService();
     }
 

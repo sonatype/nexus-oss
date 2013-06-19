@@ -49,7 +49,7 @@ public abstract class AbstractSecurityRestTest
 
         super.customizeContainerConfiguration( configuration );
     }
-    
+
     @Override
     protected Module[] getTestCustomModules()
     {
@@ -95,11 +95,6 @@ public abstract class AbstractSecurityRestTest
         // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
         ThreadContext.remove();
 
-    }
-
-    protected EventBus eventBus()
-    {
-        return eventBus;
     }
 
     @Override

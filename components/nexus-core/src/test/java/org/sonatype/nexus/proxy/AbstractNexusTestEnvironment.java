@@ -37,7 +37,7 @@ public abstract class AbstractNexusTestEnvironment
         cacheManager = lookup( CacheManager.class );
 
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
-        
+
         // rebuild cache
         lookup( RepositoryItemUidAttributeManager.class ).reset();
 
@@ -65,4 +65,5 @@ public abstract class AbstractNexusTestEnvironment
     {
         return mimeSupport;
     }
+
 }

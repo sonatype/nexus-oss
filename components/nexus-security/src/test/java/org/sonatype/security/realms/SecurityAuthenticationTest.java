@@ -86,16 +86,16 @@ public class SecurityAuthenticationTest
         throws Exception
     {
         assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
-            "test:perm" ) );
+                                          "test:perm" ) );
 
         assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
-            "other:perm" ) );
+                                          "other:perm" ) );
 
         assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
-            "other:perm" ) );
+                                          "other:perm" ) );
 
         assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
-            "test:perm" ) );
+                                          "test:perm" ) );
     }
 
     public static void assertImplied( Permission testPermission, Collection<Permission> assignedPermissions )

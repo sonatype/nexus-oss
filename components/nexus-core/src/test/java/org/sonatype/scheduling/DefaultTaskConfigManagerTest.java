@@ -90,12 +90,14 @@ public class DefaultTaskConfigManagerTest
     public void setUp()
         throws Exception
     {
+        super.setUp();
+
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
         defaultManager = (DefaultTaskConfigManager) lookup( TaskConfigManager.class.getName() );
         applicationConfiguration = lookup( NexusConfiguration.class );
         applicationConfiguration.loadConfiguration();
     }
-    
+
     @After
     public void cleanup()
     {
