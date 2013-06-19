@@ -31,7 +31,6 @@ import org.sonatype.security.realms.XmlAuthorizingRealm;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
-import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -46,7 +45,6 @@ import org.sonatype.security.usermanagement.UserStatus;
 public class EmptyRoleTest
     extends AbstractSecurityTestCase
 {
-
     public void testCreateEmptyRole()
         throws Exception
     {
