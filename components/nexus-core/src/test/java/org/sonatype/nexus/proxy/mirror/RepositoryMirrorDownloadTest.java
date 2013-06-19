@@ -709,7 +709,7 @@ public class RepositoryMirrorDownloadTest
 
     private AbstractStorageItem createRealRemoteStorageFileItem( RepositoryItemUid uid, byte[] bytes )
     {
-        ContentLocator content = new ByteArrayContentLocator( bytes, getMimeUtil().getMimeType( uid.getPath() ) );
+        ContentLocator content = new ByteArrayContentLocator( bytes, getMimeSupport().guessMimeTypeFromPath( uid.getPath() ) );
         DefaultStorageFileItem item =
             new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid.getPath() ), true, false,
                                         content );

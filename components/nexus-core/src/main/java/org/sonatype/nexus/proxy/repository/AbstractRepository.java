@@ -33,7 +33,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -56,9 +55,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreUpdate;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
-import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageNotFoundItem;
@@ -134,9 +131,6 @@ public abstract class AbstractRepository
     private Walker walker;
 
     @Requirement
-    private MimeUtil mimeUtil;
-
-    @Requirement
     private MimeSupport mimeSupport;
 
     @Requirement( role = ContentGenerator.class )
@@ -175,12 +169,6 @@ public abstract class AbstractRepository
     protected Logger getLogger()
     {
         return logger;
-    }
-
-    @Deprecated
-    protected MimeUtil getMimeUtil()
-    {
-        return mimeUtil;
     }
 
     protected MimeSupport getMimeSupport()
@@ -1337,19 +1325,6 @@ public abstract class AbstractRepository
     public boolean isCompatible( Repository repository )
     {
         return getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() );
-    }
-
-    @Deprecated
-    protected AbstractStorageItem createStorageItem( ResourceStoreRequest request, byte[] bytes )
-    {
-        ContentLocator content =
-            new ByteArrayContentLocator( bytes, getMimeUtil().getMimeType( request.getRequestPath() ) );
-
-        DefaultStorageFileItem result =
-            new DefaultStorageFileItem( this, request, true /* isReadable */, false /* isWritable */, content );
-        result.setLength( bytes.length );
-
-        return result;
     }
 
     protected void doDeleteItem( ResourceStoreRequest request )
