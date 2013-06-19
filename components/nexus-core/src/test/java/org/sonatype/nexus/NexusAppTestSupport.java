@@ -99,6 +99,8 @@ public abstract class NexusAppTestSupport
         eventBus.post( new NexusStoppedEvent( null ) );
         waitForTasksToStop();
         super.tearDown();
+        // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
+        ThreadContext.remove();
     }
 
     protected EventBus eventBus()
