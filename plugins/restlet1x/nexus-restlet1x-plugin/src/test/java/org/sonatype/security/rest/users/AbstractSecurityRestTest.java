@@ -94,7 +94,6 @@ public abstract class AbstractSecurityRestTest
         }
         // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
         ThreadContext.remove();
-
     }
 
     @Override

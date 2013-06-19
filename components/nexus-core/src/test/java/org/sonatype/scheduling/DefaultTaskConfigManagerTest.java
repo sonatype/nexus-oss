@@ -86,7 +86,6 @@ public class DefaultTaskConfigManagerTest
 
     private static final String CRON_EXPRESSION = "0 0/5 14,18,3-9,2 ? JAN,MAR,SEP MON-FRI 2002-2010";
 
-
     public void setUp()
         throws Exception
     {
