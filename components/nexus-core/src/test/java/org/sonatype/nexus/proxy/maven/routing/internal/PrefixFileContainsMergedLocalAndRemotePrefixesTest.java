@@ -61,15 +61,6 @@ public class PrefixFileContainsMergedLocalAndRemotePrefixesTest
 
     private EnvironmentBuilder environmentBuilder;
 
-    public PrefixFileContainsMergedLocalAndRemotePrefixesTest()
-        throws Exception
-    {
-        // fluke server to not have proxy autoblock, as remote connection refused IS a valid reason to auto block
-        this.server =
-            Server.withPort( 0 ).serve( "/" ).withBehaviours( Behaviours.error( 404, "don't bother yourself" ) );
-        server.start();
-    }
-
     @After
     public void stopServers()
         throws Exception

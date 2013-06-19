@@ -26,6 +26,7 @@ import java.util.List;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.After;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -43,11 +44,10 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.routing.Manager;
-import org.sonatype.nexus.proxy.maven.routing.RoutingStatus;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus.DStatus;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.maven.routing.PublishingStatus.PStatus;
-import org.sonatype.nexus.proxy.maven.routing.internal.RemotePrefixFileStrategy;
+import org.sonatype.nexus.proxy.maven.routing.RoutingStatus;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -81,6 +81,13 @@ public class RoutingAndProxyModeTest
             Server.withPort( 0 ).serve( "/" ).withBehaviours( Behaviours.error( 404, "don't bother yourself" ) ).serve(
                 "/.meta/prefixes.txt" ).withBehaviours( Behaviours.content( prefixFile() ) );
         server.start();
+    }
+
+    @After
+    public void stopServer()
+        throws Exception
+    {
+        server.stop();
     }
 
     protected String prefixFile()
