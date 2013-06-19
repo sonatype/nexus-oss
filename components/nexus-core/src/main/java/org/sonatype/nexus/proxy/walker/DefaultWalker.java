@@ -196,7 +196,7 @@ public class DefaultWalker
 
     protected final int walkRecursive( int collCount, WalkerContext context, WalkerFilter filter,
                                        StorageCollectionItem coll )
-        throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, StorageException
+        throws AccessDeniedException, IllegalOperationException, StorageException
     {
         if ( context.isStopped() )
         {
@@ -229,37 +229,44 @@ public class DefaultWalker
 
         if ( shouldProcessRecursively )
         {
-            ls = context.getRepository().list( false, coll );
-
-            if ( context.getItemComparator() != null )
+            try
             {
-                final ArrayList<StorageItem> list = new ArrayList<StorageItem>( ls );
-                Collections.sort( list, context.getItemComparator() );
-                ls = list;
+                ls = context.getRepository().list( false, coll );
+
+                if ( context.getItemComparator() != null )
+                {
+                    final ArrayList<StorageItem> list = new ArrayList<StorageItem>( ls );
+                    Collections.sort( list, context.getItemComparator() );
+                    ls = list;
+                }
+
+                for ( StorageItem i : ls )
+                {
+                    if ( !( i instanceof StorageCollectionItem ) )
+                    {
+                        walkItem( context, filter, i );
+
+                        if ( context.isStopped() )
+                        {
+                            return collCount;
+                        }
+                    }
+
+                    if ( i instanceof StorageCollectionItem )
+                    {
+                        // user may call stop()
+                        collCount = walkRecursive( collCount, context, filter, (StorageCollectionItem) i );
+
+                        if ( context.isStopped() )
+                        {
+                            return collCount;
+                        }
+                    }
+                }
             }
-
-            for ( StorageItem i : ls )
+            catch ( ItemNotFoundException e )
             {
-                if ( !( i instanceof StorageCollectionItem ) )
-                {
-                    walkItem( context, filter, i );
-
-                    if ( context.isStopped() )
-                    {
-                        return collCount;
-                    }
-                }
-
-                if ( i instanceof StorageCollectionItem )
-                {
-                    // user may call stop()
-                    collCount = walkRecursive( collCount, context, filter, (StorageCollectionItem) i );
-
-                    if ( context.isStopped() )
-                    {
-                        return collCount;
-                    }
-                }
+                getLogger().debug( "ItemNotFound not found while walking it, skipping.", e );
             }
         }
 

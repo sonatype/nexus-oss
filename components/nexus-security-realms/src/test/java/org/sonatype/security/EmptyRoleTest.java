@@ -45,7 +45,6 @@ import org.sonatype.security.usermanagement.UserStatus;
 public class EmptyRoleTest
     extends AbstractSecurityTestCase
 {
-
     public void testCreateEmptyRole()
         throws Exception
     {
