@@ -69,12 +69,6 @@ public abstract class AbstractSecurityTestCase
     }
 
     @Override
-    public void configure( final Binder binder )
-    {
-        binder.install( new SecurityModule() );
-    }
-
-    @Override
     public BeanScanning scanning()
     {
         return BeanScanning.INDEX;

@@ -57,7 +57,7 @@ public class Nexus3578IndexerManagerIT
         hackContext( (DefaultIndexingContext) ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext(
             snapshots.getId() ) );
 
-        mimeSupport = lookup( MimeSupport.class );
+        this.mimeSupport = lookup( MimeSupport.class );
 
         pomFile = getTestFile( "src/test/resources/nexus-3578/maven-pmd-plugin-2.6-20100607.233625-29.pom" );
 

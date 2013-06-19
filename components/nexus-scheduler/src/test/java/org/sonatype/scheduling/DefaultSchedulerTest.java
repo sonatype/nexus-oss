@@ -339,7 +339,7 @@ public class DefaultSchedulerTest
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
         ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
-        
+
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
         Thread.sleep( 1200 );

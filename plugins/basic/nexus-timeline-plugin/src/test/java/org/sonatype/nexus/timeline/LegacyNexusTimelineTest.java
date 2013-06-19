@@ -20,17 +20,9 @@ import static org.hamcrest.Matchers.not;
 import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.test.NexusTestSupport;
 
-/**
- * Ignored test excersising legacy timeline for now
- * 
- * @author cstamas
- *
- */
-@Ignore
 public class LegacyNexusTimelineTest
     extends NexusTestSupport
 {

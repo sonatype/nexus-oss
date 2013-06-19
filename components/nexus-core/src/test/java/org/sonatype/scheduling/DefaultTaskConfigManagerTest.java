@@ -99,12 +99,6 @@ public class DefaultTaskConfigManagerTest
     @After
     public void cleanup()
     {
-        defaultScheduler.shutdown();
-    }
-
-    @After
-    public void cleanup()
-    {
         // kill the pool
         defaultScheduler.shutdown();
     }
