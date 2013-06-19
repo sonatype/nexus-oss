@@ -12,19 +12,18 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 
 public class DefaultRepositoryConfiguratorTest
-    extends NexusProxyTestSupport
+    extends NexusAppTestSupport
 {
     @Test
     public void testExpireNFCOnUpdate()

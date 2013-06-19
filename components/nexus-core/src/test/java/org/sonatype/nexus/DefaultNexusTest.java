@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -234,7 +235,14 @@ public class DefaultNexusTest
         assertThat( plexusContentClasses.values().containsAll( contentClasses.values() ), is( true ) );
     }
 
+    /**
+     * Ignored test, as Nexus is not bouncable (reusable) as SecuritySystem is not reusable (coz Shiro SecurityManager
+     * is not restartable).
+     * 
+     * @throws Exception
+     */
     @Test
+    @Ignore
     public void testBounceNexus()
         throws Exception
     {

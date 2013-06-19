@@ -50,6 +50,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
+import com.google.common.collect.ObjectArrays;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -62,7 +63,8 @@ public class UserPrincipalsHelperTest
     @Override
     protected Module[] getTestCustomModules()
     {
-        return new Module[] { new AbstractModule()
+        Module[] modules = super.getTestCustomModules();
+        modules = ObjectArrays.concat( modules,  new AbstractModule()
         {
             @Override
             protected void configure()
@@ -70,7 +72,8 @@ public class UserPrincipalsHelperTest
                 bind( Realm.class ).annotatedWith( Names.named( "TestPrincipalsRealm" ) ).to( TestRealm.class );
                 bind( UserManager.class ).annotatedWith( Names.named( "TestPrincipalsUserManager" ) ).to( TestUserManager.class );
             }
-        } };
+        });
+        return modules;
     }
 
     @Override

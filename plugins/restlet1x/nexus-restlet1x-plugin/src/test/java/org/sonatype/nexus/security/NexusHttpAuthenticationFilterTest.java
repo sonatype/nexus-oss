@@ -12,6 +12,19 @@
  */
 package org.sonatype.nexus.security;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.SimpleAccountRealm;
@@ -27,20 +40,8 @@ import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.security.SecuritySystem;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.*;
 
 /**
  * There is a problem either with Shiro (or how we are using it) that effects logging and logging out when using a DelegatingSession (Nexus).</BR>
@@ -102,7 +103,7 @@ public class NexusHttpAuthenticationFilterTest
         // setup the MOCK
         request = mock( HttpServletRequest.class );
         when( request.getAttribute( eq( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) ) ).thenReturn( "true" );
-        when( request.getAttribute( eq( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) ) ).thenReturn( null );
+        when( request.getAttribute( eq( Constants.REQUEST_IS_AUTHZ_REJECTED ) ) ).thenReturn( null );
         // end fun with mocks
 
         response = mock( HttpServletResponse.class );

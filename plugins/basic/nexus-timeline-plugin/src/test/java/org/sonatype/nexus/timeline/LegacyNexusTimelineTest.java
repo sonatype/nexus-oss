@@ -12,51 +12,46 @@
  */
 package org.sonatype.nexus.timeline;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+
 import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 public class LegacyNexusTimelineTest
-    extends AbstractTimelineTest
+    extends NexusTestSupport
 {
     @Test
     public void testMoveLegacyTimeline()
         throws Exception
     {
-        File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
-
-        File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
-
+        final File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
+        final File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
         FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
-
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
-
+        final NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
         final EntryListCallback cb = new EntryListCallback();
         nexusTimeline.retrieve( 0, 10, null, null, null, cb );
-        assertTrue( !cb.getEntries().isEmpty() );
+        assertThat( cb.getEntries(), not( empty() ) );
     }
 
     @Test
     public void testDoNotMoveLegacyTimeline()
         throws Exception
     {
-        File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
-
-        File newDataDir = new File( getBasedir(), "target/test-classes/timeline/new" );
-
-        File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
-
-        File newTimelineDir = new File( getWorkHomeDir(), "timeline/index" );
-
+        final File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
+        final File newDataDir = new File( getBasedir(), "target/test-classes/timeline/new" );
+        final File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
+        final File newTimelineDir = new File( getWorkHomeDir(), "timeline/index" );
         FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
-
         FileUtils.copyDirectoryStructure( newDataDir, newTimelineDir );
-
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
-
+        final NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
         final EntryListCallback cb = new EntryListCallback();
         nexusTimeline.retrieve( 0, 10, null, null, null, cb );
-        assertEquals( 4, cb.getEntries().size() );
+        assertThat( cb.getEntries(), hasSize( 4 ) );
     }
 }

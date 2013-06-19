@@ -31,7 +31,6 @@ public class WebRealmSecurityTest
     {
         // Start up security
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-        securitySystem.start();
         RealmSecurityManager plexusSecurityManager = this.lookup( RealmSecurityManager.class, "default" );
 
         List<String> realms = securitySystem.getRealms();

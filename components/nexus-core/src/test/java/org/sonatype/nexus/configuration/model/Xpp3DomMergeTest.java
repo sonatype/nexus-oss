@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.configuration.model;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collections;
@@ -24,10 +27,10 @@ import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class Xpp3DomMergeTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
     private static final String XML_BASE =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><externalConfiguration></externalConfiguration>";
@@ -60,7 +63,7 @@ public class Xpp3DomMergeTest
         resultHolder.addToCollection( resultHolder.getRootNode(), "memberRepositories", "central-m1", true );
         resultHolder.addToCollection( resultHolder.getRootNode(), "memberRepositories", "m1h", true );
 
-        assertTrue( resultHolder.getRootNode().equals( aHolder.getRootNode() ) );
+        assertThat( resultHolder.getRootNode(), equalTo( aHolder.getRootNode() ) );
     }
 
     private static class SimpleXpp3ConfigHolder

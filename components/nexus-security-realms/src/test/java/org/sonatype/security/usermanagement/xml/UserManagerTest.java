@@ -362,8 +362,9 @@ public class UserManagerTest
             IOUtil.close( fileWriter );
         }
 
+        // FIXME: unsure about the intent of this test... 
         // now restart the security
-        this.getSecuritySystem().start();
+        // this.getSecuritySystem().start();
 
         // that should have went well,
         User user = this.getSecuritySystem().getUser( userId, "default" );

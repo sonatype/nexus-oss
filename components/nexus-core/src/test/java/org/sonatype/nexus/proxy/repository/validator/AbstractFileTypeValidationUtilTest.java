@@ -19,7 +19,6 @@ import org.junit.Assert;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenFileTypeValidator;
@@ -28,13 +27,14 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 /**
  * Base UT class for FileTypeValidatorHub tests. UTs extending this class should go and add asserts with some type
  * specific tests.
  */
 public abstract class AbstractFileTypeValidationUtilTest
-    extends NexusProxyTestSupport
+    extends NexusTestSupport
 {
     /**
      * Override this method if your test files are located elsewhere.

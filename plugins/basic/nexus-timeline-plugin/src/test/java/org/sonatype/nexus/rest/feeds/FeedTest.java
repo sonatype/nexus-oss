@@ -16,28 +16,22 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.google.inject.Module;
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.restlet.Context;
 import org.restlet.data.Request;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.rest.feeds.sources.FeedSource;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import com.sun.syndication.feed.synd.SyndFeed;
 import org.sonatype.security.guice.SecurityModule;
 
-public class FeedTest
-    extends NexusTestSupport
-{
-    @Override
-    protected Module[] getTestCustomModules()
-    {
-        return new Module[] { new SecurityModule() };
-    }
+import com.google.inject.Module;
+import com.sun.syndication.feed.synd.SyndFeed;
 
+public class FeedTest
+    extends NexusAppTestSupport
+{
     @Test
     public void testFeedSources()
         throws Exception

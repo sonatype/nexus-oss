@@ -119,6 +119,15 @@
       <artifactId>guice-servlet</artifactId>
     </dependency>
 
+    <!--
+      Shiro needs beanutils to run, but we have to use our
+      as Shiro's is excluded in nexus-builduspport-shiro
+    -->
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils-core</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
       <artifactId>javax.servlet</artifactId>
@@ -128,15 +137,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!--
-    FIXME: SecurityModuleTest needs this to run correctly, probably some messe dup transitive deps, revisit once deps are cleaned up
-    -->
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils-core</artifactId>
       <scope>test</scope>
     </dependency>
 

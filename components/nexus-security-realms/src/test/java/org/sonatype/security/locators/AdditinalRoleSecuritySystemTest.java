@@ -51,6 +51,7 @@ public class AdditinalRoleSecuritySystemTest
     @Override
     public void configure( Binder binder )
     {
+        super.configure( binder );
         binder.bind( StaticSecurityResource.class ).annotatedWith( Names.named( "mock" ) ).to( MockStaticSecurityResource.class );
     }
 
