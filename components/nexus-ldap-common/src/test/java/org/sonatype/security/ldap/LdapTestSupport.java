@@ -78,7 +78,7 @@ public abstract class LdapTestSupport
     {
         lookup( CacheManagerComponent.class ).shutdown();
 
-        if ( ldapServer != null )
+        if ( ldapServer != null && ldapServer.isStarted() )
         {
             ldapServer.stop();
             ldapServer = null;
