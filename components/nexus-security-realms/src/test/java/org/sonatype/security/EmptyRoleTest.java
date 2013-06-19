@@ -81,7 +81,6 @@ public class EmptyRoleTest
     public void testReloadSecurityWithEmptyRole()
         throws Exception
     {
-
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 
