@@ -181,6 +181,79 @@ public class WalkerTest
     }
 
     /**
+     * NEXUS-5766: Verify that walker will continue walking if collection/item is removed while walking
+     */
+    @Test
+    public void walkWhileItemsAreRemoved()
+        throws Exception
+    {
+
+        // fetch some content to have on walk on something
+        getRootRouter().retrieveItem( new ResourceStoreRequest(
+            "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false
+        ) );
+        getRootRouter().retrieveItem( new ResourceStoreRequest(
+            "/repositories/repo1/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.pom", false
+        ) );
+        getRootRouter().retrieveItem( new ResourceStoreRequest(
+            "/repositories/repo1/rome/rome/0.9/rome-0.9.pom", false
+        ) );
+
+        final WalkerContext wc = new DefaultWalkerContext(
+            getRepositoryRegistry().getRepository( "repo1" ),
+            new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true )
+        );
+
+        final TestWalkerProcessor wp = new TestWalkerProcessor();
+
+        wc.getProcessors().add( wp );
+        wc.getProcessors().add( new AbstractWalkerProcessor()
+        {
+            @Override
+            public void processItem( final WalkerContext context, final StorageItem item )
+                throws Exception
+            {
+                // do nothing
+            }
+
+            @Override
+            public void onCollectionEnter( final WalkerContext context, final StorageCollectionItem coll )
+                throws Exception
+            {
+                if ( coll.getPath().startsWith( "/activemq/activemq-core" ) )
+                {
+                    getRootRouter().deleteItem( new ResourceStoreRequest(
+                        "/repositories/repo1/activemq/activemq-core", true
+                    ) );
+                }
+                else if ( coll.getPath().startsWith( "/rome/rome/0.9" ) )
+                {
+                    getRootRouter().deleteItem( new ResourceStoreRequest(
+                        "/repositories/repo1/rome/rome/0.9/rome-0.9.pom", true
+                    ) );
+                }
+            }
+
+        } );
+
+        walker.walk( wc );
+
+        assertThat( "Should not be stopped!", wc.isStopped(), is( false ) );
+
+        if ( wc.getStopCause() != null )
+        {
+            wc.getStopCause().printStackTrace();
+            assertThat( "Should be no exception!", false );
+        }
+
+        assertThat( wp.collEnters, is( 10 ) );
+        assertThat( wp.collExits, is( 10 ) );
+        assertThat( wp.colls, is( 0 ) );
+        assertThat( wp.files, is( 2 ) );
+        assertThat( wp.links, is( 0 ) );
+    }
+
+    /**
      * Tests whether the walker makes use of the item comparator set in the context.
      */
     @Test
