@@ -63,6 +63,18 @@ public abstract class AbstractSecurityRestTest
     }
 
     @Override
+    protected Module[] getTestCustomModules()
+    {
+        Module[] modules = super.getTestCustomModules();
+        if ( modules == null )
+        {
+            modules = new Module[0];
+        }
+        modules = ObjectArrays.concat( modules, new SecurityModule() );
+        return modules;
+    }
+
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -94,6 +106,7 @@ public abstract class AbstractSecurityRestTest
         }
         // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
         ThreadContext.remove();
+
     }
 
     protected EventBus eventBus()

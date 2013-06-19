@@ -19,7 +19,6 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.sonatype.security.AbstractSecurityTest;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
@@ -38,12 +37,12 @@ public class SecurityAuthenticationTest
     }
 
     /**
-     * Shiro DefaultSecurityManager is NOT restartable, this test is nonsense.
+     * Security system is not restartable since the use of Shiro Guice Module, the Shiro Guice support. Test ignored.
      * 
      * @throws Exception
      */
     @Ignore
-    public void IGNOREDtestAuthcAndAuthzAfterRestart()
+    public void INGNOREtestAuthcAndAuthzAfterRestart()
         throws Exception
     {
         testSuccessfulAuthentication();

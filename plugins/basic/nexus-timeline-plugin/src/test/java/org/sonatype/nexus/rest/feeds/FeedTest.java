@@ -24,7 +24,9 @@ import org.restlet.data.Request;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.rest.feeds.sources.FeedSource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.guice.SecurityModule;
 
+import com.google.inject.Module;
 import com.sun.syndication.feed.synd.SyndFeed;
 
 public class FeedTest

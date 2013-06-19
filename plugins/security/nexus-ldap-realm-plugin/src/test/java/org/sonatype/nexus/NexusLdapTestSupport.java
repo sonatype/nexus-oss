@@ -27,14 +27,10 @@ import org.junit.Assert;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
-import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
-
-import com.google.inject.Module;
 
 public abstract class NexusLdapTestSupport
     extends NexusAppTestSupport

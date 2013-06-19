@@ -95,7 +95,7 @@ public abstract class NexusAppTestSupport
     protected void tearDown()
         throws Exception
     {
-        // FIXME: This needs to be fired as many component relies on this to cleanup
+        // FIXME: This needs to be fired as many component relies on this to cleanup (like EHCache)
         eventBus.post( new NexusStoppedEvent( null ) );
         waitForTasksToStop();
         super.tearDown();

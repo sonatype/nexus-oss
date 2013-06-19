@@ -362,6 +362,7 @@ public class UserManagerTest
             IOUtil.close( fileWriter );
         }
 
+        // FIXME: unsure about the intent of this test... 
         // now restart the security
         // this.getSecuritySystem().start();
 

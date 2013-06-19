@@ -110,7 +110,7 @@ public class MergeOperationTest
         assertThat( snapshot.getVersioning().getVersions(), notNullValue() );
         assertThat( snapshot.getVersioning().getVersions(), containsInAnyOrder( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) );
 
-        // now do the merge in reverse
+        //now do the merge in reverse
         release = getReleaseMetadata();
         snapshot = getSnapshotMetadata();
         mergeOp = new NexusMergeOperation( new MetadataOperand( snapshot ) );

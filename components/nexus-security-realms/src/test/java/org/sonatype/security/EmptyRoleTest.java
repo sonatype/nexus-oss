@@ -73,21 +73,22 @@ public class EmptyRoleTest
         authManager.deleteRole( emptyRole.getRoleId() );
     }
 
+    /**
+     * Note: this test is kinda useless, as Security system (as underlying Shiro) is not "reloadable": once created, you
+     * need to toss it away and ask another instance from Guice, we cannot reload security currently.
+     * 
+     * @throws Exception
+     */
     public void testReloadSecurityWithEmptyRole()
         throws Exception
     {
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 
         Role emptyRole = this.buildEmptyRole();
 
         // this should work fine
         authManager.addRole( emptyRole );
-
-        // restart
-        //securitySystem.stop();
-        //securitySystem.start();
 
         // make sure the role is still there
         Assert.assertNotNull( authManager.getRole( emptyRole.getRoleId() ) );
@@ -98,7 +99,6 @@ public class EmptyRoleTest
     {
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         securitySystem.setRealms( Arrays.asList( XmlAuthenticatingRealm.ROLE, XmlAuthorizingRealm.ROLE ) );
-
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 
         // create an empty role
@@ -131,7 +131,6 @@ public class EmptyRoleTest
         throws Exception
     {
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-
         AuthorizationManager authManager = securitySystem.getAuthorizationManager( "default" );
 
         // create an empty role

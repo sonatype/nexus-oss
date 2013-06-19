@@ -120,28 +120,35 @@ public class ConstrainedExecutorImplTest
 
         tw5.waitForExecuted();
 
+        // here, due to concurrency, all other workers
+        // except tw5 might not even be executed, as
+        // they were canceled before execution
+        // as new mustExecute invocation happened
+        // so, don't test the isExecuted only
+        // on tw5
+
         // was canceled when running
         assertThat( tw1.isJobDone(), equalTo( false ) );
         assertThat( tw1.isExecuting(), equalTo( false ) );
-        assertThat( tw1.isExecuted(), equalTo( true ) );
+        // assertThat( tw1.isExecuted(), equalTo( true ) );
         assertThat( tw1.isCanceled(), equalTo( true ) );
 
         // was canceled when running
         assertThat( tw2.isJobDone(), equalTo( false ) );
         assertThat( tw2.isExecuting(), equalTo( false ) );
-        assertThat( tw2.isExecuted(), equalTo( true ) );
+        // assertThat( tw2.isExecuted(), equalTo( true ) );
         assertThat( tw2.isCanceled(), equalTo( true ) );
 
         // was canceled when running
         assertThat( tw3.isJobDone(), equalTo( false ) );
         assertThat( tw3.isExecuting(), equalTo( false ) );
-        assertThat( tw3.isExecuted(), equalTo( true ) );
+        // assertThat( tw3.isExecuted(), equalTo( true ) );
         assertThat( tw3.isCanceled(), equalTo( true ) );
 
         // was canceled when running
         assertThat( tw4.isJobDone(), equalTo( false ) );
         assertThat( tw4.isExecuting(), equalTo( false ) );
-        assertThat( tw4.isExecuted(), equalTo( true ) );
+        // assertThat( tw4.isExecuted(), equalTo( true ) );
         assertThat( tw4.isCanceled(), equalTo( true ) );
 
         // was not canceled and did it
@@ -237,6 +244,7 @@ public class ConstrainedExecutorImplTest
             super( null, name );
             this.cycles = cycles;
             this.executing = false;
+            this.executed = false;
             this.jobDone = false;
         }
 

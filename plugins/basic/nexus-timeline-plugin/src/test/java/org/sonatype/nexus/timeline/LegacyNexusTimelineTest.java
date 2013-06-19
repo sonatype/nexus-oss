@@ -22,6 +22,7 @@ import java.io.File;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 /**
  * Ignored test excersising legacy timeline for now
@@ -31,20 +32,16 @@ import org.junit.Test;
  */
 @Ignore
 public class LegacyNexusTimelineTest
-    extends AbstractTimelineTest
+    extends NexusTestSupport
 {
     @Test
     public void testMoveLegacyTimeline()
         throws Exception
     {
-        File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
-
-        File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
-
+        final File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
+        final File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
         FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
-
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
-
+        final NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
         final EntryListCallback cb = new EntryListCallback();
         nexusTimeline.retrieve( 0, 10, null, null, null, cb );
         assertThat( cb.getEntries(), not( empty() ) );
@@ -54,20 +51,13 @@ public class LegacyNexusTimelineTest
     public void testDoNotMoveLegacyTimeline()
         throws Exception
     {
-        File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
-
-        File newDataDir = new File( getBasedir(), "target/test-classes/timeline/new" );
-
-        File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
-
-        File newTimelineDir = new File( getWorkHomeDir(), "timeline/index" );
-
+        final File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
+        final File newDataDir = new File( getBasedir(), "target/test-classes/timeline/new" );
+        final File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
+        final File newTimelineDir = new File( getWorkHomeDir(), "timeline/index" );
         FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
-
         FileUtils.copyDirectoryStructure( newDataDir, newTimelineDir );
-
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
-
+        final NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
         final EntryListCallback cb = new EntryListCallback();
         nexusTimeline.retrieve( 0, 10, null, null, null, cb );
         assertThat( cb.getEntries(), hasSize( 4 ) );

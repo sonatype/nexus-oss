@@ -34,7 +34,7 @@ public class Restlet1xDocumentationResourceBundle
     @Override
     public String getDescription()
     {
-        return "Restlet 1.x API";
+        return "Nexus Core API (Restlet 1.x)";
     }
 
 }

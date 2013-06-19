@@ -59,6 +59,14 @@ public abstract class AbstractSecurityTestCase
         properties.put( "security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml" );
         super.configure( properties );
     }
+    
+    @Override
+    public void configure( final Binder binder )
+    {
+        // install the module, to not rely on deprecated Plexus components anymore
+        // (as they are REMOVED)
+        binder.install( new SecurityModule() );
+    }
 
     @Override
     public void configure( final Binder binder )

@@ -26,7 +26,7 @@ public abstract class AbstractNexusTestEnvironment
     private CacheManager cacheManager;
 
     private RepositoryItemUidFactory repositoryItemUidFactory;
-    
+
     private MimeSupport mimeSupport;
 
     protected void setUp()
@@ -38,10 +38,10 @@ public abstract class AbstractNexusTestEnvironment
 
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
         
-        mimeSupport = lookup( MimeSupport.class );
-
         // rebuild cache
         lookup( RepositoryItemUidAttributeManager.class ).reset();
+
+        mimeSupport = lookup( MimeSupport.class );
 
         this.lookup( SecuritySystem.class ).setSecurityEnabled( false );
     }
@@ -60,7 +60,7 @@ public abstract class AbstractNexusTestEnvironment
     {
         return repositoryItemUidFactory;
     }
-    
+
     protected MimeSupport getMimeSupport()
     {
         return mimeSupport;

@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.timeline;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,11 +19,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+import org.sonatype.nexus.NexusAppTestSupport;
 
 import com.google.common.base.Predicate;
 
 public class DefaultNexusTimelineTest
-    extends AbstractTimelineTest
+    extends NexusAppTestSupport
 {
     protected NexusTimeline nexusTimeline;
 
