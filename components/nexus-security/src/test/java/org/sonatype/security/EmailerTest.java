@@ -28,6 +28,7 @@ public class EmailerTest
     @Override
     public void configure( Binder binder )
     {
+        super.configure( binder );
         binder.bind( SecurityEmailer.class ).toInstance( emailer );
     }
 

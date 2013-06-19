@@ -19,7 +19,10 @@ import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
+import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+
+import com.google.inject.Binder;
 
 public abstract class AbstractSecurityTest
     extends InjectedTestCase
@@ -34,6 +37,12 @@ public abstract class AbstractSecurityTest
     {
         properties.put( "application-conf", APP_CONF.getAbsolutePath() );
         super.configure( properties );
+    }
+
+    @Override
+    public void configure( final Binder binder )
+    {
+        binder.install( new SecurityModule() );
     }
 
     @Override

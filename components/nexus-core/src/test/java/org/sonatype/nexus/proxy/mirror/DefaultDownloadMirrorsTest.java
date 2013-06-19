@@ -17,16 +17,16 @@ import java.util.List;
 
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 
 public class DefaultDownloadMirrorsTest
-    extends NexusProxyTestSupport
+    extends NexusAppTestSupport
 {
     protected ApplicationConfiguration applicationConfiguration;
 

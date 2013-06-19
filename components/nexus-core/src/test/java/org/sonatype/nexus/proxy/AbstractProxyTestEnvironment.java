@@ -59,9 +59,6 @@ public abstract class AbstractProxyTestEnvironment
     /** The config */
     private ApplicationConfiguration applicationConfiguration;
 
-    /** The app event hub */
-    private EventBus eventBus;
-
     /** The repository registry. */
     private RepositoryRegistry repositoryRegistry;
 
@@ -88,11 +85,6 @@ public abstract class AbstractProxyTestEnvironment
     public ApplicationConfiguration getApplicationConfiguration()
     {
         return applicationConfiguration;
-    }
-
-    public EventBus eventBus()
-    {
-        return eventBus;
     }
 
     /**
@@ -207,13 +199,11 @@ public abstract class AbstractProxyTestEnvironment
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
 
-        eventBus = lookup( EventBus.class );
-
         repositoryRegistry = lookup( RepositoryRegistry.class );
 
         testEventListener = new TestItemEventListener();
 
-        eventBus.register( testEventListener );
+        eventBus().register( testEventListener );
 
         attributesHandler = lookup( AttributesHandler.class );
 
@@ -228,9 +218,9 @@ public abstract class AbstractProxyTestEnvironment
 
         getEnvironmentBuilder().buildEnvironment( this );
 
-        eventBus.post( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
+        eventBus().post( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
 
-        eventBus.post( new NexusStartedEvent( null ) );
+        eventBus().post( new NexusStartedEvent( null ) );
 
         getEnvironmentBuilder().startService();
     }
@@ -243,7 +233,6 @@ public abstract class AbstractProxyTestEnvironment
     public void tearDown()
         throws Exception
     {
-        eventBus.post( new NexusStoppedEvent( null ) );
         getEnvironmentBuilder().stopService();
         super.tearDown();
     }

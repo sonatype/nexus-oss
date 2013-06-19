@@ -37,7 +37,6 @@ public class DefaultSecuritySystemTest
     public void testLogin()
         throws Exception
     {
-
         SecuritySystem securitySystem = this.getSecuritySystem();
 
         // login
@@ -59,9 +58,7 @@ public class DefaultSecuritySystemTest
     public void testLogout()
         throws Exception
     {
-
         SecuritySystem securitySystem = this.getSecuritySystem();
-        securitySystem.start();
 
         // bind to a servlet request/response
         // this.setupLoginContext( "test" );

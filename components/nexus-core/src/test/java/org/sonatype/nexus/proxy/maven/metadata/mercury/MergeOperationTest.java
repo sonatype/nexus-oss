@@ -12,18 +12,25 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.mercury;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.NexusMergeOperation;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class MergeOperationTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
     @Test
     public void testMergeNoLastUpdate()
@@ -90,18 +97,18 @@ public class MergeOperationTest
         NexusMergeOperation mergeOp = new NexusMergeOperation( new MetadataOperand( release ) );
         mergeOp.perform( snapshot );
 
-        //check the snapshot metadata, which should now be merged
-        assertEquals( "test", snapshot.getArtifactId() );
-        assertEquals( "test", snapshot.getGroupId() );
-        assertTrue( snapshot.getPlugins().isEmpty() );
-        assertNull( snapshot.getVersion() );
-        assertNotNull( snapshot.getVersioning() );
-        assertEquals( "1234568", snapshot.getVersioning().getLastUpdated() );
-        assertEquals( "1.2-SNAPSHOT", snapshot.getVersioning().getLatest() );
-        assertEquals( "1.1", snapshot.getVersioning().getRelease() );
-        assertNull( snapshot.getVersioning().getSnapshot() );
-        assertNotNull( snapshot.getVersioning().getVersions() );
-        assertTrue( snapshot.getVersioning().getVersions().containsAll( Arrays.asList( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) ) );
+        // check the snapshot metadata, which should now be merged
+        assertThat( snapshot.getArtifactId(), equalTo( "test" ) );
+        assertThat( snapshot.getGroupId(), equalTo( "test" ) );
+        assertThat( snapshot.getPlugins(), empty() );
+        assertThat( snapshot.getVersion(), nullValue() );
+        assertThat( snapshot.getVersioning(), notNullValue() );
+        assertThat( snapshot.getVersioning().getLastUpdated(), equalTo( "1234568" ) );
+        assertThat( snapshot.getVersioning().getLatest(), equalTo( "1.2-SNAPSHOT" ) );
+        assertThat( snapshot.getVersioning().getRelease(), equalTo( "1.1" ) );
+        assertThat( snapshot.getVersioning().getSnapshot(), nullValue() );
+        assertThat( snapshot.getVersioning().getVersions(), notNullValue() );
+        assertThat( snapshot.getVersioning().getVersions(), containsInAnyOrder( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) );
 
         //now do the merge in reverse
         release = getReleaseMetadata();
@@ -109,18 +116,18 @@ public class MergeOperationTest
         mergeOp = new NexusMergeOperation( new MetadataOperand( snapshot ) );
         mergeOp.perform( release );
 
-        //check the release metadata, which should now be merged
-        assertEquals( "test", release.getArtifactId() );
-        assertEquals( "test", release.getGroupId() );
-        assertTrue( release.getPlugins().isEmpty() );
-        assertNull( release.getVersion() );
-        assertNotNull( release.getVersioning() );
-        assertEquals( "1234568", release.getVersioning().getLastUpdated() );
-        assertEquals( "1.2-SNAPSHOT", release.getVersioning().getLatest() );
-        assertEquals( "1.1", release.getVersioning().getRelease() );
-        assertNull( release.getVersioning().getSnapshot() );
-        assertNotNull( release.getVersioning().getVersions() );
-        assertTrue( release.getVersioning().getVersions().containsAll( Arrays.asList( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) ) );
+        // check the release metadata, which should now be merged
+        assertThat( release.getArtifactId(), equalTo( "test" ) );
+        assertThat( release.getGroupId(), equalTo( "test" ) );
+        assertThat( release.getPlugins(), empty() );
+        assertThat( release.getVersion(), nullValue() );
+        assertThat( release.getVersioning(), notNullValue() );
+        assertThat( release.getVersioning().getLastUpdated(), equalTo( "1234568" ) );
+        assertThat( release.getVersioning().getLatest(), equalTo( "1.2-SNAPSHOT" ) );
+        assertThat( release.getVersioning().getRelease(), equalTo( "1.1" ) );
+        assertThat( release.getVersioning().getSnapshot(), nullValue() );
+        assertThat( release.getVersioning().getVersions(), notNullValue() );
+        assertThat( release.getVersioning().getVersions(), containsInAnyOrder( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) );
     }
 
     private Metadata getReleaseMetadata()
@@ -201,26 +208,26 @@ public class MergeOperationTest
 
     private void validate( Metadata md, boolean setLastUpdate, boolean targetLastUpdate )
     {
-        assertTrue( md.getVersioning().getVersions().containsAll(
-                                                                  Arrays.asList( "1.2.4", "1.2.5", "1.2.6", "1.2.7",
-                                                                                 "1.2.8", "1.2.11", "1.2.9", "1.2.12",
-                                                                                 "1.2.13" ) ) );
+        assertThat(
+            md.getVersioning().getVersions(),
+            containsInAnyOrder( "1.1.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.11", "1.2.9", "1.2.12",
+                "1.2.13" ) );
 
         if ( setLastUpdate )
         {
             if ( targetLastUpdate )
             {
-                assertEquals( "7654321", md.getVersioning().getLastUpdated() );
+                assertThat( md.getVersioning().getLastUpdated(), equalTo( "7654321" ) );
             }
             else
             {
-                assertEquals( "1234567", md.getVersioning().getLastUpdated() );
+                assertThat( md.getVersioning().getLastUpdated(), equalTo( "1234567" ) );
             }
         }
         else
         {
             // it should contain "now", but not be blank
-            assertTrue( StringUtils.isNotBlank( md.getVersioning().getLastUpdated() ) );
+            assertThat( md.getVersioning().getLastUpdated(), not( equalTo( "" ) ) );
         }
     }
 }
