@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.client.core.subsystem;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 
 /**
@@ -21,5 +24,17 @@ public interface Utilities
 {
 
     Date getLastModified( String uri );
+
+    /**
+     * @since 2.6
+     */
+    Utilities download( String path, File target )
+        throws IOException;
+
+    /**
+     * @since 2.6
+     */
+    Utilities download( String path, OutputStream target )
+        throws IOException;
 
 }
