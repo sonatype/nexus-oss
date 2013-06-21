@@ -41,6 +41,7 @@ public class MDCAwareRunnable implements Runnable
     public void run()
     {
         MDC.setContextMap( mdcContext );
+        MDCUtils.setMDCUserIdIfNeeded();
         delegate.run();
     }
 }

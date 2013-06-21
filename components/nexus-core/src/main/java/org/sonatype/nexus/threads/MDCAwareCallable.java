@@ -43,6 +43,7 @@ public class MDCAwareCallable<T> implements Callable<T>
         throws Exception
     {
         MDC.setContextMap( mdcContext );
+        MDCUtils.setMDCUserIdIfNeeded();
         return delegate.call();
     }
 }
