@@ -33,27 +33,19 @@ public class ThreadFactoryImpl
         this( Thread.MIN_PRIORITY );
     }
 
-    public ThreadFactoryImpl(int threadPriority)
+    public ThreadFactoryImpl( final int threadPriority )
     {
-        super();
-
         int poolNum = poolNumber.getAndIncrement();
-
         this.schedulerThreadGroup = new ThreadGroup( "Sisu scheduler #" + poolNum );
-
         this.namePrefix = "pxpool-" + poolNum + "-thread-";
-
         this.threadPriority = threadPriority;
     }
 
-    public Thread newThread( Runnable r )
+    public Thread newThread( final Runnable r )
     {
-        Thread result = new Thread( getSchedulerThreadGroup(), r, namePrefix + threadNumber.getAndIncrement() );
-
+        final Thread result = new Thread( getSchedulerThreadGroup(), r, namePrefix + threadNumber.getAndIncrement() );
         result.setDaemon( false );
-
         result.setPriority( this.threadPriority );
-
         return result;
     }
 

@@ -12,13 +12,15 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
@@ -30,11 +32,8 @@ import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.base.Throwables;
-
-import javax.inject.Inject;
-
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Base class for all Nexus tasks.
@@ -171,10 +170,6 @@ public abstract class AbstractNexusTask<T>
 
         T result = null;
 
-        // Subject subject = this.securitySystem.runAs( new SimplePrincipalCollection("admin", "") );
-        // TODO: do the above instead
-        Subject subject = new TaskSecuritySubject();
-        ThreadContext.bind( subject );
         try
         {
             beforeRun();
@@ -221,10 +216,6 @@ public abstract class AbstractNexusTask<T>
                 Throwables.propagateIfInstanceOf( e, Exception.class );
                 throw Throwables.propagate( e );
             }
-        }
-        finally
-        {
-            subject.logout();
         }
     }
 

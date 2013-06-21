@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.shiro.concurrent.SubjectAwareExecutorService;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -36,6 +38,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -59,7 +62,7 @@ public class DefaultEventInspectorHost
     private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
         "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500 );
 
-    private final ThreadPoolExecutor hostThreadPool;
+    private final SubjectAwareExecutorService hostThreadPool;
 
     private final Map<String, EventInspector> eventInspectors;
 
@@ -69,9 +72,10 @@ public class DefaultEventInspectorHost
         this.eventInspectors = checkNotNull( eventInspectors );
 
         // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
-        this.hostThreadPool =
+        final ThreadPoolExecutor target =
             new ThreadPoolExecutor( 0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
                 new NexusThreadFactory( "nxevthost", "Event Inspector Host" ), new CallerRunsPolicy() );
+        this.hostThreadPool = new SubjectAwareExecutorService( target );
     }
 
     // == Disposable iface, to manage ExecutorService lifecycle
@@ -89,10 +93,15 @@ public class DefaultEventInspectorHost
         hostThreadPool.shutdown();
     }
 
+    /**
+     * Used by UTs and ITs only, to "wait for calm period", when all the async event inspectors finished.
+     */
+    @VisibleForTesting
     public boolean isCalmPeriod()
     {
         // "calm period" is when we have no queued nor active threads
-        return hostThreadPool.getQueue().isEmpty() && hostThreadPool.getActiveCount() == 0;
+        return ( (ThreadPoolExecutor) hostThreadPool.getTargetExecutorService() ).getQueue().isEmpty()
+            && ( (ThreadPoolExecutor) hostThreadPool.getTargetExecutorService() ).getActiveCount() == 0;
     }
 
     @AllowConcurrentEvents

@@ -103,6 +103,8 @@ public class DefaultSecuritySystem
     private SecurityEmailer securityEmailer;
 
     private static final String ALL_ROLES_KEY = "all";
+    
+    private volatile boolean started;
 
     @Inject
     public DefaultSecuritySystem( List<SecurityEmailer> securityEmailers, EventBus eventBus,
@@ -124,6 +126,7 @@ public class DefaultSecuritySystem
         this.eventBus.register( this );
         this.userManagerFacade = userManagerFacade;
         SecurityUtils.setSecurityManager( this.getSecurityManager() );
+        started = false;
     }
 
     public Subject login( AuthenticationToken token )
@@ -855,8 +858,13 @@ public class DefaultSecuritySystem
         this.securityConfiguration.save();
     }
 
-    public void start()
+    public synchronized void start()
     {
+        if ( started )
+        {
+            throw new IllegalStateException( getClass().getName()
+                + " was already started, same instance is not re-startable!" );
+        }
         // reload the config
         this.securityConfiguration.clearCache();
 
@@ -887,9 +895,10 @@ public class DefaultSecuritySystem
             ( (org.apache.shiro.util.Initializable) this.getSecurityManager() ).init();
         }
         this.setSecurityManagerRealms();
+        started = true;
     }
 
-    public void stop()
+    public synchronized void stop()
     {
         if ( getSecurityManager().getRealms() != null )
         {

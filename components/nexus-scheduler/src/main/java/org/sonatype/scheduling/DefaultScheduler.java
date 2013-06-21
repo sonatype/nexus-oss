@@ -23,18 +23,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * A simple facade to ScheduledThreadPoolExecutor.
@@ -52,21 +53,41 @@ public class DefaultScheduler
 
     private final AtomicInteger idGen;
 
-    private final ScheduledThreadPoolExecutor scheduledExecutorService;
+    private final ScheduledExecutorService scheduledExecutorService;
 
     private final ConcurrentHashMap<String, List<ScheduledTask<?>>> tasksMap;
 
+    /**
+     * Deprecated constructor.
+     * 
+     * @param taskConfig
+     * @deprecated Use another constructor. Left only for some UTs use.
+     */
+    @Deprecated
+    public DefaultScheduler( final TaskConfigManager taskConfig )
+    {
+        this( taskConfig, new TaskExecutorProvider()
+        {
+            @Override
+            public ScheduledExecutorService getTaskExecutor()
+            {
+                final ScheduledThreadPoolExecutor scheduledExecutorService =
+                    (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
+                        Thread.MIN_PRIORITY ) );
+                scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
+                scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
+                return scheduledExecutorService;
+            }
+        } );
+    }
+
     @Inject
-    public DefaultScheduler(final TaskConfigManager taskConfig)
+    public DefaultScheduler( final TaskConfigManager taskConfig, TaskExecutorProvider scheduledExecutorServiceProvider )
     {
         this.taskConfig = taskConfig;
-        idGen = new AtomicInteger( 0 );
-        tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
-        scheduledExecutorService =
-            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
-                Thread.MIN_PRIORITY ) );
-        scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
-        scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
+        this.scheduledExecutorService = scheduledExecutorServiceProvider.getTaskExecutor();
+        this.idGen = new AtomicInteger( 0 );
+        this.tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
     }
 
     protected Logger getLogger()
@@ -108,19 +129,16 @@ public class DefaultScheduler
     public void shutdown()
     {
         getLogger().info( "Shutting down Scheduler..." );
-
-        getScheduledExecutorService().shutdown();
         try
         {
-            boolean stopped = getScheduledExecutorService().awaitTermination( 1, TimeUnit.SECONDS );
-
+            scheduledExecutorService.shutdown();
+            boolean stopped = scheduledExecutorService.awaitTermination( 3L, TimeUnit.SECONDS );
             if ( !stopped )
             {
                 final Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
-
                 if ( !runningTasks.isEmpty() )
                 {
-                    getScheduledExecutorService().shutdownNow();
+                    scheduledExecutorService.shutdownNow();
                     getLogger().warn( "Scheduler shut down forcibly with tasks running." );
                 }
                 else
@@ -148,7 +166,7 @@ public class DefaultScheduler
         return taskConfig.createTaskInstance( taskType );
     }
 
-    public ScheduledThreadPoolExecutor getScheduledExecutorService()
+    public ScheduledExecutorService getScheduledExecutorService()
     {
         return scheduledExecutorService;
     }
@@ -275,7 +293,7 @@ public class DefaultScheduler
     public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
-        if ( StringUtils_isEmpty(id) )
+        if ( StringUtils_isEmpty( id ) )
         {
             throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
         }
