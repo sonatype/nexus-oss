@@ -37,20 +37,20 @@ public class DefaultThreadPoolManager
     private static final int PROXY_REPOSITORY_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
         "nexus.proxyRepositoryThreadPoolSize", 50 );
 
-    private final ExecutorService groupRepositoryThreadPool;
+    private final NexusExecutorService groupRepositoryThreadPool;
 
-    private final ExecutorService proxyRepositoryThreadPool;
+    private final NexusExecutorService proxyRepositoryThreadPool;
 
     public DefaultThreadPoolManager()
     {
         // direct hand-off used! Group pool will use caller thread to execute the task when full!
-       final ExecutorService gTarget =
+       final ThreadPoolExecutor gTarget =
             new ThreadPoolExecutor( 0, GROUP_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(), new NexusThreadFactory( "group", "Group TPool" ),
                 new CallerRunsPolicy() );
 
         // direct hand-off used! Proxy pool will use caller thread to execute the task when full!
-       final ExecutorService pTarget =
+       final ThreadPoolExecutor pTarget =
             new ThreadPoolExecutor( 0, PROXY_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(), new NexusThreadFactory( "proxy", "Proxy TPool" ),
                 new CallerRunsPolicy() );
