@@ -17,6 +17,7 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.sonatype.nexus.threads.MDCUtils;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -40,12 +41,6 @@ import java.io.IOException;
 public class MdcUserContextFilter
     implements Filter
 {
-    private static final Logger log = LoggerFactory.getLogger(MdcUserContextFilter.class);
-
-    public static final String USER_ID = "userId";
-
-    public static final String UNKNOWN_USER_ID = "<unknown-user>";
-
     @Override
     public void init(final FilterConfig config) throws ServletException {
         // ignore
@@ -60,34 +55,12 @@ public class MdcUserContextFilter
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
         throws IOException, ServletException
     {
-        MDC.put(USER_ID, getCurrentUserId());
-
+        MDC.put( MDCUtils.USER_ID_KEY, MDCUtils.getCurrentUserId());
         try {
             chain.doFilter(request, response);
         }
         finally {
-            MDC.remove(USER_ID);
+            MDC.remove( MDCUtils.USER_ID_KEY );
         }
-    }
-
-    private String getCurrentUserId() {
-        String userId = UNKNOWN_USER_ID;
-
-        try {
-            Subject subject = SecurityUtils.getSubject();
-            if (subject != null) {
-                Object principal = subject.getPrincipal();
-                if (principal != null) {
-                    userId = principal.toString();
-                }
-            }
-        }
-        catch (Exception e) {
-            log.warn("Unable to determine current user; ignoring", e);
-        }
-
-        log.trace("Current userId: {}", userId);
-
-        return userId;
     }
 }

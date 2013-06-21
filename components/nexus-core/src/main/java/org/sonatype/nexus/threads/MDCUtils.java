@@ -47,7 +47,7 @@ public class MDCUtils
         MDC.put( USER_ID_KEY, getCurrentUserId() );
     }
 
-    private static String getCurrentUserId()
+    public static String getCurrentUserId()
     {
         String userId = UNKNOWN_USER_ID;
         try
