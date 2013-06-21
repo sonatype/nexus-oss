@@ -18,12 +18,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.shiro.concurrent.SubjectAwareExecutorService;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
@@ -55,8 +55,8 @@ public class DefaultThreadPoolManager
                 new SynchronousQueue<Runnable>(), new NexusThreadFactory( "proxy", "Proxy TPool" ),
                 new CallerRunsPolicy() );
        
-       this.groupRepositoryThreadPool = new SubjectAwareExecutorService( gTarget );
-       this.proxyRepositoryThreadPool = new SubjectAwareExecutorService( pTarget );
+       this.groupRepositoryThreadPool = NexusExecutorService.forCurrentSubject( gTarget );
+       this.proxyRepositoryThreadPool = NexusExecutorService.forCurrentSubject( pTarget );
     }
 
     @Override
