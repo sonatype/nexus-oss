@@ -40,8 +40,11 @@ public class MDCAwareRunnable implements Runnable
     @Override
     public void run()
     {
-        MDC.setContextMap( mdcContext );
-        MDCUtils.setMDCUserIdIfNeeded();
+        if ( mdcContext != null )
+        {
+            MDC.setContextMap( mdcContext );
+            MDCUtils.setMDCUserIdIfNeeded();
+        }
         delegate.run();
     }
 }
