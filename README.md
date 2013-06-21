@@ -24,6 +24,15 @@ Sonatype Nexus - Open Source Edition
 * Java 6+
 * Groovy 1.7+ (for advanced usage only)
 
+## Running
+
+The run Nexus, after building, unzip the assembly and start the server:
+
+    unzip -d target assemblies/nexus-bundle-template/target/nexus-bundle-template-*-bundle.zip
+    ./target/nexus-bundle-template-*/bin/nexus console
+
+The `nexus-bundle-template` assembly is what is used as the basis for the official Nexus distributions.
+
 ## HOWTO
 
 Some examples may require Groovy 1.7+
