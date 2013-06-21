@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -350,18 +350,32 @@ public class DefaultNexusConfiguration
         }
     }
 
+    /**
+     * Returns the userId ("main principal" in Shiro lingo) of the user that is the principal of currently executing
+     * activity (like configuration save) for logging purposes only. It uses Shiro API to get the information, and will
+     * return the String userId, or {@code null} if it's impossible to determine it, as current thread (the one invoking
+     * this method) does not have bound Subject. If more information needed about current user, Shiro and/or Security
+     * API of Nexus should be used, this method is not a definitive source of users in Nexus Security.
+     * 
+     * @return
+     */
     protected String getCurrentUserId()
     {
-        Subject subject = ThreadContext.getSubject(); // Use ThreadContext directly, SecurityUtils will associate a
-                                                      // new Subject with the thread.
-        if ( subject != null && subject.getPrincipal() != null )
+        try
         {
-            return subject.getPrincipal().toString();
+            final Subject subject = SecurityUtils.getSubject();
+            if ( subject != null && subject.getPrincipal() != null )
+            {
+                return subject.getPrincipal().toString();
+            }
         }
-        else
+        catch ( final Exception e )
         {
-            return null;
+            // NEXUS-5749: Prevent interruption of configuration save (and hence, data loss) for any
+            // exception thrown while gathering userId for logging purposes.
+            getLogger().warn( "Could not obtain Shiro subject:", e );
         }
+        return null;
     }
 
     public synchronized boolean applyConfiguration()

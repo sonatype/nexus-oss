@@ -12,8 +12,12 @@
  */
 package org.sonatype.scheduling;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import junit.framework.Assert;
 
@@ -26,8 +30,6 @@ import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests for {@link DefaultScheduler}.
@@ -344,12 +346,14 @@ public class DefaultSchedulerTest
         
         int count = 0;
 
-        while ( ( count = defaultScheduler.getScheduledExecutorService().getActiveCount() ) > 0 )
+        // hack: we used deprecated constructor, so we know actual imple here
+        while ( ( count =
+            ( (ScheduledThreadPoolExecutor) defaultScheduler.getScheduledExecutorService() ).getActiveCount() ) > 0 )
         {
             assertEquals( "We scheduled one task, but more than one is executing?", 1,
-                          count );
-            
-            Thread.sleep(10);
+                count );
+
+            Thread.sleep( 10 );
         }
 
         assertEquals( 3, tr.getRunCount() );
