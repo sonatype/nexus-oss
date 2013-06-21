@@ -47,6 +47,11 @@ public class MDCUtils
         MDC.put( USER_ID_KEY, getCurrentUserId() );
     }
 
+    public static void unsetMDCUserId()
+    {
+        MDC.remove( USER_ID_KEY );
+    }
+
     public static String getCurrentUserId()
     {
         String userId = UNKNOWN_USER_ID;

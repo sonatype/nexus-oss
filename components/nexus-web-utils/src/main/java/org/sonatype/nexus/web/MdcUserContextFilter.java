@@ -12,11 +12,6 @@
  */
 package org.sonatype.nexus.web;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.sonatype.nexus.threads.MDCUtils;
 
 import javax.inject.Named;
@@ -32,7 +27,7 @@ import java.io.IOException;
 // NOTE: This would be better integrated as part of the org.sonatype.security.web.guice.SecurityWebFilter ?
 
 /**
- * Servlet filter to add user context details to the {@link MDC}.
+ * Servlet filter to add user context details to the {@link org.slf4j.MDC}.
  *
  * @since 2.5
  */
@@ -55,12 +50,12 @@ public class MdcUserContextFilter
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
         throws IOException, ServletException
     {
-        MDC.put( MDCUtils.USER_ID_KEY, MDCUtils.getCurrentUserId());
+        MDCUtils.setMDCUserId();
         try {
             chain.doFilter(request, response);
         }
         finally {
-            MDC.remove( MDCUtils.USER_ID_KEY );
+            MDCUtils.unsetMDCUserId();
         }
     }
 }
