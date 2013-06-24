@@ -87,6 +87,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-logback</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-edition</artifactId>
     </dependency>
