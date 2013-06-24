@@ -109,6 +109,7 @@
           <exclude>WEB-INF/lib/logback-core*.jar</exclude>
           <exclude>WEB-INF/lib/logback-classic*.jar</exclude>
           <exclude>WEB-INF/lib/metrics-core*.jar</exclude>
+          <exclude>WEB-INF/lib/metrics-logback*.jar</exclude>
           <exclude>WEB-INF/classes/logback.xml</exclude>
         </excludes>
       </unpackOptions>
