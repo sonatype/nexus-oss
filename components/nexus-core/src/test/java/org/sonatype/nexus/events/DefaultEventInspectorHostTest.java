@@ -20,12 +20,14 @@ import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspectorWrapper;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 public class DefaultEventInspectorHostTest
+    extends NexusAppTestSupport
 {
     @Test
     public void testSyncThenAsyncExecution()
