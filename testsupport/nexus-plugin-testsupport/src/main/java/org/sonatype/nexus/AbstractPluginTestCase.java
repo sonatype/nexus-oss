@@ -39,6 +39,7 @@ public abstract class AbstractPluginTestCase
 {
     protected String[] sourceDirectories = { "target/classes", "target/test-classes" };
 
+    @Override
     protected void setupContainer()
     {
         super.setupContainer();
