@@ -17,8 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.slf4j.MDC;
-
 /**
  * Callable that properly sets MDC context before invoking the delegate. The delegate will execute in a
  * managed thread with properly set MDC context. To be used with managed threads.
@@ -30,26 +28,19 @@ public class MDCAwareCallable<T> implements Callable<T>
 {
     private final Callable<T> delegate;
 
-    private final Map mdcContext;
+    private final Map<String, String> mdcContext;
 
     public MDCAwareCallable( final Callable<T> delegate )
     {
         this.delegate = checkNotNull( delegate );
-        this.mdcContext = MDC.getCopyOfContextMap();
+        this.mdcContext = MDCUtils.getCopyOfContextMap();
     }
 
     @Override
     public T call()
         throws Exception
     {
-        if ( mdcContext != null )
-        {
-            MDC.setContextMap( mdcContext );
-            MDCUtils.setMDCUserIdIfNeeded();
-        } else {
-            MDC.clear();
-            MDCUtils.setMDCUserId();
-        }
+        MDCUtils.setContextMap( mdcContext );
         return delegate.call();
     }
 }
