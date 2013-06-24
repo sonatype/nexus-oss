@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codehaus.plexus.PlexusConstants;
@@ -39,6 +44,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import com.google.common.base.Preconditions;
 
 public abstract class AbstractNexusPlexusResource
     extends AbstractPlexusResource
@@ -71,6 +77,42 @@ public abstract class AbstractNexusPlexusResource
 
     @Requirement
     private ReferenceFactory referenceFactory;
+
+    @Inject
+    public void setNexus( final Nexus nexus )
+    {
+        this.nexus = nexus;
+    }
+
+    @Inject
+    public void setNexusConfiguration( final NexusConfiguration nexusConfiguration )
+    {
+        this.nexusConfiguration = checkNotNull( nexusConfiguration );
+    }
+
+    @Inject
+    public void setRepositoryRegistry( final @Named( "protected" ) RepositoryRegistry repositoryRegistry )
+    {
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
+    }
+
+    @Inject
+    public void setDefaultRepositoryRegistry( final @Named( "default" ) RepositoryRegistry repositoryRegistry )
+    {
+        this.defaultRepositoryRegistry = checkNotNull( repositoryRegistry );
+    }
+
+    @Inject
+    public void setRepositoryTypeRegistry( final RepositoryTypeRegistry repoTypeRegistry )
+    {
+        this.repoTypeRegistry = checkNotNull( repoTypeRegistry );
+    }
+
+    @Inject
+    public void setReferenceFactory( final ReferenceFactory referenceFactory )
+    {
+        this.referenceFactory = checkNotNull( referenceFactory );
+    }
 
     protected Nexus getNexus()
     {
