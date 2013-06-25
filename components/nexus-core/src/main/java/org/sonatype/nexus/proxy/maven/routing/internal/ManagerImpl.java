@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -72,8 +71,8 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.scheduling.shiro.FakeAlmightySubject;
-import org.sonatype.nexus.scheduling.shiro.ShiroFixedSubjectScheduledExecutorService;
+import org.sonatype.nexus.threads.FakeAlmightySubject;
+import org.sonatype.nexus.threads.NexusScheduledExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -139,7 +138,7 @@ public class ManagerImpl
      * when repository is added). But, as background threads are bounded by presence of proxy repositories, and
      * introduce hard limit of possible max executions, it protects this instance that is basically unbounded.
      */
-    private final ScheduledExecutorService executor;
+    private final NexusScheduledExecutorService executor;
 
     /**
      * Executor used to execute update jobs. It is constrained in a way that no two update jobs will run against one
@@ -175,10 +174,10 @@ public class ManagerImpl
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
         this.quickRemoteStrategy = checkNotNull( quickRemoteStrategy );
-        final ScheduledExecutorService target =
+        final ScheduledThreadPoolExecutor target =
             new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "ar", "AR-Updater" ),
                 new ThreadPoolExecutor.AbortPolicy() );
-        this.executor = new ShiroFixedSubjectScheduledExecutorService( target, FakeAlmightySubject.TASK_SUBJECT );
+        this.executor = NexusScheduledExecutorService.forFixedSubject( target, FakeAlmightySubject.TASK_SUBJECT );
         this.constrainedExecutor = new ConstrainedExecutorImpl( executor );
         // register event dispatcher
         this.eventDispatcher = new EventDispatcher( this );

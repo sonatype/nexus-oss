@@ -10,15 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.scheduling.shiro;
+package org.sonatype.nexus.threads;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.shiro.concurrent.SubjectAwareScheduledExecutorService;
 import org.apache.shiro.subject.Subject;
-import org.sonatype.scheduling.Scheduler;
 
 /**
  * A modification of Shiro's {@link SubjectAwareScheduledExecutorService} that in turn returns always the same, supplied
@@ -27,24 +27,47 @@ import org.sonatype.scheduling.Scheduler;
  * @author cstamas
  * @since 2.6
  */
-public class ShiroFixedSubjectScheduledExecutorService
+public class NexusScheduledExecutorService
     extends SubjectAwareScheduledExecutorService
 {
-    private final Subject subject;
+    public static NexusScheduledExecutorService forFixedSubject( final ScheduledExecutorService target, final Subject subject )
+    {
+        return new NexusScheduledExecutorService( target, new FixedSubjectProvider( subject ));
+    }
 
-    public ShiroFixedSubjectScheduledExecutorService( final ScheduledExecutorService target, final Subject subject )
+    public static NexusScheduledExecutorService forCurrentSubject( final ScheduledExecutorService target )
+    {
+        return new NexusScheduledExecutorService( target, new CurrentSubjectProvider());
+    }
+
+    // ==
+
+    private final SubjectProvider subjectProvider;
+
+    public NexusScheduledExecutorService( final ScheduledExecutorService target, final SubjectProvider subjectProvider )
     {
         super( checkNotNull( target ) );
-        this.subject = checkNotNull( subject );
+        this.subjectProvider = checkNotNull( subjectProvider );
     }
 
     /**
-     * Override, as we don't "pass over" the subject from caller, but for {@link Scheduler} threads we use a common fake
-     * subject.
+     * Override, use our SubjectProvider to get subject from.
      */
     @Override
     protected Subject getSubject()
     {
-        return subject;
+        return subjectProvider.getSubject();
+    }
+
+    @Override
+    protected Runnable associateWithSubject(Runnable r) {
+        Subject subject = getSubject();
+        return subject.associateWith( new MDCAwareRunnable( r ));
+    }
+
+    @Override
+    protected <T> Callable<T> associateWithSubject(Callable<T> task) {
+        Subject subject = getSubject();
+        return subject.associateWith( new MDCAwareCallable( task ));
     }
 }
