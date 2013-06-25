@@ -12,9 +12,12 @@
  */
 package org.sonatype.security.ldap.realms;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.naming.NamingException;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -34,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
+import com.google.common.base.Preconditions;
 
 //@Component( role = AbstractLdapAuthenticatingRealm.class, hint = "ConfigurableLdapRealm" )
 public abstract class AbstractLdapAuthenticatingRealm
@@ -43,6 +47,12 @@ public abstract class AbstractLdapAuthenticatingRealm
 
     @Requirement
     private LdapManager ldapManager;
+
+    @Inject
+    public void setLdapManager( final LdapManager ldapManager )
+    {
+        this.ldapManager = checkNotNull( ldapManager );
+    }
 
     @Override
     protected AuthenticationInfo queryForAuthenticationInfo( AuthenticationToken token,
