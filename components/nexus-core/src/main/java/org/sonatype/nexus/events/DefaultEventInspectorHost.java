@@ -17,7 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
@@ -27,12 +26,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.shiro.concurrent.SubjectAwareExecutorService;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
@@ -62,7 +61,7 @@ public class DefaultEventInspectorHost
     private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
         "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500 );
 
-    private final SubjectAwareExecutorService hostThreadPool;
+    private final NexusExecutorService hostThreadPool;
 
     private final Map<String, EventInspector> eventInspectors;
 
@@ -75,7 +74,7 @@ public class DefaultEventInspectorHost
         final ThreadPoolExecutor target =
             new ThreadPoolExecutor( 0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
                 new NexusThreadFactory( "nxevthost", "Event Inspector Host" ), new CallerRunsPolicy() );
-        this.hostThreadPool = new SubjectAwareExecutorService( target );
+        this.hostThreadPool = NexusExecutorService.forCurrentSubject( target );
     }
 
     // == Disposable iface, to manage ExecutorService lifecycle

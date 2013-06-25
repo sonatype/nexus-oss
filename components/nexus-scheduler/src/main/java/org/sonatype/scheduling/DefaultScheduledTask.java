@@ -24,7 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.sonatype.scheduling.iterators.NoopSchedulerIterator;
+import org.sonatype.scheduling.iterators.RunNowSchedulerIterator;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -328,10 +330,28 @@ public class DefaultScheduledTask<T>
         this.duration = duration;
     }
     
-    private Future<T> doSchedule( long nextTime )
+    private Future<T> doSchedule( final long nextTime, final boolean inheritContext )
     {
-        return getScheduler().getScheduledExecutorService().schedule( this, Math.max( 0, nextTime - System.currentTimeMillis() ),
-                                                               TimeUnit.MILLISECONDS );
+        // FIXME: All this coz MDCUtils are in Core, while
+        // scheduler is a module ahead. If scheduler would
+        // be in core, this would not be needed, but instead
+        // MDCUtils.markCurrentContextNonInheritable() call would do it
+        if ( !inheritContext )
+        {
+            MDC.put( "non-inheritable", "non-inheritable" );
+        }
+        try
+        {
+            return getScheduler().getScheduledExecutorService().schedule( this, Math.max( 0, nextTime
+                - System.currentTimeMillis() ), TimeUnit.MILLISECONDS );
+        }
+        finally
+        {
+            if ( !inheritContext )
+            {
+                MDC.remove( "non-inheritable" );
+            }
+        }
     }
 
     protected long reschedule( boolean setFuture )
@@ -359,7 +379,7 @@ public class DefaultScheduledTask<T>
                 
                 if ( setFuture )
                 {
-                    setFuture( doSchedule( nextTime ) );
+                    setFuture( doSchedule( nextTime, iter instanceof RunNowSchedulerIterator ) );
                 }
                 
                 return nextTime;
@@ -391,7 +411,7 @@ public class DefaultScheduledTask<T>
                 getFuture().cancel( true );
             }
             
-            setFuture( doSchedule( 0 ) );
+            setFuture( doSchedule( -1, true ) );
         }
     }
 
@@ -505,7 +525,7 @@ public class DefaultScheduledTask<T>
                     //now that we dont schedule beforehand, need to schedule on error case if necessary
                     else if ( nextMillis != -1 )
                     {
-                        setFuture( doSchedule( nextMillis ) );
+                        setFuture( doSchedule( nextMillis, false ) );
                     }
 
                     if ( e instanceof Exception )
@@ -550,7 +570,7 @@ public class DefaultScheduledTask<T>
             {                
                 setTaskState( TaskState.WAITING );
                 
-                setFuture( doSchedule( nextMillis ) );
+                setFuture( doSchedule( nextMillis, false ) );
             }
             // If disabled (and not manually run),
             // put to waiting and reschedule for next time

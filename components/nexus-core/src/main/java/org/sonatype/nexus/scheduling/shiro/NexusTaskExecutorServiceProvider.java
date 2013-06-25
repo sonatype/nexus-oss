@@ -17,24 +17,26 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.threads.FakeAlmightySubject;
+import org.sonatype.nexus.threads.NexusScheduledExecutorService;
 import org.sonatype.scheduling.TaskExecutorProvider;
 import org.sonatype.scheduling.ThreadFactoryImpl;
 
 /**
  * {@link TaskExecutorProvider} implementation that provides Shiro specific
- * {@link ShiroFixedSubjectScheduledExecutorService} implementation task executors, to make scheduled task share a valid
+ * {@link org.sonatype.nexus.threads.NexusScheduledExecutorService} implementation task executors, to make scheduled task share a valid
  * subject.
  * 
  * @author cstamas
  * @since 2.6
  */
 @Component( role = TaskExecutorProvider.class )
-public class ShiroTaskExecutorServiceProvider
+public class NexusTaskExecutorServiceProvider
     implements TaskExecutorProvider
 {
-    private final ShiroFixedSubjectScheduledExecutorService shiroFixedSubjectScheduledExecutorService;
+    private final NexusScheduledExecutorService shiroFixedSubjectScheduledExecutorService;
 
-    public ShiroTaskExecutorServiceProvider()
+    public NexusTaskExecutorServiceProvider()
     {
         final ScheduledThreadPoolExecutor target =
             (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
@@ -42,7 +44,7 @@ public class ShiroTaskExecutorServiceProvider
         target.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
         target.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
         shiroFixedSubjectScheduledExecutorService =
-            new ShiroFixedSubjectScheduledExecutorService( target, FakeAlmightySubject.TASK_SUBJECT );
+            NexusScheduledExecutorService.forFixedSubject( target, FakeAlmightySubject.TASK_SUBJECT );
     }
 
     @Override
