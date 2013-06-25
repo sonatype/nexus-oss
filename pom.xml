@@ -21,6 +21,7 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>35</version>
+    <relativePath/>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
