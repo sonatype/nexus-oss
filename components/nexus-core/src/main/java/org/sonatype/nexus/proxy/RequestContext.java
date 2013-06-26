@@ -425,6 +425,8 @@ public class RequestContext
     /**
      * Returns {@code true} if this request is external, made by client outside of Nexus. Returns {@code false}
      * for requests made internally, like for example made from tasks.
+     *
+     * @since 2.6
      */
     public boolean isRequestIsExternal()
     {
@@ -442,6 +444,7 @@ public class RequestContext
      * Sets if this requst is external.
      *
      * @param external
+     * @since 2.6
      */
     public void setRequestIsExternal( boolean external )
     {

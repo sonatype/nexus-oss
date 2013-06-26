@@ -376,6 +376,8 @@ public class ResourceStoreRequest
     /**
      * Returns {@code true} if this request is external, made by client outside of Nexus. Returns {@code false}
      * for requests made internally, like for example made from tasks.
+     *
+     * @since 2.6
      */
     public boolean isExternal()
     {
@@ -386,6 +388,7 @@ public class ResourceStoreRequest
      * Sets if this requst is external.
      *
      * @param external
+     * @since 2.6
      */
     public ResourceStoreRequest setExternal( boolean external )
     {
