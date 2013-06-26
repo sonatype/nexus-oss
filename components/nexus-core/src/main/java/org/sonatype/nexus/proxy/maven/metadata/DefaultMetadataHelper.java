@@ -196,6 +196,15 @@ public class DefaultMetadataHelper
             request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
             repository.deleteItem( false, request );
         }
+        catch ( ItemNotFoundException e ) {
+            // Since Nx 2.5, checksum are not stored on disk
+            // but are stored as attributes. Still, upgraded systems
+            // might have them on disk, so delete is attempted
+            // but INFex on Checksum file in general can be neglected here.
+            if (!isChecksumFile( path )) {
+                throw new IOException( e );
+            }
+        }
         catch ( Exception e )
         {
             throw new IOException( e );
