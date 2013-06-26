@@ -21,6 +21,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -325,6 +326,25 @@ public class P2CompositeGroupRepositoryImpl
             }
         }
         return requestRepositories;
+    }
+
+    @Override
+    protected Collection<StorageItem> doListItems( final ResourceStoreRequest request )
+        throws ItemNotFoundException, StorageException
+    {
+        final boolean requestGroupLocalOnly = request.isRequestGroupLocalOnly();
+        try
+        {
+            if ( "/".equals( request.getRequestPath() ) )
+            {
+                request.setRequestGroupLocalOnly( true );
+            }
+            return super.doListItems( request );
+        }
+        finally
+        {
+            request.setRequestGroupLocalOnly( requestGroupLocalOnly );
+        }
     }
 
 }
