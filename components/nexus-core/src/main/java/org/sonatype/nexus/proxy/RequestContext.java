@@ -39,6 +39,9 @@ public class RequestContext
     /** Context URL of the original resource requested on the incoming connector. */
     public static final String CTX_REQUEST_URL = "request.url";
 
+    /** Context flag to mark that request entered on the incoming connector, is external. */
+    public static final String CTX_REQUEST_IS_EXTERNAL = "request.external";
+
     /**
      * Context flag to mark a request local only. For {@link ProxyRepository} instances: do not attempt remote access at
      * all, else: no effect.
@@ -417,6 +420,32 @@ public class RequestContext
         {
             remove( CTX_REQUEST_URL );
         }
+    }
+
+    /**
+     * Returns {@code true} if this request is external, made by client outside of Nexus. Returns {@code false}
+     * for requests made internally, like for example made from tasks.
+     */
+    public boolean isRequestIsExternal()
+    {
+        if ( containsKey( CTX_REQUEST_IS_EXTERNAL ) )
+        {
+            return (Boolean) get( CTX_REQUEST_IS_EXTERNAL );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Sets if this requst is external.
+     *
+     * @param external
+     */
+    public void setRequestIsExternal( boolean external )
+    {
+        put( CTX_REQUEST_IS_EXTERNAL, external );
     }
 
     /**
