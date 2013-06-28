@@ -95,10 +95,16 @@ public class M1Repository
         return M1ArtifactRecognizer.isMetadata( path );
     }
 
+    @Override
+    public boolean isMavenArtifactChecksumPath( String path )
+    {
+        return M1ArtifactRecognizer.isChecksum( path );
+    }
+
     /**
      * Should serve by policies.
      * 
-     * @param uid the uid
+     * @param request the request
      * @return true, if successful
      */
     @Override

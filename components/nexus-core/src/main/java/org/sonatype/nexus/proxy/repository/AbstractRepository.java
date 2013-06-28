@@ -149,7 +149,7 @@ public abstract class AbstractRepository
     private PathCache notFoundCache;
 
     /**
-     * Request strategies map. Supersedes {@link RequestProcessor}s and {@link #requestProcessors}.
+     * Request strategies map. Supersedes RequestProcessors.
      * 
      * @since 2.5
      */
@@ -993,49 +993,85 @@ public abstract class AbstractRepository
 
         try
         {
-            // determine is the thing to be deleted a collection or not
-            StorageItem item = getLocalStorage().retrieveItem( this, request );
-
-            // fire the event for file being deleted
-            eventBus().post( new RepositoryItemEventDeleteRoot( this, item ) );
-
-            // if we are deleting a collection, perform recursive notification about this too
-            if ( item instanceof StorageCollectionItem )
+            StorageItem item = null;
+            try
             {
-                if ( getLogger().isDebugEnabled() )
+                // determine is the thing to be deleted a collection or not
+                item = getLocalStorage().retrieveItem( this, request );
+            }
+            catch ( ItemNotFoundException ex )
+            {
+                if ( shouldNeglectItemNotFoundExOnDelete( request, ex ) )
                 {
-                    getLogger().debug(
-                        "We are deleting a collection, starting a walker to send delete notifications per-file." );
+                    item = null;
                 }
-
-                // it is collection, walk it and below and fire events for all files
-                DeletionNotifierWalker dnw = new DeletionNotifierWalker( eventBus(), request );
-
-                DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
-
-                ctx.getProcessors().add( dnw );
-
-                try
+                else
                 {
-                    getWalker().walk( ctx );
-                }
-                catch ( WalkerException e )
-                {
-                    if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
-                    {
-                        // everything that is not ItemNotFound should be reported,
-                        // otherwise just neglect it
-                        throw e;
-                    }
+                    throw ex;
                 }
             }
 
-            doDeleteItem( request );
+            if ( item != null )
+            {
+                // fire the event for file being deleted
+                eventBus().post( new RepositoryItemEventDeleteRoot( this, item ) );
+
+                // if we are deleting a collection, perform recursive notification about this too
+                if ( item instanceof StorageCollectionItem )
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "We are deleting a collection, starting a walker to send delete notifications per-file." );
+                    }
+
+                    // it is collection, walk it and below and fire events for all files
+                    DeletionNotifierWalker dnw = new DeletionNotifierWalker( eventBus(), request );
+
+                    DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
+
+                    ctx.getProcessors().add( dnw );
+
+                    try
+                    {
+                        getWalker().walk( ctx );
+                    }
+                    catch ( WalkerException e )
+                    {
+                        if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+                        {
+                            // everything that is not ItemNotFound should be reported,
+                            // otherwise just neglect it
+                            throw e;
+                        }
+                    }
+                }
+
+                doDeleteItem( request );
+            }
         }
         finally
         {
             uidLock.unlock();
         }
+    }
+
+    /**
+     * Decides should a {@link ItemNotFoundException} be neglected on
+     * {@link #deleteItem(boolean, org.sonatype.nexus.proxy.ResourceStoreRequest)} method invocation or not. Nexus
+     * was always throwing this exception when deletion of non existent item was tried, but since 2.4 in Maven support
+     * the Maven checksum files are not existing anymore as standalone items (in local storage), hence default
+     * implementation of this method simply returns {@code false} to retain this behaviour, but still, to make
+     * Repository implementations able to override this.
+     *
+     * @param request
+     * @param ex
+     * @return
+     * @since 2.6
+     */
+    protected boolean shouldNeglectItemNotFoundExOnDelete( ResourceStoreRequest request, ItemNotFoundException ex )
+    {
+        return false;
     }
 
     public void storeItem( boolean fromTask, StorageItem item )
