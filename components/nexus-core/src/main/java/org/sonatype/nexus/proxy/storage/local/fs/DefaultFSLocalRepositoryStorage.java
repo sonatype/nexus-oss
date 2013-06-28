@@ -21,6 +21,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -237,8 +241,7 @@ public class DefaultFSLocalRepositoryStorage
 
             DefaultStorageCollectionItem coll =
                 new DefaultStorageCollectionItem( repository, request, target.canRead(), target.canWrite() );
-            coll.setModified( target.lastModified() );
-            coll.setCreated( target.lastModified() );
+            setCreationModificationTimestamps( target, coll );
             result = coll;
 
         }
@@ -258,8 +261,7 @@ public class DefaultFSLocalRepositoryStorage
                             new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
                                 getLinkPersister().readLinkContent( linkContent ) );
                         repository.getAttributesHandler().fetchAttributes( link );
-                        link.setModified( target.lastModified() );
-                        link.setCreated( target.lastModified() );
+                        setCreationModificationTimestamps( target, link );
                         result = link;
 
                         repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), link );
@@ -282,8 +284,7 @@ public class DefaultFSLocalRepositoryStorage
                             new FileContentLocator( target, getMimeSupport().guessMimeTypeFromPath(
                                 repository.getMimeRulesSource(), target.getAbsolutePath() ) ) );
                     repository.getAttributesHandler().fetchAttributes( file );
-                    file.setModified( target.lastModified() );
-                    file.setCreated( target.lastModified() );
+                    setCreationModificationTimestamps( target, file );
                     file.setLength( target.length() );
                     result = file;
 
@@ -313,6 +314,31 @@ public class DefaultFSLocalRepositoryStorage
         }
 
         return result;
+    }
+
+    /**
+     * Sets the passed in {@link AbstractStorageItem} item's creation time and last modification time
+     * using new Java7 Files API.
+     *
+     * @param target the file to source attributes from
+     * @param item   the item onto these attributes needs to be applied
+     */
+    protected void setCreationModificationTimestamps( final File target, final AbstractStorageItem item )
+        throws LocalStorageException
+    {
+        try
+        {
+            final Path path = target.toPath();
+            BasicFileAttributes attrs = Files.readAttributes( path, BasicFileAttributes.class );
+            final FileTime creationTime = attrs.creationTime();
+            final FileTime lastModifiedTime = attrs.lastModifiedTime();
+            item.setCreated( creationTime.toMillis() );
+            item.setModified( lastModifiedTime.toMillis() );
+        }
+        catch ( IOException e )
+        {
+            throw new LocalStorageException( "Could not set creation and modification time on file " + target.getAbsoluteFile(), e );
+        }
     }
 
     public boolean isReachable( Repository repository, ResourceStoreRequest request )
