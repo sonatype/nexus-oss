@@ -167,6 +167,6 @@ public class Nexus4579OptionalTrashForSnapshotsIT
         TaskScheduleUtil.runTask( name, SnapshotRemovalTaskDescriptor.ID, repositoryProp,
                                   keepSnapshotsProp, ageProp,
                                   removeReleasedProp, deleteImmediatelyProp );
-
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 }
