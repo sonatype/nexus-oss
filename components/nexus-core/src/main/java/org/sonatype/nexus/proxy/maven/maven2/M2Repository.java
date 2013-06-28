@@ -133,6 +133,12 @@ public class M2Repository
         return M2ArtifactRecognizer.isMetadata( path );
     }
 
+    @Override
+    public boolean isMavenArtifactChecksumPath( String path )
+    {
+        return M2ArtifactRecognizer.isChecksum( path );
+    }
+
     /**
      * Should serve by policies.
      * 
