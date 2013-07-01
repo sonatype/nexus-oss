@@ -136,8 +136,25 @@ public class Nexus4579OptionalTrashForSnapshotsIT
         files = FileUtils.listFiles( groupFolder, null, true );
         assertThat( files, empty );
 
-        files = FileUtils.listFiles( trashArtifactFolder, null, true );
-        assertThat( "Files in trash folder", files, empty );
+        // IT is kinda wrong since fixed NEXUS-5773
+        // As the md rebuild is NOT invoked anymore for every file removal (that happens a LOT during snap removal)
+        // that was reading/deleting md files, trash is not touched anymore, and since trash folder is created
+        // lazily, it is not SURE that trash folder will exist (before pull nexus-oss/pull/52 it did, as MD files
+        // were deleted then purged from here). After fix it will not even be created. In future, it MIGHT be again created.
+        // but it does not change the semantic of this test. So, to make this test more reliable and/or
+        // resilient to these future changes, we broaden the "trash folder must be empty" (as direct removal
+        // happened) to assertion "trash folder might not exists (as trash was not ever used) OR if exists
+        // then it has to be empty". Needed, as FileUtils.listFiles IAEx-es when invoked with non existent
+        // folder.
+        if ( trashArtifactFolder.isDirectory() )
+        {
+            files = FileUtils.listFiles( trashArtifactFolder, null, true );
+            assertThat( "Files in trash folder", files, empty );
+        }
+        else
+        {
+            assertThat( true, is( true ) ); // see comment above IF, just here for easier spotting
+        }
     }
 
     protected void runSnapshotRemover( String name,
