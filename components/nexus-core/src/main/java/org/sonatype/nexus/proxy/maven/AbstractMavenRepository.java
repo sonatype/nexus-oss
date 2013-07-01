@@ -643,7 +643,7 @@ public abstract class AbstractMavenRepository
             }
         }
         // regenerate maven metadata for parent of this item if is a hosted maven repo and it contains maven-metadata.xml
-        if ( getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
+        if ( request.isExternal() && getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
             String parentPath = request.getRequestPath();
             parentPath = parentPath.substring( 0, parentPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );

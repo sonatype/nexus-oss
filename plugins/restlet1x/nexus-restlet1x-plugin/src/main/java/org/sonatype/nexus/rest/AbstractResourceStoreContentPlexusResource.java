@@ -316,6 +316,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         result.setRequestLocalOnly( isLocal( request, resourceStorePath ) );
         result.setRequestRemoteOnly( isRemote( request, resourceStorePath ) );
         result.setRequestAsExpired( asExpired( request, resourceStorePath ) );
+        result.setExternal( true );
 
         // honor the describe, add timing
         if ( isDescribe( request ) )

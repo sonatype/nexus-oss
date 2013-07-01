@@ -32,6 +32,10 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 public class M2RepositoryDeleteArtifactTest
     extends AbstractMavenRepoContentTests
 {
+    protected ResourceStoreRequest newExternalRequest(final String path)
+    {
+        return new ResourceStoreRequest( path ).setExternal( true );
+    }
 
     /**
      * NEXUS-2834: Verify that maven metadata is recreated after artifacts are deleted.
@@ -74,16 +78,16 @@ public class M2RepositoryDeleteArtifactTest
             doesNotContain( "<value>1.0-beta-5-20080730.002543-149</value>" )
         );
 
-        releases.deleteItem( true, new ResourceStoreRequest(
+        releases.deleteItem( true, newExternalRequest(
             "/org/sonatype/nexus/nexus-indexer/1.0-beta-4"
         ) );
-        snapshots.deleteItem( true, new ResourceStoreRequest(
+        snapshots.deleteItem( true, newExternalRequest(
             "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT"
         ) );
-        snapshots.deleteItem( true, new ResourceStoreRequest(
+        snapshots.deleteItem( true, newExternalRequest(
             "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar"
         ) );
-        snapshots.deleteItem( true, new ResourceStoreRequest(
+        snapshots.deleteItem( true, newExternalRequest(
             "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom"
         ) );
 

@@ -374,6 +374,29 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Returns {@code true} if this request is external, made by client outside of Nexus. Returns {@code false}
+     * for requests made internally, like for example made from tasks.
+     *
+     * @since 2.6
+     */
+    public boolean isExternal()
+    {
+        return getRequestContext().isRequestIsExternal();
+    }
+
+    /**
+     * Sets if this requst is external.
+     *
+     * @param external
+     * @since 2.6
+     */
+    public ResourceStoreRequest setExternal( boolean external )
+    {
+        getRequestContext().setRequestIsExternal( external );
+        return this;
+    }
+
+    /**
      * Returns the URL of the AppRoot of the incoming request.
      * 
      * @return
