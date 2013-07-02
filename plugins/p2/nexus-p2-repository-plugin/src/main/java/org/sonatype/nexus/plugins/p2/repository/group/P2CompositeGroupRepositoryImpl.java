@@ -74,9 +74,6 @@ public class P2CompositeGroupRepositoryImpl
 
     public static final String ROLE_HINT = "p2-composite";
 
-    public static final String MEMBER_REPOSITORY_ID =
-        P2CompositeGroupRepositoryImpl.class.getName() + ".memberRepositoryId";
-
     @Requirement( hint = P2ContentClass.ID )
     private ContentClass contentClass;
 
@@ -126,6 +123,46 @@ public class P2CompositeGroupRepositoryImpl
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
+    }
+
+    @Override
+    protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException, StorageException
+    {
+        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
+        final RepositoryItemUidLock lock = uid.getLock();
+        final boolean requestGroupLocalOnly = request.isRequestGroupLocalOnly();
+        try
+        {
+            lock.lock( Action.read );
+            request.setRequestGroupLocalOnly( true );
+            return super.doRetrieveItem( request );
+        }
+        finally
+        {
+            request.setRequestGroupLocalOnly( requestGroupLocalOnly );
+            lock.unlock();
+        }
+    }
+
+    @Override
+    protected Collection<StorageItem> doListItems( final ResourceStoreRequest request )
+        throws ItemNotFoundException, StorageException
+    {
+        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
+        final RepositoryItemUidLock lock = uid.getLock();
+        final boolean requestGroupLocalOnly = request.isRequestGroupLocalOnly();
+        try
+        {
+            lock.lock( Action.read );
+            request.setRequestGroupLocalOnly( true );
+            return super.doListItems( request );
+        }
+        finally
+        {
+            request.setRequestGroupLocalOnly( requestGroupLocalOnly );
+            lock.unlock();
+        }
     }
 
     @Subscribe
@@ -248,7 +285,7 @@ public class P2CompositeGroupRepositoryImpl
         {
             try
             {
-                uris[i] = new URI( memberRepositoryIds.get( i ) );
+                uris[i] = new URI( "../../repositories/" + memberRepositoryIds.get( i ) );
             }
             catch ( URISyntaxException e )
             {
@@ -256,95 +293,6 @@ public class P2CompositeGroupRepositoryImpl
             }
         }
         return uris;
-    }
-
-    @Override
-    protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
-        throws IllegalOperationException, ItemNotFoundException, StorageException
-    {
-        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
-        final RepositoryItemUidLock lock = uid.getLock();
-        try
-        {
-            lock.lock( Action.read );
-
-            if ( !request.getRequestContext().containsKey( MEMBER_REPOSITORY_ID ) )
-            {
-                String requestPath = request.getRequestPath();
-                if ( requestPath.startsWith( "/" ) )
-                {
-                    requestPath = requestPath.substring( 1 );
-                }
-                final int indexOfFirstSlash = requestPath.indexOf( '/' );
-                if ( indexOfFirstSlash > -1 )
-                {
-                    final String repositoryId = requestPath.substring( 0, indexOfFirstSlash );
-                    if ( getMemberRepositoryIds().contains( repositoryId ) )
-                    {
-                        requestPath = requestPath.substring( indexOfFirstSlash );
-                        final boolean groupMembersOnly = request.isRequestGroupMembersOnly();
-                        try
-                        {
-                            request.setRequestGroupMembersOnly( true );
-                            request.pushRequestPath( requestPath );
-                            request.getRequestContext().put( MEMBER_REPOSITORY_ID, repositoryId );
-
-                            return super.doRetrieveItem( request );
-                        }
-                        finally
-                        {
-                            request.popRequestPath();
-                            request.setRequestGroupMembersOnly( groupMembersOnly );
-                            request.getRequestContext().remove( MEMBER_REPOSITORY_ID );
-                        }
-                    }
-                }
-            }
-
-            return super.doRetrieveItem( request );
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    protected List<Repository> getRequestRepositories( final ResourceStoreRequest request )
-        throws StorageException
-    {
-        final String memberRepositoryId = (String) request.getRequestContext().get( MEMBER_REPOSITORY_ID );
-        final List<Repository> requestRepositories = super.getRequestRepositories( request );
-        if ( memberRepositoryId != null )
-        {
-            for ( final Repository repository : requestRepositories )
-            {
-                if ( memberRepositoryId.equals( repository.getId() ) )
-                {
-                    return Lists.newArrayList( repository );
-                }
-            }
-        }
-        return requestRepositories;
-    }
-
-    @Override
-    protected Collection<StorageItem> doListItems( final ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
-    {
-        final boolean requestGroupLocalOnly = request.isRequestGroupLocalOnly();
-        try
-        {
-            if ( "/".equals( request.getRequestPath() ) )
-            {
-                request.setRequestGroupLocalOnly( true );
-            }
-            return super.doListItems( request );
-        }
-        finally
-        {
-            request.setRequestGroupLocalOnly( requestGroupLocalOnly );
-        }
     }
 
 }
