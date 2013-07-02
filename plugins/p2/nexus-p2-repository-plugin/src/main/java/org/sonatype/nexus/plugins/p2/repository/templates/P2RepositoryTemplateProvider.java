@@ -48,11 +48,11 @@ public class P2RepositoryTemplateProvider
             templates.add( new P2ProxyRepositoryTemplate( this, P2_PROXY, "P2 (proxy)" ) );
             templates.add( new UpdateSiteRepositoryTemplate( this, P2_UPDATE_SITE, "P2 Update Site (proxy)" ) );
             templates.add( new P2GroupRepositoryTemplate(
-                this, P2_GROUP, "P2 (group)",
+                this, P2_GROUP, "P2 Deprecated (group)",
                 P2GroupRepository.class, P2GroupRepositoryImpl.ROLE_HINT
             ) );
             templates.add( new P2GroupRepositoryTemplate(
-                this, P2_COMPOSITE_GROUP, "P2 Composite (group)",
+                this, P2_COMPOSITE_GROUP, "P2 (group)",
                 P2CompositeGroupRepository.class, P2CompositeGroupRepositoryImpl.ROLE_HINT
             ) );
         }
