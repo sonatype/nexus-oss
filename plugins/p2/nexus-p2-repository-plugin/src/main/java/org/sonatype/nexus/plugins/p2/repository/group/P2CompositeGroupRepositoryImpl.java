@@ -46,10 +46,13 @@ import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -57,7 +60,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.p2.bridge.CompositeRepository;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -74,9 +76,6 @@ public class P2CompositeGroupRepositoryImpl
 
     public static final String ROLE_HINT = "p2-composite";
 
-    public static final String MEMBER_REPOSITORY_ID =
-        P2CompositeGroupRepositoryImpl.class.getName() + ".memberRepositoryId";
-
     @Requirement( hint = P2ContentClass.ID )
     private ContentClass contentClass;
 
@@ -88,6 +87,9 @@ public class P2CompositeGroupRepositoryImpl
 
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
+
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
 
     private RepositoryKind repositoryKind;
 
@@ -128,12 +130,52 @@ public class P2CompositeGroupRepositoryImpl
         return contentClass;
     }
 
+    @Override
+    protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException, StorageException
+    {
+        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
+        final RepositoryItemUidLock lock = uid.getLock();
+        final boolean requestGroupLocalOnly = request.isRequestGroupLocalOnly();
+        try
+        {
+            lock.lock( Action.read );
+            request.setRequestGroupLocalOnly( true );
+            return super.doRetrieveItem( request );
+        }
+        finally
+        {
+            request.setRequestGroupLocalOnly( requestGroupLocalOnly );
+            lock.unlock();
+        }
+    }
+
+    @Override
+    protected Collection<StorageItem> doListItems( final ResourceStoreRequest request )
+        throws ItemNotFoundException, StorageException
+    {
+        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
+        final RepositoryItemUidLock lock = uid.getLock();
+        final boolean requestGroupLocalOnly = request.isRequestGroupLocalOnly();
+        try
+        {
+            lock.lock( Action.read );
+            request.setRequestGroupLocalOnly( true );
+            return super.doListItems( request );
+        }
+        finally
+        {
+            request.setRequestGroupLocalOnly( requestGroupLocalOnly );
+            lock.unlock();
+        }
+    }
+
     @Subscribe
     public void onEvent( final RepositoryGroupMembersChangedEvent event )
     {
         if ( this.equals( event.getRepository() ) )
         {
-            createP2CompositeXmls( event.getNewRepositoryMemberIds(), true );
+            prepareRepository( event.getNewRepositoryMemberIds() );
         }
     }
 
@@ -142,14 +184,14 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) )
         {
-            createP2CompositeXmls( getMemberRepositoryIds(), false );
+            prepareRepository( getMemberRepositoryIds() );
         }
     }
 
     @Subscribe
     public void onEvent( final NexusStartedEvent event )
     {
-        createP2CompositeXmls( getMemberRepositoryIds(), false );
+        prepareRepository( getMemberRepositoryIds() );
     }
 
     @Subscribe
@@ -157,32 +199,33 @@ public class P2CompositeGroupRepositoryImpl
     {
         if ( this.equals( event.getRepository() ) && event.getNewLocalStatus().shouldServiceRequest() )
         {
-            createP2CompositeXmls( getMemberRepositoryIds(), true );
+            prepareRepository( getMemberRepositoryIds() );
         }
     }
 
-    private void createP2CompositeXmls( final List<String> memberRepositoryIds,
-                                        final boolean forced )
+    private void prepareRepository( final List<String> memberRepositoryIds )
     {
         if ( !getLocalStatus().shouldServiceRequest()
             || !applicationStatusSource.getSystemStatus().isNexusStarted() )
         {
             return;
         }
-        if ( !forced )
+        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
+        final RepositoryItemUidLock lock = uid.getLock();
+        try
         {
-            try
-            {
-                retrieveItem( true, new ResourceStoreRequest( COMPOSITE_ARTIFACTS_XML ) );
-                // xmls are present, so bailout
-                return;
-            }
-            catch ( Exception e )
-            {
-                // will regenerate
-            }
+            lock.lock( Action.create );
+            createMemberRepositoriesLinks( memberRepositoryIds );
+            createCompositeXmls( memberRepositoryIds );
         }
+        finally
+        {
+            lock.unlock();
+        }
+    }
 
+    private void createCompositeXmls( final List<String> memberRepositoryIds )
+    {
         try
         {
             File tempP2Repository = null;
@@ -237,6 +280,41 @@ public class P2CompositeGroupRepositoryImpl
         }
     }
 
+    private void createMemberRepositoriesLinks( final List<String> memberRepositoryIds )
+    {
+        try
+        {
+            final Collection<StorageItem> rootItems = list( false, new ResourceStoreRequest( "/", true, false ) );
+            for ( StorageItem rootItem : rootItems )
+            {
+                if ( rootItem instanceof StorageLinkItem )
+                {
+                    final RepositoryItemUid target = ( (StorageLinkItem) rootItem ).getTarget();
+                    if ( "/".equals( target.getPath() ) )
+                    {
+                        deleteItem( false, new ResourceStoreRequest( rootItem.getPath() ) );
+                    }
+                }
+            }
+            for ( String memberRepositoryId : memberRepositoryIds )
+            {
+                final Repository repository = repositoryRegistry.getRepository( memberRepositoryId );
+                final DefaultStorageLinkItem linkItem = new DefaultStorageLinkItem(
+                    this,
+                    new ResourceStoreRequest( "/" + memberRepositoryId ),
+                    true,
+                    true,
+                    repository.createUid( "/" )
+                );
+                storeItem( false, linkItem );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw Throwables.propagate( e );
+        }
+    }
+
     private URI[] toUris( final List<String> memberRepositoryIds )
     {
         if ( memberRepositoryIds == null || memberRepositoryIds.isEmpty() )
@@ -256,95 +334,6 @@ public class P2CompositeGroupRepositoryImpl
             }
         }
         return uris;
-    }
-
-    @Override
-    protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
-        throws IllegalOperationException, ItemNotFoundException, StorageException
-    {
-        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
-        final RepositoryItemUidLock lock = uid.getLock();
-        try
-        {
-            lock.lock( Action.read );
-
-            if ( !request.getRequestContext().containsKey( MEMBER_REPOSITORY_ID ) )
-            {
-                String requestPath = request.getRequestPath();
-                if ( requestPath.startsWith( "/" ) )
-                {
-                    requestPath = requestPath.substring( 1 );
-                }
-                final int indexOfFirstSlash = requestPath.indexOf( '/' );
-                if ( indexOfFirstSlash > -1 )
-                {
-                    final String repositoryId = requestPath.substring( 0, indexOfFirstSlash );
-                    if ( getMemberRepositoryIds().contains( repositoryId ) )
-                    {
-                        requestPath = requestPath.substring( indexOfFirstSlash );
-                        final boolean groupMembersOnly = request.isRequestGroupMembersOnly();
-                        try
-                        {
-                            request.setRequestGroupMembersOnly( true );
-                            request.pushRequestPath( requestPath );
-                            request.getRequestContext().put( MEMBER_REPOSITORY_ID, repositoryId );
-
-                            return super.doRetrieveItem( request );
-                        }
-                        finally
-                        {
-                            request.popRequestPath();
-                            request.setRequestGroupMembersOnly( groupMembersOnly );
-                            request.getRequestContext().remove( MEMBER_REPOSITORY_ID );
-                        }
-                    }
-                }
-            }
-
-            return super.doRetrieveItem( request );
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    protected List<Repository> getRequestRepositories( final ResourceStoreRequest request )
-        throws StorageException
-    {
-        final String memberRepositoryId = (String) request.getRequestContext().get( MEMBER_REPOSITORY_ID );
-        final List<Repository> requestRepositories = super.getRequestRepositories( request );
-        if ( memberRepositoryId != null )
-        {
-            for ( final Repository repository : requestRepositories )
-            {
-                if ( memberRepositoryId.equals( repository.getId() ) )
-                {
-                    return Lists.newArrayList( repository );
-                }
-            }
-        }
-        return requestRepositories;
-    }
-
-    @Override
-    protected Collection<StorageItem> doListItems( final ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
-    {
-        final boolean requestGroupLocalOnly = request.isRequestGroupLocalOnly();
-        try
-        {
-            if ( "/".equals( request.getRequestPath() ) )
-            {
-                request.setRequestGroupLocalOnly( true );
-            }
-            return super.doListItems( request );
-        }
-        finally
-        {
-            request.setRequestGroupLocalOnly( requestGroupLocalOnly );
-        }
     }
 
 }

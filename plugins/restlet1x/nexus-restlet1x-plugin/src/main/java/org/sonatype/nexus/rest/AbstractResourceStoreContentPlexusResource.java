@@ -455,7 +455,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                     resource.setText( child.getName() );
 
-                    resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
+                    resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom(
+                        child instanceof StorageLinkItem
+                            ? getNexus().dereferenceLinkItem( (StorageLinkItem) child ).getClass()
+                            : child.getClass()
+                    ) );
 
                     String uri = getResourceUri( req, resource, child );
                     resource.setResourceURI( uri );
