@@ -1,0 +1,3 @@
+The module is retained at Java6 language level.
+See top level parent pom for profile "java6compatible", where the changes
+are applied and activated when this file is present in module root.

@@ -361,8 +361,8 @@
             </dependency>
           </dependencies>
           <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
+            <source>1.7</source>
+            <target>1.7</target>
             <!--
             Configure support for Groovy compilation, but leave it off by default.  Modules which need this should configure the compilerId.
             -->
@@ -435,7 +435,7 @@
           <configuration>
             <signature>
               <groupId>org.codehaus.mojo.signature</groupId>
-              <artifactId>java16</artifactId>
+              <artifactId>java17</artifactId>
               <version>1.0</version>
             </signature>
           </configuration>
@@ -763,6 +763,54 @@
   </build>
 
   <profiles>
+    <!-- Allows to make certain modules Java6 level, even if project globally is Java7 -->
+    <profile>
+      <id>java6compatible</id>
+      <activation>
+        <file>
+          <exists>java6compatible.txt</exists>
+        </file>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>animal-sniffer-maven-plugin</artifactId>
+              <configuration>
+                <signature>
+                  <groupId>org.codehaus.mojo.signature</groupId>
+                  <artifactId>java16</artifactId>
+                  <version>1.1</version>
+                </signature>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>animal-sniffer-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!--
     Allows build of 'plugins' to be disabled; required for build-automation optimizations.
     -->
