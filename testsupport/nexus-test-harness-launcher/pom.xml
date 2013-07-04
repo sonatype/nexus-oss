@@ -96,13 +96,6 @@
       <artifactId>xpp3_min</artifactId>
     </dependency>
 
-    <!-- NexusRestClient uses some "illegal" Sun JDK classes, need to mark them -->
-    <dependency>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>animal-sniffer-annotations</artifactId>
-      <optional>true</optional>
-    </dependency>
-
     <!--
     FIXME: nexus-test-environment-maven-plugin insists on this entry being here.
     -->

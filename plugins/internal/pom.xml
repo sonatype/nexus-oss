@@ -32,13 +32,4 @@
     <module>nexus-groovyremote-plugin</module>
   </modules>
 
-  <dependencies>
-    <!-- RemoteControl uses some "illegal" Sun JDK classes, need to mark them -->
-    <dependency>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>animal-sniffer-annotations</artifactId>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
-
 </project>

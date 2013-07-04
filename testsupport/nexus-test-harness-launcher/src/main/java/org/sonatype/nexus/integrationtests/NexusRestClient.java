@@ -44,7 +44,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
@@ -561,18 +560,13 @@ public class NexusRestClient
         return sendMessage( request, matchers );
     }
 
-    @IgnoreJRERequirement
     public Response sendMessage( final Request request, final Matcher<Response> matchers )
         throws IOException
     {
         checkNotNull( request );
 
         // FIXME: as we use java.net.URL, this is needed to clean up the
-        // auth cache, as it's underlying URLConnection caches auth stuff!
-        // But, this class is Sun JDK "protected" class, hence we
-        // need to ignore JRE requirements here. This also means,
-        // that this class runs on Sun JRE/JDK only, which is acceptable,
-        // as this is an IT helper class only.
+        // cache, as it's underlying URLConnection caches auth stuff!
         AuthCacheValue.setAuthCache( new AuthCacheImpl() );
         // check the text context to see if this is a secure test
         if ( testContext.isSecureTest() )

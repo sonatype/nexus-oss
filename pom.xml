@@ -114,10 +114,6 @@
     <it.nexus.bundle.groupId>org.sonatype.nexus.assemblies</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-bundle-template</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
-
-    <!-- compiler plugin configuration, we are Java7 -->
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
   <modules>
@@ -365,8 +361,8 @@
             </dependency>
           </dependencies>
           <configuration>
-            <source>${maven.compiler.source}</source>
-            <target>${maven.compiler.target}</target>
+            <source>1.6</source>
+            <target>1.6</target>
             <!--
             Configure support for Groovy compilation, but leave it off by default.  Modules which need this should configure the compilerId.
             -->
@@ -439,7 +435,7 @@
           <configuration>
             <signature>
               <groupId>org.codehaus.mojo.signature</groupId>
-              <artifactId>java17</artifactId>
+              <artifactId>java16</artifactId>
               <version>1.0</version>
             </signature>
           </configuration>
@@ -618,7 +614,7 @@
                 Require Java 6+
                 -->
                 <requireJavaVersion>
-                  <version>[1.7,)</version>
+                  <version>[1.6,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
