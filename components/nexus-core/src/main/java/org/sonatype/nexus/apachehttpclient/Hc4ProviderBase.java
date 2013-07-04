@@ -239,6 +239,7 @@ public class Hc4ProviderBase
                 "http proxy setup with host '{}'", remoteProxySettings.getHttpProxySettings().getHostname()
             );
             proxies.put( "http", httpProxy );
+            proxies.put( "https", httpProxy );
 
             if ( remoteProxySettings.getHttpsProxySettings() != null
                 && remoteProxySettings.getHttpsProxySettings().isEnabled() )
