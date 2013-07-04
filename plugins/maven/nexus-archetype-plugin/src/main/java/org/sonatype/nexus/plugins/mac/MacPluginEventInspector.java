@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.mac;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
@@ -49,8 +51,7 @@ public class MacPluginEventInspector
     @Inject
     public MacPluginEventInspector( final @Named( "maven2" ) ContentClass maven2ContentClass )
     {
-        super();
-        this.maven2ContentClass = maven2ContentClass;
+        this.maven2ContentClass = checkNotNull( maven2ContentClass );
     }
 
     private boolean HANDLED( final Repository repository )
