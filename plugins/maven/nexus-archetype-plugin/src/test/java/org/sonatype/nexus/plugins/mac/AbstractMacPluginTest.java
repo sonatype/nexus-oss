@@ -24,10 +24,10 @@ import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MavenArchetypeArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 public abstract class AbstractMacPluginTest
-    extends PlexusTestCase
+    extends NexusTestSupport
 {
     public List<IndexCreator> DEFAULT_CREATORS;
 
@@ -59,18 +59,7 @@ public abstract class AbstractMacPluginTest
 
         // FileUtils.deleteDirectory( indexDir );
         nexusIndexer = lookup( NexusIndexer.class );
-        prepareNexusIndexer( nexusIndexer );
         
         macPlugin = lookup( MacPlugin.class );
     }
-
-    protected abstract void prepareNexusIndexer( NexusIndexer nexusIndexer )
-        throws Exception;
-
-    protected void unprepareNexusIndexer( NexusIndexer nexusIndexer )
-        throws Exception
-    {
-        nexusIndexer.removeIndexingContext( context, false );
-    }
-
 }

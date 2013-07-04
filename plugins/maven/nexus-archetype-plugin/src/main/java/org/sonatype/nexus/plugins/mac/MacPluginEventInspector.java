@@ -44,9 +44,14 @@ public class MacPluginEventInspector
 {
     private static final String ARCHETYPE_PATH = "/archetype-catalog.xml";
 
+    private final ContentClass maven2ContentClass;
+
     @Inject
-    @Named( "maven2" )
-    private ContentClass maven2ContentClass;
+    public MacPluginEventInspector( final @Named( "maven2" ) ContentClass maven2ContentClass )
+    {
+        super();
+        this.maven2ContentClass = maven2ContentClass;
+    }
 
     private boolean HANDLED( final Repository repository )
     {
