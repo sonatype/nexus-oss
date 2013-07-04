@@ -21,6 +21,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import groovyx.remote.server.Receiver;
 import groovyx.remote.transport.http.RemoteControlHttpHandler;
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.slf4j.LoggerFactory;
 import org.sonatype.gossip.support.DC;
 import org.sonatype.guice.bean.locators.BeanLocator;
@@ -47,6 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @EagerSingleton
+@IgnoreJRERequirement
 public class RemoteControl
     extends LifecycleSupport
 {
