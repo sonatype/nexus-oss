@@ -398,7 +398,7 @@ public abstract class AbstractGroupRepository
         checkForCyclicReference( getId(), memberIds, getId() );
 
         // check for compatibility
-        if ( !repo.getRepositoryContentClass().isCompatible( getRepositoryContentClass() ) )
+        if ( !getRepositoryContentClass().isCompatible( repo.getRepositoryContentClass() ) )
         {
             throw new InvalidGroupingException( getRepositoryContentClass(), repo.getRepositoryContentClass() );
         }
