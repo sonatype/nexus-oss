@@ -12,7 +12,17 @@
  */
 package org.sonatype.nexus.testsuite.repository;
 
+import java.io.IOException;
+import java.util.Set;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.http.HttpURI;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ConnectHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -20,6 +30,7 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.sonatype.tests.http.server.jetty.impl.ProxyServlet;
+import com.google.common.collect.Sets;
 
 /**
  * An test proxy sever which works also for HTTPS.
@@ -32,6 +43,8 @@ public class ProxyServerWithHttpsTunneling
     private int port;
 
     private Server server;
+
+    private final Set<String> proxiedHosts = Sets.newHashSet();
 
     public int getPort()
     {
@@ -56,10 +69,10 @@ public class ProxyServerWithHttpsTunneling
         final ServletContextHandler context = new ServletContextHandler(
             handlers, "/", ServletContextHandler.SESSIONS
         );
-        final ProxyServlet proxyServlet = new ProxyServlet();
+        final ProxyServlet proxyServlet = new RecordingProxyServlet();
         context.addServlet( new ServletHolder( proxyServlet ), "/*" );
 
-        handlers.addHandler( new ConnectHandler() );
+        handlers.addHandler( new RecordingConnectHandler() );
 
         setServer( proxy );
     }
@@ -84,6 +97,42 @@ public class ProxyServerWithHttpsTunneling
         throws Exception
     {
         getServer().stop();
+    }
+
+    public Set<String> getProxiedHosts()
+    {
+        return proxiedHosts;
+    }
+
+    private class RecordingConnectHandler
+        extends ConnectHandler
+    {
+
+        @Override
+        public void handle( final String target,
+                            final Request baseRequest,
+                            final HttpServletRequest request,
+                            final HttpServletResponse response )
+            throws ServletException, IOException
+        {
+            proxiedHosts.add( target );
+            super.handle( target, baseRequest, request, response );
+        }
+
+    }
+
+    private class RecordingProxyServlet
+        extends ProxyServlet
+    {
+
+        @Override
+        public void service( final ServletRequest req, final ServletResponse res )
+            throws ServletException, IOException
+        {
+            final HttpURI uri = ( (Request) req ).getUri();
+            proxiedHosts.add( uri.getHost() + ":" + uri.getPort() );
+            super.service( req, res );
+        }
     }
 
 }
