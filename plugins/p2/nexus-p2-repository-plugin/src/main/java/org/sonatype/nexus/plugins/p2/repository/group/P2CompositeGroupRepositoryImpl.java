@@ -32,9 +32,9 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.plugins.p2.repository.P2CompositeContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2CompositeGroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
-import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -74,7 +74,7 @@ public class P2CompositeGroupRepositoryImpl
 
     public static final String ROLE_HINT = "p2-composite";
 
-    @Requirement( hint = P2ContentClass.ID )
+    @Requirement( hint = P2CompositeContentClass.ID )
     private ContentClass contentClass;
 
     @Requirement
