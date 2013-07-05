@@ -23,7 +23,7 @@ public class P2CompositeContentClass
 
     public static final String ID = "p2-composite";
 
-    public static final String NAME = "P2";
+    public static final String NAME = "P2 Composite";
 
     @Override
     public String getId()
