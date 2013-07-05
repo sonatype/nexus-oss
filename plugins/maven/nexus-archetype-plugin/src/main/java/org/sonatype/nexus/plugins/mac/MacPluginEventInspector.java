@@ -12,26 +12,25 @@
  */
 package org.sonatype.nexus.plugins.mac;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.*;
 import org.sonatype.plexus.appevents.Event;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * EventInspector that listens to registry events, repo addition and removal, and simply "hooks" in the generated
@@ -47,29 +46,40 @@ public class MacPluginEventInspector
 {
     private static final String ARCHETYPE_PATH = "/archetype-catalog.xml";
 
+    private final ContentClass maven2ContentClass;
+
     @Inject
-    @Named( "maven2" )
-    private ContentClass maven2ContentClass;
+    public MacPluginEventInspector( final @Named( "maven2" ) ContentClass maven2ContentClass )
+    {
+        this.maven2ContentClass = checkNotNull( maven2ContentClass );
+    }
+
+    private boolean HANDLED( final Repository repository )
+    {
+        return maven2ContentClass.isCompatible( repository.getRepositoryContentClass() )
+                && ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class )
+                || repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) || repository.getRepositoryKind().isFacetAvailable(
+                GroupRepository.class ) );
+    }
+
 
     public boolean accepts( Event<?> evt )
     {
         if ( evt instanceof RepositoryRegistryEventAdd )
         {
-            RepositoryRegistryRepositoryEvent registryEvent = (RepositoryRegistryRepositoryEvent) evt;
-
-            Repository repository = registryEvent.getRepository();
-
-            return maven2ContentClass.isCompatible( repository.getRepositoryContentClass() )
-                && ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class )
-                    || repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) || repository.getRepositoryKind().isFacetAvailable(
-                    GroupRepository.class ) );
+            // only if is relevant to us
+            return HANDLED(((RepositoryRegistryEventAdd) evt).getRepository());
+        }
+        else if ( evt instanceof RepositoryConfigurationUpdatedEvent)
+        {
+            // only if is relevant to us
+            return HANDLED( ((RepositoryConfigurationUpdatedEvent) evt).getRepository() );
         }
         else if ( evt instanceof RepositoryEventLocalStatusChanged )
         {
-            RepositoryEventLocalStatusChanged localStatusEvent = (RepositoryEventLocalStatusChanged) evt;
-
             // only if put into service
-            return LocalStatus.IN_SERVICE.equals( localStatusEvent.getNewLocalStatus() );
+            return HANDLED( ((RepositoryEventLocalStatusChanged) evt).getRepository() )
+                    &&  LocalStatus.IN_SERVICE.equals( ((RepositoryEventLocalStatusChanged) evt).getNewLocalStatus() );
         }
         else
         {
@@ -83,15 +93,15 @@ public class MacPluginEventInspector
 
         if ( evt instanceof RepositoryRegistryEventAdd )
         {
-            RepositoryRegistryRepositoryEvent registryEvent = (RepositoryRegistryRepositoryEvent) evt;
-
-            repository = registryEvent.getRepository();
+            repository = ((RepositoryRegistryEventAdd) evt).getRepository();
+        }
+        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
+        {
+            repository = ((RepositoryConfigurationUpdatedEvent) evt).getRepository();
         }
         else if ( evt instanceof RepositoryEventLocalStatusChanged )
         {
-            RepositoryEventLocalStatusChanged localStatusEvent = (RepositoryEventLocalStatusChanged) evt;
-
-            repository = localStatusEvent.getRepository();
+            repository = ((RepositoryEventLocalStatusChanged) evt).getRepository();
         }
         else
         {
@@ -99,37 +109,56 @@ public class MacPluginEventInspector
             return;
         }
 
-        // check is it a maven2 content, and either a "hosted", "proxy" or "group" repository
-        if ( maven2ContentClass.isCompatible( repository.getRepositoryContentClass() )
-            && ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class )
-                || repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) || repository.getRepositoryKind().isFacetAvailable(
-                GroupRepository.class ) ) )
-        {
-            // new repo added or enabled, "install" the archetype catalog
+        if (repository.isIndexable()) {
+            // "install" the archetype catalog
             try
             {
-                DefaultStorageFileItem file =
-                    new DefaultStorageFileItem( repository, new ResourceStoreRequest( ARCHETYPE_PATH ), true, false,
-                        new StringContentLocator( ArchetypeContentGenerator.ID ) );
-
+                final DefaultStorageFileItem file =
+                        new DefaultStorageFileItem( repository, new ResourceStoreRequest( ARCHETYPE_PATH ), true, false,
+                                new StringContentLocator( ArchetypeContentGenerator.ID ) );
                 file.setContentGeneratorId( ArchetypeContentGenerator.ID );
-
                 repository.storeItem( false, file );
             }
             catch ( RepositoryNotAvailableException e )
             {
-                getLogger().info( "Unable to install the generated archetype catalog, repository \""
-                    + e.getRepository().getId() + "\" is out of service." );
+                getLogger().info( "Unable to install the generated archetype catalog, repository {} is out of service", e.getRepository().getId() );
             }
             catch ( Exception e )
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().info( "Unable to install the generated archetype catalog!", e );
+                    getLogger().info( "Unable to install the generated archetype catalog in repository {}:", repository, e );
                 }
                 else
                 {
-                    getLogger().info( "Unable to install the generated archetype catalog:" + e.getMessage() );
+                    getLogger().info( "Unable to install the generated archetype catalog in repository {}: {}/{}", repository, e.getClass(), e.getMessage() );
+                }
+            }
+        }
+        else
+        {
+            // "uninstall" the archetype catalog
+            try
+            {
+                repository.deleteItem( false, new ResourceStoreRequest(ARCHETYPE_PATH) );
+            }
+            catch ( RepositoryNotAvailableException e )
+            {
+                getLogger().info( "Unable to uninstall the generated archetype catalog, repository {} is out of service", e.getRepository().getId() );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // neglect this, it was not present
+            }
+            catch ( Exception e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().info( "Unable to uninstall the generated archetype catalog in repository {}:", repository, e );
+                }
+                else
+                {
+                    getLogger().info( "Unable to uninstall the generated archetype catalog in repository {}: {}/{}", repository, e.getClass(), e.getMessage() );
                 }
             }
         }

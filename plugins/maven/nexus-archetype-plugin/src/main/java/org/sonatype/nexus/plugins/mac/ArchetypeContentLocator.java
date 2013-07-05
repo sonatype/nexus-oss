@@ -110,7 +110,20 @@ public class ArchetypeContentLocator
     public InputStream getContent()
         throws IOException
     {
-        return new ByteArrayInputStream( generateCatalogPayload().getBytes( "UTF-8" ) );
+        final String payload = generateCatalogPayload();
+        if (payload != null)
+        {
+            return new ByteArrayInputStream( payload.getBytes( "UTF-8" ) );
+        }
+        else
+        {
+            // FIXME: Related to Igor's comment in #generateCatalogPayload() method above: indexer
+            // will not invoke us if context is null, hence ugly NPE would happen without this.
+            // The new IOEx will still emit HTTP 500 Server error, but is not an unexpected NPE
+            // and will mean inconsistent state: archetype-catalog.xml exists in repo root
+            // but repo itself does not have context!
+            throw new IOException("Catalog could not be generated, no IndexingContext exists!");
+        }
     }
 
     @Override

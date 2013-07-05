@@ -12,9 +12,16 @@
  */
 package org.sonatype.nexus.plugins.mac;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.search.Query;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
@@ -27,16 +34,19 @@ import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.expr.SourcedSearchExpression;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.apache.commons.lang.StringUtils;
 
-@Component( role = MacPlugin.class )
+@Singleton
+@Named
 public class DefaultMacPlugin
     implements MacPlugin
 {
-    @Requirement
-    private NexusIndexer indexer;
+    private final NexusIndexer indexer;
+
+    @Inject
+    public DefaultMacPlugin( final NexusIndexer indexer )
+    {
+        this.indexer = checkNotNull( indexer );
+    }
 
     /**
      * Lists available archatypes for given request.
