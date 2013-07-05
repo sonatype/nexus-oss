@@ -14,7 +14,6 @@ package org.sonatype.nexus.plugins.mac;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
@@ -97,33 +96,6 @@ public class ArchetypeContentGeneratorTest
         exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
         repo.configure( repoConf );
         return repo;
-    }
-
-    @Test
-    public void testWithPreparedContext()
-        throws Exception
-    {
-        final Repository repository = createRepository( "test" );
-        repositoryRegistry.addRepository( repository ); // need to be in registry to hand it over to indexerManager
-        prepareNexusIndexer( nexusIndexer, repository ); // indexerManager creates context for it
-        try
-        {
-            final ArchetypeContentGenerator archetypeContentGenerator =
-                new ArchetypeContentGenerator( lookup( MacPlugin.class ), (DefaultIndexerManager) indexerManager,
-                    mock( IndexArtifactFilter.class ), mock( RepositoryURLBuilder.class ) );
-            final StorageFileItem item = mock( StorageFileItem.class );
-            final ArchetypeContentLocator archetypeContentLocator =
-                (ArchetypeContentLocator) archetypeContentGenerator.generateContent( repository,
-                    "/archetype-catalog.xml", item );
-
-            final InputStream content = archetypeContentLocator.getContent();
-            assertThat( content, notNullValue() );
-            content.close();
-        }
-        finally
-        {
-            unprepareNexusIndexer( nexusIndexer, repository );
-        }
     }
 
     @Test
