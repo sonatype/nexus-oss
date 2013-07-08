@@ -158,14 +158,13 @@ public class KenaiRealm
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )
     {
-        // shortcut for now
-        return buildAuthorizationInfo();
-    }
-
-    private AuthorizationInfo buildAuthorizationInfo()
-    {
-        final SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        // only if authenticated with this realm too
+        if ( !principals.getRealmNames().contains( getName() ) )
+        {
+            return null;
+        }
         // add the default role
+        final SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         authorizationInfo.addRole( kenaiRealmConfiguration.getConfiguration().getDefaultRole() );
         return authorizationInfo;
     }
