@@ -40,4 +40,13 @@ public class InvalidGroupingException
     {
         super( "The group '" + id + "' has a cyclic reference! Path to the cyclic reference: '" + path + "'." );
     }
+
+    /**
+     * @since 2.6
+     */
+    public InvalidGroupingException( final String reason )
+    {
+        super( reason );
+    }
+
 }
