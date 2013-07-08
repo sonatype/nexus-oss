@@ -13,7 +13,7 @@
 package org.sonatype.nexus.testsuite.pr.nexus5026;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
 import java.io.File;
@@ -29,12 +29,11 @@ import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
 import org.sonatype.jira.test.JiraXmlRpcTestServlet;
-import org.sonatype.nexus.testsuite.proxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.testsuite.proxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
-
 import com.google.common.io.Files;
 
 public class Nexus5026GenerateProblemReportViaWebProxyIT
@@ -69,8 +68,14 @@ public class Nexus5026GenerateProblemReportViaWebProxyIT
         Assert.assertNotNull( response );
         Assert.assertNotNull( response.getData().getJiraUrl() );
 
-        assertThat( "proxy was used", server.getAccessedUris(), hasSize( 1 ) );
-        assertThat( server.getAccessedUris().get( 0 ), containsString( jettyServer.getUrl().toExternalForm() ) );
+        assertThat(
+            server.getAccessedUris(),
+            hasItem( jettyServer.getUrl().toExternalForm() + "/rpc/xmlrpc" )
+        );
+        assertThat(
+            server.getAccessedUris(),
+            hasItem( jettyServer.getUrl().toExternalForm() + "/rest/api/latest/issue/SBOX-1/attachments" )
+        );
     }
 
     private void setupMockJira()
