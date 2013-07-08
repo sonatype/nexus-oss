@@ -153,7 +153,7 @@ public class DefaultRepositoryTypeRegistry
 
         for ( ContentClass cc : contentClasses.values() )
         {
-            if ( cc.isCompatible( contentClass ) || contentClass.isCompatible( cc ) )
+            if ( contentClass.isCompatible( cc ) )
             {
                 compatibles.add( cc.getId() );
             }

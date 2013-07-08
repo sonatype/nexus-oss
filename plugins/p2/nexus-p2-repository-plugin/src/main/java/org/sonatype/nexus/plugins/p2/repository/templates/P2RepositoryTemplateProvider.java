@@ -15,7 +15,9 @@ package org.sonatype.nexus.plugins.p2.repository.templates;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.p2.repository.P2CompositeContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2CompositeGroupRepository;
+import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.group.P2CompositeGroupRepositoryImpl;
 import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryImpl;
@@ -49,11 +51,13 @@ public class P2RepositoryTemplateProvider
             templates.add( new UpdateSiteRepositoryTemplate( this, P2_UPDATE_SITE, "P2 Update Site (proxy)" ) );
             templates.add( new P2GroupRepositoryTemplate(
                 this, P2_GROUP, "P2 Deprecated (group)",
-                P2GroupRepository.class, P2GroupRepositoryImpl.ROLE_HINT
+                P2GroupRepository.class, P2GroupRepositoryImpl.ROLE_HINT,
+                new P2ContentClass()
             ) );
             templates.add( new P2GroupRepositoryTemplate(
                 this, P2_COMPOSITE_GROUP, "P2 (group)",
-                P2CompositeGroupRepository.class, P2CompositeGroupRepositoryImpl.ROLE_HINT
+                P2CompositeGroupRepository.class, P2CompositeGroupRepositoryImpl.ROLE_HINT,
+                new P2CompositeContentClass()
             ) );
         }
         catch ( final Exception e )

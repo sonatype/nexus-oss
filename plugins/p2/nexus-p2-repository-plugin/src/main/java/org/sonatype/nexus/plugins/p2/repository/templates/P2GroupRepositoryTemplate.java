@@ -19,9 +19,9 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryConfiguration;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
@@ -36,9 +36,10 @@ public class P2GroupRepositoryTemplate
                                       final String id,
                                       final String description,
                                       final Class<? extends P2GroupRepository> mainFacet,
-                                      final String providerHint )
+                                      final String providerHint,
+                                      final ContentClass contentClass )
     {
-        super( provider, id, description, new P2ContentClass(), mainFacet );
+        super( provider, id, description, contentClass, mainFacet );
         this.providerHint = checkNotNull( providerHint );
     }
 

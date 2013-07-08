@@ -217,7 +217,7 @@ NX.define('Sonatype.repoServer.RepositoryGroupEditor', {
         loadRepositories : function(arr, srcObject, fpanel) {
           var i, repoBox = fpanel.find('name', 'repositories')[0];
           this.repoStore.filterBy(function(rec, id) {
-            var compatibleClasses, contentClass = this.contentClassStore.getById(rec.data.format);
+            var compatibleClasses, contentClass = this.contentClassStore.getById(srcObject.format);
 
             // if we have the content class
             // and the content class is compatible with the repo type
@@ -225,7 +225,7 @@ NX.define('Sonatype.repoServer.RepositoryGroupEditor', {
               compatibleClasses = contentClass.get('compatibleTypes');
 
               for (i = 0; i < compatibleClasses.length; i += 1) {
-                if (compatibleClasses[i] === srcObject.format) {
+                if (compatibleClasses[i] === rec.data.format) {
                   return true;
                 }
               }
