@@ -268,8 +268,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
                                                Status.CLIENT_ERROR_BAD_REQUEST,
                                                "Invalid grouping requested, GroupId=" + model.getId(),
                                                e,
-                                               getNexusErrorResponse( "repositories",
-                                                                      "Repository referenced by Repository Group does not share same content type!" ) );
+                                               getNexusErrorResponse( "repositories", e.getMessage() ) );
         }
         catch ( IOException e )
         {
