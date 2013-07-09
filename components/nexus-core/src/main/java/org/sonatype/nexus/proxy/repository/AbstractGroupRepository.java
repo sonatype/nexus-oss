@@ -398,10 +398,7 @@ public abstract class AbstractGroupRepository
         checkForCyclicReference( getId(), memberIds, getId() );
 
         // check for compatibility
-        if ( !repo.getRepositoryContentClass().isCompatible( getRepositoryContentClass() ) )
-        {
-            throw new InvalidGroupingException( getRepositoryContentClass(), repo.getRepositoryContentClass() );
-        }
+        validateMemberRepository( repo );
 
         // if we are here, all is well
         getExternalConfiguration( true ).addMemberRepositoryId( repo.getId() );
@@ -460,6 +457,23 @@ public abstract class AbstractGroupRepository
         }
 
         return result;
+    }
+
+    /**
+     * Validates if a repository can be added as member of group. By default will only check that content class of group
+     * repository is compatible will content class of member repository.
+     *
+     * @param repository to be added
+     * @throws InvalidGroupingException If passed in repository cannot be added as member
+     * @since 2.6
+     */
+    protected void validateMemberRepository( final Repository repository )
+        throws InvalidGroupingException
+    {
+        if ( !getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() ) )
+        {
+            throw new InvalidGroupingException( getRepositoryContentClass(), repository.getRepositoryContentClass() );
+        }
     }
 
     protected List<Repository> getRequestRepositories( ResourceStoreRequest request )
