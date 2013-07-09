@@ -107,9 +107,15 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
             }
             catch ( UserNotFoundException e )
             {
-                this.getLogger().warn( "Failed to lookup user: " + username, e );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().info( "Failed to lookup user: {}", username, e );
+                }
+                else
+                {
+                    getLogger().info( "Failed to lookup user: {}: {}/{}", username, e.getClass().getName(), e.getMessage() );
+                }
             }
-
         }
 
         Map<String, Integer> privilegeMap = new HashMap<String, Integer>();

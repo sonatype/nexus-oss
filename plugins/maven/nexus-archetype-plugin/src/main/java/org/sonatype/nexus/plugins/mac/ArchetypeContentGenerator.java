@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.mac;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -42,17 +44,23 @@ public class ArchetypeContentGenerator
 {
     public static final String ID = "ArchetypeContentGenerator";
 
-    @Inject
-    private MacPlugin macPlugin;
+    private final MacPlugin macPlugin;
+
+    private final DefaultIndexerManager indexerManager;
+
+    private final IndexArtifactFilter indexArtifactFilter;
+
+    private final RepositoryURLBuilder repositoryURLBuilder;
 
     @Inject
-    private DefaultIndexerManager indexerManager;
-
-    @Inject
-    private IndexArtifactFilter indexArtifactFilter;
-
-    @Inject
-    private RepositoryURLBuilder repositoryURLBuilder;
+    public ArchetypeContentGenerator( final MacPlugin macPlugin, final DefaultIndexerManager indexerManager,
+                                      final IndexArtifactFilter indexArtifactFilter, final RepositoryURLBuilder repositoryURLBuilder )
+    {
+        this.macPlugin = checkNotNull( macPlugin );
+        this.indexerManager = checkNotNull( indexerManager );
+        this.indexArtifactFilter = checkNotNull( indexArtifactFilter );
+        this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
+    }
 
     @Override
     public String getGeneratorId()

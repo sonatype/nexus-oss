@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.repository;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
@@ -24,6 +25,7 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import javax.inject.Inject;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +44,7 @@ import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
 /**
- * ITs related to which proxy is used (global or repository level defined ones), depending on url scheme (http / https).
+ * ITs related to which proxy is used depending on url scheme (http / https).
  *
  * @since 2.6
  */
@@ -84,6 +86,7 @@ public class HttpAndHttpsProxyIT
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
         return super.configureNexus( configuration )
+            .setLogLevel( "org.sonatype.nexus.apachehttpclient.NexusHttpRoutePlanner", "TRACE" )
             .setSystemProperty( "javax.net.ssl.trustStore", testData().resolveFile( "trustStore" ).getAbsolutePath() )
             .setSystemProperty( "javax.net.ssl.trustStorePassword", "changeit" );
     }
@@ -140,7 +143,6 @@ public class HttpAndHttpsProxyIT
      * Given:
      * - no global HTTP proxy
      * - no global HTTPS proxy
-     * - no repo proxy
      * <p/>
      * Verify that no proxy is used for an HTTP url.
      */
@@ -158,7 +160,6 @@ public class HttpAndHttpsProxyIT
      * Given:
      * - no global HTTP proxy
      * - no global HTTPS proxy
-     * - no repo proxy
      * <p/>
      * Verify that no proxy is used for an HTTPS url.
      */
@@ -176,7 +177,6 @@ public class HttpAndHttpsProxyIT
      * Given:
      * - global HTTP proxy
      * - no global HTTPS proxy
-     * - no repo proxy
      * <p/>
      * Verify that global HTTP proxy is used for an HTTP url.
      */
@@ -189,13 +189,13 @@ public class HttpAndHttpsProxyIT
         disableGlobalHttpsProxy();
         final MavenProxyRepository repository = createMavenProxyRepository( httpRemoteServer );
         downloadArtifact( repository.id() );
+        assertRemoteServerAccessViaProxy( httpRemoteServer, globalHttpProxy );
     }
 
     /**
      * Given:
      * - global HTTP proxy
      * - no global HTTPS proxy
-     * - no repo proxy
      * <p/>
      * Verify that global HTTP proxy is used for an HTTPS url.
      */
@@ -208,13 +208,13 @@ public class HttpAndHttpsProxyIT
         disableGlobalHttpsProxy();
         final MavenProxyRepository repository = createMavenProxyRepository( httpsRemoteServer );
         downloadArtifact( repository.id() );
+        assertRemoteServerAccessViaProxy( httpsRemoteServer, globalHttpProxy );
     }
 
     /**
      * Given:
      * - global HTTP proxy
      * - global HTTPS proxy
-     * - no repo proxy
      * <p/>
      * Verify that global HTTP proxy is used for an HTTP url.
      */
@@ -227,13 +227,13 @@ public class HttpAndHttpsProxyIT
         enableGlobalHttpsProxy();
         final MavenProxyRepository repository = createMavenProxyRepository( httpRemoteServer );
         downloadArtifact( repository.id() );
+        assertRemoteServerAccessViaProxy( httpRemoteServer, globalHttpProxy );
     }
 
     /**
      * Given:
      * - global HTTP proxy
      * - global HTTPS proxy
-     * - no repo proxy
      * <p/>
      * Verify that global HTTPS proxy is used for an HTTPS url.
      */
@@ -246,6 +246,7 @@ public class HttpAndHttpsProxyIT
         enableGlobalHttpsProxy();
         final MavenProxyRepository repository = createMavenProxyRepository( httpsRemoteServer );
         downloadArtifact( repository.id() );
+        assertRemoteServerAccessViaProxy( httpsRemoteServer, globalHttpsProxy );
     }
 
     private void enableGlobalHttpProxy()
@@ -299,7 +300,15 @@ public class HttpAndHttpsProxyIT
         return repositories()
             .create( MavenProxyRepository.class, repositoryIdForTest() )
             .asProxyOf( remoteServer.getUrl().toExternalForm() )
+            .doNotDownloadRemoteIndexes()
+            .doNotAutoBlock()
             .save();
+    }
+
+    private void assertRemoteServerAccessViaProxy( final Server remoteServer,
+                                                   final ProxyServerWithHttpsTunneling proxy )
+    {
+        MatcherAssert.assertThat( proxy.getProxiedHosts(), hasItem( "localhost:" + remoteServer.getPort() ) );
     }
 
     public ServerConfiguration config()
