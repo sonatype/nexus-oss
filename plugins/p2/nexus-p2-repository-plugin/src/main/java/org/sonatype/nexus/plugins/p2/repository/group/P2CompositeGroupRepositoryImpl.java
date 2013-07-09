@@ -114,7 +114,7 @@ public class P2CompositeGroupRepositoryImpl
         {
             repositoryKind =
                 new DefaultRepositoryKind( GroupRepository.class,
-                                           Arrays.asList( new Class<?>[]{ P2GroupRepository.class } ) );
+                                           Arrays.asList( new Class<?>[]{ P2CompositeGroupRepository.class } ) );
         }
         return repositoryKind;
     }
