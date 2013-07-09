@@ -29,7 +29,7 @@ import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
-import org.sonatype.nexus.timeline.tasks.PurgeTimelineTask;
+import org.sonatype.nexus.timeline.tasks.PurgeTimeline;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -151,7 +151,7 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Rebuilding attributes" );
             }
-            else if ( PurgeTimelineTask.ACTION.equals( item.getAction() ) )
+            else if ( PurgeTimeline.ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Timeline purge" );
             }

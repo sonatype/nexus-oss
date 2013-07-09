@@ -28,7 +28,7 @@ import org.sonatype.nexus.timeline.NexusTimeline;
  * Purge timeline.
  */
 @Named( PurgeTimelineTaskDescriptor.ID )
-public class PurgeTimelineTask
+public class PurgeTimeline
     extends AbstractNexusTask<Object>
 {
     /**
@@ -43,7 +43,7 @@ public class PurgeTimelineTask
     private final NexusTimeline timeline;
 
     @Inject
-    public PurgeTimelineTask( final NexusTimeline timeline )
+    public PurgeTimeline( final NexusTimeline timeline )
     {
         this.timeline = checkNotNull( timeline );
     }
