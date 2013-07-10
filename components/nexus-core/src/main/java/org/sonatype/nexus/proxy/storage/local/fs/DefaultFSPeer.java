@@ -420,7 +420,7 @@ public class DefaultFSPeer
             if ( !target.isDirectory() )
             {
                 throw new LocalStorageException( String.format(
-                    "Could not create the directory hiearchy in repository %s to write \"%s\"",
+                    "Could not create the directory hierarchy in repository %s to write \"%s\"",
                     RepositoryStringUtils.getHumanizedNameString( repository ), target.getAbsolutePath() ) );
             }
         }
