@@ -115,9 +115,9 @@
     <it.nexus.bundle.artifactId>nexus-bundle-template</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
-    <!-- 
-      compiler plugin configuration, we are Java7 
-      but some child modules will override these properties to remain on Java6 
+    <!--
+      compiler plugin configuration, we are Java7
+      but some child modules will override these properties to remain on Java6
     -->
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
@@ -368,7 +368,7 @@
             </dependency>
           </dependencies>
           <configuration>
-            <!-- 
+            <!--
               While these properties are the "default" compiler plugin ones,
               we have them here explicitly for easier readability, as some
               modules will override these properties to retain Java6 compatibility.
@@ -623,7 +623,7 @@
                 </requireMavenVersion>
 
                 <!--
-                Require Java 6+
+                Require Java 7+
                 -->
                 <requireJavaVersion>
                   <version>[1.7,)</version>
