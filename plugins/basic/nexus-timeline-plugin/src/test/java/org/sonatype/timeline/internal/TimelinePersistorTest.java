@@ -12,12 +12,17 @@
  */
 package org.sonatype.timeline.internal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.timeline.AbstractTimelineTestCase;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
@@ -213,5 +218,37 @@ public class TimelinePersistorTest
         TimelineRecord record = new TimelineRecord( System.currentTimeMillis(), "type", "subType", null );
 
         persistor.persist( record );
+    }
+
+    public void testCollectFiles()
+        throws Exception
+    {
+        // Warning: use of negative rolling interval results to have each record in separate file (depends on file
+        // naming "resolution" too)!
+        // Good for testing but not for production!
+        persistor.setConfiguration( new TimelineConfiguration( persistDirectory, persistDirectory, -1, 30 ) );
+        persistor.persist( createTimelineRecord() );
+        Thread.sleep( 1000 );
+        persistor.persist( createTimelineRecord() );
+        Thread.sleep( 1000 );
+        persistor.persist( createTimelineRecord() );
+        Thread.sleep( 1000 );
+        persistor.persist( createTimelineRecord() );
+        Thread.sleep( 1000 );
+        persistor.persist( createTimelineRecord() );
+
+        final List<File> files = Arrays.asList( persistDirectory.listFiles() );
+        assertThat( files, hasSize( 5 ) );
+
+        {
+            // "newest" is here (0 day old and newer)
+            final List<File> collectedFiles = persistor.collectFiles( 0, true );
+            assertThat( collectedFiles, hasSize( 1 ) );
+        }
+        {
+            // all except "newest" is here (0 day and older, but they are all same day old)
+            final List<File> collectedFiles = persistor.collectFiles( 0, false );
+            assertThat( collectedFiles, hasSize( 4 ) );
+        }
     }
 }

@@ -25,24 +25,29 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.joda.time.Days;
+import org.joda.time.Interval;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 import org.sonatype.timeline.proto.TimeLineRecordProtos;
+
 import com.google.common.annotations.VisibleForTesting;
 
 /**
  * The class doing persitence of timeline records using Protobuf.
- *
+ * 
  * @author juven
  * @author cstamas
  */
@@ -56,9 +61,9 @@ public class DefaultTimelinePersistor
 
     private static final String V3_DATA_FILE_NAME_DATE_FORMAT = "yyyy-MM-dd.HH-mm-ssZ";
 
-    private static final Pattern V3_DATA_FILE_NAME_PATTERN = Pattern.compile( "^" + V3_DATA_FILE_NAME_PREFIX.replace(
-        ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})" + V3_DATA_FILE_NAME_SUFFIX.replace(
-        ".", "\\." ) + "$" );
+    private static final Pattern V3_DATA_FILE_NAME_PATTERN = Pattern.compile( "^"
+        + V3_DATA_FILE_NAME_PREFIX.replace( ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})"
+        + V3_DATA_FILE_NAME_SUFFIX.replace( ".", "\\." ) + "$" );
 
     // ==
 
@@ -74,9 +79,9 @@ public class DefaultTimelinePersistor
     // Public API
 
     /**
-     * Protected by DefaultTimeline, as is called from start(), that is exclusive access, so no other
-     * call might fall in.
-     *
+     * Protected by DefaultTimeline, as is called from start(), that is exclusive access, so no other call might fall
+     * in.
+     * 
      * @param configuration
      */
     protected synchronized void setConfiguration( final TimelineConfiguration configuration )
@@ -91,7 +96,7 @@ public class DefaultTimelinePersistor
 
     /**
      * Persistor writes to file, so we must ensure write request are coming in one by one.
-     *
+     * 
      * @param records
      * @throws IOException
      */
@@ -116,8 +121,9 @@ public class DefaultTimelinePersistor
     }
 
     /**
-     * Only one method setting AND reading lastRolledTimestamp and lastRolledFile, called only from #persist that is already synced.
-     *
+     * Only one method setting AND reading lastRolledTimestamp and lastRolledFile, called only from #persist that is
+     * already synced.
+     * 
      * @return
      * @throws IOException
      */
@@ -142,15 +148,45 @@ public class DefaultTimelinePersistor
     }
 
     /**
-     * This method is called only from timeline's repair method, that gains exclusive access to indexer, but also
-     * it's own state (wrt start/stop), meaning the configuration, hence the single field will no be modified.
-     *
+     * This method is called only from timeline's repair method, that gains exclusive access to indexer, but also it's
+     * own state (wrt start/stop), meaning the configuration, hence the single field will no be modified.
+     * 
      * @param days
      * @param callback
      * @throws IOException
      */
     protected void readAllSinceDays( final int days, final TimelineCallback callback )
         throws IOException
+    {
+        final List<File> result = collectFiles( days, true );
+        int filePtr = 0;
+        Iterator<TimelineRecord> currentIterator = null;
+        while ( true )
+        {
+            if ( currentIterator != null && currentIterator.hasNext() )
+            {
+                if ( !callback.processNext( currentIterator.next() ) )
+                {
+                    break;
+                }
+            }
+            else if ( filePtr >= result.size() )
+            {
+                // no more
+                break;
+            }
+            else
+            {
+                final File file = result.get( filePtr );
+                // jump to next file
+                currentIterator = readFile( file );
+                filePtr++;
+                continue;
+            }
+        }
+    }
+
+    protected List<File> collectFiles( final int days, final boolean youngerThan )
     {
         // read data files
         final File[] files = persistDirectory.listFiles( new FilenameFilter()
@@ -164,7 +200,7 @@ public class DefaultTimelinePersistor
         // do we have any?
         if ( files == null || files.length == 0 )
         {
-            return;
+            return Collections.emptyList();
         }
 
         // sort it, youngest goes 1st
@@ -200,52 +236,40 @@ public class DefaultTimelinePersistor
                 : ( getTimestampedFileNameTimestamp( files[0] ) - ( days * 24L * 60L * 60L * 1000L ) );
 
         // "cut"/filter the files
-        ArrayList<File> result = new ArrayList<File>();
+        final ArrayList<File> result = new ArrayList<File>();
 
         for ( File file : files )
         {
-            if ( oldestFileTimestampThreshold <= getTimestampedFileNameTimestamp( file ) )
+            if ( youngerThan )
             {
-                result.add( file );
-            }
-            else
-            {
-                // we have sorted array, so we can bail out, we know that older files will come only
-                break;
-            }
-        }
-
-        int filePtr = 0;
-        Iterator<TimelineRecord> currentIterator = null;
-        while ( true )
-        {
-            if ( currentIterator != null && currentIterator.hasNext() )
-            {
-                if ( !callback.processNext( currentIterator.next() ) )
+                // we collect files between "now" and "now+days"
+                if ( oldestFileTimestampThreshold <= getTimestampedFileNameTimestamp( file ) )
                 {
+                    result.add( file );
+                }
+                else
+                {
+                    // we have sorted array, so we can bail out, we know that older files will come only
                     break;
                 }
             }
-            else if ( filePtr >= result.size() )
-            {
-                // no more
-                break;
-            }
             else
             {
-                final File file = result.get( filePtr );
-                // jump to next file
-                currentIterator = readFile( file );
-                filePtr++;
-                continue;
+                // we collect files between "now+days" and "last file"
+                if ( oldestFileTimestampThreshold > getTimestampedFileNameTimestamp( file ) )
+                {
+                    result.add( file );
+                }
             }
         }
+
+        return result;
     }
 
     /**
      * Reads a whole file into memory, and in case of any problem, it returns an empty collection, making this file to
      * be skipped.
-     *
+     * 
      * @param file
      * @return
      */
@@ -290,14 +314,29 @@ public class DefaultTimelinePersistor
         return new TimelineRecord( rec.getTimestamp(), rec.getType(), rec.getSubType(), dataMap );
     }
 
+    protected int purge( final long fromTime, final long toTime )
+        throws IOException
+    {
+        final List<File> purgedFiles = collectFiles( Days.daysIn( new Interval( fromTime, toTime ) ).getDays(), false );
+        // start with oldest and go to newest
+        Collections.reverse( purgedFiles );
+        for ( File file : purgedFiles )
+        {
+            if ( !file.delete() )
+            {
+                // FIXME: nag?
+            }
+        }
+        return purgedFiles.size();
+    }
+
     // ==
 
     protected String buildTimestampedFileName()
     {
         final SimpleDateFormat dateFormat = new SimpleDateFormat( V3_DATA_FILE_NAME_DATE_FORMAT );
         final StringBuilder fileName = new StringBuilder();
-        fileName.append( V3_DATA_FILE_NAME_PREFIX ).append(
-            dateFormat.format( new Date( System.currentTimeMillis() ) ) ).append(
+        fileName.append( V3_DATA_FILE_NAME_PREFIX ).append( dateFormat.format( new Date( System.currentTimeMillis() ) ) ).append(
             V3_DATA_FILE_NAME_SUFFIX );
         return fileName.toString();
     }
