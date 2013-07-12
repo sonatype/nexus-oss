@@ -15,16 +15,12 @@ package org.sonatype.security.configuration.source;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.source.AbstractStreamConfigurationSource;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
 /**
  * Abstract class that encapsulates Modello model.
@@ -108,34 +104,6 @@ public abstract class AbstractSecurityConfigurationSource
         if ( getConfiguration() != null )
         {
             getLogger().debug( "Configuration loaded successfully." );
-        }
-    }
-
-    /**
-     * Save configuration.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    protected void saveConfiguration( OutputStream os, SecurityConfiguration configuration )
-        throws IOException
-    {
-        Writer fw = null;
-        try
-        {
-            fw = new OutputStreamWriter( os );
-
-            SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
-
-            writer.write( fw, configuration );
-        }
-        finally
-        {
-            if ( fw != null )
-            {
-                fw.flush();
-
-                fw.close();
-            }
         }
     }
 }

@@ -12,14 +12,14 @@
  */
 package org.sonatype.security.model.source;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
@@ -27,10 +27,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
+import org.sonatype.sisu.goodies.common.io.FileReplacer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 /**
  * The default configuration source powered by Modello. It will try to load configuration, upgrade if needed and
@@ -221,49 +223,42 @@ public class FileModelConfigurationSource
      * @param file the file
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private void saveConfiguration( File file )
+    private void saveConfiguration( final File file )
         throws IOException
     {
-        OutputStream output = null;
-
-        File backupFile = new File( file.getParentFile(), file.getName() + ".old" );
-
-        try
+        // Create the dir if doesn't exist, throw runtime exception on failure
+        // bad bad bad
+        if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
         {
-            // Create the dir if doesn't exist, throw runtime exception on failure
-            // bad bad bad
-            if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
-            {
-                String message =
-                    "\r\n******************************************************************************\r\n"
-                        + "* Could not create configuration file [ " + file.toString() + "]!!!! *\r\n"
-                        + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
-                        + "******************************************************************************";
+            String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not create configuration file [ "
+                    + file.toString()
+                    + "]!!!! *\r\n"
+                    + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
 
-                getLogger().error( message );
-            }
-
-            // copy the current security config file as file.bak
-            if ( file.exists() )
-            {
-                FileUtils.copyFile( file, backupFile );
-            }
-
-            output = new BufferedOutputStream( new FileOutputStream( file ) );
-
-            getLogger().info( "Saving security configuration to: " + file.getAbsolutePath() );
-
-            saveConfiguration( output, getConfiguration() );
-
-            output.flush();
-        }
-        finally
-        {
-            IOUtil.close( output );
+            getLogger().error( message );
+            throw new IOException( "Could not create configuration file " + file.getAbsolutePath() );
         }
 
-        // if all went well, delete the bak file
-        backupFile.delete();
+        final Configuration configuration = getConfiguration();
+        checkNotNull( configuration, "Missing security configuration" );
+
+        // perform the "safe save"
+        getLogger().debug( "Saving configuration: {}", file );
+        final FileReplacer fileReplacer = new FileReplacer( file );
+        fileReplacer.setDeleteBackupFile( true );
+
+        fileReplacer.replace( new ContentWriter()
+        {
+            @Override
+            public void write( final BufferedOutputStream output )
+                throws IOException
+            {
+                new SecurityConfigurationXpp3Writer().write( output, configuration );
+            }
+        } );
     }
 
     /**
