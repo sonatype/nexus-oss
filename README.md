@@ -21,7 +21,7 @@ Sonatype Nexus - Open Source Edition
 ### Requirements
 
 * Apache Maven 3.0.4+
-* Java 6+
+* Java 7+
 * Groovy 1.7+ (for advanced usage only)
 
 ## Running

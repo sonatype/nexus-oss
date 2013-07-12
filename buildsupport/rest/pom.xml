@@ -29,7 +29,7 @@
 
   <properties>
     <jackson.version>1.9.12</jackson.version>
-    <siesta.version>1.5-SNAPSHOT</siesta.version>
+    <siesta.version>1.5</siesta.version>
   </properties>
 
   <dependencyManagement>
