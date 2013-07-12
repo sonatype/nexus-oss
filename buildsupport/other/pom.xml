@@ -29,7 +29,6 @@
 
   <properties>
     <jackson.version>1.9.10</jackson.version>
-    <siesta.version>1.4.1</siesta.version>
   </properties>
 
   <dependencyManagement>
