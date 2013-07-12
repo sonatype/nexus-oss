@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.log.internal;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
@@ -39,7 +38,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.LimitedInputStream;
@@ -50,6 +48,8 @@ import org.sonatype.nexus.log.DefaultLogManagerMBean;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.sisu.goodies.common.io.FileReplacer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -60,6 +60,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
 
+import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
 
 //TODO configuration operations should be locking
@@ -334,21 +335,23 @@ public class LogbackLogManager
         }
     }
 
-    private void saveConfigurationProperties( Properties properties )
+    private void saveConfigurationProperties( final Properties properties )
         throws FileNotFoundException, IOException
     {
-        String logConfigDir = getLogConfigDir();
-        File logConfigPropsFile = new File( logConfigDir, LOG_CONF_PROPS );
-        OutputStream out = null;
-        try
+        final File configurationFile = new File( getLogConfigDir(), LOG_CONF_PROPS );
+        logger.debug( "Saving configuration: {}", configurationFile );
+        final FileReplacer fileReplacer = new FileReplacer( configurationFile );
+        // we save this file many times, don't litter backups
+        fileReplacer.setDeleteBackupFile( true );
+        fileReplacer.replace( new ContentWriter()
         {
-            out = new FileOutputStream( logConfigPropsFile );
-            properties.store( out, "Saved by Nexus" );
-        }
-        finally
-        {
-            IOUtil.close( out );
-        }
+            @Override
+            public void write( final BufferedOutputStream output )
+                throws IOException
+            {
+                properties.store( output, "Saved by Nexus" );
+            }
+        } );
     }
 
     private String getLogConfigDir()
@@ -387,63 +390,77 @@ public class LogbackLogManager
 
         if ( logConfigurationParticipants != null )
         {
-            for ( LogConfigurationParticipant participant : logConfigurationParticipants )
+            for ( final LogConfigurationParticipant participant : logConfigurationParticipants )
             {
-                String name = participant.getName();
-                File logConfigFile = new File( logConfigDir, name );
+                final String name = participant.getName();
+                final File logConfigFile = new File( logConfigDir, name );
                 if ( participant instanceof LogConfigurationParticipant.NonEditable || !logConfigFile.exists() )
                 {
-                    InputStream in = null;
                     try
                     {
-                        in = participant.getConfiguration();
-
-                        FileUtils.copyStreamToFile( new RawInputStreamFacade( in ), logConfigFile );
+                        final FileReplacer fileReplacer = new FileReplacer( logConfigFile );
+                        // we save this file many times, don't litter backups
+                        fileReplacer.setDeleteBackupFile( true );
+                        fileReplacer.replace( new ContentWriter()
+                        {
+                            @Override
+                            public void write( final BufferedOutputStream output )
+                                throws IOException
+                            {
+                                try (final InputStream in = participant.getConfiguration())
+                                {
+                                    ByteStreams.copy( in, output );
+                                }
+                            }
+                        } );
                     }
                     catch ( IOException e )
                     {
                         throw new IllegalStateException( String.format( "Could not create %s as %s", name,
                             logConfigFile.getAbsolutePath() ), e );
                     }
-                    finally
-                    {
-                        IOUtil.close( in );
-                    }
                 }
             }
         }
-        File logConfigFile = new File( logConfigDir, LOG_CONF );
-        PrintWriter out = null;
+        final File logConfigFile = new File( logConfigDir, LOG_CONF );
         try
         {
-            out = new PrintWriter( logConfigFile );
-
-            out.println( "<?xml version='1.0' encoding='UTF-8'?>" );
-            out.println();
-            out.println( "<!--" );
-            out.println( "    DO NOT EDIT - This file aggregates log configuration from Nexus and its plugins, and is automatically generated." );
-            out.println( "-->" );
-            out.println();
-            out.println( "<configuration scan='true'>" );
-            out.println( "  <property file='${nexus.log-config-dir}/logback.properties'/>" );
-            if ( logConfigurationParticipants != null )
+            final FileReplacer fileReplacer = new FileReplacer( logConfigFile );
+            // we save this file many times, don't litter backups
+            fileReplacer.setDeleteBackupFile( true );
+            fileReplacer.replace( new ContentWriter()
             {
-                for ( LogConfigurationParticipant participant : logConfigurationParticipants )
+                @Override
+                public void write( final BufferedOutputStream output )
+                    throws IOException
                 {
-                    out.println( String.format( "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName() ) );
+                    try (final PrintWriter out = new PrintWriter( output ))
+                    {
+                        out.println( "<?xml version='1.0' encoding='UTF-8'?>" );
+                        out.println();
+                        out.println( "<!--" );
+                        out.println( "    DO NOT EDIT - This file aggregates log configuration from Nexus and its plugins, and is automatically generated." );
+                        out.println( "-->" );
+                        out.println();
+                        out.println( "<configuration scan='true'>" );
+                        out.println( "  <property file='${nexus.log-config-dir}/logback.properties'/>" );
+                        if ( logConfigurationParticipants != null )
+                        {
+                            for ( LogConfigurationParticipant participant : logConfigurationParticipants )
+                            {
+                                out.println( String.format( "  <include file='${nexus.log-config-dir}/%s'/>",
+                                    participant.getName() ) );
+                            }
+                        }
+                        out.write( "</configuration>" );
+                    }
                 }
-            }
-            out.write( "</configuration>" );
+            } );
         }
         catch ( IOException e )
         {
             throw new IllegalStateException( "Could not create logback.xml as " + logConfigFile.getAbsolutePath() );
         }
-        finally
-        {
-            IOUtil.close( out );
-        }
-
     }
 
     private void reconfigure()
