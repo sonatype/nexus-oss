@@ -383,7 +383,7 @@
                   <artifactId>nexus-p2-repository-plugin</artifactId>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <version>2.6.0-SNAPSHOT</version>
+                  <version>${nexus.version}</version>
                 </plugin>
               </nexusPluginsArtifacts>
             </configuration>

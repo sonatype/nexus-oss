@@ -164,14 +164,14 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet-bridge</artifactId>
-      <version>2.6.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!-- Model code used by clients -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
-      <version>2.6.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!--
@@ -181,7 +181,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>2.6.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
     </dependency>
   </dependencies>
 

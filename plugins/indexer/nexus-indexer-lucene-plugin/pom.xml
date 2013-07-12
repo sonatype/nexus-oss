@@ -86,13 +86,13 @@
 
     <!--
     FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal
-    HACK: Using 2.6.0-SNAPSHOT here since we do not want to expose this crap in DM and proliferate usage.
+    HACK: Using ${nexus.version} here since we do not want to expose this crap in DM and proliferate usage.
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <classifier>tests</classifier>
-      <version>2.6.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -89,7 +89,12 @@
   </prerequisites>
 
   <properties>
-    
+    <!--
+    Define nexus versions.  The 'nexus.version' property always refers to the version of the current project.
+    These values must always be constants; 'nexus.version' will get update automatically by set-version.
+    -->
+    <nexus.version>2.6.0-SNAPSHOT</nexus.version>
+
     <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
     <nexus.configuration.version>2.5.0</nexus.configuration.version>
 
@@ -108,7 +113,7 @@
     <!-- nexus integration-testing bundle configuration -->
     <it.nexus.bundle.groupId>org.sonatype.nexus.assemblies</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-bundle-template</it.nexus.bundle.artifactId>
-    <it.nexus.bundle.version>2.6.0-SNAPSHOT</it.nexus.bundle.version>
+    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
     <!--
       compiler plugin configuration, we are Java7
