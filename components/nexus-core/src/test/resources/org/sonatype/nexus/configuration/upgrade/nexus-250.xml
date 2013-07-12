@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>${nexus.configuration.version}</version>
+  <version>2.2.0</version>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
   </globalConnectionSettings>
-  <remoteProxySettings>
-    <httpProxySettings>
-      <proxyHostname>localhost</proxyHostname>
-      <proxyPort>8888</proxyPort>
-      <authentication>
-        <username>me</username>
-        <password>{Fr7ns4K2G1YHYJ7zQcPU0xmXQDUSNxjaXdNv/SVs2bk=}</password>
-        <ntlmHost>windoze</ntlmHost>
-        <ntlmDomain>windoze</ntlmDomain>
-      </authentication>
-    </httpProxySettings>
+  <globalHttpProxySettings>
+    <proxyHostname>localhost</proxyHostname>
+    <proxyPort>8888</proxyPort>
+    <authentication>
+      <username>me</username>
+      <password>{Fr7ns4K2G1YHYJ7zQcPU0xmXQDUSNxjaXdNv/SVs2bk=}</password>
+      <ntlmHost>windoze</ntlmHost>
+      <ntlmDomain>windoze</ntlmDomain>
+    </authentication>
     <nonProxyHosts>
       <nonProxyHost>127.0.0.1</nonProxyHost>
       <nonProxyHost>localhost</nonProxyHost>
     </nonProxyHosts>
-  </remoteProxySettings>
+  </globalHttpProxySettings>
   <restApi>
     <baseUrl>http://localhost:9999/nexus</baseUrl>
     <uiTimeout>60000</uiTimeout>
@@ -53,6 +51,44 @@
       </localStorage>
       <remoteStorage>
         <url>http://repo1.maven.org/maven2/</url>
+        <httpProxySettings>
+          <proxyHostname>localhost</proxyHostname>
+          <proxyPort>7777</proxyPort>
+        </httpProxySettings>
+        <mirrors>
+          <mirror>
+            <id>1c16172bf804f</id>
+            <url>http://ftp.cica.es/mirrors/maven2</url>
+          </mirror>
+          <mirror>
+            <id>1c1a77a60da76</id>
+            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+          </mirror>
+          <mirror>
+            <id>1c1a77a6bbeef</id>
+            <url>http://repo.exist.com/maven2</url>
+          </mirror>
+          <mirror>
+            <id>1c1a77a6bdb8d</id>
+            <url>http://repo1.sonatype.net/maven2</url>
+          </mirror>
+          <mirror>
+            <id>1c1a77a6bf328</id>
+            <url>http://www.ibiblio.net/pub/packages/maven2</url>
+          </mirror>
+          <mirror>
+            <id>1c1a77a6c044e</id>
+            <url>http://mirrors.redv.com/maven2</url>
+          </mirror>
+          <mirror>
+            <id>1c1a77a6c19c9</id>
+            <url>http://mirrors.dotsrc.org/maven2</url>
+          </mirror>
+          <mirror>
+            <id>1c1a77a6c2f22</id>
+            <url>http://mirrors.sunsite.dk/maven2</url>
+          </mirror>
+        </mirrors>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>

@@ -21,9 +21,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.v2_5_0.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.v2_5_0.CRemoteProxySettings;
+import org.sonatype.nexus.configuration.model.v2_5_0.Configuration;
 import org.sonatype.nexus.configuration.model.v2_5_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import com.google.common.io.Closeables;
@@ -105,10 +105,10 @@ public class Upgrade220to250
             }
         };
 
-        org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        org.sonatype.nexus.configuration.model.v2_5_0.Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v2_5_0.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v2_5_0.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 
