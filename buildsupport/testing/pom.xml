@@ -73,7 +73,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.7</version>
       </dependency>
 
       <dependency>
