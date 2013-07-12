@@ -134,7 +134,7 @@ public class DefaultTimelinePersistor
         if ( lastRolledTimestamp == 0L || ( now - lastRolledTimestamp ) > ( rollingIntervalMillis * 1000 ) )
         {
             lastRolledTimestamp = now;
-            lastRolledFile = new File( persistDirectory, buildTimestampedFileName() );
+            lastRolledFile = new File( persistDirectory, buildTimestampedFileName( now ) );
             lastRolledFile.createNewFile();
         }
         return lastRolledFile;
@@ -332,11 +332,17 @@ public class DefaultTimelinePersistor
 
     // ==
 
-    protected String buildTimestampedFileName()
+    /**
+     * Builds a file name using provided timestamp.
+     * 
+     * @param timestamp
+     * @return the formatted filename that matches pattern of persist files.
+     */
+    protected String buildTimestampedFileName( final long timestamp )
     {
         final SimpleDateFormat dateFormat = new SimpleDateFormat( V3_DATA_FILE_NAME_DATE_FORMAT );
         final StringBuilder fileName = new StringBuilder();
-        fileName.append( V3_DATA_FILE_NAME_PREFIX ).append( dateFormat.format( new Date( System.currentTimeMillis() ) ) ).append(
+        fileName.append( V3_DATA_FILE_NAME_PREFIX ).append( dateFormat.format( new Date( timestamp ) ) ).append(
             V3_DATA_FILE_NAME_SUFFIX );
         return fileName.toString();
     }
