@@ -18,7 +18,7 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-plugins-osgi</artifactId>
+    <artifactId>nexus-plugins-p2</artifactId>
     <version>2.6.0-01</version>
   </parent>
 
