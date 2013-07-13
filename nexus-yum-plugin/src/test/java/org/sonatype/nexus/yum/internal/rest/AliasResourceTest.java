@@ -104,7 +104,7 @@ public class AliasResourceTest
         Map<String, String> aliases = Maps.newHashMap();
         aliases.put( "foo", "bar" );
         when( yumRepositoryCapability.configuration() ).thenReturn(
-            new GenerateMetadataCapabilityConfiguration( RELEASES, aliases, true, 1 )
+            new GenerateMetadataCapabilityConfiguration( RELEASES, aliases, true, 1, "/comps.xml" )
         );
 
         doReturn( references ).when( capabilityRegistry ).get( Mockito.<Predicate<CapabilityReference>>any() );
@@ -218,6 +218,7 @@ public class AliasResourceTest
         );
         assertThat( actualMap.get( GenerateMetadataCapabilityConfiguration.DELETE_PROCESSING ), is( "true" ) );
         assertThat( actualMap.get( GenerateMetadataCapabilityConfiguration.DELETE_PROCESSING_DELAY ), is( "1" ) );
+        assertThat( actualMap.get( GenerateMetadataCapabilityConfiguration.YUM_GROUPS_DEFINITION_FILE ), is( "/comps.xml" ) );
     }
 
     private void assert400OnPost( final String repositoryId, final String alias, final Object payload )

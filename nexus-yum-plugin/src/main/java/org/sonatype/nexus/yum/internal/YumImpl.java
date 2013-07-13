@@ -73,6 +73,8 @@ public class YumImpl
 
     private long deleteProcessingDelay;
 
+    private String yumGroupsDefinitionFile;
+
     private final File baseDir;
 
     private final Set<String> versions;
@@ -107,6 +109,8 @@ public class YumImpl
         this.aliases = Maps.newHashMap();
 
         this.baseDir = RepositoryUtils.getBaseDir( repository );
+
+        this.yumGroupsDefinitionFile = null;
     }
 
     private final YumRepositoryCache cache = new YumRepositoryCache();
@@ -132,6 +136,13 @@ public class YumImpl
     }
 
     @Override
+    public Yum setYumGroupsDefinitionFile( final String yumGroupsDefinitionFile )
+    {
+        this.yumGroupsDefinitionFile = yumGroupsDefinitionFile;
+        return this;
+    }
+
+    @Override
     public boolean shouldProcessDeletes()
     {
         return processDeletes;
@@ -141,6 +152,12 @@ public class YumImpl
     public long deleteProcessingDelay()
     {
         return deleteProcessingDelay;
+    }
+
+    @Override
+    public String getYumGroupsDefinitionFile()
+    {
+        return yumGroupsDefinitionFile;
     }
 
     @Override
@@ -205,6 +222,7 @@ public class YumImpl
             task.setRepoUrl( yumRepoUrl.toString() );
             task.setRepositoryId( repository.getId() );
             task.setVersion( version );
+            task.setYumGroupsDefinitionFile( getYumGroupsDefinitionFile() );
             return submitTask( task );
         }
         catch ( Exception e )
@@ -265,6 +283,7 @@ public class YumImpl
             task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
             task.setRepositoryId( repository.getId() );
             task.setAddedFiles( filePath );
+            task.setYumGroupsDefinitionFile( getYumGroupsDefinitionFile() );
             return submitTask( task );
         }
         catch ( Exception e )

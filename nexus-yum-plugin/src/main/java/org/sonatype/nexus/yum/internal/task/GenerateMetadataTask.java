@@ -93,6 +93,8 @@ public class GenerateMetadataTask
 
     public static final String PARAM_FORCE_FULL_SCAN = "forceFullScan";
 
+    public static final String PARAM_YUM_GROUPS_DEFINITION_FILE = "yumGroupsDefinitionFile";
+
     private final RepositoryRegistry repositoryRegistry;
 
     private final RepositoryURLBuilder repositoryURLBuilder;
@@ -345,6 +347,20 @@ public class GenerateMetadataTask
         {
             commandLine.append( " --baseurl " ).append( getRpmUrl() );
         }
+        final String yumGroupsDefinitionFile = getYumGroupsDefinitionFile();
+        if ( yumGroupsDefinitionFile != null )
+        {
+            final File file = new File( getRepoDir().getAbsolutePath(), yumGroupsDefinitionFile );
+            final String path = file.getAbsolutePath();
+            if ( file.exists() )
+            {
+                commandLine.append( " --groupfile " ).append( path );
+            }
+            else
+            {
+                LOG.warn( "Yum groups definition file '{}' doesn't exist, ignoring", path );
+            }
+        }
         commandLine.append( " " ).append( getRpmDir() );
 
         return commandLine.toString();
@@ -454,6 +470,16 @@ public class GenerateMetadataTask
     public void setVersion( String version )
     {
         getParameters().put( PARAM_VERSION, version );
+    }
+
+    public String getYumGroupsDefinitionFile()
+    {
+        return getParameter( PARAM_YUM_GROUPS_DEFINITION_FILE );
+    }
+
+    public void setYumGroupsDefinitionFile( String file )
+    {
+        getParameters().put( PARAM_YUM_GROUPS_DEFINITION_FILE, file );
     }
 
     public boolean isSingleRpmPerDirectory()

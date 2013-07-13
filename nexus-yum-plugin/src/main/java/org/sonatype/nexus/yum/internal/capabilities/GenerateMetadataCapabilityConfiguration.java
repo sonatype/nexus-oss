@@ -34,22 +34,28 @@ public class GenerateMetadataCapabilityConfiguration
 
     public static final String DELETE_PROCESSING_DELAY = "deleteProcessingDelay";
 
+    public static final String YUM_GROUPS_DEFINITION_FILE = "yumGroupsDefinitionFile";
+
     private Map<String, String> aliases;
 
     private boolean processDeletes;
 
     private long deleteProcessingDelay;
 
+    private String yumGroupsDefinitionFile;
+
     public GenerateMetadataCapabilityConfiguration( final String repository,
                                                     final Map<String, String> aliases,
                                                     final boolean processDeletes,
-                                                    final long deleteProcessingDelay )
+                                                    final long deleteProcessingDelay,
+                                                    final String yumGroupsDefinitionFile )
     {
         super( repository );
         this.aliases = Maps.newTreeMap();
         this.aliases.putAll( checkNotNull( aliases ) );
         this.processDeletes = processDeletes;
         this.deleteProcessingDelay = deleteProcessingDelay;
+        this.yumGroupsDefinitionFile = yumGroupsDefinitionFile;
     }
 
     public GenerateMetadataCapabilityConfiguration( final Map<String, String> properties )
@@ -76,6 +82,13 @@ public class GenerateMetadataCapabilityConfiguration
             // will use default
         }
         this.deleteProcessingDelay = deleteProcessingDelay;
+
+        String yumGroupsDefinitionFile = null;
+        if ( properties.containsKey( YUM_GROUPS_DEFINITION_FILE ) )
+        {
+            yumGroupsDefinitionFile = properties.get( YUM_GROUPS_DEFINITION_FILE );
+        }
+        this.yumGroupsDefinitionFile = yumGroupsDefinitionFile;
     }
 
     public Map<String, String> aliases()
@@ -99,7 +112,16 @@ public class GenerateMetadataCapabilityConfiguration
         props.put( ALIASES, new AliasMappings( aliases ).toString() );
         props.put( DELETE_PROCESSING, String.valueOf( processDeletes ) );
         props.put( DELETE_PROCESSING_DELAY, String.valueOf( deleteProcessingDelay ) );
+        if ( yumGroupsDefinitionFile != null )
+        {
+            props.put( YUM_GROUPS_DEFINITION_FILE, yumGroupsDefinitionFile );
+        }
         return props;
+    }
+
+    public String getYumGroupsDefinitionFile()
+    {
+        return yumGroupsDefinitionFile;
     }
 
 }

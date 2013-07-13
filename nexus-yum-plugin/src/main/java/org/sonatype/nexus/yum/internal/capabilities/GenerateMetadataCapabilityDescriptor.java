@@ -15,6 +15,7 @@ package org.sonatype.nexus.yum.internal.capabilities;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.ALIASES;
 import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.REPOSITORY_ID;
+import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.YUM_GROUPS_DEFINITION_FILE;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.formfields.TextAreaFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -76,7 +78,13 @@ public class GenerateMetadataCapabilityDescriptor
                 "Number of seconds to wait before regenerating Yum repository when an RPM is removed"
                     + " (default 10 seconds)",
                 FormField.OPTIONAL
-            ).withInitialValue( 10 )
+            ).withInitialValue( 10 ),
+            new StringTextFormField(
+                GenerateMetadataCapabilityConfiguration.YUM_GROUPS_DEFINITION_FILE,
+                "Yum groups definition file",
+                "Repository path of a file containing Yum groups definition (e.g. /comps.xml)",
+                FormField.OPTIONAL
+            )
         );
         this.validators = validators;
     }
