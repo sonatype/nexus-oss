@@ -15,7 +15,6 @@ package org.sonatype.nexus.security.ldap.realms.api;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.codehaus.plexus.context.Context;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.NexusLdapTestSupport;
@@ -29,6 +28,15 @@ import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfiguration
 public class LdapUserGroupConfNotConfiguredIT
     extends NexusLdapTestSupport
 {
+    @Override
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        // delete the ldap.xml file, if any
+        new File( getConfHomeDir(), "ldap.xml" ).delete();
+    }
 
     private PlexusResource getResource()
         throws Exception
@@ -72,7 +80,7 @@ public class LdapUserGroupConfNotConfiguredIT
         throws Exception
     {
         // this.getNexusLdapConfiguration();
-        String configFileName = getLdapXml().getAbsolutePath();
+        String configFileName = new File( getConfHomeDir(), "ldap.xml" ).getAbsolutePath();
 
         LdapConfigurationXpp3Reader reader = new LdapConfigurationXpp3Reader();
         FileInputStream fis = new FileInputStream( configFileName );
@@ -131,18 +139,4 @@ public class LdapUserGroupConfNotConfiguredIT
 
         this.validateConfigFile( userGroupConf );
     }
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-
-        ctx.put( CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath() );
-    }
-
-    private File getLdapXml()
-    {
-        return new File( getConfHomeDir(), "no-conf/ldap.xml" );
-    }
-
 }
