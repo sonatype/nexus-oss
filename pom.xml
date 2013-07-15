@@ -842,6 +842,9 @@
                       <allowedRepositories>
                         <repository>rso-public-grid</repository>
                       </allowedRepositories>
+                      <allowedPluginRepositories>
+                        <repository>rso-public-grid</repository>
+                      </allowedPluginRepositories>
                     </requireNoRepositories>
                   </rules>
                 </configuration>
