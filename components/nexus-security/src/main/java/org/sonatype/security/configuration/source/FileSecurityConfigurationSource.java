@@ -12,9 +12,11 @@
  */
 package org.sonatype.security.configuration.source;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,14 +26,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sonatype.sisu.goodies.common.io.FileReplacer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 /**
  * The default configuration source powered by Modello. It will try to load configuration, upgrade if needed and
@@ -247,66 +249,61 @@ public class FileSecurityConfigurationSource
      * @param file the file
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private void saveConfiguration( File file )
+    private void saveConfiguration( final File file )
         throws IOException
     {
-        FileOutputStream fos = null;
+        // Create the dir if doesn't exist, throw runtime exception on failure
+        // bad bad bad
+        if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
+        {
+            String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not create configuration file [ "
+                    + file.toString()
+                    + "]!!!! *\r\n"
+                    + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
+            getLogger().error( message );
+            throw new IOException( "Could not create configuration file " + file.getAbsolutePath() );
+        }
 
-        File backupFile = new File( file.getParentFile(), file.getName() + ".old" );
+        final SecurityConfiguration configuration = getConfiguration();
+        checkNotNull( configuration, "Missing security configuration" );
+        // store clear text password, as we have to encrypt the persisted password
+        final String clearPassword = configuration.getAnonymousPassword();
+        try
+        {
+            configuration.setAnonymousPassword( passwordHelper.encrypt( clearPassword ) );
+        }
+        catch ( PlexusCipherException e )
+        {
+            getLogger().warn(
+                "Filed to encrypte the anonymous users password, storing configuration with cleartext password!", e );
+        }
 
         try
         {
-            // Create the dir if doesn't exist, throw runtime exception on failure
-            // bad bad bad
-            if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
+            // perform the "safe save"
+            getLogger().debug( "Saving configuration: {}", file );
+            final FileReplacer fileReplacer = new FileReplacer( file );
+            fileReplacer.setDeleteBackupFile( true );
+
+            fileReplacer.replace( new ContentWriter()
             {
-                String message =
-                    "\r\n******************************************************************************\r\n"
-                        + "* Could not create configuration file [ "
-                        + file.toString()
-                        + "]!!!! *\r\n"
-                        + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
-                        + "******************************************************************************";
-
-                this.getLogger().error( message );
-            }
-
-            // copy the current security config file as file.bak
-            if ( file.exists() )
-            {
-                FileUtils.copyFile( file, backupFile );
-            }
-
-            SecurityConfiguration configuration = getConfiguration();
-            checkNotNull(configuration, "Missing security configuration");
-
-            String clearPassword = configuration.getAnonymousPassword();
-            try
-            {
-                String encryptedPassword = this.passwordHelper.encrypt( clearPassword );
-                configuration.setAnonymousPassword( encryptedPassword );
-            }
-            catch ( PlexusCipherException e )
-            {
-                this.getLogger().error( "Filed to encrypte the anonymous users password, using clear text: " + e );
-            }
-
-            fos = new FileOutputStream( file );
-
-            saveConfiguration( fos, configuration );
-
-            // set back to clear text
-            configuration.setAnonymousPassword( clearPassword );
-
-            fos.flush();
+                @Override
+                public void write( final BufferedOutputStream output )
+                    throws IOException
+                {
+                    new SecurityConfigurationXpp3Writer().write( output, configuration );
+                }
+            } );
         }
         finally
         {
-            IOUtil.close( fos );
-        }
 
-        // if all went well, delete the bak file
-        FileUtils.forceDelete(backupFile);
+            // set back to clear text
+            configuration.setAnonymousPassword( clearPassword );
+        }
     }
 
     /**
@@ -316,5 +313,4 @@ public class FileSecurityConfigurationSource
     {
         return configurationDefaulted;
     }
-
 }
