@@ -33,6 +33,8 @@ import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.params.AuthPolicy;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -122,6 +124,7 @@ public class Hc4ProviderBase
         params.setIntParameter( HttpConnectionParams.CONNECTION_TIMEOUT, getConnectionTimeout( context ) );
         params.setIntParameter( HttpConnectionParams.SO_TIMEOUT, getSoTimeout( context ) );
         params.setParameter( HttpProtocolParams.USER_AGENT, userAgentBuilder.formatUserAgentString( context ) );
+        params.setParameter( ClientPNames.COOKIE_POLICY, CookiePolicy.IGNORE_COOKIES );
         return params;
     }
 
