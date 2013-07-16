@@ -76,17 +76,6 @@
       <artifactId>joda-time</artifactId>
     </dependency>
 
-    <!-- Version (for now all of Aether API/UTIL) -->
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-util</artifactId>
-    </dependency>
-
     <!-- Needed by Model/XStream configuration -->
     <dependency>
       <groupId>commons-lang</groupId>
