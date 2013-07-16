@@ -273,6 +273,12 @@
     public static final String MODEL_VERSION = "2.5.0";
 ]]></code>
         </codeSegment>
+        <codeSegment>
+          <version>2.6.1</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "2.6.1";
+]]></code>
+        </codeSegment>
       </codeSegments>
     </class>
 
@@ -829,7 +835,7 @@
         </field>
         <field>
           <name>mirrors</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.5.0</version>
           <description>
             Repository mirrors configuration for upstream (to use for retrieving stuff).
           </description>

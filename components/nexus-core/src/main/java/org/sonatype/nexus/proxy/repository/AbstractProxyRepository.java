@@ -32,7 +32,6 @@ import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageEOFException;
@@ -57,9 +56,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.mirror.DefaultDownloadMirrors;
-import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
-import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor.EvictUnusedItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -75,6 +71,7 @@ import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import com.google.common.collect.Lists;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -145,11 +142,6 @@ public abstract class AbstractProxyRepository
      * Remote storage context to store connection configs.
      */
     private RemoteStorageContext remoteStorageContext;
-
-    /**
-     * Download mirrors
-     */
-    private DownloadMirrors dMirrors;
 
     /**
      * Item content validators
@@ -937,21 +929,6 @@ public abstract class AbstractProxyRepository
         }
     }
 
-    public DownloadMirrors getDownloadMirrors()
-    {
-        if ( dMirrors == null )
-        {
-            dMirrors = new DefaultDownloadMirrors( (CRepositoryCoreConfiguration) getCurrentCoreConfiguration() );
-        }
-
-        return dMirrors;
-    }
-
-    protected DownloadMirrorSelector openDownloadMirrorSelector( ResourceStoreRequest request )
-    {
-        return this.getDownloadMirrors().openSelector( this.getRemoteUrl() );
-    }
-
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws LocalStorageException
     {
@@ -1509,185 +1486,163 @@ public abstract class AbstractProxyRepository
 
         try
         {
-            DownloadMirrorSelector selector = this.openDownloadMirrorSelector( request );
+            List<String> remoteUrls = getRemoteUrls( request );
 
-            List<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Mirror count:" + mirrors.size() );
-            }
-
-            mirrors.add( new Mirror( "default", getRemoteUrl(), getRemoteUrl() ) );
-
-            List<RepositoryItemValidationEvent> events = new ArrayList<RepositoryItemValidationEvent>();
+            List<RepositoryItemValidationEvent> events = new ArrayList<>();
 
             Exception lastException = null;
 
-            try
+            all_urls: for ( String remoteUrl : remoteUrls )
             {
-                all_urls: for ( Mirror mirror : mirrors )
+                int retryCount = 1;
+
+                if ( getRemoteStorageContext() != null )
                 {
-                    int retryCount = 1;
-
-                    if ( getRemoteStorageContext() != null )
+                    RemoteConnectionSettings settings = getRemoteStorageContext().getRemoteConnectionSettings();
+                    if ( settings != null )
                     {
-                        RemoteConnectionSettings settings = getRemoteStorageContext().getRemoteConnectionSettings();
-                        if ( settings != null )
-                        {
-                            retryCount = settings.getRetrievalRetryCount();
-                        }
+                        retryCount = settings.getRetrievalRetryCount();
                     }
+                }
 
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "Using mirror URL:" + mirror.getUrl() + ", retryCount=" + retryCount );
-                    }
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Using URL:" + remoteUrl + ", retryCount=" + retryCount );
+                }
 
-                    // Validate the mirror URL
+                // Validate the mirror URL
+                try
+                {
+                    getRemoteStorage().validateStorageUrl( remoteUrl );
+                }
+                catch ( Exception e )
+                {
+                    lastException = e;
+
+                    logFailedUrl( remoteUrl, e );
+
+                    continue all_urls; // retry with next url
+                }
+
+                for ( int i = 0; i < retryCount; i++ )
+                {
                     try
                     {
-                        getRemoteStorage().validateStorageUrl( mirror.getUrl() );
+                        // events.clear();
+
+                        AbstractStorageItem remoteItem =
+                            getRemoteStorage().retrieveItem( this, request, remoteUrl );
+
+                        remoteItem.getItemContext().putAll( request.getRequestContext() );
+
+                        remoteItem = doCacheItem( remoteItem );
+
+                        if ( doValidateRemoteItemContent( request, remoteUrl, remoteItem, events ) )
+                        {
+                            sendContentValidationEvents( request, events, true );
+
+                            return remoteItem;
+                        }
+                        else
+                        {
+                            continue all_urls; // retry with next url
+                        }
                     }
-                    catch ( Exception e )
+                    catch ( ItemNotFoundException e )
                     {
                         lastException = e;
 
-                        selector.feedbackFailure( mirror );
-                        logFailedMirror( mirror, e );
+                        continue all_urls; // retry with next url
+                    }
+                    catch ( RemoteAccessException e )
+                    {
+                        lastException = e;
+
+                        logFailedUrl( remoteUrl, e );
+
+                        continue all_urls; // retry with next url
+                    }
+                    catch ( RemoteStorageException e )
+                    {
+                        // in case when we were unable to make outbound request
+                        // at all, do not retry
+                        if ( e instanceof RemoteStorageTransportException )
+                        {
+                            throw e;
+                        }
+
+                        lastException = e;
+
+                        // debug, print all
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            logFailedUrl( remoteUrl, e );
+                        }
+                        // not debug, only print the message
+                        else
+                        {
+                            Throwable t = ExceptionUtils.getRootCause( e );
+
+                            if ( t == null )
+                            {
+                                t = e;
+                            }
+
+                            getLogger().error(
+                                String.format(
+                                    "Got RemoteStorageException in proxy repository %s while retrieving remote artifact \"%s\" from URL %s, this is %s (re)try, cause: %s: %s",
+                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString(),
+                                    remoteUrl, String.valueOf( i + 1 ), t.getClass().getName(),
+                                    t.getMessage() ) );
+                        }
+
+                        // nope, do not switch Mirror yet, obey the retries
+                        // continue all_urls; // retry with next url
+                    }
+                    catch ( LocalStorageException e )
+                    {
+                        lastException = e;
+
+                        // debug, print all
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            logFailedUrl( remoteUrl, e );
+                        }
+                        // not debug, only print the message
+                        else
+                        {
+                            Throwable t = ExceptionUtils.getRootCause( e );
+
+                            if ( t == null )
+                            {
+                                t = e;
+                            }
+
+                            getLogger().error(
+                                String.format(
+                                    "Got LocalStorageException in proxy repository %s while caching retrieved artifact \"%s\" got from URL %s, will attempt next mirror, cause: %s: %s",
+                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString(),
+                                    remoteUrl, t.getClass().getName(), t.getMessage() ) );
+                        }
+
+                        // This is actually fatal error? LocalStorageException means something like IOException
+                        // while writing data to disk, full disk, no perms, etc
+                        // currently, we preserve the old -- probably wrong -- behaviour: on IOException Nexus will
+                        // log the error
+                        // but will respond with 404
+                        continue all_urls; // retry with next url
+                    }
+                    catch ( RuntimeException e )
+                    {
+                        lastException = e;
+
+                        logFailedUrl( remoteUrl, e );
 
                         continue all_urls; // retry with next url
                     }
 
-                    for ( int i = 0; i < retryCount; i++ )
-                    {
-                        try
-                        {
-                            // events.clear();
-
-                            AbstractStorageItem remoteItem =
-                                getRemoteStorage().retrieveItem( this, request, mirror.getUrl() );
-
-                            remoteItem.getItemContext().putAll( request.getRequestContext() );
-
-                            remoteItem = doCacheItem( remoteItem );
-
-                            if ( doValidateRemoteItemContent( request, mirror.getUrl(), remoteItem, events ) )
-                            {
-                                sendContentValidationEvents( request, events, true );
-
-                                selector.feedbackSuccess( mirror );
-
-                                return remoteItem;
-                            }
-                            else
-                            {
-                                continue all_urls; // retry with next url
-                            }
-                        }
-                        catch ( ItemNotFoundException e )
-                        {
-                            lastException = e;
-
-                            continue all_urls; // retry with next url
-                        }
-                        catch ( RemoteAccessException e )
-                        {
-                            lastException = e;
-
-                            selector.feedbackFailure( mirror );
-                            logFailedMirror( mirror, e );
-
-                            continue all_urls; // retry with next url
-                        }
-                        catch ( RemoteStorageException e )
-                        {
-                            // in case when we were unable to make outbound request
-                            // at all, do not retry
-                            if ( e instanceof RemoteStorageTransportException )
-                            {
-                                throw e;
-                            }
-
-                            lastException = e;
-
-                            selector.feedbackFailure( mirror );
-                            // debug, print all
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                logFailedMirror( mirror, e );
-                            }
-                            // not debug, only print the message
-                            else
-                            {
-                                Throwable t = ExceptionUtils.getRootCause( e );
-
-                                if ( t == null )
-                                {
-                                    t = e;
-                                }
-
-                                getLogger().error(
-                                    String.format(
-                                        "Got RemoteStorageException in proxy repository %s while retrieving remote artifact \"%s\" from URL %s, this is %s (re)try, cause: %s: %s",
-                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString(),
-                                        mirror.getUrl(), String.valueOf( i + 1 ), t.getClass().getName(),
-                                        t.getMessage() ) );
-                            }
-
-                            // nope, do not switch Mirror yet, obey the retries
-                            // continue all_urls; // retry with next url
-                        }
-                        catch ( LocalStorageException e )
-                        {
-                            lastException = e;
-
-                            selector.feedbackFailure( mirror );
-                            // debug, print all
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                logFailedMirror( mirror, e );
-                            }
-                            // not debug, only print the message
-                            else
-                            {
-                                Throwable t = ExceptionUtils.getRootCause( e );
-
-                                if ( t == null )
-                                {
-                                    t = e;
-                                }
-
-                                getLogger().error(
-                                    String.format(
-                                        "Got LocalStorageException in proxy repository %s while caching retrieved artifact \"%s\" got from URL %s, will attempt next mirror, cause: %s: %s",
-                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString(),
-                                        mirror.getUrl(), t.getClass().getName(), t.getMessage() ) );
-                            }
-
-                            // This is actually fatal error? LocalStorageException means something like IOException
-                            // while writing data to disk, full disk, no perms, etc
-                            // currently, we preserve the old -- probably wrong -- behaviour: on IOException Nexus will
-                            // log the error
-                            // but will respond with 404
-                            continue all_urls; // retry with next url
-                        }
-                        catch ( RuntimeException e )
-                        {
-                            lastException = e;
-
-                            selector.feedbackFailure( mirror );
-                            logFailedMirror( mirror, e );
-
-                            continue all_urls; // retry with next url
-                        }
-
-                        // retry with same url
-                    }
+                    // retry with same url
                 }
-            }
-            finally
-            {
-                selector.close();
             }
 
             // if we got here, requested item was not retrieved for some reason
@@ -1727,11 +1682,16 @@ public abstract class AbstractProxyRepository
         }
     }
 
-    private void logFailedMirror( Mirror mirror, Exception e )
+    protected List<String> getRemoteUrls( final ResourceStoreRequest request )
+    {
+        return Lists.newArrayList( getRemoteUrl() );
+    }
+
+    private void logFailedUrl( String url, Exception e )
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "Failed mirror URL:" + mirror.getUrl() );
+            getLogger().debug( "Failed URL: {}", url );
             getLogger().debug( e.getMessage(), e );
         }
     }

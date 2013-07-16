@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>2.5.0</version>
-  <nexusVersion>2.4.0-08</nexusVersion>
+  <version>${nexus.configuration.version}</version>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>

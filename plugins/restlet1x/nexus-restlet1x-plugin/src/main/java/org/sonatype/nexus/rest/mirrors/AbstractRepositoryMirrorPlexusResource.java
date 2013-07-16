@@ -19,7 +19,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.repository.Mirror;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.MirrorResource;
@@ -86,14 +85,7 @@ public abstract class AbstractRepositoryMirrorPlexusResource
 
     protected List<Mirror> getMirrors( Repository repository )
     {
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            return repository.adaptToFacet( ProxyRepository.class ).getDownloadMirrors().getMirrors();
-        }
-        else
-        {
-            return repository.getPublishedMirrors().getMirrors();
-        }
+        return repository.getPublishedMirrors().getMirrors();
     }
 
     protected void setMirrors( Repository repository, List<Mirror> mirrors )
@@ -108,17 +100,8 @@ public abstract class AbstractRepositoryMirrorPlexusResource
             }
         }
         
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            repository.adaptToFacet( ProxyRepository.class ).getDownloadMirrors().setMirrors( mirrors );
+        repository.getPublishedMirrors().setMirrors( mirrors );
 
-            getNexusConfiguration().saveConfiguration();
-        }
-        else
-        {
-            repository.getPublishedMirrors().setMirrors( mirrors );
-
-            getNexusConfiguration().saveConfiguration();
-        }
+        getNexusConfiguration().saveConfiguration();
     }
 }

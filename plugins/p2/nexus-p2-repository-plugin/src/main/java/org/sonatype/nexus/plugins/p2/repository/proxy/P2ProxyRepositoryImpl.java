@@ -12,17 +12,19 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.proxy;
 
+import static org.sonatype.nexus.util.DigesterUtils.getSha1Digest;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
@@ -60,8 +62,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
-import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
-import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
@@ -71,7 +71,7 @@ import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.util.DigesterUtils;
+import com.google.common.collect.Lists;
 
 @Component( role = Repository.class, hint = P2ProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Proxy Repository" )
 public class P2ProxyRepositoryImpl
@@ -95,7 +95,7 @@ public class P2ProxyRepositoryImpl
 
     private MutableProxyRepositoryKind repositoryKind;
 
-    private P2ProxyDownloadMirrors downloadMirrors;
+    private final Map<String, Mirror> mirrorMap = new LinkedHashMap<>();
 
     public P2ProxyRepositoryImpl()
     {
@@ -241,7 +241,8 @@ public class P2ProxyRepositoryImpl
             {
                 getLogger().debug( "Repository " + getId() + ": configureMirrors: found flat list of mirrors" );
                 // There are no "repository" elements, so we only have a flat list of mirrors
-                final List<Mirror> mirrors = new ArrayList<Mirror>();
+
+                mirrorMap.clear();
 
                 for ( final Xpp3Dom mirrorDOM : mirrorsDom.getChildren( "mirror" ) )
                 {
@@ -251,12 +252,12 @@ public class P2ProxyRepositoryImpl
                     {
                         // TODO: validate that this is valid way to generate id
                         // or if should be pulled from xml
-                        mirrors.add( new Mirror( DigesterUtils.getSha1Digest( mirrorUrl ), mirrorUrl, getRemoteUrl() ) );
+                        final Mirror mirror = new Mirror(
+                            getSha1Digest( mirrorUrl ), mirrorUrl, getRemoteUrl()
+                        );
+                        mirrorMap.put( mirror.getId(), mirror );
                     }
                 }
-
-                getDownloadMirrors().setMirrors( mirrors );
-                getApplicationConfiguration().saveConfiguration();
             }
 
             mirrorsConfigured = true;
@@ -286,7 +287,7 @@ public class P2ProxyRepositoryImpl
         }
     }
 
-    private void addMirrors( final String remoteRepositoryUrl, final Xpp3Dom[] mirrorsDoms )
+    private void addMirrors( final String remoteRepoUrl, final Xpp3Dom[] mirrorsDoms )
     {
         if ( mirrorsDoms != null )
         {
@@ -297,13 +298,13 @@ public class P2ProxyRepositoryImpl
                 {
                     // TODO: validate that this is valid way to generate id
                     // or if should be pulled from xml
-                    getP2DownloadMirrors().addMirror(
-                        new Mirror( DigesterUtils.getSha1Digest( mirrorUrl ), mirrorUrl, remoteRepositoryUrl ) );
+                    final Mirror mirror = new Mirror( getSha1Digest( mirrorUrl ), mirrorUrl, remoteRepoUrl );
+                    mirrorMap.put( mirror.getId(), mirror );
                 }
             }
         }
-        getP2DownloadMirrors().addMirror(
-            new Mirror( DigesterUtils.getSha1Digest( remoteRepositoryUrl ), remoteRepositoryUrl, remoteRepositoryUrl ) );
+        final Mirror mirror = new Mirror( getSha1Digest( remoteRepoUrl ), remoteRepoUrl, remoteRepoUrl );
+        mirrorMap.put( mirror.getId(), mirror );
     }
 
     private Xpp3Dom getMirrorsDom( final StorageFileItem mirrorsItem )
@@ -603,24 +604,10 @@ public class P2ProxyRepositoryImpl
     }
 
     @Override
-    public DownloadMirrors getDownloadMirrors()
+    protected List<String> getRemoteUrls( final ResourceStoreRequest request )
     {
-        return getP2DownloadMirrors();
-    }
+        final List<String> remoteUrls = Lists.newArrayList();
 
-    private P2ProxyDownloadMirrors getP2DownloadMirrors()
-    {
-        if ( downloadMirrors == null )
-        {
-            downloadMirrors = new P2ProxyDownloadMirrors();
-        }
-
-        return downloadMirrors;
-    }
-
-    @Override
-    protected DownloadMirrorSelector openDownloadMirrorSelector( final ResourceStoreRequest request )
-    {
         String remoteUrl = getRemoteUrl();
 
         // lookup child from the map here then udpate the remote URL
@@ -640,17 +627,22 @@ public class P2ProxyRepositoryImpl
                 }
             }
         }
-        catch ( final StorageException e )
-        {
-            getLogger().warn( "Could not find artifact-mapping.", e );
-        }
-        catch ( final IllegalOperationException e )
+        catch ( final StorageException | IllegalOperationException e )
         {
             getLogger().warn( "Could not find artifact-mapping.", e );
         }
 
-        // now open the selector
-        return getDownloadMirrors().openSelector( remoteUrl );
+        for ( final Mirror mirror : mirrorMap.values() )
+        {
+            if(StringUtils.equals( remoteUrl, mirror.getMirrorOfUrl() ))
+            {
+                remoteUrls.add( mirror.getUrl() );
+            }
+        }
+
+        remoteUrls.add( getRemoteUrl() );
+
+        return remoteUrls;
     }
 
     @Override
