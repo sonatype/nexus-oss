@@ -14,13 +14,9 @@ package org.sonatype.nexus.timeline.tasks;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.timeline.NexusTimeline;
 
@@ -35,10 +31,6 @@ public class PurgeTimeline
      * System event action: timeline purge
      */
     public static final String ACTION = "TL_PURGE";
-
-    public static final String TYPES_KEY = "types";
-
-    public static final String SUBTYPES_KEY = "subTypes";
 
     private final NexusTimeline timeline;
 
@@ -58,67 +50,11 @@ public class PurgeTimeline
         getParameters().put( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID, Integer.toString( purgeOlderThan ) );
     }
 
-    public Set<String> getTypes()
-    {
-        String[] elems = null;
-
-        if ( getParameters().containsKey( TYPES_KEY ) )
-        {
-            elems = getParameters().get( TYPES_KEY ).split( "," );
-        }
-        else
-        {
-            elems = new String[0];
-        }
-
-        return new HashSet<String>( Arrays.asList( elems ) );
-    }
-
-    public void setTypes( Set<String> types )
-    {
-        getParameters().put( TYPES_KEY, StringUtils.join( types.toArray(), "," ) );
-    }
-
-    public Set<String> getSubTypes()
-    {
-        String[] elems = null;
-
-        if ( getParameters().containsKey( SUBTYPES_KEY ) )
-        {
-            elems = getParameters().get( SUBTYPES_KEY ).split( "," );
-        }
-        else
-        {
-            elems = new String[0];
-        }
-
-        return new HashSet<String>( Arrays.asList( elems ) );
-    }
-
-    public void setSubTypes( Set<String> subTypes )
-    {
-        getParameters().put( SUBTYPES_KEY, StringUtils.join( subTypes.toArray(), "," ) );
-    }
-
     @Override
     protected Object doRun()
         throws Exception
     {
-        if ( getTypes().size() == 0 )
-        {
-            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), null, null, null );
-        }
-        else if ( getSubTypes().size() == 0 )
-        {
-            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(), null,
-                null );
-        }
-        else
-        {
-            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(),
-                getSubTypes(), null );
-        }
-
+        timeline.purgeOlderThan( getPurgeOlderThan() );
         return null;
     }
 
