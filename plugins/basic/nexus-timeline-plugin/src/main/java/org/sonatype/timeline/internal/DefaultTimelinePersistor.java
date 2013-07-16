@@ -181,7 +181,6 @@ public class DefaultTimelinePersistor
                 // jump to next file
                 currentIterator = readFile( file );
                 filePtr++;
-                continue;
             }
         }
     }
