@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.client.core.condition;
 
-import org.sonatype.aether.util.version.GenericVersionScheme;
-import org.sonatype.aether.version.InvalidVersionSpecificationException;
-import org.sonatype.aether.version.Version;
-import org.sonatype.aether.version.VersionConstraint;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusStatus;
+import org.sonatype.nexus.client.core.condition.internal.GenericVersionScheme;
+import org.sonatype.nexus.client.core.condition.internal.InvalidVersionSpecificationException;
+import org.sonatype.nexus.client.core.condition.internal.Version;
+import org.sonatype.nexus.client.core.condition.internal.VersionConstraint;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.internal.util.Template;
 
