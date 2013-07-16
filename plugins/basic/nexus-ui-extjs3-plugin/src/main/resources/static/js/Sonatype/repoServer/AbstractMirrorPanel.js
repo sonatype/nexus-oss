@@ -21,18 +21,6 @@ NX.define('Sonatype.repoServer.AbstractMirrorPanel', {
   MIRROR_URL_REGEXP : /^(?:http|https):\/\//i,
 
   constructor : function(config) {
-    this.mirrorStatusTask = {
-      run : function() {
-        Ext.Ajax.request({
-          url : Sonatype.config.repos.urls.repoMirrorStatus + '/' + this.payload.data.id,
-          callback : this.statusCallback,
-          scope : this
-        });
-      },
-      interval : 5000, // poll every 5 seconds
-      scope : this
-    };
-
     this.mirrorRecordConstructor = Ext.data.Record.create([
       {
         name : 'id'
@@ -73,18 +61,6 @@ NX.define('Sonatype.repoServer.AbstractMirrorPanel', {
       listeners : {
         submit : {
           fn : this.submitHandler,
-          scope : this
-        },
-        activate : {
-          fn : this.activateHandler,
-          scope : this
-        },
-        deactivate : {
-          fn : this.deactivateHandler,
-          scope : this
-        },
-        destroy : {
-          fn : this.destroyHandler,
           scope : this
         }
       }
@@ -227,64 +203,7 @@ NX.define('Sonatype.repoServer.AbstractMirrorPanel', {
     return 'POST';
   },
 
-  statusCallback : function(options, success, response) {
-    if (success) {
-      var
-            i, j, data, item,
-            statusResp = Ext.decode(response.responseText),
-            treePanel = this.find('name', 'mirror-url-list')[0],
-            childNodes = treePanel.getRootNode().childNodes;
-
-      if (statusResp.data) {
-        data = statusResp.data;
-        if (data && data.length) {
-          for (i = 0; i < data.length; i += 1) {
-            item = data[i];
-            if (childNodes && childNodes.length) {
-              for (j = 0; j < childNodes.length; j += 1) {
-                if (item.id === childNodes[j].id) {
-                  childNodes[j].getUI().getIconEl().src = item.status === 'Blacklisted' ? (Sonatype.config.extPath
-                        + '/resources/images/default/tree/drop-no.gif') : (Sonatype.config.extPath
-                        + '/resources/images/default/tree/drop-yes.gif');
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    else {
-      // don't add icons, no need to bother the user with this
-      Ext.TaskMgr.stop(this.mirrorStatusTask);
-    }
-  },
-
   submitHandler : function(form, action, receivedData) {
     this.loadMirrors(receivedData, null, this);
-  },
-
-  activateHandler : function(panel) {
-    // HACK: this.predefinedMirrorDataStore is only defined in ProxyMirrorEditor class, only attempt to call load() if the field exists
-    // HACK: Fix for NEXUS-5060, probably better way to fix however.
-    if (this.predefinedMirrorDataStore) {
-      this.predefinedMirrorDataStore.load();
-    }
-
-    if (panel.payload.data.repoType === 'proxy') {
-      Ext.TaskMgr.start(this.mirrorStatusTask);
-    }
-  },
-
-  deactivateHandler : function(panel) {
-    if (panel.payload.data.repoType === 'proxy') {
-      Ext.TaskMgr.stop(this.mirrorStatusTask);
-    }
-  },
-
-  destroyHandler : function(component) {
-    if (component.payload.data.repoType === 'proxy') {
-      Ext.TaskMgr.stop(this.mirrorStatusTask);
-    }
   }
 });

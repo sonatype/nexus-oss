@@ -399,4 +399,17 @@ public class DefaultApplicationConfigurationUpgraderTest
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-220.xml", configuration );
     }
 
+    @Test
+    public void testFrom250()
+        throws Exception
+    {
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-250.xml", getNexusConfiguration() );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertThat( configuration.getVersion(), is( Configuration.MODEL_VERSION ) );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-250.xml", configuration );
+    }
+
 }

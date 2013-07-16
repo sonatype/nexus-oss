@@ -107,32 +107,6 @@ public class MirrorMessageUtils
         return resourceResponse;
     }
 
-    public MirrorStatusResourceListResponse getMirrorsStatus( String repositoryId )
-        throws IOException
-    {
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
-
-        String serviceURI = "service/local/repository_mirrors_status/" + repositoryId;
-
-        String responseText = RequestFacade.doGetForText(serviceURI, representation, isSuccessful());
-
-        LOG.debug( " getResourceFromResponse: " + responseText);
-
-        representation = new XStreamRepresentation( xstream, responseText, mediaType );
-
-        // this
-        MirrorStatusResourceListResponse resourceResponse =
-            (MirrorStatusResourceListResponse) representation.getPayload( new MirrorStatusResourceListResponse() );
-
-        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
-
-        for ( MirrorStatusResource resource : (List<MirrorStatusResource>) resourceResponse.getData() )
-        {
-            Assert.assertNotNull( "Id shouldn't be null", resource.getId() );
-        }
-
-        return resourceResponse;
-    }
 
     public MirrorResourceListResponse getPredefinedMirrors( String repositoryId )
         throws IOException
