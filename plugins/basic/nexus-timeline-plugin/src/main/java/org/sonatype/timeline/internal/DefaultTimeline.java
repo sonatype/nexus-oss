@@ -198,6 +198,34 @@ public class DefaultTimeline
     }
 
     @Override
+    public void purge( final long timestamp )
+    {
+        if ( started )
+        {
+            doShared( new Work<Integer>()
+            {
+                @Override
+                public Integer doIt()
+                    throws IOException
+                {
+                    try
+                    {
+                        persistor.purge( 0l, timestamp );
+                    }
+                    catch ( IOException e )
+                    {
+                        // we don't want to make indexer dead in here
+                        // FIXME: but do we want to abort the purge?
+                        getLogger().warn( "Failed to purge a timeline persisted records", e );
+                    }
+                    indexer.purge( 0l, timestamp, null, null );
+                    return 0;
+                }
+            } );
+        }
+    }
+
+    @Override
     public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
                           TimelineCallback callback )
     {

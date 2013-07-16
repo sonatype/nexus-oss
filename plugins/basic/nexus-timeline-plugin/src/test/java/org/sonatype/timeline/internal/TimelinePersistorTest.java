@@ -12,13 +12,18 @@
  */
 package org.sonatype.timeline.internal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.timeline.AbstractTimelineTestCase;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
@@ -213,5 +218,72 @@ public class TimelinePersistorTest
         TimelineRecord record = new TimelineRecord( System.currentTimeMillis(), "type", "subType", null );
 
         persistor.persist( record );
+    }
+
+    /**
+     * Test for collectFiles method, which is actually the "heart" of purge method (it just iterates over resulting file
+     * list and deletes those), and the readAllSinceDays method, used when indexer is being rebuilt.
+     * 
+     * @throws Exception
+     */
+    public void testcollectFiles()
+        throws Exception
+    {
+        final long now = System.currentTimeMillis();
+        final long today = now - ( now % 1000 ); // cut millis, as filename timestamps used for data are second
+                                                 // resolution
+        final long minus1d = today - TimeUnit.DAYS.toMillis( 1L );
+        final long minus2d = today - TimeUnit.DAYS.toMillis( 2L );
+        final long minus3d = today - TimeUnit.DAYS.toMillis( 3L );
+        final long minus4d = today - TimeUnit.DAYS.toMillis( 4L );
+
+        new File( persistDirectory, persistor.buildTimestampedFileName( today ) ).createNewFile(); // today's file
+        new File( persistDirectory, persistor.buildTimestampedFileName( minus1d ) ).createNewFile(); // yesterday's
+        new File( persistDirectory, persistor.buildTimestampedFileName( minus2d ) ).createNewFile(); // -2
+        new File( persistDirectory, persistor.buildTimestampedFileName( minus3d ) ).createNewFile(); // -3
+        new File( persistDirectory, persistor.buildTimestampedFileName( minus4d ) ).createNewFile(); // -4
+
+        // we should have 5 files
+        final List<File> files = Arrays.asList( persistDirectory.listFiles() );
+        assertThat( files, hasSize( 5 ) );
+
+        // check collectFiles, the "heart" of purge, some edge cases
+        {
+            // "newest" is here (0 day old and newer)
+            final List<File> collectedFiles = persistor.collectFiles( 0, true );
+            assertThat( collectedFiles, hasSize( 1 ) );
+            assertThat( persistor.getTimestampedFileNameTimestamp( collectedFiles.get( 0 ) ), equalTo( today ) );
+        }
+        {
+            // all except "newest" is here (0 day and older)
+            final List<File> collectedFiles = persistor.collectFiles( 0, false );
+            assertThat( collectedFiles, hasSize( 4 ) );
+            assertThat( persistor.getTimestampedFileNameTimestamp( collectedFiles.get( 0 ) ), equalTo( minus1d ) );
+        }
+
+        // purge related
+        {
+            // older than 1 days:
+            final List<File> collectedFiles = persistor.collectFiles( 1, false );
+            assertThat( collectedFiles, hasSize( 3 ) );
+            assertThat( persistor.getTimestampedFileNameTimestamp( collectedFiles.get( 0 ) ), equalTo( minus2d ) );
+        }
+        {
+            // older than 2 days:
+            final List<File> collectedFiles = persistor.collectFiles( 2, false );
+            assertThat( collectedFiles, hasSize( 2 ) );
+            assertThat( persistor.getTimestampedFileNameTimestamp( collectedFiles.get( 0 ) ), equalTo( minus3d ) );
+        }
+        {
+            // older than 3 days:
+            final List<File> collectedFiles = persistor.collectFiles( 3, false );
+            assertThat( collectedFiles, hasSize( 1 ) );
+            assertThat( persistor.getTimestampedFileNameTimestamp( collectedFiles.get( 0 ) ), equalTo( minus4d ) );
+        }
+        {
+            // older than 4 days:
+            final List<File> collectedFiles = persistor.collectFiles( 4, false );
+            assertThat( collectedFiles, hasSize( 0 ) );
+        }
     }
 }

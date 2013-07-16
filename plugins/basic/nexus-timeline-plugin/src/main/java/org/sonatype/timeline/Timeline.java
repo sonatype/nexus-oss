@@ -54,7 +54,7 @@ public interface Timeline
     void add( TimelineRecord... records );
 
     /**
-     * Deletes records from timeline that are older than timestamp, and suits the filter (or null for no filtering).
+     * Deletes records from timeline index that are older than timestamp, and suits the filter (or null for no filtering).
      * 
      * @param timestamp the timestamp to which compared older records should be deleted.
      * @param types the types to purge
@@ -63,6 +63,14 @@ public interface Timeline
      * @return the record count deleted from timeline.
      */
     int purge( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter );
+
+    /**
+     * Deletes records from timeline index and persisted data that are older than timestamp.
+     * 
+     * @param timestamp the timestamp to which compared older records should be deleted.
+     * @since 2.6.1
+     */
+    void purge( long timestamp );
 
     /**
      * Retrieves records from timeline. The order is desceding, newest is 1st, oldest last.
