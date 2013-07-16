@@ -33,7 +33,7 @@
     </defaults>
 
     <classes>
-        <class rootElement="true" xml.tagName="ldapConfiguration">
+        <class rootElement="true" xml.tagName="ldapConfiguration" java.clone="deep">
             <name>Configuration</name>
             <version>1.0.0+</version>
             <description>The root element of LDAP configuration.</description>
@@ -95,7 +95,7 @@
             </codeSegments>
         </class>
         
-        <class>
+        <class java.clone="deep">
             <name>CConnectionInfo</name>
             <version>1.0.0+</version>
             <description>LDAP Connection Information.</description>
@@ -159,7 +159,7 @@
             </fields>
         </class>        
         
-        <class>
+        <class java.clone="deep">
             <name>CUserAndGroupAuthConfiguration</name>
             <version>1.0.0+</version>
             <description>The user and group mapping configuration mapping.</description>
@@ -292,7 +292,7 @@
         </class>
         
         
-        <class>
+        <class java.clone="deep">
             <name>CUserRoleMapping</name>
             <version>1.0.0+</version>
             <description>Defines the mapping between users and roles, if LDAP groups are not used.</description>

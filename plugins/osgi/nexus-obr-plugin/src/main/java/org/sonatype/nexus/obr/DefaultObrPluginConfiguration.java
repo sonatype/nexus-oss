@@ -12,39 +12,49 @@
  */
 package org.sonatype.nexus.obr;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.PropertyUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.io.FileReplacer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
+
+import com.google.common.base.Throwables;
 
 @Component( role = ObrPluginConfiguration.class )
 public class DefaultObrPluginConfiguration
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ObrPluginConfiguration
 {
     private static final String DEFAULT_OBR_PROPERTY_PATH = "/META-INF/nexus-obr-plugin/nexus-obr-plugin.properties";
 
-    @Configuration( value = "${nexus-work}/conf/nexus-obr-plugin.properties" )
-    private File configFile;
+    @Requirement
+    private ApplicationConfiguration applicationConfiguration;
 
     private Map<String, String> configMap;
 
     private long lastLoaded;
 
+    protected File getConfigurationFile()
+    {
+        return new File( applicationConfiguration.getConfigurationDirectory(), "nexus-obr-plugin.properties");
+    }
+
     private synchronized Map<String, String> getConfiguration()
     {
+        final File configFile = getConfigurationFile();
         if ( null == configMap || lastLoaded < configFile.lastModified() )
         {
             if ( !configFile.exists() )
@@ -78,24 +88,32 @@ public class DefaultObrPluginConfiguration
 
     private void writeDefaultConfiguration()
     {
-        InputStream is = null;
-        OutputStream os = null;
-
+        final File configurationFile = getConfigurationFile();
+        getLogger().debug( "Saving configuration: {}", configurationFile );
         try
         {
-            is = DefaultObrPluginConfiguration.class.getResourceAsStream( DEFAULT_OBR_PROPERTY_PATH );
-            os = new FileOutputStream( configFile );
-
-            IOUtil.copy( is, os );
+            final FileReplacer fileReplacer = new FileReplacer( configurationFile );
+            // we save this file many times, don't litter backups
+            fileReplacer.setDeleteBackupFile( true );
+            fileReplacer.replace( new ContentWriter()
+            {
+                @Override
+                public void write( final BufferedOutputStream output )
+                    throws IOException
+                {
+                    try (final InputStream is =
+                        DefaultObrPluginConfiguration.class.getResourceAsStream( DEFAULT_OBR_PROPERTY_PATH ))
+                    {
+                        IOUtil.copy( is, output );
+                    }
+                }
+            } );
         }
-        catch ( final IOException e )
+        catch ( IOException e )
         {
-            getLogger().warn( "Could not write the OBR plugin configuration to path " + configFile.getAbsolutePath(), e );
-        }
-        finally
-        {
-            IOUtil.close( is );
-            IOUtil.close( os );
+            getLogger().warn(
+                "Could not write the OBR plugin configuration to path " + configurationFile.getAbsolutePath(), e );
+            Throwables.propagate( e );
         }
     }
 

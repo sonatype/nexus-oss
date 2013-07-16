@@ -18,7 +18,6 @@ import javax.naming.NamingException;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.junit.Test;
 import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.dao.LdapDAOException;
@@ -40,26 +39,10 @@ public class MultipleAccessLdapConfigIT
     {
         super.setUp();
 
+        // delete the ldap.xml file, if any
+        new File( getConfHomeDir(), "ldap.xml" ).delete();
         ldapManager = (SimpleLdapManager) lookup( LdapManager.class );
         ldapConfig = this.lookup( LdapConfiguration.class );
-    }
-
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-
-        // delete the ldap.xml file
-        File confFile = new File( getBasedir() + "/target/test-classes/not-configured/", "ldap.xml" );
-        confFile.delete();
-    }
-
-    @Override
-    protected void customizeContext( Context context )
-    {
-        super.customizeContext( context );
-        context.put( "application-conf", getBasedir() + "/target/test-classes/not-configured/" );
     }
 
     @Test

@@ -34,6 +34,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-common</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-bean</artifactId>
     </dependency>

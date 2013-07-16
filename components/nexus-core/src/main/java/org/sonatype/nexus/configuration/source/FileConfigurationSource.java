@@ -14,16 +14,15 @@ package org.sonatype.nexus.configuration.source;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -33,9 +32,12 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
+import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.security.events.SecurityConfigurationChanged;
+import org.sonatype.sisu.goodies.common.io.FileReplacer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
@@ -349,52 +351,38 @@ public class FileConfigurationSource
      * @param file the file
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private void saveConfiguration( File file )
+    private void saveConfiguration( final File file )
         throws IOException
     {
-        FileOutputStream fos = null;
-
-        File backupFile = new File( file.getParentFile(), file.getName() + ".old" );
-
-        try
+        // Create the dir if doesn't exist, throw runtime exception on failure
+        // bad bad bad
+        if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
         {
-            // Create the dir if doesn't exist, throw runtime exception on failure
-            // bad bad bad
-            if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
-            {
-                String message =
-                    "\r\n******************************************************************************\r\n"
-                        + "* Could not create configuration file [ "
-                        + file.toString()
-                        + "]!!!! *\r\n"
-                        + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                        + "******************************************************************************";
+            String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not create configuration file [ " + file.toString() + "]!!!! *\r\n"
+                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
 
-                getLogger().error( message );
-            }
-
-            // copy the current nexus config file as file.bak
-            if ( file.exists() )
-            {
-                FileUtils.copyFile( file, backupFile );
-            }
-
-            // Clone the conf so we can encrypt the passwords
-            Configuration copyOfConfig = configHelper.encryptDecryptPasswords( getConfiguration(), true );
-
-            fos = new FileOutputStream( file );
-
-            saveConfiguration( fos, copyOfConfig );
-
-            fos.flush();
-        }
-        finally
-        {
-            IOUtil.close( fos );
+            getLogger().error( message );
+            throw new IOException( "Could not create configuration file " + file.getAbsolutePath() );
         }
 
-        // if all went well, delete the bak file
-        backupFile.delete();
+        // Clone the conf so we can encrypt the passwords
+        final Configuration configuration = configHelper.encryptDecryptPasswords( getConfiguration(), true );
+        getLogger().debug( "Saving configuration: {}", file );
+        final FileReplacer fileReplacer = new FileReplacer( file );
+        // we save this file many times, don't litter backups
+        fileReplacer.setDeleteBackupFile( true );
+        fileReplacer.replace( new ContentWriter()
+        {
+            @Override
+            public void write( final BufferedOutputStream output )
+                throws IOException
+            {
+                new NexusConfigurationXpp3Writer().write( output, configuration );
+            }
+        } );
     }
 
     /**

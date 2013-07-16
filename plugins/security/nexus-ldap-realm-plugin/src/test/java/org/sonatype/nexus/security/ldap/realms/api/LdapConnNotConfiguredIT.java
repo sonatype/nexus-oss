@@ -14,7 +14,6 @@ package org.sonatype.nexus.security.ldap.realms.api;
 
 import java.io.File;
 
-import org.codehaus.plexus.context.Context;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.NexusLdapTestSupport;
@@ -27,6 +26,15 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 public class LdapConnNotConfiguredIT
     extends NexusLdapTestSupport
 {
+    @Override
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        // delete the ldap.xml file, if any
+        new File( getConfHomeDir(), "ldap.xml" ).delete();
+    }
 
     private PlexusResource getResource()
         throws Exception
@@ -130,18 +138,4 @@ public class LdapConnNotConfiguredIT
         result = (LdapConnectionInfoResponse) resource.get( null, null, null, null );
         this.validateConnectionDTO( connectionInfo, result.getData() );
     }
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-
-        ctx.put( CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath() );
-    }
-
-    private File getLdapXml()
-    {
-        return new File( getConfHomeDir(), "no-conf/ldap.xml" );
-    }
-
 }

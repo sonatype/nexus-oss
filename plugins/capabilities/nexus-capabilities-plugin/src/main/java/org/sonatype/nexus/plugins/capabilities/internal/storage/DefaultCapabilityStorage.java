@@ -15,21 +15,20 @@ package org.sonatype.nexus.plugins.capabilities.internal.storage;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -46,6 +45,9 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapa
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -67,7 +69,7 @@ public class DefaultCapabilityStorage
     @Inject
     public DefaultCapabilityStorage( final ApplicationConfiguration applicationConfiguration )
     {
-        configurationFile = new File( applicationConfiguration.getWorkingDirectory(), "conf/capabilities.xml" );
+        configurationFile = new File( applicationConfiguration.getConfigurationDirectory(), "capabilities.xml" );
     }
 
     @Override
@@ -213,34 +215,24 @@ public class DefaultCapabilityStorage
     {
         lock.lock();
 
-        configurationFile.getParentFile().mkdirs();
-
-        Writer fw = null;
-
+        getLogger().debug( "Saving configuration: {}", configurationFile );
         try
         {
-            fw = new OutputStreamWriter( new FileOutputStream( configurationFile ) );
-
-            final NexusCapabilitiesConfigurationXpp3Writer writer = new NexusCapabilitiesConfigurationXpp3Writer();
-
-            writer.write( fw, configuration );
+            final FileReplacer fileReplacer = new FileReplacer( configurationFile );
+            // we save this file many times, don't litter backups
+            fileReplacer.setDeleteBackupFile( true );
+            fileReplacer.replace( new ContentWriter()
+            {
+                @Override
+                public void write( final BufferedOutputStream output )
+                    throws IOException
+                {
+                    new NexusCapabilitiesConfigurationXpp3Writer().write( output, configuration );
+                }
+            } );
         }
         finally
         {
-            if ( fw != null )
-            {
-                try
-                {
-                    fw.flush();
-
-                    fw.close();
-                }
-                catch ( final IOException e )
-                {
-                    // just closing if open
-                }
-            }
-
             lock.unlock();
         }
     }

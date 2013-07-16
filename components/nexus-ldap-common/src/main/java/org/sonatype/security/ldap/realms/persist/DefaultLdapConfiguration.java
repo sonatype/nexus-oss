@@ -12,24 +12,22 @@
  */
 package org.sonatype.security.ldap.realms.persist;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
@@ -38,36 +36,37 @@ import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Writer;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.common.io.FileReplacer;
+import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @Component( role = LdapConfiguration.class, hint = "default", instantiationStrategy = "singleton" )
 public class DefaultLdapConfiguration
+    extends AbstractLoggingComponent
     implements LdapConfiguration
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
-    
-    @org.codehaus.plexus.component.annotations.Configuration( value = "${application-conf}/ldap.xml" )
-    private File configurationFile;
-
-    private Configuration configuration;
+    @Requirement
+    private ApplicationConfiguration applicationConfiguration;
 
     @Requirement( role = ConfigurationValidator.class )
     private ConfigurationValidator validator;
 
     @Requirement
     private PasswordHelper passwordHelper;
-    
+
     @Requirement
     private PasswordEncoderManager passwordEncoderManager;
-    
+
     @Requirement
     private EventBus eventBus;
 
+    private Configuration configuration;
+
     private ReentrantLock lock = new ReentrantLock();
 
-    protected Logger getLogger()
+    protected File getConfigurationFile()
     {
-        return logger;
+        return new File( applicationConfiguration.getConfigurationDirectory(), "ldap.xml" );
     }
 
     public CConnectionInfo readConnectionInfo()
@@ -131,17 +130,16 @@ public class DefaultLdapConfiguration
     {
         Reader fr = null;
         FileInputStream is = null;
-       
+        lock.lock();
         try
         {
-            
-            lock.lock();
-            
+            final File configurationFile = getConfigurationFile();
+
             if ( configuration != null )
             {
                 return configuration;
             }
-            
+
             is = new FileInputStream( configurationFile );
 
             LdapConfigurationXpp3Reader reader = new LdapConfigurationXpp3Reader();
@@ -156,26 +154,28 @@ public class DefaultLdapConfiguration
             {
                 // TODO need to code the handling of invalid config
                 configuration = new Configuration();
-            }                 
-            
-         // decrypt the password, if it fails assume the password is clear text.
-            // If the password is wrong the the LDAP Realm will not work, which is no different. If the user typed in the
+            }
+
+            // decrypt the password, if it fails assume the password is clear text.
+            // If the password is wrong the the LDAP Realm will not work, which is no different. If the user typed in
+            // the
             // password wrong.
-            if ( configuration.getConnectionInfo() != null && StringUtils.isNotEmpty( configuration.getConnectionInfo().getSystemPassword() ) )
+            if ( configuration.getConnectionInfo() != null
+                && StringUtils.isNotEmpty( configuration.getConnectionInfo().getSystemPassword() ) )
             {
                 try
                 {
-                    configuration.getConnectionInfo().setSystemPassword( passwordHelper.decrypt( configuration.getConnectionInfo().getSystemPassword() ) );
+                    configuration.getConnectionInfo().setSystemPassword(
+                        passwordHelper.decrypt( configuration.getConnectionInfo().getSystemPassword() ) );
                 }
                 catch ( PlexusCipherException e )
                 {
                     this.getLogger().error(
                         "Failed to decrypt password, assuming the password in file: '"
-                            + configurationFile.getAbsolutePath() + "' is clear text.",
-                        e );
+                            + configurationFile.getAbsolutePath() + "' is clear text.", e );
                 }
             }
-            
+
         }
         catch ( FileNotFoundException e )
         {
@@ -225,42 +225,52 @@ public class DefaultLdapConfiguration
     public void save()
     {
         lock.lock();
-
-        configurationFile.getParentFile().mkdirs();
-
-        Writer fw = null;
-
         try
         {
-            // this is sort of dirty...
-            String clearPass = null;
-            
+            final File configurationFile = getConfigurationFile();
+            if ( !configurationFile.getParentFile().exists() && !configurationFile.getParentFile().mkdirs() )
+            {
+                String message =
+                    "\r\n******************************************************************************\r\n"
+                        + "* Could not create configuration file [ "
+                        + configurationFile.toString()
+                        + "]!!!! *\r\n"
+                        + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
+                        + "******************************************************************************";
+                getLogger().error( message );
+                throw new IOException( "Could not create configuration file " + configurationFile.getAbsolutePath() );
+            }
+
+            final Configuration configuration = this.configuration.clone();
             // change the password to be encrypted
-            if ( configuration.getConnectionInfo() != null && StringUtils.isNotEmpty( configuration.getConnectionInfo().getSystemPassword() ) )
+            if ( configuration.getConnectionInfo() != null
+                && StringUtils.isNotEmpty( configuration.getConnectionInfo().getSystemPassword() ) )
             {
                 try
                 {
-                    clearPass = configuration.getConnectionInfo().getSystemPassword();
-                    configuration.getConnectionInfo().setSystemPassword( passwordHelper.encrypt( clearPass ) );
+                    configuration.getConnectionInfo().setSystemPassword(
+                        passwordHelper.encrypt( configuration.getConnectionInfo().getSystemPassword() ) );
                 }
                 catch ( PlexusCipherException e )
                 {
                     getLogger().error( "Failed to encrypt password while storing configuration file", e );
                 }
             }
-            
-            fw = new OutputStreamWriter( new FileOutputStream( configurationFile ) );
 
-            LdapConfigurationXpp3Writer writer = new LdapConfigurationXpp3Writer();
+            // perform the "safe save"
+            getLogger().debug( "Saving configuration: {}", configurationFile );
+            final FileReplacer fileReplacer = new FileReplacer( configurationFile );
+            fileReplacer.setDeleteBackupFile( true );
 
-            writer.write( fw, configuration );
-            
-            // now reset the password
-            if ( configuration.getConnectionInfo() != null )
+            fileReplacer.replace( new ContentWriter()
             {
-                configuration.getConnectionInfo().setSystemPassword( clearPass );
-            }
-            
+                @Override
+                public void write( final BufferedOutputStream output )
+                    throws IOException
+                {
+                    new LdapConfigurationXpp3Writer().write( output, configuration );
+                }
+            } );
         }
         catch ( IOException e )
         {
@@ -268,31 +278,17 @@ public class DefaultLdapConfiguration
         }
         finally
         {
-            if ( fw != null )
-            {
-                try
-                {
-                    fw.flush();
-
-                    fw.close();
-                }
-                catch ( IOException e )
-                {
-                    // just closing if open
-                }
-            }
-
             lock.unlock();
         }
-        
+
         // fire clear cache event
-        this.eventBus.post( new LdapClearCacheEvent( null ) );
+        this.eventBus.post( new LdapClearCacheEvent( this ) );
     }
 
     public void clearCache()
     {
         configuration = null;
-        
+
         // fire clear cache event
         this.eventBus.post( new LdapClearCacheEvent( null ) );
     }
@@ -313,20 +309,16 @@ public class DefaultLdapConfiguration
         }
         catch ( IOException e )
         {
-            this
-                .getLogger()
-                .error(
-                    "Failed to read default LDAP Realm configuration.  This may be corrected while the application is running.",
-                    e );
+            this.getLogger().error(
+                "Failed to read default LDAP Realm configuration.  This may be corrected while the application is running.",
+                e );
             defaultConfig = new Configuration();
         }
         catch ( XmlPullParserException e )
         {
-            this
-                .getLogger()
-                .error(
-                    "Failed to read default LDAP Realm configuration.  This may be corrected while the application is running.",
-                    e );
+            this.getLogger().error(
+                "Failed to read default LDAP Realm configuration.  This may be corrected while the application is running.",
+                e );
             defaultConfig = new Configuration();
         }
         finally
@@ -364,7 +356,7 @@ public class DefaultLdapConfiguration
         LdapAuthConfiguration authConfig = new LdapAuthConfiguration();
 
         authConfig.setEmailAddressAttribute( userAndGroupsConf.getEmailAddressAttribute() );
-//        authConfig.setPasswordEncoding( userAndGroupsConf.getPreferredPasswordEncoding() );
+        // authConfig.setPasswordEncoding( userAndGroupsConf.getPreferredPasswordEncoding() );
         authConfig.setUserBaseDn( StringUtils.defaultString( userAndGroupsConf.getUserBaseDn(), "" ) );
         authConfig.setUserIdAttribute( userAndGroupsConf.getUserIdAttribute() );
         authConfig.setUserObjectClass( userAndGroupsConf.getUserObjectClass() );
@@ -381,7 +373,7 @@ public class DefaultLdapConfiguration
         authConfig.setGroupSubtree( userAndGroupsConf.isGroupSubtree() );
         authConfig.setUserMemberOfAttribute( userAndGroupsConf.getUserMemberOfAttribute() );
         authConfig.setLdapGroupsAsRoles( userAndGroupsConf.isLdapGroupsAsRoles() );
-        authConfig.setLdapFilter(userAndGroupsConf.getLdapFilter());
+        authConfig.setLdapFilter( userAndGroupsConf.getLdapFilter() );
         return authConfig;
     }
 }

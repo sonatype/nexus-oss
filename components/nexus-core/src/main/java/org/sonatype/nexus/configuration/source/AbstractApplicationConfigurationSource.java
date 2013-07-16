@@ -15,10 +15,7 @@ package org.sonatype.nexus.configuration.source;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
@@ -26,7 +23,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
 /**
@@ -126,35 +122,6 @@ public abstract class AbstractApplicationConfigurationSource
         if ( getConfiguration() != null )
         {
             getLogger().info( "Configuration loaded successfully." );
-        }
-    }
-
-    /**
-     * Save configuration.
-     * 
-     * @param file the file
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    protected void saveConfiguration( OutputStream os, Configuration configuration )
-        throws IOException
-    {
-        Writer fw = null;
-        try
-        {
-            fw = new OutputStreamWriter( os );
-
-            NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
-
-            writer.write( fw, configuration );
-        }
-        finally
-        {
-            if ( fw != null )
-            {
-                fw.flush();
-
-                fw.close();
-            }
         }
     }
 
