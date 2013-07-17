@@ -22,6 +22,9 @@ import java.util.concurrent.ExecutionException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.mime.detectors.NexusExtensionMimeDetector;
+import org.sonatype.nexus.mime.detectors.NexusMagicMimeMimeDetector;
+import org.sonatype.nexus.mime.detectors.NexusOpendesktopMimeDetector;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
@@ -33,8 +36,6 @@ import com.google.common.cache.LoadingCache;
 
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
-import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
-import eu.medsea.mimeutil.detector.OpendesktopMimeDetector;
 
 /**
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
@@ -49,14 +50,26 @@ public class DefaultMimeSupport
 {
     /**
      * Property to make Nexus consume the OpenDesktop formatted magic.mime database, used by some newer Linux based OSes
-     * (latest CentOS, RHEL, Ubuntu). This new
+     * (latest CentOS, RHEL, Ubuntu). This new switch by default read the file from {@code /usr/share/mime/mime.cache}
+     * unless overridden.
      * 
      * @see <a href="https://issues.sonatype.org/browse/NEXUS-5772">NEXUS-5772</a>
      * @see <a href="http://standards.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html">MIME info
      *      specification (latest)</a>
      * @since 2.6.1
      */
-    private static final boolean MIME_MAGIC_OPENDESKTOP = SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicOpendesktop", false );
+    public static final boolean MIME_MAGIC_OPENDESKTOP = SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicOpendesktop", false );
+
+    /**
+     * Property to override the location of the mime.magic file to read up (the OS one). The default location depends on
+     * which "standard" is used (classic vs OpenDesktop), but also some OSes might have some customizations in this
+     * area. If this property is specified, the specified file path will be used, but if not, the used mime detector
+     * default will be used instead. For defaults, see {@link NexusMagicMimeMimeDetector} (the "classic") and
+     * {@link NexusOpendesktopMimeDetector}.
+     * 
+     * @since 2.6.1
+     */
+    public static final String MIME_MAGIC_FILE = SystemPropertiesHelper.getString( "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicFile", null );
 
     private final MimeUtil2 nonTouchingMimeUtil;
 
@@ -91,11 +104,17 @@ public class DefaultMimeSupport
         touchingMimeUtil = new MimeUtil2();
         if ( MIME_MAGIC_OPENDESKTOP )
         {
-            touchingMimeUtil.registerMimeDetector( OpendesktopMimeDetector.class.getName() );
+            // MIME_MAGIC_FILE override is handled by this class
+            touchingMimeUtil.registerMimeDetector( NexusOpendesktopMimeDetector.class.getName() );
         }
         else
         {
-            touchingMimeUtil.registerMimeDetector( MagicMimeMimeDetector.class.getName() );
+            // we need to handle MIME_MAGIC_FILE override here manually
+            if (!Strings.isNullOrEmpty( MIME_MAGIC_FILE ))
+            {
+                System.setProperty( "magic-mime", MIME_MAGIC_FILE );
+            }
+            touchingMimeUtil.registerMimeDetector( NexusMagicMimeMimeDetector.class.getName() );
         }
 
         // create the cache
