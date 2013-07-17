@@ -23,17 +23,18 @@ import java.util.concurrent.ExecutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.io.Closeables;
 
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
+import eu.medsea.mimeutil.detector.OpendesktopMimeDetector;
 
 /**
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
@@ -46,6 +47,17 @@ public class DefaultMimeSupport
     extends AbstractLoggingComponent
     implements MimeSupport
 {
+    /**
+     * Property to make Nexus consume the OpenDesktop formatted magic.mime database, used by some newer Linux based OSes
+     * (latest CentOS, RHEL, Ubuntu). This new
+     * 
+     * @see <a href="https://issues.sonatype.org/browse/NEXUS-5772">NEXUS-5772</a>
+     * @see <a href="http://standards.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html">MIME info
+     *      specification (latest)</a>
+     * @since 2.6.1
+     */
+    private static final boolean MIME_MAGIC_OPENDESKTOP = SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicOpendesktop", false );
+
     private final MimeUtil2 nonTouchingMimeUtil;
 
     private final MimeUtil2 touchingMimeUtil;
@@ -77,7 +89,14 @@ public class DefaultMimeSupport
         // uses magic-mime (IO and lower speed but more accuracy)
         // See src/main/resources/magic.mime for customizations
         touchingMimeUtil = new MimeUtil2();
-        touchingMimeUtil.registerMimeDetector( MagicMimeMimeDetector.class.getName() );
+        if ( MIME_MAGIC_OPENDESKTOP )
+        {
+            touchingMimeUtil.registerMimeDetector( OpendesktopMimeDetector.class.getName() );
+        }
+        else
+        {
+            touchingMimeUtil.registerMimeDetector( MagicMimeMimeDetector.class.getName() );
+        }
 
         // create the cache
         extensionToMimeTypeCache =
@@ -158,15 +177,9 @@ public class DefaultMimeSupport
         throws IOException
     {
         Set<String> magicMimeTypes = new HashSet<String>();
-        BufferedInputStream bis = null;
-        try
+        try( final BufferedInputStream bis = new BufferedInputStream( content.getContent() ) )
         {
-            magicMimeTypes.addAll( toStringSet( getTouchingMimeUtil2().getMimeTypes(
-                bis = new BufferedInputStream( content.getContent() ) ) ) );
-        }
-        finally
-        {
-            Closeables.closeQuietly( bis );
+            magicMimeTypes.addAll( toStringSet( getTouchingMimeUtil2().getMimeTypes( bis ) ) );
         }
         return magicMimeTypes;
     }
