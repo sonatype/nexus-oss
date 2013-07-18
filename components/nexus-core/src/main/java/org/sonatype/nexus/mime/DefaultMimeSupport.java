@@ -13,6 +13,7 @@
 package org.sonatype.nexus.mime;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import com.google.common.cache.LoadingCache;
 
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
+import eu.medsea.mimeutil.detector.MimeDetector;
 
 /**
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
@@ -48,6 +50,10 @@ public class DefaultMimeSupport
     extends AbstractLoggingComponent
     implements MimeSupport
 {
+    public static final String MIME_MAGIC_OPENDESKTOP_KEY = "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicOpendesktop";
+
+    public static final String MIME_MAGIC_FILE_KEY = "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicFile";
+
     /**
      * Property to make Nexus consume the OpenDesktop formatted magic.mime database, used by some newer Linux based OSes
      * (latest CentOS, RHEL, Ubuntu). This new switch by default read the file from {@code /usr/share/mime/mime.cache}
@@ -58,7 +64,7 @@ public class DefaultMimeSupport
      *      specification (latest)</a>
      * @since 2.6.1
      */
-    public static final boolean MIME_MAGIC_OPENDESKTOP = SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicOpendesktop", false );
+    public final boolean MIME_MAGIC_OPENDESKTOP = SystemPropertiesHelper.getBoolean( MIME_MAGIC_OPENDESKTOP_KEY, false );
 
     /**
      * Property to override the location of the mime.magic file to read up (the OS one). The default location depends on
@@ -69,7 +75,7 @@ public class DefaultMimeSupport
      * 
      * @since 2.6.1
      */
-    public static final String MIME_MAGIC_FILE = SystemPropertiesHelper.getString( "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicFile", null );
+    public final String MIME_MAGIC_FILE = SystemPropertiesHelper.getString( MIME_MAGIC_FILE_KEY, null );
 
     private final MimeUtil2 nonTouchingMimeUtil;
 
@@ -101,20 +107,41 @@ public class DefaultMimeSupport
 
         // uses magic-mime (IO and lower speed but more accuracy)
         // See src/main/resources/magic.mime for customizations
+
+        final String mimeMagicFilePath = getFilePathToUseIfExistsOrDie();
         touchingMimeUtil = new MimeUtil2();
+
         if ( MIME_MAGIC_OPENDESKTOP )
         {
             // MIME_MAGIC_FILE override is handled by this class
-            touchingMimeUtil.registerMimeDetector( NexusOpendesktopMimeDetector.class.getName() );
+            if (!Strings.isNullOrEmpty( mimeMagicFilePath ))
+            {
+                NexusOpendesktopMimeDetector.mimeCachePath = mimeMagicFilePath;
+            }
+            else
+            {
+                NexusOpendesktopMimeDetector.mimeCachePath = NexusOpendesktopMimeDetector.DEFAULT_MIME_CACHE_PATH;
+            }
+            final MimeDetector md =
+                touchingMimeUtil.registerMimeDetector( NexusOpendesktopMimeDetector.class.getName() );
+            if ( md == null )
+            {
+                throw new IllegalArgumentException( "Failed to register NexusOpendesktopMimeDetector with MIME database "
+                    + NexusOpendesktopMimeDetector.mimeCachePath );
+            }
         }
         else
         {
             // we need to handle MIME_MAGIC_FILE override here manually
-            if (!Strings.isNullOrEmpty( MIME_MAGIC_FILE ))
+            if (!Strings.isNullOrEmpty( mimeMagicFilePath ))
             {
-                System.setProperty( "magic-mime", MIME_MAGIC_FILE );
+                System.setProperty( "magic-mime", mimeMagicFilePath );
             }
-            touchingMimeUtil.registerMimeDetector( NexusMagicMimeMimeDetector.class.getName() );
+            final MimeDetector md = touchingMimeUtil.registerMimeDetector( NexusMagicMimeMimeDetector.class.getName() );
+            if ( md == null )
+            {
+                throw new IllegalArgumentException( "Failed to register NexusMagicMimeMimeDetector" );
+            }
         }
 
         // create the cache
@@ -140,6 +167,31 @@ public class DefaultMimeSupport
                     return MimeUtil2.getMostSpecificMimeType( getNonTouchingMimeUtil2().getMimeTypes( "dummyfile." + key ) ).toString();
                 }
             } );
+    }
+
+    /**
+     * Method that returns user specified mime file path and also verifies it's existence. If user did not specify mime
+     * magic file path, will return {@code null}, meaning that given detector should use it's own default paths, if
+     * applicable.
+     * 
+     * @return file specific for mime database specified by user and checked for existence, or {@code null} if user did
+     *         not specify it explicitly.
+     * @throws IllegalArgumentException if user did specify a MIME file path but that path does not exists or is not a
+     *             file or is not readable.
+     */
+    private String getFilePathToUseIfExistsOrDie( )
+    {
+        // chooses override path or default path. Default path copied from OpendesktopMimeDetector source.
+        final String path = MIME_MAGIC_FILE;
+        if ( Strings.isNullOrEmpty( path ) )
+        {
+            return null;
+        }
+        if ( !new File( path ).isFile() )
+        {
+            throw new IllegalArgumentException( "Explicitly set MIME magic file not found on path " + path );
+        }
+        return path;
     }
 
     protected MimeUtil2 getNonTouchingMimeUtil2()
