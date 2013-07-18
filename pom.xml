@@ -13,8 +13,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,7 +27,7 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <version>3.0.3-SNAPSHOT</version>
+  <version>3.0.3</version>
 
   <developers>
     <developer>
@@ -117,20 +116,20 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
         <type>nexus-plugin</type>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>3.0.3</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
         <type>jar</type>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>3.0.3</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-client</artifactId>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>3.0.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
