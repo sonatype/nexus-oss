@@ -245,8 +245,7 @@ public class DefaultIndexerManager
 
     private boolean INCLUDEINSEARCH( Repository repository )
     {
-        return INSERVICE( repository )
-            && ( ISGROUP( repository ) || ( INDEXABLE( repository ) && repository.isSearchable() ) );
+        return INSERVICE( repository ) && ( ISGROUP( repository ) || ( INDEXABLE( repository ) ) );
     }
 
     @Inject
@@ -2791,7 +2790,7 @@ public class DefaultIndexerManager
         {
             for ( Repository repository : repositoryRegistry.getRepositories() )
             {
-                if ( !ISGROUP( repository ) && INCLUDEINSEARCH( repository ) )
+                if ( !ISGROUP( repository ) && INCLUDEINSEARCH( repository ) && repository.isSearchable() )
                 {
                     repositories.add( repository );
                 }
