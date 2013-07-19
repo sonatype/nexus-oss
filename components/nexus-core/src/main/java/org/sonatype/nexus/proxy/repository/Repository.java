@@ -449,31 +449,30 @@ public interface Repository
     void setWritePolicy( RepositoryWritePolicy writePolicy );
 
     /**
-     * Is Repository indexable?.
-     * 
-     * @return true if is indexable, otherwise false.
+     * Is Repository indexable? If {@code true}, indexing context (or whatever indexer technology is used if the future)
+     * will be created and maintained for this repository. This also implies, that using "targeted searches" (of maven
+     * indexer or any "future" technology we'd use for indexing) should work against this repository.
      */
     boolean isIndexable();
 
     /**
-     * Sets the indexable property of repository. If true, its content will be indexed by Indexer, otherwise not.
-     * 
-     * @param val the val
+     * Sets the indexable property of repository. If {@code true}, its content will be indexed by Indexer, otherwise not.
      */
     void setIndexable( boolean val );
 
     /**
-     * Is Repository searchable?.
-     * 
-     * @return true if is searchable, otherwise false.
+     * Is Repository searchable? If {@code true} (it implies {@link #isIndexable()} is {@code true} also, client code
+     * should check both!), it means that in case of "non targeted searches" (aka "global searches" done against this
+     * Nexus instance not specifying repository to search in) this repository will participate in search, will
+     * contribute to search results: it will be searched too, and found hits will be added to resulting search results.
+     * If {@code false}, then this repository might be searched only using "targeted searches", when this repository is
+     * explicity stated as search target.
      */
     boolean isSearchable();
 
     /**
-     * Sets the searchable property of repository. If true, its content will be searched by Indexer (when doing
-     * "global", non targeted searches), otherwise not.
-     * 
-     * @param val the val
+     * Sets the searchable property of repository. If {@code true}, it will be searched when doing
+     * "non targeted searches", otherwise not.
      */
     void setSearchable( boolean val );
 
