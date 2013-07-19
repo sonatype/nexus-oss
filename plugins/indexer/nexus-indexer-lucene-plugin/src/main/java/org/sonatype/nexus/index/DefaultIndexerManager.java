@@ -243,6 +243,12 @@ public class DefaultIndexerManager
         return repository.getRepositoryKind().isFacetAvailable( GroupRepository.class );
     }
 
+    private boolean INCLUDEINSEARCH( Repository repository )
+    {
+        return INSERVICE( repository )
+            && ( ISGROUP( repository ) || ( INDEXABLE( repository ) && repository.isSearchable() ) );
+    }
+
     @Inject
     private NexusIndexer mavenIndexer;
 
@@ -2453,7 +2459,7 @@ public class DefaultIndexerManager
         Lock lock = null;
         IndexingContext lockedContext = null;
 
-        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
+        if ( !INCLUDEINSEARCH( repository ) )
         {
             return;
         }
@@ -2767,22 +2773,25 @@ public class DefaultIndexerManager
         if ( repositoryId != null )
         {
             final Repository repository = repositoryRegistry.getRepository( repositoryId );
-            if ( ISGROUP( repository ) )
+            if ( INCLUDEINSEARCH( repository ) )
             {
-                Map<String, Repository> members = new HashMap<String, Repository>();
-                addGroupMembers( members, (GroupRepository) repository );
-                repositories.addAll( members.values() );
-            }
-            else
-            {
-                repositories.add( repository );
+                if ( ISGROUP( repository ) )
+                {
+                    Map<String, Repository> members = new HashMap<String, Repository>();
+                    addGroupMembers( members, (GroupRepository) repository );
+                    repositories.addAll( members.values() );
+                }
+                else
+                {
+                    repositories.add( repository );
+                }
             }
         }
         else
         {
             for ( Repository repository : repositoryRegistry.getRepositories() )
             {
-                if ( INDEXABLE( repository ) && repository.isSearchable() && !ISGROUP( repository ) )
+                if ( !ISGROUP( repository ) && INCLUDEINSEARCH( repository ) )
                 {
                     repositories.add( repository );
                 }
@@ -2852,7 +2861,7 @@ public class DefaultIndexerManager
     {
         for ( Repository member : group.getMemberRepositories() )
         {
-            if ( INDEXABLE( member ) && !repositories.containsKey( member.getId() ) )
+            if ( INCLUDEINSEARCH( member ) && !repositories.containsKey( member.getId() ) )
             {
                 if ( ISGROUP( member ) )
                 {
