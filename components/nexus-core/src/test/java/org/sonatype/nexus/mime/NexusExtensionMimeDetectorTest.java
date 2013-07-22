@@ -21,9 +21,11 @@ import static org.mockito.Mockito.when;
 import java.util.Collection;
 
 import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.sonatype.nexus.mime.detectors.NexusExtensionMimeDetector;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
