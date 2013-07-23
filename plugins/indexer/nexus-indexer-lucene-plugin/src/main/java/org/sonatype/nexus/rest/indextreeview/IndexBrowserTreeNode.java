@@ -163,14 +163,22 @@ public class IndexBrowserTreeNode
         this.packaging = packaging;
     }
 
+    /**
+     * Converts this instance into a DTO, ready for wire transmission.
+     * 
+     * @since 2.6.1
+     */
     public IndexBrowserTreeNodeDTO toDTO()
     {
         final List<IndexBrowserTreeNodeDTO> children = Lists.newArrayList();
-        for ( TreeNode childNode : getChildren() )
+        if ( getChildren() != null )
         {
-            if ( childNode instanceof IndexBrowserTreeNode )
+            for ( TreeNode childNode : getChildren() )
             {
-                children.add( ( (IndexBrowserTreeNode) childNode ).toDTO() );
+                if ( childNode instanceof IndexBrowserTreeNode )
+                {
+                    children.add( ( (IndexBrowserTreeNode) childNode ).toDTO() );
+                }
             }
         }
         return new IndexBrowserTreeNodeDTO( getType().name(), isLeaf(), getNodeName(), getPath(), children,
