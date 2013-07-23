@@ -12,20 +12,19 @@
  */
 package org.sonatype.nexus.mime;
 
-import com.google.common.collect.Lists;
-import eu.medsea.mimeutil.detector.MimeDetector;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.sonatype.nexus.mime.detectors.NexusExtensionMimeDetector;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import com.google.common.collect.Lists;
 
 /**
  * Tests for {@link DefaultMimeSupport}.
