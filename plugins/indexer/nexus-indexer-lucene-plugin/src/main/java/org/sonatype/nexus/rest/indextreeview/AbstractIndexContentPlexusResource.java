@@ -15,12 +15,12 @@ package org.sonatype.nexus.rest.indextreeview;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.index.Field;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.apache.commons.lang.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -66,7 +66,7 @@ public abstract class AbstractIndexContentPlexusResource
     {
         super.configureXStream( xstream );
 
-        xstream.processAnnotations( IndexBrowserTreeNode.class );
+        xstream.processAnnotations( IndexBrowserTreeNodeDTO.class );
         xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
     }
 
@@ -136,7 +136,7 @@ public abstract class AbstractIndexContentPlexusResource
                         "Unable to retrieve index tree nodes" );
                 }
 
-                return new IndexBrowserTreeViewResponseDTO( (IndexBrowserTreeNode) node );
+                return new IndexBrowserTreeViewResponseDTO( ((IndexBrowserTreeNode) node).toDTO() );
             }
             else
             {
