@@ -486,14 +486,7 @@ public class DefaultSnapshotRemover
                             }
                             else
                             {
-                                // if dateThreshold is not used (zero days) OR
-                                // if itemTimestamp is less then dateThreshold (NB: both are positive!)
-                                // below will the retentionCount overrule if needed this
-                                if ( -1 == dateThreshold
-                                    || request.shouldUseLastRequestedTimestamp()
-                                            ? getLastRequested( coll, item, gav ) < dateThreshold
-                                            : itemTimestamp < dateThreshold
-                                    )
+                                if ( snapshotShouldBeRemoved( coll, item, gav, itemTimestamp ) )
                                 {
                                     versionsToRemove.add( new Long( itemTimestamp ) );
                                     addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
@@ -634,6 +627,32 @@ public class DefaultSnapshotRemover
 
             updateMetadataIfNecessary( context, coll );
 
+        }
+
+        /**
+         * if dateThreshold is not used (zero days) OR
+         * if last requested is less then dateThreshold (and las requested should be used) OR
+         * if itemTimestamp is less then dateThreshold (NB: both are positive!) OR
+         *
+         * @since 2.6.1
+         */
+        private boolean snapshotShouldBeRemoved( final StorageCollectionItem coll,
+                                                 final StorageItem item,
+                                                 final Gav gav,
+                                                 final long itemTimestamp )
+            throws Exception
+        {
+            if ( -1 == dateThreshold )
+            {
+                return true;
+            }
+
+            if ( request.shouldUseLastRequestedTimestamp() )
+            {
+                return getLastRequested( coll, item, gav ) < dateThreshold;
+            }
+
+            return itemTimestamp < dateThreshold;
         }
 
         /**
