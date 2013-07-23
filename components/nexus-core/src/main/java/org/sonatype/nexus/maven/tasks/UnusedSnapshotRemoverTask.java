@@ -63,7 +63,17 @@ public class UnusedSnapshotRemoverTask
     public SnapshotRemovalResult doRun()
         throws Exception
     {
-        return null;
+        final SnapshotRemovalRequest req = new SnapshotRemovalRequest(
+            getRepositoryId(),
+            -1,                             // not applicable (minCountOfSnapshotsToKeep)
+            getDaysSinceLastRequested(),
+            false,                          // do not remove if release available
+            -1,                             // not applicable (graceDaysAfterRelease)
+            false,                          // do not delete immediately (will move to trash),
+            true                            // calculate number of days based on last time snapshot was requested
+        );
+
+        return snapshotRemover.removeSnapshots( req );
     }
 
     @Override
