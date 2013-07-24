@@ -31,6 +31,8 @@ public class SnapshotRemovalRequest
 
     private final boolean deleteImmediately;
 
+    private final boolean useLastRequestedTimestamp;
+
     /**
      * Old behavior without changing trash or delete (always trash).
      * <p/>
@@ -40,12 +42,25 @@ public class SnapshotRemovalRequest
                                    int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
     {
 
-        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays, removeIfReleaseExists, 0, false );
+        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays,
+              removeIfReleaseExists, 0, false, false );
     }
 
     public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
                                    int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
                                    int graceDaysAfterRelease, boolean deleteImmediately )
+    {
+        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays,
+              removeIfReleaseExists, graceDaysAfterRelease, deleteImmediately, false );
+    }
+
+    /**
+     * @since 2.6.1
+     */
+    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
+                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
+                                   int graceDaysAfterRelease, boolean deleteImmediately,
+                                   boolean useLastRequestedTimestamp )
     {
         this.repositoryId = repositoryId;
 
@@ -60,6 +75,9 @@ public class SnapshotRemovalRequest
         this.processedRepos = new HashSet<String>();
 
         this.deleteImmediately = deleteImmediately;
+
+        this.useLastRequestedTimestamp = useLastRequestedTimestamp;
+
     }
 
     public String getRepositoryId()
@@ -101,4 +119,10 @@ public class SnapshotRemovalRequest
     {
         return deleteImmediately;
     }
+
+    public boolean shouldUseLastRequestedTimestamp()
+    {
+        return useLastRequestedTimestamp;
+    }
+
 }
