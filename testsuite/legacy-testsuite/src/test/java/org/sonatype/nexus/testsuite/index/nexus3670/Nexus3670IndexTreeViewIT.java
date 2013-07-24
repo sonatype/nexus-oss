@@ -91,7 +91,7 @@ public class Nexus3670IndexTreeViewIT
         node = node.getChildren().get( 0 );
 
         // check path (note leading and trailing slashes!)
-        Assert.assertEquals( "The path should be V node", TreeNode.Type.V, node.getType() );
+        Assert.assertEquals( "The path should be V node", TreeNode.Type.V.name(), node.getType() );
     }
 
     private IndexBrowserTreeNodeDTO getNode( IndexBrowserTreeViewResponseDTO response, String artifactId )
@@ -127,7 +127,7 @@ public class Nexus3670IndexTreeViewIT
 
     protected int countNodes( IndexBrowserTreeNodeDTO node, Set<Type> types )
     {
-        int result = types.contains( node.getType() ) ? 1 : 0;
+        int result = types.contains( Type.valueOf( node.getType() ) ) ? 1 : 0;
 
         if ( !node.isLeaf() )
         {
