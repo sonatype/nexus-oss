@@ -612,9 +612,9 @@ public class ManagerImpl
         catch ( IllegalStateException e )
         {
             // just ack it, log it and return peacefully
-            getLogger().info( "Maven repository {} not in state for prefix file update: {}", mavenRepository,
-                e.getMessage() );
-            return;
+            getLogger().debug(
+                "Maven repository {} not in state for prefix file update: {}", mavenRepository, e.getMessage()
+            );
         }
     }
 
