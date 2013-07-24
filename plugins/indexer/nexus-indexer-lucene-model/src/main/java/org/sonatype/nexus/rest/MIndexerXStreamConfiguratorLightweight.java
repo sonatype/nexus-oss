@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.rest;
 
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeDTO;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
@@ -23,12 +25,8 @@ import org.sonatype.nexus.rest.model.SearchResponse;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * The "lightweight" XStream configurator for Nexus Indexer Lucene plugin. It will configure XStream for all DTOs except
- * the "tree view" ones (thus, tree view is unusable in case if "lightweight" clients, but it's the least, that's not
- * what clients would like to use). Problem with "tree view" is that it uses deep class hierarchy going all way back to
- * Maven Indexer classes, and hence, on client side all that entourage would need to be present on classpath, that would
- * defy the use of REST API at all (if indexer is present locally, then just download indexes and perform searches
- * locally too).
+ * The "lightweight" XStream configurator for Nexus Indexer Lucene plugin. It will configure XStream for all DTOs along
+ * with the "tree view" ones since 2.6.1. Class name is left for backward compatibility.
  * 
  * @author cstamas
  * @since 2.1
@@ -52,6 +50,13 @@ public class MIndexerXStreamConfiguratorLightweight
             NexusNGArtifactHit.class, "artifactHit" ) );
         xstream.registerLocalConverter( NexusNGArtifactHit.class, "artifactLinks", new AliasingListConverter(
             NexusNGArtifactLink.class, "artifactLink" ) );
+
+        // Tree (DTO classes extends classes from Maven Indexer, it is hence needed on classpath)
+        xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
+        xstream.processAnnotations( IndexBrowserTreeNodeDTO.class );
+        xstream.registerLocalConverter( IndexBrowserTreeNodeDTO.class, "children", new AliasingListConverter(
+            IndexBrowserTreeNodeDTO.class, "child" ) );
+
         return xstream;
     }
 }

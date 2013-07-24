@@ -12,16 +12,18 @@
  */
 package org.sonatype.nexus.rest.indextreeview;
 
+import java.util.List;
+
 import org.apache.maven.index.treeview.IndexTreeView;
+import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.index.treeview.DefaultMergedTreeNode;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.google.common.collect.Lists;
 
 /**
  * Adds some more details to the TreeNode, some items that are required for index browsing in the UI
  */
-@XStreamAlias( "indexBrowserTreeNode" )
 public class IndexBrowserTreeNode
     extends DefaultMergedTreeNode
 {
@@ -29,27 +31,27 @@ public class IndexBrowserTreeNode
      * The classifier of the artifact.
      */
     private String classifier;
-    
+
     /**
      * The file extension of the artifact.
      */
     private String extension;
-    
+
     /**
      * The packaging of the artifact.
      */
     private String packaging;
-    
+
     /**
      * The URI of the artifact.
      */
     private String artifactUri;
-    
+
     /**
      * The URI of the artifact's pom file.
      */
-    private String pomUri;    
-    
+    private String pomUri;
+
     /**
      * Constructor that takes an IndexTreeView implmentation and a TreeNodeFactory implementation;
      * 
@@ -60,7 +62,7 @@ public class IndexBrowserTreeNode
     {
         super( tview, request );
     }
-    
+
     /**
      * Get the classifier of the artifact.
      * 
@@ -70,7 +72,7 @@ public class IndexBrowserTreeNode
     {
         return classifier;
     }
-    
+
     /**
      * Set the classifier of the artifact.
      * 
@@ -80,7 +82,7 @@ public class IndexBrowserTreeNode
     {
         this.classifier = classifier;
     }
-    
+
     /**
      * Get the file extension of the artifact.
      * 
@@ -90,7 +92,7 @@ public class IndexBrowserTreeNode
     {
         return extension;
     }
-    
+
     /**
      * Set the file extension of the artifact.
      * 
@@ -100,7 +102,7 @@ public class IndexBrowserTreeNode
     {
         this.extension = extension;
     }
-    
+
     /**
      * Get the URI of the artifact.
      * 
@@ -110,7 +112,7 @@ public class IndexBrowserTreeNode
     {
         return artifactUri;
     }
-    
+
     /**
      * Set the URI of the artifact.
      * 
@@ -120,7 +122,7 @@ public class IndexBrowserTreeNode
     {
         this.artifactUri = artifactUri;
     }
-    
+
     /**
      * Get the URI of the artifact's pom file.
      * 
@@ -130,7 +132,7 @@ public class IndexBrowserTreeNode
     {
         return pomUri;
     }
-    
+
     /**
      * Set the URI of the artifact's pom file.
      * 
@@ -140,7 +142,7 @@ public class IndexBrowserTreeNode
     {
         this.pomUri = pomUri;
     }
-    
+
     /**
      * Get the packaging of the artifact.
      * 
@@ -150,7 +152,7 @@ public class IndexBrowserTreeNode
     {
         return packaging;
     }
-    
+
     /**
      * Set the packaging of the artifact.
      * 
@@ -159,5 +161,30 @@ public class IndexBrowserTreeNode
     public void setPackaging( String packaging )
     {
         this.packaging = packaging;
+    }
+
+    /**
+     * Converts this instance into a DTO, ready for wire transmission.
+     * 
+     * @since 2.6.1
+     */
+    public IndexBrowserTreeNodeDTO toDTO()
+    {
+        final List<IndexBrowserTreeNodeDTO> children = Lists.newArrayList();
+        if ( getChildren() != null )
+        {
+            for ( TreeNode childNode : getChildren() )
+            {
+                if ( childNode instanceof IndexBrowserTreeNode )
+                {
+                    children.add( ( (IndexBrowserTreeNode) childNode ).toDTO() );
+                }
+            }
+        }
+        return new IndexBrowserTreeNodeDTO( getType().name(), isLeaf(), getNodeName(), getPath(), children,
+            getGroupId(), getArtifactId(), getVersion(), getRepositoryId(), isLocallyAvailable(),
+            getArtifactTimestamp(), getArtifactSha1Checksum(), getArtifactMd5Checksum(), getInitiatorUserId(),
+            getInitiatorIpAddress(), getArtifactOriginReason(), getArtifactOriginUrl(), classifier, extension,
+            packaging, artifactUri, pomUri );
     }
 }

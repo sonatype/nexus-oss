@@ -12,24 +12,22 @@
  */
 package org.sonatype.nexus.rest;
 
-import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
-import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
-import org.sonatype.nexus.rest.model.AliasingListConverter;
-
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Configurator for XSream and DTOs.
+ * 
+ * @author cstamas
+ * @deprecated Use MIndexerXStreamConfiguratorLightweight as it does all since 2.6.1
+ */
+@Deprecated
 public class MIndexerXStreamConfigurator
 {
+    @Deprecated
     public static XStream configureXStream( final XStream xstream )
     {
-        // do "lightweight"
+        // do "lightweight", as since 2.6.1 it does all
         MIndexerXStreamConfiguratorLightweight.configureXStream( xstream );
-
-        // Tree (DTO classes extends classes from Maven Indexer, it is hence needed on classpath)
-        xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
-        xstream.processAnnotations( IndexBrowserTreeNode.class );
-        xstream.registerLocalConverter( IndexBrowserTreeNode.class, "children", new AliasingListConverter(
-            IndexBrowserTreeNode.class, "child" ) );
         return xstream;
     }
 }
