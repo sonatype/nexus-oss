@@ -15,40 +15,40 @@
 -->
 <repomd xmlns="http://linux.duke.edu/metadata/repo">
   <data type="filelists_db">
-    <location href="repodata/filelists.sqlite.bz2"/>
+    <location xml:base="http://localhost:8080/nexus/content/snapshots" href="repodata/filelists.sqlite.bz2"/>
     <checksum type="sha">902c601a0925baebbc4f46eacc8c53f499bbe3a4</checksum>
     <timestamp>1320389187</timestamp>
     <open-checksum type="sha">94cf6eadb5cdb255871fe3f72e1569c678864026</open-checksum>
     <database_version>10</database_version>
   </data>
   <data type="filelists">
-    <location href="repodata/filelists.xml.gz"/>
+    <location xml:base="http://localhost:8080/nexus/content/snapshots" href="repodata/filelists.xml.gz"/>
     <checksum type="sha">52d96d4bce7273c2776a2c6b3cdb66fd1c35de73</checksum>
     <timestamp>1320389187</timestamp>
     <open-checksum type="sha">a2c6f01833ef2315eede3a58767aa324c1925eb2</open-checksum>
   </data>
   <data type="other_db">
-    <location href="repodata/other.sqlite.bz2"/>
+    <location xml:base="http://localhost:8080/nexus/content/snapshots" href="repodata/other.sqlite.bz2"/>
     <checksum type="sha">52f77b72e0a885dbfaee1fb0f7f631a5383b1186</checksum>
     <timestamp>1320389187</timestamp>
     <open-checksum type="sha">c5ead1beab6d8aeda00618debd2aafd41feab3c0</open-checksum>
     <database_version>10</database_version>
   </data>
   <data type="other">
-    <location href="repodata/other.xml.gz"/>
+    <location xml:base="http://localhost:8080/nexus/content/snapshots" href="repodata/other.xml.gz"/>
     <checksum type="sha">f52669a584fc69a95e330f2757fe39b3f5daa418</checksum>
     <timestamp>1320389187</timestamp>
     <open-checksum type="sha">909c667948d794bf7ff2f8fbc54ff36dcc842433</open-checksum>
   </data>
   <data type="primary_db">
-    <location href="repodata/primary.sqlite.bz2"/>
+    <location xml:base="http://localhost:8080/nexus/content/snapshots" href="repodata/primary.sqlite.bz2"/>
     <checksum type="sha">8311e73deb31a971253708d7c3c84988636b4ce8</checksum>
     <timestamp>1320389187</timestamp>
     <open-checksum type="sha">172d6244fc6b4ccc508a30e46a7ae133f613ccde</open-checksum>
     <database_version>10</database_version>
   </data>
   <data type="primary">
-    <location href="repodata/primary.xml.gz"/>
+    <location xml:base="http://localhost:8080/nexus/content/snapshots" href="repodata/primary.xml.gz"/>
     <checksum type="sha">9943b338da49d091fae9508029d5ce068b2a33e6</checksum>
     <timestamp>1320389187</timestamp>
     <open-checksum type="sha">5db423a24d4950f5d9253a32473de54ae8035e08</open-checksum>

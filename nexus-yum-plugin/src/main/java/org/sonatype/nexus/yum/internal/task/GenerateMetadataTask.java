@@ -341,10 +341,7 @@ public class GenerateMetadataTask
         commandLine.append( " --outputdir " ).append( getRepoDir().getAbsolutePath() );
         commandLine.append( " --pkglist " ).append( packageList.getAbsolutePath() );
         commandLine.append( " --cachedir " ).append( createCacheDir().getAbsolutePath() );
-        if ( isUseAbsoluteUrls() )
-        {
-            commandLine.append( " --baseurl " ).append( getRpmUrl() );
-        }
+        commandLine.append( " --baseurl " ).append( getRpmUrl() );
         commandLine.append( " " ).append( getRpmDir() );
 
         return commandLine.toString();
@@ -361,6 +358,11 @@ public class GenerateMetadataTask
         return getCacheDir( getRepositoryIdVersion() );
     }
 
+    private boolean isUseAbsoluteUrls()
+    {
+        return isNotBlank( getVersion() );
+    }
+
     private File createPackageDir()
     {
         return getCacheDir( PACKAGE_FILE_DIR_NAME );
@@ -373,11 +375,6 @@ public class GenerateMetadataTask
         );
         cacheDir.mkdirs();
         return cacheDir;
-    }
-
-    private boolean isUseAbsoluteUrls()
-    {
-        return isNotBlank( getVersion() );
     }
 
     @Override
