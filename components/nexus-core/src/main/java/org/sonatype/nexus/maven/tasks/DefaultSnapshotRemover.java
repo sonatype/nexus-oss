@@ -32,11 +32,9 @@ import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -53,8 +51,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
@@ -305,6 +301,7 @@ public class DefaultSnapshotRemover
             getLogger().debug( "    RemoveSnapshotsOlderThanDays: " + request.getRemoveSnapshotsOlderThanDays() );
             getLogger().debug( "    RemoveIfReleaseExists: " + request.isRemoveIfReleaseExists() );
             getLogger().debug( "    DeleteImmediately: " + request.isDeleteImmediately() );
+            getLogger().debug( "    UseLastRequestedTimestamp: " + request.shouldUseLastRequestedTimestamp() );
         }
     }
 
@@ -467,13 +464,20 @@ public class DefaultSnapshotRemover
 
                         item.getItemContext().put( Gav.class.getName(), gav );
 
+                        getLogger().debug( item.getPath() );
+
                         if ( gav.getSnapshotTimeStamp() != null )
                         {
-                            getLogger().debug( "Using GAV snapshot timestamp" );
-
                             long itemTimestamp = gav.getSnapshotTimeStamp().longValue();
 
-                            getLogger().debug( "NOW is " + itemTimestamp );
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    "itemTimestamp={} ({}), dateThreshold={} ({})",
+                                    itemTimestamp, itemTimestamp > 0 ? new Date( itemTimestamp ) : "",
+                                    dateThreshold, dateThreshold > 0 ? new Date( dateThreshold ) : ""
+                                );
+                            }
 
                             // If this timestamp is already marked to be removed, junk it
                             if ( versionsToRemove.contains( new Long( itemTimestamp ) ) )
@@ -482,12 +486,7 @@ public class DefaultSnapshotRemover
                             }
                             else
                             {
-                                getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateThreshold=" + dateThreshold );
-
-                                // if dateThreshold is not used (zero days) OR
-                                // if itemTimestamp is less then dateThreshold (NB: both are positive!)
-                                // below will the retentionCount overrule if needed this
-                                if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
+                                if ( snapshotShouldBeRemoved( coll, item, gav, itemTimestamp ) )
                                 {
                                     versionsToRemove.add( new Long( itemTimestamp ) );
                                     addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
@@ -628,6 +627,64 @@ public class DefaultSnapshotRemover
 
             updateMetadataIfNecessary( context, coll );
 
+        }
+
+        /**
+         * if dateThreshold is not used (zero days) OR
+         * if last requested is less then dateThreshold (and las requested should be used) OR
+         * if itemTimestamp is less then dateThreshold (NB: both are positive!) OR
+         *
+         * @since 2.6.1
+         */
+        private boolean snapshotShouldBeRemoved( final StorageCollectionItem coll,
+                                                 final StorageItem item,
+                                                 final Gav gav,
+                                                 final long itemTimestamp )
+            throws Exception
+        {
+            if ( -1 == dateThreshold )
+            {
+                return true;
+            }
+
+            if ( request.shouldUseLastRequestedTimestamp() )
+            {
+                return getLastRequested( coll, item, gav ) < dateThreshold;
+            }
+
+            return itemTimestamp < dateThreshold;
+        }
+
+        /**
+         * Returns the most recent requested timestamp for a specified item by looking at item itself, its pom and any
+         * attached artifacts that share the same timestamp/build number.
+         *
+         * @since 2.6.1
+         */
+        private long getLastRequested( final StorageCollectionItem coll, final StorageItem item, final Gav gav )
+            throws Exception
+        {
+            long lastRequested = item.getLastRequested();
+            final MavenRepository repository = (MavenRepository) coll.getRepositoryItemUid().getRepository();
+            final Collection<StorageItem> items = repository.list( false, coll );
+            for ( final StorageItem listedItem : items )
+            {
+                final Gav listedItemGav = repository.getGavCalculator().pathToGav( listedItem.getPath() );
+                if ( gav.getSnapshotBuildNumber().equals( listedItemGav.getSnapshotBuildNumber() )
+                    && gav.getSnapshotTimeStamp().equals( listedItemGav.getSnapshotTimeStamp() ) )
+                {
+                    lastRequested = Math.max( lastRequested, listedItem.getLastRequested() );
+                }
+            }
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "lastRequested={} ({}), dateThreshold={} ({})",
+                    lastRequested, lastRequested > 0 ? new Date( lastRequested ) : "",
+                    dateThreshold, dateThreshold > 0 ? new Date( dateThreshold ) : ""
+                );
+            }
+            return lastRequested;
         }
 
         private void updateMetadataIfNecessary( WalkerContext context, StorageCollectionItem coll )
