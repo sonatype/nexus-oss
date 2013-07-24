@@ -60,6 +60,16 @@ public abstract class VersionConditions
      */
     private static final VersionConstraint POST_2_3_VERSIONS = parseVersionConstraint( "(2.3.99,)" );
 
+    /**
+     * Version constraint that matches all released Nexus versions beginning with version 2.5.
+     */
+    private static final VersionConstraint POST_2_4_VERSIONS = parseVersionConstraint( "(2.4.99,)" );
+
+    /**
+     * Version constraint that matches all released Nexus versions beginning with version 2.6.
+     */
+    private static final VersionConstraint POST_2_5_VERSIONS = parseVersionConstraint( "(2.5.99,)" );
+
     // ==
 
     public static Condition anyModernVersion()
@@ -90,6 +100,16 @@ public abstract class VersionConditions
     public static Condition any24AndLaterVersion()
     {
         return new VersionCondition( POST_2_3_VERSIONS );
+    }
+
+    public static Condition any25AndLaterVersion()
+    {
+        return new VersionCondition( POST_2_4_VERSIONS );
+    }
+
+    public static Condition any26AndLaterVersion()
+    {
+        return new VersionCondition( POST_2_5_VERSIONS );
     }
 
     public static Condition withVersion( final String versionRange )
