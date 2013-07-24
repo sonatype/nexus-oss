@@ -15,10 +15,11 @@ package org.sonatype.nexus.rest.indextreeview;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * REST Response object received after request an item from the index browser tree,
- * contains the typical 'data' parameter, which is the tree item.
+ * REST Response object received after request an item from the index browser tree, contains the typical 'data'
+ * parameter, which is the tree item.
  * 
- * @version $Revision$ $Date$
+ * @author cstamas
+ * @since 2.6.1
  */
 @XStreamAlias( "indexBrowserTreeViewResponse" )
 public class IndexBrowserTreeViewResponseDTO
@@ -26,13 +27,15 @@ public class IndexBrowserTreeViewResponseDTO
     /**
      * The tree node and its details.
      */
-    private IndexBrowserTreeNode data;
+    private IndexBrowserTreeNodeDTO data;
 
     /**
-     * Default constructor
+     * Empty constructor, used along with XStreamRepresentation where you pass in a "fresh" and empty instance to
+     * deserialize input over it.
      */
     public IndexBrowserTreeViewResponseDTO()
     {
+        this.data = null;
     }
 
     /**
@@ -40,8 +43,12 @@ public class IndexBrowserTreeViewResponseDTO
      * 
      * @param IndexBrowserTreeNode
      */
-    public IndexBrowserTreeViewResponseDTO( IndexBrowserTreeNode node )
+    public IndexBrowserTreeViewResponseDTO( final IndexBrowserTreeNodeDTO node )
     {
+        if ( node == null )
+        {
+            throw new NullPointerException( "IndexBrowserTreeNodeDTO is null!" );
+        }
         this.data = node;
     }
 
@@ -50,18 +57,8 @@ public class IndexBrowserTreeViewResponseDTO
      * 
      * @return IndexBrowserTreeNode
      */
-    public IndexBrowserTreeNode getData()
+    public IndexBrowserTreeNodeDTO getData()
     {
         return data;
-    }
-
-    /**
-     * Set the tree node and its details.
-     * 
-     * @param IndexBrowserTreeNode
-     */
-    public void setData( IndexBrowserTreeNode data )
-    {
-        this.data = data;
     }
 }

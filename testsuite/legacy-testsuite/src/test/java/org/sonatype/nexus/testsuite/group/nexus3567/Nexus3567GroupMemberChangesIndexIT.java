@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.treeview.TreeNode;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,6 +30,7 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeDTO;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
@@ -70,9 +70,9 @@ public class Nexus3567GroupMemberChangesIndexIT
     {
         prepare( "nexus3567deletememberrepo", "nexus3567deletemembergroup" );
 
-        IndexBrowserTreeNode node = getIndexContent( "nexus3567deletemembergroup" );
+        IndexBrowserTreeNodeDTO node = getIndexContent( "nexus3567deletemembergroup" );
 
-        List<TreeNode> children = node.getChildren();
+        List<IndexBrowserTreeNodeDTO> children = node.getChildren();
 
         Assert.assertEquals( 1, children.size() );
         Assert.assertEquals( children.get( 0 ).getNodeName(), "nexus3567" );
@@ -99,9 +99,9 @@ public class Nexus3567GroupMemberChangesIndexIT
     {
         prepare( "nexus3567removememberrepo", "nexus3567removemembergroup" );
 
-        IndexBrowserTreeNode node = getIndexContent( "nexus3567removemembergroup" );
+        IndexBrowserTreeNodeDTO node = getIndexContent( "nexus3567removemembergroup" );
 
-        List<TreeNode> children = node.getChildren();
+        List<IndexBrowserTreeNodeDTO> children = node.getChildren();
 
         Assert.assertEquals( 1, children.size() );
         Assert.assertEquals( children.get( 0 ).getNodeName(), "nexus3567" );
@@ -170,7 +170,7 @@ public class Nexus3567GroupMemberChangesIndexIT
         getEventInspectorsUtil().waitForCalmPeriod();
     }
 
-    private IndexBrowserTreeNode getIndexContent( String repoId )
+    private IndexBrowserTreeNodeDTO getIndexContent( String repoId )
         throws IOException
     {
         String serviceURI = "service/local/repositories/" + repoId + "/index_content/";

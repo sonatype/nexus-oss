@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
-import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeDTO;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -69,7 +69,7 @@ public class Nexus3670IndexTreeViewIT
         Assert.assertEquals( "There is one \"nexus3670\" group!", response.getData().getChildren().size(), 1 );
 
         // this is the G node of the "nexus3670" groupId (note: on G nodes, only the path is filled, but not the GAV!)
-        IndexBrowserTreeNode node = (IndexBrowserTreeNode) response.getData().getChildren().get( 0 );
+        IndexBrowserTreeNodeDTO node = (IndexBrowserTreeNodeDTO) response.getData().getChildren().get( 0 );
 
         // check path (note leading and trailing slashes!)
         Assert.assertEquals( "The path does not correspond to group!", node.getPath(), "/nexus3670/" );
@@ -88,17 +88,16 @@ public class Nexus3670IndexTreeViewIT
             3 );
 
         // get one child (V)
-        node = (IndexBrowserTreeNode) node.getChildren().get( 0 );
+        node = node.getChildren().get( 0 );
 
         // check path (note leading and trailing slashes!)
-        Assert.assertEquals( "The path should be V node", TreeNode.Type.V, node.getType() );
+        Assert.assertEquals( "The path should be V node", TreeNode.Type.V.name(), node.getType() );
     }
 
-    private IndexBrowserTreeNode getNode( IndexBrowserTreeViewResponseDTO response, String artifactId )
+    private IndexBrowserTreeNodeDTO getNode( IndexBrowserTreeViewResponseDTO response, String artifactId )
     {
-        for ( TreeNode node : response.getData().getChildren() )
+        for ( IndexBrowserTreeNodeDTO child : response.getData().getChildren() )
         {
-            final IndexBrowserTreeNode child = (IndexBrowserTreeNode) node;
             if ( artifactId.equals( child.getArtifactId() ) )
             {
                 return child;
@@ -126,15 +125,15 @@ public class Nexus3670IndexTreeViewIT
         Assert.assertEquals( "Total of 3 distinct artifacts here!", artifactCount, 3 );
     }
 
-    protected int countNodes( IndexBrowserTreeNode node, Set<Type> types )
+    protected int countNodes( IndexBrowserTreeNodeDTO node, Set<Type> types )
     {
-        int result = types.contains( node.getType() ) ? 1 : 0;
+        int result = types.contains( Type.valueOf( node.getType() ) ) ? 1 : 0;
 
         if ( !node.isLeaf() )
         {
-            for ( TreeNode child : node.getChildren() )
+            for ( IndexBrowserTreeNodeDTO child : node.getChildren() )
             {
-                result = result + countNodes( (IndexBrowserTreeNode) child, types );
+                result = result + countNodes( child, types );
             }
         }
 

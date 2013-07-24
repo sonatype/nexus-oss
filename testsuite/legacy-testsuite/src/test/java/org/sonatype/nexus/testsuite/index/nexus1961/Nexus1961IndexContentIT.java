@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.testsuite.index.nexus1961;
 
-import java.util.List;
-
-import org.apache.maven.index.treeview.TreeNode;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeDTO;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
@@ -41,7 +39,6 @@ public class Nexus1961IndexContentIT
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void getIndexContent()
         throws Exception
@@ -59,13 +56,11 @@ public class Nexus1961IndexContentIT
         IndexBrowserTreeViewResponseDTO resourceResponse =
             (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
 
-        IndexBrowserTreeNode content = resourceResponse.getData();
+        IndexBrowserTreeNodeDTO content = resourceResponse.getData();
 
-        List<TreeNode> children = content.getChildren();
-        for ( TreeNode child : children )
+        for ( IndexBrowserTreeNodeDTO child : content.getChildren() )
         {
             Assert.assertEquals( child.getNodeName(), "nexus1961" );
         }
-
     }
 }
