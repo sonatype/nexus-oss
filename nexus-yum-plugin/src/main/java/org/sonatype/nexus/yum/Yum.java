@@ -49,6 +49,14 @@ public interface Yum
     Yum setDeleteProcessingDelay( final long numberOfSeconds );
 
     /**
+     * Configures repository path of a file containing Yum groups definition.
+     *
+     * @param yumGroupsDefinitionFile repository path of a file containing Yum groups definition
+     * @return itself
+     */
+    Yum setYumGroupsDefinitionFile( final String yumGroupsDefinitionFile );
+
+    /**
      * @return true if metadata is regenerated after a delete from a Nexus repository
      */
     boolean shouldProcessDeletes();
@@ -57,6 +65,11 @@ public interface Yum
      * @return number of seconds between a delete from a Nexus repository and metadata regeneration
      */
     long deleteProcessingDelay();
+
+    /**
+     * @return repository path of a file containing Yum groups definition
+     */
+    String getYumGroupsDefinitionFile();
 
     /**
      * Configures an alias for a version.
