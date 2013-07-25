@@ -351,7 +351,14 @@ public class GenerateMetadataTask
             final String path = file.getAbsolutePath();
             if ( file.exists() )
             {
-                commandLine.append( " --groupfile " ).append( path );
+                if ( file.getName().toLowerCase().endsWith( ".xml" ) )
+                {
+                    commandLine.append( " --groupfile " ).append( path );
+                }
+                else
+                {
+                    LOG.warn( "Yum groups definition file '{}' must have an '.xml' extension, ignoring", path );
+                }
             }
             else
             {

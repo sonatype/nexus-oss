@@ -83,16 +83,7 @@ public class GenerateMetadataCapabilityConfiguration
         }
         this.deleteProcessingDelay = deleteProcessingDelay;
 
-        String yumGroupsDefinitionFile = null;
-        if ( properties.containsKey( YUM_GROUPS_DEFINITION_FILE ) )
-        {
-            yumGroupsDefinitionFile = properties.get( YUM_GROUPS_DEFINITION_FILE );
-            if ( ! yumGroupsDefinitionFile.endsWith( ".xml" ) )
-            {
-                yumGroupsDefinitionFile = null;
-            }
-        }
-        this.yumGroupsDefinitionFile = yumGroupsDefinitionFile;
+        this.yumGroupsDefinitionFile = properties.get( YUM_GROUPS_DEFINITION_FILE );
     }
 
     public Map<String, String> aliases()
