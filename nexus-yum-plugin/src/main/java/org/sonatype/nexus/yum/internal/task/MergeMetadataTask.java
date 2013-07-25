@@ -235,7 +235,7 @@ public class MergeMetadataTask
             repos.append( " --repo=" );
             repos.append( memberRepoBaseDir.toURI().toString() );
         }
-        return format( "mergerepo --nogroups -d %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath() );
+        return format( "mergerepo -d %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath() );
     }
 
     public static ScheduledTask<YumRepository> createTaskFor( final NexusScheduler nexusScheduler,

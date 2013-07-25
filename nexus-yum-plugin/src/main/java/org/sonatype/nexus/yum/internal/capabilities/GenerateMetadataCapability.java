@@ -49,6 +49,7 @@ public class GenerateMetadataCapability
         yum.setAliases( configuration().aliases() );
         yum.setProcessDeletes( configuration().shouldProcessDeletes() );
         yum.setDeleteProcessingDelay( configuration().deleteProcessingDelay() );
+        yum.setYumGroupsDefinitionFile( configuration().getYumGroupsDefinitionFile() );
     }
 
     @Override

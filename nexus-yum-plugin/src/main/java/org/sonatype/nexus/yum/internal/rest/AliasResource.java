@@ -191,7 +191,8 @@ public class AliasResource
                 configuration.repository(),
                 newAliases,
                 configuration.shouldProcessDeletes(),
-                configuration.deleteProcessingDelay()
+                configuration.deleteProcessingDelay(),
+                configuration.getYumGroupsDefinitionFile()
             );
 
         try
