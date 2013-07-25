@@ -69,7 +69,7 @@ public interface NexusTimeline
      * any way is not possible (they'd need to be indexed then first).
      * 
      * @param days how old records needs to be purged.
-     * @since 2.6.1
+     * @since 2.7.0
      */
     void purgeOlderThan( int days );
 }

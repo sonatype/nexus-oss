@@ -26,7 +26,7 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * The "lightweight" XStream configurator for Nexus Indexer Lucene plugin. It will configure XStream for all DTOs along
- * with the "tree view" ones since 2.6.1. Class name is left for backward compatibility.
+ * with the "tree view" ones since 2.7.0. Class name is left for backward compatibility.
  * 
  * @author cstamas
  * @since 2.1

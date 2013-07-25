@@ -62,7 +62,7 @@ public class DefaultMimeSupport
      * @see <a href="https://issues.sonatype.org/browse/NEXUS-5772">NEXUS-5772</a>
      * @see <a href="http://standards.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html">MIME info
      *      specification (latest)</a>
-     * @since 2.6.1
+     * @since 2.7.0
      */
     public final boolean MIME_MAGIC_OPENDESKTOP = SystemPropertiesHelper.getBoolean( MIME_MAGIC_OPENDESKTOP_KEY, false );
 
@@ -73,7 +73,7 @@ public class DefaultMimeSupport
      * default will be used instead. For defaults, see {@link NexusMagicMimeMimeDetector} (the "classic") and
      * {@link NexusOpendesktopMimeDetector}.
      * 
-     * @since 2.6.1
+     * @since 2.7.0
      */
     public final String MIME_MAGIC_FILE = SystemPropertiesHelper.getString( MIME_MAGIC_FILE_KEY, null );
 

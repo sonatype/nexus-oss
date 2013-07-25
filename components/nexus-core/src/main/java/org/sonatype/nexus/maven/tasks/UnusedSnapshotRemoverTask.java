@@ -25,7 +25,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 /**
  * Unused Snapshot Remover Task.
  *
- * @since 2.6.1
+ * @since 2.7.0
  */
 @Named( UnusedSnapshotRemovalTaskDescriptor.ID )
 public class UnusedSnapshotRemoverTask

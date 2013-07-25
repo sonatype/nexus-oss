@@ -166,7 +166,7 @@ public class IndexBrowserTreeNode
     /**
      * Converts this instance into a DTO, ready for wire transmission.
      * 
-     * @since 2.6.1
+     * @since 2.7.0
      */
     public IndexBrowserTreeNodeDTO toDTO()
     {

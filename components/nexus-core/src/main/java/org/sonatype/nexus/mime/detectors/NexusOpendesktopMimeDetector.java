@@ -19,7 +19,7 @@ import eu.medsea.mimeutil.detector.OpendesktopMimeDetector;
  * accordingly.
  * 
  * @author cstamas
- * @since 2.6.1
+ * @since 2.7.0
  */
 public class NexusOpendesktopMimeDetector
     extends OpendesktopMimeDetector

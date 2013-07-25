@@ -24,17 +24,17 @@ import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.model.v2_6_1.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import com.google.common.io.Closeables;
 
 /**
- * Upgrades configuration model from version 2.5.0 to 2.6.1.
+ * Upgrades configuration model from version 2.5.0 to 2.7.0.
  *
- * @since 2.6.1
+ * @since 2.7.0
  */
 @Component(role = SingleVersionUpgrader.class, hint = "2.5.0")
-public class Upgrade250to261
+public class Upgrade250to270
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
