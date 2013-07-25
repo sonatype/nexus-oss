@@ -431,9 +431,9 @@ public class GenerateMetadataTask
         return new File( getParameter( PARAM_REPO_DIR ) );
     }
 
-    public void setRepoDir( File RepoDir )
+    public void setRepoDir( File repoDir )
     {
-        getParameters().put( PARAM_REPO_DIR, RepoDir.getAbsolutePath() );
+        getParameters().put( PARAM_REPO_DIR, repoDir.getAbsolutePath() );
     }
 
     public String getRepoUrl()
@@ -441,9 +441,9 @@ public class GenerateMetadataTask
         return getParameter( PARAM_REPO_URL );
     }
 
-    public void setRepoUrl( String RepoUrl )
+    public void setRepoUrl( String repoUrl )
     {
-        getParameters().put( PARAM_REPO_URL, RepoUrl );
+        getParameters().put( PARAM_REPO_URL, repoUrl );
     }
 
     public String getRpmDir()
@@ -451,9 +451,9 @@ public class GenerateMetadataTask
         return getParameter( PARAM_RPM_DIR );
     }
 
-    public void setRpmDir( String RpmDir )
+    public void setRpmDir( String rpmDir )
     {
-        getParameters().put( PARAM_RPM_DIR, RpmDir );
+        getParameters().put( PARAM_RPM_DIR, rpmDir );
     }
 
     public String getRpmUrl()
@@ -461,9 +461,9 @@ public class GenerateMetadataTask
         return getParameter( PARAM_RPM_URL );
     }
 
-    public void setRpmUrl( String RpmUrl )
+    public void setRpmUrl( String rpmUrl )
     {
-        getParameters().put( PARAM_RPM_URL, RpmUrl );
+        getParameters().put( PARAM_RPM_URL, rpmUrl );
     }
 
     public String getVersion()
