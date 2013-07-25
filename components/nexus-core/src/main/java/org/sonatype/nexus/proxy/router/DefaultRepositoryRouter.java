@@ -168,11 +168,9 @@ public class DefaultRepositoryRouter
             // it hits a repository, mangle path and call it
 
             StorageItem item;
-
+            request.pushRequestPath( route.getRepositoryPath() );
             try
             {
-                request.pushRequestPath( route.getRepositoryPath() );
-
                 item = route.getTargetedRepository().retrieveItem( request );
             }
             finally
@@ -198,11 +196,9 @@ public class DefaultRepositoryRouter
         if ( route.isRepositoryHit() )
         {
             // it hits a repository, mangle path and call it
-
+            request.pushRequestPath( route.getRepositoryPath() );
             try
             {
-                request.pushRequestPath( route.getRepositoryPath() );
-
                 route.getTargetedRepository().storeItem( request, is, userAttributes );
             }
             finally
@@ -311,10 +307,9 @@ public class DefaultRepositoryRouter
 
             Collection<StorageItem> items;
 
+            request.pushRequestPath( route.getRepositoryPath() );
             try
             {
-                request.pushRequestPath( route.getRepositoryPath() );
-
                 items = route.getTargetedRepository().list( request );
             }
             finally
@@ -348,10 +343,9 @@ public class DefaultRepositoryRouter
         {
             // it hits a repository, mangle path and call it
 
+            request.pushRequestPath( route.getRepositoryPath() );
             try
             {
-                request.pushRequestPath( route.getRepositoryPath() );
-
                 route.getTargetedRepository().createCollection( request, userAttributes );
             }
             finally
@@ -376,11 +370,9 @@ public class DefaultRepositoryRouter
         if ( route.isRepositoryHit() )
         {
             // it hits a repository, mangle path and call it
-
+            request.pushRequestPath( route.getRepositoryPath() );
             try
             {
-                request.pushRequestPath( route.getRepositoryPath() );
-
                 route.getTargetedRepository().deleteItem( request );
             }
             finally
@@ -407,11 +399,9 @@ public class DefaultRepositoryRouter
             if ( route.isRepositoryHit() )
             {
                 // it hits a repository, mangle path and call it
-
+                request.pushRequestPath( route.getRepositoryPath() );
                 try
                 {
-                    request.pushRequestPath( route.getRepositoryPath() );
-
                     result.addTargetSet( route.getTargetedRepository().getTargetsForRequest( request ) );
                 }
                 finally
@@ -738,12 +728,12 @@ public class DefaultRepositoryRouter
             if ( route.getTargetedRepository() != null )
             {
                 // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
+                request.pushRequestPath( route.getRepositoryPath() );
                 try
                 {
-                    request.pushRequestPath( route.getRepositoryPath() );
-
-                    matched.addTargetSet( this.itemAuthorizer.getGroupsTargetSet( route.getTargetedRepository(),
-                        request ) );
+                    matched.addTargetSet(
+                        this.itemAuthorizer.getGroupsTargetSet( route.getTargetedRepository(), request )
+                    );
                 }
                 finally
                 {

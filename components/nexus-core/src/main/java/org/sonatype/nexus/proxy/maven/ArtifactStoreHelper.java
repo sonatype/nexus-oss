@@ -245,36 +245,29 @@ public class ArtifactStoreHelper
             }
         }
 
+        request.pushRequestPath( request.getRequestPath() + ".sha1" );
         try
         {
-            request.pushRequestPath( request.getRequestPath() + ".sha1" );
+            getMavenRepository().deleteItem( fromTask, request );
 
-            try
-            {
-                getMavenRepository().deleteItem( fromTask, request );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // ignore not found
-            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
         }
         finally
         {
             request.popRequestPath();
         }
 
+        request.pushRequestPath( request.getRequestPath() + ".md5" );
         try
         {
-            request.pushRequestPath( request.getRequestPath() + ".md5" );
-
-            try
-            {
-                getMavenRepository().deleteItem( fromTask, request );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // ignore not found
-            }
+            getMavenRepository().deleteItem( fromTask, request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
         }
         finally
         {
@@ -285,10 +278,9 @@ public class ArtifactStoreHelper
         // Note this is a recursive call, hence the check for .asc
         if ( !request.getRequestPath().endsWith( ".asc" ) )
         {
+            request.pushRequestPath( request.getRequestPath() + ".asc" );
             try
             {
-                request.pushRequestPath( request.getRequestPath() + ".asc" );
-
                 deleteItemWithChecksums( fromTask, request );
             }
             finally
@@ -599,10 +591,9 @@ public class ArtifactStoreHelper
                         && gavRequest.getArtifactId().equals( gav.getArtifactId() )
                         && gavRequest.getVersion().equals( gav.getVersion() ) && gav.getClassifier() != null )
                     {
+                        gavRequest.pushRequestPath( item.getPath() );
                         try
                         {
-                            gavRequest.pushRequestPath( item.getPath() );
-
                             repository.deleteItem( false, gavRequest );
                         }
                         finally
@@ -659,10 +650,9 @@ public class ArtifactStoreHelper
             {
                 if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
+                    gavRequest.pushRequestPath( item.getPath() );
                     try
                     {
-                        gavRequest.pushRequestPath( item.getPath() );
-
                         repository.deleteItem( false, gavRequest );
                     }
                     finally

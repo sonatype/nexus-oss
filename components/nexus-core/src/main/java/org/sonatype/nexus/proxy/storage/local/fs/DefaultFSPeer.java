@@ -349,10 +349,14 @@ public class DefaultFSPeer
                         String newPath = ItemPathUtils.concatPaths( request.getRequestPath(), files[i].getName() );
 
                         request.pushRequestPath( newPath );
-
-                        result.add( retrieveItem( repository, repositoryBaseDir, request, files[i] ) );
-
-                        request.popRequestPath();
+                        try
+                        {
+                            result.add( retrieveItem( repository, repositoryBaseDir, request, files[i] ) );
+                        }
+                        finally
+                        {
+                            request.popRequestPath();
+                        }
                     }
                 }
             }
