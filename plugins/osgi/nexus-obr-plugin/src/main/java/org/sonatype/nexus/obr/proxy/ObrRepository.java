@@ -271,8 +271,15 @@ public class ObrRepository
                 final String fileName = url.substring( url.lastIndexOf( "/" ) );
 
                 request.pushRequestPath( fileName );
-                final AbstractStorageItem item = getRemoteStorage().retrieveItem( this, request, baseUrl );
-                request.popRequestPath();
+                final AbstractStorageItem item;
+                try
+                {
+                    item = getRemoteStorage().retrieveItem( this, request, baseUrl );
+                }
+                finally
+                {
+                    request.popRequestPath();
+                }
                 // since NEXUS-5511, the line above does not modify the request carried by item!
                 // Those two are detached
                 item.getResourceStoreRequest().setRequestPath( request.getRequestPath() );

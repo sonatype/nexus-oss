@@ -563,13 +563,18 @@ public class UpdateSiteProxyRepositoryImpl
         throws RemoteAccessException, StorageException, ItemNotFoundException
     {
         // chop off the baseDir from the request, as we only care about the file in this case
+        final AbstractStorageItem item;
         remoteStoreRequest.pushRequestPath( remoteStoreRequest.getRequestPath().substring( basePath.length() ) );
-
-        // we need to chop it up here to remove filename from url, as that is in request
-        final AbstractStorageItem item = getRemoteStorage().retrieveItem( this, remoteStoreRequest, absoluteUrl );
-
-        // now put the basePath back on
-        remoteStoreRequest.popRequestPath();
+        try
+        {
+            // we need to chop it up here to remove filename from url, as that is in request
+            item = getRemoteStorage().retrieveItem( this, remoteStoreRequest, absoluteUrl );
+        }
+        finally
+        {
+            // now put the basePath back on
+            remoteStoreRequest.popRequestPath();
+        }
 
         if ( localStoreRequest == null )
         {

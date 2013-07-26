@@ -109,10 +109,9 @@ public class DefaultFSLocalRepositoryStorage
     {
         URL url;
 
+        request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
         try
         {
-            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
-
             url = getAbsoluteUrlFromBase( repository, request );
         }
         finally
@@ -496,20 +495,23 @@ public class DefaultFSLocalRepositoryStorage
                 String newPath = ItemPathUtils.concatPaths( request.getRequestPath(), file.getName() );
 
                 request.pushRequestPath( newPath );
-
-                ResourceStoreRequest collMemberReq = new ResourceStoreRequest( request );
-
                 try
                 {
-                    result.add( retrieveItemFromFile( repository, collMemberReq, file ) );
+                    ResourceStoreRequest collMemberReq = new ResourceStoreRequest( request );
+                    try
+                    {
+                        result.add( retrieveItemFromFile( repository, collMemberReq, file ) );
+                    }
+                    catch ( ItemNotFoundException e )
+                    {
+                        getLogger().debug( "ItemNotFoundException while listing directory, for request: {}",
+                                           collMemberReq.getRequestPath(), e );
+                    }
                 }
-                catch ( ItemNotFoundException e )
+                finally
                 {
-                    getLogger().debug( "ItemNotFoundException while listing directory, for request: {}",
-                        collMemberReq.getRequestPath(), e );
+                    request.popRequestPath();
                 }
-
-                request.popRequestPath();
             }
         }
         else
