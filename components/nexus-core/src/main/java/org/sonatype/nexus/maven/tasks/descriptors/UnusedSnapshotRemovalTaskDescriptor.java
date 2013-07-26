@@ -24,7 +24,7 @@ import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import com.google.common.collect.Lists;
 
 /**
- * @since 2.6.1
+ * @since 2.7.0
  */
 @Named( "UnusedSnapshotRemoval" )
 @Singleton

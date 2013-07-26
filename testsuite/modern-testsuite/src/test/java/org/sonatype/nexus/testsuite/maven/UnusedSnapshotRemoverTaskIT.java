@@ -40,7 +40,7 @@ import com.google.common.collect.Maps;
 /**
  * ITs related to unused snapshots remover task.
  *
- * @since 2.6.1
+ * @since 2.7.0
  */
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class UnusedSnapshotRemoverTaskIT

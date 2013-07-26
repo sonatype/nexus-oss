@@ -18,7 +18,7 @@ import com.thoughtworks.xstream.XStream;
  * Configurator for XSream and DTOs.
  * 
  * @author cstamas
- * @deprecated Use MIndexerXStreamConfiguratorLightweight as it does all since 2.6.1
+ * @deprecated Use MIndexerXStreamConfiguratorLightweight as it does all since 2.7.0
  */
 @Deprecated
 public class MIndexerXStreamConfigurator
@@ -26,7 +26,7 @@ public class MIndexerXStreamConfigurator
     @Deprecated
     public static XStream configureXStream( final XStream xstream )
     {
-        // do "lightweight", as since 2.6.1 it does all
+        // do "lightweight", as since 2.7.0 it does all
         MIndexerXStreamConfiguratorLightweight.configureXStream( xstream );
         return xstream;
     }

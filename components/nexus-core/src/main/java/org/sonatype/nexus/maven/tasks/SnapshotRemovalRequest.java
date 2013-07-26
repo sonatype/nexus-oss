@@ -55,7 +55,7 @@ public class SnapshotRemovalRequest
     }
 
     /**
-     * @since 2.6.1
+     * @since 2.7.0
      */
     public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
                                    int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,

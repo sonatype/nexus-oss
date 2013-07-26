@@ -18,7 +18,7 @@ import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
  * Nexus specific {@link MagicMimeMimeDetector}.
  * 
  * @author cstamas
- * @since 2.6.1
+ * @since 2.7.0
  */
 public class NexusMagicMimeMimeDetector
     extends MagicMimeMimeDetector

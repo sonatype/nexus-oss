@@ -634,7 +634,7 @@ public class DefaultSnapshotRemover
          * if last requested is less then dateThreshold (and las requested should be used) OR
          * if itemTimestamp is less then dateThreshold (NB: both are positive!) OR
          *
-         * @since 2.6.1
+         * @since 2.7.0
          */
         private boolean snapshotShouldBeRemoved( final StorageCollectionItem coll,
                                                  final StorageItem item,
@@ -659,7 +659,7 @@ public class DefaultSnapshotRemover
          * Returns the most recent requested timestamp for a specified item by looking at item itself, its pom and any
          * attached artifacts that share the same timestamp/build number.
          *
-         * @since 2.6.1
+         * @since 2.7.0
          */
         private long getLastRequested( final StorageCollectionItem coll, final StorageItem item, final Gav gav )
             throws Exception

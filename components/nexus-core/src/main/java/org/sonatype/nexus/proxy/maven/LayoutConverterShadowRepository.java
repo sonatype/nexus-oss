@@ -360,10 +360,9 @@ public abstract class LayoutConverterShadowRepository
 
         deleteItem( fromTask, request );
 
+        request.pushRequestPath( request.getRequestPath() + ".sha1" );
         try
         {
-            request.pushRequestPath( request.getRequestPath() + ".sha1" );
-
             deleteItem( fromTask, request );
         }
         catch ( ItemNotFoundException e )
@@ -375,10 +374,9 @@ public abstract class LayoutConverterShadowRepository
             request.popRequestPath();
         }
 
+        request.pushRequestPath( request.getRequestPath() + ".md5" );
         try
         {
-            request.pushRequestPath( request.getRequestPath() + ".md5" );
-
             deleteItem( fromTask, request );
         }
         catch ( ItemNotFoundException e )
@@ -612,11 +610,10 @@ public abstract class LayoutConverterShadowRepository
 
             for ( String transformedPath : transformedPaths )
             {
+                // delegate the call to the master
+                request.pushRequestPath( transformedPath );
                 try
                 {
-                    // delegate the call to the master
-                    request.pushRequestPath( transformedPath );
-
                     result = doRetrieveItemFromMaster( request );
 
                     // try to create link on the fly

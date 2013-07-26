@@ -19,7 +19,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * parameter, which is the tree item.
  * 
  * @author cstamas
- * @since 2.6.1
+ * @since 2.7.0
  */
 @XStreamAlias( "indexBrowserTreeViewResponse" )
 public class IndexBrowserTreeViewResponseDTO

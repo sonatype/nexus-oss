@@ -18,7 +18,7 @@ import java.util.List;
  * Tree node that carries most of the information Nexus Indexer Lucene has about an indexed item.
  * 
  * @author cstamas
- * @since 2.6.1
+ * @since 2.7.0
  */
 public abstract class AbstractNexusTreeNodeDTO<T extends AbstractNexusTreeNodeDTO>
 {
