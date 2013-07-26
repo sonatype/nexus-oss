@@ -14,6 +14,7 @@ package org.sonatype.timeline.internal;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nullable;
@@ -198,7 +199,7 @@ public class DefaultTimeline
     }
 
     @Override
-    public void purge( final long timestamp )
+    public void purgeOlderThan( final int days )
     {
         if ( started )
         {
@@ -210,7 +211,7 @@ public class DefaultTimeline
                 {
                     try
                     {
-                        persistor.purge( 0l, timestamp );
+                        persistor.purge( days );
                     }
                     catch ( IOException e )
                     {
@@ -218,7 +219,7 @@ public class DefaultTimeline
                         // FIXME: but do we want to abort the purge?
                         getLogger().warn( "Failed to purge a timeline persisted records", e );
                     }
-                    indexer.purge( 0l, timestamp, null, null );
+                    indexer.purge( 0l, System.currentTimeMillis() - (days * TimeUnit.DAYS.toMillis( days )), null, null );
                     return 0;
                 }
             } );
