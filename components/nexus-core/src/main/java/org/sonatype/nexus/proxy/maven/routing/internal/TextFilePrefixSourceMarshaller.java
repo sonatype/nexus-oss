@@ -48,7 +48,7 @@ public class TextFilePrefixSourceMarshaller
      * 
      * @since 2.6.1
      */
-    protected static final String MAGIC = "## repository-prefixes/2.0";
+    public static final String MAGIC = "## repository-prefixes/2.0";
 
     /**
      * Bytes that are expected to be and used as "legacy magic", this is basically the first line of the prefixes file
@@ -62,7 +62,7 @@ public class TextFilePrefixSourceMarshaller
      * The headers we write out.
      */
     protected static final String[] HEADERS =
-        { MAGIC, "#", LEGACY_MAGIC, "# Do not edit, changes will be overwritten!" };
+        { "#", LEGACY_MAGIC, "# Do not edit, changes will be overwritten!" };
 
     protected static final Charset CHARSET = Charset.forName( "UTF-8" );
 
@@ -126,6 +126,7 @@ public class TextFilePrefixSourceMarshaller
         throws IOException
     {
         final PrintWriter printWriter = new PrintWriter( new OutputStreamWriter( outputStream, CHARSET ) );
+        printWriter.println( MAGIC );
         for ( String header : HEADERS )
         {
             printWriter.println( header );
@@ -240,6 +241,7 @@ public class TextFilePrefixSourceMarshaller
     public void writeUnsupported( ByteArrayOutputStream outputStream )
     {
         final PrintWriter printWriter = new PrintWriter( new OutputStreamWriter( outputStream, CHARSET ) );
+        printWriter.println( MAGIC );
         for ( String header : HEADERS )
         {
             printWriter.println( header );
