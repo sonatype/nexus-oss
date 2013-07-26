@@ -47,27 +47,19 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
                                 final ResourceStoreRequest request )
         throws RemoteStorageException
     {
-        boolean result = false;
-
+        request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
         try
         {
-            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
-
-            try
-            {
-                result = checkRemoteAvailability( 0, repository, request, false );
-            }
-            catch ( RemoteAccessDeniedException e )
-            {
-                return true;
-            }
+            return checkRemoteAvailability( 0, repository, request, false );
+        }
+        catch ( RemoteAccessDeniedException e )
+        {
+            return true;
         }
         finally
         {
             request.popRequestPath();
         }
-
-        return result;
     }
 
     @Override
