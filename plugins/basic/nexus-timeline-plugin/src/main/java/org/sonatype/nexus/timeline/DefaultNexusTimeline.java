@@ -17,7 +17,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -188,6 +187,6 @@ public class DefaultNexusTimeline
     @Override
     public void purgeOlderThan( int days )
     {
-        timeline.purge( System.currentTimeMillis() - ( TimeUnit.DAYS.toMillis( days ) ) );
+        timeline.purgeOlderThan( days );
     }
 }

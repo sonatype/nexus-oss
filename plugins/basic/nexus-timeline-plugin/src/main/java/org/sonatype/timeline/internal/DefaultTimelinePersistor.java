@@ -36,8 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.IOUtil;
-import org.joda.time.Days;
-import org.joda.time.Interval;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
@@ -313,10 +311,10 @@ public class DefaultTimelinePersistor
         return new TimelineRecord( rec.getTimestamp(), rec.getType(), rec.getSubType(), dataMap );
     }
 
-    protected int purge( final long fromTime, final long toTime )
+    protected int purge( final int days )
         throws IOException
     {
-        final List<File> purgedFiles = collectFiles( Days.daysIn( new Interval( fromTime, toTime ) ).getDays(), false );
+        final List<File> purgedFiles = collectFiles( days, false );
         // start with oldest and go to newest
         Collections.reverse( purgedFiles );
         for ( File file : purgedFiles )
