@@ -95,6 +95,7 @@ import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
+import org.apache.maven.index.util.IndexCreatorSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -527,7 +528,7 @@ public class DefaultIndexerManager
                 openFSDirectory( indexDirectory ), // indexDirectory
                 null, // repositoryUrl
                 null, // indexUpdateUrl
-                indexCreators, //
+                IndexCreatorSorter.sort( indexCreators ), //
                 true, // reclaimIndex
                 ISPROXY( repository ) );
             mavenIndexer.addIndexingContext( ctx );
