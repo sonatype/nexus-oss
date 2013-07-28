@@ -67,10 +67,10 @@ public interface Timeline
     /**
      * Deletes records from timeline index and persisted data that are older than timestamp.
      * 
-     * @param timestamp the timestamp to which compared older records should be deleted.
+     * @param days how old records needs to be purged.
      * @since 2.7.0
      */
-    void purge( long timestamp );
+    void purgeOlderThan( int days );
 
     /**
      * Retrieves records from timeline. The order is desceding, newest is 1st, oldest last.
