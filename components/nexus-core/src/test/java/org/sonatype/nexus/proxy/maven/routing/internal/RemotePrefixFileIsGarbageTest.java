@@ -170,6 +170,7 @@ public class RemotePrefixFileIsGarbageTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         pw.println( "# This is mighty prefix file!" );
         // some "usual" stuff
         pw.println( "/org/apache/maven" );
@@ -305,7 +306,7 @@ public class RemotePrefixFileIsGarbageTest
         server.stop();
         server =
             Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                Behaviours.content( "# Just a comment" ) ).start();
+                Behaviours.content( TextFilePrefixSourceMarshaller.MAGIC + "\n# Just a comment" ) ).start();
         try
         {
             final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
