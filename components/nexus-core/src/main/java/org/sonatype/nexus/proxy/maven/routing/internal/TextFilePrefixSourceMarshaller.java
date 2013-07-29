@@ -163,7 +163,8 @@ public class TextFilePrefixSourceMarshaller
             String line = reader.readLine();
             if ( !MAGIC.equals( line ) && !LEGACY_MAGIC.equals( line ) && !UNSUPPORTED.equals( line ) )
             {
-                throw new InvalidInputException( "Prefix file 'magic' header not found, refusing to load the file." );
+                throw new InvalidInputException( "Prefix file does not start with expected \"" + MAGIC
+                    + "\" header, refusing to load the file." );
             }
             while ( line != null )
             {
