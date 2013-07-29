@@ -152,6 +152,7 @@ public class PrefixFileContainsMergedLocalAndRemotePrefixesTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         pw.println( "# This is mighty prefix file!" );
         pw.println( "/org/apache/maven" );
         pw.println( "/org/sonatype" );

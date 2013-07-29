@@ -195,6 +195,7 @@ public class RemoteContentDiscovererImplTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         if ( withComments )
         {
             pw.println( "# This is mighty prefix file1!" );
@@ -213,6 +214,7 @@ public class RemoteContentDiscovererImplTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         if ( withComments )
         {
             pw.println( "# This is mighty prefix file2!" );
@@ -362,7 +364,7 @@ public class RemoteContentDiscovererImplTest
             server2.stop();
             server2 =
                 Server.withPort( server2port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                    Behaviours.content( Strings.repeat( "/12345677890", 25 ) ) );
+                    Behaviours.content( TextFilePrefixSourceMarshaller.MAGIC + "\n" + Strings.repeat( "/12345677890", 25 ) ) );
             server2.start();
 
             final Manager wm = lookup( Manager.class );

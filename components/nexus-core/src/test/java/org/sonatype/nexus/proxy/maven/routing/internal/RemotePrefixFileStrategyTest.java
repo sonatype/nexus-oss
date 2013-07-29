@@ -192,6 +192,7 @@ public class RemotePrefixFileStrategyTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         if ( withComments )
         {
             pw.println( "# This is mighty prefix file!" );

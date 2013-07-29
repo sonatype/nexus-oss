@@ -31,8 +31,8 @@ import org.sonatype.nexus.client.core.subsystem.routing.Status;
 import org.sonatype.nexus.client.core.subsystem.routing.Status.Outcome;
 import org.sonatype.sisu.litmus.testsupport.group.External;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
+
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
 import com.google.common.io.InputSupplier;
 
 /**
@@ -44,10 +44,10 @@ import com.google.common.io.InputSupplier;
  * IT scraping Central for real! On my Mac (cstamas), this IT runs for 210seconds, hence, is marked as Slow.
  * <p/>
  * Not anymore, as prefix file is deployed to central.
- *
+ * 
  * @author cstamas
  */
-@Category({ Slow.class, External.class })
+@Category( { Slow.class, External.class } )
 public class RoutingSanityIT
     extends RoutingITSupport
 {
@@ -61,10 +61,8 @@ public class RoutingSanityIT
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
         // we lessen the throttling as otherwise this test would run even longer
-        return super.configureNexus( configuration )
-            .setSystemProperty(
-                "org.sonatype.nexus.proxy.maven.routing.internal.scrape.Scraper.pageSleepTimeMillis", "50"
-            );
+        return super.configureNexus( configuration ).setSystemProperty(
+            "org.sonatype.nexus.proxy.maven.routing.internal.scrape.Scraper.pageSleepTimeMillis", "50" );
     }
 
     @Before
@@ -72,13 +70,13 @@ public class RoutingSanityIT
         throws Exception
     {
         routingTest().waitForAllRoutingUpdateJobToStop();
-        //waitForWLDiscoveryOutcome( "central" );
+        // waitForWLDiscoveryOutcome( "central" );
     }
 
     /**
      * Testing initial boot of Nexus with WL feature. Asserting that Central (and hence Public group, that has Central
      * and only one proxy member) has WL published, since Central discovery succeeded.
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -93,8 +91,7 @@ public class RoutingSanityIT
         assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
 
         // let's check some sanity (just blindly check that some expected entries are present)
-        final InputStream entityStream = getPrefixFileFrom( centralStatus.getPublishedUrl() );
-        try
+        try (final InputStream entityStream = getPrefixFileFrom( centralStatus.getPublishedUrl() );)
         {
             final LineNumberReader lnr = new LineNumberReader( new InputStreamReader( entityStream, "UTF-8" ) );
             boolean hasAbbot = false;
@@ -123,17 +120,12 @@ public class RoutingSanityIT
             // The prefix file has around 1600 entries.
             assertThat( lnr.getLineNumber() + 1, is( greaterThanOrEqualTo( 1000 ) ) );
         }
-        finally
-        {
-            Closeables.closeQuietly( entityStream );
-        }
-
     }
 
     /**
      * Fetches and compares prefix file from Nx and the "original" from Central and compares the two: they must be
      * binary equal, Nexus must not modify the content at all.
-     *
+     * 
      * @throws IOException
      */
     @Test
@@ -144,33 +136,27 @@ public class RoutingSanityIT
         final Status centralStatus = routing().getStatus( "central" );
         // let's verify that Nexus did not modify the prefix file got from Central (req: Nexus must publish prefix file
         // as-is, as it was received from remote). both should be equal on byte level.
-        final InputStream nexusPrefixFile = getPrefixFileFrom( centralStatus.getPublishedUrl() );
-        final InputStream centralPrefixFile = getPrefixFileFrom( "http://repo1.maven.org/maven2/.meta/prefixes.txt" );
-        try
+        try (final InputStream nexusPrefixFile = getPrefixFileFrom( centralStatus.getPublishedUrl() );
+                        final InputStream centralPrefixFile =
+                            getPrefixFileFrom( "http://repo1.maven.org/maven2/.meta/prefixes.txt" );)
         {
             ByteStreams.equal( new InputSupplier<InputStream>()
-                               {
-                                   @Override
-                                   public InputStream getInput()
-                                       throws IOException
-                                   {
-                                       return nexusPrefixFile;
-                                   }
-                               }, new InputSupplier<InputStream>()
-                               {
-                                   @Override
-                                   public InputStream getInput()
-                                       throws IOException
-                                   {
-                                       return centralPrefixFile;
-                                   }
-                               }
-            );
-        }
-        finally
-        {
-            Closeables.closeQuietly( nexusPrefixFile );
-            Closeables.closeQuietly( centralPrefixFile );
+            {
+                @Override
+                public InputStream getInput()
+                    throws IOException
+                {
+                    return nexusPrefixFile;
+                }
+            }, new InputSupplier<InputStream>()
+            {
+                @Override
+                public InputStream getInput()
+                    throws IOException
+                {
+                    return centralPrefixFile;
+                }
+            } );
         }
     }
 }

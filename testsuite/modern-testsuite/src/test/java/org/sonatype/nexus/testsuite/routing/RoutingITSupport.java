@@ -26,14 +26,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
-import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.content.Content.Directive;
+import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.routing.Routing;
+import org.sonatype.nexus.testsuite.NexusCoreITSupport;
 import org.sonatype.nexus.testsuite.client.RoutingTest;
 
 import com.google.common.io.Closeables;
-
-import org.sonatype.nexus.testsuite.NexusCoreITSupport;
 
 /**
  * Support class for Automatic Routing Core feature (NEXUS-5472), aka "proxy404".
@@ -79,19 +78,10 @@ public abstract class RoutingITSupport
     protected HttpResponse executeGet( final String url )
         throws IOException
     {
-        InputStream entityStream = null;
-        try
-        {
-            final HttpClient httpClient = new DefaultHttpClient();
-            final HttpGet get = new HttpGet( url );
-            final HttpResponse httpResponse = httpClient.execute( get );
-            return httpResponse;
-        }
-        catch ( IOException e )
-        {
-            Closeables.closeQuietly( entityStream );
-            throw e;
-        }
+        final HttpClient httpClient = new DefaultHttpClient();
+        final HttpGet get = new HttpGet( url );
+        final HttpResponse httpResponse = httpClient.execute( get );
+        return httpResponse;
     }
 
     /**
@@ -133,7 +123,7 @@ public abstract class RoutingITSupport
         try
         {
             content().downloadWith( location, directive, buf );
-            return new String( buf.toByteArray(), "UTF-8" ).startsWith( "@ unsupported" );
+            return new String( buf.toByteArray(), "UTF-8" ).contains( "@ unsupported" );
         }
         catch ( NexusClientNotFoundException e )
         {

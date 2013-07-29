@@ -49,6 +49,7 @@ public class TextFilePrefixSourceMarshallerTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         if ( withComments )
         {
             pw.println( "# This is mighty prefix file!" );
@@ -67,6 +68,7 @@ public class TextFilePrefixSourceMarshallerTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         if ( withComments )
         {
             pw.println( "# This is mighty prefix file!" );
@@ -85,6 +87,7 @@ public class TextFilePrefixSourceMarshallerTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         if ( withComments )
         {
             pw.println( "# This is mighty prefix file!" );
@@ -97,6 +100,7 @@ public class TextFilePrefixSourceMarshallerTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         if ( withComments )
         {
             pw.println( "# This is mighty prefix file!" );
@@ -120,12 +124,12 @@ public class TextFilePrefixSourceMarshallerTest
     {
         final StringBuilder sb = new StringBuilder();
 
+        sb.append( TextFilePrefixSourceMarshaller.MAGIC ).append( System.getProperty("line.separator") );
         for ( String header : TextFilePrefixSourceMarshaller.HEADERS )
         {
             sb.append( header ).append( System.getProperty("line.separator") );
         }
-        sb.append( content );
-        return sb.toString();
+        return content.replace( TextFilePrefixSourceMarshaller.MAGIC + "\n", sb.toString() );
     }
 
     @Test

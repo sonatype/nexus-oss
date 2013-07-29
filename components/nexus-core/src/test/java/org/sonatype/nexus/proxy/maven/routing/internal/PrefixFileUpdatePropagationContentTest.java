@@ -107,6 +107,7 @@ public class PrefixFileUpdatePropagationContentTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         pw.println( "# This is first prefix file!" );
         pw.println( "/org/apache" );
         return sw.toString();
@@ -116,6 +117,7 @@ public class PrefixFileUpdatePropagationContentTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         pw.println( "# This is second prefix file!" );
         pw.println( "/org/sonatype" );
         pw.println( "/com/sonatype" );
@@ -126,6 +128,7 @@ public class PrefixFileUpdatePropagationContentTest
     {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter( sw );
+        pw.println( TextFilePrefixSourceMarshaller.MAGIC );
         pw.println( "# This is third prefix file!" );
         pw.println( "/eu/flatwhite" );
         return sw.toString();
