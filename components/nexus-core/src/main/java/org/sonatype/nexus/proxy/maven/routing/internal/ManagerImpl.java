@@ -74,6 +74,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.FakeAlmightySubject;
 import org.sonatype.nexus.threads.NexusScheduledExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -104,7 +105,7 @@ import com.google.common.eventbus.Subscribe;
  * the contents of the prefix file.</li>
  * </ul>
  * </p>
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
@@ -148,7 +149,7 @@ public class ManagerImpl
 
     /**
      * Da constructor.
-     * 
+     *
      * @param eventBus
      * @param applicationStatusSource
      * @param applicationConfiguration
@@ -337,7 +338,7 @@ public class ManagerImpl
      * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of prefix list update
      * period in hours too), and will perform prefix list update on proxy repository only if needed (prefix list is
      * stale, or does not exists).
-     * 
+     *
      * @param mavenProxyRepository
      * @return {@code true} if update has been spawned, {@code false} if no update needed (prefix list is up to date or
      *         remote discovery is disable for repository).
@@ -481,7 +482,7 @@ public class ManagerImpl
     /**
      * Checks conditions for repository, is it updateable. If not for any reason, {@link IllegalStateException} is
      * thrown.
-     * 
+     *
      * @param mavenRepository
      * @throws IllegalStateException when passed in repository cannot be updated for some reason. Reason is message of
      *             the exception being thrown.
@@ -499,7 +500,7 @@ public class ManagerImpl
         final LocalStatus localStatus = mavenRepository.getLocalStatus();
         if ( !localStatus.shouldServiceRequest() )
         {
-            throw new IllegalStateException( "Repository out of service" );
+            throw new IllegalStateException(SimpleFormat.format("Repository '%s' out of service", mavenRepository.getId()));
         }
     }
 
@@ -507,7 +508,7 @@ public class ManagerImpl
      * Performs "background" async update. If {@code forced} is {@code true}, it will always schedule an update job
      * (even at cost of cancelling any currently running one). If {@code forced} is {@code false}, job will be spawned
      * only if another job for same repository is not running.
-     * 
+     *
      * @param forced if {@code true} will always schedule update job, and might cancel any existing job, if running.
      * @param mavenRepository
      * @return if {@code forced=true}, return value of {@code true} means this invocation did cancel previous job. If
@@ -541,7 +542,7 @@ public class ManagerImpl
     /**
      * Is visible to expose over the nexus-it-helper-plugin only, and UTs are using this. Should not be used for other
      * means.
-     * 
+     *
      * @return {@code true} if there are prefix file update jobs running, or boot of feature not yet finished.
      */
     @VisibleForTesting
@@ -1123,7 +1124,7 @@ public class ManagerImpl
 
     /**
      * Event handler.
-     * 
+     *
      * @param evt
      */
     @Subscribe
@@ -1134,7 +1135,7 @@ public class ManagerImpl
 
     /**
      * Event handler.
-     * 
+     *
      * @param evt
      */
     @Subscribe
