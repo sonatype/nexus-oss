@@ -500,7 +500,7 @@ public class ManagerImpl
         final LocalStatus localStatus = mavenRepository.getLocalStatus();
         if ( !localStatus.shouldServiceRequest() )
         {
-            throw new IllegalStateException(SimpleFormat.format("Repository '%s' out of service", mavenRepository.getId()));
+            throw new IllegalStateException(SimpleFormat.format("Repository out of service '%s'", mavenRepository.getId()));
         }
     }
 
