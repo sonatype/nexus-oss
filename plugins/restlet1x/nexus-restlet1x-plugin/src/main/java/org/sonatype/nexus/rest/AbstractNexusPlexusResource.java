@@ -44,7 +44,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import com.google.common.base.Preconditions;
 
 public abstract class AbstractNexusPlexusResource
     extends AbstractPlexusResource
