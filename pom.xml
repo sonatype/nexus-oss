@@ -395,7 +395,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
-            <releaseProfiles>release,tattletale,optimize</releaseProfiles>
+            <releaseProfiles>release,optimize</releaseProfiles>
           </configuration>
         </plugin>
 
