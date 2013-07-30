@@ -113,7 +113,7 @@ public class Hc4ProviderImpl
     /**
      * Shared client connection manager.
      */
-    private final PoolingClientConnectionManager sharedConnectionManager;
+    private final ManagedClientConnectionManager sharedConnectionManager;
 
     /**
      * Thread evicting idle open connections from {@link #sharedConnectionManager}.
@@ -201,7 +201,7 @@ public class Hc4ProviderImpl
     {
         evictingThread.interrupt();
         jmxInstaller.unregister();
-        sharedConnectionManager.shutdown();
+        sharedConnectionManager._shutdown();
         eventBus.unregister( this );
         getLogger().info( "Stopped" );
     }
@@ -262,7 +262,7 @@ public class Hc4ProviderImpl
         return params;
     }
 
-    protected PoolingClientConnectionManager createClientConnectionManager(
+    protected ManagedClientConnectionManager createClientConnectionManager(
         final List<ClientConnectionOperatorSelector> selectors )
         throws IllegalStateException
     {
@@ -270,7 +270,7 @@ public class Hc4ProviderImpl
         schemeRegistry.register( new Scheme( "http", 80, PlainSocketFactory.getSocketFactory() ) );
         schemeRegistry.register( new Scheme( "https", 443, SSLSocketFactory.getSystemSocketFactory() ) );
 
-        final PoolingClientConnectionManager connManager = new InstrumentedClientConnManager( schemeRegistry )
+        final ManagedClientConnectionManager connManager = new ManagedClientConnectionManager( schemeRegistry )
         {
             @Override
             protected ClientConnectionOperator createConnectionOperator( final SchemeRegistry defaultSchemeRegistry )
@@ -286,6 +286,27 @@ public class Hc4ProviderImpl
         connManager.setDefaultMaxPerRoute( perRouteConnectionCount );
 
         return connManager;
+    }
+
+    private class ManagedClientConnectionManager
+        extends InstrumentedClientConnManager
+    {
+
+        public ManagedClientConnectionManager( final SchemeRegistry schemeRegistry )
+        {
+            super( schemeRegistry );
+        }
+
+        @Override
+        public void shutdown()
+        {
+            // do nothing in order to avoid unwanted shutdown of shared connection manager
+        }
+
+        private void _shutdown()
+        {
+            super.shutdown();
+        }
     }
 
 }
