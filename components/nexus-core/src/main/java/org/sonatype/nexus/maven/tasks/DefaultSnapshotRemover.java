@@ -678,6 +678,7 @@ public class DefaultSnapshotRemover
             }
             if ( getLogger().isDebugEnabled() )
             {
+                // FIXME this debug message lacks storage item context, and could be possibly better at TRACE as well
                 getLogger().debug(
                     "lastRequested={} ({}), dateThreshold={} ({})",
                     lastRequested, lastRequested > 0 ? new Date( lastRequested ) : "",
