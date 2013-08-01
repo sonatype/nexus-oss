@@ -12,9 +12,13 @@
  */
 package org.sonatype.nexus.client.rest.jersey;
 
-import java.net.MalformedURLException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 
-import junit.framework.Assert;
+import java.net.MalformedURLException;
 
 import org.apache.http.params.CoreProtocolPNames;
 import org.junit.Test;
@@ -24,13 +28,6 @@ import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * UT for NexusClient UA, as it should carry the version from now on.
@@ -46,14 +43,14 @@ public class JerseyNexusTestClientUserAgentTest
         throws MalformedURLException
     {
         final String version =
-            Version.readVersion( "META-INF/maven/org.sonatype.nexus.client/nexus-client-core/pom.properties", "foo" );
+            Version.readVersion( "META-INF/maven/org.sonatype.nexus/nexus-client-core/pom.properties", "foo" );
         assertThat( "Version read must not return null!", version, notNullValue() );
         assertThat( "Version read must not return the default (it should succeed in reading the stuff up)!", version,
             not( equalTo( "foo" ) ) );
 
         final NexusClientFactory factory = new JerseyNexusClientFactory();
         final NexusClient client = factory.createFor( BaseUrl.baseUrlFrom( "https://repository.sonatype.org/" ) );
-        Assert.assertNotNull( client.getNexusStatus() );
+        assertThat( client.getNexusStatus(), notNullValue() );
         final String userAgent =
             (String) ( (ApacheHttpClient4) ( (JerseyNexusClient) client ).getClient() ).getClientHandler().getHttpClient().getParams().getParameter(
                 CoreProtocolPNames.USER_AGENT );
