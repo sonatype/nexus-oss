@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -23,23 +25,22 @@ import org.sonatype.nexus.yum.YumRegistry;
 /**
  * @since 3.0
  */
-@Named( MergeMetadataCapabilityDescriptor.TYPE_ID )
+@Named(MergeMetadataCapabilityDescriptor.TYPE_ID)
 public class MergeMetadataCapability
     extends MetadataCapabilitySupport<MergeMetadataCapabilityConfiguration>
 {
 
-    @Inject
-    public MergeMetadataCapability( final YumRegistry service,
-                                    final Conditions conditions,
-                                    final RepositoryRegistry repositoryRegistry )
-    {
-        super( service, conditions, repositoryRegistry );
-    }
+  @Inject
+  public MergeMetadataCapability(final YumRegistry service,
+                                 final Conditions conditions,
+                                 final RepositoryRegistry repositoryRegistry)
+  {
+    super(service, conditions, repositoryRegistry);
+  }
 
-    @Override
-    MergeMetadataCapabilityConfiguration createConfiguration( final Map<String, String> properties )
-    {
-        return new MergeMetadataCapabilityConfiguration( properties );
-    }
+  @Override
+  MergeMetadataCapabilityConfiguration createConfiguration(final Map<String, String> properties) {
+    return new MergeMetadataCapabilityConfiguration(properties);
+  }
 
 }

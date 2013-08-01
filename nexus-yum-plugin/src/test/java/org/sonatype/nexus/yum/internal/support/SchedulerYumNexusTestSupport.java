@@ -10,49 +10,48 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.support;
 
-import static org.sonatype.scheduling.TaskState.RUNNING;
+package org.sonatype.nexus.yum.internal.support;
 
 import java.util.List;
 import java.util.Map.Entry;
+
 import javax.inject.Inject;
 
-import org.junit.After;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+
 import com.google.code.tempusfugit.temporal.Condition;
+import org.junit.After;
+
+import static org.sonatype.scheduling.TaskState.RUNNING;
 
 public abstract class SchedulerYumNexusTestSupport
     extends YumNexusTestSupport
 {
 
-    @Inject
-    private NexusScheduler nexusScheduler;
+  @Inject
+  private NexusScheduler nexusScheduler;
 
-    @After
-    public void waitForThreadPool()
-        throws Exception
+  @After
+  public void waitForThreadPool()
+      throws Exception
+  {
+    waitFor(new Condition()
     {
-        waitFor( new Condition()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                int running = 0;
-                for ( Entry<String, List<ScheduledTask<?>>> entry : nexusScheduler.getActiveTasks().entrySet() )
-                {
-                    for ( ScheduledTask<?> task : entry.getValue() )
-                    {
-                        if ( RUNNING.equals( task.getTaskState() ) )
-                        {
-                            running++;
-                        }
-                    }
-                }
-                return running == 0;
+      @Override
+      public boolean isSatisfied() {
+        int running = 0;
+        for (Entry<String, List<ScheduledTask<?>>> entry : nexusScheduler.getActiveTasks().entrySet()) {
+          for (ScheduledTask<?> task : entry.getValue()) {
+            if (RUNNING.equals(task.getTaskState())) {
+              running++;
             }
-        } );
-    }
+          }
+        }
+        return running == 0;
+      }
+    });
+  }
 
 }

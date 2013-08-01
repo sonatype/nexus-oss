@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal;
 
 import java.util.Map;
@@ -21,37 +22,31 @@ import java.util.concurrent.ConcurrentHashMap;
 public class YumRepositoryCache
 {
 
-    private final Map<String, YumRepositoryImpl> cache = new ConcurrentHashMap<String, YumRepositoryImpl>();
+  private final Map<String, YumRepositoryImpl> cache = new ConcurrentHashMap<String, YumRepositoryImpl>();
 
-    public YumRepositoryImpl lookup( String id, String version )
-    {
-        YumRepositoryImpl yumRepository = cache.get( hash( id, version ) );
+  public YumRepositoryImpl lookup(String id, String version) {
+    YumRepositoryImpl yumRepository = cache.get(hash(id, version));
 
-        if ( yumRepository != null && !yumRepository.getBaseDir().exists() )
-        {
-            yumRepository.setDirty();
-        }
-
-        return yumRepository;
+    if (yumRepository != null && !yumRepository.getBaseDir().exists()) {
+      yumRepository.setDirty();
     }
 
-    public void cache( YumRepositoryImpl yumRepository )
-    {
-        cache.put( hash( yumRepository.nexusRepositoryId(), yumRepository.version() ), yumRepository );
-    }
+    return yumRepository;
+  }
 
-    public void markDirty( String id, String version )
-    {
-        final YumRepositoryImpl repository = cache.get( hash( id, version ) );
-        if ( repository != null )
-        {
-            repository.setDirty();
-        }
-    }
+  public void cache(YumRepositoryImpl yumRepository) {
+    cache.put(hash(yumRepository.nexusRepositoryId(), yumRepository.version()), yumRepository);
+  }
 
-    private String hash( String id, String version )
-    {
-        return id + "/" + version;
+  public void markDirty(String id, String version) {
+    final YumRepositoryImpl repository = cache.get(hash(id, version));
+    if (repository != null) {
+      repository.setDirty();
     }
+  }
+
+  private String hash(String id, String version) {
+    return id + "/" + version;
+  }
 
 }

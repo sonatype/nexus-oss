@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum;
 
 import java.io.File;
@@ -22,20 +23,20 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 public interface YumRegistry
 {
 
-    static final int DEFAULT_MAX_NUMBER_PARALLEL_THREADS = 10;
+  static final int DEFAULT_MAX_NUMBER_PARALLEL_THREADS = 10;
 
-    Yum register( MavenRepository repository );
+  Yum register(MavenRepository repository);
 
-    Yum unregister( String repositoryId );
+  Yum unregister(String repositoryId);
 
-    Yum get( String repositoryId );
+  Yum get(String repositoryId);
 
-    boolean isRegistered( String repositoryId );
+  boolean isRegistered(String repositoryId);
 
-    YumRegistry setMaxNumberOfParallelThreads( int maxNumberOfParallelThreads );
+  YumRegistry setMaxNumberOfParallelThreads(int maxNumberOfParallelThreads);
 
-    int maxNumberOfParallelThreads();
+  int maxNumberOfParallelThreads();
 
-    File getTemporaryDirectory();
+  File getTemporaryDirectory();
 
 }

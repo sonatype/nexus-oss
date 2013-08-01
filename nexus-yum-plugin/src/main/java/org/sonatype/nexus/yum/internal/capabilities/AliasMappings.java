@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.capabilities;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.util.Map;
 
-import org.apache.shiro.util.StringUtils;
 import com.google.common.collect.Maps;
+import org.apache.shiro.util.StringUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @since 3.0
@@ -25,54 +26,45 @@ import com.google.common.collect.Maps;
 public class AliasMappings
 {
 
-    private Map<String, String> aliases;
+  private Map<String, String> aliases;
 
-    public AliasMappings( final Map<String, String> aliases )
-    {
-        this.aliases = Maps.newTreeMap();
-        this.aliases.putAll( checkNotNull( aliases ) );
-    }
+  public AliasMappings(final Map<String, String> aliases) {
+    this.aliases = Maps.newTreeMap();
+    this.aliases.putAll(checkNotNull(aliases));
+  }
 
-    public AliasMappings( final String mappings )
-    {
-        aliases = parseAliases( mappings );
-    }
+  public AliasMappings(final String mappings) {
+    aliases = parseAliases(mappings);
+  }
 
-    public Map<String, String> aliases()
-    {
-        return aliases;
-    }
+  public Map<String, String> aliases() {
+    return aliases;
+  }
 
-    @Override
-    public String toString()
-    {
-        return StringUtils.join( aliases.entrySet().iterator(), "," );
-    }
+  @Override
+  public String toString() {
+    return StringUtils.join(aliases.entrySet().iterator(), ",");
+  }
 
-    private static Map<String, String> parseAliases( final String mappings )
-    {
-        final Map<String, String> parsedAliases = Maps.newHashMap();
+  private static Map<String, String> parseAliases(final String mappings) {
+    final Map<String, String> parsedAliases = Maps.newHashMap();
 
-        if ( mappings != null && !mappings.trim().isEmpty() )
-        {
-            final String[] segments = mappings.split( "," );
-            for ( final String segment : segments )
-            {
-                if ( !segment.trim().isEmpty() )
-                {
-                    final String[] parts = segment.split( "=" );
-                    if ( parts.length != 2 )
-                    {
-                        throw new IllegalArgumentException(
-                            "Invalid format for entry '" + segment + "'. Expected <alias>=<version>"
-                        );
-                    }
-                    parsedAliases.put( parts[0], parts[1] );
-                }
-            }
+    if (mappings != null && !mappings.trim().isEmpty()) {
+      final String[] segments = mappings.split(",");
+      for (final String segment : segments) {
+        if (!segment.trim().isEmpty()) {
+          final String[] parts = segment.split("=");
+          if (parts.length != 2) {
+            throw new IllegalArgumentException(
+                "Invalid format for entry '" + segment + "'. Expected <alias>=<version>"
+            );
+          }
+          parsedAliases.put(parts[0], parts[1]);
         }
-
-        return parsedAliases;
+      }
     }
+
+    return parsedAliases;
+  }
 
 }

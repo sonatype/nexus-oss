@@ -10,15 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.task;
 
-import static org.sonatype.nexus.formfields.FormField.MANDATORY;
-import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_DIR;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_ID;
+package org.sonatype.nexus.yum.internal.task;
 
 import java.util.Arrays;
 import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -27,47 +24,49 @@ import org.sonatype.nexus.formfields.RepoComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
+import static org.sonatype.nexus.formfields.FormField.MANDATORY;
+import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
+import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_DIR;
+import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_ID;
+
 /**
  * @since 3.0
  */
-@Named( GenerateMetadataTask.ID )
+@Named(GenerateMetadataTask.ID)
 @Singleton
 public class GenerateMetadataTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
 
-    public static final String NAME = "Yum: Generate Metadata";
+  public static final String NAME = "Yum: Generate Metadata";
 
-    private final RepoComboFormField repoField = new RepoComboFormField(
-        PARAM_REPO_ID, "Repository for createrepo",
-        "Maven Repository for which the yum metadata is generated via createrepo.",
-        MANDATORY
-    );
+  private final RepoComboFormField repoField = new RepoComboFormField(
+      PARAM_REPO_ID, "Repository for createrepo",
+      "Maven Repository for which the yum metadata is generated via createrepo.",
+      MANDATORY
+  );
 
-    private final StringTextFormField outputField = new StringTextFormField(
-        PARAM_REPO_DIR,
-        "Optional Output Directory",
-        "Directory which should contain the yum metadata after generation."
-            + " If not set, yum will generate the metadata into the root directory of the selected repository.",
-        OPTIONAL
-    );
+  private final StringTextFormField outputField = new StringTextFormField(
+      PARAM_REPO_DIR,
+      "Optional Output Directory",
+      "Directory which should contain the yum metadata after generation."
+          + " If not set, yum will generate the metadata into the root directory of the selected repository.",
+      OPTIONAL
+  );
 
-    @Override
-    public String getId()
-    {
-        return GenerateMetadataTask.ID;
-    }
+  @Override
+  public String getId() {
+    return GenerateMetadataTask.ID;
+  }
 
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
+  @Override
+  public String getName() {
+    return NAME;
+  }
 
-    @Override
-    public List<FormField> formFields()
-    {
-        return Arrays.<FormField>asList( repoField, outputField );
-    }
+  @Override
+  public List<FormField> formFields() {
+    return Arrays.<FormField>asList(repoField, outputField);
+  }
 
 }

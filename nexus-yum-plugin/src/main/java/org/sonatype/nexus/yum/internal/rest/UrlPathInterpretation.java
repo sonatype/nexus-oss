@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.rest;
 
 import java.net.URL;
@@ -20,53 +21,46 @@ import java.net.URL;
 public class UrlPathInterpretation
 {
 
-    private final URL repoUrl;
+  private final URL repoUrl;
 
-    private final String path;
+  private final String path;
 
-    private final boolean index;
+  private final boolean index;
 
-    private final boolean redirect;
+  private final boolean redirect;
 
-    private final String redirectUri;
+  private final String redirectUri;
 
-    public UrlPathInterpretation( URL repoUrl, String path, boolean index )
-    {
-        this( repoUrl, path, index, false, null );
-    }
+  public UrlPathInterpretation(URL repoUrl, String path, boolean index) {
+    this(repoUrl, path, index, false, null);
+  }
 
-    public UrlPathInterpretation( URL repoUrl, String path, boolean index, boolean redirect, String redirectUri )
-    {
-        this.repoUrl = repoUrl;
-        this.path = path;
-        this.index = index;
-        this.redirect = redirect;
-        this.redirectUri = redirectUri;
-    }
+  public UrlPathInterpretation(URL repoUrl, String path, boolean index, boolean redirect, String redirectUri) {
+    this.repoUrl = repoUrl;
+    this.path = path;
+    this.index = index;
+    this.redirect = redirect;
+    this.redirectUri = redirectUri;
+  }
 
-    public String getPath()
-    {
-        return path;
-    }
+  public String getPath() {
+    return path;
+  }
 
-    public boolean isIndex()
-    {
-        return index;
-    }
+  public boolean isIndex() {
+    return index;
+  }
 
-    public URL getRepositoryUrl()
-    {
-        return repoUrl;
-    }
+  public URL getRepositoryUrl() {
+    return repoUrl;
+  }
 
-    public boolean isRedirect()
-    {
-        return redirect;
-    }
+  public boolean isRedirect() {
+    return redirect;
+  }
 
-    public String getRedirectUri()
-    {
-        return redirectUri;
-    }
+  public String getRedirectUri() {
+    return redirectUri;
+  }
 
 }

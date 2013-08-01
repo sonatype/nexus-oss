@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.capabilities;
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+package org.sonatype.nexus.yum.internal.capabilities;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,54 +26,53 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+
 /**
  * @since 3.0
  */
 @Singleton
-@Named( YumCapabilityDescriptor.TYPE_ID )
+@Named(YumCapabilityDescriptor.TYPE_ID)
 public class YumCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    public static final String TYPE_ID = "yum";
+  public static final String TYPE_ID = "yum";
 
-    public static final CapabilityType TYPE = capabilityType( TYPE_ID );
+  public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-    private final Validators validators;
+  private final Validators validators;
 
-    @Inject
-    public YumCapabilityDescriptor( final Validators validators )
-    {
-        super(
-            TYPE,
-            "Yum: Configuration",
-            "Yum plugin configuration.",
-            new NumberTextFormField(
-                YumCapabilityConfiguration.MAX_NUMBER_PARALLEL_THREADS,
-                "Max number of parallel threads",
-                "Maximum number of threads to be used for generating Yum repositories"
-                    + " (default 10 threads)",
-                FormField.OPTIONAL
-            ).withInitialValue( 10 )
-        );
-        this.validators = validators;
-    }
+  @Inject
+  public YumCapabilityDescriptor(final Validators validators) {
+    super(
+        TYPE,
+        "Yum: Configuration",
+        "Yum plugin configuration.",
+        new NumberTextFormField(
+            YumCapabilityConfiguration.MAX_NUMBER_PARALLEL_THREADS,
+            "Max number of parallel threads",
+            "Maximum number of threads to be used for generating Yum repositories"
+                + " (default 10 threads)",
+            FormField.OPTIONAL
+        ).withInitialValue(10)
+    );
+    this.validators = validators;
+  }
 
-    @Override
-    public Validator validator()
-    {
-        return validators.logical().and(
-            validators.capability().uniquePer( TYPE )
-        );
-    }
+  @Override
+  public Validator validator() {
+    return validators.logical().and(
+        validators.capability().uniquePer(TYPE)
+    );
+  }
 
-    @Override
-    public Validator validator( final CapabilityIdentity id )
-    {
-        return validators.logical().and(
-            validators.capability().uniquePerExcluding( id, TYPE )
-        );
-    }
+  @Override
+  public Validator validator(final CapabilityIdentity id) {
+    return validators.logical().and(
+        validators.capability().uniquePerExcluding(id, TYPE)
+    );
+  }
 
 }

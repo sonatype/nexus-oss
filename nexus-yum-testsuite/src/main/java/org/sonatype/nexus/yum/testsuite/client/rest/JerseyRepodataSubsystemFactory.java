@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.testsuite.client.rest;
 
 import javax.inject.Inject;
@@ -33,25 +34,22 @@ public class JerseyRepodataSubsystemFactory
     implements SubsystemFactory<Repodata, JerseyNexusClient>
 {
 
-    @Inject
-    private JerseyRepositoriesFactory repositoriesFactory;
+  @Inject
+  private JerseyRepositoriesFactory repositoriesFactory;
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.anyModern();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.anyModern();
+  }
 
-    @Override
-    public Class<Repodata> getType()
-    {
-        return Repodata.class;
-    }
+  @Override
+  public Class<Repodata> getType() {
+    return Repodata.class;
+  }
 
-    @Override
-    public Repodata create( JerseyNexusClient nexusClient )
-    {
-        return new JerseyRepodata( nexusClient, repositoriesFactory.create( nexusClient ) );
-    }
+  @Override
+  public Repodata create(JerseyNexusClient nexusClient) {
+    return new JerseyRepodata(nexusClient, repositoriesFactory.create(nexusClient));
+  }
 
 }

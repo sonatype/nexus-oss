@@ -10,48 +10,46 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.testsuite.client;
+
+import org.sonatype.nexus.yum.testsuite.client.internal.CompressionType;
 
 import static org.sonatype.nexus.yum.testsuite.client.internal.CompressionType.BZIP2;
 import static org.sonatype.nexus.yum.testsuite.client.internal.CompressionType.GZIP;
-
-import org.sonatype.nexus.yum.testsuite.client.internal.CompressionType;
 
 /**
  * @since 3.0
  */
 public enum MetadataType
 {
-    PRIMARY_XML( "primary", GZIP ),
+  PRIMARY_XML("primary", GZIP),
 
-    PRIMARY_SQLITE( "primary_db", BZIP2 ),
+  PRIMARY_SQLITE("primary_db", BZIP2),
 
-    FILELISTs_XML( "filelists", GZIP ),
+  FILELISTs_XML("filelists", GZIP),
 
-    FILELISTS_SQLITE( "filelists_db", BZIP2 ),
+  FILELISTS_SQLITE("filelists_db", BZIP2),
 
-    OTHER_XML( "other", GZIP ),
+  OTHER_XML("other", GZIP),
 
-    OTHER_SQLITE( "other_db", BZIP2 );
+  OTHER_SQLITE("other_db", BZIP2);
 
-    private final String type;
+  private final String type;
 
-    private final CompressionType compression;
+  private final CompressionType compression;
 
-    private MetadataType( String type, CompressionType compression )
-    {
-        this.type = type;
-        this.compression = compression;
-    }
+  private MetadataType(String type, CompressionType compression) {
+    this.type = type;
+    this.compression = compression;
+  }
 
-    public CompressionType getCompression()
-    {
-        return compression;
-    }
+  public CompressionType getCompression() {
+    return compression;
+  }
 
-    public String getType()
-    {
-        return type;
-    }
+  public String getType() {
+    return type;
+  }
 
 }

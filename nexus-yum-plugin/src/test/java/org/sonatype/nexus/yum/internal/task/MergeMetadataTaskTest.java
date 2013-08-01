@@ -10,7 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.task;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
@@ -20,115 +38,94 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.MergeMetadataTask.ID;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import org.junit.Test;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
-
 public class MergeMetadataTaskTest
     extends YumNexusTestSupport
 {
 
-    private static final String GROUP_ID_1 = "group-repo-id-1";
+  private static final String GROUP_ID_1 = "group-repo-id-1";
 
-    private static final String GROUP_ID_2 = "group-repo-id-2";
+  private static final String GROUP_ID_2 = "group-repo-id-2";
 
-    @Test
-    public void shouldGenerateGroupRepo()
-        throws Exception
-    {
-        final GroupRepository group = givenGroupWithTwoYumEnabledRepositories();
+  @Test
+  public void shouldGenerateGroupRepo()
+      throws Exception
+  {
+    final GroupRepository group = givenGroupWithTwoYumEnabledRepositories();
 
-        final MergeMetadataTask task = new MergeMetadataTask( mock( EventBus.class ) );
-        task.setGroupRepository( group );
-        task.doRun();
+    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class));
+    task.setGroupRepository(group);
+    task.doRun();
 
-        assertThatYumMetadataAreTheSame( repositoryDir( group.getId() ), "group-repo" );
+    assertThatYumMetadataAreTheSame(repositoryDir(group.getId()), "group-repo");
+  }
+
+  @Test
+  public void shouldNotAllowConcurrentExecutionForSameRepo()
+      throws Exception
+  {
+    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class));
+    final GroupRepository group = mock(GroupRepository.class);
+    when(group.getId()).thenReturn(GROUP_ID_1);
+    task.setGroupRepository(group);
+    assertThat(task.allowConcurrentExecution(createRunningTaskForGroups(group)), is(false));
+  }
+
+  @Test
+  public void shouldNotAllowConcurrentExecutionIfAnotherTaskIsRunning()
+      throws Exception
+  {
+    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class));
+    final GroupRepository group1 = mock(GroupRepository.class);
+    when(group1.getId()).thenReturn(GROUP_ID_1);
+    final GroupRepository group2 = mock(GroupRepository.class);
+    when(group2.getId()).thenReturn(GROUP_ID_2);
+    task.setGroupRepository(group1);
+    assertThat(task.allowConcurrentExecution(createRunningTaskForGroups(group2)), is(false));
+  }
+
+  private Map<String, List<ScheduledTask<?>>> createRunningTaskForGroups(final GroupRepository... groups) {
+    final Map<String, List<ScheduledTask<?>>> map = new HashMap<String, List<ScheduledTask<?>>>();
+    final List<ScheduledTask<?>> taskList = new ArrayList<ScheduledTask<?>>();
+    for (final GroupRepository group : groups) {
+      taskList.add(runningTask(group));
     }
+    map.put(ID, taskList);
+    return map;
+  }
 
-    @Test
-    public void shouldNotAllowConcurrentExecutionForSameRepo()
-        throws Exception
-    {
-        final MergeMetadataTask task = new MergeMetadataTask( mock( EventBus.class ) );
-        final GroupRepository group = mock( GroupRepository.class );
-        when( group.getId() ).thenReturn( GROUP_ID_1 );
-        task.setGroupRepository( group );
-        assertThat( task.allowConcurrentExecution( createRunningTaskForGroups( group ) ), is( false ) );
-    }
+  @SuppressWarnings({"unchecked"})
+  private ScheduledTask<?> runningTask(final GroupRepository group) {
+    final ScheduledTask<?> task = mock(ScheduledTask.class);
+    final MergeMetadataTask otherGenerationTask = mock(MergeMetadataTask.class);
+    when(otherGenerationTask.getGroupRepository()).thenReturn(group);
+    when(task.getTaskState()).thenReturn(RUNNING);
+    when(task.getTask()).thenReturn((Callable) otherGenerationTask);
+    return task;
+  }
 
-    @Test
-    public void shouldNotAllowConcurrentExecutionIfAnotherTaskIsRunning()
-        throws Exception
-    {
-        final MergeMetadataTask task = new MergeMetadataTask( mock( EventBus.class ) );
-        final GroupRepository group1 = mock( GroupRepository.class );
-        when( group1.getId() ).thenReturn( GROUP_ID_1 );
-        final GroupRepository group2 = mock( GroupRepository.class );
-        when( group2.getId() ).thenReturn( GROUP_ID_2 );
-        task.setGroupRepository( group1 );
-        assertThat( task.allowConcurrentExecution( createRunningTaskForGroups( group2 ) ), is( false ) );
-    }
+  private GroupRepository givenGroupWithTwoYumEnabledRepositories() {
+    final String groupRepositoryId = testName.getMethodName();
+    final File groupRepoDir = repositoryDir(groupRepositoryId);
 
-    private Map<String, List<ScheduledTask<?>>> createRunningTaskForGroups( final GroupRepository... groups )
-    {
-        final Map<String, List<ScheduledTask<?>>> map = new HashMap<String, List<ScheduledTask<?>>>();
-        final List<ScheduledTask<?>> taskList = new ArrayList<ScheduledTask<?>>();
-        for ( final GroupRepository group : groups )
-        {
-            taskList.add( runningTask( group ) );
-        }
-        map.put( ID, taskList );
-        return map;
-    }
+    final GroupRepository group = mock(GroupRepository.class);
+    when(group.getId()).thenReturn(groupRepositoryId);
+    when(group.getLocalUrl()).thenReturn(groupRepoDir.getAbsolutePath());
+    final List<Repository> repositories = asList(
+        createRepositoryWithYumMetadata("repo1"), createRepositoryWithYumMetadata("repo2")
+    );
+    when(group.getMemberRepositories()).thenReturn(repositories);
 
-    @SuppressWarnings( { "unchecked" } )
-    private ScheduledTask<?> runningTask( final GroupRepository group )
-    {
-        final ScheduledTask<?> task = mock( ScheduledTask.class );
-        final MergeMetadataTask otherGenerationTask = mock( MergeMetadataTask.class );
-        when( otherGenerationTask.getGroupRepository() ).thenReturn( group );
-        when( task.getTaskState() ).thenReturn( RUNNING );
-        when( task.getTask() ).thenReturn( (Callable) otherGenerationTask );
-        return task;
-    }
+    return group;
+  }
 
-    private GroupRepository givenGroupWithTwoYumEnabledRepositories()
-    {
-        final String groupRepositoryId = testName.getMethodName();
-        final File groupRepoDir = repositoryDir( groupRepositoryId );
+  private Repository createRepositoryWithYumMetadata(final String repositoryId) {
+    final Repository repository = mock(Repository.class);
+    when(repository.getId()).thenReturn(repositoryId);
+    when(repository.getLocalUrl()).thenReturn(testData.resolveFile(repositoryId).getAbsolutePath());
+    final RepositoryKind kind = mock(RepositoryKind.class);
+    when(kind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
+    when(repository.getRepositoryKind()).thenReturn(kind);
 
-        final GroupRepository group = mock( GroupRepository.class );
-        when( group.getId() ).thenReturn( groupRepositoryId );
-        when( group.getLocalUrl() ).thenReturn( groupRepoDir.getAbsolutePath() );
-        final List<Repository> repositories = asList(
-            createRepositoryWithYumMetadata( "repo1" ), createRepositoryWithYumMetadata( "repo2" )
-        );
-        when( group.getMemberRepositories() ).thenReturn( repositories );
-
-        return group;
-    }
-
-    private Repository createRepositoryWithYumMetadata( final String repositoryId )
-    {
-        final Repository repository = mock( Repository.class );
-        when( repository.getId() ).thenReturn( repositoryId );
-        when( repository.getLocalUrl() ).thenReturn( testData.resolveFile( repositoryId ).getAbsolutePath() );
-        final RepositoryKind kind = mock( RepositoryKind.class );
-        when( kind.isFacetAvailable( HostedRepository.class ) ).thenReturn( true );
-        when( repository.getRepositoryKind() ).thenReturn( kind );
-
-        return repository;
-    }
+    return repository;
+  }
 }

@@ -10,16 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.testsuite;
 
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
+package org.sonatype.nexus.yum.testsuite;
 
 import java.util.Collection;
 
-import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
@@ -37,117 +32,111 @@ import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
 import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 import org.sonatype.nexus.yum.testsuite.client.Repodata;
 
+import org.junit.runners.Parameterized;
+
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
+
 /**
  * Support class for Yum ITs.
  *
  * @since 3.0
  */
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
+@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public class YumITSupport
     extends NexusRunningParametrizedITSupport
 {
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            testParameters(
-                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        testParameters(
+            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
+        )
+    ).load();
+  }
+
+  public YumITSupport(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
+
+  @Override
+  protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
+    return configuration
+        .setLogPattern("%d{HH:mm:ss.SSS} %-5level - %msg%n")
+        .setLogLevel("org.sonatype.nexus.yum", "DEBUG")
+        .setLogLevel("org.sonatype.nexus.plugins.capabilities", "DEBUG")
+        .addPlugins(
+            artifactResolver().resolvePluginFromDependencyManagement(
+                "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
+            ),
+            artifactResolver().resolvePluginFromDependencyManagement(
+                "org.sonatype.nexus.plugins", "nexus-yum-plugin"
             )
-        ).load();
-    }
+        );
+  }
 
-    public YumITSupport( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  protected Repository createYumEnabledRepository(final String repositoryId) {
+    final Repository repository = repositories()
+        .create(MavenHostedRepository.class, repositoryId)
+        .excludeFromSearchResults()
+        .save();
 
-    @Override
-    protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
-    {
-        return configuration
-            .setLogPattern( "%d{HH:mm:ss.SSS} %-5level - %msg%n" )
-            .setLogLevel( "org.sonatype.nexus.yum", "DEBUG" )
-            .setLogLevel( "org.sonatype.nexus.plugins.capabilities", "DEBUG" )
-            .addPlugins(
-                artifactResolver().resolvePluginFromDependencyManagement(
-                    "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
-                ),
-                artifactResolver().resolvePluginFromDependencyManagement(
-                    "org.sonatype.nexus.plugins", "nexus-yum-plugin"
-                )
-            );
-    }
+    enableMetadataGenerationFor(repositoryId);
 
-    protected Repository createYumEnabledRepository( final String repositoryId )
-    {
-        final Repository repository = repositories()
-            .create( MavenHostedRepository.class, repositoryId )
-            .excludeFromSearchResults()
-            .save();
+    return repository;
+  }
 
-        enableMetadataGenerationFor( repositoryId );
+  protected GroupRepository createYumEnabledGroupRepository(final String repositoryId, final String... memberIds) {
+    final GroupRepository repository = repositories().create(MavenGroupRepository.class, repositoryId)
+        .ofRepositories(memberIds)
+        .save();
 
-        return repository;
-    }
+    enableMetadataMergeFor(repositoryId);
 
-    protected GroupRepository createYumEnabledGroupRepository( final String repositoryId, final String... memberIds )
-    {
-        final GroupRepository repository = repositories().create( MavenGroupRepository.class, repositoryId )
-            .ofRepositories( memberIds )
-            .save();
+    return repository;
+  }
 
-        enableMetadataMergeFor( repositoryId );
+  private void enableMetadataGenerationFor(final String repositoryId) {
+    capabilities().create(GenerateMetadataCapability.class).withRepository(repositoryId).enable();
+  }
 
-        return repository;
-    }
+  private void enableMetadataMergeFor(final String repositoryId) {
+    capabilities().create(MergeMetadataCapability.class).withRepository(repositoryId).enable();
+  }
 
-    private void enableMetadataGenerationFor( final String repositoryId )
-    {
-        capabilities().create( GenerateMetadataCapability.class ).withRepository( repositoryId ).enable();
-    }
+  protected Yum yum() {
+    return client().getSubsystem(Yum.class);
+  }
 
-    private void enableMetadataMergeFor( final String repositoryId )
-    {
-        capabilities().create( MergeMetadataCapability.class ).withRepository( repositoryId ).enable();
-    }
+  protected Repodata repodata() {
+    return client().getSubsystem(Repodata.class);
+  }
 
-    protected Yum yum()
-    {
-        return client().getSubsystem( Yum.class );
-    }
+  protected Repositories repositories() {
+    return client().getSubsystem(Repositories.class);
+  }
 
-    protected Repodata repodata()
-    {
-        return client().getSubsystem( Repodata.class );
-    }
+  protected Content content() {
+    return client().getSubsystem(Content.class);
+  }
 
-    protected Repositories repositories()
-    {
-        return client().getSubsystem( Repositories.class );
-    }
+  private Capabilities capabilities() {
+    return client().getSubsystem(Capabilities.class);
+  }
 
-    protected Content content()
-    {
-        return client().getSubsystem( Content.class );
-    }
+  public Scheduler scheduler() {
+    return client().getSubsystem(Scheduler.class);
+  }
 
-    private Capabilities capabilities()
-    {
-        return client().getSubsystem( Capabilities.class );
-    }
-
-    public Scheduler scheduler()
-    {
-        return client().getSubsystem( Scheduler.class );
-    }
-
-    protected void waitForNexusToSettleDown()
-        throws Exception
-    {
-        client().getSubsystem( Events.class ).waitForCalmPeriod();
-        scheduler().waitForAllTasksToStop();
-    }
+  protected void waitForNexusToSettleDown()
+      throws Exception
+  {
+    client().getSubsystem(Events.class).waitForCalmPeriod();
+    scheduler().waitForAllTasksToStop();
+  }
 
 }

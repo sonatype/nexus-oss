@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.testsuite.client.internal;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.yum.testsuite.client.MetadataType;
 import org.sonatype.nexus.yum.testsuite.client.Repodata;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -32,148 +34,126 @@ public class JerseyRepodata
     implements Repodata
 {
 
-    private final Repositories repositories;
+  private final Repositories repositories;
 
-    public JerseyRepodata( final JerseyNexusClient nexusClient, final Repositories repositories )
-    {
-        super( nexusClient );
-        this.repositories = repositories;
-    }
+  public JerseyRepodata(final JerseyNexusClient nexusClient, final Repositories repositories) {
+    super(nexusClient);
+    this.repositories = repositories;
+  }
 
-    @Override
-    public <T> T getMetadata( final String repositoryId,
-                              final MetadataType metadataType,
-                              final Class<T> returnType )
-        throws IOException
-    {
-        try
-        {
-            final String url = ensureUrlEndsWithSlash( repositoryId );
-            final String location = getLocationOfMetadata( url, metadataType );
-            if ( location != null )
-            {
-                return handleResponse(
-                    getNexusClient().getClient().resource( url + location ).get( ClientResponse.class ),
-                    returnType,
-                    metadataType.getCompression()
-                );
-            }
-            throw new NexusClientNotFoundException(
-                "Could not find metadata type '" + metadataType.getType() + "'", null
-            );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  @Override
+  public <T> T getMetadata(final String repositoryId,
+                           final MetadataType metadataType,
+                           final Class<T> returnType)
+      throws IOException
+  {
+    try {
+      final String url = ensureUrlEndsWithSlash(repositoryId);
+      final String location = getLocationOfMetadata(url, metadataType);
+      if (location != null) {
+        return handleResponse(
+            getNexusClient().getClient().resource(url + location).get(ClientResponse.class),
+            returnType,
+            metadataType.getCompression()
+        );
+      }
+      throw new NexusClientNotFoundException(
+          "Could not find metadata type '" + metadataType.getType() + "'", null
+      );
     }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
 
-    @Override
-    public <T> T getMetadata( final String repositoryId,
-                              final String version,
-                              final MetadataType metadataType,
-                              final Class<T> returnType )
-        throws IOException
-    {
-        try
-        {
-            final String url = getNexusClient().resolveServicePath( "yum/repos/" + repositoryId + "/" + version + "/" );
-            final String location = getLocationOfMetadata( url, metadataType );
-            if ( location != null )
-            {
-                return handleResponse(
-                    getNexusClient().getClient().resource( url + location ).get( ClientResponse.class ),
-                    returnType,
-                    metadataType.getCompression()
-                );
-            }
-            throw new NexusClientNotFoundException(
-                "Could not find metadata type '" + metadataType.getType() + "'", null
-            );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  @Override
+  public <T> T getMetadata(final String repositoryId,
+                           final String version,
+                           final MetadataType metadataType,
+                           final Class<T> returnType)
+      throws IOException
+  {
+    try {
+      final String url = getNexusClient().resolveServicePath("yum/repos/" + repositoryId + "/" + version + "/");
+      final String location = getLocationOfMetadata(url, metadataType);
+      if (location != null) {
+        return handleResponse(
+            getNexusClient().getClient().resource(url + location).get(ClientResponse.class),
+            returnType,
+            metadataType.getCompression()
+        );
+      }
+      throw new NexusClientNotFoundException(
+          "Could not find metadata type '" + metadataType.getType() + "'", null
+      );
     }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
 
-    @Override
-    public String getIndex( final String repositoryId, final String version )
-    {
-        try
-        {
-            return getNexusClient().serviceResource(
-                "yum/repos/" + repositoryId + "/" + version + "/" )
-                .get( String.class );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  @Override
+  public String getIndex(final String repositoryId, final String version) {
+    try {
+      return getNexusClient().serviceResource(
+          "yum/repos/" + repositoryId + "/" + version + "/")
+          .get(String.class);
     }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
 
-    private String getLocationOfMetadata( final String url, final MetadataType metadataType )
-    {
-        final ClientResponse clientResponse = getNexusClient().getClient()
-            .resource( url + "repodata/repomd.xml" )
-            .get( ClientResponse.class );
-        try
-        {
-            if ( clientResponse.getStatus() < 300 )
-            {
-                final RepoMD repomd = new RepoMD( clientResponse.getEntityInputStream() );
-                return repomd.getLocation( metadataType.getType() );
-            }
-            throw getNexusClient().convert( new UniformInterfaceException( clientResponse ) );
-        }
-        finally
-        {
-            clientResponse.close();
-        }
+  private String getLocationOfMetadata(final String url, final MetadataType metadataType) {
+    final ClientResponse clientResponse = getNexusClient().getClient()
+        .resource(url + "repodata/repomd.xml")
+        .get(ClientResponse.class);
+    try {
+      if (clientResponse.getStatus() < 300) {
+        final RepoMD repomd = new RepoMD(clientResponse.getEntityInputStream());
+        return repomd.getLocation(metadataType.getType());
+      }
+      throw getNexusClient().convert(new UniformInterfaceException(clientResponse));
     }
+    finally {
+      clientResponse.close();
+    }
+  }
 
-    private <T> T handleResponse( final ClientResponse clientResponse,
-                                  final Class<T> returnType,
-                                  final CompressionType compression )
-        throws IOException
-    {
-        try
-        {
-            if ( clientResponse.getStatus() < 300 )
-            {
-                clientResponse.setEntityInputStream(
-                    new CompressionAdapter( compression ).adapt( clientResponse.getEntityInputStream() )
-                );
-                return clientResponse.getEntity( returnType );
-            }
-            throw getNexusClient().convert( new UniformInterfaceException( clientResponse ) );
-        }
-        finally
-        {
-            clientResponse.close();
-        }
+  private <T> T handleResponse(final ClientResponse clientResponse,
+                               final Class<T> returnType,
+                               final CompressionType compression)
+      throws IOException
+  {
+    try {
+      if (clientResponse.getStatus() < 300) {
+        clientResponse.setEntityInputStream(
+            new CompressionAdapter(compression).adapt(clientResponse.getEntityInputStream())
+        );
+        return clientResponse.getEntity(returnType);
+      }
+      throw getNexusClient().convert(new UniformInterfaceException(clientResponse));
     }
+    finally {
+      clientResponse.close();
+    }
+  }
 
-    private String ensureUrlEndsWithSlash( final String repositoryId )
-    {
-        String uri = repositories.get( repositoryId ).contentUri();
-        if ( !uri.endsWith( "/" ) )
-        {
-            uri += "/";
-        }
-        return uri;
+  private String ensureUrlEndsWithSlash(final String repositoryId) {
+    String uri = repositories.get(repositoryId).contentUri();
+    if (!uri.endsWith("/")) {
+      uri += "/";
     }
+    return uri;
+  }
 
 }

@@ -10,15 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.testsuite;
+
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
+
+import org.junit.Test;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
 import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
-
-import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 
 /**
  * ITs related to versioned REST resource.
@@ -29,54 +31,53 @@ public class VersionedIT
     extends YumITSupport
 {
 
-    public VersionedIT( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  public VersionedIT(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
 
-    @Test
-    public void shouldGenerateVersionedRepoForVersion()
-        throws Exception
-    {
-        final Repository repository = givenRepositoryWithOneRpm();
+  @Test
+  public void shouldGenerateVersionedRepoForVersion()
+      throws Exception
+  {
+    final Repository repository = givenRepositoryWithOneRpm();
 
-        final String content = repodata().getMetadata( repository.id(), "1.0", PRIMARY_XML, String.class );
-        assertThat( content, containsString( "test-artifact" ) );
-    }
+    final String content = repodata().getMetadata(repository.id(), "1.0", PRIMARY_XML, String.class);
+    assertThat(content, containsString("test-artifact"));
+  }
 
-    @Test
-    public void shouldGenerateVersionedRepoForAlias()
-        throws Exception
-    {
-        final Repository repository = givenRepositoryWithOneRpm();
+  @Test
+  public void shouldGenerateVersionedRepoForAlias()
+      throws Exception
+  {
+    final Repository repository = givenRepositoryWithOneRpm();
 
-        yum().createOrUpdateAlias( repository.id(), "alias", "1.0" );
-        final String content = repodata().getMetadata( repository.id(), "alias", PRIMARY_XML, String.class );
-        assertThat( content, containsString( "test-artifact" ) );
-    }
+    yum().createOrUpdateAlias(repository.id(), "alias", "1.0");
+    final String content = repodata().getMetadata(repository.id(), "alias", PRIMARY_XML, String.class);
+    assertThat(content, containsString("test-artifact"));
+  }
 
-    @Test
-    public void shouldGenerateIndexHtml()
-        throws Exception
-    {
-        final Repository repository = givenRepositoryWithOneRpm();
+  @Test
+  public void shouldGenerateIndexHtml()
+      throws Exception
+  {
+    final Repository repository = givenRepositoryWithOneRpm();
 
-        final String content = repodata().getIndex( repository.id(), "1.0" );
-        assertThat( content, containsString( "<a href=\"repodata/\">repodata/</a>" ) );
-    }
+    final String content = repodata().getIndex(repository.id(), "1.0");
+    assertThat(content, containsString("<a href=\"repodata/\">repodata/</a>"));
+  }
 
-    private Repository givenRepositoryWithOneRpm()
-        throws Exception
-    {
-        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+  private Repository givenRepositoryWithOneRpm()
+      throws Exception
+  {
+    final Repository repository = createYumEnabledRepository(repositoryIdForTest());
 
-        content().upload(
-            repositoryLocation( repository.id(), "group/artifact/1.0/artifact-1.0.rpm" ),
-            testData.resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
-        );
+    content().upload(
+        repositoryLocation(repository.id(), "group/artifact/1.0/artifact-1.0.rpm"),
+        testData.resolveFile("/rpms/test-artifact-1.2.3-1.noarch.rpm")
+    );
 
-        waitForNexusToSettleDown();
+    waitForNexusToSettleDown();
 
-        return repository;
-    }
+    return repository;
+  }
 }

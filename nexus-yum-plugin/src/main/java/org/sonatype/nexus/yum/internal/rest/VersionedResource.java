@@ -10,29 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.rest;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
-import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
+package org.sonatype.nexus.yum.internal.rest;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
-import org.restlet.data.Request;
-import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import org.restlet.data.Request;
+import org.restlet.resource.ResourceException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
+import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
+
 /**
  * @since 3.0
  */
-@Path( VersionedResource.RESOURCE_URI )
+@Path(VersionedResource.RESOURCE_URI)
 @Named
 @Singleton
 public class VersionedResource
@@ -40,86 +42,77 @@ public class VersionedResource
     implements PlexusResource
 {
 
-    private static final String YUM_REPO_PREFIX_NAME = "yum/repos";
+  private static final String YUM_REPO_PREFIX_NAME = "yum/repos";
 
-    private static final String YUM_REPO_PREFIX = "/" + YUM_REPO_PREFIX_NAME;
+  private static final String YUM_REPO_PREFIX = "/" + YUM_REPO_PREFIX_NAME;
 
-    private static final String VERSION_URL_PARAM = "version";
+  private static final String VERSION_URL_PARAM = "version";
 
-    private static final String REPOSITORY_URL_PARAM = "repository";
+  private static final String REPOSITORY_URL_PARAM = "repository";
 
-    private static final int SEGMENTS_AFTER_REPO_PREFIX = 3;
+  private static final int SEGMENTS_AFTER_REPO_PREFIX = 3;
 
-    public static final String RESOURCE_URI = YUM_REPO_PREFIX + "/{" + REPOSITORY_URL_PARAM + "}/{" + VERSION_URL_PARAM
-        + "}";
+  public static final String RESOURCE_URI = YUM_REPO_PREFIX + "/{" + REPOSITORY_URL_PARAM + "}/{" + VERSION_URL_PARAM
+      + "}";
 
-    private final YumRegistry yumRegistry;
+  private final YumRegistry yumRegistry;
 
-    @Inject
-    public VersionedResource( final YumRegistry yumRegistry )
-    {
-        this.yumRegistry = checkNotNull( yumRegistry );
+  @Inject
+  public VersionedResource(final YumRegistry yumRegistry) {
+    this.yumRegistry = checkNotNull(yumRegistry);
+  }
+
+  @Override
+  protected String getUrlPrefixName() {
+    return "yum";
+  }
+
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(YUM_REPO_PREFIX + "/**",
+        "authcBasic,perms[nexus:yumVersionedRepositories]");
+  }
+
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
+
+  @Override
+  protected YumRepository getYumRepository(Request request, UrlPathInterpretation interpretation)
+      throws Exception
+  {
+    final String repositoryId = request.getAttributes().get(REPOSITORY_URL_PARAM).toString();
+    final String version = request.getAttributes().get(VERSION_URL_PARAM).toString();
+
+    final Yum yum = yumRegistry.get(repositoryId);
+    if (yum == null) {
+      throw new ResourceException(CLIENT_ERROR_BAD_REQUEST,
+          "Couldn't find repository with id : " + repositoryId);
     }
 
-    @Override
-    protected String getUrlPrefixName()
-    {
-        return "yum";
+    final String aliasVersion;
+
+    if (yum.getVersions().contains(version)) {
+      aliasVersion = version;
+    }
+    else {
+      aliasVersion = yum.getVersion(version);
     }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( YUM_REPO_PREFIX + "/**",
-                                             "authcBasic,perms[nexus:yumVersionedRepositories]" );
+    if (aliasVersion == null) {
+      throw new ResourceException(
+          CLIENT_ERROR_NOT_FOUND,
+          "Couldn't find version or alias '" + version + "' in repository '" + repositoryId + "'"
+      );
     }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+    return yum.getYumRepository(aliasVersion, interpretation.getRepositoryUrl());
+  }
 
-    @Override
-    protected YumRepository getYumRepository( Request request, UrlPathInterpretation interpretation )
-        throws Exception
-    {
-        final String repositoryId = request.getAttributes().get( REPOSITORY_URL_PARAM ).toString();
-        final String version = request.getAttributes().get( VERSION_URL_PARAM ).toString();
-
-        final Yum yum = yumRegistry.get( repositoryId );
-        if ( yum == null )
-        {
-            throw new ResourceException( CLIENT_ERROR_BAD_REQUEST,
-                                         "Couldn't find repository with id : " + repositoryId );
-        }
-
-        final String aliasVersion;
-
-        if ( yum.getVersions().contains( version ) )
-        {
-            aliasVersion = version;
-        }
-        else
-        {
-            aliasVersion = yum.getVersion( version );
-        }
-
-        if ( aliasVersion == null )
-        {
-            throw new ResourceException(
-                CLIENT_ERROR_NOT_FOUND,
-                "Couldn't find version or alias '" + version + "' in repository '" + repositoryId + "'"
-            );
-        }
-
-        return yum.getYumRepository( aliasVersion, interpretation.getRepositoryUrl() );
-    }
-
-    @Override
-    protected int getSegmentCountAfterPrefix()
-    {
-        return SEGMENTS_AFTER_REPO_PREFIX;
-    }
+  @Override
+  protected int getSegmentCountAfterPrefix() {
+    return SEGMENTS_AFTER_REPO_PREFIX;
+  }
 
 }

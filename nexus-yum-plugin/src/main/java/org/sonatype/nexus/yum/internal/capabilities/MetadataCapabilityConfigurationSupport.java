@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.capabilities;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Support class for Yum repository capability configurations.
@@ -26,39 +27,34 @@ import com.google.common.collect.Maps;
 public abstract class MetadataCapabilityConfigurationSupport
 {
 
-    public static final String REPOSITORY_ID = "repository";
+  public static final String REPOSITORY_ID = "repository";
 
-    private String repository;
+  private String repository;
 
-    public MetadataCapabilityConfigurationSupport( final String repository )
-    {
-        this.repository = checkNotNull( repository );
-    }
+  public MetadataCapabilityConfigurationSupport(final String repository) {
+    this.repository = checkNotNull(repository);
+  }
 
-    public MetadataCapabilityConfigurationSupport( final Map<String, String> properties )
-    {
-        checkNotNull( properties );
-        this.repository = properties.get( REPOSITORY_ID );
-    }
+  public MetadataCapabilityConfigurationSupport(final Map<String, String> properties) {
+    checkNotNull(properties);
+    this.repository = properties.get(REPOSITORY_ID);
+  }
 
-    public String repository()
-    {
-        return repository;
-    }
+  public String repository() {
+    return repository;
+  }
 
-    public Map<String, String> asMap()
-    {
-        final Map<String, String> props = Maps.newHashMap();
-        props.put( REPOSITORY_ID, repository );
-        return props;
-    }
+  public Map<String, String> asMap() {
+    final Map<String, String> props = Maps.newHashMap();
+    props.put(REPOSITORY_ID, repository);
+    return props;
+  }
 
-    @Override
-    public String toString()
-    {
-        return getClass().getSimpleName() + "{" +
-            "repository=" + repository +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "repository=" + repository +
+        '}';
+  }
 
 }

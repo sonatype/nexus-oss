@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -36,8 +36,11 @@ import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.task.MergeMetadataTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @since 3.0
@@ -48,128 +51,109 @@ import com.google.common.eventbus.Subscribe;
 public class EventsRouter
 {
 
-    private final Provider<RepositoryRegistry> repositoryRegistry;
+  private final Provider<RepositoryRegistry> repositoryRegistry;
 
-    private final Provider<YumRegistry> yumRegistryProvider;
+  private final Provider<YumRegistry> yumRegistryProvider;
 
-    private final Provider<NexusScheduler> nexusScheduler;
+  private final Provider<NexusScheduler> nexusScheduler;
 
-    private final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy;
+  private final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy;
 
-    @Inject
-    public EventsRouter( final Provider<RepositoryRegistry> repositoryRegistry,
-                         final Provider<YumRegistry> yumRegistryProvider,
-                         final Provider<NexusScheduler> nexusScheduler,
-                         final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy )
-    {
-        this.steadyLinksStrategy = checkNotNull( steadyLinksStrategy );
-        this.repositoryRegistry = checkNotNull( repositoryRegistry );
-        this.yumRegistryProvider = checkNotNull( yumRegistryProvider );
-        this.nexusScheduler = checkNotNull( nexusScheduler );
+  @Inject
+  public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistry,
+                      final Provider<YumRegistry> yumRegistryProvider,
+                      final Provider<NexusScheduler> nexusScheduler,
+                      final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy)
+  {
+    this.steadyLinksStrategy = checkNotNull(steadyLinksStrategy);
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
+    this.nexusScheduler = checkNotNull(nexusScheduler);
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final RepositoryRegistryEventAdd event) {
+    event.getRepository().registerRequestStrategy(
+        SteadyLinksRequestStrategy.class.getName(), steadyLinksStrategy.get()
+    );
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final RepositoryRegistryEventRemove event) {
+    event.getRepository().unregisterRequestStrategy(
+        SteadyLinksRequestStrategy.class.getName()
+    );
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final RepositoryGroupMembersChangedEvent event) {
+    if (yumRegistryProvider.get().isRegistered(event.getGroupRepository().getId())
+        && (anyOfRepositoriesHasYumRepository(event.getAddedRepositoryIds())
+        || anyOfRepositoriesHasYumRepository(event.getRemovedRepositoryIds())
+        || anyOfRepositoriesHasYumRepository(event.getReorderedRepositoryIds()))) {
+      MergeMetadataTask.createTaskFor(nexusScheduler.get(), event.getGroupRepository());
     }
+  }
 
-    @AllowConcurrentEvents
-    @Subscribe
-    public void on( final RepositoryRegistryEventAdd event )
-    {
-        event.getRepository().registerRequestStrategy( 
-            SteadyLinksRequestStrategy.class.getName(), steadyLinksStrategy.get()
-        );
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final RepositoryItemEventStore eventStore) {
+    if (isRpmItemEvent(eventStore)) {
+      final Yum yum = yumRegistryProvider.get().get(eventStore.getRepository().getId());
+      if (yum != null) {
+        yum.markDirty(getItemVersion(eventStore.getItem()));
+        yum.addRpmAndRegenerate(eventStore.getItem().getPath());
+      }
     }
+  }
 
-    @AllowConcurrentEvents
-    @Subscribe
-    public void on( final RepositoryRegistryEventRemove event )
-    {
-        event.getRepository().unregisterRequestStrategy( 
-            SteadyLinksRequestStrategy.class.getName()
-        );
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(RepositoryItemEventDelete itemEvent) {
+    final Yum yum = yumRegistryProvider.get().get(itemEvent.getRepository().getId());
+    if (yum != null) {
+      if (isRpmItemEvent(itemEvent)) {
+        yum.regenerateWhenPathIsRemoved(itemEvent.getItem().getPath());
+      }
+      else if (isCollectionItem(itemEvent)) {
+        yum.regenerateWhenDirectoryIsRemoved(itemEvent.getItem().getPath());
+      }
     }
+  }
 
-    @AllowConcurrentEvents
-    @Subscribe
-    public void on( final RepositoryGroupMembersChangedEvent event )
-    {
-        if ( yumRegistryProvider.get().isRegistered( event.getGroupRepository().getId() )
-            && ( anyOfRepositoriesHasYumRepository( event.getAddedRepositoryIds() )
-            || anyOfRepositoriesHasYumRepository( event.getRemovedRepositoryIds() )
-            || anyOfRepositoriesHasYumRepository( event.getReorderedRepositoryIds() ) ) )
-        {
-            MergeMetadataTask.createTaskFor( nexusScheduler.get(), event.getGroupRepository() );
+  private boolean isCollectionItem(RepositoryItemEvent itemEvent) {
+    return StorageCollectionItem.class.isAssignableFrom(itemEvent.getItem().getClass());
+  }
+
+  private boolean isRpmItemEvent(RepositoryItemEvent itemEvent) {
+    return yumRegistryProvider.get().isRegistered(itemEvent.getRepository().getId())
+        && !itemEvent.getItem().getRepositoryItemUid().getBooleanAttributeValue(IsHiddenAttribute.class)
+        && itemEvent.getItem().getPath().toLowerCase().endsWith(".rpm");
+  }
+
+  private String getItemVersion(StorageItem item) {
+    String[] parts = item.getParentPath().split("/");
+    return parts[parts.length - 1];
+  }
+
+  private boolean anyOfRepositoriesHasYumRepository(final List<String> repositoryIds) {
+    if (repositoryIds != null) {
+      for (final String repositoryId : repositoryIds) {
+        try {
+          repositoryRegistry.get().getRepository(repositoryId).retrieveItem(
+              new ResourceStoreRequest(Yum.PATH_OF_REPOMD_XML)
+          );
+          return true;
         }
-    }
-
-    @AllowConcurrentEvents
-    @Subscribe
-    public void on( final RepositoryItemEventStore eventStore )
-    {
-        if ( isRpmItemEvent( eventStore ) )
-        {
-            final Yum yum = yumRegistryProvider.get().get( eventStore.getRepository().getId() );
-            if ( yum != null )
-            {
-                yum.markDirty( getItemVersion( eventStore.getItem() ) );
-                yum.addRpmAndRegenerate( eventStore.getItem().getPath() );
-            }
+        catch (final Exception ignore) {
+          // we could not get the repository or repomd.xml so looks like we do not have an yum repository
         }
+      }
     }
-
-    @AllowConcurrentEvents
-    @Subscribe
-    public void on( RepositoryItemEventDelete itemEvent )
-    {
-        final Yum yum = yumRegistryProvider.get().get( itemEvent.getRepository().getId() );
-        if ( yum != null )
-        {
-            if ( isRpmItemEvent( itemEvent ) )
-            {
-                yum.regenerateWhenPathIsRemoved( itemEvent.getItem().getPath() );
-            }
-            else if ( isCollectionItem( itemEvent ) )
-            {
-                yum.regenerateWhenDirectoryIsRemoved( itemEvent.getItem().getPath() );
-            }
-        }
-    }
-
-    private boolean isCollectionItem( RepositoryItemEvent itemEvent )
-    {
-        return StorageCollectionItem.class.isAssignableFrom( itemEvent.getItem().getClass() );
-    }
-
-    private boolean isRpmItemEvent( RepositoryItemEvent itemEvent )
-    {
-        return yumRegistryProvider.get().isRegistered( itemEvent.getRepository().getId() )
-            && !itemEvent.getItem().getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class )
-            && itemEvent.getItem().getPath().toLowerCase().endsWith( ".rpm" );
-    }
-
-    private String getItemVersion( StorageItem item )
-    {
-        String[] parts = item.getParentPath().split( "/" );
-        return parts[parts.length - 1];
-    }
-
-    private boolean anyOfRepositoriesHasYumRepository( final List<String> repositoryIds )
-    {
-        if ( repositoryIds != null )
-        {
-            for ( final String repositoryId : repositoryIds )
-            {
-                try
-                {
-                    repositoryRegistry.get().getRepository( repositoryId ).retrieveItem(
-                        new ResourceStoreRequest( Yum.PATH_OF_REPOMD_XML )
-                    );
-                    return true;
-                }
-                catch ( final Exception ignore )
-                {
-                    // we could not get the repository or repomd.xml so looks like we do not have an yum repository
-                }
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 
 }

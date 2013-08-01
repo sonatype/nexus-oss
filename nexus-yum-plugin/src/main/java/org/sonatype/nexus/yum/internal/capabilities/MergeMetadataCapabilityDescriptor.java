@@ -10,10 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.capabilities;
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.yum.internal.capabilities.MergeMetadataCapabilityConfiguration.REPOSITORY_ID;
+package org.sonatype.nexus.yum.internal.capabilities;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,50 +27,50 @@ import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSuppo
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.yum.internal.capabilities.MergeMetadataCapabilityConfiguration.REPOSITORY_ID;
+
 /**
  * @since 3.0
  */
 @Singleton
-@Named( MergeMetadataCapabilityDescriptor.TYPE_ID )
+@Named(MergeMetadataCapabilityDescriptor.TYPE_ID)
 public class MergeMetadataCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    public static final String TYPE_ID = "yum.merge";
+  public static final String TYPE_ID = "yum.merge";
 
-    public static final CapabilityType TYPE = capabilityType( TYPE_ID );
+  public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-    private final Validators validators;
+  private final Validators validators;
 
-    @Inject
-    public MergeMetadataCapabilityDescriptor( final Validators validators )
-    {
-        super(
-            TYPE,
-            "Yum: Merge Metadata",
-            "Merges Yum metadata from group members.",
-            new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY )
-        );
-        this.validators = validators;
-    }
+  @Inject
+  public MergeMetadataCapabilityDescriptor(final Validators validators) {
+    super(
+        TYPE,
+        "Yum: Merge Metadata",
+        "Merges Yum metadata from group members.",
+        new RepoOrGroupComboFormField(REPOSITORY_ID, FormField.MANDATORY)
+    );
+    this.validators = validators;
+  }
 
-    @Override
-    public Validator validator()
-    {
-        return validators.logical().and(
-            validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, GroupRepository.class ),
-            validators.capability().uniquePer( TYPE, REPOSITORY_ID )
-        );
-    }
+  @Override
+  public Validator validator() {
+    return validators.logical().and(
+        validators.repository().repositoryOfType(TYPE, REPOSITORY_ID, GroupRepository.class),
+        validators.capability().uniquePer(TYPE, REPOSITORY_ID)
+    );
+  }
 
-    @Override
-    public Validator validator( final CapabilityIdentity id )
-    {
-        return validators.logical().and(
-            validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, GroupRepository.class ),
-            validators.capability().uniquePerExcluding( id, TYPE, REPOSITORY_ID )
-        );
-    }
+  @Override
+  public Validator validator(final CapabilityIdentity id) {
+    return validators.logical().and(
+        validators.repository().repositoryOfType(TYPE, REPOSITORY_ID, GroupRepository.class),
+        validators.capability().uniquePerExcluding(id, TYPE, REPOSITORY_ID)
+    );
+  }
 
 }

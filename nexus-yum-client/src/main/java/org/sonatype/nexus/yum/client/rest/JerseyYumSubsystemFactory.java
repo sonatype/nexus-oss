@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.client.rest;
 
 import javax.inject.Named;
@@ -33,22 +34,19 @@ public class JerseyYumSubsystemFactory
     implements SubsystemFactory<Yum, JerseyNexusClient>
 {
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.anyModern();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.anyModern();
+  }
 
-    @Override
-    public Class<Yum> getType()
-    {
-        return Yum.class;
-    }
+  @Override
+  public Class<Yum> getType() {
+    return Yum.class;
+  }
 
-    @Override
-    public Yum create( JerseyNexusClient nexusClient )
-    {
-        return new JerseyYum( nexusClient );
-    }
+  @Override
+  public Yum create(JerseyNexusClient nexusClient) {
+    return new JerseyYum(nexusClient);
+  }
 
 }

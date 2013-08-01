@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.capabilities;
 
 import javax.inject.Named;
@@ -30,17 +31,17 @@ public class YumCapabilitiesBooter
     extends CapabilityBooterSupport
 {
 
-    @Override
-    protected void boot( final CapabilityRegistry registry )
-        throws Exception
-    {
-        maybeAddCapability(
-            registry,
-            YumCapabilityDescriptor.TYPE,
-            true, // enabled
-            null, // no notes
-            new YumCapabilityConfiguration( YumRegistry.DEFAULT_MAX_NUMBER_PARALLEL_THREADS ).asMap()
-        );
-    }
+  @Override
+  protected void boot(final CapabilityRegistry registry)
+      throws Exception
+  {
+    maybeAddCapability(
+        registry,
+        YumCapabilityDescriptor.TYPE,
+        true, // enabled
+        null, // no notes
+        new YumCapabilityConfiguration(YumRegistry.DEFAULT_MAX_NUMBER_PARALLEL_THREADS).asMap()
+    );
+  }
 
 }

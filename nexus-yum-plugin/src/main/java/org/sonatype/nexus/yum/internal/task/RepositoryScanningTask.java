@@ -10,13 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.task;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.yum.internal.task;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -28,85 +28,77 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * This job scans a {@link Repository} for RPMs and adds each version to Yam.
  *
  * @since 3.0
  */
-@Named( RepositoryScanningTask.ID )
+@Named(RepositoryScanningTask.ID)
 public class RepositoryScanningTask
     extends AbstractNexusTask<Object>
 {
 
-    private static final int MAXIMAL_PARALLEL_RUNS = 3;
+  private static final int MAXIMAL_PARALLEL_RUNS = 3;
 
-    public static final String ID = "RepositoryScanningTask";
+  public static final String ID = "RepositoryScanningTask";
 
-    private Yum yum;
+  private Yum yum;
 
-    private final RpmScanner scanner;
+  private final RpmScanner scanner;
 
-    @Inject
-    public RepositoryScanningTask( final RpmScanner scanner, final EventBus eventBus )
-    {
-        super( eventBus, null );
-        this.scanner = checkNotNull( scanner );
+  @Inject
+  public RepositoryScanningTask(final RpmScanner scanner, final EventBus eventBus) {
+    super(eventBus, null);
+    this.scanner = checkNotNull(scanner);
+  }
+
+  @Override
+  protected Object doRun()
+      throws Exception
+  {
+    checkNotNull(yum, "Yum must be set");
+
+    getLogger().debug(
+        "Scanning repository '{}' base dir '{}' for RPMs", yum.getNexusRepository().getId(), yum.getBaseDir()
+    );
+
+    for (final File rpm : scanner.scan(yum.getBaseDir())) {
+      yum.addVersion(rpm.getParentFile().getName());
     }
 
-    @Override
-    protected Object doRun()
-        throws Exception
-    {
-        checkNotNull( yum, "Yum must be set" );
+    return null;
+  }
 
-        getLogger().debug(
-            "Scanning repository '{}' base dir '{}' for RPMs", yum.getNexusRepository().getId(), yum.getBaseDir()
-        );
-
-        for ( final File rpm : scanner.scan( yum.getBaseDir() ) )
-        {
-            yum.addVersion( rpm.getParentFile().getName() );
+  @Override
+  public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
+    if (activeTasks.containsKey(ID)) {
+      int activeRunningTasks = 0;
+      for (ScheduledTask<?> task : activeTasks.get(ID)) {
+        if (TaskState.RUNNING.equals(task.getTaskState())) {
+          activeRunningTasks++;
         }
-
-        return null;
+      }
+      return activeRunningTasks < MAXIMAL_PARALLEL_RUNS;
     }
-
-    @Override
-    public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> activeTasks )
-    {
-        if ( activeTasks.containsKey( ID ) )
-        {
-            int activeRunningTasks = 0;
-            for ( ScheduledTask<?> task : activeTasks.get( ID ) )
-            {
-                if ( TaskState.RUNNING.equals( task.getTaskState() ) )
-                {
-                    activeRunningTasks++;
-                }
-            }
-            return activeRunningTasks < MAXIMAL_PARALLEL_RUNS;
-        }
-        else
-        {
-            return true;
-        }
+    else {
+      return true;
     }
+  }
 
-    @Override
-    protected String getAction()
-    {
-        return "scanning";
-    }
+  @Override
+  protected String getAction() {
+    return "scanning";
+  }
 
-    @Override
-    protected String getMessage()
-    {
-        return "Scanning repository '" + yum.getNexusRepository().getId() + "'";
-    }
+  @Override
+  protected String getMessage() {
+    return "Scanning repository '" + yum.getNexusRepository().getId() + "'";
+  }
 
-    public void setYum( final Yum yum )
-    {
-        this.yum = yum;
-    }
+  public void setYum(final Yum yum) {
+    this.yum = yum;
+  }
 
 }

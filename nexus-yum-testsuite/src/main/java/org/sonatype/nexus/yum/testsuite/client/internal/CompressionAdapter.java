@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.testsuite.client.internal;
 
 import java.io.IOException;
@@ -24,27 +25,25 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 public class CompressionAdapter
 {
 
-    private final CompressionType compression;
+  private final CompressionType compression;
 
-    public CompressionAdapter( CompressionType compression )
-    {
-        this.compression = compression;
-    }
+  public CompressionAdapter(CompressionType compression) {
+    this.compression = compression;
+  }
 
-    public InputStream adapt( InputStream inputStream )
-        throws IOException
-    {
-        switch ( compression )
-        {
-            case NONE:
-                return inputStream;
-            case GZIP:
-                return new GZIPInputStream( inputStream );
-            case BZIP2:
-                return new BZip2CompressorInputStream( inputStream );
-            default:
-                throw new IllegalArgumentException( "Could not adapt unknown compression " + compression );
-        }
+  public InputStream adapt(InputStream inputStream)
+      throws IOException
+  {
+    switch (compression) {
+      case NONE:
+        return inputStream;
+      case GZIP:
+        return new GZIPInputStream(inputStream);
+      case BZIP2:
+        return new BZip2CompressorInputStream(inputStream);
+      default:
+        throw new IllegalArgumentException("Could not adapt unknown compression " + compression);
     }
+  }
 
 }

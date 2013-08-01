@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,89 +28,84 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
+
 import com.google.common.io.Closeables;
 
 /**
  * @since 3.0
  */
-@Named( YumConfigContentGenerator.ID )
+@Named(YumConfigContentGenerator.ID)
 @Singleton
 public class YumConfigContentGenerator
     implements ContentGenerator
 {
 
-    public static final String ID = "YumConfigContentGenerator";
+  public static final String ID = "YumConfigContentGenerator";
 
-    private RepositoryURLBuilder repositoryURLBuilder;
+  private RepositoryURLBuilder repositoryURLBuilder;
 
-    @Inject
-    public YumConfigContentGenerator( final RepositoryURLBuilder repositoryURLBuilder )
+  @Inject
+  public YumConfigContentGenerator(final RepositoryURLBuilder repositoryURLBuilder) {
+    this.repositoryURLBuilder = repositoryURLBuilder;
+  }
+
+  @Override
+  public String getGeneratorId() {
+    return ID;
+  }
+
+  @Override
+  public ContentLocator generateContent(final Repository repository,
+                                        final String path,
+                                        final StorageFileItem item)
+  {
+    // make length unknown (since it will be known only in the moment of actual content pull)
+    item.setLength(-1);
+
+    return new ContentLocator()
     {
-        this.repositoryURLBuilder = repositoryURLBuilder;
-    }
 
-    @Override
-    public String getGeneratorId()
-    {
-        return ID;
-    }
+      private String content;
 
-    @Override
-    public ContentLocator generateContent( final Repository repository,
-                                           final String path,
-                                           final StorageFileItem item )
-    {
-        // make length unknown (since it will be known only in the moment of actual content pull)
-        item.setLength( -1 );
+      @Override
+      public InputStream getContent()
+          throws IOException
+      {
+        if (content == null) {
+          final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          final PrintWriter out = new PrintWriter(baos);
 
-        return new ContentLocator()
-        {
+          out.println("[" + repository.getId() + "]");
+          out.println("name=" + repository.getName());
+          out.println("baseurl=" + repositoryURLBuilder.getExposedRepositoryContentUrl(repository));
+          out.println("enabled=1");
+          out.println("protect=0");
+          out.println("gpgcheck=0");
+          out.println("metadata_expire=30s");
+          out.println("autorefresh=1");
+          out.println("type=rpm-md");
 
-            private String content;
+          Closeables.closeQuietly(out);
+          content = new String(baos.toByteArray());
+        }
+        return new ByteArrayInputStream(content.getBytes("UTF-8"));
+      }
 
-            @Override
-            public InputStream getContent()
-                throws IOException
-            {
-                if ( content == null )
-                {
-                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    final PrintWriter out = new PrintWriter( baos );
+      @Override
+      public String getMimeType() {
+        return "text/plain";
+      }
 
-                    out.println( "[" + repository.getId() + "]" );
-                    out.println( "name=" + repository.getName() );
-                    out.println( "baseurl=" + repositoryURLBuilder.getExposedRepositoryContentUrl( repository ) );
-                    out.println( "enabled=1" );
-                    out.println( "protect=0" );
-                    out.println( "gpgcheck=0" );
-                    out.println( "metadata_expire=30s" );
-                    out.println( "autorefresh=1" );
-                    out.println( "type=rpm-md" );
+      @Override
+      public boolean isReusable() {
+        return true;
+      }
 
-                    Closeables.closeQuietly( out );
-                    content = new String( baos.toByteArray() );
-                }
-                return new ByteArrayInputStream( content.getBytes( "UTF-8" ) );
-            }
+    };
+  }
 
-            @Override
-            public String getMimeType()
-            {
-                return "text/plain";
-            }
-
-            @Override
-            public boolean isReusable()
-            {
-                return true;
-            }
-
-        };
-    }
-
-    public static String configFilePath( final String repositoryId )
-    {
-        return ".meta/" + repositoryId + ".repo";
-    }
+  public static String configFilePath(final String repositoryId) {
+    return ".meta/" + repositoryId + ".repo";
+  }
 
 }

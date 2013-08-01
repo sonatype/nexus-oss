@@ -10,14 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.capabilities;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.util.Map;
 
 import org.sonatype.nexus.yum.Yum;
+
 import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Configuration adapter for {@link GenerateMetadataCapability}.
@@ -28,95 +30,85 @@ public class GenerateMetadataCapabilityConfiguration
     extends MetadataCapabilityConfigurationSupport
 {
 
-    public static final String ALIASES = "aliases";
+  public static final String ALIASES = "aliases";
 
-    public static final String DELETE_PROCESSING = "deleteProcessing";
+  public static final String DELETE_PROCESSING = "deleteProcessing";
 
-    public static final String DELETE_PROCESSING_DELAY = "deleteProcessingDelay";
+  public static final String DELETE_PROCESSING_DELAY = "deleteProcessingDelay";
 
-    public static final String YUM_GROUPS_DEFINITION_FILE = "yumGroupsDefinitionFile";
+  public static final String YUM_GROUPS_DEFINITION_FILE = "yumGroupsDefinitionFile";
 
-    private Map<String, String> aliases;
+  private Map<String, String> aliases;
 
-    private boolean processDeletes;
+  private boolean processDeletes;
 
-    private long deleteProcessingDelay;
+  private long deleteProcessingDelay;
 
-    private String yumGroupsDefinitionFile;
+  private String yumGroupsDefinitionFile;
 
-    public GenerateMetadataCapabilityConfiguration( final String repository,
-                                                    final Map<String, String> aliases,
-                                                    final boolean processDeletes,
-                                                    final long deleteProcessingDelay,
-                                                    final String yumGroupsDefinitionFile )
-    {
-        super( repository );
-        this.aliases = Maps.newTreeMap();
-        this.aliases.putAll( checkNotNull( aliases ) );
-        this.processDeletes = processDeletes;
-        this.deleteProcessingDelay = deleteProcessingDelay;
-        this.yumGroupsDefinitionFile = yumGroupsDefinitionFile;
+  public GenerateMetadataCapabilityConfiguration(final String repository,
+                                                 final Map<String, String> aliases,
+                                                 final boolean processDeletes,
+                                                 final long deleteProcessingDelay,
+                                                 final String yumGroupsDefinitionFile)
+  {
+    super(repository);
+    this.aliases = Maps.newTreeMap();
+    this.aliases.putAll(checkNotNull(aliases));
+    this.processDeletes = processDeletes;
+    this.deleteProcessingDelay = deleteProcessingDelay;
+    this.yumGroupsDefinitionFile = yumGroupsDefinitionFile;
+  }
+
+  public GenerateMetadataCapabilityConfiguration(final Map<String, String> properties) {
+    super(properties);
+
+    this.aliases = Maps.newTreeMap();
+    aliases.putAll(new AliasMappings(properties.get(ALIASES)).aliases());
+
+    boolean processDeletes = true;
+    if (properties.containsKey(DELETE_PROCESSING)) {
+      processDeletes = Boolean.parseBoolean(properties.get(DELETE_PROCESSING));
     }
+    this.processDeletes = processDeletes;
 
-    public GenerateMetadataCapabilityConfiguration( final Map<String, String> properties )
-    {
-        super( properties );
-
-        this.aliases = Maps.newTreeMap();
-        aliases.putAll( new AliasMappings( properties.get( ALIASES ) ).aliases() );
-
-        boolean processDeletes = true;
-        if ( properties.containsKey( DELETE_PROCESSING ) )
-        {
-            processDeletes = Boolean.parseBoolean( properties.get( DELETE_PROCESSING ) );
-        }
-        this.processDeletes = processDeletes;
-
-        long deleteProcessingDelay = Yum.DEFAULT_DELETE_PROCESSING_DELAY;
-        try
-        {
-            deleteProcessingDelay = Long.parseLong( properties.get( DELETE_PROCESSING_DELAY ) );
-        }
-        catch ( NumberFormatException e )
-        {
-            // will use default
-        }
-        this.deleteProcessingDelay = deleteProcessingDelay;
-
-        this.yumGroupsDefinitionFile = properties.get( YUM_GROUPS_DEFINITION_FILE );
+    long deleteProcessingDelay = Yum.DEFAULT_DELETE_PROCESSING_DELAY;
+    try {
+      deleteProcessingDelay = Long.parseLong(properties.get(DELETE_PROCESSING_DELAY));
     }
-
-    public Map<String, String> aliases()
-    {
-        return aliases;
+    catch (NumberFormatException e) {
+      // will use default
     }
+    this.deleteProcessingDelay = deleteProcessingDelay;
 
-    public long deleteProcessingDelay()
-    {
-        return deleteProcessingDelay;
-    }
+    this.yumGroupsDefinitionFile = properties.get(YUM_GROUPS_DEFINITION_FILE);
+  }
 
-    public boolean shouldProcessDeletes()
-    {
-        return processDeletes;
-    }
+  public Map<String, String> aliases() {
+    return aliases;
+  }
 
-    public Map<String, String> asMap()
-    {
-        final Map<String, String> props = super.asMap();
-        props.put( ALIASES, new AliasMappings( aliases ).toString() );
-        props.put( DELETE_PROCESSING, String.valueOf( processDeletes ) );
-        props.put( DELETE_PROCESSING_DELAY, String.valueOf( deleteProcessingDelay ) );
-        if ( yumGroupsDefinitionFile != null )
-        {
-            props.put( YUM_GROUPS_DEFINITION_FILE, yumGroupsDefinitionFile );
-        }
-        return props;
-    }
+  public long deleteProcessingDelay() {
+    return deleteProcessingDelay;
+  }
 
-    public String getYumGroupsDefinitionFile()
-    {
-        return yumGroupsDefinitionFile;
+  public boolean shouldProcessDeletes() {
+    return processDeletes;
+  }
+
+  public Map<String, String> asMap() {
+    final Map<String, String> props = super.asMap();
+    props.put(ALIASES, new AliasMappings(aliases).toString());
+    props.put(DELETE_PROCESSING, String.valueOf(processDeletes));
+    props.put(DELETE_PROCESSING_DELAY, String.valueOf(deleteProcessingDelay));
+    if (yumGroupsDefinitionFile != null) {
+      props.put(YUM_GROUPS_DEFINITION_FILE, yumGroupsDefinitionFile);
     }
+    return props;
+  }
+
+  public String getYumGroupsDefinitionFile() {
+    return yumGroupsDefinitionFile;
+  }
 
 }

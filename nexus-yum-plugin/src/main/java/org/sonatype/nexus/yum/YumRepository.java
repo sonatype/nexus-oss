@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum;
 
 import java.io.File;
@@ -22,12 +23,12 @@ import java.io.File;
 public interface YumRepository
 {
 
-    /**
-     * Resolves a file given its path.
-     *
-     * @param path to be resolved. A null value is considered similar to "/" (root)
-     * @return resolved file
-     */
-    File resolvePath( String path );
+  /**
+   * Resolves a file given its path.
+   *
+   * @param path to be resolved. A null value is considered similar to "/" (root)
+   * @return resolved file
+   */
+  File resolvePath(String path);
 
 }

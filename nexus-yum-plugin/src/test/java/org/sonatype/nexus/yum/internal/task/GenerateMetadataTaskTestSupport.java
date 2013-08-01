@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.task;
 
 import javax.inject.Inject;
@@ -23,14 +24,14 @@ public abstract class GenerateMetadataTaskTestSupport
     extends YumNexusTestSupport
 {
 
-    @Inject
-    protected NexusScheduler nexusScheduler;
+  @Inject
+  protected NexusScheduler nexusScheduler;
 
-    protected YumRepository executeJob( final GenerateMetadataTask task )
-        throws Exception
-    {
-        final ScheduledTask<YumRepository> scheduledTask = nexusScheduler.submit( GenerateMetadataTask.ID, task );
-        return scheduledTask.get();
-    }
+  protected YumRepository executeJob(final GenerateMetadataTask task)
+      throws Exception
+  {
+    final ScheduledTask<YumRepository> scheduledTask = nexusScheduler.submit(GenerateMetadataTask.ID, task);
+    return scheduledTask.get();
+  }
 
 }

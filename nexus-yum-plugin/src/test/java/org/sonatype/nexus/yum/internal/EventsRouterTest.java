@@ -10,49 +10,48 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal;
 
 import javax.inject.Inject;
 
-import org.junit.Test;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.SchedulerYumNexusTestSupport;
 
+import org.junit.Test;
+
 public class EventsRouterTest
     extends SchedulerYumNexusTestSupport
 {
 
-    @Inject
-    private EventsRouter eventsRouter;
+  @Inject
+  private EventsRouter eventsRouter;
 
-    @Inject
-    private YumRegistry repositoryRegistry;
+  @Inject
+  private YumRegistry repositoryRegistry;
 
-    @Test
-    public void shouldNotCreateRepo()
-    {
-        Repository repo = createRepository( true );
-        repositoryRegistry.unregister( repo.getId() );
-        eventsRouter.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
-    }
+  @Test
+  public void shouldNotCreateRepo() {
+    Repository repo = createRepository(true);
+    repositoryRegistry.unregister(repo.getId());
+    eventsRouter.on(new RepositoryItemEventStoreCreate(repo, createItem("VERSION", "test-source.jar")));
+  }
 
-    @Test
-    public void shouldNotCreateRepoForPom()
-    {
-        MavenRepository repo = createRepository( true );
-        repositoryRegistry.register( repo );
-        eventsRouter.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
-    }
+  @Test
+  public void shouldNotCreateRepoForPom() {
+    MavenRepository repo = createRepository(true);
+    repositoryRegistry.register(repo);
+    eventsRouter.on(new RepositoryItemEventStoreCreate(repo, createItem("VERSION", "test.pom")));
+  }
 
-    @Test
-    public void shouldCreateRepoForRpm()
-    {
-        MavenRepository repo = createRepository( true );
-        repositoryRegistry.register( repo );
-        eventsRouter.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
-    }
+  @Test
+  public void shouldCreateRepoForRpm() {
+    MavenRepository repo = createRepository(true);
+    repositoryRegistry.register(repo);
+    eventsRouter.on(new RepositoryItemEventStoreCreate(repo, createItem("VERSION", "test.rpm")));
+  }
 
 }

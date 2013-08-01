@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum;
 
 import java.io.File;
@@ -28,112 +29,115 @@ import org.sonatype.scheduling.ScheduledTask;
 public interface Yum
 {
 
-    static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;
-    String PATH_OF_REPODATA = "repodata";
-    String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/repomd.xml";
+  static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;
 
-    /**
-     * Configures if deletes from a Nexus repository should result in Yum metadata regeneration.
-     *
-     * @param processDeletes true if metadata should be regenerated
-     * @return itself
-     */
-    Yum setProcessDeletes( boolean processDeletes );
+  String PATH_OF_REPODATA = "repodata";
 
-    /**
-     * Configures the delay between a delete and Yum metadata regeneration.
-     *
-     * @param numberOfSeconds delay in seconds
-     * @return itself
-     */
-    Yum setDeleteProcessingDelay( final long numberOfSeconds );
+  String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/repomd.xml";
 
-    /**
-     * Configures repository path of a file containing Yum groups definition.
-     *
-     * @param yumGroupsDefinitionFile repository path of a file containing Yum groups definition
-     * @return itself
-     */
-    Yum setYumGroupsDefinitionFile( final String yumGroupsDefinitionFile );
+  /**
+   * Configures if deletes from a Nexus repository should result in Yum metadata regeneration.
+   *
+   * @param processDeletes true if metadata should be regenerated
+   * @return itself
+   */
+  Yum setProcessDeletes(boolean processDeletes);
 
-    /**
-     * @return true if metadata is regenerated after a delete from a Nexus repository
-     */
-    boolean shouldProcessDeletes();
+  /**
+   * Configures the delay between a delete and Yum metadata regeneration.
+   *
+   * @param numberOfSeconds delay in seconds
+   * @return itself
+   */
+  Yum setDeleteProcessingDelay(final long numberOfSeconds);
 
-    /**
-     * @return number of seconds between a delete from a Nexus repository and metadata regeneration
-     */
-    long deleteProcessingDelay();
+  /**
+   * Configures repository path of a file containing Yum groups definition.
+   *
+   * @param yumGroupsDefinitionFile repository path of a file containing Yum groups definition
+   * @return itself
+   */
+  Yum setYumGroupsDefinitionFile(final String yumGroupsDefinitionFile);
 
-    /**
-     * @return repository path of a file containing Yum groups definition
-     */
-    String getYumGroupsDefinitionFile();
+  /**
+   * @return true if metadata is regenerated after a delete from a Nexus repository
+   */
+  boolean shouldProcessDeletes();
 
-    /**
-     * Configures an alias for a version.
-     *
-     * @param alias   alias name (cannot be null)
-     * @param version to be aliased (cannot be null)
-     * @return itself
-     */
-    Yum addAlias( String alias, String version );
+  /**
+   * @return number of seconds between a delete from a Nexus repository and metadata regeneration
+   */
+  long deleteProcessingDelay();
 
-    /**
-     * Removes an alias.
-     *
-     * @param alias alias name (cannot be null)
-     * @return itself
-     */
-    Yum removeAlias( String alias );
+  /**
+   * @return repository path of a file containing Yum groups definition
+   */
+  String getYumGroupsDefinitionFile();
 
-    /**
-     * Resets aliases to provided mappings.
-     *
-     * @param aliases alias mappings (cannot be null)
-     * @return itself
-     */
-    Yum setAliases( Map<String, String> aliases );
+  /**
+   * Configures an alias for a version.
+   *
+   * @param alias   alias name (cannot be null)
+   * @param version to be aliased (cannot be null)
+   * @return itself
+   */
+  Yum addAlias(String alias, String version);
 
-    /**
-     * @param alias alias name
-     * @return version mapped to provided alias, null if no mapping found
-     */
-    String getVersion( String alias );
+  /**
+   * Removes an alias.
+   *
+   * @param alias alias name (cannot be null)
+   * @return itself
+   */
+  Yum removeAlias(String alias);
 
-    /**
-     * @return associated Nexus repository (never null)
-     */
-    Repository getNexusRepository();
+  /**
+   * Resets aliases to provided mappings.
+   *
+   * @param aliases alias mappings (cannot be null)
+   * @return itself
+   */
+  Yum setAliases(Map<String, String> aliases);
 
-    /**
-     * Regenerates Yum metadata.
-     *
-     * @return regenerate future (never null)
-     */
-    ScheduledTask<YumRepository> regenerate();
+  /**
+   * @param alias alias name
+   * @return version mapped to provided alias, null if no mapping found
+   */
+  String getVersion(String alias);
 
-    /**
-     * Adds RPM and regenerate.
-     * @param path to be added
-     * @return regenerate future (never null)
-     */
-    ScheduledTask<YumRepository> addRpmAndRegenerate( String path );
+  /**
+   * @return associated Nexus repository (never null)
+   */
+  Repository getNexusRepository();
 
-    YumRepository getYumRepository( String version, URL repoBaseUrl )
-        throws Exception;
+  /**
+   * Regenerates Yum metadata.
+   *
+   * @return regenerate future (never null)
+   */
+  ScheduledTask<YumRepository> regenerate();
 
-    void regenerateWhenPathIsRemoved( String path );
+  /**
+   * Adds RPM and regenerate.
+   *
+   * @param path to be added
+   * @return regenerate future (never null)
+   */
+  ScheduledTask<YumRepository> addRpmAndRegenerate(String path);
 
-    void regenerateWhenDirectoryIsRemoved( String path );
+  YumRepository getYumRepository(String version, URL repoBaseUrl)
+      throws Exception;
 
-    File getBaseDir();
+  void regenerateWhenPathIsRemoved(String path);
 
-    Set<String> getVersions();
+  void regenerateWhenDirectoryIsRemoved(String path);
 
-    void addVersion( String version );
+  File getBaseDir();
 
-    void markDirty( String itemVersion );
+  Set<String> getVersions();
+
+  void addVersion(String version);
+
+  void markDirty(String itemVersion);
 
 }

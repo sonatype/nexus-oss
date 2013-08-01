@@ -10,16 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal.task;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
-import static org.apache.commons.io.FileUtils.writeStringToFile;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.sonatype.scheduling.TaskState.RUNNING;
-import static org.sonatype.scheduling.TaskState.SLEEPING;
-import static org.sonatype.scheduling.TaskState.SUBMITTED;
+package org.sonatype.nexus.yum.internal.task;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +23,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
@@ -56,448 +44,395 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.scheduling.TaskState.RUNNING;
+import static org.sonatype.scheduling.TaskState.SLEEPING;
+import static org.sonatype.scheduling.TaskState.SUBMITTED;
+
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
  *
  * @since 3.0
  */
-@Named( GenerateMetadataTask.ID )
+@Named(GenerateMetadataTask.ID)
 public class GenerateMetadataTask
     extends AbstractNexusTask<YumRepository>
     implements ListFileFactory
 {
 
-    public static final String ID = "GenerateMetadataTask";
+  public static final String ID = "GenerateMetadataTask";
 
-    private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
+  private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
 
-    private static final String CACHE_DIR_PREFIX = ".cache-";
+  private static final String CACHE_DIR_PREFIX = ".cache-";
 
-    private static final Logger LOG = LoggerFactory.getLogger( GenerateMetadataTask.class );
+  private static final Logger LOG = LoggerFactory.getLogger(GenerateMetadataTask.class);
 
-    public static final String PARAM_REPO_ID = "repoId";
+  public static final String PARAM_REPO_ID = "repoId";
 
-    public static final String PARAM_RPM_DIR = "rpmDir";
+  public static final String PARAM_RPM_DIR = "rpmDir";
 
-    public static final String PARAM_REPO_DIR = "repoDir";
+  public static final String PARAM_REPO_DIR = "repoDir";
 
-    public static final String PARAM_VERSION = "version";
+  public static final String PARAM_VERSION = "version";
 
-    public static final String PARAM_RPM_URL = "rpmUrl";
+  public static final String PARAM_RPM_URL = "rpmUrl";
 
-    public static final String PARAM_REPO_URL = "repoUrl";
+  public static final String PARAM_REPO_URL = "repoUrl";
 
-    public static final String PARAM_ADDED_FILES = "addedFiles";
+  public static final String PARAM_ADDED_FILES = "addedFiles";
 
-    public static final String PARAM_SINGLE_RPM_PER_DIR = "singleRpmPerDir";
+  public static final String PARAM_SINGLE_RPM_PER_DIR = "singleRpmPerDir";
 
-    public static final String PARAM_FORCE_FULL_SCAN = "forceFullScan";
+  public static final String PARAM_FORCE_FULL_SCAN = "forceFullScan";
 
-    public static final String PARAM_YUM_GROUPS_DEFINITION_FILE = "yumGroupsDefinitionFile";
+  public static final String PARAM_YUM_GROUPS_DEFINITION_FILE = "yumGroupsDefinitionFile";
 
-    private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-    private final RepositoryURLBuilder repositoryURLBuilder;
+  private final RepositoryURLBuilder repositoryURLBuilder;
 
-    private final RpmScanner scanner;
+  private final RpmScanner scanner;
 
-    private final NexusScheduler nexusScheduler;
+  private final NexusScheduler nexusScheduler;
 
-    private final YumRegistry yumRegistry;
+  private final YumRegistry yumRegistry;
 
-    private final Manager routingManager;
+  private final Manager routingManager;
 
-    @Inject
-    public GenerateMetadataTask( final EventBus eventBus,
-                                 final RepositoryRegistry repositoryRegistry,
-                                 final YumRegistry yumRegistry,
-                                 final RepositoryURLBuilder repositoryURLBuilder,
-                                 final RpmScanner scanner,
-                                 final NexusScheduler nexusScheduler,
-                                 final Manager routingManager)
-    {
-        super( eventBus, null );
+  @Inject
+  public GenerateMetadataTask(final EventBus eventBus,
+                              final RepositoryRegistry repositoryRegistry,
+                              final YumRegistry yumRegistry,
+                              final RepositoryURLBuilder repositoryURLBuilder,
+                              final RpmScanner scanner,
+                              final NexusScheduler nexusScheduler,
+                              final Manager routingManager)
+  {
+    super(eventBus, null);
 
-        this.yumRegistry = checkNotNull( yumRegistry );
-        this.nexusScheduler = checkNotNull( nexusScheduler );
-        this.scanner = checkNotNull( scanner );
-        this.repositoryRegistry = checkNotNull( repositoryRegistry );
-        this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
-        this.routingManager = checkNotNull( routingManager );
+    this.yumRegistry = checkNotNull(yumRegistry);
+    this.nexusScheduler = checkNotNull(nexusScheduler);
+    this.scanner = checkNotNull(scanner);
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryURLBuilder = checkNotNull(repositoryURLBuilder);
+    this.routingManager = checkNotNull(routingManager);
 
-        getParameters().put( PARAM_SINGLE_RPM_PER_DIR, Boolean.toString( true ) );
+    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
+  }
+
+  @Override
+  protected YumRepository doRun()
+      throws Exception
+  {
+    setDefaults();
+
+    LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
+    try {
+      getRepoDir().mkdirs();
+
+      File rpmListFile = createRpmListFile();
+      new CommandLineExecutor().exec(buildCreateRepositoryCommand(rpmListFile));
+
+      if (isUseAbsoluteUrls()) {
+        replaceUrlInRepomdXml();
+      }
+
     }
+    catch (IOException e) {
+      LOG.warn("Yum metadata generation failed", e);
+      throw new IOException("Yum metadata generation failed", e);
+    }
+    // TODO dubious
+    Thread.sleep(100);
 
-    @Override
-    protected YumRepository doRun()
-        throws Exception
-    {
-        setDefaults();
-
-        LOG.debug( "Generating Yum-Repository for '{}' ...", getRpmDir() );
-        try
-        {
-            getRepoDir().mkdirs();
-
-            File rpmListFile = createRpmListFile();
-            new CommandLineExecutor().exec( buildCreateRepositoryCommand( rpmListFile ) );
-
-            if ( isUseAbsoluteUrls() )
-            {
-                replaceUrlInRepomdXml();
-            }
-
+    final Repository repository = findRepository();
+    if (repository != null) {
+      final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
+      if (mavenRepository != null) {
+        try {
+          routingManager.forceUpdatePrefixFile(mavenRepository);
         }
-        catch ( IOException e )
-        {
-            LOG.warn( "Yum metadata generation failed", e );
-            throw new IOException( "Yum metadata generation failed", e );
+        catch (Exception e) {
+          logger.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
         }
-        // TODO dubious
-        Thread.sleep( 100 );
+      }
+    }
 
-        final Repository repository = findRepository();
-        if ( repository != null )
-        {
-            final MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
-            if ( mavenRepository != null )
-            {
-                try
-                {
-                    routingManager.forceUpdatePrefixFile( mavenRepository );
-                }
-                catch ( Exception e )
-                {
-                    logger.warn( "Could not update Whitelist for repository '{}'", mavenRepository, e );
-                }
-            }
+    regenerateMetadataForGroups();
+    return new YumRepositoryImpl(getRepoDir(), getRepositoryId(), getVersion());
+  }
+
+  protected void setDefaults()
+      throws MalformedURLException, URISyntaxException
+  {
+    final Repository repository = findRepository();
+    if (isBlank(getRpmDir()) && repository != null) {
+      setRpmDir(RepositoryUtils.getBaseDir(repository).getAbsolutePath());
+    }
+    if (isBlank(getRpmUrl()) && repository != null) {
+      setRpmUrl(repositoryURLBuilder.getRepositoryContentUrl(repository));
+    }
+    if (isBlank(getParameter(PARAM_REPO_DIR)) && isNotBlank(getRpmDir())) {
+      setRepoDir(new File(getRpmDir()));
+    }
+    if (isBlank(getRepoUrl()) && isNotBlank(getRpmUrl())) {
+      setRepoUrl(getRpmUrl());
+    }
+  }
+
+  private Repository findRepository() {
+    try {
+      return repositoryRegistry.getRepository(getRepositoryId());
+    }
+    catch (NoSuchRepositoryException e) {
+      return null;
+    }
+  }
+
+  @Override
+  protected String getAction() {
+    return "GENERATE_YUM_METADATA";
+  }
+
+  @Override
+  protected String getMessage() {
+    return format("Generate Yum metadata of repository '%s'", getRepositoryId());
+  }
+
+  @Override
+  public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
+
+    if (activeTasks.containsKey(ID)) {
+      int activeRunningTasks = 0;
+      for (ScheduledTask<?> scheduledTask : activeTasks.get(ID)) {
+        if (RUNNING.equals(scheduledTask.getTaskState())) {
+          if (conflictsWith((GenerateMetadataTask) scheduledTask.getTask())) {
+            return false;
+          }
+          activeRunningTasks++;
         }
-
-        regenerateMetadataForGroups();
-        return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );
+      }
+      return activeRunningTasks < yumRegistry.maxNumberOfParallelThreads();
     }
 
-    protected void setDefaults()
-        throws MalformedURLException, URISyntaxException
-    {
-        final Repository repository = findRepository();
-        if ( isBlank( getRpmDir() ) && repository != null )
-        {
-            setRpmDir( RepositoryUtils.getBaseDir( repository ).getAbsolutePath() );
+    return true;
+  }
+
+  @Override
+  public boolean allowConcurrentSubmission(Map<String, List<ScheduledTask<?>>> activeTasks) {
+    if (activeTasks.containsKey(ID)) {
+      for (ScheduledTask<?> scheduledTask : activeTasks.get(ID)) {
+        if (isSubmitted(scheduledTask)
+            && conflictsWith((GenerateMetadataTask) scheduledTask.getTask())
+            && scheduledTask.getSchedule() instanceof RunNowSchedule) {
+          throw new TaskAlreadyScheduledException(scheduledTask, "Found same task in scheduler queue.");
         }
-        if ( isBlank( getRpmUrl() ) && repository != null )
-        {
-            setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
+      }
+    }
+
+    return true;
+  }
+
+  private boolean isSubmitted(ScheduledTask<?> scheduledTask) {
+    return SUBMITTED.equals(scheduledTask.getTaskState()) || SLEEPING.equals(scheduledTask.getTaskState());
+  }
+
+  private void regenerateMetadataForGroups() {
+    if (StringUtils.isBlank(getVersion())) {
+      try {
+        final Repository repository = repositoryRegistry.getRepository(getRepositoryId());
+        for (GroupRepository groupRepository : repositoryRegistry.getGroupsOfRepository(repository)) {
+          if (yumRegistry.isRegistered(repository.getId())) {
+            MergeMetadataTask.createTaskFor(nexusScheduler, groupRepository);
+          }
         }
-        if ( isBlank( getParameter( PARAM_REPO_DIR ) ) && isNotBlank( getRpmDir() ) )
-        {
-            setRepoDir( new File( getRpmDir() ) );
-        }
-        if ( isBlank( getRepoUrl() ) && isNotBlank( getRpmUrl() ) )
-        {
-            setRepoUrl( getRpmUrl() );
-        }
-    }
-
-    private Repository findRepository()
-    {
-        try
-        {
-            return repositoryRegistry.getRepository( getRepositoryId() );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            return null;
-        }
-    }
-
-    @Override
-    protected String getAction()
-    {
-        return "GENERATE_YUM_METADATA";
-    }
-
-    @Override
-    protected String getMessage()
-    {
-        return format( "Generate Yum metadata of repository '%s'", getRepositoryId() );
-    }
-
-    @Override
-    public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> activeTasks )
-    {
-
-        if ( activeTasks.containsKey( ID ) )
-        {
-            int activeRunningTasks = 0;
-            for ( ScheduledTask<?> scheduledTask : activeTasks.get( ID ) )
-            {
-                if ( RUNNING.equals( scheduledTask.getTaskState() ) )
-                {
-                    if ( conflictsWith( (GenerateMetadataTask) scheduledTask.getTask() ) )
-                    {
-                        return false;
-                    }
-                    activeRunningTasks++;
-                }
-            }
-            return activeRunningTasks < yumRegistry.maxNumberOfParallelThreads();
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> activeTasks )
-    {
-        if ( activeTasks.containsKey( ID ) )
-        {
-            for ( ScheduledTask<?> scheduledTask : activeTasks.get( ID ) )
-            {
-                if ( isSubmitted( scheduledTask )
-                    && conflictsWith( (GenerateMetadataTask) scheduledTask.getTask() )
-                    && scheduledTask.getSchedule() instanceof RunNowSchedule )
-                {
-                    throw new TaskAlreadyScheduledException( scheduledTask, "Found same task in scheduler queue." );
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private boolean isSubmitted( ScheduledTask<?> scheduledTask )
-    {
-        return SUBMITTED.equals( scheduledTask.getTaskState() ) || SLEEPING.equals( scheduledTask.getTaskState() );
-    }
-
-    private void regenerateMetadataForGroups()
-    {
-        if ( StringUtils.isBlank( getVersion() ) )
-        {
-            try
-            {
-                final Repository repository = repositoryRegistry.getRepository( getRepositoryId() );
-                for ( GroupRepository groupRepository : repositoryRegistry.getGroupsOfRepository( repository ) )
-                {
-                    if ( yumRegistry.isRegistered( repository.getId() ) )
-                    {
-                        MergeMetadataTask.createTaskFor( nexusScheduler, groupRepository );
-                    }
-                }
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                logger.warn(
-                    "Repository '{}' does not exist anymore. Backing out from triggering group merge for it.",
-                    getRepositoryId()
-                );
-            }
-        }
-    }
-
-    private boolean conflictsWith( GenerateMetadataTask task )
-    {
-        if ( StringUtils.equals( getRepositoryId(), task.getRepositoryId() ) )
-        {
-            return StringUtils.equals( getVersion(), task.getVersion() );
-        }
-        return false;
-    }
-
-    private File createRpmListFile()
-        throws IOException
-    {
-        return new RpmListWriter(
-            getRepositoryId(),
-            new File( getRpmDir() ),
-            getAddedFiles(),
-            getVersion(),
-            isSingleRpmPerDirectory(),
-            shouldForceFullScan(),
-            this,
-            scanner
-        ).writeList();
-    }
-
-    private String getRepositoryIdVersion()
-    {
-        return getRepositoryId() + ( isNotBlank( getVersion() ) ? ( "-version-" + getVersion() ) : "" );
-    }
-
-    private void replaceUrlInRepomdXml()
-        throws IOException
-    {
-        File repomd = new File( getRepoDir(), Yum.PATH_OF_REPOMD_XML );
-        if ( repomd.exists() && getRepoUrl() != null )
-        {
-            String repomdStr = FileUtils.readFileToString( repomd );
-            repomdStr = repomdStr.replace( getRpmUrl(), getRepoUrl() );
-            writeStringToFile( repomd, repomdStr );
-        }
-    }
-
-    private String buildCreateRepositoryCommand( File packageList )
-    {
-        StringBuilder commandLine = new StringBuilder( "createrepo --update --verbose --database" );
-        commandLine.append( " --outputdir " ).append( getRepoDir().getAbsolutePath() );
-        commandLine.append( " --pkglist " ).append( packageList.getAbsolutePath() );
-        commandLine.append( " --cachedir " ).append( createCacheDir().getAbsolutePath() );
-        commandLine.append( " --baseurl " ).append( getRpmUrl() );
-        final String yumGroupsDefinitionFile = getYumGroupsDefinitionFile();
-        if ( yumGroupsDefinitionFile != null )
-        {
-            final File file = new File( getRepoDir().getAbsolutePath(), yumGroupsDefinitionFile );
-            final String path = file.getAbsolutePath();
-            if ( file.exists() )
-            {
-                if ( file.getName().toLowerCase().endsWith( ".xml" ) )
-                {
-                    commandLine.append( " --groupfile " ).append( path );
-                }
-                else
-                {
-                    LOG.warn( "Yum groups definition file '{}' must have an '.xml' extension, ignoring", path );
-                }
-            }
-            else
-            {
-                LOG.warn( "Yum groups definition file '{}' doesn't exist, ignoring", path );
-            }
-        }
-        commandLine.append( " " ).append( getRpmDir() );
-
-        return commandLine.toString();
-    }
-
-    @Override
-    public File getRpmListFile( String repositoryId )
-    {
-        return new File( createPackageDir(), getRepositoryId() + ".txt" );
-    }
-
-    private File createCacheDir()
-    {
-        return getCacheDir( getRepositoryIdVersion() );
-    }
-
-    private boolean isUseAbsoluteUrls()
-    {
-        return isNotBlank( getVersion() );
-    }
-
-    private File createPackageDir()
-    {
-        return getCacheDir( PACKAGE_FILE_DIR_NAME );
-    }
-
-    private File getCacheDir( final String name )
-    {
-        final File cacheDir = new File(
-            new File( yumRegistry.getTemporaryDirectory(), CACHE_DIR_PREFIX + getRepositoryId() ), name
+      }
+      catch (NoSuchRepositoryException e) {
+        logger.warn(
+            "Repository '{}' does not exist anymore. Backing out from triggering group merge for it.",
+            getRepositoryId()
         );
-        cacheDir.mkdirs();
-        return cacheDir;
+      }
     }
+  }
 
-    @Override
-    public File getRpmListFile( String repositoryId, String version )
-    {
-        return new File( createPackageDir(), getRepositoryId() + "-" + version + ".txt" );
+  private boolean conflictsWith(GenerateMetadataTask task) {
+    if (StringUtils.equals(getRepositoryId(), task.getRepositoryId())) {
+      return StringUtils.equals(getVersion(), task.getVersion());
     }
+    return false;
+  }
 
-    public String getRepositoryId()
-    {
-        return getParameter( PARAM_REPO_ID );
-    }
+  private File createRpmListFile()
+      throws IOException
+  {
+    return new RpmListWriter(
+        getRepositoryId(),
+        new File(getRpmDir()),
+        getAddedFiles(),
+        getVersion(),
+        isSingleRpmPerDirectory(),
+        shouldForceFullScan(),
+        this,
+        scanner
+    ).writeList();
+  }
 
-    public void setRepositoryId( String repositoryId )
-    {
-        getParameters().put( PARAM_REPO_ID, repositoryId );
-    }
+  private String getRepositoryIdVersion() {
+    return getRepositoryId() + (isNotBlank(getVersion()) ? ("-version-" + getVersion()) : "");
+  }
 
-    public String getAddedFiles()
-    {
-        return getParameter( PARAM_ADDED_FILES );
+  private void replaceUrlInRepomdXml()
+      throws IOException
+  {
+    File repomd = new File(getRepoDir(), Yum.PATH_OF_REPOMD_XML);
+    if (repomd.exists() && getRepoUrl() != null) {
+      String repomdStr = FileUtils.readFileToString(repomd);
+      repomdStr = repomdStr.replace(getRpmUrl(), getRepoUrl());
+      writeStringToFile(repomd, repomdStr);
     }
+  }
 
-    public void setAddedFiles( String addedFiles )
-    {
-        getParameters().put( PARAM_ADDED_FILES, addedFiles );
+  private String buildCreateRepositoryCommand(File packageList) {
+    StringBuilder commandLine = new StringBuilder("createrepo --update --verbose --database");
+    commandLine.append(" --outputdir ").append(getRepoDir().getAbsolutePath());
+    commandLine.append(" --pkglist ").append(packageList.getAbsolutePath());
+    commandLine.append(" --cachedir ").append(createCacheDir().getAbsolutePath());
+    commandLine.append(" --baseurl ").append(getRpmUrl());
+    final String yumGroupsDefinitionFile = getYumGroupsDefinitionFile();
+    if (yumGroupsDefinitionFile != null) {
+      final File file = new File(getRepoDir().getAbsolutePath(), yumGroupsDefinitionFile);
+      final String path = file.getAbsolutePath();
+      if (file.exists()) {
+        if (file.getName().toLowerCase().endsWith(".xml")) {
+          commandLine.append(" --groupfile ").append(path);
+        }
+        else {
+          LOG.warn("Yum groups definition file '{}' must have an '.xml' extension, ignoring", path);
+        }
+      }
+      else {
+        LOG.warn("Yum groups definition file '{}' doesn't exist, ignoring", path);
+      }
     }
+    commandLine.append(" ").append(getRpmDir());
 
-    public File getRepoDir()
-    {
-        return new File( getParameter( PARAM_REPO_DIR ) );
-    }
+    return commandLine.toString();
+  }
 
-    public void setRepoDir( File repoDir )
-    {
-        getParameters().put( PARAM_REPO_DIR, repoDir.getAbsolutePath() );
-    }
+  @Override
+  public File getRpmListFile(String repositoryId) {
+    return new File(createPackageDir(), getRepositoryId() + ".txt");
+  }
 
-    public String getRepoUrl()
-    {
-        return getParameter( PARAM_REPO_URL );
-    }
+  private File createCacheDir() {
+    return getCacheDir(getRepositoryIdVersion());
+  }
 
-    public void setRepoUrl( String repoUrl )
-    {
-        getParameters().put( PARAM_REPO_URL, repoUrl );
-    }
+  private boolean isUseAbsoluteUrls() {
+    return isNotBlank(getVersion());
+  }
 
-    public String getRpmDir()
-    {
-        return getParameter( PARAM_RPM_DIR );
-    }
+  private File createPackageDir() {
+    return getCacheDir(PACKAGE_FILE_DIR_NAME);
+  }
 
-    public void setRpmDir( String rpmDir )
-    {
-        getParameters().put( PARAM_RPM_DIR, rpmDir );
-    }
+  private File getCacheDir(final String name) {
+    final File cacheDir = new File(
+        new File(yumRegistry.getTemporaryDirectory(), CACHE_DIR_PREFIX + getRepositoryId()), name
+    );
+    cacheDir.mkdirs();
+    return cacheDir;
+  }
 
-    public String getRpmUrl()
-    {
-        return getParameter( PARAM_RPM_URL );
-    }
+  @Override
+  public File getRpmListFile(String repositoryId, String version) {
+    return new File(createPackageDir(), getRepositoryId() + "-" + version + ".txt");
+  }
 
-    public void setRpmUrl( String rpmUrl )
-    {
-        getParameters().put( PARAM_RPM_URL, rpmUrl );
-    }
+  public String getRepositoryId() {
+    return getParameter(PARAM_REPO_ID);
+  }
 
-    public String getVersion()
-    {
-        return getParameter( PARAM_VERSION );
-    }
+  public void setRepositoryId(String repositoryId) {
+    getParameters().put(PARAM_REPO_ID, repositoryId);
+  }
 
-    public void setVersion( String version )
-    {
-        getParameters().put( PARAM_VERSION, version );
-    }
+  public String getAddedFiles() {
+    return getParameter(PARAM_ADDED_FILES);
+  }
 
-    public String getYumGroupsDefinitionFile()
-    {
-        return getParameter( PARAM_YUM_GROUPS_DEFINITION_FILE );
-    }
+  public void setAddedFiles(String addedFiles) {
+    getParameters().put(PARAM_ADDED_FILES, addedFiles);
+  }
 
-    public void setYumGroupsDefinitionFile( String file )
-    {
-        getParameters().put( PARAM_YUM_GROUPS_DEFINITION_FILE, file );
-    }
+  public File getRepoDir() {
+    return new File(getParameter(PARAM_REPO_DIR));
+  }
 
-    public boolean isSingleRpmPerDirectory()
-    {
-        return Boolean.valueOf( getParameter( PARAM_SINGLE_RPM_PER_DIR ) );
-    }
+  public void setRepoDir(File repoDir) {
+    getParameters().put(PARAM_REPO_DIR, repoDir.getAbsolutePath());
+  }
 
-    public boolean shouldForceFullScan()
-    {
-        return Boolean.valueOf( getParameter( PARAM_FORCE_FULL_SCAN ) );
-    }
+  public String getRepoUrl() {
+    return getParameter(PARAM_REPO_URL);
+  }
 
-    public void setSingleRpmPerDirectory( boolean singleRpmPerDirectory )
-    {
-        getParameters().put( PARAM_SINGLE_RPM_PER_DIR, Boolean.toString( singleRpmPerDirectory ) );
-    }
+  public void setRepoUrl(String repoUrl) {
+    getParameters().put(PARAM_REPO_URL, repoUrl);
+  }
+
+  public String getRpmDir() {
+    return getParameter(PARAM_RPM_DIR);
+  }
+
+  public void setRpmDir(String rpmDir) {
+    getParameters().put(PARAM_RPM_DIR, rpmDir);
+  }
+
+  public String getRpmUrl() {
+    return getParameter(PARAM_RPM_URL);
+  }
+
+  public void setRpmUrl(String rpmUrl) {
+    getParameters().put(PARAM_RPM_URL, rpmUrl);
+  }
+
+  public String getVersion() {
+    return getParameter(PARAM_VERSION);
+  }
+
+  public void setVersion(String version) {
+    getParameters().put(PARAM_VERSION, version);
+  }
+
+  public String getYumGroupsDefinitionFile() {
+    return getParameter(PARAM_YUM_GROUPS_DEFINITION_FILE);
+  }
+
+  public void setYumGroupsDefinitionFile(String file) {
+    getParameters().put(PARAM_YUM_GROUPS_DEFINITION_FILE, file);
+  }
+
+  public boolean isSingleRpmPerDirectory() {
+    return Boolean.valueOf(getParameter(PARAM_SINGLE_RPM_PER_DIR));
+  }
+
+  public boolean shouldForceFullScan() {
+    return Boolean.valueOf(getParameter(PARAM_FORCE_FULL_SCAN));
+  }
+
+  public void setSingleRpmPerDirectory(boolean singleRpmPerDirectory) {
+    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(singleRpmPerDirectory));
+  }
 }

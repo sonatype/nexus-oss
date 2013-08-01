@@ -10,48 +10,49 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.rest;
 
-import static org.junit.Assert.assertEquals;
+import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.junit.Assert.assertEquals;
 
 public class YumFileRepresentationTest
     extends TestSupport
 {
 
-    @Test
-    public void shouldReturnXmlFile()
-        throws Exception
-    {
-        YumFileRepresentation representation = createRepresentation( "repomd.xml" );
-        assertEquals( MediaType.APPLICATION_XML, representation.getMediaType() );
-    }
+  @Test
+  public void shouldReturnXmlFile()
+      throws Exception
+  {
+    YumFileRepresentation representation = createRepresentation("repomd.xml");
+    assertEquals(MediaType.APPLICATION_XML, representation.getMediaType());
+  }
 
-    @Test
-    public void shouldReturnGzFile()
-        throws Exception
-    {
-        YumFileRepresentation representation = createRepresentation( "primary.xml.gz" );
-        assertEquals( MediaType.APPLICATION_GNU_ZIP, representation.getMediaType() );
-    }
+  @Test
+  public void shouldReturnGzFile()
+      throws Exception
+  {
+    YumFileRepresentation representation = createRepresentation("primary.xml.gz");
+    assertEquals(MediaType.APPLICATION_GNU_ZIP, representation.getMediaType());
+  }
 
-    @Test
-    public void shouldReturnAllFile()
-        throws Exception
-    {
-        YumFileRepresentation representation = createRepresentation( "primary.txt" );
-        assertEquals( MediaType.APPLICATION_ALL, representation.getMediaType() );
-    }
+  @Test
+  public void shouldReturnAllFile()
+      throws Exception
+  {
+    YumFileRepresentation representation = createRepresentation("primary.txt");
+    assertEquals(MediaType.APPLICATION_ALL, representation.getMediaType());
+  }
 
-    private YumFileRepresentation createRepresentation( String filename )
-    {
-        return new YumFileRepresentation(
-            new UrlPathInterpretation( null, filename, false ),
-            new YumRepositoryImpl( util.resolveFile( "target/yum" ), null, null )
-        );
-    }
+  private YumFileRepresentation createRepresentation(String filename) {
+    return new YumFileRepresentation(
+        new UrlPathInterpretation(null, filename, false),
+        new YumRepositoryImpl(util.resolveFile("target/yum"), null, null)
+    );
+  }
 }
