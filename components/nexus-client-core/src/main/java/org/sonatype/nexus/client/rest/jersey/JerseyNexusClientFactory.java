@@ -127,7 +127,7 @@ public class JerseyNexusClientFactory
 
     protected String discoverClientVersion()
     {
-        return Version.readVersion( "META-INF/maven/org.sonatype.nexus.client/nexus-client-core/pom.properties", "unknown" );
+        return Version.readVersion( "META-INF/maven/org.sonatype.nexus/nexus-client-core/pom.properties", "unknown" );
     }
 
     // ==
