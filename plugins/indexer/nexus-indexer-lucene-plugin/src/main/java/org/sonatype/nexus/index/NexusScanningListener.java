@@ -151,7 +151,7 @@ public class NexusScanningListener
                 artifactError( ac, e );
             }
         }
-        catch ( IOException ex )
+        catch ( Exception ex )
         {
             artifactError( ac, ex );
         }
