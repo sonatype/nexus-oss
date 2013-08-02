@@ -206,28 +206,18 @@ public class NexusScanningListener
     public void artifactError( final ArtifactContext ac, final Exception e )
     {
         Exception exception = e;
-        if ( ac.getPom() != null )
+        if ( ac.getPom() != null || ac.getArtifact() != null )
         {
+            final StringBuilder sb = new StringBuilder( "Found a problem while indexing" );
             if ( ac.getArtifact() != null )
             {
-                exception = new Exception(
-                    SimpleFormat.format(
-                        "Found a problem while indexing artifact '%s' (pom '%s')",
-                        ac.getArtifact().getAbsolutePath(), ac.getPom().getAbsolutePath()
-                    ),
-                    e
-                );
+                sb.append( " artifact '" + ac.getArtifact().getAbsolutePath() + "'" );
             }
-            else
+            if ( ac.getPom() != null )
             {
-                exception = new Exception(
-                    SimpleFormat.format(
-                        "Found a problem while indexing pom '%s'",
-                        ac.getPom().getAbsolutePath()
-                    ),
-                    e
-                );
+                sb.append( " pom '" + ac.getPom().getAbsolutePath() + "'" );
             }
+            exception = new Exception( sb.toString(), e );
         }
         exceptions.add( exception );
     }
