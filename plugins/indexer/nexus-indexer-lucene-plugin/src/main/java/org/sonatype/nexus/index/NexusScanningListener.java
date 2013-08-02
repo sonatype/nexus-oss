@@ -39,6 +39,7 @@ import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 /**
  * Nexus specific ArtifactScanningListener implementation. Looks like the MI's DefaultScannerListener, but has
@@ -204,7 +205,31 @@ public class NexusScanningListener
     @Override
     public void artifactError( final ArtifactContext ac, final Exception e )
     {
-        exceptions.add( e );
+        Exception exception = e;
+        if ( ac.getPom() != null )
+        {
+            if ( ac.getArtifact() != null )
+            {
+                exception = new Exception(
+                    SimpleFormat.format(
+                        "Found a problem while indexing artifact '%s' (pom '%s')",
+                        ac.getArtifact().getAbsolutePath(), ac.getPom().getAbsolutePath()
+                    ),
+                    e
+                );
+            }
+            else
+            {
+                exception = new Exception(
+                    SimpleFormat.format(
+                        "Found a problem while indexing pom '%s'",
+                        ac.getPom().getAbsolutePath()
+                    ),
+                    e
+                );
+            }
+        }
+        exceptions.add( exception );
     }
 
     /**
