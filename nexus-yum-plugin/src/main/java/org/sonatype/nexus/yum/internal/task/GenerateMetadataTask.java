@@ -42,6 +42,7 @@ import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.apache.commons.io.FileUtils;
@@ -143,7 +144,7 @@ public class GenerateMetadataTask
       File rpmListFile = createRpmListFile();
       new CommandLineExecutor().exec(buildCreateRepositoryCommand(rpmListFile));
 
-      if (isUseAbsoluteUrls()) {
+      if (isUseAbsoluteUrls() && StringUtils.isNotBlank(getRpmUrl())) {
         replaceUrlInRepomdXml();
       }
 
@@ -180,7 +181,16 @@ public class GenerateMetadataTask
       setRpmDir(RepositoryUtils.getBaseDir(repository).getAbsolutePath());
     }
     if (isBlank(getRpmUrl()) && repository != null) {
-      setRpmUrl(repositoryURLBuilder.getRepositoryContentUrl(repository));
+      final String rpmUrl = repositoryURLBuilder.getRepositoryContentUrl(repository);
+      if (StringUtils.isBlank(rpmUrl)) {
+        throw new IllegalStateException(
+            SimpleFormat.format(
+                "Not able to build content URL of the repository \"%s\" [id=%s], baseUrl not set!",
+                repository.getName(), repository.getId()
+            )
+        );
+      }
+      setRpmUrl(rpmUrl);
     }
     if (isBlank(getParameter(PARAM_REPO_DIR)) && isNotBlank(getRpmDir())) {
       setRepoDir(new File(getRpmDir()));
@@ -308,7 +318,9 @@ public class GenerateMetadataTask
     commandLine.append(" --outputdir ").append(getRepoDir().getAbsolutePath());
     commandLine.append(" --pkglist ").append(packageList.getAbsolutePath());
     commandLine.append(" --cachedir ").append(createCacheDir().getAbsolutePath());
-    commandLine.append(" --baseurl ").append(getRpmUrl());
+    if (StringUtils.isNotBlank(getRpmUrl())) {
+      commandLine.append(" --baseurl ").append(getRpmUrl());
+    }
     final String yumGroupsDefinitionFile = getYumGroupsDefinitionFile();
     if (yumGroupsDefinitionFile != null) {
       final File file = new File(getRepoDir().getAbsolutePath(), yumGroupsDefinitionFile);
