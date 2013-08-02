@@ -177,7 +177,6 @@ public class DefaultNexusEmailer
         return !( "smtp-host".equals( getSMTPHostname() )
             && 25 == getSMTPPort()
             && "smtp-username".equals( getSMTPUsername() )
-            && "smtp-password".equals( getSMTPPassword() )
         );
     }
 
