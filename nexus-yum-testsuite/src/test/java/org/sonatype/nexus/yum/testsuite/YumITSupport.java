@@ -17,6 +17,8 @@ import java.util.Collection;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
+import org.sonatype.nexus.client.core.subsystem.config.RestApi;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
@@ -32,6 +34,7 @@ import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
 import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 import org.sonatype.nexus.yum.testsuite.client.Repodata;
 
+import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
@@ -77,6 +80,14 @@ public class YumITSupport
                 "org.sonatype.nexus.plugins", "nexus-yum-plugin"
             )
         );
+  }
+
+  @Before
+  public void setBaseUrl() {
+    final RestApi restApi = serverConfiguration().restApi();
+    restApi.settings().setBaseUrl(nexus().getUrl().toExternalForm());
+    restApi.settings().setForceBaseUrl(true);
+    restApi.save();
   }
 
   protected Repository createYumEnabledRepository(final String repositoryId) {
@@ -130,6 +141,10 @@ public class YumITSupport
 
   public Scheduler scheduler() {
     return client().getSubsystem(Scheduler.class);
+  }
+
+  private ServerConfiguration serverConfiguration() {
+    return client().getSubsystem(ServerConfiguration.class);
   }
 
   protected void waitForNexusToSettleDown()
