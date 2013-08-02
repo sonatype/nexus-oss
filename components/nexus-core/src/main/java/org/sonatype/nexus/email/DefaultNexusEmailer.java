@@ -126,7 +126,7 @@ public class DefaultNexusEmailer
         }
 
         final String message = SimpleFormat.format(
-            "e-mail with id %s was not sent since SMTP settings are not configured", request.getRequestId()
+            "Mail requestId[%s] not sent, SMTP not configured", request.getRequestId()
         );
 
         LOG.debug( message );
