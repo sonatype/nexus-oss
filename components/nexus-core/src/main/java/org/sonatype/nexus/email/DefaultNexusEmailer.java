@@ -18,6 +18,8 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
@@ -35,12 +37,16 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguration;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 @Component( role = NexusEmailer.class )
 public class DefaultNexusEmailer
     extends AbstractConfigurable
     implements NexusEmailer, Startable
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( DefaultNexusEmailer.class );
+
     /**
      * The "name" of Nexus instance, as displayed on sent mails.
      */
@@ -113,8 +119,21 @@ public class DefaultNexusEmailer
         }
 
         prependNexusBaseUrl( request );
-        
-        return eMailer.sendMail( request );
+
+        if ( emailSettingsConfigured() )
+        {
+            return eMailer.sendMail( request );
+        }
+
+        final String message = SimpleFormat.format(
+            "e-mail with id %s was not sent since SMTP settings are not configured", request.getRequestId()
+        );
+
+        LOG.debug( message );
+
+        final MailRequestStatus status = new MailRequestStatus( request );
+        status.setErrorCause( new EmailerException( message ) );
+        return status;
     }
 
     /**
@@ -151,6 +170,15 @@ public class DefaultNexusEmailer
         messageBody.append( request.getBodyContext().get( DefaultMailType.BODY_KEY ) );
 
         request.getBodyContext().put( DefaultMailType.BODY_KEY, messageBody.toString() );
+    }
+
+    private boolean emailSettingsConfigured()
+    {
+        return !( "smtp-host".equals( getSMTPHostname() )
+            && 25 == getSMTPPort()
+            && "smtp-username".equals( getSMTPUsername() )
+            && "smtp-password".equals( getSMTPPassword() )
+        );
     }
 
     // ==
