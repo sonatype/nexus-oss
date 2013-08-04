@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.content;
 
 import org.sonatype.nexus.client.internal.util.Check;
@@ -20,55 +21,47 @@ import org.sonatype.nexus.client.internal.util.Check;
 public class Location
 {
 
-    private final String contentType;
+  private final String contentType;
 
-    private final String repositoryId;
+  private final String repositoryId;
 
-    private final String repositoryPath;
+  private final String repositoryPath;
 
-    public Location( final String contentType, final String repositoryId, final String repositoryPath )
-    {
-        this.contentType = Check.notBlank( contentType, "contentType" );
-        this.repositoryId = Check.notBlank( repositoryId, "repositoryId" );
-        String repoPath = Check.notBlank( repositoryPath, "repositoryPath" );
-        while ( repoPath.startsWith( "/" ) )
-        {
-            repoPath = repoPath.substring( 1 );
-        }
-        this.repositoryPath = repoPath;
+  public Location(final String contentType, final String repositoryId, final String repositoryPath) {
+    this.contentType = Check.notBlank(contentType, "contentType");
+    this.repositoryId = Check.notBlank(repositoryId, "repositoryId");
+    String repoPath = Check.notBlank(repositoryPath, "repositoryPath");
+    while (repoPath.startsWith("/")) {
+      repoPath = repoPath.substring(1);
     }
+    this.repositoryPath = repoPath;
+  }
 
-    public Location( final String repositoryId, final String repositoryPath )
-    {
-        this( "repositories", repositoryId, repositoryPath );
-    }
+  public Location(final String repositoryId, final String repositoryPath) {
+    this("repositories", repositoryId, repositoryPath);
+  }
 
-    public String toContentPath()
-    {
-        return String.format( "%s/%s/%s", contentType, repositoryId, repositoryPath );
-    }
+  public String toContentPath() {
+    return String.format("%s/%s/%s", contentType, repositoryId, repositoryPath);
+  }
 
-    // --
+  // --
 
-    @Override
-    public String toString()
-    {
-        return toContentPath();
-    }
+  @Override
+  public String toString() {
+    return toContentPath();
+  }
 
-    public static Location repositoryLocation( final String repositoryId, final String path )
-    {
-        return new Location( "repositories", repositoryId, path );
-    }
+  public static Location repositoryLocation(final String repositoryId, final String path) {
+    return new Location("repositories", repositoryId, path);
+  }
 
-    public static Location groupLocation( final String groupId, final String path )
-    {
-        return new Location( "groups", groupId, path );
-    }
+  public static Location groupLocation(final String groupId, final String path) {
+    return new Location("groups", groupId, path);
+  }
 
-    public static Location siteLocation( final String siteId, final String path )
-    {
-        return new Location( "sites", siteId, path );
-    }
+  public static Location siteLocation(final String siteId, final String path) {
+    return new Location("sites", siteId, path);
+  }
 
 }

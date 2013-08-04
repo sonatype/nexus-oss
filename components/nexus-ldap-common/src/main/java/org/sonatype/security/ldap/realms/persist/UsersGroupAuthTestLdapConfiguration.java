@@ -10,53 +10,48 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.persist;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
-
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
-@Component( role = LdapConfiguration.class, hint = "UsersGroupAuthTestLdapConfiguration" )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = LdapConfiguration.class, hint = "UsersGroupAuthTestLdapConfiguration")
 public class UsersGroupAuthTestLdapConfiguration
-    extends  DefaultLdapConfiguration
+    extends DefaultLdapConfiguration
 {
 
-    private LdapAuthConfiguration ldapAuthConfiguration;
-    
-    private CConnectionInfo connectionInfo;
+  private LdapAuthConfiguration ldapAuthConfiguration;
 
-    /**
-     * @param ldapAuthConfiguration the ldapAuthConfiguration to set
-     */
-    public void setLdapAuthConfiguration( LdapAuthConfiguration ldapAuthConfiguration )
-    {
-        this.ldapAuthConfiguration = ldapAuthConfiguration;
-    }
+  private CConnectionInfo connectionInfo;
 
-    public LdapAuthConfiguration getLdapAuthConfiguration()
-    {
-        return this.ldapAuthConfiguration;
-    }
+  /**
+   * @param ldapAuthConfiguration the ldapAuthConfiguration to set
+   */
+  public void setLdapAuthConfiguration(LdapAuthConfiguration ldapAuthConfiguration) {
+    this.ldapAuthConfiguration = ldapAuthConfiguration;
+  }
 
-    public void setConnectionInfo( CConnectionInfo connectionInfo)
-    {
-        this.connectionInfo = connectionInfo;
-    }
-    
-    public CConnectionInfo readConnectionInfo()
-    {
-        return connectionInfo;
-    }
-    
-    public void clearCache()
-    {
-        
-    }
+  public LdapAuthConfiguration getLdapAuthConfiguration() {
+    return this.ldapAuthConfiguration;
+  }
 
-    public void save()
-    {
-        
-    }
+  public void setConnectionInfo(CConnectionInfo connectionInfo) {
+    this.connectionInfo = connectionInfo;
+  }
+
+  public CConnectionInfo readConnectionInfo() {
+    return connectionInfo;
+  }
+
+  public void clearCache() {
+
+  }
+
+  public void save() {
+
+  }
 
 }

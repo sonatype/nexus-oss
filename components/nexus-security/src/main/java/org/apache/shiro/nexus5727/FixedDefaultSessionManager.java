@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.apache.shiro.nexus5727;
 
 import org.apache.shiro.session.mgt.DefaultSessionManager;
@@ -18,7 +19,7 @@ import org.apache.shiro.session.mgt.SessionValidationScheduler;
 /**
  * Fixed {@link DefaultSessionManager} for issue SHIRO-443. This subclass is put into package of Shiro to have
  * shiro-guice's TypeListener applied to it, and result in same behavior as for other Shiro classes.
- * 
+ *
  * @author cstamas
  * @see <a href="https://issues.apache.org/jira/browse/SHIRO-443">SHIRO-443 SessionValidationScheduler created multiple
  *      times, enabling it is not thread safe</a>
@@ -28,13 +29,11 @@ import org.apache.shiro.session.mgt.SessionValidationScheduler;
 public class FixedDefaultSessionManager
     extends DefaultSessionManager
 {
-    @Override
-    protected synchronized void enableSessionValidation()
-    {
-        final SessionValidationScheduler scheduler = getSessionValidationScheduler();
-        if ( scheduler == null )
-        {
-            super.enableSessionValidation();
-        }
+  @Override
+  protected synchronized void enableSessionValidation() {
+    final SessionValidationScheduler scheduler = getSessionValidationScheduler();
+    if (scheduler == null) {
+      super.enableSessionValidation();
     }
+  }
 }

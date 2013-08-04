@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds;
 
 import java.io.PrintWriter;
@@ -18,177 +19,155 @@ import java.util.Date;
 
 /**
  * A system process event, a system event that has duration and holds possible error cause if any.
- * 
+ *
  * @author cstamas
  */
 public class SystemProcess
     extends SystemEvent
 {
-    enum Status
-    {
-        STARTED, FINISHED, BROKEN, CANCELED
-    };
+  enum Status
+  {
+    STARTED, FINISHED, BROKEN, CANCELED
+  }
 
-    /**
-     * When was the process started?
-     */
-    private final Date started;
+  ;
 
-    /**
-     * The process status.
-     */
-    private Status status;
+  /**
+   * When was the process started?
+   */
+  private final Date started;
 
-    /**
-     * When has finised the process?
-     */
-    private Date finished;
+  /**
+   * The process status.
+   */
+  private Status status;
 
-    /**
-     * Human message/descritpion.
-     */
-    private String finishedMessage;
+  /**
+   * When has finised the process?
+   */
+  private Date finished;
 
-    /**
-     * The error cause while running, if any.
-     */
-    private Throwable errorCause;
+  /**
+   * Human message/descritpion.
+   */
+  private String finishedMessage;
 
-    public SystemProcess( final Date eventDate, final String action, final String message, final Date started )
-    {
-        super( eventDate, action, message );
+  /**
+   * The error cause while running, if any.
+   */
+  private Throwable errorCause;
 
-        this.started = started;
+  public SystemProcess(final Date eventDate, final String action, final String message, final Date started) {
+    super(eventDate, action, message);
 
-        this.status = Status.STARTED;
+    this.started = started;
+
+    this.status = Status.STARTED;
+  }
+
+  public void finished(String message) {
+    this.finished = new Date();
+
+    this.status = Status.FINISHED;
+
+    this.finishedMessage = message;
+  }
+
+  public void canceled(String message) {
+    this.finished = new Date();
+
+    this.status = Status.CANCELED;
+
+    this.finishedMessage = message;
+  }
+
+  public void broken(Throwable e) {
+    this.errorCause = e;
+
+    this.finished = new Date();
+
+    this.status = Status.BROKEN;
+  }
+
+  public Date getEventDate() {
+    if (finished == null) {
+      return super.getEventDate();
     }
-
-    public void finished( String message )
-    {
-        this.finished = new Date();
-
-        this.status = Status.FINISHED;
-
-        this.finishedMessage = message;
+    else {
+      return getFinished();
     }
-    
-    public void canceled( String message )
-    {
-        this.finished = new Date();
+  }
 
-        this.status = Status.CANCELED;
+  public boolean isRunning() {
+    return Status.STARTED.equals(status);
+  }
 
-        this.finishedMessage = message;
-    }
+  public boolean isFinished() {
+    return Status.FINISHED.equals(status);
+  }
 
-    public void broken( Throwable e )
-    {
-        this.errorCause = e;
+  public boolean isBroken() {
+    return Status.BROKEN.equals(status);
+  }
 
-        this.finished = new Date();
+  public Date getStarted() {
+    return started;
+  }
 
-        this.status = Status.BROKEN;
-    }
+  public Date getFinished() {
+    return finished;
+  }
 
-    public Date getEventDate()
-    {
-        if ( finished == null )
-        {
-            return super.getEventDate();
-        }
-        else
-        {
-            return getFinished();
-        }
-    }
+  public Throwable getErrorCause() {
+    return errorCause;
+  }
 
-    public boolean isRunning()
-    {
-        return Status.STARTED.equals( status );
-    }
+  public String getFinishedMessage() {
+    return finishedMessage;
+  }
 
-    public boolean isFinished()
-    {
-        return Status.FINISHED.equals( status );
-    }
+  public String getMessage() {
+    StringBuilder sb = new StringBuilder(super.getMessage());
 
-    public boolean isBroken()
-    {
-        return Status.BROKEN.equals( status );
-    }
+    if (started != null) {
+      sb.append(" : Process started on ");
 
-    public Date getStarted()
-    {
-        return started;
-    }
+      sb.append(started.toString());
 
-    public Date getFinished()
-    {
-        return finished;
-    }
+      if (finished != null) {
+        if (Status.BROKEN.equals(status)) {
+          sb.append(", finished on ").append(finished.toString()).append(" with error.");
 
-    public Throwable getErrorCause()
-    {
-        return errorCause;
-    }
+          if (errorCause != null) {
+            sb.append(" Error message is: ").append(errorCause.getClass().getName());
 
-    public String getFinishedMessage()
-    {
-        return finishedMessage;
-    }
-
-    public String getMessage()
-    {
-        StringBuilder sb = new StringBuilder( super.getMessage() );
-
-        if ( started != null )
-        {
-            sb.append( " : Process started on " );
-
-            sb.append( started.toString() );
-
-            if ( finished != null )
-            {
-                if ( Status.BROKEN.equals( status ) )
-                {
-                    sb.append( ", finished on " ).append( finished.toString() ).append( " with error." );
-
-                    if ( errorCause != null )
-                    {
-                        sb.append( " Error message is: " ).append( errorCause.getClass().getName() );
-
-                        if ( errorCause.getMessage() != null )
-                        {
-                            sb.append( ", " ).append( errorCause.getMessage() );
-                        }
-
-                        StringWriter sw = new StringWriter();
-                        PrintWriter pw = new PrintWriter( sw );
-                        errorCause.printStackTrace( pw );
-                        sb.append( " Strack trace: " ).append( sw.toString() );
-                    }
-                }
-                else if ( Status.FINISHED.equals( status ) )
-                {
-                    sb.append( ", finished successfully on " ).append( finished.toString() );
-                }
-                else if ( Status.CANCELED.equals( status ) )
-                {
-                    sb.append( ", canceled on " ).append( finished.toString() );
-                }
+            if (errorCause.getMessage() != null) {
+              sb.append(", ").append(errorCause.getMessage());
             }
-            else
-            {
-                sb.append( ", not yet finished." );
-            }
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            errorCause.printStackTrace(pw);
+            sb.append(" Strack trace: ").append(sw.toString());
+          }
         }
-
-        return sb.toString();
+        else if (Status.FINISHED.equals(status)) {
+          sb.append(", finished successfully on ").append(finished.toString());
+        }
+        else if (Status.CANCELED.equals(status)) {
+          sb.append(", canceled on ").append(finished.toString());
+        }
+      }
+      else {
+        sb.append(", not yet finished.");
+      }
     }
 
-    public String toString()
-    {
-        return getMessage();
-    }
+    return sb.toString();
+  }
+
+  public String toString() {
+    return getMessage();
+  }
 
 }

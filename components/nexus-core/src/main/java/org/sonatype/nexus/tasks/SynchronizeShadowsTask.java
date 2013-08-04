@@ -10,80 +10,74 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
 
 import javax.inject.Named;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * Publish indexes task.
  */
-@Named( SynchronizeShadowTaskDescriptor.ID )
+@Named(SynchronizeShadowTaskDescriptor.ID)
 public class SynchronizeShadowsTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    /**
-     * System event action: shadow sync
-     */
-    public static final String ACTION = "SYNC_SHADOW";
+  /**
+   * System event action: shadow sync
+   */
+  public static final String ACTION = "SYNC_SHADOW";
 
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return SynchronizeShadowTaskDescriptor.REPO_FIELD_ID;
-    }
+  @Override
+  protected String getRepositoryFieldId() {
+    return SynchronizeShadowTaskDescriptor.REPO_FIELD_ID;
+  }
 
-    public String getShadowRepositoryId()
-    {
-        return getRepositoryId();
-    }
+  public String getShadowRepositoryId() {
+    return getRepositoryId();
+  }
 
-    public void setShadowRepositoryId( String shadowRepositoryId )
-    {
-        setRepositoryId( shadowRepositoryId );
-    }
-    
-    @Override
-    public String getRepositoryId()
-    {
-        return getParameters().get( getRepositoryFieldId() );
-    }
-    
-    @Override
-    public void setRepositoryId( String repositoryId )
-    {
-        if ( !StringUtils.isEmpty( repositoryId ) )
-        {
-            getParameters().put( getRepositoryFieldId(), repositoryId );
-        }
-    }
+  public void setShadowRepositoryId(String shadowRepositoryId) {
+    setRepositoryId(shadowRepositoryId);
+  }
 
-    @Override
-    protected Object doRun()
-        throws Exception
-    {
-        ShadowRepository shadow =
-            getRepositoryRegistry().getRepositoryWithFacet( getShadowRepositoryId(), ShadowRepository.class );
+  @Override
+  public String getRepositoryId() {
+    return getParameters().get(getRepositoryFieldId());
+  }
 
-        shadow.synchronizeWithMaster();
-
-        return null;
+  @Override
+  public void setRepositoryId(String repositoryId) {
+    if (!StringUtils.isEmpty(repositoryId)) {
+      getParameters().put(getRepositoryFieldId(), repositoryId);
     }
+  }
 
-    @Override
-    protected String getAction()
-    {
-        return ACTION;
-    }
+  @Override
+  protected Object doRun()
+      throws Exception
+  {
+    ShadowRepository shadow =
+        getRepositoryRegistry().getRepositoryWithFacet(getShadowRepositoryId(), ShadowRepository.class);
 
-    @Override
-    protected String getMessage()
-    {
-        return "Synchronizing virtual repository ID='" + getShadowRepositoryId() + "') with it's master repository.";
-    }
+    shadow.synchronizeWithMaster();
+
+    return null;
+  }
+
+  @Override
+  protected String getAction() {
+    return ACTION;
+  }
+
+  @Override
+  protected String getMessage() {
+    return "Synchronizing virtual repository ID='" + getShadowRepositoryId() + "') with it's master repository.";
+  }
 
 }

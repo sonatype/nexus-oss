@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.timeline.internal;
 
 import java.io.IOException;
@@ -20,24 +21,23 @@ import org.sonatype.timeline.TimelineRecord;
 public class RepairBatch
     implements TimelineCallback
 {
-    private final DefaultTimelineIndexer indexer;
+  private final DefaultTimelineIndexer indexer;
 
-    public RepairBatch( final DefaultTimelineIndexer indexer )
-    {
-        this.indexer = indexer;
-    }
+  public RepairBatch(final DefaultTimelineIndexer indexer) {
+    this.indexer = indexer;
+  }
 
-    @Override
-    public boolean processNext( TimelineRecord rec )
-        throws IOException
-    {
-        indexer.addBatch( rec );
-        return true;
-    }
+  @Override
+  public boolean processNext(TimelineRecord rec)
+      throws IOException
+  {
+    indexer.addBatch(rec);
+    return true;
+  }
 
-    public void finish()
-        throws IOException
-    {
-        indexer.finishBatch();
-    }
+  public void finish()
+      throws IOException
+  {
+    indexer.finishBatch();
+  }
 }

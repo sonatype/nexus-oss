@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.remote;
 
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -25,28 +26,28 @@ import org.sonatype.nexus.proxy.storage.StorageContext;
 public interface RemoteStorageContext
     extends StorageContext
 {
-    boolean hasRemoteConnectionSettings();
+  boolean hasRemoteConnectionSettings();
 
-    RemoteConnectionSettings getRemoteConnectionSettings();
+  RemoteConnectionSettings getRemoteConnectionSettings();
 
-    void setRemoteConnectionSettings( RemoteConnectionSettings settings );
+  void setRemoteConnectionSettings(RemoteConnectionSettings settings);
 
-    void removeRemoteConnectionSettings();
+  void removeRemoteConnectionSettings();
 
-    boolean hasRemoteAuthenticationSettings();
+  boolean hasRemoteAuthenticationSettings();
 
-    RemoteAuthenticationSettings getRemoteAuthenticationSettings();
+  RemoteAuthenticationSettings getRemoteAuthenticationSettings();
 
-    void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings );
+  void setRemoteAuthenticationSettings(RemoteAuthenticationSettings settings);
 
-    void removeRemoteAuthenticationSettings();
+  void removeRemoteAuthenticationSettings();
 
-    boolean hasRemoteProxySettings();
+  boolean hasRemoteProxySettings();
 
-    RemoteProxySettings getRemoteProxySettings();
+  RemoteProxySettings getRemoteProxySettings();
 
-    void setRemoteProxySettings( RemoteProxySettings settings );
+  void setRemoteProxySettings(RemoteProxySettings settings);
 
-    void removeRemoteProxySettings();
+  void removeRemoteProxySettings();
 
 }

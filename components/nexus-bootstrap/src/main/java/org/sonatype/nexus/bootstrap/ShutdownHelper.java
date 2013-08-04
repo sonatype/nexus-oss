@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap;
 
 /**
@@ -19,48 +20,48 @@ package org.sonatype.nexus.bootstrap;
  */
 public class ShutdownHelper
 {
-    public static interface ShutdownDelegate
-    {
-        void doExit(int code);
+  public static interface ShutdownDelegate
+  {
+    void doExit(int code);
 
-        void doHalt(int code);
+    void doHalt(int code);
+  }
+
+  public static class JavaShutdownDelegate
+      implements ShutdownDelegate
+  {
+    @Override
+    public void doExit(final int code) {
+      System.exit(code);
     }
 
-    public static class JavaShutdownDelegate
-        implements ShutdownDelegate
-    {
-        @Override
-        public void doExit(final int code) {
-            System.exit(code);
-        }
-
-        @Override
-        public void doHalt(final int code) {
-            Runtime.getRuntime().halt(code);
-        }
+    @Override
+    public void doHalt(final int code) {
+      Runtime.getRuntime().halt(code);
     }
+  }
 
-    private static ShutdownDelegate delegate = new JavaShutdownDelegate();
+  private static ShutdownDelegate delegate = new JavaShutdownDelegate();
 
-    public static ShutdownDelegate getDelegate() {
-        if (delegate == null) {
-            throw new IllegalStateException();
-        }
-        return delegate;
+  public static ShutdownDelegate getDelegate() {
+    if (delegate == null) {
+      throw new IllegalStateException();
     }
+    return delegate;
+  }
 
-    public static void setDelegate(final ShutdownDelegate delegate) {
-        if (delegate == null) {
-            throw new NullPointerException();
-        }
-        ShutdownHelper.delegate = delegate;
+  public static void setDelegate(final ShutdownDelegate delegate) {
+    if (delegate == null) {
+      throw new NullPointerException();
     }
+    ShutdownHelper.delegate = delegate;
+  }
 
-    public static void exit(final int code) {
-        getDelegate().doExit(code);
-    }
+  public static void exit(final int code) {
+    getDelegate().doExit(code);
+  }
 
-    public static void halt(final int code) {
-        getDelegate().doHalt(code);
-    }
+  public static void halt(final int code) {
+    getDelegate().doHalt(code);
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge.connector;
 
 import java.util.Collection;
@@ -24,24 +25,23 @@ public class NexusRepositoryConnector
     implements RepositoryConnector
 {
 
-    public void get( Collection<? extends ArtifactDownload> artifactDownloads,
-                     Collection<? extends MetadataDownload> metadataDownloads )
-    {
-        // TODO Auto-generated method stub
-        
-    }
+  public void get(Collection<? extends ArtifactDownload> artifactDownloads,
+                  Collection<? extends MetadataDownload> metadataDownloads)
+  {
+    // TODO Auto-generated method stub
 
-    public void put( Collection<? extends ArtifactUpload> artifactUploads,
-                     Collection<? extends MetadataUpload> metadataUploads )
-    {
-        // TODO Auto-generated method stub
-        
-    }
+  }
 
-    public void close()
-    {
-        // TODO Auto-generated method stub
-        
-    }
+  public void put(Collection<? extends ArtifactUpload> artifactUploads,
+                  Collection<? extends MetadataUpload> metadataUploads)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void close() {
+    // TODO Auto-generated method stub
+
+  }
 
 }

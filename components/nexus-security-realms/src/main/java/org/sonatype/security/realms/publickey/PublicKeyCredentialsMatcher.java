@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.publickey;
 
 import java.security.PublicKey;
@@ -23,50 +24,42 @@ import org.apache.shiro.authc.credential.CredentialsMatcher;
 
 /**
  * Matches authentication tokens which are {@link java.security.PublicKey}.
- * 
+ *
  * @author hugo@josefson.org
  */
 class PublicKeyCredentialsMatcher
     implements CredentialsMatcher
 {
 
-    public boolean doCredentialsMatch( AuthenticationToken token, AuthenticationInfo info )
-    {
-        PublicKeyWithEquals tokenKey = getTokenKey( token );
-        Collection<PublicKeyWithEquals> infoKeys = getInfoKeys( info );
-        for ( PublicKeyWithEquals infoKey : infoKeys )
-        {
-            if ( infoKey.equals( tokenKey ) )
-            {
-                return true;
-            }
-        }
-        return false;
+  public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
+    PublicKeyWithEquals tokenKey = getTokenKey(token);
+    Collection<PublicKeyWithEquals> infoKeys = getInfoKeys(info);
+    for (PublicKeyWithEquals infoKey : infoKeys) {
+      if (infoKey.equals(tokenKey)) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    protected PublicKeyWithEquals getTokenKey( AuthenticationToken token )
-    {
-        final PublicKeyAuthenticationToken publicKeyAuthentictionToken = (PublicKeyAuthenticationToken) token;
-        return new PublicKeyWithEquals( publicKeyAuthentictionToken.getCredentials() );
-    }
+  protected PublicKeyWithEquals getTokenKey(AuthenticationToken token) {
+    final PublicKeyAuthenticationToken publicKeyAuthentictionToken = (PublicKeyAuthenticationToken) token;
+    return new PublicKeyWithEquals(publicKeyAuthentictionToken.getCredentials());
+  }
 
-    protected Collection<PublicKeyWithEquals> getInfoKeys( AuthenticationInfo info )
-    {
-        // TODO: check types so they are sure to be PublicKey
-        final Set<PublicKeyWithEquals> result = new HashSet<PublicKeyWithEquals>();
-        final Object credentials = info.getCredentials();
-        if ( Collection.class.isAssignableFrom( credentials.getClass() ) )
-        {
-            Collection<PublicKey> credentialsCollection = (Collection<PublicKey>) credentials;
-            for ( PublicKey publicKey : credentialsCollection )
-            {
-                result.add( new PublicKeyWithEquals( publicKey ) );
-            }
-        }
-        else
-        {
-            result.add( new PublicKeyWithEquals( (PublicKey) credentials ) );
-        }
-        return result;
+  protected Collection<PublicKeyWithEquals> getInfoKeys(AuthenticationInfo info) {
+    // TODO: check types so they are sure to be PublicKey
+    final Set<PublicKeyWithEquals> result = new HashSet<PublicKeyWithEquals>();
+    final Object credentials = info.getCredentials();
+    if (Collection.class.isAssignableFrom(credentials.getClass())) {
+      Collection<PublicKey> credentialsCollection = (Collection<PublicKey>) credentials;
+      for (PublicKey publicKey : credentialsCollection) {
+        result.add(new PublicKeyWithEquals(publicKey));
+      }
     }
+    else {
+      result.add(new PublicKeyWithEquals((PublicKey) credentials));
+    }
+    return result;
+  }
 }

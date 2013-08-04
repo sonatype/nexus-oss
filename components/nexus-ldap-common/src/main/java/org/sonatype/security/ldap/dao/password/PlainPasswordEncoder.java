@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao.password;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -17,29 +18,25 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * @author cstamas
  */
-@Component( role=PasswordEncoder.class, hint="plain" )
+@Component(role = PasswordEncoder.class, hint = "plain")
 public class PlainPasswordEncoder
     implements PasswordEncoder
 {
 
-    public String getMethod()
-    {
-        return "PLAIN";
+  public String getMethod() {
+    return "PLAIN";
+  }
+
+  public String encodePassword(String password, Object salt) {
+    return "{PLAIN}" + password;
+  }
+
+  public boolean isPasswordValid(String encPassword, String inputPassword, Object salt) {
+    String encryptedPassword = encPassword;
+    if (encryptedPassword.startsWith("{PLAIN}") || encryptedPassword.startsWith("{plain}")) {
+      encryptedPassword = encryptedPassword.substring("{plain}".length());
     }
 
-    public String encodePassword( String password, Object salt )
-    {
-        return "{PLAIN}" + password;
-    }
-
-    public boolean isPasswordValid( String encPassword, String inputPassword, Object salt )
-    {
-        String encryptedPassword = encPassword;
-        if ( encryptedPassword.startsWith( "{PLAIN}" ) || encryptedPassword.startsWith( "{plain}" ) )
-        {
-            encryptedPassword = encryptedPassword.substring( "{plain}".length() );
-        }
-
-        return inputPassword.equals( encryptedPassword );
-    }
+    return inputPassword.equals(encryptedPassword);
+  }
 }

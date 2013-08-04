@@ -10,37 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.attributes;
+
+import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
-import org.sonatype.nexus.tasks.RebuildAttributesTask;
 
 public abstract class AbstractAttributesPlexusResource
     extends AbstractRestorePlexusResource
 {
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
 
-    @Override
-    public void delete( Context context, Request request, Response response )
-        throws ResourceException
-    {
-        RebuildAttributesTask task = getNexusScheduler().createTaskInstance( RebuildAttributesTask.class );
+  @Override
+  public void delete(Context context, Request request, Response response)
+      throws ResourceException
+  {
+    RebuildAttributesTask task = getNexusScheduler().createTaskInstance(RebuildAttributesTask.class);
 
-        task.setRepositoryId( getRepositoryId( request ) );
+    task.setRepositoryId(getRepositoryId(request));
 
-        task.setRepositoryGroupId( getRepositoryGroupId( request ) );
+    task.setRepositoryGroupId(getRepositoryGroupId(request));
 
-        task.setResourceStorePath( getResourceStorePath( request ) );
+    task.setResourceStorePath(getResourceStorePath(request));
 
-        this.handleDelete( task, request );
-    }
+    this.handleDelete(task, request);
+  }
 
 }

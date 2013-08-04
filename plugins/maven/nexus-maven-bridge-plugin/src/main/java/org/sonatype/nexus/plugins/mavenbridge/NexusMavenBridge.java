@@ -10,13 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge;
 
 import java.util.List;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelBuildingException;
-import org.apache.maven.model.building.ModelSource;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.collection.DependencyCollectionException;
 import org.sonatype.aether.graph.Dependency;
@@ -24,32 +22,36 @@ import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelSource;
+
 public interface NexusMavenBridge
 {
 
-    Model buildModel( ModelSource pom,
-                      List<MavenRepository> repositories,
-                      RepositoryListener... listeners )
-        throws ModelBuildingException;
+  Model buildModel(ModelSource pom,
+                   List<MavenRepository> repositories,
+                   RepositoryListener... listeners)
+      throws ModelBuildingException;
 
-    DependencyNode collectDependencies( Dependency dependency,
-                                        List<MavenRepository> repositories,
-                                        RepositoryListener... listeners )
-        throws DependencyCollectionException, ArtifactResolutionException;
+  DependencyNode collectDependencies(Dependency dependency,
+                                     List<MavenRepository> repositories,
+                                     RepositoryListener... listeners)
+      throws DependencyCollectionException, ArtifactResolutionException;
 
-    DependencyNode resolveDependencies( Dependency node,
-                                        List<MavenRepository> repositories,
-                                        RepositoryListener... listeners )
-        throws DependencyCollectionException, ArtifactResolutionException;
+  DependencyNode resolveDependencies(Dependency node,
+                                     List<MavenRepository> repositories,
+                                     RepositoryListener... listeners)
+      throws DependencyCollectionException, ArtifactResolutionException;
 
-    DependencyNode collectDependencies( Model model,
-                                        List<MavenRepository> repositories,
-                                        RepositoryListener... listeners )
-        throws DependencyCollectionException, ArtifactResolutionException;
+  DependencyNode collectDependencies(Model model,
+                                     List<MavenRepository> repositories,
+                                     RepositoryListener... listeners)
+      throws DependencyCollectionException, ArtifactResolutionException;
 
-    DependencyNode resolveDependencies( Model model,
-                                        List<MavenRepository> repositories,
-                                        RepositoryListener... listeners )
-        throws DependencyCollectionException, ArtifactResolutionException;
+  DependencyNode resolveDependencies(Model model,
+                                     List<MavenRepository> repositories,
+                                     RepositoryListener... listeners)
+      throws DependencyCollectionException, ArtifactResolutionException;
 
 }

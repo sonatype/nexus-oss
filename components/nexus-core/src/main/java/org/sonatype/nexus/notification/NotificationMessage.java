@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.notification;
 
 /**
@@ -17,27 +18,25 @@ package org.sonatype.nexus.notification;
  * has to be reusable (and cached if needed), since in case of multiple targets, the same message instance is reused!
  * TODO: rethink this. We need more subtle abstraction to support multiple message formats and/or sources. This will do
  * for now.
- * 
+ *
  * @author cstamas
  */
 public interface NotificationMessage
 {
-    String getMessageTitle();
+  String getMessageTitle();
 
-    String getMessageBody();
+  String getMessageBody();
 
-    // --
+  // --
 
-    public static final NotificationMessage EMPTY_MESSAGE = new NotificationMessage()
-    {
-        public String getMessageTitle()
-        {
-            return "";
-        }
+  public static final NotificationMessage EMPTY_MESSAGE = new NotificationMessage()
+  {
+    public String getMessageTitle() {
+      return "";
+    }
 
-        public String getMessageBody()
-        {
-            return "";
-        }
-    };
+    public String getMessageBody() {
+      return "";
+    }
+  };
 }

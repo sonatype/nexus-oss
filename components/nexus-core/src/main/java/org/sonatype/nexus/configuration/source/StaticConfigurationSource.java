@@ -10,78 +10,78 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.source;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.Configuration;
+
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * A special "static" configuration source, that always return a factory provided defaults for Nexus configuration. It
  * is unmodifiable, since it actually reads the bundled config file from the module's JAR.
- * 
+ *
  * @author cstamas
  */
-@Component( role = ApplicationConfigurationSource.class, hint = "static" )
+@Component(role = ApplicationConfigurationSource.class, hint = "static")
 public class StaticConfigurationSource
     extends AbstractApplicationConfigurationSource
 {
 
-    /**
-     * Gets the configuration using getResourceAsStream from "/META-INF/nexus/nexus.xml".
-     */
-    public InputStream getConfigurationAsStream()
-        throws IOException
-    {
-        InputStream result = getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
+  /**
+   * Gets the configuration using getResourceAsStream from "/META-INF/nexus/nexus.xml".
+   */
+  public InputStream getConfigurationAsStream()
+      throws IOException
+  {
+    InputStream result = getClass().getResourceAsStream("/META-INF/nexus/nexus.xml");
 
-        if ( result != null )
-        {
-            return result;
-        }
-        else
-        {
-            getLogger().info( "No edition-specific configuration found, falling back to Core default configuration." );
-
-            return getClass().getResourceAsStream( "/META-INF/nexus/default-oss-nexus.xml" );
-        }
+    if (result != null) {
+      return result;
     }
+    else {
+      getLogger().info("No edition-specific configuration found, falling back to Core default configuration.");
 
-    public Configuration loadConfiguration()
-        throws ConfigurationException, IOException
-    {
-        loadConfiguration( getConfigurationAsStream() );
-
-        return getConfiguration();
+      return getClass().getResourceAsStream("/META-INF/nexus/default-oss-nexus.xml");
     }
+  }
 
-    /**
-     * This method will always throw UnsupportedOperationException, since NexusDefaultsConfigurationSource is read only.
-     */
-    public void storeConfiguration()
-        throws IOException
-    {
-        throw new UnsupportedOperationException( "The NexusDefaultsConfigurationSource is static source!" );
-    }
+  public Configuration loadConfiguration()
+      throws ConfigurationException, IOException
+  {
+    loadConfiguration(getConfigurationAsStream());
 
-    /**
-     * Static configuration has no default source, hence it cannot be defalted. Always returns false.
-     */
-    public boolean isConfigurationDefaulted()
-    {
-        return false;
-    }
+    return getConfiguration();
+  }
 
-    /**
-     * This method will always throw UnsupportedOperationException, since StaticConfigurationSource is read only.
-     */
-    public void backupConfiguration()
-        throws IOException
-    {
-        throw new UnsupportedOperationException( "The NexusDefaultsConfigurationSource is static source!" );
-    }
+  /**
+   * This method will always throw UnsupportedOperationException, since NexusDefaultsConfigurationSource is read
+   * only.
+   */
+  public void storeConfiguration()
+      throws IOException
+  {
+    throw new UnsupportedOperationException("The NexusDefaultsConfigurationSource is static source!");
+  }
+
+  /**
+   * Static configuration has no default source, hence it cannot be defalted. Always returns false.
+   */
+  public boolean isConfigurationDefaulted() {
+    return false;
+  }
+
+  /**
+   * This method will always throw UnsupportedOperationException, since StaticConfigurationSource is read only.
+   */
+  public void backupConfiguration()
+      throws IOException
+  {
+    throw new UnsupportedOperationException("The NexusDefaultsConfigurationSource is static source!");
+  }
 
 }

@@ -10,11 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.repositories;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
+import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
@@ -23,56 +28,49 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * A resource list for Repository list.
- * 
+ *
  * @author cstamas
  */
-@Component( role = PlexusResource.class, hint = "AllRepositoryListPlexusResource" )
-@Path( AllRepositoryListPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "AllRepositoryListPlexusResource")
+@Path(AllRepositoryListPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class AllRepositoryListPlexusResource
     extends AbstractRepositoryPlexusResource
 {
-    public static final String RESOURCE_URI = "/all_repositories";
-    
-    public AllRepositoryListPlexusResource()
-    {
-        this.setModifiable( false );
-    }
+  public static final String RESOURCE_URI = "/all_repositories";
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
+  public AllRepositoryListPlexusResource() {
+    this.setModifiable(false);
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repositories]" );
-    }
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
 
-    /**
-     * Retrieve the list of all repositories in nexus, regardless if user or nexus managed.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( output = RepositoryListResourceResponse.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        return listRepositories( request, true, true );
-    }
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:repositories]");
+  }
+
+  /**
+   * Retrieve the list of all repositories in nexus, regardless if user or nexus managed.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(output = RepositoryListResourceResponse.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    return listRepositories(request, true, true);
+  }
 
 }

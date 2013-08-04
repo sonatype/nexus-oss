@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.source.filter;
 
 import java.util.HashMap;
@@ -23,41 +24,37 @@ import org.sonatype.appcontext.source.EntrySourceMarker;
 
 /**
  * EntrySource that wraps another EntrySource and applies EntryFilter to it.
- * 
+ *
  * @author cstamas
  */
 public class FilteredEntrySource
     implements EntrySource
 {
-    private final EntrySource source;
+  private final EntrySource source;
 
-    private final EntryFilter filter;
+  private final EntryFilter filter;
 
-    private final EntrySourceMarker sourceMarker;
+  private final EntrySourceMarker sourceMarker;
 
-    public FilteredEntrySource( final EntrySource source, final EntryFilter filter )
-    {
-        this.source = Preconditions.checkNotNull( source );
-        this.filter = Preconditions.checkNotNull( filter );
-        this.sourceMarker = filter.getFilteredEntrySourceMarker( source.getEntrySourceMarker() );
+  public FilteredEntrySource(final EntrySource source, final EntryFilter filter) {
+    this.source = Preconditions.checkNotNull(source);
+    this.filter = Preconditions.checkNotNull(filter);
+    this.sourceMarker = filter.getFilteredEntrySourceMarker(source.getEntrySourceMarker());
+  }
+
+  public EntrySourceMarker getEntrySourceMarker() {
+    return sourceMarker;
+  }
+
+  public Map<String, Object> getEntries(AppContextRequest request)
+      throws AppContextException
+  {
+    final Map<String, Object> result = new HashMap<String, Object>();
+    for (Map.Entry<String, Object> entry : source.getEntries(request).entrySet()) {
+      if (filter.accept(entry.getKey(), entry.getValue())) {
+        result.put(entry.getKey(), entry.getValue());
+      }
     }
-
-    public EntrySourceMarker getEntrySourceMarker()
-    {
-        return sourceMarker;
-    }
-
-    public Map<String, Object> getEntries( AppContextRequest request )
-        throws AppContextException
-    {
-        final Map<String, Object> result = new HashMap<String, Object>();
-        for ( Map.Entry<String, Object> entry : source.getEntries( request ).entrySet() )
-        {
-            if ( filter.accept( entry.getKey(), entry.getValue() ) )
-            {
-                result.put( entry.getKey(), entry.getValue() );
-            }
-        }
-        return result;
-    }
+    return result;
+  }
 }

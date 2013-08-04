@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import com.google.common.base.Predicate;
 
 /**
  * MavenRepositoryMetadataManager specialization manages Maven2 layouted repositories.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
@@ -34,88 +35,79 @@ public class MavenRepositoryMetadataManager
     extends AbstractRepositoryDistributedMetadataManager
     implements MetadataManager
 {
-    public MavenRepositoryMetadataManager( final MavenRepository repository )
+  public MavenRepositoryMetadataManager(final MavenRepository repository) {
+    super(repository);
+  }
+
+  @Override
+  public boolean recreateMetadata(ResourceStoreRequest request) {
+    return getRepository().recreateMavenMetadata(request);
+  }
+
+  protected MavenRepository getRepository() {
+    return (MavenRepository) super.getRepository();
+  }
+
+  @Override
+  protected WalkerFilter getMetadataWalkerFilter() {
+    return new PredicatePathWalkerFilter(PredicatePathWalkerFilter.ITEM_PATH_EXTRACTOR, new Predicate<String>()
     {
-        super( repository );
+      @Override
+      public boolean apply(final String input) {
+        return M2ArtifactRecognizer.isMetadata(input);
+      }
+    });
+  }
+
+  @Override
+  public void deployArtifact(ArtifactStoreRequest request)
+      throws IOException
+  {
+    if (getRepository() != request.getMavenRepository()) {
+      throw new IllegalArgumentException("This is MavenRepositoryMetadataManager of repository "
+          + RepositoryStringUtils.getHumanizedNameString(getRepository()) + " while the request refers to "
+          + RepositoryStringUtils.getHumanizedNameString(request.getMavenRepository()) + "!");
     }
 
-    @Override
-    public boolean recreateMetadata( ResourceStoreRequest request )
-    {
-        return getRepository().recreateMavenMetadata( request );
+    getRepository().getMetadataManager().deployArtifact(request);
+  }
+
+  @Override
+  public void undeployArtifact(ArtifactStoreRequest request)
+      throws IOException
+  {
+    if (getRepository() != request.getMavenRepository()) {
+      throw new IllegalArgumentException("This is MavenRepositoryMetadataManager of repository "
+          + RepositoryStringUtils.getHumanizedNameString(getRepository()) + " while the request refers to "
+          + RepositoryStringUtils.getHumanizedNameString(request.getMavenRepository()) + "!");
     }
 
-    protected MavenRepository getRepository()
-    {
-        return (MavenRepository) super.getRepository();
+    getRepository().getMetadataManager().undeployArtifact(request);
+  }
+
+  @Override
+  public Gav resolveArtifact(ArtifactStoreRequest request)
+      throws IOException
+  {
+    if (getRepository() != request.getMavenRepository()) {
+      throw new IllegalArgumentException("This is MavenRepositoryMetadataManager of repository "
+          + RepositoryStringUtils.getHumanizedNameString(getRepository()) + " while the request refers to "
+          + RepositoryStringUtils.getHumanizedNameString(request.getMavenRepository()) + "!");
     }
 
-    @Override
-    protected WalkerFilter getMetadataWalkerFilter()
-    {
-        return new PredicatePathWalkerFilter( PredicatePathWalkerFilter.ITEM_PATH_EXTRACTOR, new Predicate<String>()
-        {
-            @Override
-            public boolean apply( final String input )
-            {
-                return M2ArtifactRecognizer.isMetadata( input );
-            }
-        } );
+    return getRepository().getMetadataManager().resolveArtifact(request);
+  }
+
+  @Override
+  public Gav resolveSnapshot(ArtifactStoreRequest request, Gav gav)
+      throws IOException
+  {
+    if (getRepository() != request.getMavenRepository()) {
+      throw new IllegalArgumentException("This is MavenRepositoryMetadataManager of repository "
+          + RepositoryStringUtils.getHumanizedNameString(getRepository()) + " while the request refers to "
+          + RepositoryStringUtils.getHumanizedNameString(request.getMavenRepository()) + "!");
     }
 
-    @Override
-    public void deployArtifact( ArtifactStoreRequest request )
-        throws IOException
-    {
-        if ( getRepository() != request.getMavenRepository() )
-        {
-            throw new IllegalArgumentException( "This is MavenRepositoryMetadataManager of repository "
-                + RepositoryStringUtils.getHumanizedNameString( getRepository() ) + " while the request refers to "
-                + RepositoryStringUtils.getHumanizedNameString( request.getMavenRepository() ) + "!" );
-        }
-
-        getRepository().getMetadataManager().deployArtifact( request );
-    }
-
-    @Override
-    public void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException
-    {
-        if ( getRepository() != request.getMavenRepository() )
-        {
-            throw new IllegalArgumentException( "This is MavenRepositoryMetadataManager of repository "
-                + RepositoryStringUtils.getHumanizedNameString( getRepository() ) + " while the request refers to "
-                + RepositoryStringUtils.getHumanizedNameString( request.getMavenRepository() ) + "!" );
-        }
-
-        getRepository().getMetadataManager().undeployArtifact( request );
-    }
-
-    @Override
-    public Gav resolveArtifact( ArtifactStoreRequest request )
-        throws IOException
-    {
-        if ( getRepository() != request.getMavenRepository() )
-        {
-            throw new IllegalArgumentException( "This is MavenRepositoryMetadataManager of repository "
-                + RepositoryStringUtils.getHumanizedNameString( getRepository() ) + " while the request refers to "
-                + RepositoryStringUtils.getHumanizedNameString( request.getMavenRepository() ) + "!" );
-        }
-
-        return getRepository().getMetadataManager().resolveArtifact( request );
-    }
-
-    @Override
-    public Gav resolveSnapshot( ArtifactStoreRequest request, Gav gav )
-        throws IOException
-    {
-        if ( getRepository() != request.getMavenRepository() )
-        {
-            throw new IllegalArgumentException( "This is MavenRepositoryMetadataManager of repository "
-                + RepositoryStringUtils.getHumanizedNameString( getRepository() ) + " while the request refers to "
-                + RepositoryStringUtils.getHumanizedNameString( request.getMavenRepository() ) + "!" );
-        }
-
-        return getRepository().getMetadataManager().resolveSnapshot( request, gav );
-    }
+    return getRepository().getMetadataManager().resolveSnapshot(request, gav);
+  }
 }

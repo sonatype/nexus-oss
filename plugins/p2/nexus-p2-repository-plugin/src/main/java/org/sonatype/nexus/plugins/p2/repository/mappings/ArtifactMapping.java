@@ -10,40 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.mappings;
 
 import java.util.Map;
 
 public class ArtifactMapping
 {
-    private Map<String, ArtifactPath> artifactsPath;
+  private Map<String, ArtifactPath> artifactsPath;
 
-    private String repository;
+  private String repository;
 
-    public ArtifactMapping( final String repository, final Map<String, ArtifactPath> artifactsPath )
-    {
-        super();
-        this.repository = repository;
-        this.artifactsPath = artifactsPath;
-    }
+  public ArtifactMapping(final String repository, final Map<String, ArtifactPath> artifactsPath) {
+    super();
+    this.repository = repository;
+    this.artifactsPath = artifactsPath;
+  }
 
-    public Map<String, ArtifactPath> getArtifactsPath()
-    {
-        return artifactsPath;
-    }
+  public Map<String, ArtifactPath> getArtifactsPath() {
+    return artifactsPath;
+  }
 
-    public String getRepository()
-    {
-        return repository;
-    }
+  public String getRepository() {
+    return repository;
+  }
 
-    public void setArtifactsPath( final Map<String, ArtifactPath> artifactsPath )
-    {
-        this.artifactsPath = artifactsPath;
-    }
+  public void setArtifactsPath(final Map<String, ArtifactPath> artifactsPath) {
+    this.artifactsPath = artifactsPath;
+  }
 
-    public void setRepository( final String repository )
-    {
-        this.repository = repository;
-    }
+  public void setRepository(final String repository) {
+    this.repository = repository;
+  }
 }

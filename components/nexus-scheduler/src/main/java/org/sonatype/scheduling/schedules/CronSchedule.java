@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling.schedules;
 
 import java.text.ParseException;
@@ -22,28 +23,26 @@ import org.sonatype.scheduling.iterators.cron.CronExpression;
 public class CronSchedule
     extends AbstractSchedule
 {
-    private final String cronString;
+  private final String cronString;
 
-    private final CronExpression cronExpression;
+  private final CronExpression cronExpression;
 
-    public CronSchedule( String cronExpression )
-        throws ParseException
-    {
-        super( new Date(), null );
+  public CronSchedule(String cronExpression)
+      throws ParseException
+  {
+    super(new Date(), null);
 
-        this.cronString = cronExpression;
+    this.cronString = cronExpression;
 
-        this.cronExpression = new CronExpression( cronString );
-    }
+    this.cronExpression = new CronExpression(cronString);
+  }
 
-    public String getCronString()
-    {
-        return cronString;
-    }
+  public String getCronString() {
+    return cronString;
+  }
 
-    protected SchedulerIterator createIterator()
-    {
-        return new CronIterator( cronExpression );
-    }
+  protected SchedulerIterator createIterator() {
+    return new CronIterator(cronExpression);
+  }
 
 }

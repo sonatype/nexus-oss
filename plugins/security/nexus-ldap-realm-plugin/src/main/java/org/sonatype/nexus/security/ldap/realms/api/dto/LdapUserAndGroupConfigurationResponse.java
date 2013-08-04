@@ -10,33 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.ldap.realms.api.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias( value = "userAndGroupConfig" )
-@XmlRootElement( name = "userAndGroupConfig" )
+@XStreamAlias(value = "userAndGroupConfig")
+@XmlRootElement(name = "userAndGroupConfig")
 public class LdapUserAndGroupConfigurationResponse
 {
 
-    private LdapUserAndGroupConfigurationDTO data;
+  private LdapUserAndGroupConfigurationDTO data;
 
-    /**
-     * @return the userAndGroupConfig
-     */
-    public LdapUserAndGroupConfigurationDTO getData()
-    {
-        return data;
-    }
+  /**
+   * @return the userAndGroupConfig
+   */
+  public LdapUserAndGroupConfigurationDTO getData() {
+    return data;
+  }
 
-    /**
-     * @param userAndGroupConfig the userAndGroupConfig to set
-     */
-    public void setData( LdapUserAndGroupConfigurationDTO userAndGroupConfig )
-    {
-        this.data = userAndGroupConfig;
-    }
+  /**
+   * @param userAndGroupConfig the userAndGroupConfig to set
+   */
+  public void setData(LdapUserAndGroupConfigurationDTO userAndGroupConfig) {
+    this.data = userAndGroupConfig;
+  }
 
 }

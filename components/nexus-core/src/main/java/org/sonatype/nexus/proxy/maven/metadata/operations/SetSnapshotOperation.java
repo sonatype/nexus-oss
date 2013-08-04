@@ -10,14 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import java.util.List;
 
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 
 /**
  * adds new snapshot to metadata
@@ -29,104 +31,89 @@ public class SetSnapshotOperation
     implements MetadataOperation
 {
 
-    private SnapshotOperand operand;
+  private SnapshotOperand operand;
 
-    private final VersionComparator versionComparator;
+  private final VersionComparator versionComparator;
 
-    /**
-     * @throws MetadataException
-     */
-    public SetSnapshotOperation( SnapshotOperand data )
-        throws MetadataException
-    {
-        this.versionComparator = new VersionComparator();
-        setOperand( data );
+  /**
+   * @throws MetadataException
+   */
+  public SetSnapshotOperation(SnapshotOperand data)
+      throws MetadataException
+  {
+    this.versionComparator = new VersionComparator();
+    setOperand(data);
+  }
+
+  public void setOperand(AbstractOperand data)
+      throws MetadataException
+  {
+    if (data == null || !(data instanceof SnapshotOperand)) {
+      throw new MetadataException("Operand is not correct: expected SnapshotOperand, but got "
+          + (data == null ? "null" : data.getClass().getName()));
+    }
+    this.operand = (SnapshotOperand) data;
+  }
+
+  /**
+   * add/replace snapshot to the in-memory metadata instance
+   */
+  public boolean perform(Metadata metadata)
+      throws MetadataException
+  {
+    if (metadata == null) {
+      return false;
     }
 
-    public void setOperand( AbstractOperand data )
-        throws MetadataException
-    {
-        if ( data == null || !( data instanceof SnapshotOperand ) )
-        {
-            throw new MetadataException( "Operand is not correct: expected SnapshotOperand, but got "
-                                             + ( data == null ? "null" : data.getClass().getName() ) );
-        }
-        this.operand = (SnapshotOperand) data;
+    Versioning vs = metadata.getVersioning();
+
+    if (vs == null) {
+      vs = new Versioning();
+
+      metadata.setVersioning(vs);
     }
 
-    /**
-     * add/replace snapshot to the in-memory metadata instance
-     *
-     * @param metadata
-     * @return
-     * @throws MetadataException
-     */
-    public boolean perform( Metadata metadata )
-        throws MetadataException
-    {
-        if ( metadata == null )
-        {
-            return false;
-        }
+    return updateSnapshot(metadata);
+  }
 
-        Versioning vs = metadata.getVersioning();
+  private boolean updateSnapshot(Metadata metadata)
+      throws MetadataException
+  {
+    final Versioning vs = metadata.getVersioning();
 
-        if ( vs == null )
-        {
-            vs = new Versioning();
-
-            metadata.setVersioning( vs );
-        }
-
-        return updateSnapshot( metadata );
+    if (operand.getSnapshot() != null) {
+      vs.setSnapshot(operand.getSnapshot());
     }
 
-    private boolean updateSnapshot( Metadata metadata )
-        throws MetadataException
-    {
-        final Versioning vs = metadata.getVersioning();
+    List<SnapshotVersion> extras = operand.getSnapshotVersions();
+    List<SnapshotVersion> currents = vs.getSnapshotVersions();
 
-        if ( operand.getSnapshot() != null )
-        {
-            vs.setSnapshot( operand.getSnapshot() );
+    if (extras != null && extras.size() > 0) {
+      // fix/upgrade the version
+      ModelVersionUtility.setModelVersion(metadata, ModelVersionUtility.LATEST_MODEL_VERSION);
+
+      for (SnapshotVersion extra : extras) {
+        SnapshotVersion current = MetadataUtil.searchForEquivalent(extra, currents);
+        if (current == null) {
+          currents.add(extra);
         }
-
-        List<SnapshotVersion> extras = operand.getSnapshotVersions();
-        List<SnapshotVersion> currents = vs.getSnapshotVersions();
-
-        if ( extras != null && extras.size() > 0 )
-        {
-            // fix/upgrade the version
-            ModelVersionUtility.setModelVersion( metadata, ModelVersionUtility.LATEST_MODEL_VERSION );
-
-            for ( SnapshotVersion extra : extras )
-            {
-                SnapshotVersion current = MetadataUtil.searchForEquivalent( extra, currents );
-                if ( current == null )
-                {
-                    currents.add( extra );
-                }
-                else
-                {
-                    if ( versionComparator.compare( current.getVersion(), extra.getVersion() ) < 0 )
-                    {
-                        currents.remove( current );
-                        currents.add( extra );
-                    }
-                }
-            }
+        else {
+          if (versionComparator.compare(current.getVersion(), extra.getVersion()) < 0) {
+            currents.remove(current);
+            currents.add(extra);
+          }
         }
-        else if ( Version.V100 == operand.getOriginModelVersion() && operand.getSnapshot() != null )
-        {
-            for ( SnapshotVersion current : currents )
-            {
-                current.setUpdated( operand.getTimestamp() );
-            }
-        }
-
-        vs.setLastUpdated( operand.getTimestamp() );
-
-        return true;
+      }
     }
+    else if (Version.V100 == operand.getOriginModelVersion() && operand.getSnapshot() != null) {
+      for (SnapshotVersion current : currents) {
+        current.setUpdated(operand.getTimestamp());
+      }
+    }
+
+    vs.setLastUpdated(operand.getTimestamp());
+
+    return true;
+  }
 
 }

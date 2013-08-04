@@ -10,31 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.ldap.realms.api.dto;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias( value = "userRequest" )
+@XStreamAlias(value = "userRequest")
 public class LdapUserRequest
 {
 
-    private LdapUserRequestDTO data;
+  private LdapUserRequestDTO data;
 
-    /**
-     * @return the ldapUserRoleMapping
-     */
-    public LdapUserRequestDTO getLdapUserRequestDto()
-    {
-        return data;
-    }
+  /**
+   * @return the ldapUserRoleMapping
+   */
+  public LdapUserRequestDTO getLdapUserRequestDto() {
+    return data;
+  }
 
-    /**
-     * @param ldapUserRoleMapping the ldapUserRoleMapping to set
-     */
-    public void setLdapUserRequestDto( LdapUserRequestDTO ldapUserRoleMapping )
-    {
-        this.data = ldapUserRoleMapping;
-    }
-    
-    
+  /**
+   * @param ldapUserRoleMapping the ldapUserRoleMapping to set
+   */
+  public void setLdapUserRequestDto(LdapUserRequestDTO ldapUserRoleMapping) {
+    this.data = ldapUserRoleMapping;
+  }
+
+
 }

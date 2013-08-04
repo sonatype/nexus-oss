@@ -10,27 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 /**
- * Exception to be thrown in cases when {@link RemoteRepositoryStorage} is unable to make an outbound request because it
+ * Exception to be thrown in cases when {@link RemoteRepositoryStorage} is unable to make an outbound request because
+ * it
  * is overloaded. Reason might be different, but they are usually cases when maximum connection limit is reached, or
  * some pools are depleted. Typically, these happens when given instance of {@link RemoteRepositoryStorage} is
  * overloaded.
- * 
+ *
  * @author cstamas
  */
 public class RemoteStorageTransportOverloadedException
     extends RemoteStorageTransportException
 {
-    private static final long serialVersionUID = -847618217772014024L;
+  private static final long serialVersionUID = -847618217772014024L;
 
-    public RemoteStorageTransportOverloadedException( final ProxyRepository repository, final String message,
-                                                      final Throwable cause )
-    {
-        super( repository, message, cause );
-    }
+  public RemoteStorageTransportOverloadedException(final ProxyRepository repository, final String message,
+                                                   final Throwable cause)
+  {
+    super(repository, message, cause);
+  }
 }

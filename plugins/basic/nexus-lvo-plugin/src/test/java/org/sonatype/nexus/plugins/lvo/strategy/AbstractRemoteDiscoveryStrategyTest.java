@@ -10,25 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.lvo.strategy;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.when;
-import static org.sonatype.tests.http.server.fluent.Behaviours.content;
-import static org.sonatype.tests.http.server.fluent.Behaviours.error;
-import static org.sonatype.tests.http.server.fluent.Behaviours.redirect;
+package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.apachehttpclient.Hc4ProviderImpl;
 import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBeanInstaller;
@@ -46,6 +33,21 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Proxy;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.when;
+import static org.sonatype.tests.http.server.fluent.Behaviours.content;
+import static org.sonatype.tests.http.server.fluent.Behaviours.error;
+import static org.sonatype.tests.http.server.fluent.Behaviours.redirect;
+
 /**
  * Tests for network parts of AbstractRemoteDiscoveryStrategy
  */
@@ -53,180 +55,177 @@ public class AbstractRemoteDiscoveryStrategyTest
     extends TestSupport
 {
 
-    private Server server;
+  private Server server;
 
-    private String content;
+  private String content;
 
-    private AbstractRemoteDiscoveryStrategy.RequestResult result;
+  private AbstractRemoteDiscoveryStrategy.RequestResult result;
 
-    @Mock
-    private DefaultNexusConfiguration cfg;
+  @Mock
+  private DefaultNexusConfiguration cfg;
 
-    @Mock
-    private RemoteStorageContext remoteStorageContext;
+  @Mock
+  private RemoteStorageContext remoteStorageContext;
 
-    @Mock
-    private RemoteProxySettings remoteProxySettings;
-    
-    @Mock
-    private UserAgentBuilder userAgentBuilder;
-    
-    @Mock
-    private EventBus eventBus;
-    
-    @Mock
-    private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
+  @Mock
+  private RemoteProxySettings remoteProxySettings;
 
-    @Before
-    public void setup()
-        throws Exception
-    {
-        content = "nexus-oss.version=2.0\nnexus-oss.url=http://some.url\n";
+  @Mock
+  private UserAgentBuilder userAgentBuilder;
 
-        when( cfg.getGlobalRemoteStorageContext() ).thenReturn( remoteStorageContext );
-        when( remoteStorageContext.getRemoteProxySettings() ).thenReturn( remoteProxySettings );
-        when( remoteStorageContext.getRemoteConnectionSettings() ).thenReturn( new DefaultRemoteConnectionSettings() );
+  @Mock
+  private EventBus eventBus;
+
+  @Mock
+  private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
+
+  @Before
+  public void setup()
+      throws Exception
+  {
+    content = "nexus-oss.version=2.0\nnexus-oss.url=http://some.url\n";
+
+    when(cfg.getGlobalRemoteStorageContext()).thenReturn(remoteStorageContext);
+    when(remoteStorageContext.getRemoteProxySettings()).thenReturn(remoteProxySettings);
+    when(remoteStorageContext.getRemoteConnectionSettings()).thenReturn(new DefaultRemoteConnectionSettings());
+  }
+
+  @After
+  public void cleanup()
+      throws Exception
+  {
+    if (server != null) {
+      server.stop();
     }
 
-    @After
-    public void cleanup()
-        throws Exception
-    {
-        if ( server != null )
-        {
-            server.stop();
-        }
-
-        if ( result != null )
-        {
-            result.close();
-        }
+    if (result != null) {
+      result.close();
     }
+  }
 
-    private AbstractRemoteDiscoveryStrategy create()
+  private AbstractRemoteDiscoveryStrategy create() {
+    final Hc4Provider provider = new Hc4ProviderImpl(cfg, userAgentBuilder, eventBus, jmxInstaller, null);
+    return new AbstractRemoteDiscoveryStrategy(provider)
     {
-        final Hc4Provider provider = new Hc4ProviderImpl( cfg, userAgentBuilder, eventBus, jmxInstaller, null );
-        return new AbstractRemoteDiscoveryStrategy( provider )
-        {
-            @Override
-            public DiscoveryResponse discoverLatestVersion( final DiscoveryRequest request )
-                throws NoSuchRepositoryException, IOException
-            {
-                return null;
-            }
-        };
-    }
+      @Override
+      public DiscoveryResponse discoverLatestVersion(final DiscoveryRequest request)
+          throws NoSuchRepositoryException, IOException
+      {
+        return null;
+      }
+    };
+  }
 
-    @Test
-    public void testDirect()
-        throws Exception
-    {
-        server = Server.withPort( 0 ).serve( "/test.properties" ).withBehaviours( content( content ) ).start();
+  @Test
+  public void testDirect()
+      throws Exception
+  {
+    server = Server.withPort(0).serve("/test.properties").withBehaviours(content(content)).start();
 
-        AbstractRemoteDiscoveryStrategy underTest = create();
+    AbstractRemoteDiscoveryStrategy underTest = create();
 
-        AbstractRemoteDiscoveryStrategy.RequestResult result =
-            underTest.handleRequest( server.getUrl().toString() + "/test.properties" );
+    AbstractRemoteDiscoveryStrategy.RequestResult result =
+        underTest.handleRequest(server.getUrl().toString() + "/test.properties");
 
-        assertThat( result.getInputStream(), notNullValue() );
-        assertThat( "content did not match",
-            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
-    }
+    assertThat(result.getInputStream(), notNullValue());
+    assertThat("content did not match",
+        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+  }
 
-    @Test
-    public void testProxy()
-        throws Exception
-    {
-        server = Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( content( content ) ).start();
+  @Test
+  public void testProxy()
+      throws Exception
+  {
+    server = Proxy.withPort(0).serve("/test.properties").withBehaviours(content(content)).start();
 
-        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
-        httpProxySettings.setHostname( "localhost" );
-        httpProxySettings.setPort( server.getPort() );
+    final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+    httpProxySettings.setHostname("localhost");
+    httpProxySettings.setPort(server.getPort());
 
-        when( remoteProxySettings.getHttpProxySettings() ).thenReturn( httpProxySettings );
+    when(remoteProxySettings.getHttpProxySettings()).thenReturn(httpProxySettings);
 
-        AbstractRemoteDiscoveryStrategy underTest = create();
+    AbstractRemoteDiscoveryStrategy underTest = create();
 
-        result = underTest.handleRequest( "http://invalid.url/test.properties" );
+    result = underTest.handleRequest("http://invalid.url/test.properties");
 
-        assertThat( result.getInputStream(), notNullValue() );
-        assertThat( "content did not match",
-            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
-    }
+    assertThat(result.getInputStream(), notNullValue());
+    assertThat("content did not match",
+        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+  }
 
-    @Test
-    public void testDirectFails()
-        throws Exception
-    {
-        server = Server.withPort( 0 ).serve( "/test.properties" ).withBehaviours( error( 404 ) ).start();
+  @Test
+  public void testDirectFails()
+      throws Exception
+  {
+    server = Server.withPort(0).serve("/test.properties").withBehaviours(error(404)).start();
 
-        AbstractRemoteDiscoveryStrategy underTest = create();
+    AbstractRemoteDiscoveryStrategy underTest = create();
 
-        AbstractRemoteDiscoveryStrategy.RequestResult result =
-            underTest.handleRequest( server.getUrl().toString() + "/test.properties" );
+    AbstractRemoteDiscoveryStrategy.RequestResult result =
+        underTest.handleRequest(server.getUrl().toString() + "/test.properties");
 
-        assertThat( result, nullValue() );
-    }
+    assertThat(result, nullValue());
+  }
 
-    @Test
-    public void testProxyFails()
-        throws Exception
-    {
-        server = Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( error( 404 ) ).start();
+  @Test
+  public void testProxyFails()
+      throws Exception
+  {
+    server = Proxy.withPort(0).serve("/test.properties").withBehaviours(error(404)).start();
 
-        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
-        httpProxySettings.setHostname( "localhost" );
-        httpProxySettings.setPort( server.getPort() );
+    final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+    httpProxySettings.setHostname("localhost");
+    httpProxySettings.setPort(server.getPort());
 
-        when( remoteProxySettings.getHttpProxySettings() ).thenReturn( httpProxySettings );
+    when(remoteProxySettings.getHttpProxySettings()).thenReturn(httpProxySettings);
 
-        AbstractRemoteDiscoveryStrategy underTest = create();
+    AbstractRemoteDiscoveryStrategy underTest = create();
 
-        result = underTest.handleRequest( "http://invalid.url/test.properties" );
+    result = underTest.handleRequest("http://invalid.url/test.properties");
 
-        assertThat( result, nullValue() );
-    }
+    assertThat(result, nullValue());
+  }
 
-    @Test
-    public void testDirectRedirect()
-        throws Exception
-    {
-        server =
-            Server.withPort( 0 ).serve( "/test.properties" ).withBehaviours(
-                redirect( "/redirect/test.properties", 301 ) ).serve( "/redirect/test.properties" ).withBehaviours(
-                content( content ) ).start();
+  @Test
+  public void testDirectRedirect()
+      throws Exception
+  {
+    server =
+        Server.withPort(0).serve("/test.properties").withBehaviours(
+            redirect("/redirect/test.properties", 301)).serve("/redirect/test.properties").withBehaviours(
+            content(content)).start();
 
-        AbstractRemoteDiscoveryStrategy underTest = create();
+    AbstractRemoteDiscoveryStrategy underTest = create();
 
-        AbstractRemoteDiscoveryStrategy.RequestResult result =
-            underTest.handleRequest( server.getUrl().toString() + "/test.properties" );
+    AbstractRemoteDiscoveryStrategy.RequestResult result =
+        underTest.handleRequest(server.getUrl().toString() + "/test.properties");
 
-        assertThat( result.getInputStream(), notNullValue() );
-        assertThat( "content did not match",
-            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
-    }
+    assertThat(result.getInputStream(), notNullValue());
+    assertThat("content did not match",
+        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+  }
 
-    @Test
-    public void testProxyRedirect()
-        throws Exception
-    {
-        server =
-            Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( redirect( "/redirect/test.properties", 301 ) ).serve(
-                "/redirect/test.properties" ).withBehaviours( content( content ) ).start();
+  @Test
+  public void testProxyRedirect()
+      throws Exception
+  {
+    server =
+        Proxy.withPort(0).serve("/test.properties").withBehaviours(redirect("/redirect/test.properties", 301)).serve(
+            "/redirect/test.properties").withBehaviours(content(content)).start();
 
-        final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
-        httpProxySettings.setHostname( "localhost" );
-        httpProxySettings.setPort( server.getPort() );
+    final DefaultRemoteHttpProxySettings httpProxySettings = new DefaultRemoteHttpProxySettings();
+    httpProxySettings.setHostname("localhost");
+    httpProxySettings.setPort(server.getPort());
 
-        when( remoteProxySettings.getHttpProxySettings() ).thenReturn( httpProxySettings );
+    when(remoteProxySettings.getHttpProxySettings()).thenReturn(httpProxySettings);
 
-        AbstractRemoteDiscoveryStrategy underTest = create();
+    AbstractRemoteDiscoveryStrategy underTest = create();
 
-        result = underTest.handleRequest( "http://invalid.url/test.properties" );
+    result = underTest.handleRequest("http://invalid.url/test.properties");
 
-        assertThat( result.getInputStream(), notNullValue() );
-        assertThat( "content did not match",
-            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
-    }
+    assertThat(result.getInputStream(), notNullValue());
+    assertThat("content did not match",
+        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+  }
 
 }

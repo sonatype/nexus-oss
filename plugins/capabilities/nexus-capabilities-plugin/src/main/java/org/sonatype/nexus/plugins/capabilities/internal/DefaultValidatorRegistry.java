@@ -10,10 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal;
 
 import java.util.Collection;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,6 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
+
 import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,83 +43,73 @@ class DefaultValidatorRegistry
     implements ValidatorRegistry
 {
 
-    private final DefaultCapabilityRegistry capabilityRegistry;
+  private final DefaultCapabilityRegistry capabilityRegistry;
 
-    private final CapabilityFactoryRegistry capabilityFactoryRegistry;
+  private final CapabilityFactoryRegistry capabilityFactoryRegistry;
 
-    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+  private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
-    private final Validators validators;
+  private final Validators validators;
 
-    @Inject
-    DefaultValidatorRegistry( final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                              final CapabilityFactoryRegistry capabilityFactoryRegistry,
-                              final DefaultCapabilityRegistry capabilityRegistry,
-                              final Validators validators )
-    {
-        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
-        this.capabilityFactoryRegistry = checkNotNull( capabilityFactoryRegistry );
-        this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.validators = checkNotNull( validators );
-    }
+  @Inject
+  DefaultValidatorRegistry(final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                           final CapabilityFactoryRegistry capabilityFactoryRegistry,
+                           final DefaultCapabilityRegistry capabilityRegistry,
+                           final Validators validators)
+  {
+    this.capabilityDescriptorRegistry = checkNotNull(capabilityDescriptorRegistry);
+    this.capabilityFactoryRegistry = checkNotNull(capabilityFactoryRegistry);
+    this.capabilityRegistry = checkNotNull(capabilityRegistry);
+    this.validators = checkNotNull(validators);
+  }
 
-    @Override
-    public Collection<Validator> get( final CapabilityType type )
-    {
-        final Set<Validator> typeValidators = Sets.newHashSet();
+  @Override
+  public Collection<Validator> get(final CapabilityType type) {
+    final Set<Validator> typeValidators = Sets.newHashSet();
 
-        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
-        if ( descriptor != null )
-        {
-            typeValidators.add( validators.capability().constraintsOf( type ) );
+    final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(type);
+    if (descriptor != null) {
+      typeValidators.add(validators.capability().constraintsOf(type));
 
-            final Validator validator = descriptor.validator();
-            if ( validator != null )
-            {
-                typeValidators.add( validator );
-            }
+      final Validator validator = descriptor.validator();
+      if (validator != null) {
+        typeValidators.add(validator);
+      }
 
-            final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
-            if ( factory != null )
-            {
-                if ( factory instanceof Validator )
-                {
-                    typeValidators.add( (Validator) factory );
-                }
-            }
-
+      final CapabilityFactory factory = capabilityFactoryRegistry.get(type);
+      if (factory != null) {
+        if (factory instanceof Validator) {
+          typeValidators.add((Validator) factory);
         }
+      }
 
-        return typeValidators;
     }
 
-    @Override
-    public Collection<Validator> get( final CapabilityIdentity id )
-    {
-        final Set<Validator> instanceValidators = Sets.newHashSet();
+    return typeValidators;
+  }
 
-        final DefaultCapabilityReference reference = capabilityRegistry.get( id );
-        if ( reference != null )
-        {
-            instanceValidators.add( validators.capability().constraintsOf( reference.context().type() ) );
+  @Override
+  public Collection<Validator> get(final CapabilityIdentity id) {
+    final Set<Validator> instanceValidators = Sets.newHashSet();
 
-            final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( reference.context().type() );
-            if ( descriptor != null )
-            {
-                final Validator validator = descriptor.validator( id );
-                if ( validator != null )
-                {
-                    instanceValidators.add( validator );
-                }
-            }
+    final DefaultCapabilityReference reference = capabilityRegistry.get(id);
+    if (reference != null) {
+      instanceValidators.add(validators.capability().constraintsOf(reference.context().type()));
 
-            if ( reference.capability() instanceof Validator )
-            {
-                instanceValidators.add( (Validator) reference.capability() );
-            }
+      final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(reference.context().type());
+      if (descriptor != null) {
+        final Validator validator = descriptor.validator(id);
+        if (validator != null) {
+          instanceValidators.add(validator);
         }
+      }
 
-        return instanceValidators;
+      if (reference.capability() instanceof Validator) {
+        instanceValidators.add((Validator) reference.capability());
+      }
     }
+
+    return instanceValidators;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.deploy.nxcm970;
 
 import java.io.IOException;
@@ -23,94 +24,81 @@ import org.apache.http.impl.client.DefaultHttpClient;
 public class ContinuousDeployer
     implements Runnable
 {
-    private final HttpClient httpClient;
+  private final HttpClient httpClient;
 
-    private volatile boolean deploying;
+  private volatile boolean deploying;
 
-    private final String targetUrl;
+  private final String targetUrl;
 
-    private int result = -1;
+  private int result = -1;
 
-    public ContinuousDeployer( final String targetUrl )
-    {
-        super();
-        this.targetUrl = targetUrl;
-        this.deploying = true;
-        this.httpClient = new DefaultHttpClient();
+  public ContinuousDeployer(final String targetUrl) {
+    super();
+    this.targetUrl = targetUrl;
+    this.deploying = true;
+    this.httpClient = new DefaultHttpClient();
+  }
+
+  public boolean isDeploying() {
+    return deploying;
+  }
+
+  public void finishDeploying() {
+    this.deploying = false;
+  }
+
+  public boolean isFinished() {
+    return result != -1;
+  }
+
+  public int getResult() {
+    return result;
+  }
+
+  public void run() {
+    final HttpPut method = new HttpPut(targetUrl);
+    method.setEntity(new InputStreamEntity(new EndlessBlockingInputStream(this), -1));
+
+    try {
+      result = httpClient.execute(method).getStatusLine().getStatusCode();
+    }
+    catch (Exception e) {
+      result = -2;
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * This is an endless stream, that will sleep a little and then serve the 'T' character.
+   *
+   * @author cstamas
+   */
+  public static class EndlessBlockingInputStream
+      extends InputStream
+  {
+    private final ContinuousDeployer continuousDeployer;
+
+    public EndlessBlockingInputStream(final ContinuousDeployer deployer) {
+      this.continuousDeployer = deployer;
     }
 
-    public boolean isDeploying()
+    @Override
+    public int read()
+        throws IOException
     {
-        return deploying;
-    }
-
-    public void finishDeploying()
-    {
-        this.deploying = false;
-    }
-
-    public boolean isFinished()
-    {
-        return result != -1;
-    }
-
-    public int getResult()
-    {
-        return result;
-    }
-
-    public void run()
-    {
-        final HttpPut method = new HttpPut( targetUrl );
-        method.setEntity( new InputStreamEntity( new EndlessBlockingInputStream( this ), -1 ) );
-
-        try
-        {
-            result = httpClient.execute( method ).getStatusLine().getStatusCode();
+      if (continuousDeployer.isDeploying()) {
+        try {
+          Thread.sleep(300);
+          return 'T';
         }
-        catch ( Exception e )
-        {
-            result = -2;
-            e.printStackTrace();
+        catch (InterruptedException e) {
+          throw new IOException(e.getMessage());
         }
+      }
+      else {
+        // finish
+        return -1;
+      }
     }
-
-    /**
-     * This is an endless stream, that will sleep a little and then serve the 'T' character.
-     * 
-     * @author cstamas
-     */
-    public static class EndlessBlockingInputStream
-        extends InputStream
-    {
-        private final ContinuousDeployer continuousDeployer;
-
-        public EndlessBlockingInputStream( final ContinuousDeployer deployer )
-        {
-            this.continuousDeployer = deployer;
-        }
-
-        @Override
-        public int read()
-            throws IOException
-        {
-            if ( continuousDeployer.isDeploying() )
-            {
-                try
-                {
-                    Thread.sleep( 300 );
-                    return 'T';
-                }
-                catch ( InterruptedException e )
-                {
-                    throw new IOException( e.getMessage() );
-                }
-            }
-            else
-            {
-                // finish
-                return -1;
-            }
-        }
-    }
+  }
 }

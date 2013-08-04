@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -20,31 +21,31 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * A helper base class that makes it easier to create processors.
- * 
+ *
  * @author cstamas
  * @since 2.5
  */
 public abstract class AbstractRequestStrategy
     implements RequestStrategy
 {
-    @Override
-    public void onHandle( Repository repository, ResourceStoreRequest request, Action action )
-        throws ItemNotFoundException, IllegalOperationException
-    {
-        // nop
-    }
+  @Override
+  public void onHandle(Repository repository, ResourceStoreRequest request, Action action)
+      throws ItemNotFoundException, IllegalOperationException
+  {
+    // nop
+  }
 
-    @Override
-    public void onServing( final Repository repository, final ResourceStoreRequest request, final StorageItem item )
-        throws ItemNotFoundException, IllegalOperationException
-    {
-        // nop
-    }
+  @Override
+  public void onServing(final Repository repository, final ResourceStoreRequest request, final StorageItem item)
+      throws ItemNotFoundException, IllegalOperationException
+  {
+    // nop
+  }
 
-    @Override
-    public void onRemoteAccess( ProxyRepository proxy, ResourceStoreRequest request, StorageItem item )
-        throws ItemNotFoundException, IllegalOperationException
-    {
-        // nop
-    }
+  @Override
+  public void onRemoteAccess(ProxyRepository proxy, ResourceStoreRequest request, StorageItem item)
+      throws ItemNotFoundException, IllegalOperationException
+  {
+    // nop
+  }
 }

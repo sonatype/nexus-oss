@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.resource;
 
 import org.restlet.data.Response;
@@ -24,12 +25,12 @@ import org.restlet.resource.Representation;
 public interface RestletResponseCustomizer
 {
 
-    /**
-     * Callback just before returning the response to Restlet framework. The call is always done after the call to
-     * {@link PlexusResource} GET/POST/PUT/UPLOAD was performed.
-     *
-     * @param response Restlet response
-     */
-    void customize( Response response );
+  /**
+   * Callback just before returning the response to Restlet framework. The call is always done after the call to
+   * {@link PlexusResource} GET/POST/PUT/UPLOAD was performed.
+   *
+   * @param response Restlet response
+   */
+  void customize(Response response);
 
 }

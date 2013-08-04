@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.indextreeview;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -17,48 +18,42 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 /**
  * REST Response object received after request an item from the index browser tree, contains the typical 'data'
  * parameter, which is the tree item.
- * 
+ *
  * @author cstamas
  * @since 2.7.0
  */
-@XStreamAlias( "indexBrowserTreeViewResponse" )
+@XStreamAlias("indexBrowserTreeViewResponse")
 public class IndexBrowserTreeViewResponseDTO
 {
-    /**
-     * The tree node and its details.
-     */
-    private IndexBrowserTreeNodeDTO data;
+  /**
+   * The tree node and its details.
+   */
+  private IndexBrowserTreeNodeDTO data;
 
-    /**
-     * Empty constructor, used along with XStreamRepresentation where you pass in a "fresh" and empty instance to
-     * deserialize input over it.
-     */
-    public IndexBrowserTreeViewResponseDTO()
-    {
-        this.data = null;
-    }
+  /**
+   * Empty constructor, used along with XStreamRepresentation where you pass in a "fresh" and empty instance to
+   * deserialize input over it.
+   */
+  public IndexBrowserTreeViewResponseDTO() {
+    this.data = null;
+  }
 
-    /**
-     * Constructor with TreeNode
-     * 
-     * @param IndexBrowserTreeNode
-     */
-    public IndexBrowserTreeViewResponseDTO( final IndexBrowserTreeNodeDTO node )
-    {
-        if ( node == null )
-        {
-            throw new NullPointerException( "IndexBrowserTreeNodeDTO is null!" );
-        }
-        this.data = node;
+  /**
+   * Constructor with TreeNode
+   */
+  public IndexBrowserTreeViewResponseDTO(final IndexBrowserTreeNodeDTO node) {
+    if (node == null) {
+      throw new NullPointerException("IndexBrowserTreeNodeDTO is null!");
     }
+    this.data = node;
+  }
 
-    /**
-     * Get the tree node and its details.
-     * 
-     * @return IndexBrowserTreeNode
-     */
-    public IndexBrowserTreeNodeDTO getData()
-    {
-        return data;
-    }
+  /**
+   * Get the tree node and its details.
+   *
+   * @return IndexBrowserTreeNode
+   */
+  public IndexBrowserTreeNodeDTO getData() {
+    return data;
+  }
 }

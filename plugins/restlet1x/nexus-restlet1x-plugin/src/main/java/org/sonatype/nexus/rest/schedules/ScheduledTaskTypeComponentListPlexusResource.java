@@ -10,11 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.schedules;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
+import org.sonatype.nexus.rest.component.AbstractComponentListPlexusResource;
+import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
+import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
@@ -23,47 +30,39 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.component.AbstractComponentListPlexusResource;
-import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
-import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "ScheduledTaskTypeComonentListPlexusResource" )
-@Path( ScheduledTaskTypeComponentListPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "ScheduledTaskTypeComonentListPlexusResource")
+@Path(ScheduledTaskTypeComponentListPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class ScheduledTaskTypeComponentListPlexusResource
     extends AbstractComponentListPlexusResource
 {
-    public static final String RESOURCE_URI = "/components/schedule_types"; 
+  public static final String RESOURCE_URI = "/components/schedule_types";
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:componentscheduletypes]" );
-    }
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:componentscheduletypes]");
+  }
 
-    @Override
-    protected String getRole( Request request )
-    {
-        return ScheduledTaskDescriptor.class.getName();
-    }
-    
-    /**
-     * Retrieve the list of scheduled task type plexus components.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( output = PlexusComponentListResourceResponse.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        return super.get( context, request, response, variant );
-    }
+  @Override
+  protected String getRole(Request request) {
+    return ScheduledTaskDescriptor.class.getName();
+  }
+
+  /**
+   * Retrieve the list of scheduled task type plexus components.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(output = PlexusComponentListResourceResponse.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    return super.get(context, request, response, variant);
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.plugin.console.ui;
 
 import javax.inject.Named;
@@ -23,16 +24,14 @@ public class PluginConsoleDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
 
-    @Override
-    public String getPluginId()
-    {
-        return "nexus-plugin-console-plugin";
-    }
+  @Override
+  public String getPluginId() {
+    return "nexus-plugin-console-plugin";
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "Plugin Console Plugin API";
-    }
+  @Override
+  public String getDescription() {
+    return "Plugin Console Plugin API";
+  }
 
 }

@@ -10,12 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge.internal.guice;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.sonatype.aether.spi.locator.ServiceLocator;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenDependencyTreeResolver;
@@ -23,7 +23,9 @@ import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 import org.sonatype.sisu.maven.bridge.support.artifact.RemoteMavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.support.dependency.RemoteMavenDependencyTreeResolver;
 import org.sonatype.sisu.maven.bridge.support.model.RemoteMavenModelResolver;
+
 import com.google.inject.AbstractModule;
+import org.apache.maven.repository.internal.DefaultServiceLocator;
 
 @Named
 @Singleton
@@ -31,13 +33,12 @@ public class GuiceModule
     extends AbstractModule
 {
 
-    @Override
-    protected void configure()
-    {
-        bind( ServiceLocator.class ).to( DefaultServiceLocator.class );
-        bind( MavenArtifactResolver.class ).to( RemoteMavenArtifactResolver.class );
-        bind( MavenModelResolver.class ).to( RemoteMavenModelResolver.class );
-        bind( MavenDependencyTreeResolver.class ).to( RemoteMavenDependencyTreeResolver.class );
-    }
+  @Override
+  protected void configure() {
+    bind(ServiceLocator.class).to(DefaultServiceLocator.class);
+    bind(MavenArtifactResolver.class).to(RemoteMavenArtifactResolver.class);
+    bind(MavenModelResolver.class).to(RemoteMavenModelResolver.class);
+    bind(MavenDependencyTreeResolver.class).to(RemoteMavenDependencyTreeResolver.class);
+  }
 
 }

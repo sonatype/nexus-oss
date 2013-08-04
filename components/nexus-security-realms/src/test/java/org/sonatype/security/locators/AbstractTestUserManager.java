@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.locators;
 
 import java.util.HashSet;
@@ -24,39 +25,32 @@ public abstract class AbstractTestUserManager
     extends AbstractReadOnlyUserManager
 {
 
-    public User getUser( String userId )
-    {
-        Set<User> users = this.listUsers();
+  public User getUser(String userId) {
+    Set<User> users = this.listUsers();
 
-        for ( User plexusUser : users )
-        {
-            if ( plexusUser.getUserId().equals( userId ) )
-            {
-                return plexusUser;
-            }
-        }
-
-        return null;
+    for (User plexusUser : users) {
+      if (plexusUser.getUserId().equals(userId)) {
+        return plexusUser;
+      }
     }
 
-    public Set<String> listUserIds()
-    {
-        Set<String> result = new HashSet<String>();
-        for ( User plexusUser : this.listUsers() )
-        {
-            result.add( plexusUser.getUserId() );
-        }
-        return result;
-    }
+    return null;
+  }
 
-    public Set<User> searchUsers( UserSearchCriteria criteria )
-    {
-        return this.filterListInMemeory( this.listUsers(), criteria );
+  public Set<String> listUserIds() {
+    Set<String> result = new HashSet<String>();
+    for (User plexusUser : this.listUsers()) {
+      result.add(plexusUser.getUserId());
     }
+    return result;
+  }
 
-    protected RoleIdentifier createFakeRole( String roleId )
-    {
-        RoleIdentifier role = new RoleIdentifier( this.getSource(), roleId );
-        return role;
-    }
+  public Set<User> searchUsers(UserSearchCriteria criteria) {
+    return this.filterListInMemeory(this.listUsers(), criteria);
+  }
+
+  protected RoleIdentifier createFakeRole(String roleId) {
+    RoleIdentifier role = new RoleIdentifier(this.getSource(), roleId);
+    return role;
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -18,38 +19,36 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public abstract class AbstractWalkerProcessor
     implements WalkerProcessor
 {
-    private boolean active = true;
+  private boolean active = true;
 
-    public boolean isActive()
-    {
-        return active;
-    }
+  public boolean isActive() {
+    return active;
+  }
 
-    public void setActive( boolean active )
-    {
-        this.active = active;
-    }
+  public void setActive(boolean active) {
+    this.active = active;
+  }
 
-    public void beforeWalk( WalkerContext context )
-        throws Exception
-    {
-    }
+  public void beforeWalk(WalkerContext context)
+      throws Exception
+  {
+  }
 
-    public void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
-        throws Exception
-    {
-    }
+  public void onCollectionEnter(WalkerContext context, StorageCollectionItem coll)
+      throws Exception
+  {
+  }
 
-    public abstract void processItem( WalkerContext context, StorageItem item )
-        throws Exception;
+  public abstract void processItem(WalkerContext context, StorageItem item)
+      throws Exception;
 
-    public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
-        throws Exception
-    {
-    }
+  public void onCollectionExit(WalkerContext context, StorageCollectionItem coll)
+      throws Exception
+  {
+  }
 
-    public void afterWalk( WalkerContext context )
-        throws Exception
-    {
-    }
+  public void afterWalk(WalkerContext context)
+      throws Exception
+  {
+  }
 }

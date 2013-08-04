@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.net.URL;
@@ -19,41 +20,36 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 /**
  * Thrown when a request is denied by remote peer for security reasons (ie. HTTP RemoteRepositoryStorage gets 403
  * response code).
- * 
+ *
  * @author cstamas
  */
 public class RemoteAccessDeniedException
     extends RemoteAccessException
 {
-    private static final long serialVersionUID = -4719375204384900503L;
+  private static final long serialVersionUID = -4719375204384900503L;
 
-    private final String url;
+  private final String url;
 
-    public RemoteAccessDeniedException( ProxyRepository repository, URL url, String message )
-    {
-        this( repository, url.toString(), message );
-    }
+  public RemoteAccessDeniedException(ProxyRepository repository, URL url, String message) {
+    this(repository, url.toString(), message);
+  }
 
-    public RemoteAccessDeniedException( ProxyRepository repository, URL url, String message, Throwable cause )
-    {
-        this( repository, url.toString(), message, cause );
-    }
+  public RemoteAccessDeniedException(ProxyRepository repository, URL url, String message, Throwable cause) {
+    this(repository, url.toString(), message, cause);
+  }
 
-    public RemoteAccessDeniedException( ProxyRepository repository, String url, String message )
-    {
-        this( repository, url, message, null );
-    }
+  public RemoteAccessDeniedException(ProxyRepository repository, String url, String message) {
+    this(repository, url, message, null);
+  }
 
-    public RemoteAccessDeniedException( ProxyRepository repository, String url, String message, Throwable cause )
-    {
-        super( repository, message, cause );
+  public RemoteAccessDeniedException(ProxyRepository repository, String url, String message, Throwable cause) {
+    super(repository, message, cause);
 
-        this.url = url;
-    }
+    this.url = url;
+  }
 
-    public String getRemoteUrl()
-    {
-        return url;
-    }
+  public String getRemoteUrl() {
+    return url;
+  }
 
 }

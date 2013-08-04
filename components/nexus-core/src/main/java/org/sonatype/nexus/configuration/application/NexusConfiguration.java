@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
 import java.io.IOException;
@@ -23,78 +24,65 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * A component responsible for configuration management.
- * 
+ *
  * @author cstamas
  */
 public interface NexusConfiguration
     extends ApplicationConfiguration, MutableConfiguration
 {
-    /**
-     * Explicit loading of configuration. Does not force reload.
-     * 
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    void loadConfiguration()
-        throws ConfigurationException, IOException;
+  /**
+   * Explicit loading of configuration. Does not force reload.
+   */
+  void loadConfiguration()
+      throws ConfigurationException, IOException;
 
-    /**
-     * Explicit loading of configuration. Enables to force reloading of config.
-     * 
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    void loadConfiguration( boolean forceReload )
-        throws ConfigurationException, IOException;
+  /**
+   * Explicit loading of configuration. Enables to force reloading of config.
+   */
+  void loadConfiguration(boolean forceReload)
+      throws ConfigurationException, IOException;
 
-    ApplicationConfigurationSource getConfigurationSource();
+  ApplicationConfigurationSource getConfigurationSource();
 
-    boolean isInstanceUpgraded();
+  boolean isInstanceUpgraded();
 
-    boolean isConfigurationUpgraded();
+  boolean isConfigurationUpgraded();
 
-    boolean isConfigurationDefaulted();
+  boolean isConfigurationDefaulted();
 
-    /**
-     * Creates a repository from the CRepository model. Do not use this method!
-     * 
-     * @param repository
-     * @return
-     * @throws ConfigurationException
-     * @deprecated Do NOT use this method! The MutableConfiguration.createRepository( CRepository settings ) should be
-     *             used instead.
-     */
-    Repository createRepositoryFromModel( CRepository repository )
-        throws ConfigurationException;
+  /**
+   * Creates a repository from the CRepository model. Do not use this method!
+   *
+   * @deprecated Do NOT use this method! The MutableConfiguration.createRepository( CRepository settings ) should be
+   *             used instead.
+   */
+  Repository createRepositoryFromModel(CRepository repository)
+      throws ConfigurationException;
 
-    // ------------------------------------------------------------------
-    // Booting
+  // ------------------------------------------------------------------
+  // Booting
 
-    /**
-     * Creates internals like reposes configured in nexus.xml. Called on startup.
-     */
-    void createInternals()
-        throws ConfigurationException;
+  /**
+   * Creates internals like reposes configured in nexus.xml. Called on startup.
+   */
+  void createInternals()
+      throws ConfigurationException;
 
-    /**
-     * Cleanups the internals, like on shutdown.
-     */
-    void dropInternals();
+  /**
+   * Cleanups the internals, like on shutdown.
+   */
+  void dropInternals();
 
-    /**
-     * List the names of files under Configuration Directory
-     * 
-     * @return A map with the value be file name
-     */
-    Map<String, String> getConfigurationFiles();
+  /**
+   * List the names of files under Configuration Directory
+   *
+   * @return A map with the value be file name
+   */
+  Map<String, String> getConfigurationFiles();
 
-    /**
-     * Loads the config file.
-     * 
-     * @param key
-     * @return
-     * @throws IOException
-     */
-    NexusStreamResponse getConfigurationAsStreamByKey( String key )
-        throws IOException;
+  /**
+   * Loads the config file.
+   */
+  NexusStreamResponse getConfigurationAsStreamByKey(String key)
+      throws IOException;
 }

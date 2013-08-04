@@ -10,17 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus385;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
@@ -28,6 +22,13 @@ import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
 
 /**
  * CRUD tests for XML request/response.
@@ -36,164 +37,155 @@ public class Nexus385RoutesCrudXmlIT
     extends AbstractNexusIntegrationTest
 {
 
-    protected RoutesMessageUtil messageUtil;
+  protected RoutesMessageUtil messageUtil;
 
-    @BeforeClass
-    public static void setSecureTest()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
+
+  @Before
+  public void setUp()
+      throws IOException
+  {
+    this.messageUtil = new RoutesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    RoutesMessageUtil.removeAllRoutes();
+  }
+
+  @Test
+  public void createRouteTest()
+      throws IOException
+  {
+    this.runCreateTest("exclusive");
+    this.runCreateTest("inclusive");
+    this.runCreateTest("blocking");
+  }
+
+  @SuppressWarnings("unchecked")
+  private RepositoryRouteResource runCreateTest(String ruleType)
+      throws IOException
+  {
+    RepositoryRouteResource resource = new RepositoryRouteResource();
+    resource.setGroupId("nexus-test");
+    resource.setPattern(".*" + ruleType + ".*");
+    resource.setRuleType(ruleType);
+
+    if (!"blocking".equals(ruleType)) {
+      RepositoryRouteMemberRepository memberRepo1 = new RepositoryRouteMemberRepository();
+      memberRepo1.setId("nexus-test-harness-repo");
+      resource.addRepository(memberRepo1);
     }
 
-    @Before
-    public void setUp()
-        throws IOException
-    {
-        this.messageUtil = new RoutesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-        RoutesMessageUtil.removeAllRoutes();
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (!response.getStatus().isSuccess()) {
+      String responseText = response.getEntity().getText();
+      try {
+        Assert.fail("Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText);
+      }
+      catch (NullPointerException e) {
+        Assert.fail(new XStream().toXML(response));
+      }
     }
 
-    @Test
-    public void createRouteTest()
-        throws IOException
-    {
-        this.runCreateTest( "exclusive" );
-        this.runCreateTest( "inclusive" );
-        this.runCreateTest( "blocking" );
+    // get the Resource object
+    RepositoryRouteResource resourceResponse = this.messageUtil.getResourceFromResponse(response);
+
+    Assert.assertNotNull(resourceResponse.getId());
+
+    Assert.assertEquals(resourceResponse.getGroupId(), resource.getGroupId());
+    Assert.assertEquals(resourceResponse.getPattern(), resource.getPattern());
+    Assert.assertEquals(resourceResponse.getRuleType(), resource.getRuleType());
+    this.messageUtil.validateSame(resource.getRepositories(), resourceResponse.getRepositories());
+
+    // now check the nexus config
+    this.messageUtil.validateRoutesConfig(resourceResponse);
+
+    return resourceResponse;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void readTest()
+      throws IOException
+  {
+    // create
+    RepositoryRouteResource resource = this.runCreateTest("exclusive");
+
+    Response response = this.messageUtil.sendMessage(Method.GET, resource);
+
+    if (!response.getStatus().isSuccess()) {
+      String responseText = response.getEntity().getText();
+      Assert.fail("Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText);
     }
 
-    @SuppressWarnings( "unchecked" )
-    private RepositoryRouteResource runCreateTest( String ruleType )
-        throws IOException
-    {
-        RepositoryRouteResource resource = new RepositoryRouteResource();
-        resource.setGroupId( "nexus-test" );
-        resource.setPattern( ".*" + ruleType + ".*" );
-        resource.setRuleType( ruleType );
+    // get the Resource object
+    RepositoryRouteResource resourceResponse = this.messageUtil.getResourceFromResponse(response);
 
-        if ( !"blocking".equals( ruleType ) )
-        {
-            RepositoryRouteMemberRepository memberRepo1 = new RepositoryRouteMemberRepository();
-            memberRepo1.setId( "nexus-test-harness-repo" );
-            resource.addRepository( memberRepo1 );
-        }
+    Assert.assertNotNull(resourceResponse.getId());
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+    Assert.assertEquals(resourceResponse.getGroupId(), resource.getGroupId());
+    Assert.assertEquals(resourceResponse.getPattern(), resource.getPattern());
+    Assert.assertEquals(resourceResponse.getRuleType(), resource.getRuleType());
+    this.messageUtil.validateSame(resource.getRepositories(), resourceResponse.getRepositories());
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            try
-            {
-                Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
-            }
-            catch ( NullPointerException e )
-            {
-                Assert.fail( new XStream().toXML( response ) );
-            }
-        }
+    // now check the nexus config
+    this.messageUtil.validateRoutesConfig(resourceResponse);
 
-        // get the Resource object
-        RepositoryRouteResource resourceResponse = this.messageUtil.getResourceFromResponse( response );
+  }
 
-        Assert.assertNotNull( resourceResponse.getId() );
-
-        Assert.assertEquals( resourceResponse.getGroupId(), resource.getGroupId() );
-        Assert.assertEquals( resourceResponse.getPattern(), resource.getPattern() );
-        Assert.assertEquals( resourceResponse.getRuleType(), resource.getRuleType() );
-        this.messageUtil.validateSame( resource.getRepositories(), resourceResponse.getRepositories() );
-
-        // now check the nexus config
-        this.messageUtil.validateRoutesConfig( resourceResponse );
-
-        return resourceResponse;
+  @SuppressWarnings("unchecked")
+  @Test
+  public void updateTest()
+      throws IOException
+  {
+    // FIXME: this test is known to fail, but is commented out so the CI builds are useful
+    if (this.printKnownErrorButDoNotFail(this.getClass(), "updateTest")) {
+      return;
     }
 
-    @SuppressWarnings( "unchecked" )
-    @Test
-    public void readTest()
-        throws IOException
-    {
-        // create
-        RepositoryRouteResource resource = this.runCreateTest( "exclusive" );
+    // create
+    RepositoryRouteResource resource = this.runCreateTest("exclusive");
+    resource.setPattern(".*update.*");
 
-        Response response = this.messageUtil.sendMessage( Method.GET, resource );
+    Response response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
-        }
-
-        // get the Resource object
-        RepositoryRouteResource resourceResponse = this.messageUtil.getResourceFromResponse( response );
-
-        Assert.assertNotNull( resourceResponse.getId() );
-
-        Assert.assertEquals( resourceResponse.getGroupId(), resource.getGroupId() );
-        Assert.assertEquals( resourceResponse.getPattern(), resource.getPattern() );
-        Assert.assertEquals( resourceResponse.getRuleType(), resource.getRuleType() );
-        this.messageUtil.validateSame( resource.getRepositories(), resourceResponse.getRepositories() );
-
-        // now check the nexus config
-        this.messageUtil.validateRoutesConfig( resourceResponse );
-
+    if (!response.getStatus().isSuccess()) {
+      String responseText = response.getEntity().getText();
+      Assert.fail("Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText);
     }
 
-    @SuppressWarnings( "unchecked" )
-    @Test
-    public void updateTest()
-        throws IOException
-    {
-        // FIXME: this test is known to fail, but is commented out so the CI builds are useful
-        if ( this.printKnownErrorButDoNotFail( this.getClass(), "updateTest" ) )
-        {
-            return;
-        }
+    // get the Resource object
+    RepositoryRouteResource resourceResponse = this.messageUtil.getResourceFromResponse(response);
 
-        // create
-        RepositoryRouteResource resource = this.runCreateTest( "exclusive" );
-        resource.setPattern( ".*update.*" );
+    Assert.assertNotNull(resourceResponse.getId());
 
-        Response response = this.messageUtil.sendMessage( Method.PUT, resource );
+    Assert.assertEquals(resourceResponse.getGroupId(), resource.getGroupId());
+    Assert.assertEquals(resourceResponse.getPattern(), resource.getPattern());
+    Assert.assertEquals(resourceResponse.getRuleType(), resource.getRuleType());
+    this.messageUtil.validateSame(resource.getRepositories(), resourceResponse.getRepositories());
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
-        }
+    // now check the nexus config
+    this.messageUtil.validateRoutesConfig(resourceResponse);
 
-        // get the Resource object
-        RepositoryRouteResource resourceResponse = this.messageUtil.getResourceFromResponse( response );
+  }
 
-        Assert.assertNotNull( resourceResponse.getId() );
+  @Test
+  public void deleteTest()
+      throws IOException
+  {
+    // create
+    RepositoryRouteResource resource = this.runCreateTest("exclusive");
 
-        Assert.assertEquals( resourceResponse.getGroupId(), resource.getGroupId() );
-        Assert.assertEquals( resourceResponse.getPattern(), resource.getPattern() );
-        Assert.assertEquals( resourceResponse.getRuleType(), resource.getRuleType() );
-        this.messageUtil.validateSame( resource.getRepositories(), resourceResponse.getRepositories() );
+    Response response = this.messageUtil.sendMessage(Method.DELETE, resource);
 
-        // now check the nexus config
-        this.messageUtil.validateRoutesConfig( resourceResponse );
-
+    if (!response.getStatus().isSuccess()) {
+      String responseText = response.getEntity().getText();
+      Assert.fail("Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText);
     }
 
-    @Test
-    public void deleteTest()
-        throws IOException
-    {
-        // create
-        RepositoryRouteResource resource = this.runCreateTest( "exclusive" );
+    Assert.assertTrue("Route was not deleted.", getNexusConfigUtil().getRoute(resource.getId()) == null);
 
-        Response response = this.messageUtil.sendMessage( Method.DELETE, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
-        }
-
-        Assert.assertTrue( "Route was not deleted.", getNexusConfigUtil().getRoute( resource.getId() ) == null );
-
-    }
+  }
 
 }

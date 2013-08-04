@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
@@ -21,50 +22,46 @@ import javax.inject.Singleton;
 /**
  * {@link File} backed {@link NexusWritablePluginRepository} that supplies user plugins.
  */
-@Named( UserNexusPluginRepository.ID )
+@Named(UserNexusPluginRepository.ID)
 @Singleton
 final class UserNexusPluginRepository
     extends AbstractFileNexusWritablePluginRepository
 {
-    // ----------------------------------------------------------------------
-    // Constants
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constants
+  // ----------------------------------------------------------------------
 
-    static final String ID = "user";
+  static final String ID = "user";
 
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    @Inject
-    @Named( "${nexus-work}/plugin-repository" )
-    private File userPluginsFolder;
+  @Inject
+  @Named("${nexus-work}/plugin-repository")
+  private File userPluginsFolder;
 
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
 
-    public String getId()
-    {
-        return ID;
+  public String getId() {
+    return ID;
+  }
+
+  public int getPriority() {
+    return 100;
+  }
+
+  // ----------------------------------------------------------------------
+  // Customized methods
+  // ----------------------------------------------------------------------
+
+  @Override
+  protected File getNexusPluginsDirectory() {
+    if (!userPluginsFolder.exists()) {
+      userPluginsFolder.mkdirs();
     }
-
-    public int getPriority()
-    {
-        return 100;
-    }
-
-    // ----------------------------------------------------------------------
-    // Customized methods
-    // ----------------------------------------------------------------------
-
-    @Override
-    protected File getNexusPluginsDirectory()
-    {
-        if ( !userPluginsFolder.exists() )
-        {
-            userPluginsFolder.mkdirs();
-        }
-        return userPluginsFolder;
-    }
+    return userPluginsFolder;
+  }
 }

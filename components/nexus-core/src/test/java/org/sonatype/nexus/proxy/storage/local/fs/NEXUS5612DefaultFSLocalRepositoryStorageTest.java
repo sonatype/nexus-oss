@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
@@ -19,11 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -50,9 +46,13 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
 import com.google.common.primitives.Ints;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
@@ -64,153 +64,146 @@ import static org.hamcrest.Matchers.not;
 public class NEXUS5612DefaultFSLocalRepositoryStorageTest
     extends AbstractProxyTestEnvironment
 {
-    private static final String MINE_MESSAGE = "You stepped a mine!";
+  private static final String MINE_MESSAGE = "You stepped a mine!";
 
-    private final String REPO_ID = "testrepo";
+  private final String REPO_ID = "testrepo";
 
-    private File localStorageDirectory;
+  private File localStorageDirectory;
+
+  @Override
+  protected EnvironmentBuilder getEnvironmentBuilder()
+      throws Exception
+  {
+    // we need one hosted repo only, so build it
+    return new EnvironmentBuilder()
+    {
+      @Override
+      public void startService() {
+      }
+
+      @Override
+      public void stopService() {
+      }
+
+      @Override
+      public void buildEnvironment(AbstractProxyTestEnvironment env)
+          throws ConfigurationException, IOException, ComponentLookupException
+      {
+        final PlexusContainer container = env.getPlexusContainer();
+        localStorageDirectory =
+            env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + REPO_ID);
+
+        // ading one hosted only
+        final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+        CRepository repoConf = new DefaultCRepository();
+        repoConf.setProviderRole(Repository.class.getName());
+        repoConf.setProviderHint("maven2");
+        repoConf.setId(REPO_ID);
+        repoConf.setName(REPO_ID);
+        repoConf.setLocalStorage(new CLocalStorage());
+        repoConf.getLocalStorage().setProvider("file");
+        repoConf.getLocalStorage().setUrl(localStorageDirectory.toURI().toURL().toString());
+        Xpp3Dom exRepo = new Xpp3Dom("externalConfiguration");
+        repoConf.setExternalConfiguration(exRepo);
+        M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration(exRepo);
+        exRepoConf.setRepositoryPolicy(RepositoryPolicy.RELEASE);
+        repo.configure(repoConf);
+        env.getApplicationConfiguration().getConfigurationModel().addRepository(repoConf);
+        env.getRepositoryRegistry().addRepository(repo);
+      }
+    };
+  }
+
+  private static class TestingDefaultFSPeer
+      extends DefaultFSPeer
+  {
+    private final List<String> minedPaths;
+
+    public TestingDefaultFSPeer(List<String> minedPaths) {
+      this.minedPaths = minedPaths;
+    }
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
-        throws Exception
+    public Collection<File> listItems(final Repository repository, final File repositoryBaseDir,
+                                      final ResourceStoreRequest request, final File target)
+        throws ItemNotFoundException, LocalStorageException
     {
-        // we need one hosted repo only, so build it
-        return new EnvironmentBuilder()
-        {
-            @Override
-            public void startService()
-            {
-            }
-
-            @Override
-            public void stopService()
-            {
-            }
-
-            @Override
-            public void buildEnvironment( AbstractProxyTestEnvironment env )
-                throws ConfigurationException, IOException, ComponentLookupException
-            {
-                final PlexusContainer container = env.getPlexusContainer();
-                localStorageDirectory =
-                    env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + REPO_ID );
-
-                // ading one hosted only
-                final M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
-                CRepository repoConf = new DefaultCRepository();
-                repoConf.setProviderRole( Repository.class.getName() );
-                repoConf.setProviderHint( "maven2" );
-                repoConf.setId( REPO_ID );
-                repoConf.setName( REPO_ID );
-                repoConf.setLocalStorage( new CLocalStorage() );
-                repoConf.getLocalStorage().setProvider( "file" );
-                repoConf.getLocalStorage().setUrl( localStorageDirectory.toURI().toURL().toString() );
-                Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
-                repoConf.setExternalConfiguration( exRepo );
-                M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
-                exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-                repo.configure( repoConf );
-                env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
-                env.getRepositoryRegistry().addRepository( repo );
-            }
-        };
+      if (minedPaths.contains(request.getRequestPath())) {
+        throw new LocalStorageException(MINE_MESSAGE);
+      }
+      return super.listItems(repository, repositoryBaseDir, request, target);
     }
+  }
 
-    private static class TestingDefaultFSPeer
-        extends DefaultFSPeer
+  /**
+   * Tests interaction when listing a directory and FSPeer throws LocalStorageException due to {@link File#list()}
+   * returning null.
+   */
+  @Test
+  public void testListFilesThrowsLocalStorageException()
+      throws Exception
+  {
+    // prepare a repo to walk, copy some stuff under local storage
+    FileUtils.copyDirectoryStructure(getTestFile("target/test-classes/repo1"), localStorageDirectory);
+    // count the existing files
+    final int filesInRepo =
+        Ints.checkedCast(org.sonatype.nexus.util.FileUtils.fileSizesInDirectory(localStorageDirectory));
+
+    // list of parents that will crack
+    final List<String> minedParents = Collections.singletonList("/activemq/activemq-core/1.2");
+    // list of visited children during walk
+    final List<String> visitedChildren = new ArrayList<String>();
+    // list of parent collections having onCollectionExit invoked with
+    final List<String> exitedCollections = new ArrayList<String>();
+
+    // get the repo and tap in modified LS implementation
+    final MavenHostedRepository testRepo =
+        getRepositoryRegistry().getRepositoryWithFacet(REPO_ID, MavenHostedRepository.class);
+    // tap in FSPeer that has mines planted
+    // everything as usual, exception FSPeer implementation
+    testRepo.setLocalStorage(new DefaultFSLocalRepositoryStorage(lookup(Wastebasket.class),
+        lookup(LinkPersister.class), lookup(MimeSupport.class), new TestingDefaultFSPeer(minedParents)));
+
+    // Create context and processors for the walk
+    final DefaultWalkerContext context = new DefaultWalkerContext(testRepo, new ResourceStoreRequest("/"));
+    context.getProcessors().add(new AbstractFileWalkerProcessor()
     {
-        private final List<String> minedPaths;
+      @Override
+      protected void processFileItem(WalkerContext context, StorageFileItem fItem)
+          throws Exception
+      {
+        visitedChildren.add(fItem.getPath());
+      }
 
-        public TestingDefaultFSPeer( List<String> minedPaths )
-        {
-            this.minedPaths = minedPaths;
-        }
+      @Override
+      public void onCollectionExit(WalkerContext context, StorageCollectionItem coll)
+          throws Exception
+      {
+        exitedCollections.add(coll.getPath());
+      }
 
-        @Override
-        public Collection<File> listItems( final Repository repository, final File repositoryBaseDir,
-                                           final ResourceStoreRequest request, final File target )
-            throws ItemNotFoundException, LocalStorageException
-        {
-            if ( minedPaths.contains( request.getRequestPath() ) )
-            {
-                throw new LocalStorageException( MINE_MESSAGE );
-            }
-            return super.listItems( repository, repositoryBaseDir, request, target );
-        }
+    });
+    final Walker walker = lookup(Walker.class);
+
+    // walk
+    try {
+      walker.walk(context);
+      assertThat("Walk must fail as we planted a mine in there!", false);
     }
-
-    /**
-     * Tests interaction when listing a directory and FSPeer throws LocalStorageException due to {@link File#list()}
-     * returning null.
-     */
-    @Test
-    public void testListFilesThrowsLocalStorageException()
-        throws Exception
-    {
-        // prepare a repo to walk, copy some stuff under local storage
-        FileUtils.copyDirectoryStructure( getTestFile( "target/test-classes/repo1" ), localStorageDirectory );
-        // count the existing files
-        final int filesInRepo =
-            Ints.checkedCast( org.sonatype.nexus.util.FileUtils.fileSizesInDirectory( localStorageDirectory ) );
-
-        // list of parents that will crack
-        final List<String> minedParents = Collections.singletonList( "/activemq/activemq-core/1.2" );
-        // list of visited children during walk
-        final List<String> visitedChildren = new ArrayList<String>();
-        // list of parent collections having onCollectionExit invoked with
-        final List<String> exitedCollections = new ArrayList<String>();
-
-        // get the repo and tap in modified LS implementation
-        final MavenHostedRepository testRepo =
-            getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenHostedRepository.class );
-        // tap in FSPeer that has mines planted
-        // everything as usual, exception FSPeer implementation
-        testRepo.setLocalStorage( new DefaultFSLocalRepositoryStorage( lookup( Wastebasket.class ),
-            lookup( LinkPersister.class ), lookup( MimeSupport.class ), new TestingDefaultFSPeer( minedParents ) ) );
-
-        // Create context and processors for the walk
-        final DefaultWalkerContext context = new DefaultWalkerContext( testRepo, new ResourceStoreRequest( "/" ) );
-        context.getProcessors().add( new AbstractFileWalkerProcessor()
-        {
-            @Override
-            protected void processFileItem( WalkerContext context, StorageFileItem fItem )
-                throws Exception
-            {
-                visitedChildren.add( fItem.getPath() );
-            }
-
-            @Override
-            public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
-                throws Exception
-            {
-                exitedCollections.add( coll.getPath() );
-            }
-
-        } );
-        final Walker walker = lookup( Walker.class );
-
-        // walk
-        try
-        {
-            walker.walk( context );
-            assertThat( "Walk must fail as we planted a mine in there!", false );
-        }
-        catch ( WalkerException e )
-        {
-            assertThat( "Reason must state walk is \"aborted\"", e.getMessage().toLowerCase().contains( "aborted" ) );
-            assertThat( "Reason must refer to our repo ID=" + REPO_ID,
-                e.getMessage().toLowerCase().contains( REPO_ID.toLowerCase() ) );
-            assertThat( "Cause must be LocalStorageException", e.getCause() instanceof LocalStorageException );
-            assertThat( "Cause message must be the one we defined", e.getCause().getMessage(), equalTo( MINE_MESSAGE ) );
-            assertThat( "Context must be marked as stopped", context.isStopped() );
-            assertThat( "Context stop-cause must be same as WalkerException's cause",
-                context.getStopCause() == e.getCause() );
-            assertThat( "Walk must stop before visiting all files", visitedChildren.size(), lessThan( filesInRepo ) );
-            for ( String minedParent : minedParents )
-            {
-                assertThat( "WalkerProcessor#onCollectionExit must not be invoked with parent being mined",
-                    exitedCollections, not( contains( minedParent ) ) );
-            }
-        }
+    catch (WalkerException e) {
+      assertThat("Reason must state walk is \"aborted\"", e.getMessage().toLowerCase().contains("aborted"));
+      assertThat("Reason must refer to our repo ID=" + REPO_ID,
+          e.getMessage().toLowerCase().contains(REPO_ID.toLowerCase()));
+      assertThat("Cause must be LocalStorageException", e.getCause() instanceof LocalStorageException);
+      assertThat("Cause message must be the one we defined", e.getCause().getMessage(), equalTo(MINE_MESSAGE));
+      assertThat("Context must be marked as stopped", context.isStopped());
+      assertThat("Context stop-cause must be same as WalkerException's cause",
+          context.getStopCause() == e.getCause());
+      assertThat("Walk must stop before visiting all files", visitedChildren.size(), lessThan(filesInRepo));
+      for (String minedParent : minedParents) {
+        assertThat("WalkerProcessor#onCollectionExit must not be invoked with parent being mined",
+            exitedCollections, not(contains(minedParent)));
+      }
     }
+  }
 }

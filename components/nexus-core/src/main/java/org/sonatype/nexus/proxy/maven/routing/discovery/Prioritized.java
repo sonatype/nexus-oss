@@ -10,39 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.discovery;
 
 import java.util.Comparator;
 
 /**
  * Prioritized support, when ordering of components is essential.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public interface Prioritized
 {
-    /**
-     * Returns the priority of this instance.
-     * 
-     * @return the priority of this instance.
-     */
-    int getPriority();
+  /**
+   * Returns the priority of this instance.
+   *
+   * @return the priority of this instance.
+   */
+  int getPriority();
 
-    // ==
+  // ==
 
-    /**
-     * Comparator for {@link Prioritized} instances.
-     * 
-     * @param <T>
-     */
-    public static class PriorityOrderingComparator<T extends Prioritized>
-        implements Comparator<T>
-    {
-        @Override
-        public int compare( T o1, T o2 )
-        {
-            return o1.getPriority() - o2.getPriority();
-        }
+  /**
+   * Comparator for {@link Prioritized} instances.
+   */
+  public static class PriorityOrderingComparator<T extends Prioritized>
+      implements Comparator<T>
+  {
+    @Override
+    public int compare(T o1, T o2) {
+      return o1.getPriority() - o2.getPriority();
     }
+  }
 }

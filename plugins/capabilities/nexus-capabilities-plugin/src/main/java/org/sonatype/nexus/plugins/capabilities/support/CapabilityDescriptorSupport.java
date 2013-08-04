@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.support;
 
 import java.util.Arrays;
@@ -32,124 +33,112 @@ public abstract class CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    static final Validator NO_VALIDATOR = null;
+  static final Validator NO_VALIDATOR = null;
 
-    private final CapabilityType type;
+  private final CapabilityType type;
 
-    private final String name;
+  private final String name;
 
-    private final String about;
+  private final String about;
 
-    private final List<FormField> formFields;
+  private final List<FormField> formFields;
 
-    protected CapabilityDescriptorSupport( final CapabilityType type,
-                                           final String name,
-                                           final String about,
-                                           final FormField... formFields )
-    {
-        this.type = type;
-        this.name = name;
-        this.about = about;
-        if ( formFields == null )
-        {
-            this.formFields = Collections.emptyList();
-        }
-        else
-        {
-            this.formFields = Arrays.asList( formFields );
-        }
+  protected CapabilityDescriptorSupport(final CapabilityType type,
+                                        final String name,
+                                        final String about,
+                                        final FormField... formFields)
+  {
+    this.type = type;
+    this.name = name;
+    this.about = about;
+    if (formFields == null) {
+      this.formFields = Collections.emptyList();
     }
-
-    @Override
-    public CapabilityType type()
-    {
-        return type;
+    else {
+      this.formFields = Arrays.asList(formFields);
     }
+  }
 
-    @Override
-    public String name()
-    {
-        return name;
-    }
+  @Override
+  public CapabilityType type() {
+    return type;
+  }
 
-    @Override
-    public String about()
-    {
-        return about;
-    }
+  @Override
+  public String name() {
+    return name;
+  }
 
-    @Override
-    public List<FormField> formFields()
-    {
-        return formFields;
-    }
+  @Override
+  public String about() {
+    return about;
+  }
 
-    /**
-     * Always exposed.
-     *
-     * @return true
-     */
-    @Override
-    public boolean isExposed()
-    {
-        return true;
-    }
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
+  }
 
-    /**
-     * Not hidden.
-     *
-     * @return false
-     */
-    @Override
-    public boolean isHidden()
-    {
-        return false;
-    }
+  /**
+   * Always exposed.
+   *
+   * @return true
+   */
+  @Override
+  public boolean isExposed() {
+    return true;
+  }
 
-    /**
-     * No validator.
-     *
-     * @return null
-     */
-    @Override
-    public Validator validator()
-    {
-        return NO_VALIDATOR;
-    }
+  /**
+   * Not hidden.
+   *
+   * @return false
+   */
+  @Override
+  public boolean isHidden() {
+    return false;
+  }
 
-    /**
-     * No validator.
-     *
-     * @return null
-     */
-    @Override
-    public Validator validator( final CapabilityIdentity id )
-    {
-        return NO_VALIDATOR;
-    }
+  /**
+   * No validator.
+   *
+   * @return null
+   */
+  @Override
+  public Validator validator() {
+    return NO_VALIDATOR;
+  }
 
-    /**
-     * Return 1.
-     *
-     * @return 1
-     */
-    @Override
-    public int version()
-    {
-        return 1;
-    }
+  /**
+   * No validator.
+   *
+   * @return null
+   */
+  @Override
+  public Validator validator(final CapabilityIdentity id) {
+    return NO_VALIDATOR;
+  }
 
-    /**
-     * No conversion.
-     *
-     * @param properties  to be converted
-     * @param fromVersion version of capability properties to be converted
-     * @return same properties as passed in
-     */
-    @Override
-    public Map<String, String> convert( final Map<String, String> properties, final int fromVersion )
-    {
-        return properties;
-    }
+  /**
+   * Return 1.
+   *
+   * @return 1
+   */
+  @Override
+  public int version() {
+    return 1;
+  }
+
+  /**
+   * No conversion.
+   *
+   * @param properties  to be converted
+   * @param fromVersion version of capability properties to be converted
+   * @return same properties as passed in
+   */
+  @Override
+  public Map<String, String> convert(final Map<String, String> properties, final int fromVersion) {
+    return properties;
+  }
 
 }

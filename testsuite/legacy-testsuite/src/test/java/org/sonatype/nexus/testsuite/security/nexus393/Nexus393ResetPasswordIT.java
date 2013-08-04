@@ -10,54 +10,55 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus393;
 
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
 import org.sonatype.nexus.test.utils.ResetPasswordUtils;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
+import org.junit.Assert;
+import org.junit.Test;
+import org.restlet.data.Response;
 
 
 /**
- * Test password reset.  Check if nexus is sending the e-mail. 
+ * Test password reset.  Check if nexus is sending the e-mail.
  */
 public class Nexus393ResetPasswordIT
     extends AbstractEmailServerNexusIT
 {
 
-    @Test
-    public void resetPassword()
-        throws Exception
-    {
-        String username = "test-user";
-        Response response = ResetPasswordUtils.resetPassword( username );
-        Assert.assertTrue( "Status: "+ response.getStatus() +"\n"+ response.getEntity().getText(), response.getStatus().isSuccess() );
+  @Test
+  public void resetPassword()
+      throws Exception
+  {
+    String username = "test-user";
+    Response response = ResetPasswordUtils.resetPassword(username);
+    Assert.assertTrue("Status: " + response.getStatus() + "\n" + response.getEntity().getText(),
+        response.getStatus().isSuccess());
 
-        // Need 1 message
-        waitForMail( 1 );
+    // Need 1 message
+    waitForMail(1);
 
-        MimeMessage[] msgs = server.getReceivedMessages();
-        Assert.assertTrue( "Expected email.", msgs != null && msgs.length > 0 );
-        MimeMessage msg = msgs[0];
+    MimeMessage[] msgs = server.getReceivedMessages();
+    Assert.assertTrue("Expected email.", msgs != null && msgs.length > 0);
+    MimeMessage msg = msgs[0];
 
-        String password = null;
-        // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
-        String body = GreenMailUtil.getBody( msg );
-        
-        int index = body.indexOf( "Your new password is: " );
-        int passwordStartIndex = index + "Your new password is: ".length();
-        if ( index != -1 )
-        {
-            password = body.substring( passwordStartIndex, body.indexOf( '\n', passwordStartIndex ) ).trim();
-            log.debug( "New password:\n" + password );
-        }
+    String password = null;
+    // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
+    String body = GreenMailUtil.getBody(msg);
 
-        Assert.assertNotNull( password );
+    int index = body.indexOf("Your new password is: ");
+    int passwordStartIndex = index + "Your new password is: ".length();
+    if (index != -1) {
+      password = body.substring(passwordStartIndex, body.indexOf('\n', passwordStartIndex)).trim();
+      log.debug("New password:\n" + password);
     }
+
+    Assert.assertNotNull(password);
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.internal;
 
 import org.sonatype.appcontext.source.EntrySourceMarker;
@@ -17,8 +18,7 @@ import org.sonatype.appcontext.source.EntrySourceMarker;
 public class ProgrammaticallySetSourceMarker
     implements EntrySourceMarker
 {
-    public String getDescription()
-    {
-        return "set(programmatically)";
-    }
+  public String getDescription() {
+    return "set(programmatically)";
+  }
 }

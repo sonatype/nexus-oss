@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling.events;
 
 import org.sonatype.nexus.scheduling.NexusTask;
@@ -17,32 +18,30 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * Abstract super class for task related events.
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public abstract class NexusTaskEvent<T>
     extends AbstractEvent<NexusTask<T>>
 {
-    public NexusTaskEvent( final NexusTask<T> task )
-    {
-        super( task );
-    }
+  public NexusTaskEvent(final NexusTask<T> task) {
+    super(task);
+  }
 
-    /**
-     * Returns the newxus task that failed.
-     * 
-     * @return failing nexus task
-     */
-    public NexusTask<T> getNexusTask()
-    {
-        return getEventSender();
-    }
+  /**
+   * Returns the newxus task that failed.
+   *
+   * @return failing nexus task
+   */
+  public NexusTask<T> getNexusTask() {
+    return getEventSender();
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "nexusTask=" + getNexusTask() +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "nexusTask=" + getNexusTask() +
+        '}';
+  }
 }

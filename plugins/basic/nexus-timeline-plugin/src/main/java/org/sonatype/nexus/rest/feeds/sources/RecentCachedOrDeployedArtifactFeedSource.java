@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Arrays;
@@ -18,66 +19,60 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.Entry;
 
 import com.google.common.base.Predicate;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author Juven Xu
  */
-@Component( role = FeedSource.class, hint = "recentlyCachedOrDeployedArtifacts" )
+@Component(role = FeedSource.class, hint = "recentlyCachedOrDeployedArtifacts")
 public class RecentCachedOrDeployedArtifactFeedSource
     extends AbstractNexusItemEventFeedSource
 {
-    @Requirement( hint = "artifact" )
-    private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
+  @Requirement(hint = "artifact")
+  private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
 
-    public static final String CHANNEL_KEY = "recentlyCachedOrDeployedArtifacts";
+  public static final String CHANNEL_KEY = "recentlyCachedOrDeployedArtifacts";
 
-    public String getFeedKey()
-    {
-        return CHANNEL_KEY;
-    }
+  public String getFeedKey() {
+    return CHANNEL_KEY;
+  }
 
-    public String getFeedName()
-    {
-        return getDescription();
-    }
+  public String getFeedName() {
+    return getDescription();
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "New artifacts in all Nexus repositories (cached or deployed).";
-    }
+  @Override
+  public String getDescription() {
+    return "New artifacts in all Nexus repositories (cached or deployed).";
+  }
 
-    @Override
-    public List<NexusArtifactEvent> getEventList( Integer from, Integer count, Map<String, String> params )
-    {
-        final Set<String> repositoryIds = getRepoIdsFromParams( params );
+  @Override
+  public List<NexusArtifactEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
+    final Set<String> repositoryIds = getRepoIdsFromParams(params);
 
-        final Predicate<Entry> filter =
-            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
-                : new RepositoryIdTimelineFilter( repositoryIds );
+    final Predicate<Entry> filter =
+        (repositoryIds == null || repositoryIds.isEmpty()) ? null
+            : new RepositoryIdTimelineFilter(repositoryIds);
 
-        return getFeedRecorder().getNexusArtifectEvents(
-            new HashSet<String>( Arrays.asList( NexusArtifactEvent.ACTION_CACHED, NexusArtifactEvent.ACTION_DEPLOYED ) ),
-            from, count, filter );
-    }
+    return getFeedRecorder().getNexusArtifectEvents(
+        new HashSet<String>(Arrays.asList(NexusArtifactEvent.ACTION_CACHED, NexusArtifactEvent.ACTION_DEPLOYED)),
+        from, count, filter);
+  }
 
-    @Override
-    public String getTitle()
-    {
-        return "New artifacts";
-    }
+  @Override
+  public String getTitle() {
+    return "New artifacts";
+  }
 
-    @Override
-    public SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder( NexusArtifactEvent event )
-    {
-        return entryBuilder;
-    }
+  @Override
+  public SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder(NexusArtifactEvent event) {
+    return entryBuilder;
+  }
 
 }

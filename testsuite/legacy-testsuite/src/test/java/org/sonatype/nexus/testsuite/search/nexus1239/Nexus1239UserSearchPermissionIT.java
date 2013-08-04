@@ -10,18 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.search.nexus1239;
 
-import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+package org.sonatype.nexus.testsuite.search.nexus1239;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -30,87 +25,96 @@ import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.restlet.data.MediaType;
+
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+
 public class Nexus1239UserSearchPermissionIT
     extends AbstractPrivilegeTest
 {
 
-    @Test @Category(SECURITY.class)
-    public void userExactSearchTest()
-        throws IOException
-    {
-        this.giveUserPrivilege( TEST_USER_NAME, "39" );
+  @Test
+  @Category(SECURITY.class)
+  public void userExactSearchTest()
+      throws IOException
+  {
+    this.giveUserPrivilege(TEST_USER_NAME, "39");
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        List<PlexusUserResource> users = userUtil.searchPlexusUsers( "default", "admin" );
+    UserMessageUtil userUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    List<PlexusUserResource> users = userUtil.searchPlexusUsers("default", "admin");
 
-        Assert.assertEquals( 1, users.size() );
-        PlexusUserResource user = users.get( 0 );
-        Assert.assertEquals( user.getUserId(), "admin" );
-        Assert.assertEquals( user.getEmail(), "changeme@yourcompany.com" );
-        Assert.assertEquals( user.getFirstName(), "Administrator" );
-        Assert.assertEquals( user.getSource(), "default" );
+    Assert.assertEquals(1, users.size());
+    PlexusUserResource user = users.get(0);
+    Assert.assertEquals(user.getUserId(), "admin");
+    Assert.assertEquals(user.getEmail(), "changeme@yourcompany.com");
+    Assert.assertEquals(user.getFirstName(), "Administrator");
+    Assert.assertEquals(user.getSource(), "default");
 
-        List<PlexusRoleResource> roles = user.getRoles();
-        Assert.assertEquals( 1, roles.size() );
+    List<PlexusRoleResource> roles = user.getRoles();
+    Assert.assertEquals(1, roles.size());
 
-        PlexusRoleResource role = roles.get( 0 );
-        Assert.assertEquals( role.getName(), "Nexus Administrator Role" );
-        Assert.assertEquals( role.getRoleId(), "nx-admin" );
-        Assert.assertEquals( role.getSource(), "default" );
+    PlexusRoleResource role = roles.get(0);
+    Assert.assertEquals(role.getName(), "Nexus Administrator Role");
+    Assert.assertEquals(role.getRoleId(), "nx-admin");
+    Assert.assertEquals(role.getSource(), "default");
+  }
+
+  @Test
+  @Category(SECURITY.class)
+  public void userSearchTest()
+      throws IOException
+  {
+
+    this.giveUserPrivilege(TEST_USER_NAME, "39");
+
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
+
+    UserMessageUtil userUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    List<PlexusUserResource> users = userUtil.searchPlexusUsers("default", "a");
+
+    List<String> userIds = new ArrayList<String>();
+
+    for (PlexusUserResource plexusUserResource : users) {
+      userIds.add(plexusUserResource.getUserId());
     }
 
-    @Test @Category(SECURITY.class)
-    public void userSearchTest()
-        throws IOException
-    {
+    Assert.assertEquals(2, users.size());
+    Assert.assertTrue(userIds.contains("admin"));
+    Assert.assertTrue(userIds.contains("anonymous"));
+  }
 
-        this.giveUserPrivilege( TEST_USER_NAME, "39" );
+  @Test
+  @Category(SECURITY.class)
+  public void emptySearchTest()
+      throws IOException
+  {
+    this.giveUserPrivilege(TEST_USER_NAME, "39");
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        List<PlexusUserResource> users = userUtil.searchPlexusUsers( "default", "a" );
+    UserMessageUtil userUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    List<PlexusUserResource> users = userUtil.searchPlexusUsers("default", "VOID");
+    Assert.assertEquals(0, users.size());
+  }
 
-        List<String> userIds = new ArrayList<String>();
+  public void noAccessTest()
+      throws IOException
+  {
 
-        for ( PlexusUserResource plexusUserResource : users )
-        {
-            userIds.add( plexusUserResource.getUserId() );
-        }
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        Assert.assertEquals( 2, users.size() );
-        Assert.assertTrue( userIds.contains( "admin" ) );
-        Assert.assertTrue( userIds.contains( "anonymous" ) );
-    }
+    String uriPart = RequestFacade.SERVICE_LOCAL + "user_search/default/a";
 
-    @Test @Category(SECURITY.class)
-    public void emptySearchTest()
-        throws IOException
-    {
-        this.giveUserPrivilege( TEST_USER_NAME, "39" );
-
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-
-        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        List<PlexusUserResource> users = userUtil.searchPlexusUsers( "default", "VOID" );
-        Assert.assertEquals( 0, users.size() );
-    }
-
-    public void noAccessTest()
-        throws IOException
-    {
-
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-
-        String uriPart = RequestFacade.SERVICE_LOCAL + "user_search/default/a";
-
-        RequestFacade.doGet( uriPart, respondsWithStatusCode( 403 ) );
-    }
+    RequestFacade.doGet(uriPart, respondsWithStatusCode(403));
+  }
 
 }

@@ -10,21 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 /**
  * This is the actual Walker that walks the ResourceStorage.
- * 
+ *
  * @author cstamas
  */
 public interface Walker
 {
-    /**
-     * Walks from the path given on resource store, local only and not only collections.
-     * 
-     * @param fromPath
-     * @throws WalkerException
-     */
-    void walk( WalkerContext context )
-        throws WalkerException;
+  /**
+   * Walks from the path given on resource store, local only and not only collections.
+   */
+  void walk(WalkerContext context)
+      throws WalkerException;
 }

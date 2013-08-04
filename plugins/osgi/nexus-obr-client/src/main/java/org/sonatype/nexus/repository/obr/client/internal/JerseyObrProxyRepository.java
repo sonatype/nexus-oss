@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.obr.client.internal;
 
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.JerseyProxyRepository;
@@ -25,28 +26,25 @@ public class JerseyObrProxyRepository
     implements ObrProxyRepository
 {
 
-    static final String PROVIDER = "obr-proxy";
+  static final String PROVIDER = "obr-proxy";
 
-    public JerseyObrProxyRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyObrProxyRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyObrProxyRepository( final JerseyNexusClient nexusClient, final RepositoryProxyResource resource )
-    {
-        super( nexusClient, resource );
-    }
+  public JerseyObrProxyRepository(final JerseyNexusClient nexusClient, final RepositoryProxyResource resource) {
+    super(nexusClient, resource);
+  }
 
-    @Override
-    protected RepositoryProxyResource createSettings()
-    {
-        final RepositoryProxyResource settings = super.createSettings();
+  @Override
+  protected RepositoryProxyResource createSettings() {
+    final RepositoryProxyResource settings = super.createSettings();
 
-        settings.setProvider( JerseyObrProxyRepository.PROVIDER );
-        settings.setRepoPolicy( "RELEASE" );
-        settings.setIndexable( false );
+    settings.setProvider(JerseyObrProxyRepository.PROVIDER);
+    settings.setRepoPolicy("RELEASE");
+    settings.setIndexable(false);
 
-        return settings;
-    }
+    return settings;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
@@ -32,56 +33,50 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
 public abstract class AbstractScheduledTaskDescriptor
     implements ScheduledTaskDescriptor
 {
-    public boolean isExposed()
-    {
-        return true;
-    }
-    
-    @Deprecated
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
-    {
-        return Collections.emptyList();
-    }
-    
-    /**
-     * Helper method, that will convert from old api to new api, saving plugin devs
-     * some headaches
-     */
-    public List<FormField> formFields()
-    {
-        if ( getPropertyDescriptors().size() > 0 )
-        {
-            List<FormField> formFields = new ArrayList<FormField>();
-            
-            for ( ScheduledTaskPropertyDescriptor prop : getPropertyDescriptors() )
-            {
-                if ( prop instanceof AbstractBooleanPropertyDescriptor )
-                {
-                    formFields.add( new CheckboxFormField( prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired() ) );
-                }
-                else if ( prop instanceof AbstractNumberPropertyDescriptor )
-                {
-                    formFields.add( new NumberTextFormField( prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(), prop.getRegexValidation() ) );
-                }
-                else if ( prop instanceof AbstractStringPropertyDescriptor )
-                {
-                    formFields.add( new StringTextFormField( prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(), prop.getRegexValidation() ) );
-                }
-                else if ( prop instanceof AbstractRepositoryOrGroupPropertyDescriptor )
-                {
-                    formFields.add( new RepoOrGroupComboFormField( prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(), prop.getRegexValidation() ) );
-                }
-                else if ( prop instanceof AbstractRepositoryPropertyDescriptor )
-                {
-                    formFields.add( new RepoComboFormField( prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(), prop.getRegexValidation() ) );
-                }
-            }
-            
-            return formFields;
+  public boolean isExposed() {
+    return true;
+  }
+
+  @Deprecated
+  public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors() {
+    return Collections.emptyList();
+  }
+
+  /**
+   * Helper method, that will convert from old api to new api, saving plugin devs
+   * some headaches
+   */
+  public List<FormField> formFields() {
+    if (getPropertyDescriptors().size() > 0) {
+      List<FormField> formFields = new ArrayList<FormField>();
+
+      for (ScheduledTaskPropertyDescriptor prop : getPropertyDescriptors()) {
+        if (prop instanceof AbstractBooleanPropertyDescriptor) {
+          formFields.add(new CheckboxFormField(prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired()));
         }
-        else
-        {
-            return Collections.emptyList();
+        else if (prop instanceof AbstractNumberPropertyDescriptor) {
+          formFields.add(new NumberTextFormField(prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(),
+              prop.getRegexValidation()));
         }
+        else if (prop instanceof AbstractStringPropertyDescriptor) {
+          formFields.add(new StringTextFormField(prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(),
+              prop.getRegexValidation()));
+        }
+        else if (prop instanceof AbstractRepositoryOrGroupPropertyDescriptor) {
+          formFields.add(
+              new RepoOrGroupComboFormField(prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(),
+                  prop.getRegexValidation()));
+        }
+        else if (prop instanceof AbstractRepositoryPropertyDescriptor) {
+          formFields.add(new RepoComboFormField(prop.getId(), prop.getName(), prop.getHelpText(), prop.isRequired(),
+              prop.getRegexValidation()));
+        }
+      }
+
+      return formFields;
     }
+    else {
+      return Collections.emptyList();
+    }
+  }
 }

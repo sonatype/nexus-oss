@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.maven;
 
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
@@ -27,73 +28,63 @@ public class JerseyMavenProxyRepository
     implements MavenProxyRepository
 {
 
-    static final String PROVIDER = "maven2";
+  static final String PROVIDER = "maven2";
 
-    public JerseyMavenProxyRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyMavenProxyRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyMavenProxyRepository( final JerseyNexusClient nexusClient, final RepositoryProxyResource settings )
-    {
-        super( nexusClient, settings );
-    }
+  public JerseyMavenProxyRepository(final JerseyNexusClient nexusClient, final RepositoryProxyResource settings) {
+    super(nexusClient, settings);
+  }
 
-    @Override
-    protected RepositoryProxyResource createSettings()
-    {
-        final RepositoryProxyResource settings = super.createSettings();
+  @Override
+  protected RepositoryProxyResource createSettings() {
+    final RepositoryProxyResource settings = super.createSettings();
 
-        settings.setProvider( PROVIDER );
-        settings.setIndexable( true );
-        settings.setRepoPolicy( "RELEASE" );
+    settings.setProvider(PROVIDER);
+    settings.setIndexable(true);
+    settings.setRepoPolicy("RELEASE");
 
-        return settings;
-    }
+    return settings;
+  }
 
-    private MavenProxyRepository me()
-    {
-        return this;
-    }
+  private MavenProxyRepository me() {
+    return this;
+  }
 
-    @Override
-    public MavenProxyRepository withArtifactMaxAge( final int minutes )
-    {
-        settings().setArtifactMaxAge( minutes );
-        return me();
-    }
+  @Override
+  public MavenProxyRepository withArtifactMaxAge(final int minutes) {
+    settings().setArtifactMaxAge(minutes);
+    return me();
+  }
 
-    @Override
-    public MavenProxyRepository withMetadataMaxAge( final int minutes )
-    {
-        settings().setMetadataMaxAge( minutes );
-        return me();
-    }
+  @Override
+  public MavenProxyRepository withMetadataMaxAge(final int minutes) {
+    settings().setMetadataMaxAge(minutes);
+    return me();
+  }
 
-    @Override
-    public MavenProxyRepository downloadRemoteIndexes()
-    {
-        settings().setDownloadRemoteIndexes( true );
-        return me();
-    }
+  @Override
+  public MavenProxyRepository downloadRemoteIndexes() {
+    settings().setDownloadRemoteIndexes(true);
+    return me();
+  }
 
-    @Override
-    public MavenProxyRepository doNotDownloadRemoteIndexes()
-    {
-        settings().setDownloadRemoteIndexes( false );
-        return me();
-    }
+  @Override
+  public MavenProxyRepository doNotDownloadRemoteIndexes() {
+    settings().setDownloadRemoteIndexes(false);
+    return me();
+  }
 
-    @Override
-    public int artifactMaxAge()
-    {
-        return settings().getArtifactMaxAge();
-    }
+  @Override
+  public int artifactMaxAge() {
+    return settings().getArtifactMaxAge();
+  }
 
-    @Override
-    public int metadataMaxAge()
-    {
-        return settings().getMetadataMaxAge();
-    }
+  @Override
+  public int metadataMaxAge() {
+    return settings().getMetadataMaxAge();
+  }
 
 }

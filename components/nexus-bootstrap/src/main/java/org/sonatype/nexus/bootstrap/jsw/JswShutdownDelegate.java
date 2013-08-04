@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.jsw;
 
 import org.sonatype.nexus.bootstrap.ShutdownHelper.ShutdownDelegate;
+
 import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
@@ -23,13 +25,13 @@ import org.tanukisoftware.wrapper.WrapperManager;
 public class JswShutdownDelegate
     implements ShutdownDelegate
 {
-    @Override
-    public void doExit(final int code) {
-        WrapperManager.stop(code);
-    }
+  @Override
+  public void doExit(final int code) {
+    WrapperManager.stop(code);
+  }
 
-    @Override
-    public void doHalt(final int code) {
-        WrapperManager.stopImmediate(code);
-    }
+  @Override
+  public void doHalt(final int code) {
+    WrapperManager.stopImmediate(code);
+  }
 }

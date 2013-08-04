@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -21,28 +22,25 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  * repositories too, or just group's locol storage. Logically equivalent to
  * {@link ResourceStoreRequest#isRequestGroupLocalOnly()}, but while that allows per-request control, this one as
  * attribute allows programmatical control over it too.
- * 
+ *
  * @author cstamas
  */
 public class IsGroupLocalOnlyAttribute
     implements Attribute<Boolean>
 {
-    public Boolean getValueFor( RepositoryItemUid subject )
-    {
-        // stuff being group-local
-        // /.meta
-        // /.index
-        // /.nexus
-        // we are specific about these for a good reason (see future)
+  public Boolean getValueFor(RepositoryItemUid subject) {
+    // stuff being group-local
+    // /.meta
+    // /.index
+    // /.nexus
+    // we are specific about these for a good reason (see future)
 
-        if ( subject.getPath() != null )
-        {
-            return subject.getPath().startsWith( "/.meta" ) || subject.getPath().startsWith( "/.index" )
-                || subject.getPath().startsWith( "/.nexus" );
-        }
-        else
-        {
-            return false;
-        }
+    if (subject.getPath() != null) {
+      return subject.getPath().startsWith("/.meta") || subject.getPath().startsWith("/.index")
+          || subject.getPath().startsWith("/.nexus");
     }
+    else {
+      return false;
+    }
+  }
 }

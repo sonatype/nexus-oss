@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default {@link ValidationResult.Violation} implementation.
@@ -25,65 +26,55 @@ public class DefaultViolation
     implements ValidationResult.Violation
 {
 
-    private final String key;
+  private final String key;
 
-    private final String message;
+  private final String message;
 
-    public DefaultViolation( final String message )
-    {
-        this.key = "*";
-        this.message = checkNotNull( message );
+  public DefaultViolation(final String message) {
+    this.key = "*";
+    this.message = checkNotNull(message);
+  }
+
+  public DefaultViolation(final String key, final String message) {
+    this.key = checkNotNull(key);
+    this.message = checkNotNull(message);
+  }
+
+  @Override
+  public String key() {
+    return key;
+  }
+
+  @Override
+  public String message() {
+    return message;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof DefaultViolation)) {
+      return false;
     }
 
-    public DefaultViolation( final String key, final String message )
-    {
-        this.key = checkNotNull( key );
-        this.message = checkNotNull( message );
+    final DefaultViolation that = (DefaultViolation) o;
+
+    if (!key.equals(that.key)) {
+      return false;
+    }
+    if (!message.equals(that.message)) {
+      return false;
     }
 
-    @Override
-    public String key()
-    {
-        return key;
-    }
+    return true;
+  }
 
-    @Override
-    public String message()
-    {
-        return message;
-    }
-
-    @Override
-    public boolean equals( final Object o )
-    {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( !( o instanceof DefaultViolation ) )
-        {
-            return false;
-        }
-
-        final DefaultViolation that = (DefaultViolation) o;
-
-        if ( !key.equals( that.key ) )
-        {
-            return false;
-        }
-        if ( !message.equals( that.message ) )
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = key.hashCode();
-        result = 31 * result + message.hashCode();
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = key.hashCode();
+    result = 31 * result + message.hashCode();
+    return result;
+  }
 }

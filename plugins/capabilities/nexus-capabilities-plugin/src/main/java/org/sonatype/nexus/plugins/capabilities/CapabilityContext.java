@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 import java.util.Map;
@@ -22,74 +23,74 @@ import java.util.Map;
 public interface CapabilityContext
 {
 
-    /**
-     * Returns an unique capability identifier.
-     *
-     * @return identifier
-     */
-    CapabilityIdentity id();
+  /**
+   * Returns an unique capability identifier.
+   *
+   * @return identifier
+   */
+  CapabilityIdentity id();
 
-    /**
-     * Returns type of capability.
-     *
-     * @return capability type (never null)
-     */
-    CapabilityType type();
+  /**
+   * Returns type of capability.
+   *
+   * @return capability type (never null)
+   */
+  CapabilityType type();
 
-    /**
-     * Returns descriptor of capability.
-     *
-     * @return capability descriptor (never null)
-     */
-    CapabilityDescriptor descriptor();
+  /**
+   * Returns descriptor of capability.
+   *
+   * @return capability descriptor (never null)
+   */
+  CapabilityDescriptor descriptor();
 
-    /**
-     * Returns capability notes.
-     *
-     * @return capability notes (can be null)
-     */
-    String notes();
+  /**
+   * Returns capability notes.
+   *
+   * @return capability notes (can be null)
+   */
+  String notes();
 
-    /**
-     * Current capability properties.
-     *
-     * @return properties.
-     */
-    Map<String, String> properties();
+  /**
+   * Current capability properties.
+   *
+   * @return properties.
+   */
+  Map<String, String> properties();
 
-    /**
-     * Whether the capability is enabled.
-     *
-     * @return true, if capability is enabled
-     */
-    boolean isEnabled();
+  /**
+   * Whether the capability is enabled.
+   *
+   * @return true, if capability is enabled
+   */
+  boolean isEnabled();
 
-    /**
-     * Whether the capability is active.
-     *
-     * @return true, if capability was activated and not yet passivated
-     */
-    boolean isActive();
+  /**
+   * Whether the capability is active.
+   *
+   * @return true, if capability was activated and not yet passivated
+   */
+  boolean isActive();
 
-    /**
-     * Whether the capability had failed a lifecycle callback method (create/load/update/activate/passivate).
-     *
-     * @return true, if capability had failed a callback method
-     */
-    boolean hasFailure();
+  /**
+   * Whether the capability had failed a lifecycle callback method (create/load/update/activate/passivate).
+   *
+   * @return true, if capability had failed a callback method
+   */
+  boolean hasFailure();
 
-    /**
-     * Last exception thrown during a lifecycle callback method (create/load/update/activate/passivate).
-     *
-     * @return last exception thrown during a lifecycle callback method or null if it not failed
-     */
-    Exception failure();
+  /**
+   * Last exception thrown during a lifecycle callback method (create/load/update/activate/passivate).
+   *
+   * @return last exception thrown during a lifecycle callback method or null if it not failed
+   */
+  Exception failure();
 
-    /**
-     * Describe current state.
-     *
-     * @return state description
-     */
-    String stateDescription();
+  /**
+   * Describe current state.
+   *
+   * @return state description
+   */
+  String stateDescription();
 
 }

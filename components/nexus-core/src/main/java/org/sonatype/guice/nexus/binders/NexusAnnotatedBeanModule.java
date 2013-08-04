@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.guice.nexus.binders;
 
 import java.util.List;
@@ -34,91 +35,85 @@ import com.google.inject.Binder;
 public final class NexusAnnotatedBeanModule
     implements PlexusBeanModule
 {
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    final ClassSpace space;
+  final ClassSpace space;
 
-    final Map<?, ?> variables;
+  final Map<?, ?> variables;
 
-    final List<String> classNames;
+  final List<String> classNames;
 
-    final List<RepositoryTypeDescriptor> descriptors;
+  final List<RepositoryTypeDescriptor> descriptors;
 
-    final BeanScanning scanning;
+  final BeanScanning scanning;
 
-    // ----------------------------------------------------------------------
-    // Constructors
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constructors
+  // ----------------------------------------------------------------------
 
-    /**
-     * Creates a bean source that scans the given class space for Nexus annotations using the given scanner.
-     */
-    public NexusAnnotatedBeanModule( final ClassSpace space, final Map<?, ?> variables, final List<String> classNames,
-                                     final List<RepositoryTypeDescriptor> descriptors )
-    {
-        this( space, variables, classNames, descriptors, BeanScanning.ON );
+  /**
+   * Creates a bean source that scans the given class space for Nexus annotations using the given scanner.
+   */
+  public NexusAnnotatedBeanModule(final ClassSpace space, final Map<?, ?> variables, final List<String> classNames,
+                                  final List<RepositoryTypeDescriptor> descriptors)
+  {
+    this(space, variables, classNames, descriptors, BeanScanning.ON);
+  }
+
+  /**
+   * Creates a bean source that scans the given class space for Nexus annotations using the given scanner.
+   */
+  public NexusAnnotatedBeanModule(final ClassSpace space, final Map<?, ?> variables, final List<String> classNames,
+                                  final List<RepositoryTypeDescriptor> descriptors, final BeanScanning scanning)
+  {
+    this.space = space;
+    this.variables = variables;
+    this.classNames = classNames;
+    this.descriptors = descriptors;
+    this.scanning = scanning;
+  }
+
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
+
+  public PlexusBeanSource configure(final Binder binder) {
+    if (null != space && scanning != BeanScanning.OFF) {
+      new NexusSpaceModule().configure(binder);
+    }
+    return new NexusAnnotatedBeanSource(variables);
+  }
+
+  // ----------------------------------------------------------------------
+  // Implementation types
+  // ----------------------------------------------------------------------
+
+  private final class NexusSpaceModule
+      extends SpaceModule
+  {
+    NexusSpaceModule() {
+      super(space, scanning);
     }
 
-    /**
-     * Creates a bean source that scans the given class space for Nexus annotations using the given scanner.
-     */
-    public NexusAnnotatedBeanModule( final ClassSpace space, final Map<?, ?> variables, final List<String> classNames,
-                                     final List<RepositoryTypeDescriptor> descriptors, final BeanScanning scanning )
-    {
-        this.space = space;
-        this.variables = variables;
-        this.classNames = classNames;
-        this.descriptors = descriptors;
-        this.scanning = scanning;
+    @Override
+    protected ClassSpaceVisitor visitor(final Binder binder) {
+      return new NexusTypeVisitor(new NexusTypeBinder(binder, classNames, descriptors));
+    }
+  }
+
+  private static final class NexusAnnotatedBeanSource
+      implements PlexusBeanSource
+  {
+    private final PlexusBeanMetadata metadata;
+
+    NexusAnnotatedBeanSource(final Map<?, ?> variables) {
+      metadata = new PlexusAnnotatedMetadata(variables);
     }
 
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
-
-    public PlexusBeanSource configure( final Binder binder )
-    {
-        if ( null != space && scanning != BeanScanning.OFF )
-        {
-            new NexusSpaceModule().configure( binder );
-        }
-        return new NexusAnnotatedBeanSource( variables );
+    public PlexusBeanMetadata getBeanMetadata(final Class<?> implementation) {
+      return metadata;
     }
-
-    // ----------------------------------------------------------------------
-    // Implementation types
-    // ----------------------------------------------------------------------
-
-    private final class NexusSpaceModule
-        extends SpaceModule
-    {
-        NexusSpaceModule()
-        {
-            super( space, scanning );
-        }
-
-        @Override
-        protected ClassSpaceVisitor visitor( final Binder binder )
-        {
-            return new NexusTypeVisitor( new NexusTypeBinder( binder, classNames, descriptors ) );
-        }
-    }
-
-    private static final class NexusAnnotatedBeanSource
-        implements PlexusBeanSource
-    {
-        private final PlexusBeanMetadata metadata;
-
-        NexusAnnotatedBeanSource( final Map<?, ?> variables )
-        {
-            metadata = new PlexusAnnotatedMetadata( variables );
-        }
-
-        public PlexusBeanMetadata getBeanMetadata( final Class<?> implementation )
-        {
-            return metadata;
-        }
-    }
+  }
 }

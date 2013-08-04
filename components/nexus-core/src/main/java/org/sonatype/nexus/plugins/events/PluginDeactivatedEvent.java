@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.events;
 
 import org.sonatype.nexus.plugins.NexusPluginManager;
@@ -23,41 +24,38 @@ import org.sonatype.plexus.appevents.Event;
 public final class PluginDeactivatedEvent
     extends AbstractEvent<NexusPluginManager>
 {
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    private final PluginDescriptor descriptor;
+  private final PluginDescriptor descriptor;
 
-    // ----------------------------------------------------------------------
-    // Constructors
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constructors
+  // ----------------------------------------------------------------------
 
-    public PluginDeactivatedEvent( final NexusPluginManager component, final PluginDescriptor descriptor )
-    {
-        super( component );
+  public PluginDeactivatedEvent(final NexusPluginManager component, final PluginDescriptor descriptor) {
+    super(component);
 
-        this.descriptor = descriptor;
-    }
+    this.descriptor = descriptor;
+  }
 
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
 
-    public PluginDescriptor getPluginDescriptor()
-    {
-        return descriptor;
-    }
+  public PluginDescriptor getPluginDescriptor() {
+    return descriptor;
+  }
 
-    public NexusPluginManager getNexusPluginManager()
-    {
-        return getEventSender();
-    }
+  public NexusPluginManager getNexusPluginManager() {
+    return getEventSender();
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "gav=" + descriptor.getPluginCoordinates() +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "gav=" + descriptor.getPluginCoordinates() +
+        '}';
+  }
 }

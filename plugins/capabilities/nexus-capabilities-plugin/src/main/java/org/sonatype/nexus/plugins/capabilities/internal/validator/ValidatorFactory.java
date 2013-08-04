@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
+
 import com.google.inject.assistedinject.Assisted;
 
 /**
@@ -25,25 +27,25 @@ import com.google.inject.assistedinject.Assisted;
 public interface ValidatorFactory
 {
 
-    PrimaryKeyValidator uniquePer( CapabilityType type, String... propertyKeys );
+  PrimaryKeyValidator uniquePer(CapabilityType type, String... propertyKeys);
 
-    PrimaryKeyExcludingSelfValidator uniquePerExcluding( CapabilityIdentity excludeId, CapabilityType type,
-                                                         String... propertyKeys );
+  PrimaryKeyExcludingSelfValidator uniquePerExcluding(CapabilityIdentity excludeId, CapabilityType type,
+                                                      String... propertyKeys);
 
-    RepositoryTypeValidator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet );
+  RepositoryTypeValidator repositoryOfType(CapabilityType type, String propertyKey, Class<?> facet);
 
-    /**
-     * @since 2.3
-     */
-    RepositoryExistsValidator repositoryExists( CapabilityType type, String propertyKey );
+  /**
+   * @since 2.3
+   */
+  RepositoryExistsValidator repositoryExists(CapabilityType type, String propertyKey);
 
-    DescriptorConstraintsValidator constraintsOf( CapabilityType type );
+  DescriptorConstraintsValidator constraintsOf(CapabilityType type);
 
-    AlwaysValidValidator alwaysValid();
+  AlwaysValidValidator alwaysValid();
 
-    RequiredFieldValidator required( CapabilityType type, String propertyKey );
+  RequiredFieldValidator required(CapabilityType type, String propertyKey);
 
-    RegexpFieldValidator matches( CapabilityType type,
-                                  @Assisted( "key" ) String propertyKey,
-                                  @Assisted( "regexp" ) String regexp );
+  RegexpFieldValidator matches(CapabilityType type,
+                               @Assisted("key") String propertyKey,
+                               @Assisted("regexp") String regexp);
 }

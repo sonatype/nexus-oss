@@ -10,66 +10,67 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.kenai;
 
 import java.util.Collections;
+
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.security.SecuritySystem;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.junit.Test;
-import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.security.SecuritySystem;
 
 public class KenaiClearCacheTest
     extends AbstractKenaiRealmTest
 {
-    protected SecuritySystem securitySystem;
+  protected SecuritySystem securitySystem;
 
-    @Override
-    protected boolean loadConfigurationAtSetUp()
-    {
-        return false;
-    }
-    
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        
-        getKenaiRealmConfiguration();
+  @Override
+  protected boolean loadConfigurationAtSetUp() {
+    return false;
+  }
 
-        // to start the hobelevanc and make it use Kenai realm
-        lookup( Nexus.class );
-        lookup( NexusConfiguration.class ).setRealms( Collections.singletonList( "kenai" ) );
-        lookup( NexusConfiguration.class ).saveConfiguration();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        securitySystem = lookup( SecuritySystem.class );
-    }
+    getKenaiRealmConfiguration();
+
+    // to start the hobelevanc and make it use Kenai realm
+    lookup(Nexus.class);
+    lookup(NexusConfiguration.class).setRealms(Collections.singletonList("kenai"));
+    lookup(NexusConfiguration.class).saveConfiguration();
+
+    securitySystem = lookup(SecuritySystem.class);
+  }
 
 
-    @Test
-    public void testClearCache()
-        throws Exception
-    {
-        // so here is the problem, we clear the authz cache when ever config changes happen
+  @Test
+  public void testClearCache()
+      throws Exception
+  {
+    // so here is the problem, we clear the authz cache when ever config changes happen
 
-        // now log the user in
-        Subject subject1 = securitySystem.login( new UsernamePasswordToken( username, password ) );
-        // check authz
-        subject1.checkRole( DEFAULT_ROLE );
+    // now log the user in
+    Subject subject1 = securitySystem.login(new UsernamePasswordToken(username, password));
+    // check authz
+    subject1.checkRole(DEFAULT_ROLE);
 
-        // clear the cache
-        KenaiRealm realm = (KenaiRealm) this.lookup( Realm.class, "kenai" );
-        realm.getAuthorizationCache().clear();
+    // clear the cache
+    KenaiRealm realm = (KenaiRealm) this.lookup(Realm.class, "kenai");
+    realm.getAuthorizationCache().clear();
 
-        // user should still have the role
-        subject1.checkRole( DEFAULT_ROLE );
+    // user should still have the role
+    subject1.checkRole(DEFAULT_ROLE);
 
-        // the user should be able to login again as well
-        Subject subject2 = securitySystem.login( new UsernamePasswordToken( username, password ) );
-        subject2.checkRole( DEFAULT_ROLE );
-    }
+    // the user should be able to login again as well
+    Subject subject2 = securitySystem.login(new UsernamePasswordToken(username, password));
+    subject2.checkRole(DEFAULT_ROLE);
+  }
 }

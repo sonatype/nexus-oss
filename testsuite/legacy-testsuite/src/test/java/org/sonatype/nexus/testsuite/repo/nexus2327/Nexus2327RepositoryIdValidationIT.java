@@ -10,13 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus2327;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -25,110 +21,116 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+
 public class Nexus2327RepositoryIdValidationIT
     extends AbstractNexusIntegrationTest
 {
-    private RepositoryMessageUtil repositoryMsgUtil;
+  private RepositoryMessageUtil repositoryMsgUtil;
 
-    private GroupMessageUtil groupMsgUtil;
+  private GroupMessageUtil groupMsgUtil;
 
-    public Nexus2327RepositoryIdValidationIT()
-        throws Exception
-    {
-        repositoryMsgUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+  public Nexus2327RepositoryIdValidationIT()
+      throws Exception
+  {
+    repositoryMsgUtil = new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
 
-        groupMsgUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-    }
+    groupMsgUtil = new GroupMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+  }
 
-    @Test
-    public void repositoryIdLegal()
-        throws Exception
-    {
-        RepositoryResource resource = new RepositoryResource();
-        resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
-        resource.setName( "Create Test Repo" );
-        resource.setProvider( "maven2" );
-        resource.setFormat( "maven2" );
-        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+  @Test
+  public void repositoryIdLegal()
+      throws Exception
+  {
+    RepositoryResource resource = new RepositoryResource();
+    resource.setRepoType("hosted"); // [hosted, proxy, virtual]
+    resource.setName("Create Test Repo");
+    resource.setProvider("maven2");
+    resource.setFormat("maven2");
+    resource.setRepoPolicy(RepositoryPolicy.RELEASE.name());
 
-        resource.setId( "repoaA1-_." );
-        Response resp = repositoryMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertTrue( resp.getStatus().isSuccess() );
-    }
+    resource.setId("repoaA1-_.");
+    Response resp = repositoryMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertTrue(resp.getStatus().isSuccess());
+  }
 
-    @Test
-    public void repositoryIdIllegal()
-        throws Exception
-    {
-        RepositoryResource resource = new RepositoryResource();
-        resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
-        resource.setName( "Create Test Repo" );
-        resource.setProvider( "maven2" );
-        resource.setFormat( "maven2" );
-        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+  @Test
+  public void repositoryIdIllegal()
+      throws Exception
+  {
+    RepositoryResource resource = new RepositoryResource();
+    resource.setRepoType("hosted"); // [hosted, proxy, virtual]
+    resource.setName("Create Test Repo");
+    resource.setProvider("maven2");
+    resource.setFormat("maven2");
+    resource.setRepoPolicy(RepositoryPolicy.RELEASE.name());
 
-        resource.setId( "repo/" );
-        Response resp = repositoryMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
+    resource.setId("repo/");
+    Response resp = repositoryMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
 
-        resource.setId( "repo," );
-        resp = repositoryMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
+    resource.setId("repo,");
+    resp = repositoryMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
 
-        resource.setId( "repo*" );
-        resp = repositoryMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
+    resource.setId("repo*");
+    resp = repositoryMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
 
-        resource.setId( "repo>" );
-        resp = repositoryMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
-    }
+    resource.setId("repo>");
+    resp = repositoryMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
+  }
 
-    @Test
-    public void groupIdLegal()
-        throws Exception
-    {
-        RepositoryGroupResource resource = new RepositoryGroupResource();
-        resource.setName( "createTestGroup" );
-        resource.setFormat( "maven2" );
-        resource.setProvider( "maven2" );
-        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
-        member.setId( "nexus-test-harness-repo" );
-        resource.addRepository( member );
+  @Test
+  public void groupIdLegal()
+      throws Exception
+  {
+    RepositoryGroupResource resource = new RepositoryGroupResource();
+    resource.setName("createTestGroup");
+    resource.setFormat("maven2");
+    resource.setProvider("maven2");
+    RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
+    member.setId("nexus-test-harness-repo");
+    resource.addRepository(member);
 
-        resource.setId( "groupaA0-_." );
-        Response resp = groupMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertTrue( resp.getStatus().isSuccess() );
-    }
+    resource.setId("groupaA0-_.");
+    Response resp = groupMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertTrue(resp.getStatus().isSuccess());
+  }
 
-    @Test
-    public void groupIdIllegal()
-        throws Exception
-    {
-        RepositoryGroupResource resource = new RepositoryGroupResource();
+  @Test
+  public void groupIdIllegal()
+      throws Exception
+  {
+    RepositoryGroupResource resource = new RepositoryGroupResource();
 
-        resource.setName( "createTestGroup" );
-        resource.setFormat( "maven2" );
-        resource.setProvider( "maven2" );
-        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
-        member.setId( "nexus-test-harness-repo" );
-        resource.addRepository( member );
+    resource.setName("createTestGroup");
+    resource.setFormat("maven2");
+    resource.setProvider("maven2");
+    RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
+    member.setId("nexus-test-harness-repo");
+    resource.addRepository(member);
 
-        resource.setId( "group/" );
-        Response resp = groupMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
+    resource.setId("group/");
+    Response resp = groupMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
 
-        resource.setId( "group," );
-        resp = groupMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
+    resource.setId("group,");
+    resp = groupMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
 
-        resource.setId( "group*" );
-        resp = groupMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
+    resource.setId("group*");
+    resp = groupMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
 
-        resource.setId( "group>" );
-        resp = groupMsgUtil.sendMessage( Method.POST, resource );
-        Assert.assertFalse( resp.getStatus().isSuccess() );
-    }
+    resource.setId("group>");
+    resp = groupMsgUtil.sendMessage(Method.POST, resource);
+    Assert.assertFalse(resp.getStatus().isSuccess());
+  }
 
 }

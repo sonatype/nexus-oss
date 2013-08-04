@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.publisher;
 
 import java.io.PrintStream;
@@ -19,39 +20,35 @@ import org.sonatype.appcontext.internal.Preconditions;
 
 /**
  * A EntryPublisher the publishes the contexts to supplied {@code java.io.PrintStream}, or to {@code System.out}.
- * 
+ *
  * @author cstamas
  */
 public class PrintStreamEntryPublisher
     extends AbstractStringDumpingEntryPublisher
     implements EntryPublisher
 {
-    /**
-     * The PrintStream to be used for publishing.
-     */
-    private final PrintStream printStream;
+  /**
+   * The PrintStream to be used for publishing.
+   */
+  private final PrintStream printStream;
 
-    /**
-     * Constructs publisher the publishes to {@code System.out}.
-     */
-    public PrintStreamEntryPublisher()
-    {
-        this( System.out );
-    }
+  /**
+   * Constructs publisher the publishes to {@code System.out}.
+   */
+  public PrintStreamEntryPublisher() {
+    this(System.out);
+  }
 
-    /**
-     * Constructs publisher to use supplied print stream.
-     * 
-     * @param printStream
-     * @throws NullPointerException if {@code preintStream} is null
-     */
-    public PrintStreamEntryPublisher( final PrintStream printStream )
-    {
-        this.printStream = Preconditions.checkNotNull( printStream );
-    }
+  /**
+   * Constructs publisher to use supplied print stream.
+   *
+   * @throws NullPointerException if {@code preintStream} is null
+   */
+  public PrintStreamEntryPublisher(final PrintStream printStream) {
+    this.printStream = Preconditions.checkNotNull(printStream);
+  }
 
-    public void publishEntries( final AppContext context )
-    {
-        printStream.println( getDumpAsString( context ) );
-    }
+  public void publishEntries(final AppContext context) {
+    printStream.println(getDumpAsString(context));
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
 
 import java.io.IOException;
@@ -33,97 +34,84 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class WholeWorldClassloader
     extends ClassLoader
 {
-    private final ClassWorld classWorld;
+  private final ClassWorld classWorld;
 
-    public WholeWorldClassloader( final ClassWorld classWorld )
-    {
-        this.classWorld = checkNotNull( classWorld );
+  public WholeWorldClassloader(final ClassWorld classWorld) {
+    this.classWorld = checkNotNull(classWorld);
+  }
+
+  protected ClassWorld getClassWorld() {
+    return classWorld;
+  }
+
+  @Override
+  public Class<?> loadClass(String name)
+      throws ClassNotFoundException
+  {
+    return loadClass(name, false);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected Class<?> loadClass(String name, boolean resolve)
+      throws ClassNotFoundException
+  {
+    for (ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms()) {
+      try {
+        return realm.loadClass(name);
+      }
+      catch (ClassNotFoundException e) {
+        // ignore it
+      }
     }
 
-    protected ClassWorld getClassWorld()
-    {
-        return classWorld;
+    throw new ClassNotFoundException(name);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public URL getResource(String name) {
+    for (ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms()) {
+      URL result = realm.getResource(name);
+
+      if (result != null) {
+        return result;
+      }
     }
 
-    @Override
-    public Class<?> loadClass( String name )
-        throws ClassNotFoundException
-    {
-        return loadClass( name, false );
+    return null;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public InputStream getResourceAsStream(String name) {
+    for (ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms()) {
+      InputStream result = realm.getResourceAsStream(name);
+
+      if (result != null) {
+        return result;
+      }
     }
 
-    @Override
-    @SuppressWarnings( "unchecked" )
-    protected Class<?> loadClass( String name, boolean resolve )
-        throws ClassNotFoundException
-    {
-        for ( ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms() )
-        {
-            try
-            {
-                return realm.loadClass( name );
-            }
-            catch ( ClassNotFoundException e )
-            {
-                // ignore it
-            }
-        }
+    return null;
+  }
 
-        throw new ClassNotFoundException( name );
+  @Override
+  @SuppressWarnings("unchecked")
+  public Enumeration<URL> findResources(String name)
+      throws IOException
+  {
+    ArrayList<URL> result = new ArrayList<URL>();
+
+    for (ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms()) {
+      Enumeration<URL> realmResources = realm.findResources(name);
+
+      for (; realmResources.hasMoreElements(); ) {
+        result.add(realmResources.nextElement());
+      }
     }
 
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public URL getResource( String name )
-    {
-        for ( ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms() )
-        {
-            URL result = realm.getResource( name );
-
-            if ( result != null )
-            {
-                return result;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public InputStream getResourceAsStream( String name )
-    {
-        for ( ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms() )
-        {
-            InputStream result = realm.getResourceAsStream( name );
-
-            if ( result != null )
-            {
-                return result;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public Enumeration<URL> findResources( String name )
-        throws IOException
-    {
-        ArrayList<URL> result = new ArrayList<URL>();
-
-        for ( ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms() )
-        {
-            Enumeration<URL> realmResources = realm.findResources( name );
-
-            for ( ; realmResources.hasMoreElements(); )
-            {
-                result.add( realmResources.nextElement() );
-            }
-        }
-
-        return Collections.enumeration( result );
-    }
+    return Collections.enumeration(result);
+  }
 
 }

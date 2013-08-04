@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 import java.util.Map;
 
 /**
  * Validates capability properties.
- * 
+ *
  * The validators to be used are extracted as follows:<b/>
  * On create:<b/>
  * * Automatically created validators for all mandatory fields and fields supporting regexp validation<b/>
@@ -33,26 +34,26 @@ import java.util.Map;
 public interface Validator
 {
 
-    /**
-     * Validates capability properties before a capability is created/updated.
-     *
-     * @param properties capability properties that will be applied to capability
-     * @return validation result
-     */
-    ValidationResult validate( Map<String, String> properties );
+  /**
+   * Validates capability properties before a capability is created/updated.
+   *
+   * @param properties capability properties that will be applied to capability
+   * @return validation result
+   */
+  ValidationResult validate(Map<String, String> properties);
 
-    /**
-     * Describe when validation will pass.
-     *
-     * @return description
-     */
-    String explainValid();
+  /**
+   * Describe when validation will pass.
+   *
+   * @return description
+   */
+  String explainValid();
 
-    /**
-     * Describe when validation will fail.
-     *
-     * @return description
-     */
-    String explainInvalid();
+  /**
+   * Describe when validation will fail.
+   *
+   * @return description
+   */
+  String explainInvalid();
 
 }

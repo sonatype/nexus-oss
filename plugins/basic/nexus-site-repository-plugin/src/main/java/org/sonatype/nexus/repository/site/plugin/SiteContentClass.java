@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.site.plugin;
 
 import javax.inject.Named;
@@ -23,32 +24,28 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  *
  * @author cstamas
  */
-@Named( SiteRepository.ID )
+@Named(SiteRepository.ID)
 @Singleton
 public class SiteContentClass
     extends AbstractIdContentClass
 {
 
-    public static final String NAME = "Site";
+  public static final String NAME = "Site";
 
-    public String getId()
-    {
-        return SiteRepository.ID;
-    }
+  public String getId() {
+    return SiteRepository.ID;
+  }
 
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
+  @Override
+  public String getName() {
+    return NAME;
+  }
 
-    public boolean isCompatible( ContentClass contentClass )
-    {
-        return false;
-    }
+  public boolean isCompatible(ContentClass contentClass) {
+    return false;
+  }
 
-    public boolean isGroupable()
-    {
-        return false;
-    }
+  public boolean isGroupable() {
+    return false;
+  }
 }

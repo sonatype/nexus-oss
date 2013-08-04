@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.repository;
 
 /**
@@ -21,14 +22,14 @@ public interface ProxyRepositoryStatus
     extends RepositoryStatus
 {
 
-    /**
-     * @return if repository is currently blocked (manual or automatic)
-     */
-    boolean isBlocked();
+  /**
+   * @return if repository is currently blocked (manual or automatic)
+   */
+  boolean isBlocked();
 
-    /**
-     * @return if repository is currently automatically blocked
-     */
-    boolean isAutoBlocked();
+  /**
+   * @return if repository is currently automatically blocked
+   */
+  boolean isAutoBlocked();
 
 }

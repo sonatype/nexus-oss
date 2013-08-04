@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest;
 
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.rest.model.XStreamConfiguratorLightweight;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
+
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -26,39 +28,29 @@ import com.thoughtworks.xstream.XStream;
 public class NexusXStreamFactory
 {
 
-    /**
-     * Just creates a fresh XStream instance.
-     *
-     * @return
-     */
-    public XStream createForXml()
-    {
-        final XStream xstream = new XStream( new LookAheadXppDriver() );
-        xstream.setMode( XStream.NO_REFERENCES );
-        xstream.autodetectAnnotations( false );
-        return xstream;
-    }
+  /**
+   * Just creates a fresh XStream instance.
+   */
+  public XStream createForXml() {
+    final XStream xstream = new XStream(new LookAheadXppDriver());
+    xstream.setMode(XStream.NO_REFERENCES);
+    xstream.autodetectAnnotations(false);
+    return xstream;
+  }
 
-    /**
-     * Configures the passed in instance to make it able to consume and produce the core Nexus REST DTOs.
-     *
-     * @param xstream
-     * @return
-     */
-    public XStream configure( final XStream xstream )
-    {
-        // core (lightweight one)
-        XStreamConfiguratorLightweight.configureXStream( xstream, ErrorResponse.class, ErrorMessage.class );
-        return xstream;
-    }
+  /**
+   * Configures the passed in instance to make it able to consume and produce the core Nexus REST DTOs.
+   */
+  public XStream configure(final XStream xstream) {
+    // core (lightweight one)
+    XStreamConfiguratorLightweight.configureXStream(xstream, ErrorResponse.class, ErrorMessage.class);
+    return xstream;
+  }
 
-    /**
-     * Creates and configures an XML XStream for Nexus REST API DTOs.
-     *
-     * @return
-     */
-    public XStream createAndConfigureForXml()
-    {
-        return configure( createForXml() );
-    }
+  /**
+   * Creates and configures an XML XStream for Nexus REST API DTOs.
+   */
+  public XStream createAndConfigureForXml() {
+    return configure(createForXml());
+  }
 }

@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.rrb.security;
 
-import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
+package org.sonatype.nexus.plugins.rrb.security;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 @Named
 @Singleton
@@ -24,9 +25,8 @@ public class RrbSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    @Override
-    protected String getResourcePath()
-    {
-        return "/META-INF/nexus-rrb-plugin-security.xml";
-    }
+  @Override
+  protected String getResourcePath() {
+    return "/META-INF/nexus-rrb-plugin-security.xml";
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import java.net.URL;
@@ -21,45 +22,46 @@ import java.util.Set;
 public interface RemoteProxySettings
 {
 
-    /**
-     * @return HTTP proxy settings. When null, no HTTP proxy should be used
-     * @since 2.6
-     */
-    RemoteHttpProxySettings getHttpProxySettings();
+  /**
+   * @return HTTP proxy settings. When null, no HTTP proxy should be used
+   * @since 2.6
+   */
+  RemoteHttpProxySettings getHttpProxySettings();
 
-    /**
-     * @param settings HTTP proxy settings. When null, will no proxy will be used for HTTP
-     * @since 2.6
-     */
-    void setHttpProxySettings( RemoteHttpProxySettings settings );
+  /**
+   * @param settings HTTP proxy settings. When null, will no proxy will be used for HTTP
+   * @since 2.6
+   */
+  void setHttpProxySettings(RemoteHttpProxySettings settings);
 
-    /**
-     * @return HTTPS proxy settings. When null, HTTP proxy settings should be used
-     * @since 2.6
-     */
-    RemoteHttpProxySettings getHttpsProxySettings();
+  /**
+   * @return HTTPS proxy settings. When null, HTTP proxy settings should be used
+   * @since 2.6
+   */
+  RemoteHttpProxySettings getHttpsProxySettings();
 
-    /**
-     * @param settings HTTPS proxy settings. When null, will default to HTTP proxy settings
-     * @since 2.6
-     */
-    void setHttpsProxySettings( RemoteHttpProxySettings settings );
+  /**
+   * @param settings HTTPS proxy settings. When null, will default to HTTP proxy settings
+   * @since 2.6
+   */
+  void setHttpsProxySettings(RemoteHttpProxySettings settings);
 
-    /**
-     * @return set of hosts for which proxy should not be used
-     */
-    Set<String> getNonProxyHosts();
+  /**
+   * @return set of hosts for which proxy should not be used
+   */
+  Set<String> getNonProxyHosts();
 
-    /**
-     * @param nonProxyHosts set of hosts for which proxy should not be used
-     */
-    void setNonProxyHosts( Set<String> nonProxyHosts );
+  /**
+   * @param nonProxyHosts set of hosts for which proxy should not be used
+   */
+  void setNonProxyHosts(Set<String> nonProxyHosts);
 
-    /**
-     * Determines the {@link RemoteHttpProxySettings} to be used for provided URL.
-     * @param url for which the {@link RemoteHttpProxySettings} should be determined
-     * @return {@link RemoteHttpProxySettings} to be used or null if http proxy is not configured/enabled
-     */
-    RemoteHttpProxySettings getRemoteHttpProxySettingsFor( final URL url );
+  /**
+   * Determines the {@link RemoteHttpProxySettings} to be used for provided URL.
+   *
+   * @param url for which the {@link RemoteHttpProxySettings} should be determined
+   * @return {@link RemoteHttpProxySettings} to be used or null if http proxy is not configured/enabled
+   */
+  RemoteHttpProxySettings getRemoteHttpProxySettingsFor(final URL url);
 
 }

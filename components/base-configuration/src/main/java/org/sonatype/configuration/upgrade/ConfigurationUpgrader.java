@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.configuration.upgrade;
 
 import java.io.File;
@@ -20,20 +21,14 @@ import org.sonatype.configuration.Configuration;
 /**
  * A component involved only if old security configuration is found. It will fetch the old configuration, transform it
  * to current Configuration model and return it. Nothing else.
- * 
+ *
  * @author cstamas
  */
 public interface ConfigurationUpgrader<E extends Configuration>
 {
-    /**
-     * Tries to load an old configuration from file and will try to upgrade it to current model.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
-     * @throws ConfigurationIsCorruptedException
-     * @throws UnsupportedConfigurationVersionException
-     */
-    public E loadOldConfiguration( File file )
-        throws IOException, ConfigurationIsCorruptedException, UnsupportedConfigurationVersionException;
+  /**
+   * Tries to load an old configuration from file and will try to upgrade it to current model.
+   */
+  public E loadOldConfiguration(File file)
+      throws IOException, ConfigurationIsCorruptedException, UnsupportedConfigurationVersionException;
 }

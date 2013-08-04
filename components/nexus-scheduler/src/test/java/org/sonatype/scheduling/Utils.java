@@ -10,66 +10,57 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.scheduling;
 
-import static org.junit.Assert.fail;
+package org.sonatype.scheduling;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.fail;
+
 public class Utils
 {
 
-    public static void awaitTaskState( ScheduledTask<?> task, long timeout, TaskState... states )
-    {
-        Set<TaskState> stateSet = new HashSet<TaskState>( Arrays.asList( states ) );
+  public static void awaitTaskState(ScheduledTask<?> task, long timeout, TaskState... states) {
+    Set<TaskState> stateSet = new HashSet<TaskState>(Arrays.asList(states));
 
-        long start = System.currentTimeMillis();
-        TaskState state = null;
-        do
-        {
-            state = task.getTaskState();
-            if ( stateSet.contains( state ) )
-            {
-                return;
-            }
-            try
-            {
-                Thread.sleep( 10 );
-            }
-            catch ( InterruptedException e )
-            {
-                // ignored
-            }
-        }
-        while ( System.currentTimeMillis() - start <= timeout );
-        fail( "exceeded timeout while waiting for task " + task + " to transition from state " + state + " into "
-            + stateSet );
+    long start = System.currentTimeMillis();
+    TaskState state = null;
+    do {
+      state = task.getTaskState();
+      if (stateSet.contains(state)) {
+        return;
+      }
+      try {
+        Thread.sleep(10);
+      }
+      catch (InterruptedException e) {
+        // ignored
+      }
     }
+    while (System.currentTimeMillis() - start <= timeout);
+    fail("exceeded timeout while waiting for task " + task + " to transition from state " + state + " into "
+        + stateSet);
+  }
 
-    public static void awaitZeroTaskCount( Scheduler scheduler, long timeout )
-    {
-        long start = System.currentTimeMillis();
-        int n = 0;
-        do
-        {
-            n = scheduler.getAllTasks().size();
-            if ( n <= 0 )
-            {
-                return;
-            }
-            try
-            {
-                Thread.sleep( 10 );
-            }
-            catch ( InterruptedException e )
-            {
-                // ignored
-            }
-        }
-        while ( System.currentTimeMillis() - start <= timeout );
-        fail( "exceeded timeout while waiting for task map to transition from count " + n + " into 0" );
+  public static void awaitZeroTaskCount(Scheduler scheduler, long timeout) {
+    long start = System.currentTimeMillis();
+    int n = 0;
+    do {
+      n = scheduler.getAllTasks().size();
+      if (n <= 0) {
+        return;
+      }
+      try {
+        Thread.sleep(10);
+      }
+      catch (InterruptedException e) {
+        // ignored
+      }
     }
+    while (System.currentTimeMillis() - start <= timeout);
+    fail("exceeded timeout while waiting for task map to transition from count " + n + " into 0");
+  }
 
 }

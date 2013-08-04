@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.global;
 
 import java.util.ArrayList;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.apache.commons.lang.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
@@ -48,459 +47,409 @@ import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.nexus.rest.model.SystemNotificationSettings;
 
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * The base class for global configuration resources.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractGlobalConfigurationPlexusResource
     extends AbstractNexusPlexusResource
 {
-    public static final String SECURITY_OFF = "off";
+  public static final String SECURITY_OFF = "off";
 
-    public static final String SECURITY_SIMPLE = "simple";
+  public static final String SECURITY_SIMPLE = "simple";
 
-    public static final String SECURITY_CUSTOM = "custom";
+  public static final String SECURITY_CUSTOM = "custom";
 
-    @Requirement
-    private NexusEmailer nexusEmailer;
+  @Requirement
+  private NexusEmailer nexusEmailer;
 
-    @Requirement
-    private GlobalRemoteProxySettings globalRemoteProxySettings;
+  @Requirement
+  private GlobalRemoteProxySettings globalRemoteProxySettings;
 
-    @Requirement
-    private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
+  @Requirement
+  private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
-    @Requirement
-    private GlobalRestApiSettings globalRestApiSettings;
+  @Requirement
+  private GlobalRestApiSettings globalRestApiSettings;
 
-    @Requirement
-    private AuthenticationInfoConverter authenticationInfoConverter;
+  @Requirement
+  private AuthenticationInfoConverter authenticationInfoConverter;
 
-    @Requirement
-    private ErrorReportingManager errorReportingManager;
+  @Requirement
+  private ErrorReportingManager errorReportingManager;
 
-    protected NexusEmailer getNexusEmailer()
-    {
-        return nexusEmailer;
+  protected NexusEmailer getNexusEmailer() {
+    return nexusEmailer;
+  }
+
+  protected GlobalRemoteProxySettings getGlobalRemoteProxySettings() {
+    return globalRemoteProxySettings;
+  }
+
+  protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings() {
+    return globalRemoteConnectionSettings;
+  }
+
+  protected GlobalRestApiSettings getGlobalRestApiSettings() {
+    return globalRestApiSettings;
+  }
+
+  protected AuthenticationInfoConverter getAuthenticationInfoConverter() {
+    return authenticationInfoConverter;
+  }
+
+  protected ErrorReportingManager getErrorReportingManager() {
+    return errorReportingManager;
+  }
+
+  public static SmtpSettings convert(NexusEmailer nexusEmailer) {
+    if (nexusEmailer == null) {
+      return null;
     }
 
-    protected GlobalRemoteProxySettings getGlobalRemoteProxySettings()
-    {
-        return globalRemoteProxySettings;
+    SmtpSettings result = new SmtpSettings();
+
+    result.setHost(nexusEmailer.getSMTPHostname());
+
+    result.setPort(nexusEmailer.getSMTPPort());
+
+    result.setSslEnabled(nexusEmailer.isSMTPSslEnabled());
+
+    result.setTlsEnabled(nexusEmailer.isSMTPTlsEnabled());
+
+    result.setUsername(nexusEmailer.getSMTPUsername());
+
+    if (!StringUtils.isEmpty(nexusEmailer.getSMTPPassword())) {
+      result.setPassword(PASSWORD_PLACE_HOLDER);
     }
 
-    protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
-    {
-        return globalRemoteConnectionSettings;
+    result.setSystemEmailAddress(nexusEmailer.getSMTPSystemEmailAddress().getMailAddress());
+
+    return result;
+  }
+
+  public static ErrorReportingSettings convert(ErrorReportingManager errorReportingManager) {
+    ErrorReportingSettings result = new ErrorReportingSettings();
+
+    result.setJiraUsername(errorReportingManager.getJIRAUsername());
+    if (StringUtils.isEmpty(errorReportingManager.getJIRAPassword())) {
+      result.setJiraPassword(errorReportingManager.getJIRAPassword());
+    }
+    else {
+      result.setJiraPassword(PASSWORD_PLACE_HOLDER);
+    }
+    result.setUseGlobalProxy(true);
+    result.setReportErrorsAutomatically(errorReportingManager.isEnabled());
+
+    return result;
+  }
+
+  public static SystemNotificationSettings convert(NotificationManager manager) {
+    if (manager == null) {
+      return null;
     }
 
-    protected GlobalRestApiSettings getGlobalRestApiSettings()
-    {
-        return globalRestApiSettings;
+    SystemNotificationSettings settings = new SystemNotificationSettings();
+    settings.setEnabled(manager.isEnabled());
+
+    NotificationTarget target = manager.readNotificationTarget(NotificationCheat.AUTO_BLOCK_NOTIFICATION_GROUP_ID);
+
+    if (target == null) {
+      return settings;
     }
 
-    protected AuthenticationInfoConverter getAuthenticationInfoConverter()
-    {
-        return authenticationInfoConverter;
+    settings.getRoles().addAll(target.getTargetRoles());
+
+    StringBuilder sb = new StringBuilder();
+
+    for (String email : target.getExternalTargets()) {
+      sb.append(email).append(",");
     }
 
-    protected ErrorReportingManager getErrorReportingManager()
-    {
-        return errorReportingManager;
+    // drop last comma
+    if (sb.length() > 0) {
+      sb.setLength(sb.length() - 1);
     }
 
-    public static SmtpSettings convert( NexusEmailer nexusEmailer )
-    {
-        if ( nexusEmailer == null )
-        {
-            return null;
-        }
+    settings.setEmailAddresses(sb.toString());
 
-        SmtpSettings result = new SmtpSettings();
+    return settings;
+  }
 
-        result.setHost( nexusEmailer.getSMTPHostname() );
-
-        result.setPort( nexusEmailer.getSMTPPort() );
-
-        result.setSslEnabled( nexusEmailer.isSMTPSslEnabled() );
-
-        result.setTlsEnabled( nexusEmailer.isSMTPTlsEnabled() );
-
-        result.setUsername( nexusEmailer.getSMTPUsername() );
-
-        if ( !StringUtils.isEmpty( nexusEmailer.getSMTPPassword() ) )
-        {
-            result.setPassword( PASSWORD_PLACE_HOLDER );
-        }
-
-        result.setSystemEmailAddress( nexusEmailer.getSMTPSystemEmailAddress().getMailAddress() );
-
-        return result;
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static RemoteConnectionSettings convert(GlobalRemoteConnectionSettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    public static ErrorReportingSettings convert( ErrorReportingManager errorReportingManager )
-    {
-        ErrorReportingSettings result = new ErrorReportingSettings();
+    RemoteConnectionSettings result = new RemoteConnectionSettings();
 
-        result.setJiraUsername( errorReportingManager.getJIRAUsername() );
-        if ( StringUtils.isEmpty( errorReportingManager.getJIRAPassword() ) )
-        {
-            result.setJiraPassword( errorReportingManager.getJIRAPassword() );
-        }
-        else
-        {
-            result.setJiraPassword( PASSWORD_PLACE_HOLDER );
-        }
-        result.setUseGlobalProxy( true );
-        result.setReportErrorsAutomatically( errorReportingManager.isEnabled() );
+    result.setConnectionTimeout(settings.getConnectionTimeout() / 1000);
 
-        return result;
-    }
-    
-    public static SystemNotificationSettings convert( NotificationManager manager )
-    {
-        if ( manager == null )
-        {
-            return null;
-        }
-        
-        SystemNotificationSettings settings = new SystemNotificationSettings();
-        settings.setEnabled( manager.isEnabled() );
-        
-        NotificationTarget target = manager.readNotificationTarget( NotificationCheat.AUTO_BLOCK_NOTIFICATION_GROUP_ID );
-        
-        if ( target == null )
-        {
-            return settings;
-        }
-        
-        settings.getRoles().addAll( target.getTargetRoles() );
-        
-        StringBuilder sb = new StringBuilder();
-        
-        for ( String email : target.getExternalTargets() )
-        {
-            sb.append( email ).append( "," );
-        }
-        
-        // drop last comma
-        if ( sb.length() > 0 )
-        {
-            sb.setLength( sb.length() - 1 );
-        }
-        
-        settings.setEmailAddresses( sb.toString() );
-        
-        return settings;
+    result.setRetrievalRetryCount(settings.getRetrievalRetryCount());
+
+    result.setQueryString(settings.getQueryString());
+
+    result.setUserAgentString(settings.getUserAgentCustomizationString());
+
+    return result;
+  }
+
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static RemoteProxySettingsDTO convert(GlobalRemoteProxySettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     * 
-     * @param resource
-     */
-    public static RemoteConnectionSettings convert( GlobalRemoteConnectionSettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    RemoteProxySettingsDTO result = new RemoteProxySettingsDTO();
 
-        RemoteConnectionSettings result = new RemoteConnectionSettings();
+    result.setHttpProxySettings(convert(settings.getHttpProxySettings()));
 
-        result.setConnectionTimeout( settings.getConnectionTimeout() / 1000 );
+    result.setHttpsProxySettings(convert(settings.getHttpsProxySettings()));
 
-        result.setRetrievalRetryCount( settings.getRetrievalRetryCount() );
+    result.setNonProxyHosts(new ArrayList<String>(settings.getNonProxyHosts()));
 
-        result.setQueryString( settings.getQueryString() );
+    return result;
+  }
 
-        result.setUserAgentString( settings.getUserAgentCustomizationString() );
-
-        return result;
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static RemoteHttpProxySettingsDTO convert(RemoteHttpProxySettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     */
-    public static RemoteProxySettingsDTO convert( GlobalRemoteProxySettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    final RemoteHttpProxySettingsDTO result = new RemoteHttpProxySettingsDTO();
 
-        RemoteProxySettingsDTO result = new RemoteProxySettingsDTO();
+    result.setProxyHostname(settings.getHostname());
 
-        result.setHttpProxySettings( convert( settings.getHttpProxySettings() ) );
+    result.setProxyPort(settings.getPort());
 
-        result.setHttpsProxySettings( convert( settings.getHttpsProxySettings() ) );
+    result.setAuthentication(convert(settings.getProxyAuthentication()));
 
-        result.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
+    return result;
+  }
 
-        return result;
+
+  public static RestApiSettings convert(GlobalRestApiSettings settings) {
+    if (settings == null || !settings.isEnabled()) {
+      return null;
     }
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     */
-    public static RemoteHttpProxySettingsDTO convert( RemoteHttpProxySettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    RestApiSettings result = new RestApiSettings();
 
-        final RemoteHttpProxySettingsDTO result = new RemoteHttpProxySettingsDTO();
+    result.setBaseUrl(settings.getBaseUrl());
 
-        result.setProxyHostname( settings.getHostname() );
+    result.setForceBaseUrl(settings.isForceBaseUrl());
 
-        result.setProxyPort( settings.getPort() );
+    result.setUiTimeout(settings.getUITimeout() / 1000);
 
-        result.setAuthentication( convert( settings.getProxyAuthentication() ) );
+    return result;
+  }
 
-        return result;
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static AuthenticationSettings convert(RemoteAuthenticationSettings settings) {
+    if (settings == null) {
+      return null;
     }
 
+    AuthenticationSettings auth = new AuthenticationSettings();
 
-    public static RestApiSettings convert( GlobalRestApiSettings settings )
-    {
-        if ( settings == null || !settings.isEnabled() )
-        {
-            return null;
-        }
+    if (settings instanceof ClientSSLRemoteAuthenticationSettings) {
+      // huh?
+    }
+    else if (settings instanceof NtlmRemoteAuthenticationSettings) {
+      NtlmRemoteAuthenticationSettings up = (NtlmRemoteAuthenticationSettings) settings;
 
-        RestApiSettings result = new RestApiSettings();
+      auth.setUsername(up.getUsername());
 
-        result.setBaseUrl( settings.getBaseUrl() );
+      auth.setPassword(PASSWORD_PLACE_HOLDER);
 
-        result.setForceBaseUrl( settings.isForceBaseUrl() );
+      auth.setNtlmHost(up.getNtlmHost());
 
-        result.setUiTimeout( settings.getUITimeout() / 1000 );
+      auth.setNtlmDomain(up.getNtlmDomain());
 
-        return result;
+    }
+    else if (settings instanceof UsernamePasswordRemoteAuthenticationSettings) {
+      UsernamePasswordRemoteAuthenticationSettings up = (UsernamePasswordRemoteAuthenticationSettings) settings;
+
+      auth.setUsername(up.getUsername());
+
+      auth.setPassword(PASSWORD_PLACE_HOLDER);
     }
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     * 
-     * @param resource
-     */
-    public static AuthenticationSettings convert( RemoteAuthenticationSettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    return auth;
+  }
 
-        AuthenticationSettings auth = new AuthenticationSettings();
+  // ==
 
-        if ( settings instanceof ClientSSLRemoteAuthenticationSettings )
-        {
-            // huh?
-        }
-        else if ( settings instanceof NtlmRemoteAuthenticationSettings )
-        {
-            NtlmRemoteAuthenticationSettings up = (NtlmRemoteAuthenticationSettings) settings;
-
-            auth.setUsername( up.getUsername() );
-
-            auth.setPassword( PASSWORD_PLACE_HOLDER );
-
-            auth.setNtlmHost( up.getNtlmHost() );
-
-            auth.setNtlmDomain( up.getNtlmDomain() );
-
-        }
-        else if ( settings instanceof UsernamePasswordRemoteAuthenticationSettings )
-        {
-            UsernamePasswordRemoteAuthenticationSettings up = (UsernamePasswordRemoteAuthenticationSettings) settings;
-
-            auth.setUsername( up.getUsername() );
-
-            auth.setPassword( PASSWORD_PLACE_HOLDER );
-        }
-
-        return auth;
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static RemoteConnectionSettings convert(CRemoteConnectionSettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    // ==
+    RemoteConnectionSettings result = new RemoteConnectionSettings();
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     * 
-     * @param resource
-     */
-    public static RemoteConnectionSettings convert( CRemoteConnectionSettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    result.setConnectionTimeout(settings.getConnectionTimeout() / 1000);
 
-        RemoteConnectionSettings result = new RemoteConnectionSettings();
+    result.setRetrievalRetryCount(settings.getRetrievalRetryCount());
 
-        result.setConnectionTimeout( settings.getConnectionTimeout() / 1000 );
+    result.setQueryString(settings.getQueryString());
 
-        result.setRetrievalRetryCount( settings.getRetrievalRetryCount() );
+    result.setUserAgentString(settings.getUserAgentCustomizationString());
 
-        result.setQueryString( settings.getQueryString() );
+    return result;
+  }
 
-        result.setUserAgentString( settings.getUserAgentCustomizationString() );
-
-        return result;
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static RemoteProxySettingsDTO convert(CRemoteProxySettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     */
-    public static RemoteProxySettingsDTO convert( CRemoteProxySettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    final RemoteProxySettingsDTO result = new RemoteProxySettingsDTO();
 
-        final RemoteProxySettingsDTO result = new RemoteProxySettingsDTO();
+    result.setHttpProxySettings(convert(settings.getHttpProxySettings()));
 
-        result.setHttpProxySettings( convert( settings.getHttpProxySettings() ) );
+    result.setHttpsProxySettings(convert(settings.getHttpsProxySettings()));
 
-        result.setHttpsProxySettings( convert( settings.getHttpsProxySettings() ) );
+    result.setNonProxyHosts(settings.getNonProxyHosts());
 
-        result.setNonProxyHosts( settings.getNonProxyHosts() );
+    return result;
+  }
 
-        return result;
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static RemoteHttpProxySettingsDTO convert(CRemoteHttpProxySettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     */
-    public static RemoteHttpProxySettingsDTO convert( CRemoteHttpProxySettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    final RemoteHttpProxySettingsDTO result = new RemoteHttpProxySettingsDTO();
 
-        final RemoteHttpProxySettingsDTO result = new RemoteHttpProxySettingsDTO();
+    result.setProxyHostname(settings.getProxyHostname());
 
-        result.setProxyHostname( settings.getProxyHostname() );
+    result.setProxyPort(settings.getProxyPort());
 
-        result.setProxyPort( settings.getProxyPort() );
+    result.setAuthentication(convert(settings.getAuthentication()));
 
-        result.setAuthentication( convert( settings.getAuthentication() ) );
+    return result;
+  }
 
-        return result;
+  public static RestApiSettings convert(CRestApiSettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    public static RestApiSettings convert( CRestApiSettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    RestApiSettings result = new RestApiSettings();
 
-        RestApiSettings result = new RestApiSettings();
+    result.setBaseUrl(settings.getBaseUrl());
 
-        result.setBaseUrl( settings.getBaseUrl() );
+    result.setForceBaseUrl(settings.isForceBaseUrl());
 
-        result.setForceBaseUrl( settings.isForceBaseUrl() );
+    result.setUiTimeout(settings.getUiTimeout() / 1000);
 
-        result.setUiTimeout( settings.getUiTimeout() / 1000 );
+    return result;
+  }
 
-        return result;
+  /**
+   * Externalized Nexus object to DTO's conversion.
+   */
+  public static AuthenticationSettings convert(CRemoteAuthentication settings) {
+    if (settings == null) {
+      return null;
     }
 
-    /**
-     * Externalized Nexus object to DTO's conversion.
-     * 
-     * @param resource
-     */
-    public static AuthenticationSettings convert( CRemoteAuthentication settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    AuthenticationSettings auth = new AuthenticationSettings();
 
-        AuthenticationSettings auth = new AuthenticationSettings();
+    auth.setUsername(settings.getUsername());
 
-        auth.setUsername( settings.getUsername() );
+    auth.setPassword(PASSWORD_PLACE_HOLDER);
 
-        auth.setPassword( PASSWORD_PLACE_HOLDER );
+    auth.setNtlmHost(settings.getNtlmHost());
 
-        auth.setNtlmHost( settings.getNtlmHost() );
+    auth.setNtlmDomain(settings.getNtlmDomain());
 
-        auth.setNtlmDomain( settings.getNtlmDomain() );
+    // auth.setPrivateKey( settings.getPrivateKey() );
 
-        // auth.setPrivateKey( settings.getPrivateKey() );
+    // auth.setPassphrase( settings.getPassphrase() );
 
-        // auth.setPassphrase( settings.getPassphrase() );
+    return auth;
+  }
 
-        return auth;
+  public static SmtpSettings convert(CSmtpConfiguration settings) {
+    if (settings == null) {
+      return null;
     }
 
-    public static SmtpSettings convert( CSmtpConfiguration settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
+    SmtpSettings result = new SmtpSettings();
 
-        SmtpSettings result = new SmtpSettings();
+    result.setHost(settings.getHostname());
 
-        result.setHost( settings.getHostname() );
+    result.setPassword(PASSWORD_PLACE_HOLDER);
 
-        result.setPassword( PASSWORD_PLACE_HOLDER );
+    result.setPort(settings.getPort());
 
-        result.setPort( settings.getPort() );
+    result.setSslEnabled(settings.isSslEnabled());
 
-        result.setSslEnabled( settings.isSslEnabled() );
+    result.setSystemEmailAddress(settings.getSystemEmailAddress());
 
-        result.setSystemEmailAddress( settings.getSystemEmailAddress() );
+    result.setTlsEnabled(settings.isTlsEnabled());
 
-        result.setTlsEnabled( settings.isTlsEnabled() );
+    result.setUsername(settings.getUsername());
 
-        result.setUsername( settings.getUsername() );
+    return result;
+  }
 
-        return result;
+  public RemoteHttpProxySettings convert(final RemoteHttpProxySettingsDTO settings,
+                                         final String oldPassword)
+      throws ConfigurationException
+  {
+    if (settings == null || StringUtils.isEmpty(settings.getProxyHostname())) {
+      return null;
     }
 
-    public RemoteHttpProxySettings convert( final RemoteHttpProxySettingsDTO settings,
-                                            final String oldPassword )
-        throws ConfigurationException
-    {
-        if ( settings == null || StringUtils.isEmpty( settings.getProxyHostname() ) )
-        {
-            return null;
-        }
+    final RemoteHttpProxySettings result = new DefaultRemoteHttpProxySettings();
 
-        final RemoteHttpProxySettings result = new DefaultRemoteHttpProxySettings();
+    result.setHostname(settings.getProxyHostname());
+    result.setPort(settings.getProxyPort());
 
-        result.setHostname( settings.getProxyHostname() );
-        result.setPort( settings.getProxyPort() );
+    if (settings.getAuthentication() != null) {
+      CRemoteAuthentication auth = new CRemoteAuthentication();
 
-        if ( settings.getAuthentication() != null )
-        {
-            CRemoteAuthentication auth = new CRemoteAuthentication();
+      auth.setUsername(settings.getAuthentication().getUsername());
 
-            auth.setUsername( settings.getAuthentication().getUsername() );
+      auth.setPassword(getActualPassword(settings.getAuthentication().getPassword(), oldPassword));
 
-            auth.setPassword( getActualPassword( settings.getAuthentication().getPassword(), oldPassword ) );
+      auth.setNtlmDomain(settings.getAuthentication().getNtlmDomain());
 
-            auth.setNtlmDomain( settings.getAuthentication().getNtlmDomain() );
+      auth.setNtlmHost(settings.getAuthentication().getNtlmHost());
 
-            auth.setNtlmHost( settings.getAuthentication().getNtlmHost() );
-
-            result.setProxyAuthentication(
-                getAuthenticationInfoConverter().convertAndValidateFromModel( auth ) );
-        }
-        else
-        {
-            result.setProxyAuthentication( null );
-        }
-
-        return result;
+      result.setProxyAuthentication(
+          getAuthenticationInfoConverter().convertAndValidateFromModel(auth));
     }
+    else {
+      result.setProxyAuthentication(null);
+    }
+
+    return result;
+  }
 
 }

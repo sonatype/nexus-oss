@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
 
 /**
@@ -21,30 +22,25 @@ public class TextAreaFormField
     extends AbstractFormField<String>
 {
 
-    public TextAreaFormField( String id, String label, String helpText, boolean required, String regexValidation )
-    {
-        super( id, label, helpText, required, regexValidation );
-    }
+  public TextAreaFormField(String id, String label, String helpText, boolean required, String regexValidation) {
+    super(id, label, helpText, required, regexValidation);
+  }
 
-    public TextAreaFormField( String id, String label, String helpText, boolean required )
-    {
-        super( id, label, helpText, required );
-    }
+  public TextAreaFormField(String id, String label, String helpText, boolean required) {
+    super(id, label, helpText, required);
+  }
 
-    public TextAreaFormField( String id )
-    {
-        super( id );
-    }
+  public TextAreaFormField(String id) {
+    super(id);
+  }
 
-    public String getType()
-    {
-        return "text-area";
-    }
+  public String getType() {
+    return "text-area";
+  }
 
-    public TextAreaFormField withInitialValue( final String initialValue )
-    {
-        setInitialValue( initialValue );
-        return this;
-    }
+  public TextAreaFormField withInitialValue(final String initialValue) {
+    setInitialValue(initialValue);
+    return this;
+  }
 
 }

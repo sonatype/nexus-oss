@@ -10,33 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.templates;
 
 /**
  * Template manager aggregates various TemplateProviders, and adds means to select between them.
- * 
+ *
  * @author cstamas
  */
 public interface TemplateManager
 {
-    /**
-     * Get templates.
-     * 
-     * @param <I>
-     * @param clazz
-     * @return
-     */
-    TemplateSet getTemplates();
+  /**
+   * Get templates.
+   */
+  TemplateSet getTemplates();
 
-    /**
-     * Get one specific template that fits of supplied class with given id.
-     * 
-     * @param <I>
-     * @param clazz
-     * @param id
-     * @return
-     * @throws NoSuchTemplateIdException
-     */
-    Template getTemplate( Object clazz, String id )
-        throws NoSuchTemplateIdException;
+  /**
+   * Get one specific template that fits of supplied class with given id.
+   */
+  Template getTemplate(Object clazz, String id)
+      throws NoSuchTemplateIdException;
 }

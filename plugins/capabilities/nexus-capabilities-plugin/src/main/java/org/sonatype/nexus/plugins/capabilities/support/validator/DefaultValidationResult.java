@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
 import java.util.Set;
 
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;
+
 import com.google.common.collect.Sets;
 
 /**
@@ -26,45 +28,38 @@ public class DefaultValidationResult
     implements ValidationResult
 {
 
-    private Set<Violation> violations;
+  private Set<Violation> violations;
 
-    public DefaultValidationResult()
-    {
-        violations = Sets.newHashSet();
-    }
+  public DefaultValidationResult() {
+    violations = Sets.newHashSet();
+  }
 
-    @Override
-    public boolean isValid()
-    {
-        return violations.isEmpty();
-    }
+  @Override
+  public boolean isValid() {
+    return violations.isEmpty();
+  }
 
-    @Override
-    public Set<Violation> violations()
-    {
-        return violations;
-    }
+  @Override
+  public Set<Violation> violations() {
+    return violations;
+  }
 
-    public DefaultValidationResult add( final Violation violation )
-    {
-        violations().add( violation );
+  public DefaultValidationResult add(final Violation violation) {
+    violations().add(violation);
 
-        return this;
-    }
+    return this;
+  }
 
-    public void add( final Set<Violation> violations )
-    {
-        violations().addAll( violations );
-    }
+  public void add(final Set<Violation> violations) {
+    violations().addAll(violations);
+  }
 
-    public DefaultValidationResult add( final String key, final String message )
-    {
-        return add( new DefaultViolation( key, message ) );
-    }
+  public DefaultValidationResult add(final String key, final String message) {
+    return add(new DefaultViolation(key, message));
+  }
 
-    public DefaultValidationResult add( final String message )
-    {
-        return add( new DefaultViolation( message ) );
-    }
+  public DefaultValidationResult add(final String message) {
+    return add(new DefaultViolation(message));
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.utils;
 
 import javax.annotation.Nullable;
@@ -26,14 +27,14 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public interface UserAgentContributor
 {
 
-    /**
-     * Return a string to append to the user agent.
-     *
-     * @param ctx The remote storage settings.
-     * @param repository The proxy repository that the user agent will be used for. May be null if the user agent is
-     *                   built in a global context.
-     * @return The string to append to the user agent.
-     */
-    String getUserAgent( RemoteStorageContext ctx, @Nullable ProxyRepository repository );
+  /**
+   * Return a string to append to the user agent.
+   *
+   * @param ctx        The remote storage settings.
+   * @param repository The proxy repository that the user agent will be used for. May be null if the user agent is
+   *                   built in a global context.
+   * @return The string to append to the user agent.
+   */
+  String getUserAgent(RemoteStorageContext ctx, @Nullable ProxyRepository repository);
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import java.util.HashMap;
@@ -17,56 +18,47 @@ import java.util.Map;
 
 public class SnapshotRemovalResult
 {
-    private Map<String, SnapshotRemovalRepositoryResult> processedRepositories;
+  private Map<String, SnapshotRemovalRepositoryResult> processedRepositories;
 
-    private boolean isSuccessful;
+  private boolean isSuccessful;
 
-    public SnapshotRemovalResult()
-    {
-        super();
+  public SnapshotRemovalResult() {
+    super();
 
-        this.processedRepositories = new HashMap<String, SnapshotRemovalRepositoryResult>();
+    this.processedRepositories = new HashMap<String, SnapshotRemovalRepositoryResult>();
 
-        this.isSuccessful = true;
-    }
+    this.isSuccessful = true;
+  }
 
-    public Map<String, SnapshotRemovalRepositoryResult> getProcessedRepositories()
-    {
-        return processedRepositories;
-    }
+  public Map<String, SnapshotRemovalRepositoryResult> getProcessedRepositories() {
+    return processedRepositories;
+  }
 
-    public void addResult( SnapshotRemovalRepositoryResult res )
-    {
-        if ( res != null )
-        {
-            if ( processedRepositories.containsKey( res.getRepositoryId() ) )
-            {
-                SnapshotRemovalRepositoryResult ex = processedRepositories.get( res.getRepositoryId() );
+  public void addResult(SnapshotRemovalRepositoryResult res) {
+    if (res != null) {
+      if (processedRepositories.containsKey(res.getRepositoryId())) {
+        SnapshotRemovalRepositoryResult ex = processedRepositories.get(res.getRepositoryId());
 
-                ex.setDeletedFiles( ex.getDeletedFiles() + res.getDeletedFiles() );
+        ex.setDeletedFiles(ex.getDeletedFiles() + res.getDeletedFiles());
 
-                ex.setDeletedSnapshots( ex.getDeletedSnapshots() + res.getDeletedSnapshots() );
-                
-                if ( res.isSkipped() )
-                {
-                    ex.setSkippedCount( ex.getSkippedCount() + 1 );
-                }
-            }
-            else
-            {
-                processedRepositories.put( res.getRepositoryId(), res );
-            }
+        ex.setDeletedSnapshots(ex.getDeletedSnapshots() + res.getDeletedSnapshots());
 
-            if ( !res.isSuccessful() )
-            {
-                isSuccessful = false;
-            }
+        if (res.isSkipped()) {
+          ex.setSkippedCount(ex.getSkippedCount() + 1);
         }
-    }
+      }
+      else {
+        processedRepositories.put(res.getRepositoryId(), res);
+      }
 
-    public boolean isSuccessful()
-    {
-        return isSuccessful;
+      if (!res.isSuccessful()) {
+        isSuccessful = false;
+      }
     }
+  }
+
+  public boolean isSuccessful() {
+    return isSuccessful;
+  }
 
 }

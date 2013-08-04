@@ -10,16 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.util.Collection;
 
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -34,63 +31,52 @@ public class WastebasketWalker
     implements WalkerProcessor, SilentWalker
 {
 
-    private long age;
+  private long age;
 
-    public WastebasketWalker( long age )
-    {
-        this.age = age;
+  public WastebasketWalker(long age) {
+    this.age = age;
+  }
+
+  @Override
+  public void processItem(WalkerContext ctx, StorageItem item) {
+    long now = System.currentTimeMillis();
+    long limitDate = now - age;
+
+    if (item instanceof StorageFileItem && //
+        (age == DefaultWastebasket.ALL || item.getModified() < limitDate)) {
+      try {
+        ctx.getRepository().getLocalStorage().shredItem(ctx.getRepository(), item.getResourceStoreRequest());
+      }
+      catch (ItemNotFoundException e) {
+        // silent
+      }
+      catch (UnsupportedStorageOperationException e) {
+        // silent?
+      }
+      catch (LocalStorageException e) {
+        // silent?
+      }
+    }
+  }
+
+  @Override
+  public void onCollectionExit(WalkerContext ctx, StorageCollectionItem item)
+      throws Exception
+  {
+    if (ctx.getResourceStoreRequest().getRequestPath().equals(item.getPath())) {
+      // NEXUS-4642 do not delete the trash
+      return;
     }
 
-    @Override
-    public void processItem( WalkerContext ctx, StorageItem item )
-    {
-        long now = System.currentTimeMillis();
-        long limitDate = now - age;
-
-        if ( item instanceof StorageFileItem && //
-            ( age == DefaultWastebasket.ALL || item.getModified() < limitDate ) )
-        {
-            try
-            {
-                ctx.getRepository().getLocalStorage().shredItem( ctx.getRepository(), item.getResourceStoreRequest() );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // silent
-            }
-            catch ( UnsupportedStorageOperationException e )
-            {
-                // silent?
-            }
-            catch ( LocalStorageException e )
-            {
-                // silent?
-            }
-        }
+    try {
+      // item is now gone, let's check if this is empty and if so delete it as well
+      Collection<StorageItem> items = item.list();
+      if (items.isEmpty()) {
+        ctx.getRepository().getLocalStorage().shredItem(ctx.getRepository(), item.getResourceStoreRequest());
+      }
     }
-
-    @Override
-    public void onCollectionExit( WalkerContext ctx, StorageCollectionItem item )
-        throws Exception
-    {
-        if ( ctx.getResourceStoreRequest().getRequestPath().equals( item.getPath() ) )
-        {
-            // NEXUS-4642 do not delete the trash
-            return;
-        }
-
-        try
-        {
-            // item is now gone, let's check if this is empty and if so delete it as well
-            Collection<StorageItem> items = item.list();
-            if ( items.isEmpty() )
-            {
-                ctx.getRepository().getLocalStorage().shredItem( ctx.getRepository(), item.getResourceStoreRequest() );
-            }
-        }
-        catch ( final ItemNotFoundException ignore )
-        {
-            // someone else removed the item in the mean time. yet we anyhow wanted to remove it so... nevermind
-        }
+    catch (final ItemNotFoundException ignore) {
+      // someone else removed the item in the mean time. yet we anyhow wanted to remove it so... nevermind
     }
+  }
 }

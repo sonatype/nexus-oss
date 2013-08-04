@@ -10,27 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item.uid;
 
 import java.util.Map;
 
-import org.sonatype.plugin.ExtensionPoint;
-
 import javax.inject.Singleton;
+
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * RepositoryItemUid Attribute source that is contributing attributes to core.
- * 
+ *
  * @author cstamas
  */
 @ExtensionPoint
 @Singleton
 public interface RepositoryItemUidAttributeSource
 {
-    /**
-     * Returns the map of attributes coming from this source.
-     * 
-     * @return
-     */
-    Map<Class<?>, Attribute<?>> getAttributes();
+  /**
+   * Returns the map of attributes coming from this source.
+   */
+  Map<Class<?>, Attribute<?>> getAttributes();
 }

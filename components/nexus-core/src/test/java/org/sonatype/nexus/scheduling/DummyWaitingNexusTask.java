@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
 import java.util.HashMap;
@@ -23,119 +24,100 @@ public class DummyWaitingNexusTask
     extends AbstractSchedulerTask<Object>
     implements NexusTask<Object>
 {
-    private boolean allowConcurrentSubmission = false;
+  private boolean allowConcurrentSubmission = false;
 
-    private boolean allowConcurrentExecution = false;
+  private boolean allowConcurrentExecution = false;
 
-    private long sleepTime = 10000;
+  private long sleepTime = 10000;
 
-    private Map<String, String> parameters;
+  private Map<String, String> parameters;
 
-    private Object result;
+  private Object result;
 
-    public boolean isExposed()
-    {
-        return true;
+  public boolean isExposed() {
+    return true;
+  }
+
+  public void addParameter(String key, String value) {
+    getParameters().put(key, value);
+  }
+
+  public String getParameter(String key) {
+    return getParameters().get(key);
+  }
+
+  public Map<String, String> getParameters() {
+    if (parameters == null) {
+      parameters = new HashMap<String, String>();
     }
 
-    public void addParameter( String key, String value )
-    {
-        getParameters().put( key, value );
-    }
+    return parameters;
+  }
 
-    public String getParameter( String key )
-    {
-        return getParameters().get( key );
-    }
+  public boolean allowConcurrentSubmission(Map<String, List<ScheduledTask<?>>> activeTasks) {
+    return allowConcurrentSubmission;
+  }
 
-    public Map<String, String> getParameters()
-    {
-        if ( parameters == null )
-        {
-            parameters = new HashMap<String, String>();
-        }
+  public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
+    return allowConcurrentExecution;
+  }
 
-        return parameters;
-    }
+  public void setAllowConcurrentSubmission(boolean allowConcurrentSubmission) {
+    this.allowConcurrentSubmission = allowConcurrentSubmission;
+  }
 
-    public boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> activeTasks )
-    {
-        return allowConcurrentSubmission;
-    }
+  public void setAllowConcurrentExecution(boolean allowConcurrentExecution) {
+    this.allowConcurrentExecution = allowConcurrentExecution;
+  }
 
-    public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> activeTasks )
-    {
-        return allowConcurrentExecution;
-    }
+  public long getSleepTime() {
+    return sleepTime;
+  }
 
-    public void setAllowConcurrentSubmission( boolean allowConcurrentSubmission )
-    {
-        this.allowConcurrentSubmission = allowConcurrentSubmission;
-    }
+  public void setSleepTime(long sleepTime) {
+    this.sleepTime = sleepTime;
+  }
 
-    public void setAllowConcurrentExecution( boolean allowConcurrentExecution )
-    {
-        this.allowConcurrentExecution = allowConcurrentExecution;
-    }
+  public void setResult(Object resul) {
+    this.result = resul;
+  }
 
-    public long getSleepTime()
-    {
-        return sleepTime;
-    }
+  public Object call()
+      throws Exception
+  {
+    System.out.println("BEFORE SLEEP");
+    Thread.sleep(getSleepTime());
+    System.out.println("AFTER SLEEP");
 
-    public void setSleepTime( long sleepTime )
-    {
-        this.sleepTime = sleepTime;
-    }
+    return result;
+  }
 
-    public void setResult( Object resul )
-    {
-        this.result = resul;
-    }
+  protected String getAction() {
+    return "DUMMY";
+  }
 
-    public Object call()
-        throws Exception
-    {
-        System.out.println( "BEFORE SLEEP" );
-        Thread.sleep( getSleepTime() );
-        System.out.println( "AFTER SLEEP" );
+  protected String getMessage() {
+    return "A Dummy task, waits for some time";
+  }
 
-        return result;
-    }
+  public String getId() {
+    return "dummyId";
+  }
 
-    protected String getAction()
-    {
-        return "DUMMY";
-    }
+  public String getName() {
+    return "dummyName";
+  }
 
-    protected String getMessage()
-    {
-        return "A Dummy task, waits for some time";
-    }
+  public boolean shouldSendAlertEmail() {
+    return false;
+  }
 
-    public String getId()
-    {
-        return "dummyId";
-    }
+  public String getAlertEmail() {
+    return null;
+  }
 
-    public String getName()
-    {
-        return "dummyName";
-    }
-
-    public boolean shouldSendAlertEmail()
-    {
-        return false;
-    }
-
-    public String getAlertEmail()
-    {
-        return null;
-    }
-
-    public TaskActivityDescriptor getTaskActivityDescriptor()
-    {
-        return null;
-    }
+  public TaskActivityDescriptor getTaskActivityDescriptor() {
+    return null;
+  }
 
 }

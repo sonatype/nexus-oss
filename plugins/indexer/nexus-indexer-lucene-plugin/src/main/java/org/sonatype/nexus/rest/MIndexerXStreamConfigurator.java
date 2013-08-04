@@ -10,24 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import com.thoughtworks.xstream.XStream;
 
 /**
  * Configurator for XSream and DTOs.
- * 
+ *
  * @author cstamas
  * @deprecated Use MIndexerXStreamConfiguratorLightweight as it does all since 2.7.0
  */
 @Deprecated
 public class MIndexerXStreamConfigurator
 {
-    @Deprecated
-    public static XStream configureXStream( final XStream xstream )
-    {
-        // do "lightweight", as since 2.7.0 it does all
-        MIndexerXStreamConfiguratorLightweight.configureXStream( xstream );
-        return xstream;
-    }
+  @Deprecated
+  public static XStream configureXStream(final XStream xstream) {
+    // do "lightweight", as since 2.7.0 it does all
+    MIndexerXStreamConfiguratorLightweight.configureXStream(xstream);
+    return xstream;
+  }
 }

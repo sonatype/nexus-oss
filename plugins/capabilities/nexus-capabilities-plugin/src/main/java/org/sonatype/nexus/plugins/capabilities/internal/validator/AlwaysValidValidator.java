@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
 import java.util.Map;
+
 import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;
@@ -28,22 +30,19 @@ public class AlwaysValidValidator
     implements Validator
 {
 
-    @Override
-    public ValidationResult validate( final Map<String, String> properties )
-    {
-        return ValidationResult.VALID;
-    }
+  @Override
+  public ValidationResult validate(final Map<String, String> properties) {
+    return ValidationResult.VALID;
+  }
 
-    @Override
-    public String explainValid()
-    {
-        return "Always valid";
-    }
+  @Override
+  public String explainValid() {
+    return "Always valid";
+  }
 
-    @Override
-    public String explainInvalid()
-    {
-        return "Always invalid";
-    }
+  @Override
+  public String explainInvalid() {
+    return "Always invalid";
+  }
 
 }

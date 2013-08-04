@@ -10,31 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.misc.nexus166;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 import org.junit.AfterClass;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 public class StartStopLeak
     extends AbstractNexusIntegrationTest
 {
-    @AfterClass
-    public void stop()
-        throws Exception
-    {
-        // JOptionPane.showConfirmDialog( null, "Stop" );
-        getNexusStatusUtil().stop();
-        System.gc();
-        JOptionPane.showConfirmDialog( null, "Stoped" );
-    }
+  @AfterClass
+  public void stop()
+      throws Exception
+  {
+    // JOptionPane.showConfirmDialog( null, "Stop" );
+    getNexusStatusUtil().stop();
+    System.gc();
+    JOptionPane.showConfirmDialog(null, "Stoped");
+  }
 
-    @Test
-    public void test()
-    {
-        System.out.println( "In use: " + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() )
-            / 1024 / 1024 );
-    }
+  @Test
+  public void test() {
+    System.out.println("In use: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
+        / 1024 / 1024);
+  }
 }

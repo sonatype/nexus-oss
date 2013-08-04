@@ -10,35 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
 
 public class NumberTextFormField
     extends AbstractFormField<Number>
 {
-    public NumberTextFormField( String id, String label, String helpText, boolean required, String regexValidation )
-    {
-        super( id, label, helpText, required, regexValidation );
-    }
-    
-    public NumberTextFormField( String id, String label, String helpText, boolean required )
-    {
-        super( id, label, helpText, required );
-    }
-    
-    public NumberTextFormField( String id )
-    {
-        super( id );
-    }
-    
-    public String getType()
-    {
-        return "number";
-    }
+  public NumberTextFormField(String id, String label, String helpText, boolean required, String regexValidation) {
+    super(id, label, helpText, required, regexValidation);
+  }
 
-    public NumberTextFormField withInitialValue( final Number initialValue )
-    {
-        setInitialValue( initialValue );
-        return this;
-    }
+  public NumberTextFormField(String id, String label, String helpText, boolean required) {
+    super(id, label, helpText, required);
+  }
+
+  public NumberTextFormField(String id) {
+    super(id);
+  }
+
+  public String getType() {
+    return "number";
+  }
+
+  public NumberTextFormField withInitialValue(final Number initialValue) {
+    setInitialValue(initialValue);
+    return this;
+  }
 
 }

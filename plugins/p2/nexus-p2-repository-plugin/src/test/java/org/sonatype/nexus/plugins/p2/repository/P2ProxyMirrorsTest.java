@@ -10,18 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -35,140 +30,146 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.security.SecuritySystem;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 public class P2ProxyMirrorsTest
     extends NexusAppTestSupport
 {
-    protected Nexus nexus;
+  protected Nexus nexus;
 
-    protected NexusConfiguration nexusConfiguration;
+  protected NexusConfiguration nexusConfiguration;
 
-    private P2ProxyRepository repository;
+  private P2ProxyRepository repository;
 
-    @Override
-    protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
-    }
+  @Override
+  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
+    super.customizeContainerConfiguration(configuration);
+    configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
+  }
 
-    @Override
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  public void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        copyDefaultConfigToPlace();
+    copyDefaultConfigToPlace();
 
-        // next line will force initialization of P2 repository types
-        lookup( TemplateProvider.class, "p2-repository" );
+    // next line will force initialization of P2 repository types
+    lookup(TemplateProvider.class, "p2-repository");
 
-        nexus = lookup( Nexus.class );
+    nexus = lookup(Nexus.class);
 
-        nexusConfiguration = lookup( NexusConfiguration.class );
+    nexusConfiguration = lookup(NexusConfiguration.class);
 
-        repository = (P2ProxyRepository) lookup( RepositoryRegistry.class ).getRepository( "p2-repo" );
-        repository.setChecksumPolicy( ChecksumPolicy.IGNORE );
-        final String remoteUrl = repository.getRemoteUrl();
-        final MockRemoteStorage mockStorage = (MockRemoteStorage) this.lookup( RemoteRepositoryStorage.class, "mock" );
-        repository.setRemoteUrl( remoteUrl );
-        repository.setRemoteStorage( mockStorage );
+    repository = (P2ProxyRepository) lookup(RepositoryRegistry.class).getRepository("p2-repo");
+    repository.setChecksumPolicy(ChecksumPolicy.IGNORE);
+    final String remoteUrl = repository.getRemoteUrl();
+    final MockRemoteStorage mockStorage = (MockRemoteStorage) this.lookup(RemoteRepositoryStorage.class, "mock");
+    repository.setRemoteUrl(remoteUrl);
+    repository.setRemoteStorage(mockStorage);
 
-        this.lookup( SecuritySystem.class ).setSecurityEnabled( false );
-    }
+    this.lookup(SecuritySystem.class).setSecurityEnabled(false);
+  }
 
-    private void copyFileToDotNexus( final String fileName, final String targetFileName )
-        throws IOException
-    {
-        final String localStorageDir = new URL( repository.getLocalUrl() ).getPath();
+  private void copyFileToDotNexus(final String fileName, final String targetFileName)
+      throws IOException
+  {
+    final String localStorageDir = new URL(repository.getLocalUrl()).getPath();
 
-        final String filePrefix = this.getClass().getName().replaceAll( "\\.", "/" ) + "-";
-        final String resource = filePrefix + fileName;
+    final String filePrefix = this.getClass().getName().replaceAll("\\.", "/") + "-";
+    final String resource = filePrefix + fileName;
 
-        final String destinationPath = P2Constants.PRIVATE_ROOT + "/" + targetFileName;
-        final File destination = new File( localStorageDir, destinationPath );
+    final String destinationPath = P2Constants.PRIVATE_ROOT + "/" + targetFileName;
+    final File destination = new File(localStorageDir, destinationPath);
 
-        destination.getParentFile().mkdirs();
-        FileUtils.copyFile( new File( "target/test-classes", resource ), destination );
+    destination.getParentFile().mkdirs();
+    FileUtils.copyFile(new File("target/test-classes", resource), destination);
 
-    }
+  }
 
-    @Override
-    protected void copyDefaultConfigToPlace()
-        throws IOException
-    {
-        copyResource( "/nexus.xml", new File( getConfHomeDir(), "nexus.xml" ).getAbsolutePath() );
-    }
+  @Override
+  protected void copyDefaultConfigToPlace()
+      throws IOException
+  {
+    copyResource("/nexus.xml", new File(getConfHomeDir(), "nexus.xml").getAbsolutePath());
+  }
 
-    @Test
-    @Ignore
-    public void testVerifyBlackList()
-        throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
-    {
+  @Test
+  @Ignore
+  public void testVerifyBlackList()
+      throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
+  {
 
-        copyFileToDotNexus( "mirrors.xml", "mirrors.xml" );
-        copyFileToDotNexus( "artifact-mappings.xml", "artifact-mappings.xml" );
+    copyFileToDotNexus("mirrors.xml", "mirrors.xml");
+    copyFileToDotNexus("artifact-mappings.xml", "artifact-mappings.xml");
 
-        final MockRemoteStorage remoteStorage = (MockRemoteStorage) repository.getRemoteStorage();
-        remoteStorage.getDownUrls().add( "http://remote3/" );
-        remoteStorage.getValidUrls().add( "http://default/test/remote3/file1.txt" );
-        remoteStorage.getValidUrls().add( "http://default/test/remote3/file2.txt" );
+    final MockRemoteStorage remoteStorage = (MockRemoteStorage) repository.getRemoteStorage();
+    remoteStorage.getDownUrls().add("http://remote3/");
+    remoteStorage.getValidUrls().add("http://default/test/remote3/file1.txt");
+    remoteStorage.getValidUrls().add("http://default/test/remote3/file2.txt");
 
-        // not found with bad mirror
-        ResourceStoreRequest request = new ResourceStoreRequest( "/remote3/file1.txt" );
+    // not found with bad mirror
+    ResourceStoreRequest request = new ResourceStoreRequest("/remote3/file1.txt");
 
-        repository.retrieveItem( request );
+    repository.retrieveItem(request);
 
-        // make sure we hit the mirror
-        Assert.assertTrue( remoteStorage.getRequests().contains(
-            new MockRemoteStorage.MockRequestRecord( repository, request, "http://remote3/" ) ) );
-        Assert.assertTrue( remoteStorage.getRequests().contains(
-            new MockRemoteStorage.MockRequestRecord( repository, request, "http://remote2/" ) ) );
-        Assert.assertTrue( remoteStorage.getRequests().contains(
-            new MockRemoteStorage.MockRequestRecord( repository, request, "http://remote1/" ) ) );
-        // clear the requests
-        remoteStorage.getRequests().clear();
+    // make sure we hit the mirror
+    Assert.assertTrue(remoteStorage.getRequests().contains(
+        new MockRemoteStorage.MockRequestRecord(repository, request, "http://remote3/")));
+    Assert.assertTrue(remoteStorage.getRequests().contains(
+        new MockRemoteStorage.MockRequestRecord(repository, request, "http://remote2/")));
+    Assert.assertTrue(remoteStorage.getRequests().contains(
+        new MockRemoteStorage.MockRequestRecord(repository, request, "http://remote1/")));
+    // clear the requests
+    remoteStorage.getRequests().clear();
 
-        request = new ResourceStoreRequest( "/remote3/file2.txt" );
+    request = new ResourceStoreRequest("/remote3/file2.txt");
 
-        repository.retrieveItem( request );
+    repository.retrieveItem(request);
 
-        // make sure we did NOT hit the mirror
-        Assert.assertFalse( remoteStorage.getRequests().contains(
-            new MockRemoteStorage.MockRequestRecord( repository, request, "http://remote3/" ) ) );
-        Assert.assertTrue( remoteStorage.getRequests().contains(
-            new MockRemoteStorage.MockRequestRecord( repository, request, "http://remote2/" ) ) );
-        Assert.assertTrue( remoteStorage.getRequests().contains(
-            new MockRemoteStorage.MockRequestRecord( repository, request, "http://remote1/" ) ) );
-    }
+    // make sure we did NOT hit the mirror
+    Assert.assertFalse(remoteStorage.getRequests().contains(
+        new MockRemoteStorage.MockRequestRecord(repository, request, "http://remote3/")));
+    Assert.assertTrue(remoteStorage.getRequests().contains(
+        new MockRemoteStorage.MockRequestRecord(repository, request, "http://remote2/")));
+    Assert.assertTrue(remoteStorage.getRequests().contains(
+        new MockRemoteStorage.MockRequestRecord(repository, request, "http://remote1/")));
+  }
 
-    @Test
-    @Ignore
-    public void testVerifyBlackListWithCompositeRepo()
-        throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
-    {
-        // all we need is a different mirrors.xml
-        copyFileToDotNexus( "mirrors-composite.xml", "mirrors.xml" );
-        copyFileToDotNexus( "artifact-mappings-composite.xml", "artifact-mappings.xml" );
+  @Test
+  @Ignore
+  public void testVerifyBlackListWithCompositeRepo()
+      throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
+  {
+    // all we need is a different mirrors.xml
+    copyFileToDotNexus("mirrors-composite.xml", "mirrors.xml");
+    copyFileToDotNexus("artifact-mappings-composite.xml", "artifact-mappings.xml");
 
-        testVerifyBlackList();
-    }
+    testVerifyBlackList();
+  }
 
-    @Test
-    @Ignore
-    public void testCompositeRepoWithNoMirrors()
-        throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
-    {
-        copyFileToDotNexus( "mirrors-none-composite.xml", "mirrors.xml" );
-        copyFileToDotNexus( "artifact-mappings-composite.xml", "artifact-mappings.xml" );
+  @Test
+  @Ignore
+  public void testCompositeRepoWithNoMirrors()
+      throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
+  {
+    copyFileToDotNexus("mirrors-none-composite.xml", "mirrors.xml");
+    copyFileToDotNexus("artifact-mappings-composite.xml", "artifact-mappings.xml");
 
-        final MockRemoteStorage remoteStorage = (MockRemoteStorage) repository.getRemoteStorage();
-        // remoteStorage.getDownUrls().add( "http://remote3/" );
-        remoteStorage.getValidUrls().add( "http://default/member2/remote2/file1.txt" );
-        // remoteStorage.getValidUrls().add( "http://default/test/remote3/file2.txt" );
+    final MockRemoteStorage remoteStorage = (MockRemoteStorage) repository.getRemoteStorage();
+    // remoteStorage.getDownUrls().add( "http://remote3/" );
+    remoteStorage.getValidUrls().add("http://default/member2/remote2/file1.txt");
+    // remoteStorage.getValidUrls().add( "http://default/test/remote3/file2.txt" );
 
-        // not found with bad mirror
-        final ResourceStoreRequest request = new ResourceStoreRequest( "/remote2/file1.txt" );
+    // not found with bad mirror
+    final ResourceStoreRequest request = new ResourceStoreRequest("/remote2/file1.txt");
 
-        repository.retrieveItem( request );
-    }
+    repository.retrieveItem(request);
+  }
 }

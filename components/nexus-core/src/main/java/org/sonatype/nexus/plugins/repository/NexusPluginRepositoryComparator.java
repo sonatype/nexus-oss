@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import java.util.Comparator;
@@ -20,17 +21,15 @@ import java.util.Comparator;
 final class NexusPluginRepositoryComparator
     implements Comparator<NexusPluginRepository>
 {
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
 
-    public int compare( final NexusPluginRepository o1, final NexusPluginRepository o2 )
-    {
-        final int order = o1.getPriority() - o2.getPriority();
-        if ( 0 == order )
-        {
-            return o1.getId().compareTo( o2.getId() );
-        }
-        return order;
+  public int compare(final NexusPluginRepository o1, final NexusPluginRepository o2) {
+    final int order = o1.getPriority() - o2.getPriority();
+    if (0 == order) {
+      return o1.getId().compareTo(o2.getId());
     }
+    return order;
+  }
 }

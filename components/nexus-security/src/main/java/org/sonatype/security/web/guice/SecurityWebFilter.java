@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.web.guice;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.sonatype.security.SecuritySystem;
+
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.AbstractShiroFilter;
 import org.apache.shiro.web.servlet.ShiroFilter;
-import org.sonatype.security.SecuritySystem;
 
 /**
  * Injected {@link ShiroFilter} that only applies when {@link SecuritySystem#isSecurityEnabled()} is {@code true}.
@@ -28,19 +30,17 @@ import org.sonatype.security.SecuritySystem;
 public class SecurityWebFilter
     extends AbstractShiroFilter
 {
-    private final SecuritySystem securitySystem;
+  private final SecuritySystem securitySystem;
 
-    @Inject
-    protected SecurityWebFilter( SecuritySystem securitySystem, FilterChainResolver filterChainResolver )
-    {
-        this.securitySystem = securitySystem;
-        this.setSecurityManager( (WebSecurityManager) securitySystem.getSecurityManager() );
-        this.setFilterChainResolver( filterChainResolver );
-    }
+  @Inject
+  protected SecurityWebFilter(SecuritySystem securitySystem, FilterChainResolver filterChainResolver) {
+    this.securitySystem = securitySystem;
+    this.setSecurityManager((WebSecurityManager) securitySystem.getSecurityManager());
+    this.setFilterChainResolver(filterChainResolver);
+  }
 
-    @Override
-    public boolean isEnabled()
-    {
-        return securitySystem.isSecurityEnabled();
-    }
+  @Override
+  public boolean isEnabled() {
+    return securitySystem.isSecurityEnabled();
+  }
 }

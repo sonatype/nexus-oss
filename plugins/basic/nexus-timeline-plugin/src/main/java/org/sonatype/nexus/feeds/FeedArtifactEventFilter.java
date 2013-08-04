@@ -10,19 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds;
 
 import java.util.List;
 
 /**
- * Filter the Feeds results.  For example if the user didn't have access to an element in the feed it should be filtered so they do not see it.
+ * Filter the Feeds results.  For example if the user didn't have access to an element in the feed it should be
+ * filtered
+ * so they do not see it.
  */
 public interface FeedArtifactEventFilter
 {
-    /**
-     * Filters the list <code>artifactEvents</code>.
-     * @param artifactEvents the events to be filtered.
-     * @return A subset of the original <code>artifactEvents</code> list.
-     */
-    List<NexusArtifactEvent> filterArtifactEventList( List<NexusArtifactEvent> artifactEvents );
+  /**
+   * Filters the list <code>artifactEvents</code>.
+   * @param artifactEvents the events to be filtered.
+   * @return A subset of the original <code>artifactEvents</code> list.
+   */
+  List<NexusArtifactEvent> filterArtifactEventList(List<NexusArtifactEvent> artifactEvents);
 }

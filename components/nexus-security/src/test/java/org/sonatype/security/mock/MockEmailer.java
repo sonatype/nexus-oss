@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.mock;
 
 import java.util.List;
@@ -20,29 +21,24 @@ public class MockEmailer
     implements SecurityEmailer
 {
 
-    public List<String> forgotUserIds;
+  public List<String> forgotUserIds;
 
-    public void sendForgotUsername( String email, List<String> userIds )
-    {
-        forgotUserIds = userIds;
-    }
+  public void sendForgotUsername(String email, List<String> userIds) {
+    forgotUserIds = userIds;
+  }
 
-    public void sendNewUserCreated( String email, String userid, String password )
-    {
-    }
+  public void sendNewUserCreated(String email, String userid, String password) {
+  }
 
-    public void sendResetPassword( String email, String password )
-    {
-    }
+  public void sendResetPassword(String email, String password) {
+  }
 
-    public List<String> getForgotUserIds()
-    {
-        return forgotUserIds;
-    }
+  public List<String> getForgotUserIds() {
+    return forgotUserIds;
+  }
 
-    public void setForgotUserIds( List<String> forgotUserIds )
-    {
-        this.forgotUserIds = forgotUserIds;
-    }
+  public void setForgotUserIds(List<String> forgotUserIds) {
+    this.forgotUserIds = forgotUserIds;
+  }
 
 }

@@ -10,36 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal.task;
 
 /**
  * Helper class for {@link Cancelable}.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class CancelableSupport
     implements Cancelable
 {
-    private volatile boolean canceled;
+  private volatile boolean canceled;
 
-    /**
-     * Default constructor.
-     */
-    public CancelableSupport()
-    {
-        this.canceled = false;
-    }
+  /**
+   * Default constructor.
+   */
+  public CancelableSupport() {
+    this.canceled = false;
+  }
 
-    @Override
-    public boolean isCanceled()
-    {
-        return canceled;
-    }
+  @Override
+  public boolean isCanceled() {
+    return canceled;
+  }
 
-    @Override
-    public void cancel()
-    {
-        canceled = true;
-    }
+  @Override
+  public void cancel() {
+    canceled = true;
+  }
 }

@@ -10,14 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest.jersey;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.client.rest.Protocol.HTTP;
+import org.sonatype.nexus.client.core.spi.SubsystemFactory;
+import org.sonatype.nexus.client.rest.BaseUrl;
+import org.sonatype.nexus.client.rest.ConnectionInfo;
+import org.sonatype.nexus.client.rest.ProxyInfo;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.collect.ImmutableMap;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.thoughtworks.xstream.XStream;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.hamcrest.Matcher;
@@ -25,14 +29,12 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.rest.BaseUrl;
-import org.sonatype.nexus.client.rest.ConnectionInfo;
-import org.sonatype.nexus.client.rest.ProxyInfo;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-import com.google.common.collect.ImmutableMap;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.thoughtworks.xstream.XStream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.client.rest.Protocol.HTTP;
 
 /**
  * Tests for JerseyNexusClientFactory.
@@ -41,44 +43,42 @@ public class JerseyNexusClientFactoryTest
     extends TestSupport
 {
 
-    private JerseyNexusClientFactory underTest;
+  private JerseyNexusClientFactory underTest;
 
-    @Mock
-    private SubsystemFactory<?, JerseyNexusClient> factory;
+  @Mock
+  private SubsystemFactory<?, JerseyNexusClient> factory;
 
-    @Mock
-    private XStream xstream;
+  @Mock
+  private XStream xstream;
 
-    @Mock
-    private ConnectionInfo connection;
+  @Mock
+  private ConnectionInfo connection;
 
-    @Mock
-    private ProxyInfo proxyInfo;
+  @Mock
+  private ProxyInfo proxyInfo;
 
-    @Before
-    public void setup()
-    {
-        underTest = new JerseyNexusClientFactory( factory );
-    }
+  @Before
+  public void setup() {
+    underTest = new JerseyNexusClientFactory(factory);
+  }
 
-    @Test
-    public void testProxySettings()
-    {
-        when( connection.getProxyInfos() ).thenReturn( ImmutableMap.of( HTTP, proxyInfo ) );
-        when( connection.getBaseUrl() ).thenReturn( new BaseUrl( HTTP, "otherhost", 8080, "path" ) );
+  @Test
+  public void testProxySettings() {
+    when(connection.getProxyInfos()).thenReturn(ImmutableMap.of(HTTP, proxyInfo));
+    when(connection.getBaseUrl()).thenReturn(new BaseUrl(HTTP, "otherhost", 8080, "path"));
 
-        when( proxyInfo.getProxyHost() ).thenReturn( "somehost" );
-        when( proxyInfo.getProxyPort() ).thenReturn( 8888 );
-        when( proxyInfo.getProxyProtocol() ).thenReturn( HTTP );
+    when(proxyInfo.getProxyHost()).thenReturn("somehost");
+    when(proxyInfo.getProxyPort()).thenReturn(8888);
+    when(proxyInfo.getProxyProtocol()).thenReturn(HTTP);
 
-        final ApacheHttpClient4 client = underTest.doCreateHttpClientFor( connection, xstream );
+    final ApacheHttpClient4 client = underTest.doCreateHttpClientFor(connection, xstream);
 
-        assertThat( client.getClientHandler().getHttpClient().getParams().getParameter( ConnRoutePNames.DEFAULT_PROXY ),
-                    (Matcher) allOf(
-                        Matchers.isA( HttpHost.class ),
-                        Matchers.hasProperty( "hostName", is( "somehost" ) ),
-                        Matchers.hasProperty( "port", is( 8888 ) )
-                    ) );
-    }
+    assertThat(client.getClientHandler().getHttpClient().getParams().getParameter(ConnRoutePNames.DEFAULT_PROXY),
+        (Matcher) allOf(
+            Matchers.isA(HttpHost.class),
+            Matchers.hasProperty("hostName", is("somehost")),
+            Matchers.hasProperty("port", is(8888))
+        ));
+  }
 
 }

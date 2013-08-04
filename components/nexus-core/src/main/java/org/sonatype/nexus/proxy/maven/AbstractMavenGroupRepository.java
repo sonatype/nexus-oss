@@ -10,13 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -32,145 +32,129 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
+import org.codehaus.plexus.component.annotations.Requirement;
+
 public abstract class AbstractMavenGroupRepository
     extends AbstractGroupRepository
     implements MavenGroupRepository
 {
-    /**
-     * Metadata manager.
-     */
-    @Requirement
-    private MetadataManager metadataManager;
+  /**
+   * Metadata manager.
+   */
+  @Requirement
+  private MetadataManager metadataManager;
 
-    /**
-     * The artifact packaging mapper.
-     */
-    @Requirement
-    private ArtifactPackagingMapper artifactPackagingMapper;
+  /**
+   * The artifact packaging mapper.
+   */
+  @Requirement
+  private ArtifactPackagingMapper artifactPackagingMapper;
 
-    private ArtifactStoreHelper artifactStoreHelper;
+  private ArtifactStoreHelper artifactStoreHelper;
 
-    private RepositoryKind repositoryKind;
+  private RepositoryKind repositoryKind;
 
-    @Override
-    protected AbstractMavenGroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
-    {
-        return (AbstractMavenGroupRepositoryConfiguration) super.getExternalConfiguration( forWrite );
+  @Override
+  protected AbstractMavenGroupRepositoryConfiguration getExternalConfiguration(boolean forWrite) {
+    return (AbstractMavenGroupRepositoryConfiguration) super.getExternalConfiguration(forWrite);
+  }
+
+  public RepositoryKind getRepositoryKind() {
+    if (repositoryKind == null) {
+      repositoryKind =
+          new DefaultRepositoryKind(GroupRepository.class,
+              Arrays.asList(new Class<?>[]{MavenGroupRepository.class}));
+    }
+    return repositoryKind;
+  }
+
+  public boolean isMergeMetadata() {
+    return getExternalConfiguration(false).isMergeMetadata();
+  }
+
+  public void setMergeMetadata(boolean mergeMetadata) {
+    getExternalConfiguration(true).setMergeMetadata(mergeMetadata);
+  }
+
+  public ArtifactPackagingMapper getArtifactPackagingMapper() {
+    return artifactPackagingMapper;
+  }
+
+  public ArtifactStoreHelper getArtifactStoreHelper() {
+    if (artifactStoreHelper == null) {
+      artifactStoreHelper = new ArtifactStoreHelper(this);
     }
 
-    public RepositoryKind getRepositoryKind()
-    {
-        if ( repositoryKind == null )
-        {
-            repositoryKind =
-                new DefaultRepositoryKind( GroupRepository.class,
-                    Arrays.asList( new Class<?>[] { MavenGroupRepository.class } ) );
-        }
-        return repositoryKind;
+    return artifactStoreHelper;
+  }
+
+  public MetadataManager getMetadataManager() {
+    return metadataManager;
+  }
+
+  public boolean recreateMavenMetadata(ResourceStoreRequest request) {
+    if (!getLocalStatus().shouldServiceRequest()) {
+      return false;
     }
 
-    public boolean isMergeMetadata()
-    {
-        return getExternalConfiguration( false ).isMergeMetadata();
+    boolean result = false;
+
+    for (Repository repository : getMemberRepositories()) {
+      if (repository.getRepositoryKind().isFacetAvailable(MavenRepository.class)) {
+        result |= ((MavenRepository) repository).recreateMavenMetadata(request);
+      }
     }
 
-    public void setMergeMetadata( boolean mergeMetadata )
-    {
-        getExternalConfiguration( true ).setMergeMetadata( mergeMetadata );
-    }
+    return result;
+  }
 
-    public ArtifactPackagingMapper getArtifactPackagingMapper()
-    {
-        return artifactPackagingMapper;
-    }
+  public RepositoryPolicy getRepositoryPolicy() {
+    return RepositoryPolicy.MIXED;
+  }
 
-    public ArtifactStoreHelper getArtifactStoreHelper()
-    {
-        if ( artifactStoreHelper == null )
-        {
-            artifactStoreHelper = new ArtifactStoreHelper( this );
-        }
+  public void setRepositoryPolicy(RepositoryPolicy repositoryPolicy) {
+    throw new UnsupportedOperationException(
+        "Setting repository policy on a Maven group repository is not possible!");
+  }
 
-        return artifactStoreHelper;
-    }
+  public boolean isMavenArtifact(StorageItem item) {
+    return isMavenArtifactPath(item.getPath());
+  }
 
-    public MetadataManager getMetadataManager()
-    {
-        return metadataManager;
-    }
+  public boolean isMavenMetadata(StorageItem item) {
+    return isMavenMetadataPath(item.getPath());
+  }
 
-    public boolean recreateMavenMetadata( ResourceStoreRequest request )
-    {
-        if ( !getLocalStatus().shouldServiceRequest() )
-        {
-            return false;
-        }
+  public boolean isMavenArtifactPath(String path) {
+    return getGavCalculator().pathToGav(path) != null;
+  }
 
-        boolean result = false;
+  public abstract boolean isMavenMetadataPath(String path);
 
-        for ( Repository repository : getMemberRepositories() )
-        {
-            if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
-            {
-                result |= ( (MavenRepository) repository ).recreateMavenMetadata( request );
-            }
-        }
+  public void storeItemWithChecksums(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
+      throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+             StorageException, AccessDeniedException
+  {
+    getArtifactStoreHelper().storeItemWithChecksums(request, is, userAttributes);
+  }
 
-        return result;
-    }
+  public void storeItemWithChecksums(boolean fromTask, AbstractStorageItem item)
+      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
+  {
+    getArtifactStoreHelper().storeItemWithChecksums(fromTask, item);
+  }
 
-    public RepositoryPolicy getRepositoryPolicy()
-    {
-        return RepositoryPolicy.MIXED;
-    }
+  public void deleteItemWithChecksums(ResourceStoreRequest request)
+      throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+             StorageException, AccessDeniedException
+  {
+    getArtifactStoreHelper().deleteItemWithChecksums(request);
+  }
 
-    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
-    {
-        throw new UnsupportedOperationException(
-            "Setting repository policy on a Maven group repository is not possible!" );
-    }
-
-    public boolean isMavenArtifact( StorageItem item )
-    {
-        return isMavenArtifactPath( item.getPath() );
-    }
-
-    public boolean isMavenMetadata( StorageItem item )
-    {
-        return isMavenMetadataPath( item.getPath() );
-    }
-
-    public boolean isMavenArtifactPath( String path )
-    {
-        return getGavCalculator().pathToGav( path ) != null;
-    }
-
-    public abstract boolean isMavenMetadataPath( String path );
-
-    public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
-        StorageException, AccessDeniedException
-    {
-        getArtifactStoreHelper().storeItemWithChecksums( request, is, userAttributes );
-    }
-
-    public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
-        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
-    {
-        getArtifactStoreHelper().storeItemWithChecksums( fromTask, item );
-    }
-
-    public void deleteItemWithChecksums( ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
-        StorageException, AccessDeniedException
-    {
-        getArtifactStoreHelper().deleteItemWithChecksums( request );
-    }
-
-    public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
-    {
-        getArtifactStoreHelper().deleteItemWithChecksums( fromTask, request );
-    }
+  public void deleteItemWithChecksums(boolean fromTask, ResourceStoreRequest request)
+      throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
+  {
+    getArtifactStoreHelper().deleteItemWithChecksums(fromTask, request);
+  }
 
 }

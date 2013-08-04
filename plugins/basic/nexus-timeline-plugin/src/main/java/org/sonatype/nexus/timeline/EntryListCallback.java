@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline;
 
 import java.io.IOException;
@@ -22,18 +23,17 @@ import org.sonatype.timeline.TimelineRecord;
 public class EntryListCallback
     implements TimelineCallback
 {
-    private final List<Entry> entries = new ArrayList<Entry>();
+  private final List<Entry> entries = new ArrayList<Entry>();
 
-    @Override
-    public boolean processNext( TimelineRecord rec )
-        throws IOException
-    {
-        entries.add( new TimelineRecordWrapper( rec ) );
-        return true;
-    }
+  @Override
+  public boolean processNext(TimelineRecord rec)
+      throws IOException
+  {
+    entries.add(new TimelineRecordWrapper(rec));
+    return true;
+  }
 
-    public List<Entry> getEntries()
-    {
-        return entries;
-    }
+  public List<Entry> getEntries() {
+    return entries;
+  }
 }

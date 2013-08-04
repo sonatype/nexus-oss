@@ -10,48 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
 public class DummyWaitingNexusRepositoriesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
 
-    private long sleepTime = 10000;
-    
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return null;
-    }
+  private long sleepTime = 10000;
 
-    public long getSleepTime()
-    {
-        return sleepTime;
-    }
+  @Override
+  protected String getRepositoryFieldId() {
+    return null;
+  }
 
-    public void setSleepTime( long sleepTime )
-    {
-        this.sleepTime = sleepTime;
-    }
+  public long getSleepTime() {
+    return sleepTime;
+  }
 
-    public Object doRun()
-        throws Exception
-    {
-        System.out.println( "BEFORE SLEEP" );
-        Thread.sleep( getSleepTime() );
-        System.out.println( "AFTER SLEEP" );
+  public void setSleepTime(long sleepTime) {
+    this.sleepTime = sleepTime;
+  }
 
-        return null;
-    }
+  public Object doRun()
+      throws Exception
+  {
+    System.out.println("BEFORE SLEEP");
+    Thread.sleep(getSleepTime());
+    System.out.println("AFTER SLEEP");
 
-    protected String getAction()
-    {
-        return "DUMMY";
-    }
+    return null;
+  }
 
-    protected String getMessage()
-    {
-        return "A Dummy task, waits for some time";
-    }
+  protected String getAction() {
+    return "DUMMY";
+  }
+
+  protected String getMessage() {
+    return "A Dummy task, waits for some time";
+  }
 
 }

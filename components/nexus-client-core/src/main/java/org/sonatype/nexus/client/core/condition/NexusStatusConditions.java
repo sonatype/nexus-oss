@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.condition;
 
 import org.sonatype.nexus.client.core.Condition;
@@ -17,89 +18,73 @@ import org.sonatype.nexus.client.core.NexusStatus;
 
 /**
  * {@link Condition}s matching {@link NexusStatus}.
- * 
+ *
  * @since 2.1
  */
 public abstract class NexusStatusConditions
 {
 
-    public static Condition anyModern()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.anyModernVersion() );
-    }
+  public static Condition anyModern() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.anyModernVersion());
+  }
 
-    public static Condition anyModernPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.anyModernVersion() );
-    }
+  public static Condition anyModernPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.anyModernVersion());
+  }
 
-    public static Condition any20AndLater()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any20AndLaterVersion() );
-    }
+  public static Condition any20AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any20AndLaterVersion());
+  }
 
-    public static Condition any20AndLaterPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any20AndLaterVersion() );
-    }
+  public static Condition any20AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any20AndLaterVersion());
+  }
 
-    public static Condition any21AndLater()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any21AndLaterVersion() );
-    }
+  public static Condition any21AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any21AndLaterVersion());
+  }
 
-    public static Condition any21AndLaterPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any21AndLaterVersion() );
-    }
+  public static Condition any21AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any21AndLaterVersion());
+  }
 
-    public static Condition any22AndLater()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any22AndLaterVersion() );
-    }
+  public static Condition any22AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any22AndLaterVersion());
+  }
 
-    public static Condition any22AndLaterPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any22AndLaterVersion() );
-    }
+  public static Condition any22AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any22AndLaterVersion());
+  }
 
-    public static Condition any23AndLater()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any23AndLaterVersion() );
-    }
+  public static Condition any23AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any23AndLaterVersion());
+  }
 
-    public static Condition any23AndLaterPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any23AndLaterVersion() );
-    }
+  public static Condition any23AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any23AndLaterVersion());
+  }
 
-    public static Condition any24AndLater()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any24AndLaterVersion() );
-    }
+  public static Condition any24AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any24AndLaterVersion());
+  }
 
-    public static Condition any24AndLaterPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any24AndLaterVersion() );
-    }
+  public static Condition any24AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any24AndLaterVersion());
+  }
 
-    public static Condition any25AndLater()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any25AndLaterVersion() );
-    }
+  public static Condition any25AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any25AndLaterVersion());
+  }
 
-    public static Condition any25AndLaterPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any25AndLaterVersion() );
-    }
+  public static Condition any25AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any25AndLaterVersion());
+  }
 
-    public static Condition any26AndLater()
-    {
-        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any26AndLaterVersion() );
-    }
+  public static Condition any26AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any26AndLaterVersion());
+  }
 
-    public static Condition any26AndLaterPro()
-    {
-        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any26AndLaterVersion() );
-    }
+  public static Condition any26AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any26AndLaterVersion());
+  }
 }

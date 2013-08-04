@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository;
 
 import java.util.Map;
@@ -25,24 +26,24 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 public interface P2ProxyRepository
     extends ProxyRepository, P2Repository
 {
-    P2MetadataSource<P2ProxyRepository> getMetadataSource();
+  P2MetadataSource<P2ProxyRepository> getMetadataSource();
 
-    void initArtifactMappingsAndMirrors();
+  void initArtifactMappingsAndMirrors();
 
-    Map<String, ArtifactMapping> getArtifactMappings()
-        throws IllegalOperationException, StorageException;
+  Map<String, ArtifactMapping> getArtifactMappings()
+      throws IllegalOperationException, StorageException;
 
-    int getArtifactMaxAge();
+  int getArtifactMaxAge();
 
-    void setArtifactMaxAge( final int maxAge );
+  void setArtifactMaxAge(final int maxAge);
 
-    int getMetadataMaxAge();
+  int getMetadataMaxAge();
 
-    void setMetadataMaxAge( final int metadataMaxAge );
+  void setMetadataMaxAge(final int metadataMaxAge);
 
-    ChecksumPolicy getChecksumPolicy();
+  ChecksumPolicy getChecksumPolicy();
 
-    void setChecksumPolicy( final ChecksumPolicy checksumPolicy );
+  void setChecksumPolicy(final ChecksumPolicy checksumPolicy);
 
-    boolean isMetadataOld( StorageItem metadataItem );
+  boolean isMetadataOld(StorageItem metadataItem);
 }

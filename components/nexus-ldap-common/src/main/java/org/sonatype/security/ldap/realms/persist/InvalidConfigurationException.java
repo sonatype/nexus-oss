@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.persist;
 
 import java.io.StringWriter;
@@ -17,70 +18,59 @@ import java.io.StringWriter;
 public class InvalidConfigurationException
     extends Exception
 {
-    /**
-     * The validation response.
-     */
-    private ValidationResponse validationResponse;
+  /**
+   * The validation response.
+   */
+  private ValidationResponse validationResponse;
 
-    public InvalidConfigurationException()
-    {
-        this( "Configuration is invalid!" );
-    }
+  public InvalidConfigurationException() {
+    this("Configuration is invalid!");
+  }
 
-    public InvalidConfigurationException( String msg )
-    {
-        super( msg );
-    }
+  public InvalidConfigurationException(String msg) {
+    super(msg);
+  }
 
-    public InvalidConfigurationException( String msg, Throwable t )
-    {
-        super( msg, t );
-    }
+  public InvalidConfigurationException(String msg, Throwable t) {
+    super(msg, t);
+  }
 
-    public InvalidConfigurationException( ValidationResponse validationResponse )
-    {
-        this();
+  public InvalidConfigurationException(ValidationResponse validationResponse) {
+    this();
 
-        this.validationResponse = validationResponse;
-    }
+    this.validationResponse = validationResponse;
+  }
 
-    public ValidationResponse getValidationResponse()
-    {
-        return validationResponse;
-    }
+  public ValidationResponse getValidationResponse() {
+    return validationResponse;
+  }
 
-    public String getMessage()
-    {
-        StringWriter sw = new StringWriter();
+  public String getMessage() {
+    StringWriter sw = new StringWriter();
 
-        sw.append( super.getMessage() );
+    sw.append(super.getMessage());
 
-        if ( getValidationResponse() != null )
-        {
-            if ( getValidationResponse().getValidationErrors().size() > 0 )
-            {
-                sw.append( "\nValidation errors follows:\n" );
+    if (getValidationResponse() != null) {
+      if (getValidationResponse().getValidationErrors().size() > 0) {
+        sw.append("\nValidation errors follows:\n");
 
-                for ( ValidationMessage error : getValidationResponse().getValidationErrors() )
-                {
-                    sw.append( error.toString() );
-                }
-                sw.append( "\n" );
-            }
-
-            if ( getValidationResponse().getValidationWarnings().size() > 0 )
-            {
-                sw.append( "\nValidation warnings follows:\n" );
-
-                for ( ValidationMessage warning : getValidationResponse().getValidationWarnings() )
-                {
-                    sw.append( warning.toString() );
-                }
-                sw.append( "\n" );
-            }
+        for (ValidationMessage error : getValidationResponse().getValidationErrors()) {
+          sw.append(error.toString());
         }
+        sw.append("\n");
+      }
 
-        return sw.toString();
+      if (getValidationResponse().getValidationWarnings().size() > 0) {
+        sw.append("\nValidation warnings follows:\n");
+
+        for (ValidationMessage warning : getValidationResponse().getValidationWarnings()) {
+          sw.append(warning.toString());
+        }
+        sw.append("\n");
+      }
     }
+
+    return sw.toString();
+  }
 
 }

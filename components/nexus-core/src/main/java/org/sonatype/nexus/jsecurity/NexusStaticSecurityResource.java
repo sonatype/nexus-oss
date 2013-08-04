@@ -10,20 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.jsecurity;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
-@Component( role = StaticSecurityResource.class, hint = "NexusStaticSecurityResource" )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = StaticSecurityResource.class, hint = "NexusStaticSecurityResource")
 public class NexusStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    @Override
-    public String getResourcePath()
-    {
-        return "/META-INF/nexus/static-security.xml";
-    }
+  @Override
+  public String getResourcePath() {
+    return "/META-INF/nexus/static-security.xml";
+  }
 }

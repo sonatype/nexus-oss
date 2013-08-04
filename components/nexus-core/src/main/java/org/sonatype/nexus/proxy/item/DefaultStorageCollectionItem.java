@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 import java.util.Collection;
@@ -31,115 +32,98 @@ public class DefaultStorageCollectionItem
     implements StorageCollectionItem
 {
 
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = -7329636330511885938L;
+  /**
+   * The Constant serialVersionUID.
+   */
+  private static final long serialVersionUID = -7329636330511885938L;
 
-    /**
-     * Instantiates a new default storage collection item.
-     * 
-     * @param repository the repository
-     * @param path the path
-     * @param canRead the can read
-     * @param canWrite the can write
-     */
-    public DefaultStorageCollectionItem( Repository repository, ResourceStoreRequest request, boolean canRead,
-                                         boolean canWrite )
-    {
-        super( repository, request, canRead, canWrite );
+  /**
+   * Instantiates a new default storage collection item.
+   *
+   * @param repository the repository
+   * @param path       the path
+   * @param canRead    the can read
+   * @param canWrite   the can write
+   */
+  public DefaultStorageCollectionItem(Repository repository, ResourceStoreRequest request, boolean canRead,
+                                      boolean canWrite)
+  {
+    super(repository, request, canRead, canWrite);
+  }
+
+  /**
+   * Shotuct method.
+   *
+   * @deprecated supply resourceStoreRequest always
+   */
+  public DefaultStorageCollectionItem(Repository repository, String path, boolean canRead, boolean canWrite) {
+    this(repository, new ResourceStoreRequest(path, true, false), canRead, canWrite);
+  }
+
+  /**
+   * Instantiates a new default storage collection item.
+   *
+   * @param router   the router
+   * @param path     the path
+   * @param virtual  the virtual
+   * @param canRead  the can read
+   * @param canWrite the can write
+   */
+  public DefaultStorageCollectionItem(RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
+                                      boolean canWrite)
+  {
+    super(router, request, canRead, canWrite);
+  }
+
+  /**
+   * Shortcut method.
+   *
+   * @deprecated supply resourceStoreRequest always
+   */
+  public DefaultStorageCollectionItem(RepositoryRouter router, String path, boolean canRead, boolean canWrite) {
+    this(router, new ResourceStoreRequest(path, true, false), canRead, canWrite);
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see org.sonatype.nexus.item.StorageCollectionItem#list()
+   */
+  public Collection<StorageItem> list()
+      throws AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException, ItemNotFoundException,
+             StorageException
+  {
+    if (isVirtual()) {
+      return getStore().list(getResourceStoreRequest());
     }
+    else {
+      Repository repo = getRepositoryItemUid().getRepository();
 
-    /**
-     * Shotuct method.
-     * 
-     * @param repository
-     * @param path
-     * @param canRead
-     * @param canWrite
-     * @deprecated supply resourceStoreRequest always
-     */
-    public DefaultStorageCollectionItem( Repository repository, String path, boolean canRead, boolean canWrite )
-    {
-        this( repository, new ResourceStoreRequest( path, true, false ), canRead, canWrite );
+      Collection<StorageItem> result = repo.list(false, this);
+
+      correctPaths(result);
+
+      return result;
     }
+  }
 
-    /**
-     * Instantiates a new default storage collection item.
-     * 
-     * @param router the router
-     * @param path the path
-     * @param virtual the virtual
-     * @param canRead the can read
-     * @param canWrite the can write
-     */
-    public DefaultStorageCollectionItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-                                         boolean canWrite )
-    {
-        super( router, request, canRead, canWrite );
+  /**
+   * This method "normalizes" the paths back to the "level" from where the original item was requested.
+   */
+  protected void correctPaths(Collection<StorageItem> list) {
+    for (StorageItem item : list) {
+      if (getPath().endsWith(RepositoryItemUid.PATH_SEPARATOR)) {
+        ((AbstractStorageItem) item).setPath(getPath() + item.getName());
+      }
+      else {
+        ((AbstractStorageItem) item).setPath(getPath() + RepositoryItemUid.PATH_SEPARATOR + item.getName());
+      }
     }
+  }
 
-    /**
-     * Shortcut method.
-     * 
-     * @param router
-     * @param path
-     * @param canRead
-     * @param canWrite
-     * @deprecated supply resourceStoreRequest always
-     */
-    public DefaultStorageCollectionItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite )
-    {
-        this( router, new ResourceStoreRequest( path, true, false ), canRead, canWrite );
-    }
+  // --
 
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.nexus.item.StorageCollectionItem#list()
-     */
-    public Collection<StorageItem> list()
-        throws AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException, ItemNotFoundException,
-        StorageException
-    {
-        if ( isVirtual() )
-        {
-            return getStore().list( getResourceStoreRequest() );
-        }
-        else
-        {
-            Repository repo = getRepositoryItemUid().getRepository();
-
-            Collection<StorageItem> result = repo.list( false, this );
-
-            correctPaths( result );
-
-            return result;
-        }
-    }
-
-    /**
-     * This method "normalizes" the paths back to the "level" from where the original item was requested.
-     * 
-     * @param list
-     */
-    protected void correctPaths( Collection<StorageItem> list )
-    {
-        for ( StorageItem item : list )
-        {
-            if ( getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-            {
-                ( (AbstractStorageItem) item ).setPath( getPath() + item.getName() );
-            }
-            else
-            {
-                ( (AbstractStorageItem) item ).setPath( getPath() + RepositoryItemUid.PATH_SEPARATOR + item.getName() );
-            }
-        }
-    }
-
-    // --
-
-    public String toString()
-    {
-        return String.format( "%s (coll)", super.toString() );
-    }
+  public String toString() {
+    return String.format("%s (coll)", super.toString());
+  }
 
 }

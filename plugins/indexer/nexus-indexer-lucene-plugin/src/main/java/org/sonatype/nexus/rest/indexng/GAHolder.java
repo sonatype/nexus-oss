@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.indexng;
 
 import java.util.Collection;
@@ -17,65 +18,57 @@ import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.maven.index.artifact.VersionUtils;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
+
+import org.apache.maven.index.artifact.VersionUtils;
 
 class GAHolder
 {
-    private final SortedMap<StringVersion, NexusNGArtifact> versionHits = new TreeMap<StringVersion, NexusNGArtifact>( Collections.reverseOrder() );
+  private final SortedMap<StringVersion, NexusNGArtifact> versionHits = new TreeMap<StringVersion, NexusNGArtifact>(
+      Collections.reverseOrder());
 
-    private NexusNGArtifact latestSnapshot = null;
+  private NexusNGArtifact latestSnapshot = null;
 
-    private StringVersion latestSnapshotVersion = null;
+  private StringVersion latestSnapshotVersion = null;
 
-    private NexusNGArtifact latestRelease = null;
+  private NexusNGArtifact latestRelease = null;
 
-    private StringVersion latestReleaseVersion = null;
+  private StringVersion latestReleaseVersion = null;
 
-    public NexusNGArtifact getVersionHit( StringVersion version )
-    {
-        return versionHits.get( version );
+  public NexusNGArtifact getVersionHit(StringVersion version) {
+    return versionHits.get(version);
+  }
+
+  public void putVersionHit(StringVersion version, NexusNGArtifact versionHit) {
+    versionHits.put(version, versionHit);
+
+    if (VersionUtils.isSnapshot(versionHit.getVersion())) {
+      if (latestSnapshotVersion == null || latestSnapshotVersion.compareTo(version) < 0) {
+        latestSnapshot = versionHit;
+        latestSnapshotVersion = version;
+      }
     }
-
-    public void putVersionHit( StringVersion version, NexusNGArtifact versionHit )
-    {
-        versionHits.put( version, versionHit );
-
-        if ( VersionUtils.isSnapshot( versionHit.getVersion() ) )
-        {
-            if ( latestSnapshotVersion == null || latestSnapshotVersion.compareTo( version ) < 0 )
-            {
-                latestSnapshot = versionHit;
-                latestSnapshotVersion = version;
-            }
-        }
-        else
-        {
-            if ( latestReleaseVersion == null || latestReleaseVersion.compareTo( version ) < 0 )
-            {
-                latestRelease = versionHit;
-                latestReleaseVersion = version;
-            }
-        }
+    else {
+      if (latestReleaseVersion == null || latestReleaseVersion.compareTo(version) < 0) {
+        latestRelease = versionHit;
+        latestReleaseVersion = version;
+      }
     }
+  }
 
-    public NexusNGArtifact getLatestRelease()
-    {
-        return latestRelease;
-    }
+  public NexusNGArtifact getLatestRelease() {
+    return latestRelease;
+  }
 
-    public NexusNGArtifact getLatestSnapshot()
-    {
-        return latestSnapshot;
-    }
+  public NexusNGArtifact getLatestSnapshot() {
+    return latestSnapshot;
+  }
 
-    public Collection<NexusNGArtifact> getOrderedVersionHits()
-    {
-        return versionHits.values();
-    }
+  public Collection<NexusNGArtifact> getOrderedVersionHits() {
+    return versionHits.values();
+  }
 
-    public NexusNGArtifact getLatestVersionHit()
-    {
-        return latestRelease != null ? latestRelease : latestSnapshot;
-    }
+  public NexusNGArtifact getLatestVersionHit() {
+    return latestRelease != null ? latestRelease : latestSnapshot;
+  }
 }

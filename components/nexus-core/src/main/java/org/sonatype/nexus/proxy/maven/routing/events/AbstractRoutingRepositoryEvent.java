@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.events;
 
 import org.sonatype.nexus.proxy.events.RepositoryEvent;
@@ -17,21 +18,19 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
  * Parent abstract class for routing related events.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public abstract class AbstractRoutingRepositoryEvent
     extends RepositoryEvent
 {
-    protected AbstractRoutingRepositoryEvent( final MavenRepository mavenRepository )
-    {
-        super( mavenRepository );
-    }
+  protected AbstractRoutingRepositoryEvent(final MavenRepository mavenRepository) {
+    super(mavenRepository);
+  }
 
-    @Override
-    public MavenRepository getRepository()
-    {
-        return (MavenRepository) super.getRepository();
-    }
+  @Override
+  public MavenRepository getRepository() {
+    return (MavenRepository) super.getRepository();
+  }
 }

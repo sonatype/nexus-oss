@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage;
 
 import java.util.HashMap;
@@ -19,119 +20,101 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * The abstract storage context.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractStorageContext
     extends AbstractLoggingComponent
     implements StorageContext
 {
-    private final HashMap<String, Object> context;
+  private final HashMap<String, Object> context;
 
-    private final StorageContext parent;
+  private final StorageContext parent;
 
-    private AtomicInteger generation;
+  private AtomicInteger generation;
 
-    @Deprecated
-    private long changeTimestamp;
+  @Deprecated
+  private long changeTimestamp;
 
-    protected AbstractStorageContext( StorageContext parent )
-    {
-        this.context = new HashMap<String, Object>();
-        this.parent = parent;
-        this.generation = new AtomicInteger( 0 );
-        this.changeTimestamp = System.currentTimeMillis();
+  protected AbstractStorageContext(StorageContext parent) {
+    this.context = new HashMap<String, Object>();
+    this.parent = parent;
+    this.generation = new AtomicInteger(0);
+    this.changeTimestamp = System.currentTimeMillis();
+  }
+
+  public synchronized int getGeneration() {
+    if (parent != null) {
+      return parent.getGeneration() + generation.get();
+    }
+    return generation.get();
+  }
+
+  @Deprecated
+  public synchronized long getLastChanged() {
+    if (parent != null) {
+      final long parentChangeTimestamp = parent.getLastChanged();
+
+      if (parentChangeTimestamp > changeTimestamp) {
+        return parentChangeTimestamp;
+      }
     }
 
-    public synchronized int getGeneration()
-    {
-        if ( parent != null )
-        {
-            return parent.getGeneration() + generation.get();
-        }
-        return generation.get();
+    return changeTimestamp;
+  }
+
+  protected synchronized void incrementGeneration() {
+    generation.incrementAndGet();
+    changeTimestamp = System.currentTimeMillis();
+  }
+
+  public StorageContext getParentStorageContext() {
+    return parent;
+  }
+
+  public void setParentStorageContext(StorageContext parent) {
+    // noop
+    getLogger().warn(
+        "Class {} uses illegal method invocation, org.sonatype.nexus.proxy.storage.AbstractStorageContext.setParentStorageContext( StorageContext ), please update the code!",
+        getClass().getName());
+  }
+
+  public Object getContextObject(String key) {
+    return getContextObject(key, true);
+  }
+
+  public synchronized Object getContextObject(final String key, final boolean fallbackToParent) {
+    if (context.containsKey(key)) {
+      return context.get(key);
     }
-
-    @Deprecated
-    public synchronized long getLastChanged()
-    {
-        if ( parent != null )
-        {
-            final long parentChangeTimestamp = parent.getLastChanged();
-
-            if ( parentChangeTimestamp > changeTimestamp )
-            {
-                return parentChangeTimestamp;
-            }
-        }
-
-        return changeTimestamp;
+    else if (fallbackToParent && parent != null) {
+      return parent.getContextObject(key);
     }
-
-    protected synchronized void incrementGeneration()
-    {
-        generation.incrementAndGet();
-        changeTimestamp = System.currentTimeMillis();
+    else {
+      return null;
     }
+  }
 
-    public StorageContext getParentStorageContext()
-    {
-        return parent;
-    }
+  public synchronized void putContextObject(String key, Object value) {
+    final Object previous = context.put(key, value);
 
-    public void setParentStorageContext( StorageContext parent )
-    {
-        // noop
-        getLogger().warn(
-            "Class {} uses illegal method invocation, org.sonatype.nexus.proxy.storage.AbstractStorageContext.setParentStorageContext( StorageContext ), please update the code!",
-            getClass().getName() );
-    }
+    incrementGeneration();
+    getLogger().debug("Context entry \"{}\" updated: {} -> {}", new Object[]{key, previous, value});
+  }
 
-    public Object getContextObject( String key )
-    {
-        return getContextObject( key, true );
-    }
+  public synchronized void removeContextObject(String key) {
+    final Object removed = context.remove(key);
 
-    public synchronized Object getContextObject( final String key, final boolean fallbackToParent )
-    {
-        if ( context.containsKey( key ) )
-        {
-            return context.get( key );
-        }
-        else if ( fallbackToParent && parent != null )
-        {
-            return parent.getContextObject( key );
-        }
-        else
-        {
-            return null;
-        }
-    }
+    incrementGeneration();
+    getLogger().debug("Context entry \"{}\" removed. Existent value: ", key, removed);
+  }
 
-    public synchronized void putContextObject( String key, Object value )
-    {
-        final Object previous = context.put( key, value );
+  public boolean hasContextObject(String key) {
+    return context.containsKey(key);
+  }
 
-        incrementGeneration();
-        getLogger().debug( "Context entry \"{}\" updated: {} -> {}", new Object[] { key, previous, value } );
-    }
-
-    public synchronized void removeContextObject( String key )
-    {
-        final Object removed = context.remove( key );
-
-        incrementGeneration();
-        getLogger().debug( "Context entry \"{}\" removed. Existent value: ", key, removed );
-    }
-
-    public boolean hasContextObject( String key )
-    {
-        return context.containsKey( key );
-    }
-
-    @Override
-    public String toString()
-    {
-        return getClass().getName() + "{generation=" + generation + ", parent=" + parent + "}";
-    }
+  @Override
+  public String toString() {
+    return getClass().getName() + "{generation=" + generation + ", parent=" + parent + "}";
+  }
 }

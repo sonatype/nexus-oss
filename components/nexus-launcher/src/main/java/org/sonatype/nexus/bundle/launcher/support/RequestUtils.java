@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.support;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.bundle.launcher.support;
 
 import java.io.IOException;
 
@@ -29,6 +28,8 @@ import org.apache.http.params.HttpParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * TODO
  *
@@ -37,50 +38,44 @@ import org.slf4j.LoggerFactory;
 public class RequestUtils
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( RequestUtils.class );
+  private static final Logger LOG = LoggerFactory.getLogger(RequestUtils.class);
 
-    public static boolean isNexusRESTStarted( final String nexusBaseURI )
-    {
-        final String serviceStatusURI = checkNotNull( nexusBaseURI ).endsWith( "/" )
-            ? nexusBaseURI + "service/local/status"
-            : nexusBaseURI + "/service/local/status";
+  public static boolean isNexusRESTStarted(final String nexusBaseURI) {
+    final String serviceStatusURI = checkNotNull(nexusBaseURI).endsWith("/")
+        ? nexusBaseURI + "service/local/status"
+        : nexusBaseURI + "/service/local/status";
 
-        final HttpParams params = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout( params, 2000 );
-        HttpConnectionParams.setSoTimeout( params, 2000 );
+    final HttpParams params = new BasicHttpParams();
+    HttpConnectionParams.setConnectionTimeout(params, 2000);
+    HttpConnectionParams.setSoTimeout(params, 2000);
 
-        final DefaultHttpClient client = new DefaultHttpClient( params );
-        client.getCredentialsProvider().setCredentials(
-            AuthScope.ANY,
-            new UsernamePasswordCredentials( "admin", "admin123" )
-        );
-        final HttpGet request = new HttpGet( serviceStatusURI );
-        try
-        {
-            final HttpResponse response = client.execute( request );
-            final int statusCode = response.getStatusLine().getStatusCode();
-            if ( statusCode != 200 )
-            {
-                LOG.debug( "Nexus Status Check: Returned status: " + statusCode );
-                return false;
-            }
-            final String responseAsString = new BasicResponseHandler().handleResponse( response );
-            if ( responseAsString == null || !responseAsString.contains( "<state>STARTED</state>" ) )
-            {
-                LOG.debug( "Nexus Status Check: Invalid system state. Status: " + responseAsString );
-                return false;
-            }
-        }
-        catch ( IOException e )
-        {
-            LOG.debug( "Nexus Status Check: Failed with: " + e.getMessage() );
-            return false;
-        }
-        finally
-        {
-            HttpClientUtils.closeQuietly( client );
-        }
-        return true;
+    final DefaultHttpClient client = new DefaultHttpClient(params);
+    client.getCredentialsProvider().setCredentials(
+        AuthScope.ANY,
+        new UsernamePasswordCredentials("admin", "admin123")
+    );
+    final HttpGet request = new HttpGet(serviceStatusURI);
+    try {
+      final HttpResponse response = client.execute(request);
+      final int statusCode = response.getStatusLine().getStatusCode();
+      if (statusCode != 200) {
+        LOG.debug("Nexus Status Check: Returned status: " + statusCode);
+        return false;
+      }
+      final String responseAsString = new BasicResponseHandler().handleResponse(response);
+      if (responseAsString == null || !responseAsString.contains("<state>STARTED</state>")) {
+        LOG.debug("Nexus Status Check: Invalid system state. Status: " + responseAsString);
+        return false;
+      }
     }
+    catch (IOException e) {
+      LOG.debug("Nexus Status Check: Failed with: " + e.getMessage());
+      return false;
+    }
+    finally {
+      HttpClientUtils.closeQuietly(client);
+    }
+    return true;
+  }
 
 }

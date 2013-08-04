@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest.jersey.subsystem;
 
 import javax.inject.Named;
@@ -33,22 +34,19 @@ public class JerseyRolesSubsystemFactory
     implements SubsystemFactory<Roles, JerseyNexusClient>
 {
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.anyModern();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.anyModern();
+  }
 
-    @Override
-    public Class<Roles> getType()
-    {
-        return Roles.class;
-    }
+  @Override
+  public Class<Roles> getType() {
+    return Roles.class;
+  }
 
-    @Override
-    public Roles create( JerseyNexusClient nexusClient )
-    {
-        return new JerseyRoles( nexusClient );
-    }
+  @Override
+  public Roles create(JerseyNexusClient nexusClient) {
+    return new JerseyRoles(nexusClient);
+  }
 
 }

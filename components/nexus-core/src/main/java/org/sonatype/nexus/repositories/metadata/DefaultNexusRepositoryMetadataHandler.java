@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repositories.metadata;
 
 import java.io.IOException;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -25,46 +24,49 @@ import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.RepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 
-@Component( role = NexusRepositoryMetadataHandler.class )
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
+@Component(role = NexusRepositoryMetadataHandler.class)
 public class DefaultNexusRepositoryMetadataHandler
     extends AbstractLoggingComponent
     implements NexusRepositoryMetadataHandler
 {
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
+  @Requirement
+  private RepositoryRegistry repositoryRegistry;
 
-    @Requirement
-    private RepositoryMetadataHandler repositoryMetadataHandler;
+  @Requirement
+  private RepositoryMetadataHandler repositoryMetadataHandler;
 
-    @Requirement
-    private Hc4Provider hc4Provider;
+  @Requirement
+  private Hc4Provider hc4Provider;
 
-    public RepositoryMetadata readRemoteRepositoryMetadata( final String url )
-        throws MetadataHandlerException,
-            IOException
-    {
-        final Hc4RawTransport hc4RawTransport = new Hc4RawTransport( hc4Provider.createHttpClient(), url );
-        return repositoryMetadataHandler.readRepositoryMetadata( hc4RawTransport );
-    }
+  public RepositoryMetadata readRemoteRepositoryMetadata(final String url)
+      throws MetadataHandlerException,
+             IOException
+  {
+    final Hc4RawTransport hc4RawTransport = new Hc4RawTransport(hc4Provider.createHttpClient(), url);
+    return repositoryMetadataHandler.readRepositoryMetadata(hc4RawTransport);
+  }
 
-    public RepositoryMetadata readRepositoryMetadata( final String repositoryId )
-        throws NoSuchRepositoryException,
-            MetadataHandlerException,
-            IOException
-    {
-        final Repository repository = repositoryRegistry.getRepository( repositoryId );
-        final NexusRawTransport nrt = new NexusRawTransport( repository, false, true );
-        return repositoryMetadataHandler.readRepositoryMetadata( nrt );
-    }
+  public RepositoryMetadata readRepositoryMetadata(final String repositoryId)
+      throws NoSuchRepositoryException,
+             MetadataHandlerException,
+             IOException
+  {
+    final Repository repository = repositoryRegistry.getRepository(repositoryId);
+    final NexusRawTransport nrt = new NexusRawTransport(repository, false, true);
+    return repositoryMetadataHandler.readRepositoryMetadata(nrt);
+  }
 
-    public void writeRepositoryMetadata( final String repositoryId, final RepositoryMetadata repositoryMetadata )
-        throws NoSuchRepositoryException,
-            MetadataHandlerException,
-            IOException
-    {
-        final Repository repository = repositoryRegistry.getRepository( repositoryId );
-        final NexusRawTransport nrt = new NexusRawTransport( repository, true, false );
-        repositoryMetadataHandler.writeRepositoryMetadata( repositoryMetadata, nrt );
-    }
+  public void writeRepositoryMetadata(final String repositoryId, final RepositoryMetadata repositoryMetadata)
+      throws NoSuchRepositoryException,
+             MetadataHandlerException,
+             IOException
+  {
+    final Repository repository = repositoryRegistry.getRepository(repositoryId);
+    final NexusRawTransport nrt = new NexusRawTransport(repository, true, false);
+    repositoryMetadataHandler.writeRepositoryMetadata(repositoryMetadata, nrt);
+  }
 
 }

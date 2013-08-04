@@ -10,24 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.xml;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias( value = "simple" )
+@XStreamAlias(value = "simple")
 public class SimpleTestObject
 {
 
-    private String data;
+  private String data;
 
-    public String getData()
-    {
-        return data;
-    }
+  public String getData() {
+    return data;
+  }
 
-    public void setData( String data )
-    {
-        this.data = data;
-    }
+  public void setData(String data) {
+    this.data = data;
+  }
 
 }

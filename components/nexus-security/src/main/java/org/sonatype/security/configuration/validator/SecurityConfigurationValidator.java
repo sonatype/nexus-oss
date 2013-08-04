@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.configuration.validator;
 
 import java.util.List;
@@ -20,12 +21,12 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 public interface SecurityConfigurationValidator
 {
-    ValidationResponse validateModel( SecurityValidationContext context,
-                                      ValidationRequest<SecurityConfiguration> request );
+  ValidationResponse validateModel(SecurityValidationContext context,
+                                   ValidationRequest<SecurityConfiguration> request);
 
-    ValidationResponse validateAnonymousUsername( SecurityValidationContext context, String anonymousUsername );
+  ValidationResponse validateAnonymousUsername(SecurityValidationContext context, String anonymousUsername);
 
-    ValidationResponse validateAnonymousPassword( SecurityValidationContext context, String anonymousPassword );
+  ValidationResponse validateAnonymousPassword(SecurityValidationContext context, String anonymousPassword);
 
-    ValidationResponse validateRealms( SecurityValidationContext context, List<String> realms );
+  ValidationResponse validateRealms(SecurityValidationContext context, List<String> realms);
 }

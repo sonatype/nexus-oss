@@ -10,39 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.resource;
 
 public class PathProtectionDescriptor
 {
-    private String pathPattern;
+  private String pathPattern;
 
-    private String filterExpression;
+  private String filterExpression;
 
-    public PathProtectionDescriptor( String pathPattern, String filterExpression )
-    {
-        this.pathPattern = pathPattern;
+  public PathProtectionDescriptor(String pathPattern, String filterExpression) {
+    this.pathPattern = pathPattern;
 
-        this.filterExpression = filterExpression;
-    }
+    this.filterExpression = filterExpression;
+  }
 
-    public String getPathPattern()
-    {
-        return pathPattern;
-    }
+  public String getPathPattern() {
+    return pathPattern;
+  }
 
-    public void setPathPattern( String pathPattern )
-    {
-        this.pathPattern = pathPattern;
-    }
+  public void setPathPattern(String pathPattern) {
+    this.pathPattern = pathPattern;
+  }
 
-    public String getFilterExpression()
-    {
-        return filterExpression;
-    }
+  public String getFilterExpression() {
+    return filterExpression;
+  }
 
-    public void setFilterExpression( String filterExpression )
-    {
-        this.filterExpression = filterExpression;
-    }
+  public void setFilterExpression(String filterExpression) {
+    this.filterExpression = filterExpression;
+  }
 
 }

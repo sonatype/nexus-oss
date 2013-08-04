@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
@@ -22,69 +23,61 @@ import org.sonatype.plugins.model.PluginMetadata;
  */
 public final class PluginRepositoryArtifact
 {
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    private GAVCoordinate gav;
+  private GAVCoordinate gav;
 
-    private File file;
+  private File file;
 
-    private NexusPluginRepository repo;
+  private NexusPluginRepository repo;
 
-    // ----------------------------------------------------------------------
-    // Constructors
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constructors
+  // ----------------------------------------------------------------------
 
-    public PluginRepositoryArtifact()
-    {
-        // legacy constructor
-    }
+  public PluginRepositoryArtifact() {
+    // legacy constructor
+  }
 
-    PluginRepositoryArtifact( final GAVCoordinate gav, final File file, final NexusPluginRepository repo )
-    {
-        this.gav = gav;
-        this.file = file;
-        this.repo = repo;
-    }
+  PluginRepositoryArtifact(final GAVCoordinate gav, final File file, final NexusPluginRepository repo) {
+    this.gav = gav;
+    this.file = file;
+    this.repo = repo;
+  }
 
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
 
-    public void setCoordinate( final GAVCoordinate gav )
-    {
-        this.gav = gav;
-    }
+  public void setCoordinate(final GAVCoordinate gav) {
+    this.gav = gav;
+  }
 
-    public GAVCoordinate getCoordinate()
-    {
-        return gav;
-    }
+  public GAVCoordinate getCoordinate() {
+    return gav;
+  }
 
-    public void setFile( final File file )
-    {
-        this.file = file;
-    }
+  public void setFile(final File file) {
+    this.file = file;
+  }
 
-    public File getFile()
-    {
-        return file;
-    }
+  public File getFile() {
+    return file;
+  }
 
-    public void setNexusPluginRepository( final NexusPluginRepository repo )
-    {
-        this.repo = repo;
-    }
+  public void setNexusPluginRepository(final NexusPluginRepository repo) {
+    this.repo = repo;
+  }
 
-    public NexusPluginRepository getNexusPluginRepository()
-    {
-        return repo;
-    }
+  public NexusPluginRepository getNexusPluginRepository() {
+    return repo;
+  }
 
-    public PluginMetadata getPluginMetadata()
-        throws NoSuchPluginRepositoryArtifactException
-    {
-        return repo.getPluginMetadata( gav );
-    }
+  public PluginMetadata getPluginMetadata()
+      throws NoSuchPluginRepositoryArtifactException
+  {
+    return repo.getPluginMetadata(gav);
+  }
 }

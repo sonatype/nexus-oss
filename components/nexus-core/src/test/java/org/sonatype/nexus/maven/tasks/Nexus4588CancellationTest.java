@@ -10,19 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
-import java.lang.reflect.Method;
+import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.scheduling.CancellableProgressListenerWrapper;
+import org.sonatype.scheduling.TaskInterruptedException;
+import org.sonatype.scheduling.TaskUtil;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.scheduling.CancellableProgressListenerWrapper;
-import org.sonatype.scheduling.ProgressListener;
-import org.sonatype.scheduling.TaskInterruptedException;
-import org.sonatype.scheduling.TaskUtil;
 
 /**
  * See Nexus-4588, testing SnapshotRemover cancellation. Note: Snapshot remover task is just a "thin wrapper" doing
@@ -35,60 +34,60 @@ public class Nexus4588CancellationTest
     extends AbstractMavenRepoContentTests
 {
 
-    @Before
-    public void setUpProgressListener()
-        throws Exception
+  @Before
+  public void setUpProgressListener()
+      throws Exception
+  {
+    new TaskUtil()
     {
-        new TaskUtil()
-        {
-            {
-                setCurrent( new CancellableProgressListenerWrapper( null ) );
-            }
-        };
-    }
+      {
+        setCurrent(new CancellableProgressListenerWrapper(null));
+      }
+    };
+  }
 
-    @After
-    public void removeProgressListener()
-        throws Exception
+  @After
+  public void removeProgressListener()
+      throws Exception
+  {
+    new TaskUtil()
     {
-        new TaskUtil()
-        {
-            {
-                setCurrent( null );
-            }
-        };
-    }
+      {
+        setCurrent(null);
+      }
+    };
+  }
 
-    @Test( expected = TaskInterruptedException.class )
-    public void testNexus4588()
-        throws Exception
-    {
-        fillInRepo();
+  @Test(expected = TaskInterruptedException.class)
+  public void testNexus4588()
+      throws Exception
+  {
+    fillInRepo();
 
-        SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), 1, 10, true );
+    SnapshotRemovalRequest snapshotRemovalRequest =
+        new SnapshotRemovalRequest(snapshots.getId(), 1, 10, true);
 
-        TaskUtil.getCurrentProgressListener().cancel();
+    TaskUtil.getCurrentProgressListener().cancel();
 
-        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
-    }
+    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+  }
 
-    @Test( expected = TaskInterruptedException.class )
-    public void testNexus4588After1stWalk()
-        throws Exception
-    {
-        fillInRepo();
+  @Test(expected = TaskInterruptedException.class)
+  public void testNexus4588After1stWalk()
+      throws Exception
+  {
+    fillInRepo();
 
-        SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), 1, 10, true );
+    SnapshotRemovalRequest snapshotRemovalRequest =
+        new SnapshotRemovalRequest(snapshots.getId(), 1, 10, true);
 
-        // activate the molester
-        // the molester will cancel the task once it receives cache expired event, which is sent
-        // after 1st pass. This is an implementation details, so this test is actually fragile
-        // against SnapshotRemover component implementation changes
-        ( (Nexus4588CancellationEventInspector) lookup( EventInspector.class, "nexus4588" ) ).setActive( true );
+    // activate the molester
+    // the molester will cancel the task once it receives cache expired event, which is sent
+    // after 1st pass. This is an implementation details, so this test is actually fragile
+    // against SnapshotRemover component implementation changes
+    ((Nexus4588CancellationEventInspector) lookup(EventInspector.class, "nexus4588")).setActive(true);
 
-        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
-    }
+    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+  }
 
 }

@@ -10,117 +10,119 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.p2.nxcm1916;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-
 import java.io.IOException;
+
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class NXCM1916CRUDP2RepositoryIT
     extends AbstractNexusProxyP2IT
 {
 
-    private final RepositoryMessageUtil messageUtil;
+  private final RepositoryMessageUtil messageUtil;
 
-    public NXCM1916CRUDP2RepositoryIT()
-        throws ComponentLookupException
-    {
-        super( "nxcm1916" );
-        messageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
-    }
+  public NXCM1916CRUDP2RepositoryIT()
+      throws ComponentLookupException
+  {
+    super("nxcm1916");
+    messageUtil = new RepositoryMessageUtil(this, getJsonXStream(), MediaType.APPLICATION_JSON);
+  }
 
-    @Test
-    public void createRepositoryTest()
-        throws IOException
-    {
+  @Test
+  public void createRepositoryTest()
+      throws IOException
+  {
 
-        final RepositoryResource resource = new RepositoryResource();
+    final RepositoryResource resource = new RepositoryResource();
 
-        resource.setId( "createTestRepo" );
-        resource.setRepoType( "hosted" );
-        resource.setName( "Create Test Repo" );
-        resource.setProvider( "p2" );
-        resource.setFormat( "p2" );
-        resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
+    resource.setId("createTestRepo");
+    resource.setRepoType("hosted");
+    resource.setName("Create Test Repo");
+    resource.setProvider("p2");
+    resource.setFormat("p2");
+    resource.setRepoPolicy(RepositoryPolicy.MIXED.name());
 
-        messageUtil.createRepository( resource );
-    }
+    messageUtil.createRepository(resource);
+  }
 
-    @Test
-    public void readTest()
-        throws IOException
-    {
+  @Test
+  public void readTest()
+      throws IOException
+  {
 
-        final RepositoryResource resource = new RepositoryResource();
+    final RepositoryResource resource = new RepositoryResource();
 
-        resource.setId( "readTestRepo" );
-        resource.setRepoType( "hosted" );
-        resource.setName( "Read Test Repo" );
-        resource.setProvider( "p2" );
-        resource.setFormat( "p2" );
-        resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
+    resource.setId("readTestRepo");
+    resource.setRepoType("hosted");
+    resource.setName("Read Test Repo");
+    resource.setProvider("p2");
+    resource.setFormat("p2");
+    resource.setRepoPolicy(RepositoryPolicy.MIXED.name());
 
-        messageUtil.createRepository( resource );
+    messageUtil.createRepository(resource);
 
-        final RepositoryResource responseRepo = (RepositoryResource) messageUtil.getRepository( resource.getId() );
+    final RepositoryResource responseRepo = (RepositoryResource) messageUtil.getRepository(resource.getId());
 
-        messageUtil.validateResourceResponse( resource, responseRepo );
+    messageUtil.validateResourceResponse(resource, responseRepo);
 
-    }
+  }
 
-    @Test
-    public void updateTest()
-        throws IOException
-    {
+  @Test
+  public void updateTest()
+      throws IOException
+  {
 
-        RepositoryResource resource = new RepositoryResource();
+    RepositoryResource resource = new RepositoryResource();
 
-        resource.setId( "updateTestRepo" );
-        resource.setRepoType( "hosted" );
-        resource.setName( "Update Test Repo" );
-        resource.setProvider( "p2" );
-        resource.setFormat( "p2" );
-        resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
+    resource.setId("updateTestRepo");
+    resource.setRepoType("hosted");
+    resource.setName("Update Test Repo");
+    resource.setProvider("p2");
+    resource.setFormat("p2");
+    resource.setRepoPolicy(RepositoryPolicy.MIXED.name());
 
-        resource = (RepositoryResource) messageUtil.createRepository( resource );
+    resource = (RepositoryResource) messageUtil.createRepository(resource);
 
-        resource.setName( "updated repo" );
+    resource.setName("updated repo");
 
-        messageUtil.updateRepo( resource );
+    messageUtil.updateRepo(resource);
 
-    }
+  }
 
-    @Test
-    public void deleteTest()
-        throws IOException
-    {
-        RepositoryResource resource = new RepositoryResource();
+  @Test
+  public void deleteTest()
+      throws IOException
+  {
+    RepositoryResource resource = new RepositoryResource();
 
-        resource.setId( "deleteTestRepo" );
-        resource.setRepoType( "hosted" );
-        resource.setName( "Delete Test Repo" );
-        resource.setProvider( "p2" );
-        resource.setFormat( "p2" );
-        resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
+    resource.setId("deleteTestRepo");
+    resource.setRepoType("hosted");
+    resource.setName("Delete Test Repo");
+    resource.setProvider("p2");
+    resource.setFormat("p2");
+    resource.setRepoPolicy(RepositoryPolicy.MIXED.name());
 
-        resource = (RepositoryResource) messageUtil.createRepository( resource );
+    resource = (RepositoryResource) messageUtil.createRepository(resource);
 
-        final Response response = messageUtil.sendMessage( Method.DELETE, resource );
+    final Response response = messageUtil.sendMessage(Method.DELETE, resource);
 
-        assertThat( response.getStatus().isSuccess(), is( true ) );
-        assertThat( getNexusConfigUtil().getRepo( resource.getId() ), is( nullValue() ) );
-    }
+    assertThat(response.getStatus().isSuccess(), is(true));
+    assertThat(getNexusConfigUtil().getRepo(resource.getId()), is(nullValue()));
+  }
 
 }

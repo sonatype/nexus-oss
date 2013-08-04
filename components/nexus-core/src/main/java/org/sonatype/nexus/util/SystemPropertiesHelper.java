@@ -10,86 +10,71 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
 
 public class SystemPropertiesHelper
 {
-    public final static String[] getStringlist( final String key, final String delimiter, final String[] defaultValue )
-    {
-        final String value = System.getProperty( key );
+  public final static String[] getStringlist(final String key, final String delimiter, final String[] defaultValue) {
+    final String value = System.getProperty(key);
 
-        if ( value == null || value.trim().length() == 0 )
-        {
-            return defaultValue;
-        }
-
-        try
-        {
-            return value.split( "," );
-        }
-        catch ( NumberFormatException e )
-        {
-            return defaultValue;
-        }
+    if (value == null || value.trim().length() == 0) {
+      return defaultValue;
     }
 
-    public final static String[] getStringlist( final String key, final String... defaultValue )
-    {
-        return getStringlist( key, ",", defaultValue );
+    try {
+      return value.split(",");
+    }
+    catch (NumberFormatException e) {
+      return defaultValue;
+    }
+  }
+
+  public final static String[] getStringlist(final String key, final String... defaultValue) {
+    return getStringlist(key, ",", defaultValue);
+  }
+
+  public final static int getInteger(final String key, final int defaultValue) {
+    final String value = System.getProperty(key);
+
+    if (value == null || value.trim().length() == 0) {
+      return defaultValue;
     }
 
-    public final static int getInteger( final String key, final int defaultValue )
-    {
-        final String value = System.getProperty( key );
+    try {
+      return Integer.valueOf(value);
+    }
+    catch (NumberFormatException e) {
+      return defaultValue;
+    }
+  }
 
-        if ( value == null || value.trim().length() == 0 )
-        {
-            return defaultValue;
-        }
+  public final static long getLong(final String key, final long defaultValue) {
+    final String value = System.getProperty(key);
 
-        try
-        {
-            return Integer.valueOf( value );
-        }
-        catch ( NumberFormatException e )
-        {
-            return defaultValue;
-        }
+    if (value == null || value.trim().length() == 0) {
+      return defaultValue;
     }
 
-    public final static long getLong( final String key, final long defaultValue )
-    {
-        final String value = System.getProperty( key );
+    try {
+      return Long.valueOf(value);
+    }
+    catch (NumberFormatException e) {
+      return defaultValue;
+    }
+  }
 
-        if ( value == null || value.trim().length() == 0 )
-        {
-            return defaultValue;
-        }
+  public final static boolean getBoolean(final String key, final boolean defaultValue) {
+    final String value = System.getProperty(key);
 
-        try
-        {
-            return Long.valueOf( value );
-        }
-        catch ( NumberFormatException e )
-        {
-            return defaultValue;
-        }
+    if (value == null || value.trim().length() == 0) {
+      return defaultValue;
     }
 
-    public final static boolean getBoolean( final String key, final boolean defaultValue )
-    {
-        final String value = System.getProperty( key );
+    return Boolean.valueOf(value);
+  }
 
-        if ( value == null || value.trim().length() == 0 )
-        {
-            return defaultValue;
-        }
-
-        return Boolean.valueOf( value );
-    }
-
-    public final static String getString( final String key, final String defaultValue )
-    {
-        return System.getProperty( key, defaultValue );
-    }
+  public final static String getString(final String key, final String defaultValue) {
+    return System.getProperty(key, defaultValue);
+  }
 }

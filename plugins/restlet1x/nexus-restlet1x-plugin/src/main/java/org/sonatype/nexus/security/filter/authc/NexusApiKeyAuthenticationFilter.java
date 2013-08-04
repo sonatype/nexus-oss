@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authc;
 
 import java.util.Collections;
@@ -30,35 +31,29 @@ import org.apache.shiro.web.util.WebUtils;
 public class NexusApiKeyAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
-    @Inject
-    private Map<String, NexusApiKey> apiKeys = Collections.emptyMap();
+  @Inject
+  private Map<String, NexusApiKey> apiKeys = Collections.emptyMap();
 
-    @Override
-    protected boolean isLoginAttempt( ServletRequest request, ServletResponse response )
-    {
-        final HttpServletRequest http = WebUtils.toHttp( request );
-        for ( final String key : apiKeys.keySet() )
-        {
-            if ( null != http.getHeader( key ) )
-            {
-                return true;
-            }
-        }
-        return super.isLoginAttempt( request, response );
+  @Override
+  protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
+    final HttpServletRequest http = WebUtils.toHttp(request);
+    for (final String key : apiKeys.keySet()) {
+      if (null != http.getHeader(key)) {
+        return true;
+      }
     }
+    return super.isLoginAttempt(request, response);
+  }
 
-    @Override
-    protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
-    {
-        final HttpServletRequest http = WebUtils.toHttp( request );
-        for ( final String key : apiKeys.keySet() )
-        {
-            final String token = http.getHeader( key );
-            if ( null != token )
-            {
-                return new NexusApiKeyAuthenticationToken( key, token.toCharArray(), request.getRemoteHost() );
-            }
-        }
-        return super.createToken( request, response );
+  @Override
+  protected AuthenticationToken createToken(final ServletRequest request, final ServletResponse response) {
+    final HttpServletRequest http = WebUtils.toHttp(request);
+    for (final String key : apiKeys.keySet()) {
+      final String token = http.getHeader(key);
+      if (null != token) {
+        return new NexusApiKeyAuthenticationToken(key, token.toCharArray(), request.getRemoteHost());
+      }
     }
+    return super.createToken(request, response);
+  }
 }

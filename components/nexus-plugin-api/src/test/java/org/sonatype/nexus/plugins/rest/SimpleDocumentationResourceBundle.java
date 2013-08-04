@@ -10,52 +10,48 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.rest;
 
-import org.sonatype.nexus.mime.DefaultMimeSupport;
+package org.sonatype.nexus.plugins.rest;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import org.sonatype.nexus.mime.DefaultMimeSupport;
+
 public class SimpleDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
-    public SimpleDocumentationResourceBundle() {
-        super(new DefaultMimeSupport());
-    }
+  public SimpleDocumentationResourceBundle() {
+    super(new DefaultMimeSupport());
+  }
 
-    @Override
-    public String getPluginId()
-    {
-        return "test";
-    }
+  @Override
+  public String getPluginId() {
+    return "test";
+  }
 
-    @Override
-    protected ZipFile getZipFile()
-        throws IOException
-    {
-        final String file = new File( getClass().getResource( "/docs.zip" ).getFile() ).getCanonicalPath();
-        try
-        {
-            return new ZipFile( file );
-        }
-        catch ( ZipException e )
-        {
-            throw new IOException( e.getMessage() + ": " + file, e );
-        }
+  @Override
+  protected ZipFile getZipFile()
+      throws IOException
+  {
+    final String file = new File(getClass().getResource("/docs.zip").getFile()).getCanonicalPath();
+    try {
+      return new ZipFile(file);
     }
+    catch (ZipException e) {
+      throw new IOException(e.getMessage() + ": " + file, e);
+    }
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "Simple Test";
-    }
+  @Override
+  public String getDescription() {
+    return "Simple Test";
+  }
 
-    @Override
-    public String getUrlSnippet()
-    {
-        return "test";
-    }
+  @Override
+  public String getUrlSnippet() {
+    return "test";
+  }
 }

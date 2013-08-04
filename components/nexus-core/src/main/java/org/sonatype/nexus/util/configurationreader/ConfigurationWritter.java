@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util.configurationreader;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.io.Writer;
 public interface ConfigurationWritter<E>
 {
 
-    void write( Writer fr, E configuration )
-        throws IOException;
+  void write(Writer fr, E configuration)
+      throws IOException;
 
 }

@@ -10,17 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.maven.index.ArtifactInfo;
-import org.apache.maven.index.IteratorResultSet;
-import org.apache.maven.index.MatchHighlight;
-import org.apache.commons.lang.StringUtils;
-import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -29,196 +25,170 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 
 import com.thoughtworks.xstream.XStream;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.IteratorResultSet;
+import org.apache.maven.index.MatchHighlight;
+import org.restlet.data.Request;
 
 public abstract class AbstractIndexerNexusPlexusResource
     extends AbstractNexusPlexusResource
 {
-    @Override
-    public void configureXStream( XStream xstream )
-    {
-        super.configureXStream( xstream );
-        MIndexerXStreamConfiguratorLightweight.configureXStream( xstream );
+  @Override
+  public void configureXStream(XStream xstream) {
+    super.configureXStream(xstream);
+    MIndexerXStreamConfiguratorLightweight.configureXStream(xstream);
+  }
+
+  /**
+   * Convert a collection of ArtifactInfo's to NexusArtifacts
+   */
+  protected Collection<NexusArtifact> ai2NaColl(Request request, Collection<ArtifactInfo> aic) {
+    if (aic == null) {
+      return null;
     }
 
-    /**
-     * Convert a collection of ArtifactInfo's to NexusArtifacts
-     * 
-     * @param aic
-     * @return
-     */
-    protected Collection<NexusArtifact> ai2NaColl( Request request, Collection<ArtifactInfo> aic )
-    {
-        if ( aic == null )
-        {
-            return null;
+    List<NexusArtifact> result = new ArrayList<NexusArtifact>();
+
+    for (ArtifactInfo ai : aic) {
+      NexusArtifact na = ai2Na(request, ai);
+
+      if (na != null) {
+        result.add(na);
+      }
+    }
+    return result;
+  }
+
+  protected Collection<NexusArtifact> ai2NaColl(Request request, IteratorResultSet aic) {
+    List<NexusArtifact> result = new ArrayList<NexusArtifact>();
+
+    if (aic != null) {
+      for (ArtifactInfo ai : aic) {
+        NexusArtifact na = ai2Na(request, ai);
+
+        if (na != null) {
+          result.add(na);
         }
-
-        List<NexusArtifact> result = new ArrayList<NexusArtifact>();
-
-        for ( ArtifactInfo ai : aic )
-        {
-            NexusArtifact na = ai2Na( request, ai );
-
-            if ( na != null )
-            {
-                result.add( na );
-            }
-        }
-        return result;
+      }
     }
 
-    protected Collection<NexusArtifact> ai2NaColl( Request request, IteratorResultSet aic )
-    {
-        List<NexusArtifact> result = new ArrayList<NexusArtifact>();
+    return result;
+  }
 
-        if ( aic != null )
-        {
-            for ( ArtifactInfo ai : aic )
-            {
-                NexusArtifact na = ai2Na( request, ai );
+  protected String getMatchHighlightHtmlSnippet(ArtifactInfo ai) {
+    if (ai.getMatchHighlights().size() > 0) {
+      // <blockquote>Artifact classes
+      // <ul>
+      // <li>aaaa</li>
+      // <li>bbbbb</li>
+      // </ul>
+      // </blockquote>
 
-                if ( na != null )
-                {
-                    result.add( na );
-                }
-            }
+      StringBuilder sb = new StringBuilder();
+
+      for (MatchHighlight mh : ai.getMatchHighlights()) {
+        sb.append("<blockquote>").append(mh.getField().getDescription()).append("<UL>");
+
+        // TODO: fix this!
+        for (String high : mh.getHighlightedMatch()) {
+          sb.append("<LI>").append(high).append("</LI>");
         }
 
-        return result;
+        sb.append("</UL></blockquote>");
+      }
+
+      return sb.toString();
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
+   * Convert from ArtifactInfo to a NexusArtifact
+   */
+  protected NexusArtifact ai2Na(Request request, ArtifactInfo ai) {
+    if (ai == null) {
+      return null;
     }
 
-    protected String getMatchHighlightHtmlSnippet( ArtifactInfo ai )
-    {
-        if ( ai.getMatchHighlights().size() > 0 )
-        {
-            // <blockquote>Artifact classes
-            // <ul>
-            // <li>aaaa</li>
-            // <li>bbbbb</li>
-            // </ul>
-            // </blockquote>
+    NexusArtifact a = new NexusArtifact();
 
-            StringBuilder sb = new StringBuilder();
+    a.setGroupId(ai.groupId);
 
-            for ( MatchHighlight mh : ai.getMatchHighlights() )
-            {
-                sb.append( "<blockquote>" ).append( mh.getField().getDescription() ).append( "<UL>" );
+    a.setArtifactId(ai.artifactId);
 
-                // TODO: fix this!
-                for ( String high : mh.getHighlightedMatch() )
-                {
-                    sb.append( "<LI>" ).append( high ).append( "</LI>" );
-                }
+    a.setVersion(ai.version);
 
-                sb.append( "</UL></blockquote>" );
-            }
+    a.setClassifier(ai.classifier);
 
-            return sb.toString();
+    a.setPackaging(ai.packaging);
+
+    a.setExtension(ai.fextension);
+
+    a.setRepoId(ai.repository);
+
+    a.setContextId(ai.context);
+
+    a.setHighlightedFragment(getMatchHighlightHtmlSnippet(ai));
+
+    if (ai.repository != null) {
+      a.setPomLink(createPomLink(request, ai));
+
+      a.setArtifactLink(createArtifactLink(request, ai));
+
+      try {
+        Repository repository = getUnprotectedRepositoryRegistry().getRepository(ai.repository);
+
+        if (MavenRepository.class.isAssignableFrom(repository.getClass())) {
+          MavenRepository mavenRepository = (MavenRepository) repository;
+
+          Gav gav =
+              new Gav(ai.groupId, ai.artifactId, ai.version, ai.classifier,
+                  mavenRepository.getArtifactPackagingMapper().getExtensionForPackaging(ai.packaging),
+                  null, null, null, false, null, false, null);
+
+          ResourceStoreRequest req =
+              new ResourceStoreRequest(mavenRepository.getGavCalculator().gavToPath(gav));
+
+          a.setResourceURI(createRepositoryReference(request, ai.repository, req.getRequestPath()).toString());
         }
-        else
-        {
-            return null;
-        }
+      }
+      catch (NoSuchRepositoryException e) {
+        getLogger().warn("No such repository: '" + ai.repository + "'.", e);
+
+        return null;
+      }
     }
 
-    /**
-     * Convert from ArtifactInfo to a NexusArtifact
-     * 
-     * @param ai
-     * @return
-     */
-    protected NexusArtifact ai2Na( Request request, ArtifactInfo ai )
-    {
-        if ( ai == null )
-        {
-            return null;
-        }
+    return a;
+  }
 
-        NexusArtifact a = new NexusArtifact();
-
-        a.setGroupId( ai.groupId );
-
-        a.setArtifactId( ai.artifactId );
-
-        a.setVersion( ai.version );
-
-        a.setClassifier( ai.classifier );
-
-        a.setPackaging( ai.packaging );
-
-        a.setExtension( ai.fextension );
-
-        a.setRepoId( ai.repository );
-
-        a.setContextId( ai.context );
-
-        a.setHighlightedFragment( getMatchHighlightHtmlSnippet( ai ) );
-
-        if ( ai.repository != null )
-        {
-            a.setPomLink( createPomLink( request, ai ) );
-
-            a.setArtifactLink( createArtifactLink( request, ai ) );
-
-            try
-            {
-                Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
-
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-                {
-                    MavenRepository mavenRepository = (MavenRepository) repository;
-
-                    Gav gav =
-                        new Gav( ai.groupId, ai.artifactId, ai.version, ai.classifier,
-                            mavenRepository.getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ),
-                            null, null, null, false, null, false, null );
-
-                    ResourceStoreRequest req =
-                        new ResourceStoreRequest( mavenRepository.getGavCalculator().gavToPath( gav ) );
-
-                    a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
-                }
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                getLogger().warn( "No such repository: '" + ai.repository + "'.", e );
-
-                return null;
-            }
-        }
-
-        return a;
+  protected String createPomLink(Request request, ArtifactInfo ai) {
+    if (StringUtils.isNotEmpty(ai.classifier)) {
+      return "";
     }
 
-    protected String createPomLink( Request request, ArtifactInfo ai )
-    {
-        if ( StringUtils.isNotEmpty( ai.classifier ) )
-        {
-            return "";
-        }
+    String suffix =
+        "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e=pom";
 
-        String suffix =
-            "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e=pom";
+    return createRedirectBaseRef(request).toString() + suffix;
+  }
 
-        return createRedirectBaseRef( request ).toString() + suffix;
+  protected String createArtifactLink(Request request, ArtifactInfo ai) {
+    if (StringUtils.isEmpty(ai.packaging) || "pom".equals(ai.packaging)) {
+      return "";
     }
 
-    protected String createArtifactLink( Request request, ArtifactInfo ai )
-    {
-        if ( StringUtils.isEmpty( ai.packaging ) || "pom".equals( ai.packaging ) )
-        {
-            return "";
-        }
+    String suffix =
+        "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e="
+            + ai.fextension;
 
-        String suffix =
-            "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e="
-                + ai.fextension;
-
-        if ( StringUtils.isNotBlank( ai.classifier ) )
-        {
-            suffix = suffix + "&c=" + ai.classifier;
-        }
-
-        return createRedirectBaseRef( request ).toString() + suffix;
+    if (StringUtils.isNotBlank(ai.classifier)) {
+      suffix = suffix + "&c=" + ai.classifier;
     }
+
+    return createRedirectBaseRef(request).toString() + suffix;
+  }
 }

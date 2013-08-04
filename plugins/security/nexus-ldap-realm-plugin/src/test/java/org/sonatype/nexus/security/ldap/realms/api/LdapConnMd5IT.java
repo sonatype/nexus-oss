@@ -10,64 +10,66 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.ldap.realms.api;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.util.IOUtil;
-import org.junit.Test;
 import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+
+import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 
 
 public class LdapConnMd5IT
     extends NexusLdapTestSupport
 {
 
-    private PlexusResource getResource()
-        throws Exception
-    {
-        return this.lookup( PlexusResource.class, "LdapConnectionInfoPlexusResource" );
-    }
+  private PlexusResource getResource()
+      throws Exception
+  {
+    return this.lookup(PlexusResource.class, "LdapConnectionInfoPlexusResource");
+  }
 
-    @Test
-    public void testPutChangeConfig()
-        throws Exception
-    {
-        // the test config starts off being setup for simple auth scheme, this test will update it for DIGEST-MD5
-        PlexusResource resource = getResource();
+  @Test
+  public void testPutChangeConfig()
+      throws Exception
+  {
+    // the test config starts off being setup for simple auth scheme, this test will update it for DIGEST-MD5
+    PlexusResource resource = getResource();
 
-        LdapConnectionInfoResponse response = new LdapConnectionInfoResponse();
-        LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
-        response.setData( connectionInfo );
-        connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( this.getLdapPort() );
-        connectionInfo.setSearchBase( "o=sonatype" );
-        connectionInfo.setSystemPassword( "secret" );
-        connectionInfo.setSystemUsername( "admin" );
-        connectionInfo.setProtocol( "ldap" );
-        connectionInfo.setAuthScheme( "DIGEST-MD5" );
-        connectionInfo.setRealm( "localhost" );
+    LdapConnectionInfoResponse response = new LdapConnectionInfoResponse();
+    LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
+    response.setData(connectionInfo);
+    connectionInfo.setHost("localhost");
+    connectionInfo.setPort(this.getLdapPort());
+    connectionInfo.setSearchBase("o=sonatype");
+    connectionInfo.setSystemPassword("secret");
+    connectionInfo.setSystemUsername("admin");
+    connectionInfo.setProtocol("ldap");
+    connectionInfo.setAuthScheme("DIGEST-MD5");
+    connectionInfo.setRealm("localhost");
 
-        LdapConnectionInfoResponse result = (LdapConnectionInfoResponse) resource.put( null, null, null, response );
-        this.validateConnectionDTO( connectionInfo, result.getData() );
+    LdapConnectionInfoResponse result = (LdapConnectionInfoResponse) resource.put(null, null, null, response);
+    this.validateConnectionDTO(connectionInfo, result.getData());
 
-        // now how about that get
-        result = (LdapConnectionInfoResponse) resource.get( null, null, null, null );
-        this.validateConnectionDTO( connectionInfo, result.getData() );
-    }
+    // now how about that get
+    result = (LdapConnectionInfoResponse) resource.get(null, null, null, null);
+    this.validateConnectionDTO(connectionInfo, result.getData());
+  }
 
-    @Override
-    protected void copyDefaultLdapConfigToPlace()
-        throws IOException
-    {
-        InputStream in = getClass().getResourceAsStream( "/test-conf/md5-ldap.xml" );
-        this.interpolateLdapXml( in, new File( getNexusLdapConfiguration() ) );
-        IOUtil.close( in );
-    }
+  @Override
+  protected void copyDefaultLdapConfigToPlace()
+      throws IOException
+  {
+    InputStream in = getClass().getResourceAsStream("/test-conf/md5-ldap.xml");
+    this.interpolateLdapXml(in, new File(getNexusLdapConfiguration()));
+    IOUtil.close(in);
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rest;
 
 import java.io.IOException;
@@ -23,51 +24,43 @@ import java.util.Properties;
 public class AbstractNexusIndexHtmlCustomizer
     implements NexusIndexHtmlCustomizer
 {
-    @Override
-    public String getPreHeadContribution( Map<String, Object> context )
-    {
+  @Override
+  public String getPreHeadContribution(Map<String, Object> context) {
+    return null;
+  }
+
+  @Override
+  public String getPostHeadContribution(Map<String, Object> context) {
+    return null;
+  }
+
+  @Override
+  public String getPreBodyContribution(Map<String, Object> context) {
+    return null;
+  }
+
+  @Override
+  public String getPostBodyContribution(Map<String, Object> context) {
+    return null;
+  }
+
+  // ==
+
+  protected String getVersionFromJarFile(String path) {
+    Properties props = new Properties();
+
+    InputStream is = getClass().getResourceAsStream(path);
+
+    if (is != null) {
+      try {
+        props.load(is);
+      }
+      catch (IOException e) {
+        // no prop file ?? back out
         return null;
+      }
     }
 
-    @Override
-    public String getPostHeadContribution( Map<String, Object> context )
-    {
-        return null;
-    }
-
-    @Override
-    public String getPreBodyContribution( Map<String, Object> context )
-    {
-        return null;
-    }
-
-    @Override
-    public String getPostBodyContribution( Map<String, Object> context )
-    {
-        return null;
-    }
-
-    // ==
-
-    protected String getVersionFromJarFile( String path )
-    {
-        Properties props = new Properties();
-
-        InputStream is = getClass().getResourceAsStream( path );
-
-        if ( is != null )
-        {
-            try
-            {
-                props.load( is );
-            }
-            catch ( IOException e )
-            {
-                // no prop file ?? back out
-                return null;
-            }
-        }
-
-        return props.getProperty( "version" );
-    }
+    return props.getProperty("version");
+  }
 }

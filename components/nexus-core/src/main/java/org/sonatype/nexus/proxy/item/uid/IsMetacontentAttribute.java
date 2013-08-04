@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -17,19 +18,18 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 /**
  * Attribute yielding "false" for real repository content, and "true" for all the "meta content", that is actually not
  * holding data serving the basic purpose of this given repository.
- * 
+ *
  * @author cstamas
  */
 public class IsMetacontentAttribute
     implements Attribute<Boolean>
 {
-    public Boolean getValueFor( RepositoryItemUid subject )
-    {
-        // stuff not having metadata:
-        // /.nexus/attributes
-        // /.nexus/trash
-        // we are specific about these for a good reason (see future)
-        return subject.getBooleanAttributeValue( IsItemAttributeMetacontentAttribute.class )
-            || subject.getBooleanAttributeValue( IsTrashMetacontentAttribute.class );
-    }
+  public Boolean getValueFor(RepositoryItemUid subject) {
+    // stuff not having metadata:
+    // /.nexus/attributes
+    // /.nexus/trash
+    // we are specific about these for a good reason (see future)
+    return subject.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class)
+        || subject.getBooleanAttributeValue(IsTrashMetacontentAttribute.class);
+  }
 }

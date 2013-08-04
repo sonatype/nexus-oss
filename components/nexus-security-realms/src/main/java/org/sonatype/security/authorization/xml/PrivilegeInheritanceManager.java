@@ -10,22 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.authorization.xml;
 
 import java.util.List;
 
 /**
  * Allows for an method to inherit from another. For example: 'delete' imply that a user has access to 'read'.
- * 
+ *
  * @author Brian Demers
  */
 public interface PrivilegeInheritanceManager
 {
-    /**
-     * Retrive a list of methods that are inherited by the requested method
-     * 
-     * @param method
-     * @return
-     */
-    List<String> getInheritedMethods( String method );
+  /**
+   * Retrive a list of methods that are inherited by the requested method
+   */
+  List<String> getInheritedMethods(String method);
 }

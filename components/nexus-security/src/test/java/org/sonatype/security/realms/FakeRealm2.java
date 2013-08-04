@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms;
 
 import java.util.Collections;
@@ -32,36 +33,34 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 
 @Singleton
-@Typed( Realm.class )
-@Named( "FakeRealm2" )
+@Typed(Realm.class)
+@Named("FakeRealm2")
 public class FakeRealm2
     extends AuthorizingRealm
 {
-    @Override
-    public String getName()
-    {
-        return FakeRealm2.class.getName();
-    }
+  @Override
+  public String getName() {
+    return FakeRealm2.class.getName();
+  }
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection arg0 )
-    {
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection arg0) {
 
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( Collections.singleton( "role" ) );
+    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(Collections.singleton("role"));
 
-        Permission permission = new WildcardPermission( "other:perm" );
+    Permission permission = new WildcardPermission("other:perm");
 
-        info.setObjectPermissions( Collections.singleton( permission ) );
+    info.setObjectPermissions(Collections.singleton(permission));
 
-        return info;
-    }
+    return info;
+  }
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
-        throws AuthenticationException
-    {
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+  @Override
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+      throws AuthenticationException
+  {
+    UsernamePasswordToken upToken = (UsernamePasswordToken) token;
 
-        return new SimpleAuthenticationInfo( upToken.getUsername(), "password", getName() );
-    }
+    return new SimpleAuthenticationInfo(upToken.getUsername(), "password", getName());
+  }
 }

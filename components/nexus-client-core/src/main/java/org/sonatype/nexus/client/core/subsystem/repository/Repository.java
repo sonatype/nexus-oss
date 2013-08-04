@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.repository;
 
 /**
@@ -20,72 +21,72 @@ package org.sonatype.nexus.client.core.subsystem.repository;
 public interface Repository<T extends Repository, U extends RepositoryStatus>
 {
 
-    /**
-     * @return repository id (never null)
-     */
-    String id();
+  /**
+   * @return repository id (never null)
+   */
+  String id();
 
-    /**
-     * @return repository name
-     */
-    String name();
+  /**
+   * @return repository name
+   */
+  String name();
 
-    /**
-     * @return content URI (null when repository does not publish its URI)
-     */
-    String contentUri();
+  /**
+   * @return content URI (null when repository does not publish its URI)
+   */
+  String contentUri();
 
-    /**
-     * @return repository status.
-     */
-    U status();
+  /**
+   * @return repository status.
+   */
+  U status();
 
-    /**
-     * Sets repository name.
-     *
-     * @param name repository name
-     * @return itself, for fluent api usage
-     */
-    T withName( String name );
+  /**
+   * Sets repository name.
+   *
+   * @param name repository name
+   * @return itself, for fluent api usage
+   */
+  T withName(String name);
 
-    /**
-     * Directly puts repository out of service (no save required).
-     *
-     * @return itself, for fluent api usage
-     */
-    T putOutOfService();
+  /**
+   * Directly puts repository out of service (no save required).
+   *
+   * @return itself, for fluent api usage
+   */
+  T putOutOfService();
 
-    /**
-     * Directly puts repository in service (no save required).
-     *
-     * @return itself, for fluent api usage
-     */
-    T putInService();
+  /**
+   * Directly puts repository in service (no save required).
+   *
+   * @return itself, for fluent api usage
+   */
+  T putInService();
 
-    /**
-     * Refreshes repository, replacing any current changes.
-     *
-     * @return itself, for fluent api usage
-     */
-    T refresh();
+  /**
+   * Refreshes repository, replacing any current changes.
+   *
+   * @return itself, for fluent api usage
+   */
+  T refresh();
 
-    /**
-     * Saves current changes.
-     *
-     * @return itself, for fluent api usage
-     */
-    T save();
+  /**
+   * Saves current changes.
+   *
+   * @return itself, for fluent api usage
+   */
+  T save();
 
-    /**
-     * Removes the repository.
-     *
-     * @return itself, for fluent api usage
-     */
-    T remove();
+  /**
+   * Removes the repository.
+   *
+   * @return itself, for fluent api usage
+   */
+  T remove();
 
-    /**
-     * @return {@code true} if the repository is exposed, {@code false} otherwise.
-     * @since 2.5
-     */
-    boolean isExposed();
+  /**
+   * @return {@code true} if the repository is exposed, {@code false} otherwise.
+   * @since 2.5
+   */
+  boolean isExposed();
 }

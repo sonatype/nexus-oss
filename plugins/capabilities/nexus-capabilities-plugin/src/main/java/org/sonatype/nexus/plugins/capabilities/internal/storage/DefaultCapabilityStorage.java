@@ -10,10 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -33,10 +31,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -49,6 +43,13 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.collect.Lists;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 /**
  * Handles persistence of capabilities configuration.
@@ -60,242 +61,214 @@ public class DefaultCapabilityStorage
     implements CapabilityStorage
 {
 
-    private final File configurationFile;
+  private final File configurationFile;
 
-    private final ReentrantLock lock = new ReentrantLock();
+  private final ReentrantLock lock = new ReentrantLock();
 
-    private Configuration configuration;
+  private Configuration configuration;
 
-    @Inject
-    public DefaultCapabilityStorage( final ApplicationConfiguration applicationConfiguration )
-    {
-        configurationFile = new File( applicationConfiguration.getConfigurationDirectory(), "capabilities.xml" );
+  @Inject
+  public DefaultCapabilityStorage(final ApplicationConfiguration applicationConfiguration) {
+    configurationFile = new File(applicationConfiguration.getConfigurationDirectory(), "capabilities.xml");
+  }
+
+  @Override
+  public void add(final CapabilityStorageItem item)
+      throws IOException
+  {
+    try {
+      lock.lock();
+
+      load().addCapability(asCCapability(item));
+      save();
+    }
+    finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public boolean update(final CapabilityStorageItem item)
+      throws IOException
+  {
+    try {
+      lock.lock();
+
+      final CCapability capability = asCCapability(item);
+
+      final CCapability stored = getInternal(capability.getId());
+
+      if (stored == null) {
+        return false;
+      }
+      load().removeCapability(stored);
+      load().addCapability(capability);
+      save();
+      return true;
+    }
+    finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public boolean remove(final CapabilityIdentity id)
+      throws IOException
+  {
+    try {
+      lock.lock();
+
+      final CCapability stored = getInternal(id.toString());
+      if (stored == null) {
+        return false;
+      }
+      load().removeCapability(stored);
+      save();
+      return true;
+    }
+    finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public Collection<CapabilityStorageItem> getAll()
+      throws IOException
+  {
+    Collection<CapabilityStorageItem> items = Lists.newArrayList();
+    final List<CCapability> capabilities = load().getCapabilities();
+    if (capabilities != null) {
+      for (final CCapability capability : capabilities) {
+        items.add(asCapabilityStorageItem(capability));
+      }
+    }
+    return items;
+  }
+
+  private Configuration load()
+      throws IOException
+  {
+    if (configuration != null) {
+      return configuration;
     }
 
-    @Override
-    public void add( final CapabilityStorageItem item )
-        throws IOException
-    {
-        try
-        {
-            lock.lock();
+    lock.lock();
 
-            load().addCapability( asCCapability( item ) );
-            save();
-        }
-        finally
-        {
-            lock.unlock();
-        }
+    Reader fr = null;
+    FileInputStream is = null;
+
+    try {
+      final Reader r = new FileReader(configurationFile);
+
+      Xpp3DomBuilder.build(r);
+
+      is = new FileInputStream(configurationFile);
+
+      final NexusCapabilitiesConfigurationXpp3Reader reader = new NexusCapabilitiesConfigurationXpp3Reader();
+
+      fr = new InputStreamReader(is);
+
+      configuration = reader.read(fr);
+    }
+    catch (final FileNotFoundException e) {
+      // This is ok, may not exist first time around
+      configuration = new Configuration();
+
+      configuration.setVersion(Configuration.MODEL_VERSION);
+
+      save();
+    }
+    catch (final IOException e) {
+      getLogger().error("IOException while retrieving configuration file", e);
+    }
+    catch (final XmlPullParserException e) {
+      getLogger().error("Invalid XML Configuration", e);
+    }
+    finally {
+      IOUtil.close(fr);
+      IOUtil.close(is);
+
+      lock.unlock();
     }
 
-    @Override
-    public boolean update( final CapabilityStorageItem item )
-        throws IOException
-    {
-        try
+    return configuration;
+  }
+
+  private void save()
+      throws IOException
+  {
+    lock.lock();
+
+    getLogger().debug("Saving configuration: {}", configurationFile);
+    try {
+      final FileReplacer fileReplacer = new FileReplacer(configurationFile);
+      // we save this file many times, don't litter backups
+      fileReplacer.setDeleteBackupFile(true);
+      fileReplacer.replace(new ContentWriter()
+      {
+        @Override
+        public void write(final BufferedOutputStream output)
+            throws IOException
         {
-            lock.lock();
-
-            final CCapability capability = asCCapability( item );
-
-            final CCapability stored = getInternal( capability.getId() );
-
-            if ( stored == null )
-            {
-                return false;
-            }
-            load().removeCapability( stored );
-            load().addCapability( capability );
-            save();
-            return true;
+          new NexusCapabilitiesConfigurationXpp3Writer().write(output, configuration);
         }
-        finally
-        {
-            lock.unlock();
-        }
+      });
+    }
+    finally {
+      lock.unlock();
+    }
+  }
+
+  private CCapability getInternal(final String capabilityId)
+      throws IOException
+  {
+    if (StringUtils.isEmpty(capabilityId)) {
+      return null;
     }
 
-    @Override
-    public boolean remove( final CapabilityIdentity id )
-        throws IOException
-    {
-        try
-        {
-            lock.lock();
-
-            final CCapability stored = getInternal( id.toString() );
-            if ( stored == null )
-            {
-                return false;
-            }
-            load().removeCapability( stored );
-            save();
-            return true;
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public Collection<CapabilityStorageItem> getAll()
-        throws IOException
-    {
-        Collection<CapabilityStorageItem> items = Lists.newArrayList();
-        final List<CCapability> capabilities = load().getCapabilities();
-        if ( capabilities != null )
-        {
-            for ( final CCapability capability : capabilities )
-            {
-                items.add( asCapabilityStorageItem( capability ) );
-            }
-        }
-        return items;
-    }
-
-    private Configuration load()
-        throws IOException
-    {
-        if ( configuration != null )
-        {
-            return configuration;
-        }
-
-        lock.lock();
-
-        Reader fr = null;
-        FileInputStream is = null;
-
-        try
-        {
-            final Reader r = new FileReader( configurationFile );
-
-            Xpp3DomBuilder.build( r );
-
-            is = new FileInputStream( configurationFile );
-
-            final NexusCapabilitiesConfigurationXpp3Reader reader = new NexusCapabilitiesConfigurationXpp3Reader();
-
-            fr = new InputStreamReader( is );
-
-            configuration = reader.read( fr );
-        }
-        catch ( final FileNotFoundException e )
-        {
-            // This is ok, may not exist first time around
-            configuration = new Configuration();
-
-            configuration.setVersion( Configuration.MODEL_VERSION );
-
-            save();
-        }
-        catch ( final IOException e )
-        {
-            getLogger().error( "IOException while retrieving configuration file", e );
-        }
-        catch ( final XmlPullParserException e )
-        {
-            getLogger().error( "Invalid XML Configuration", e );
-        }
-        finally
-        {
-            IOUtil.close( fr );
-            IOUtil.close( is );
-
-            lock.unlock();
-        }
-
-        return configuration;
-    }
-
-    private void save()
-        throws IOException
-    {
-        lock.lock();
-
-        getLogger().debug( "Saving configuration: {}", configurationFile );
-        try
-        {
-            final FileReplacer fileReplacer = new FileReplacer( configurationFile );
-            // we save this file many times, don't litter backups
-            fileReplacer.setDeleteBackupFile( true );
-            fileReplacer.replace( new ContentWriter()
-            {
-                @Override
-                public void write( final BufferedOutputStream output )
-                    throws IOException
-                {
-                    new NexusCapabilitiesConfigurationXpp3Writer().write( output, configuration );
-                }
-            } );
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    private CCapability getInternal( final String capabilityId )
-        throws IOException
-    {
-        if ( StringUtils.isEmpty( capabilityId ) )
-        {
-            return null;
-        }
-
-        for ( final CCapability capability : load().getCapabilities() )
-        {
-            if ( capabilityId.equals( capability.getId() ) )
-            {
-                return capability;
-            }
-        }
-
-        return null;
-    }
-
-    private CapabilityStorageItem asCapabilityStorageItem( final CCapability capability )
-    {
-        final Map<String, String> properties = new HashMap<String, String>();
-        if ( capability.getProperties() != null )
-        {
-            for ( final CCapabilityProperty property : capability.getProperties() )
-            {
-                properties.put( property.getKey(), property.getValue() );
-            }
-        }
-
-        return new CapabilityStorageItem(
-            capability.getVersion(),
-            capabilityIdentity( capability.getId() ),
-            capabilityType( capability.getTypeId() ),
-            capability.isEnabled(),
-            capability.getNotes(),
-            properties
-        );
-    }
-
-    private CCapability asCCapability( final CapabilityStorageItem item )
-    {
-        final CCapability capability = new CCapability();
-        capability.setVersion( item.version() );
-        capability.setId( item.id().toString() );
-        capability.setTypeId( item.type().toString() );
-        capability.setEnabled( item.isEnabled() );
-        capability.setNotes( item.notes() );
-        if ( item.properties() != null )
-        {
-            for ( Map.Entry<String, String> entry : item.properties().entrySet() )
-            {
-                final CCapabilityProperty property = new CCapabilityProperty();
-                property.setKey( entry.getKey() );
-                property.setValue( entry.getValue() );
-                capability.addProperty( property );
-            }
-        }
+    for (final CCapability capability : load().getCapabilities()) {
+      if (capabilityId.equals(capability.getId())) {
         return capability;
+      }
     }
+
+    return null;
+  }
+
+  private CapabilityStorageItem asCapabilityStorageItem(final CCapability capability) {
+    final Map<String, String> properties = new HashMap<String, String>();
+    if (capability.getProperties() != null) {
+      for (final CCapabilityProperty property : capability.getProperties()) {
+        properties.put(property.getKey(), property.getValue());
+      }
+    }
+
+    return new CapabilityStorageItem(
+        capability.getVersion(),
+        capabilityIdentity(capability.getId()),
+        capabilityType(capability.getTypeId()),
+        capability.isEnabled(),
+        capability.getNotes(),
+        properties
+    );
+  }
+
+  private CCapability asCCapability(final CapabilityStorageItem item) {
+    final CCapability capability = new CCapability();
+    capability.setVersion(item.version());
+    capability.setId(item.id().toString());
+    capability.setTypeId(item.type().toString());
+    capability.setEnabled(item.isEnabled());
+    capability.setNotes(item.notes());
+    if (item.properties() != null) {
+      for (Map.Entry<String, String> entry : item.properties().entrySet()) {
+        final CCapabilityProperty property = new CCapabilityProperty();
+        property.setKey(entry.getKey());
+        property.setValue(entry.getValue());
+        capability.addProperty(property);
+      }
+    }
+    return capability;
+  }
 
 }

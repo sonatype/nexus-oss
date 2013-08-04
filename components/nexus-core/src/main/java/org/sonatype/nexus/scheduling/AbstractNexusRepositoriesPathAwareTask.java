@@ -10,33 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
 public abstract class AbstractNexusRepositoriesPathAwareTask<T>
     extends AbstractNexusRepositoriesTask<T>
 {
-    protected abstract String getRepositoryPathFieldId();
+  protected abstract String getRepositoryPathFieldId();
 
-    public String getResourceStorePath()
-    {
-        String id = getRepositoryPathFieldId();
+  public String getResourceStorePath() {
+    String id = getRepositoryPathFieldId();
 
-        if ( id == null )
-        {
-            return null;
-        }
-
-        return getParameters().get( id );
+    if (id == null) {
+      return null;
     }
 
-    public void setResourceStorePath( String resourceStorePath )
-    {
-        String id = getRepositoryPathFieldId();
+    return getParameters().get(id);
+  }
 
-        if ( id != null )
-        {
-            getParameters().put( id, resourceStorePath );
-        }
+  public void setResourceStorePath(String resourceStorePath) {
+    String id = getRepositoryPathFieldId();
+
+    if (id != null) {
+      getParameters().put(id, resourceStorePath);
     }
+  }
 
 }

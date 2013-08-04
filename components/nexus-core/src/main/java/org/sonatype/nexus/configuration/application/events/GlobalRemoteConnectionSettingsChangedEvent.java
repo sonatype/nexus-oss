@@ -10,28 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application.events;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
- * Event fired when global remote connection settings are changed (within configuration change). The settings carried in
- * this event will reflect the NEW values, but if you have the {@link GlobalRemoteConnectionSettings} component, you can
+ * Event fired when global remote connection settings are changed (within configuration change). The settings carried
+ * in
+ * this event will reflect the NEW values, but if you have the {@link GlobalRemoteConnectionSettings} component, you
+ * can
  * query it too <em>after</em> you received this event .
  */
 public class GlobalRemoteConnectionSettingsChangedEvent
     extends AbstractEvent<GlobalRemoteConnectionSettings>
 {
 
-    public GlobalRemoteConnectionSettingsChangedEvent( GlobalRemoteConnectionSettings settings )
-    {
-        super( settings );
-    }
+  public GlobalRemoteConnectionSettingsChangedEvent(GlobalRemoteConnectionSettings settings) {
+    super(settings);
+  }
 
-    public GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
-    {
-        return getEventSender();
-    }
+  public GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings() {
+    return getEventSender();
+  }
 
 }

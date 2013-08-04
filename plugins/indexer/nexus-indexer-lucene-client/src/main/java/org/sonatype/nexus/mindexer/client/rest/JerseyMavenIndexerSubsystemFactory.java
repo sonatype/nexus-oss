@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mindexer.client.rest;
 
 import javax.inject.Named;
@@ -18,9 +19,9 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
+import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.mindexer.client.MavenIndexer;
 import org.sonatype.nexus.mindexer.client.internal.JerseyMavenIndexer;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 @Named
 @Singleton
@@ -28,21 +29,18 @@ public class JerseyMavenIndexerSubsystemFactory
     implements SubsystemFactory<MavenIndexer, JerseyNexusClient>
 {
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.anyModern();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.anyModern();
+  }
 
-    @Override
-    public Class<MavenIndexer> getType()
-    {
-        return MavenIndexer.class;
-    }
+  @Override
+  public Class<MavenIndexer> getType() {
+    return MavenIndexer.class;
+  }
 
-    @Override
-    public MavenIndexer create( final JerseyNexusClient nexusClient )
-    {
-        return new JerseyMavenIndexer( nexusClient );
-    }
+  @Override
+  public MavenIndexer create(final JerseyNexusClient nexusClient) {
+    return new JerseyMavenIndexer(nexusClient);
+  }
 }

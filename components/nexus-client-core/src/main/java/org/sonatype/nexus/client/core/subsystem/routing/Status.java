@@ -10,247 +10,224 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.routing;
 
 /**
  * The routing status for a Maven repository.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class Status
 {
+  /**
+   * Enum representing the outcome of some (possibly long running) operation.
+   */
+  public static enum Outcome
+  {
     /**
-     * Enum representing the outcome of some (possibly long running) operation.
+     * Operation resulted with failure.
      */
-    public static enum Outcome
-    {
-        /**
-         * Operation resulted with failure.
-         */
-        FAILED,
-
-        /**
-         * Operation has no outcome yet. This means operation still did not run or is still running for the first time.
-         */
-        UNDECIDED,
-
-        /**
-         * Operation resulted with success.
-         */
-        SUCCEEDED;
-    }
+    FAILED,
 
     /**
-     * The routing discovery status for a Maven Proxy repository.
+     * Operation has no outcome yet. This means operation still did not run or is still running for the first time.
      */
-    public static class DiscoveryStatus
-    {
-        /**
-         * The discovery is enabled or not.
-         */
-        private final boolean discoveryEnabled;
-
-        /**
-         * Update interval in hours.
-         */
-        private final int discoveryIntervalHours;
-
-        /**
-         * The last discovery status, was it successful (1) or not (-1), or still running (0).
-         */
-        private final Outcome discoveryLastStatus;
-
-        /**
-         * The strategy used (once finished).
-         */
-        private final String discoveryLastStrategy;
-
-        /**
-         * The message of discovery (strategy dependant, once finished).
-         */
-        private final String discoveryLastMessage;
-
-        /**
-         * When discovery last run, timestamp (in millis) or -1 if not yet finished.
-         */
-        private final long discoveryLastRunTimestamp;
-
-        /**
-         * Constructor.
-         * 
-         * @param discoveryEnabled
-         * @param discoveryIntervalHours
-         * @param discoveryLastStatus
-         * @param discoveryLastStrategy
-         * @param discoveryLastMessage
-         * @param discoveryLastRunTimestamp
-         */
-        public DiscoveryStatus( final boolean discoveryEnabled, final int discoveryIntervalHours,
-                                final Outcome discoveryLastStatus, final String discoveryLastStrategy,
-                                final String discoveryLastMessage, final long discoveryLastRunTimestamp )
-        {
-            this.discoveryEnabled = discoveryEnabled;
-            this.discoveryIntervalHours = discoveryIntervalHours;
-            this.discoveryLastStatus = discoveryLastStatus;
-            this.discoveryLastStrategy = discoveryLastStrategy;
-            this.discoveryLastMessage = discoveryLastMessage;
-            this.discoveryLastRunTimestamp = discoveryLastRunTimestamp;
-        }
-
-        /**
-         * Returns enabled state.
-         * 
-         * @return {@code true} if enabled.
-         */
-        public boolean isDiscoveryEnabled()
-        {
-            return discoveryEnabled;
-        }
-
-        /**
-         * Returns discovery interval in hours.
-         * 
-         * @return discovery interval in hours.
-         */
-        public int getDiscoveryIntervalHours()
-        {
-            return discoveryIntervalHours;
-        }
-
-        /**
-         * Returns last discovery outcome.
-         * 
-         * @return last discovery outcome.
-         */
-        public Outcome getDiscoveryLastStatus()
-        {
-            return discoveryLastStatus;
-        }
-
-        /**
-         * Returns last discovery strategy.
-         * 
-         * @return last discovery strategy.
-         */
-        public String getDiscoveryLastStrategy()
-        {
-            return discoveryLastStrategy;
-        }
-
-        /**
-         * Returns last discovery message.
-         * 
-         * @return last discovery message.
-         */
-        public String getDiscoveryLastMessage()
-        {
-            return discoveryLastMessage;
-        }
-
-        /**
-         * Returns last discovery run timestamp.
-         * 
-         * @return last discovery run timestamp.
-         */
-        public long getDiscoveryLastRunTimestamp()
-        {
-            return discoveryLastRunTimestamp;
-        }
-    }
+    UNDECIDED,
 
     /**
-     * The publishing status, was it published (1), not published (-1) or not processed or still processing (0).
+     * Operation resulted with success.
      */
-    private final Outcome publishedStatus;
+    SUCCEEDED;
+  }
+
+  /**
+   * The routing discovery status for a Maven Proxy repository.
+   */
+  public static class DiscoveryStatus
+  {
+    /**
+     * The discovery is enabled or not.
+     */
+    private final boolean discoveryEnabled;
 
     /**
-     * The publishing accompanying message.
+     * Update interval in hours.
      */
-    private final String publishedMessage;
+    private final int discoveryIntervalHours;
 
     /**
-     * The timestamp of last publishing (in millis) or -1 if not published.
+     * The last discovery status, was it successful (1) or not (-1), or still running (0).
      */
-    private final long publishedTimestamp;
+    private final Outcome discoveryLastStatus;
 
     /**
-     * The URL of the published prefix file or {@code null} if not published.
+     * The strategy used (once finished).
      */
-    private final String publishedUrl;
+    private final String discoveryLastStrategy;
 
     /**
-     * The discovery status if this status represents a status for Maven Proxy repository, {@code null} otherwise.
+     * The message of discovery (strategy dependant, once finished).
      */
-    private final DiscoveryStatus discoveryStatus;
+    private final String discoveryLastMessage;
+
+    /**
+     * When discovery last run, timestamp (in millis) or -1 if not yet finished.
+     */
+    private final long discoveryLastRunTimestamp;
 
     /**
      * Constructor.
-     * 
-     * @param publishedStatus
-     * @param publishedMessage
-     * @param publishedTimestamp
-     * @param publishedUrl
-     * @param discoveryStatus
      */
-    public Status( final Outcome publishedStatus, final String publishedMessage, final long publishedTimestamp,
-                   final String publishedUrl, final DiscoveryStatus discoveryStatus )
+    public DiscoveryStatus(final boolean discoveryEnabled, final int discoveryIntervalHours,
+                           final Outcome discoveryLastStatus, final String discoveryLastStrategy,
+                           final String discoveryLastMessage, final long discoveryLastRunTimestamp)
     {
-        this.publishedStatus = publishedStatus;
-        this.publishedMessage = publishedMessage;
-        this.publishedTimestamp = publishedTimestamp;
-        this.publishedUrl = publishedUrl;
-        this.discoveryStatus = discoveryStatus;
+      this.discoveryEnabled = discoveryEnabled;
+      this.discoveryIntervalHours = discoveryIntervalHours;
+      this.discoveryLastStatus = discoveryLastStatus;
+      this.discoveryLastStrategy = discoveryLastStrategy;
+      this.discoveryLastMessage = discoveryLastMessage;
+      this.discoveryLastRunTimestamp = discoveryLastRunTimestamp;
     }
 
     /**
-     * Returns the publish outcome.
-     * 
-     * @return the publish outcome.
+     * Returns enabled state.
+     *
+     * @return {@code true} if enabled.
      */
-    public Outcome getPublishedStatus()
-    {
-        return publishedStatus;
+    public boolean isDiscoveryEnabled() {
+      return discoveryEnabled;
     }
 
     /**
-     * Returns the publish message.
-     * 
-     * @return the message.
+     * Returns discovery interval in hours.
+     *
+     * @return discovery interval in hours.
      */
-    public String getPublishedMessage()
-    {
-        return publishedMessage;
+    public int getDiscoveryIntervalHours() {
+      return discoveryIntervalHours;
     }
 
     /**
-     * Returns the timestamp of last publishing.
-     * 
-     * @return the timestamp of last publish or -1 if not published yet.
+     * Returns last discovery outcome.
+     *
+     * @return last discovery outcome.
      */
-    public long getPublishedTimestamp()
-    {
-        return publishedTimestamp;
+    public Outcome getDiscoveryLastStatus() {
+      return discoveryLastStatus;
     }
 
     /**
-     * Returns the URL of the published prefix file, or {@code null} if not published.
-     * 
-     * @return the prefix file URL if published, or {@code null}.
+     * Returns last discovery strategy.
+     *
+     * @return last discovery strategy.
      */
-    public String getPublishedUrl()
-    {
-        return publishedUrl;
+    public String getDiscoveryLastStrategy() {
+      return discoveryLastStrategy;
     }
 
     /**
-     * Returns the {@link DiscoveryStatus} if this status represents a status of a Maven Proxy repository, {@code null}
-     * otherwise.
-     * 
-     * @return discovery status if this status belongs to a Maven Proxy repository, {@code null} otherwise.
+     * Returns last discovery message.
+     *
+     * @return last discovery message.
      */
-    public DiscoveryStatus getDiscoveryStatus()
-    {
-        return discoveryStatus;
+    public String getDiscoveryLastMessage() {
+      return discoveryLastMessage;
     }
+
+    /**
+     * Returns last discovery run timestamp.
+     *
+     * @return last discovery run timestamp.
+     */
+    public long getDiscoveryLastRunTimestamp() {
+      return discoveryLastRunTimestamp;
+    }
+  }
+
+  /**
+   * The publishing status, was it published (1), not published (-1) or not processed or still processing (0).
+   */
+  private final Outcome publishedStatus;
+
+  /**
+   * The publishing accompanying message.
+   */
+  private final String publishedMessage;
+
+  /**
+   * The timestamp of last publishing (in millis) or -1 if not published.
+   */
+  private final long publishedTimestamp;
+
+  /**
+   * The URL of the published prefix file or {@code null} if not published.
+   */
+  private final String publishedUrl;
+
+  /**
+   * The discovery status if this status represents a status for Maven Proxy repository, {@code null} otherwise.
+   */
+  private final DiscoveryStatus discoveryStatus;
+
+  /**
+   * Constructor.
+   */
+  public Status(final Outcome publishedStatus, final String publishedMessage, final long publishedTimestamp,
+                final String publishedUrl, final DiscoveryStatus discoveryStatus)
+  {
+    this.publishedStatus = publishedStatus;
+    this.publishedMessage = publishedMessage;
+    this.publishedTimestamp = publishedTimestamp;
+    this.publishedUrl = publishedUrl;
+    this.discoveryStatus = discoveryStatus;
+  }
+
+  /**
+   * Returns the publish outcome.
+   *
+   * @return the publish outcome.
+   */
+  public Outcome getPublishedStatus() {
+    return publishedStatus;
+  }
+
+  /**
+   * Returns the publish message.
+   *
+   * @return the message.
+   */
+  public String getPublishedMessage() {
+    return publishedMessage;
+  }
+
+  /**
+   * Returns the timestamp of last publishing.
+   *
+   * @return the timestamp of last publish or -1 if not published yet.
+   */
+  public long getPublishedTimestamp() {
+    return publishedTimestamp;
+  }
+
+  /**
+   * Returns the URL of the published prefix file, or {@code null} if not published.
+   *
+   * @return the prefix file URL if published, or {@code null}.
+   */
+  public String getPublishedUrl() {
+    return publishedUrl;
+  }
+
+  /**
+   * Returns the {@link DiscoveryStatus} if this status represents a status of a Maven Proxy repository, {@code null}
+   * otherwise.
+   *
+   * @return discovery status if this status belongs to a Maven Proxy repository, {@code null} otherwise.
+   */
+  public DiscoveryStatus getDiscoveryStatus() {
+    return discoveryStatus;
+  }
 }

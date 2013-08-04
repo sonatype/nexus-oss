@@ -10,31 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 /**
  * Local storage exception thrown by local storage when stream/content being pushed (stored) ends prematurely (EOFs).
  * Denotes an unrecoverable state, but is not resolvable by Nexus core (happens when client drops connection
  * during upload, recovery is to have client retry upload).
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class LocalStorageEOFException
     extends LocalStorageException
 {
-    public LocalStorageEOFException( String msg )
-    {
-        super( msg );
-    }
+  public LocalStorageEOFException(String msg) {
+    super(msg);
+  }
 
-    public LocalStorageEOFException( String msg, Throwable cause )
-    {
-        super( msg, cause );
-    }
+  public LocalStorageEOFException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 
-    public LocalStorageEOFException( Throwable cause )
-    {
-        super( cause.getMessage(), cause );
-    }
+  public LocalStorageEOFException(Throwable cause) {
+    super(cause.getMessage(), cause);
+  }
 }

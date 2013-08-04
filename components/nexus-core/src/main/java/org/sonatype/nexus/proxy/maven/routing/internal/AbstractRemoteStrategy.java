@@ -10,32 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Abstract class for {@link RemoteStrategy} implementations.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractRemoteStrategy
     extends AbstractPrioritized
     implements RemoteStrategy
 {
-    private final String id;
+  private final String id;
 
-    protected AbstractRemoteStrategy( final int priority, final String id )
-    {
-        super( priority );
-        this.id = checkNotNull( id );
-    }
+  protected AbstractRemoteStrategy(final int priority, final String id) {
+    super(priority);
+    this.id = checkNotNull(id);
+  }
 
-    @Override
-    public String getId()
-    {
-        return id;
-    }
+  @Override
+  public String getId() {
+    return id;
+  }
 }

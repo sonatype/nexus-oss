@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.slf4j.Logger;
@@ -18,10 +19,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractEventInspector
     implements EventInspector
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
+  protected Logger getLogger() {
+    return logger;
+  }
 }

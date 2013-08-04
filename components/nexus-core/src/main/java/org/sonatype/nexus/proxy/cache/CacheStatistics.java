@@ -10,40 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.cache;
 
 public class CacheStatistics
 {
-    private final long size;
+  private final long size;
 
-    private final long misses;
+  private final long misses;
 
-    private final long hits;
+  private final long hits;
 
-    public CacheStatistics( long size, long misses, long hits )
-    {
-        super();
+  public CacheStatistics(long size, long misses, long hits) {
+    super();
 
-        this.size = size;
+    this.size = size;
 
-        this.misses = misses;
+    this.misses = misses;
 
-        this.hits = hits;
-    }
+    this.hits = hits;
+  }
 
-    public long getSize()
-    {
-        return size;
-    }
+  public long getSize() {
+    return size;
+  }
 
-    public long getMisses()
-    {
-        return misses;
-    }
+  public long getMisses() {
+    return misses;
+  }
 
-    public long getHits()
-    {
-        return hits;
-    }
+  public long getHits() {
+    return hits;
+  }
 
 }

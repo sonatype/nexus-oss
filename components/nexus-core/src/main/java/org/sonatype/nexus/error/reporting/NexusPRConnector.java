@@ -10,26 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.protocol.BasicHttpContext;
 import org.sonatype.jira.connector.internal.HttpClientConnector;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+
+import org.apache.http.client.HttpClient;
 
 /**
  * NexusConfiguration-aware connector for the attachment parts of sisu-problem-reporting.
@@ -42,33 +37,31 @@ public class NexusPRConnector
     extends HttpClientConnector
 {
 
-    private final Hc4Provider httpClientProvider;
+  private final Hc4Provider httpClientProvider;
 
-    private final RemoteStorageContext remoteStorageContext;
+  private final RemoteStorageContext remoteStorageContext;
 
-    @Inject
-    public NexusPRConnector( final Hc4Provider httpClientProvider,
-                             final ApplicationConfiguration applicationConfiguration )
-    {
-        this.httpClientProvider = httpClientProvider;
-        this.remoteStorageContext = new DefaultRemoteStorageContext(
-            applicationConfiguration.getGlobalRemoteStorageContext()
-        );
-    }
+  @Inject
+  public NexusPRConnector(final Hc4Provider httpClientProvider,
+                          final ApplicationConfiguration applicationConfiguration)
+  {
+    this.httpClientProvider = httpClientProvider;
+    this.remoteStorageContext = new DefaultRemoteStorageContext(
+        applicationConfiguration.getGlobalRemoteStorageContext()
+    );
+  }
 
-    @Override
-    protected HttpClient client()
-    {
-        return httpClientProvider.createHttpClient( remoteStorageContext );
-    }
+  @Override
+  protected HttpClient client() {
+    return httpClientProvider.createHttpClient(remoteStorageContext);
+  }
 
-    @Override
-    public void setCredentials( final String username, final String password )
-    {
-        remoteStorageContext.setRemoteAuthenticationSettings(
-            new UsernamePasswordRemoteAuthenticationSettings( username, password )
-        );
-    }
+  @Override
+  public void setCredentials(final String username, final String password) {
+    remoteStorageContext.setRemoteAuthenticationSettings(
+        new UsernamePasswordRemoteAuthenticationSettings(username, password)
+    );
+  }
 
 }
 

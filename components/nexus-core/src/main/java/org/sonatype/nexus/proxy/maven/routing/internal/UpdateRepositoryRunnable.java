@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
 
@@ -23,64 +22,55 @@ import org.sonatype.nexus.proxy.maven.routing.internal.task.ProgressListener;
 
 import com.google.common.base.Throwables;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Job that performs prefix file updates and publishing of one single {@link MavenRepository}.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class UpdateRepositoryRunnable
     extends CancelableRunnableSupport
 {
-    private final ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
-    private final ManagerImpl manager;
+  private final ManagerImpl manager;
 
-    private final MavenRepository mavenRepository;
+  private final MavenRepository mavenRepository;
 
-    /**
-     * Constructor.
-     * 
-     * @param progressListener
-     * @param applicationStatusSource
-     * @param manager
-     * @param mavenRepository
-     */
-    public UpdateRepositoryRunnable( final ProgressListener progressListener,
-                                       final ApplicationStatusSource applicationStatusSource,
-                                       final ManagerImpl manager, final MavenRepository mavenRepository )
-    {
-        super( progressListener, mavenRepository.getId() + " AR-Updater" );
-        this.applicationStatusSource = checkNotNull( applicationStatusSource );
-        this.manager = checkNotNull( manager );
-        this.mavenRepository = checkNotNull( mavenRepository );
+  /**
+   * Constructor.
+   */
+  public UpdateRepositoryRunnable(final ProgressListener progressListener,
+                                  final ApplicationStatusSource applicationStatusSource,
+                                  final ManagerImpl manager, final MavenRepository mavenRepository)
+  {
+    super(progressListener, mavenRepository.getId() + " AR-Updater");
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.manager = checkNotNull(manager);
+    this.mavenRepository = checkNotNull(mavenRepository);
+  }
+
+  @Override
+  protected void doRun() {
+    if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
+      getLogger().warn("Nexus stopped during background prefix file updates for {}, bailing out.",
+          mavenRepository.toString());
+      return;
     }
-
-    @Override
-    protected void doRun()
-    {
-        if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
-        {
-            getLogger().warn( "Nexus stopped during background prefix file updates for {}, bailing out.",
-                              mavenRepository.toString() );
-            return;
-        }
-        try
-        {
-            manager.updateAndPublishPrefixFile( mavenRepository );
-        }
-        catch ( Exception e )
-        {
-            try
-            {
-                manager.unpublish( mavenRepository );
-            }
-            catch ( IOException ioe )
-            {
-                // silently
-            }
-            // propagate original exception
-            Throwables.propagate( e );
-        }
+    try {
+      manager.updateAndPublishPrefixFile(mavenRepository);
     }
+    catch (Exception e) {
+      try {
+        manager.unpublish(mavenRepository);
+      }
+      catch (IOException ioe) {
+        // silently
+      }
+      // propagate original exception
+      Throwables.propagate(e);
+    }
+  }
 }

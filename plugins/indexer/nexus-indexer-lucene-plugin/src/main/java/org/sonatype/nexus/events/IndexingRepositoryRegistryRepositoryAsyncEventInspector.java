@@ -10,11 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.events;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
@@ -32,159 +30,140 @@ import org.sonatype.nexus.tasks.RepairIndexTask;
 import org.sonatype.nexus.tasks.UpdateIndexTask;
 import org.sonatype.plexus.appevents.Event;
 
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * Listens for events and manages indexes by doing reindexes when needed (on repository configuration updates).
  * <p>
  * This EventInspector HAS TO BY ASYNC
- * 
+ *
  * @author Toni Menzel
  * @author cstamas
  */
-@Component( role = EventInspector.class, hint = "IndexingRepositoryRegistryRepositoryAsyncEventInspector" )
+@Component(role = EventInspector.class, hint = "IndexingRepositoryRegistryRepositoryAsyncEventInspector")
 public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
     extends AbstractEventInspector
     implements AsynchronousEventInspector
 {
-    @Requirement
-    private RepositoryRegistry repoRegistry;
+  @Requirement
+  private RepositoryRegistry repoRegistry;
 
-    @Requirement
-    private NexusScheduler nexusScheduler;
+  @Requirement
+  private NexusScheduler nexusScheduler;
 
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
+  @Requirement
+  private ApplicationStatusSource applicationStatusSource;
 
-    public boolean accepts( Event<?> evt )
-    {
-        return ( ( evt instanceof RepositoryRegistryRepositoryEvent ) || ( evt instanceof RepositoryConfigurationUpdatedEvent ) )
-            && applicationStatusSource.getSystemStatus().isNexusStarted();
+  public boolean accepts(Event<?> evt) {
+    return ((evt instanceof RepositoryRegistryRepositoryEvent) || (evt instanceof RepositoryConfigurationUpdatedEvent))
+        && applicationStatusSource.getSystemStatus().isNexusStarted();
+  }
+
+  public void inspect(Event<?> evt) {
+    if (!accepts(evt)) {
+      return;
     }
 
-    public void inspect( Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
-
-        Repository repository = null;
-        if ( evt instanceof RepositoryRegistryRepositoryEvent )
-        {
-            repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
-        }
-        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
-        {
-            repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
-        }
-
-        try
-        {
-            // check registry for existance, wont be able to do much
-            // if doesn't exist yet
-            repoRegistry.getRepositoryWithFacet( repository.getId(), MavenRepository.class );
-
-            inspectForIndexerManager( evt, repository );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().debug( "Attempted to handle repository that isn't yet in registry" );
-        }
+    Repository repository = null;
+    if (evt instanceof RepositoryRegistryRepositoryEvent) {
+      repository = ((RepositoryRegistryRepositoryEvent) evt).getRepository();
+    }
+    else if (evt instanceof RepositoryConfigurationUpdatedEvent) {
+      repository = ((RepositoryConfigurationUpdatedEvent) evt).getRepository();
     }
 
-    private void inspectForIndexerManager( Event<?> evt, Repository repository )
-    {
-        try
-        {
-            // we are handling repo events, like addition and removal
-            if ( evt instanceof RepositoryRegistryEventAdd )
-            {
-                // create the initial index
-                if ( repository.isIndexable() )
-                {
-                    // Create the initial index for the repository
-                    reindexRepo( repository, false, "Creating initial index, repositoryId=" + repository.getId() );
-                }
-            }
-            else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
-            {
-                RepositoryConfigurationUpdatedEvent event = (RepositoryConfigurationUpdatedEvent) evt;
+    try {
+      // check registry for existance, wont be able to do much
+      // if doesn't exist yet
+      repoRegistry.getRepositoryWithFacet(repository.getId(), MavenRepository.class);
 
-                // we need to do a full reindex of a Maven2 Proxy repository if:
-                // a) if remoteUrl changed
-                // b) if download remote index enabled (any repo type)
-                // c) if repository is made searchable
-                // TODO: are we sure only a) needs a check for Maven2? I think all of them need
-                if ( event.isRemoteUrlChanged() || event.isDownloadRemoteIndexEnabled() || event.isMadeSearchable() )
-                {
-                    String taskName = null;
+      inspectForIndexerManager(evt, repository);
+    }
+    catch (NoSuchRepositoryException e) {
+      getLogger().debug("Attempted to handle repository that isn't yet in registry");
+    }
+  }
 
-                    String logMessage = null;
-
-                    if ( event.isRemoteUrlChanged() )
-                    {
-                        taskName = append( taskName, "remote URL changed" );
-
-                        logMessage = append( logMessage, "remote URL changed" );
-                    }
-
-                    if ( event.isDownloadRemoteIndexEnabled() )
-                    {
-                        taskName = append( taskName, "enabled download of indexes" );
-
-                        logMessage = append( logMessage, "enabled download of indexes" );
-                    }
-
-                    if ( event.isMadeSearchable() )
-                    {
-                        taskName = append( taskName, "enabled searchable" );
-
-                        logMessage = append( logMessage, "enabled searchable" );
-                    }
-
-                    taskName = taskName + ", repositoryId=" + event.getRepository().getId() + ".";
-
-                    logMessage =
-                        logMessage + " on repository \"" + event.getRepository().getName() + "\" (id="
-                            + event.getRepository().getId() + "), doing full reindex of it.";
-
-                    reindexRepo( event.getRepository(), true, taskName );
-
-                    getLogger().info( logMessage );
-                }
-            }
+  private void inspectForIndexerManager(Event<?> evt, Repository repository) {
+    try {
+      // we are handling repo events, like addition and removal
+      if (evt instanceof RepositoryRegistryEventAdd) {
+        // create the initial index
+        if (repository.isIndexable()) {
+          // Create the initial index for the repository
+          reindexRepo(repository, false, "Creating initial index, repositoryId=" + repository.getId());
         }
-        catch ( Exception e )
-        {
-            getLogger().error( "Could not maintain indexing contexts!", e );
+      }
+      else if (evt instanceof RepositoryConfigurationUpdatedEvent) {
+        RepositoryConfigurationUpdatedEvent event = (RepositoryConfigurationUpdatedEvent) evt;
+
+        // we need to do a full reindex of a Maven2 Proxy repository if:
+        // a) if remoteUrl changed
+        // b) if download remote index enabled (any repo type)
+        // c) if repository is made searchable
+        // TODO: are we sure only a) needs a check for Maven2? I think all of them need
+        if (event.isRemoteUrlChanged() || event.isDownloadRemoteIndexEnabled() || event.isMadeSearchable()) {
+          String taskName = null;
+
+          String logMessage = null;
+
+          if (event.isRemoteUrlChanged()) {
+            taskName = append(taskName, "remote URL changed");
+
+            logMessage = append(logMessage, "remote URL changed");
+          }
+
+          if (event.isDownloadRemoteIndexEnabled()) {
+            taskName = append(taskName, "enabled download of indexes");
+
+            logMessage = append(logMessage, "enabled download of indexes");
+          }
+
+          if (event.isMadeSearchable()) {
+            taskName = append(taskName, "enabled searchable");
+
+            logMessage = append(logMessage, "enabled searchable");
+          }
+
+          taskName = taskName + ", repositoryId=" + event.getRepository().getId() + ".";
+
+          logMessage =
+              logMessage + " on repository \"" + event.getRepository().getName() + "\" (id="
+                  + event.getRepository().getId() + "), doing full reindex of it.";
+
+          reindexRepo(event.getRepository(), true, taskName);
+
+          getLogger().info(logMessage);
         }
+      }
+    }
+    catch (Exception e) {
+      getLogger().error("Could not maintain indexing contexts!", e);
+    }
+  }
+
+  private void reindexRepo(Repository repository, boolean full, String taskName) {
+    AbstractNexusRepositoriesPathAwareTask<Object> rt;
+    if (full) {
+      rt = nexusScheduler.createTaskInstance(RepairIndexTask.class);
+    }
+    else {
+      rt = nexusScheduler.createTaskInstance(UpdateIndexTask.class);
     }
 
-    private void reindexRepo( Repository repository, boolean full, String taskName )
-    {
-        AbstractNexusRepositoriesPathAwareTask<Object> rt;
-        if ( full )
-        {
-            rt = nexusScheduler.createTaskInstance( RepairIndexTask.class );
-        }
-        else
-        {
-            rt = nexusScheduler.createTaskInstance( UpdateIndexTask.class );
-        }
+    rt.setRepositoryId(repository.getId());
 
-        rt.setRepositoryId( repository.getId() );
+    nexusScheduler.submit(taskName, rt);
+  }
 
-        nexusScheduler.submit( taskName, rt );
+  private String append(String message, String append) {
+    if (StringUtils.isBlank(message)) {
+      return StringUtils.capitalize(append);
     }
-
-    private String append( String message, String append )
-    {
-        if ( StringUtils.isBlank( message ) )
-        {
-            return StringUtils.capitalize( append );
-        }
-        else
-        {
-            return message + ", " + append;
-        }
+    else {
+      return message + ", " + append;
     }
+  }
 }

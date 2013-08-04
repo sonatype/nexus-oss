@@ -10,15 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web;
 
 import javax.servlet.ServletContext;
 
-import org.apache.shiro.mgt.RealmSecurityManager;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+import org.apache.shiro.mgt.RealmSecurityManager;
 
 /**
  * Custom {@link SecurityWebModule} for Nexus.
@@ -26,15 +27,13 @@ import com.google.inject.name.Names;
 public class NexusWebModule
     extends SecurityWebModule
 {
-    public NexusWebModule( ServletContext servletContext )
-    {
-        super( servletContext, true );
-    }
+  public NexusWebModule(ServletContext servletContext) {
+    super(servletContext, true);
+  }
 
-    @Override
-    protected void configureShiroWeb()
-    {
-        super.configureShiroWeb();
+  @Override
+  protected void configureShiroWeb() {
+    super.configureShiroWeb();
 
         /*
          * -----------------------------------------------------------------------------------------------------------
@@ -46,8 +45,8 @@ public class NexusWebModule
          * -----------------------------------------------------------------------------------------------------------
          */
 
-        Named nexus = Names.named( "nexus" );
-        bind( RealmSecurityManager.class ).annotatedWith( nexus ).to( RealmSecurityManager.class );
-        expose( RealmSecurityManager.class ).annotatedWith( nexus );
-    }
+    Named nexus = Names.named("nexus");
+    bind(RealmSecurityManager.class).annotatedWith(nexus).to(RealmSecurityManager.class);
+    expose(RealmSecurityManager.class).annotatedWith(nexus);
+  }
 }

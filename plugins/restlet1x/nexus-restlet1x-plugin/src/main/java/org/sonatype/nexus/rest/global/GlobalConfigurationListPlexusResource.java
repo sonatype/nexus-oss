@@ -10,11 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.global;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
+import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
+import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
@@ -23,72 +29,65 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
-import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * The GlobalConfigurationList resource. This is a read only resource that simply returns a list of known configuration
  * resources.
- * 
+ *
  * @author cstamas
  * @author tstevens
  */
-@Component( role = PlexusResource.class, hint = "GlobalConfigurationListPlexusResource" )
-@Path( GlobalConfigurationListPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "GlobalConfigurationListPlexusResource")
+@Path(GlobalConfigurationListPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class GlobalConfigurationListPlexusResource
     extends AbstractGlobalConfigurationPlexusResource
 {
-    public static final String RESOURCE_URI = "/global_settings";
-    
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
+  public static final String RESOURCE_URI = "/global_settings";
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:settings]" );
-    }
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
 
-    /**
-     * Get the list of global configuration objects in nexus.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( output = GlobalConfigurationListResourceResponse.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        GlobalConfigurationListResourceResponse result = new GlobalConfigurationListResourceResponse();
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:settings]");
+  }
 
-        GlobalConfigurationListResource data = new GlobalConfigurationListResource();
+  /**
+   * Get the list of global configuration objects in nexus.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(output = GlobalConfigurationListResourceResponse.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    GlobalConfigurationListResourceResponse result = new GlobalConfigurationListResourceResponse();
 
-        data.setName( GlobalConfigurationPlexusResource.DEFAULT_CONFIG_NAME );
+    GlobalConfigurationListResource data = new GlobalConfigurationListResource();
 
-        data.setResourceURI( createChildReference( request, this, data.getName() ).toString() );
+    data.setName(GlobalConfigurationPlexusResource.DEFAULT_CONFIG_NAME);
 
-        result.addData( data );
+    data.setResourceURI(createChildReference(request, this, data.getName()).toString());
 
-        data = new GlobalConfigurationListResource();
+    result.addData(data);
 
-        data.setName( GlobalConfigurationPlexusResource.CURRENT_CONFIG_NAME );
+    data = new GlobalConfigurationListResource();
 
-        data.setResourceURI( createChildReference( request, this, data.getName() ).toString() );
+    data.setName(GlobalConfigurationPlexusResource.CURRENT_CONFIG_NAME);
 
-        result.addData( data );
+    data.setResourceURI(createChildReference(request, this, data.getName()).toString());
 
-        return result;
-    }
+    result.addData(data);
+
+    return result;
+  }
 
 }

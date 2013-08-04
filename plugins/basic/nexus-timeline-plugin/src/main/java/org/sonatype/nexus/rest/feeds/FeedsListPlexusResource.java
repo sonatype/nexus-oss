@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
@@ -17,6 +18,13 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.feeds.sources.FeedSource;
+import org.sonatype.nexus.rest.model.FeedListResource;
+import org.sonatype.nexus.rest.model.FeedListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
@@ -26,74 +34,64 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.feeds.sources.FeedSource;
-import org.sonatype.nexus.rest.model.FeedListResource;
-import org.sonatype.nexus.rest.model.FeedListResourceResponse;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * A resource that lists existing feeds.
- * 
+ *
  * @author cstamas
  * @author dip
  */
-@Component( role = PlexusResource.class, hint = "FeedsListPlexusResource" )
-@Path( FeedsListPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "FeedsListPlexusResource")
+@Path(FeedsListPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class FeedsListPlexusResource
     extends AbstractNexusPlexusResource
 {
-    public static final String RESOURCE_URI = "/feeds";
-    
-    @Requirement( role = FeedSource.class )
-    private List<FeedSource> feeds;
+  public static final String RESOURCE_URI = "/feeds";
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        // RO resource, no payload
-        return null;
+  @Requirement(role = FeedSource.class)
+  private List<FeedSource> feeds;
+
+  @Override
+  public Object getPayloadInstance() {
+    // RO resource, no payload
+    return null;
+  }
+
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
+
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:feeds]");
+  }
+
+  /**
+   * Get the list of feeds available from the nexus server.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(output = FeedListResourceResponse.class)
+  public Object get(Context context, Request req, Response res, Variant variant)
+      throws ResourceException
+  {
+    FeedListResourceResponse response = new FeedListResourceResponse();
+
+    List<FeedSource> sources = feeds;
+
+    for (FeedSource source : sources) {
+      FeedListResource resource = new FeedListResource();
+
+      resource.setResourceURI(createChildReference(req, this, source.getFeedKey()).toString());
+
+      resource.setName(source.getFeedName());
+
+      response.addData(resource);
     }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
-
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:feeds]" );
-    }
-
-    /**
-     * Get the list of feeds available from the nexus server.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( output = FeedListResourceResponse.class )
-    public Object get( Context context, Request req, Response res, Variant variant )
-        throws ResourceException
-    {
-        FeedListResourceResponse response = new FeedListResourceResponse();
-
-        List<FeedSource> sources = feeds;
-
-        for ( FeedSource source : sources )
-        {
-            FeedListResource resource = new FeedListResource();
-
-            resource.setResourceURI( createChildReference( req, this, source.getFeedKey() ).toString() );
-
-            resource.setName( source.getFeedName() );
-
-            response.addData( resource );
-        }
-
-        return response;
-    }
+    return response;
+  }
 
 }

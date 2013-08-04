@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -17,26 +18,26 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public interface P2RepositoryAggregator
 {
 
-    void addConfiguration( final P2RepositoryAggregatorConfiguration configuration );
+  void addConfiguration(final P2RepositoryAggregatorConfiguration configuration);
 
-    void removeConfiguration( final P2RepositoryAggregatorConfiguration configuration );
+  void removeConfiguration(final P2RepositoryAggregatorConfiguration configuration);
 
-    void enableAggregationFor( final P2RepositoryAggregatorConfiguration configuration );
+  void enableAggregationFor(final P2RepositoryAggregatorConfiguration configuration);
 
-    void disableAggregationFor( final P2RepositoryAggregatorConfiguration configuration );
+  void disableAggregationFor(final P2RepositoryAggregatorConfiguration configuration);
 
-    P2RepositoryAggregatorConfiguration getConfiguration( final String repositoryId );
+  P2RepositoryAggregatorConfiguration getConfiguration(final String repositoryId);
 
-    void updateP2Artifacts( StorageItem item );
+  void updateP2Artifacts(StorageItem item);
 
-    void removeP2Artifacts( StorageItem item );
+  void removeP2Artifacts(StorageItem item);
 
-    void updateP2Metadata( StorageItem item );
+  void updateP2Metadata(StorageItem item);
 
-    void removeP2Metadata( StorageItem item );
+  void removeP2Metadata(StorageItem item);
 
-    void scanAndRebuild( String repositoryId );
+  void scanAndRebuild(String repositoryId);
 
-    void scanAndRebuild();
+  void scanAndRebuild();
 
 }

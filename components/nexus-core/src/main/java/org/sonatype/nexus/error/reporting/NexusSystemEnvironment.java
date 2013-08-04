@@ -10,13 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.sisu.pr.SystemEnvironmentContributor;
 
@@ -25,33 +24,31 @@ import org.sonatype.sisu.pr.SystemEnvironmentContributor;
  *
  * @since 2.1
  */
-@Named( "nexus" )
+@Named("nexus")
 public class NexusSystemEnvironment
     implements SystemEnvironmentContributor
 {
-    private static String LINE_SEPERATOR = System.getProperty( "line.separator" );
+  private static String LINE_SEPERATOR = System.getProperty("line.separator");
 
-    ApplicationStatusSource applicationStatus;
+  ApplicationStatusSource applicationStatus;
 
-    @Inject
-    public NexusSystemEnvironment( final ApplicationStatusSource applicationStatus )
-    {
-        this.applicationStatus = applicationStatus;
-    }
+  @Inject
+  public NexusSystemEnvironment(final ApplicationStatusSource applicationStatus) {
+    this.applicationStatus = applicationStatus;
+  }
 
-    @Override
-    public String asDiagnosticsFormat()
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append( "Nexus Version: " );
-        sb.append( applicationStatus.getSystemStatus().getVersion() );
-        sb.append( LINE_SEPERATOR );
+  @Override
+  public String asDiagnosticsFormat() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Nexus Version: ");
+    sb.append(applicationStatus.getSystemStatus().getVersion());
+    sb.append(LINE_SEPERATOR);
 
-        sb.append( "Nexus Edition: " );
-        sb.append( applicationStatus.getSystemStatus().getEditionLong() );
-        sb.append( LINE_SEPERATOR );
-        
-        return sb.toString();
-    }
+    sb.append("Nexus Edition: ");
+    sb.append(applicationStatus.getSystemStatus().getEditionLong());
+    sb.append(LINE_SEPERATOR);
+
+    return sb.toString();
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2bridge.internal;
 
 import javax.inject.Inject;
@@ -26,24 +27,21 @@ public class CompositeRepositoryProvider
     implements Provider<CompositeRepository>
 {
 
-    private final P2Runtime p2Runtime;
+  private final P2Runtime p2Runtime;
 
-    private CompositeRepository service;
+  private CompositeRepository service;
 
-    @Inject
-    public CompositeRepositoryProvider( final P2Runtime p2Runtime )
-    {
-        this.p2Runtime = p2Runtime;
+  @Inject
+  public CompositeRepositoryProvider(final P2Runtime p2Runtime) {
+    this.p2Runtime = p2Runtime;
+  }
+
+  @Override
+  public CompositeRepository get() {
+    if (service == null) {
+      service = p2Runtime.get().getService(CompositeRepository.class);
     }
-
-    @Override
-    public CompositeRepository get()
-    {
-        if ( service == null )
-        {
-            service = p2Runtime.get().getService( CompositeRepository.class );
-        }
-        return service;
-    }
+    return service;
+  }
 
 }

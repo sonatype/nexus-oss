@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.json;
 
 import java.io.BufferedReader;
@@ -31,79 +32,65 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
  * JSON.org based StreamDriver.
- * 
+ *
  * @author cstamas
  */
 public class JsonOrgHierarchicalStreamDriver
     implements HierarchicalStreamDriver
 {
-    private ClassHintProvider classHintProvider;
+  private ClassHintProvider classHintProvider;
 
-    public JsonOrgHierarchicalStreamDriver()
-    {
-        this( null );
-    }
+  public JsonOrgHierarchicalStreamDriver() {
+    this(null);
+  }
 
-    public JsonOrgHierarchicalStreamDriver( ClassHintProvider classHintProvider )
-    {
-        super();
-        this.classHintProvider = classHintProvider;
-    }
+  public JsonOrgHierarchicalStreamDriver(ClassHintProvider classHintProvider) {
+    super();
+    this.classHintProvider = classHintProvider;
+  }
 
-    public HierarchicalStreamReader createReader( Reader in )
-    {
-        if ( classHintProvider != null )
-        {
-            return new JsonOrgHierarchicalStreamReader( in, false, classHintProvider );
-        }
-        else
-        {
-            return new JsonOrgHierarchicalStreamReader( in, true );
-        }
+  public HierarchicalStreamReader createReader(Reader in) {
+    if (classHintProvider != null) {
+      return new JsonOrgHierarchicalStreamReader(in, false, classHintProvider);
     }
+    else {
+      return new JsonOrgHierarchicalStreamReader(in, true);
+    }
+  }
 
-    public HierarchicalStreamReader createReader( InputStream in )
-    {
-        return createReader( new InputStreamReader( in ) );
-    }
+  public HierarchicalStreamReader createReader(InputStream in) {
+    return createReader(new InputStreamReader(in));
+  }
 
-    /**
-     * @since 1.25
-     */
-    public HierarchicalStreamReader createReader( URL in )
-    {
-        try
-        {
-            return createReader( in.openStream() );
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( e );
-        }
+  /**
+   * @since 1.25
+   */
+  public HierarchicalStreamReader createReader(URL in) {
+    try {
+      return createReader(in.openStream());
     }
+    catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-    /**
-     * @since 1.25
-     */
-    public HierarchicalStreamReader createReader( File in )
-    {
-        try
-        {
-            return createReader( new BufferedReader( new FileReader( in ) ) );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RuntimeException( e );
-        }
+  /**
+   * @since 1.25
+   */
+  public HierarchicalStreamReader createReader(File in) {
+    try {
+      return createReader(new BufferedReader(new FileReader(in)));
     }
+    catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-    public HierarchicalStreamWriter createWriter( Writer out )
-    {
-        return new JsonOrgHierarchicalStreamWriter( out, false );
-    }
+  public HierarchicalStreamWriter createWriter(Writer out) {
+    return new JsonOrgHierarchicalStreamWriter(out, false);
+  }
 
-    public HierarchicalStreamWriter createWriter( OutputStream out )
-    {
-        return createWriter( new OutputStreamWriter( out ) );
-    }
+  public HierarchicalStreamWriter createWriter(OutputStream out) {
+    return createWriter(new OutputStreamWriter(out));
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.maven.nexus634;
 
 import java.io.IOException;
@@ -29,21 +30,19 @@ public class TouchTrackingHandler
     extends AbstractHandler
     implements Handler
 {
-    private final List<String> touchedTargets;
+  private final List<String> touchedTargets;
 
-    public TouchTrackingHandler()
-    {
-        this.touchedTargets = new ArrayList<String>();
-    }
+  public TouchTrackingHandler() {
+    this.touchedTargets = new ArrayList<String>();
+  }
 
-    public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-        throws IOException, ServletException
-    {
-        touchedTargets.add( target );
-    }
+  public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+      throws IOException, ServletException
+  {
+    touchedTargets.add(target);
+  }
 
-    public List<String> getTouchedTargets()
-    {
-        return Collections.unmodifiableList( touchedTargets );
-    }
+  public List<String> getTouchedTargets() {
+    return Collections.unmodifiableList(touchedTargets);
+  }
 }

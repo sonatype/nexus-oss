@@ -10,20 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.item;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+package org.sonatype.nexus.proxy.item;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 /**
  * Support for {@link LockResource} tests.
@@ -31,198 +33,178 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 public abstract class LockResourceTestSupport
     extends TestSupport
 {
-    private ExecutorService executor;
+  private ExecutorService executor;
 
-    @Before
-    public void prepare()
-    {
-        executor = Executors.newFixedThreadPool( 5 );
+  @Before
+  public void prepare() {
+    executor = Executors.newFixedThreadPool(5);
+  }
+
+  protected abstract RepositoryItemUidLock getLockResource(final String name);
+
+  /**
+   * Testing shared access: we lock the resource using shared lock, spawn two shared locking threads and we expect
+   * that all of those finish their work before we do.
+   */
+  @Test
+  public void sharedLockIsSharedAccess()
+      throws Exception
+  {
+    final RepositoryItemUidLock slr = getLockResource("foo");
+
+    final LockResourceRunnable r1 = new LockResourceRunnable(null, slr, Action.read);
+    final LockResourceRunnable r2 = new LockResourceRunnable(null, slr, Action.read);
+
+    slr.lock(Action.read);
+
+    long unlockTs = -1;
+
+    try {
+      executor.execute(r1);
+      executor.execute(r2);
+
+      Thread.sleep(100);
+
+      unlockTs = System.currentTimeMillis();
+    }
+    finally {
+      slr.unlock();
     }
 
-    protected abstract RepositoryItemUidLock getLockResource( final String name );
+    executor.shutdown();
+    executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
 
-    /**
-     * Testing shared access: we lock the resource using shared lock, spawn two shared locking threads and we expect
-     * that all of those finish their work before we do.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void sharedLockIsSharedAccess()
-        throws Exception
-    {
-        final RepositoryItemUidLock slr = getLockResource( "foo" );
+    assertThat(r1.getDoneTs(), lessThanOrEqualTo(unlockTs));
+    assertThat(r2.getDoneTs(), lessThanOrEqualTo(unlockTs));
+  }
 
-        final LockResourceRunnable r1 = new LockResourceRunnable( null, slr, Action.read );
-        final LockResourceRunnable r2 = new LockResourceRunnable( null, slr, Action.read );
+  /**
+   * Testing exclusive access: we lock the resource using exclusive lock, spawn two shared locking threads and we
+   * expect that all of those finish their work after we do.
+   */
+  @Test
+  public void exclusiveLockIsNotSharedAccess()
+      throws Exception
+  {
+    final RepositoryItemUidLock slr = getLockResource("foo");
 
-        slr.lock( Action.read );
+    final LockResourceRunnable r1 = new LockResourceRunnable(null, slr, Action.read);
+    final LockResourceRunnable r2 = new LockResourceRunnable(null, slr, Action.read);
 
-        long unlockTs = -1;
+    slr.lock(Action.create);
 
-        try
-        {
-            executor.execute( r1 );
-            executor.execute( r2 );
+    long unlockTs = -1;
 
-            Thread.sleep( 100 );
+    try {
+      executor.execute(r1);
+      executor.execute(r2);
 
-            unlockTs = System.currentTimeMillis();
-        }
-        finally
-        {
-            slr.unlock();
-        }
+      Thread.sleep(100);
 
-        executor.shutdown();
-        executor.awaitTermination( 1000, TimeUnit.MILLISECONDS );
-
-        assertThat( r1.getDoneTs(), lessThanOrEqualTo( unlockTs ) );
-        assertThat( r2.getDoneTs(), lessThanOrEqualTo( unlockTs ) );
+      unlockTs = System.currentTimeMillis();
+    }
+    finally {
+      slr.unlock();
     }
 
-    /**
-     * Testing exclusive access: we lock the resource using exclusive lock, spawn two shared locking threads and we
-     * expect that all of those finish their work after we do.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void exclusiveLockIsNotSharedAccess()
-        throws Exception
-    {
-        final RepositoryItemUidLock slr = getLockResource( "foo" );
+    executor.shutdown();
+    executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
 
-        final LockResourceRunnable r1 = new LockResourceRunnable( null, slr, Action.read );
-        final LockResourceRunnable r2 = new LockResourceRunnable( null, slr, Action.read );
+    assertThat(r1.getDoneTs(), greaterThanOrEqualTo(unlockTs));
+    assertThat(r2.getDoneTs(), greaterThanOrEqualTo(unlockTs));
+  }
 
-        slr.lock( Action.create );
+  /**
+   * Testing lock downgrading: we lock the resource using shared lock, then using exclusive lock, spawn two shared
+   * locking threads (that should block since we have exclusive lock), then we unlock (releasing the exclusive lock)
+   * and we expect that all of those finish their work before we do.
+   * <p>
+   * Note: before downgradeable locks, this UT would fail, since after upgrade, exclusive lock would be released on
+   * last unlock invocation. Having this test passing shows that downgrade does happen.
+   */
+  @Test
+  public void downgradeLockEnabledSharedAccess()
+      throws Exception
+  {
+    final RepositoryItemUidLock slr = getLockResource("foo");
 
-        long unlockTs = -1;
+    final LockResourceRunnable r1 = new LockResourceRunnable(null, slr, Action.read);
+    final LockResourceRunnable r2 = new LockResourceRunnable(null, slr, Action.read);
 
-        try
-        {
-            executor.execute( r1 );
-            executor.execute( r2 );
+    slr.lock(Action.read);
 
-            Thread.sleep( 100 );
+    long unlockTs = -1;
 
-            unlockTs = System.currentTimeMillis();
-        }
-        finally
-        {
-            slr.unlock();
-        }
+    try {
+      slr.lock(Action.create);
 
-        executor.shutdown();
-        executor.awaitTermination( 1000, TimeUnit.MILLISECONDS );
+      try {
+        executor.execute(r1);
+        executor.execute(r2);
+      }
+      finally {
+        slr.unlock();
+      }
 
-        assertThat( r1.getDoneTs(), greaterThanOrEqualTo( unlockTs ) );
-        assertThat( r2.getDoneTs(), greaterThanOrEqualTo( unlockTs ) );
+      Thread.sleep(100);
+
+      unlockTs = System.currentTimeMillis();
+    }
+    finally {
+      slr.unlock();
     }
 
-    /**
-     * Testing lock downgrading: we lock the resource using shared lock, then using exclusive lock, spawn two shared
-     * locking threads (that should block since we have exclusive lock), then we unlock (releasing the exclusive lock)
-     * and we expect that all of those finish their work before we do.
-     * <p>
-     * Note: before downgradeable locks, this UT would fail, since after upgrade, exclusive lock would be released on
-     * last unlock invocation. Having this test passing shows that downgrade does happen.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void downgradeLockEnabledSharedAccess()
-        throws Exception
+    executor.shutdown();
+    executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+
+    assertThat(r1.getDoneTs(), lessThanOrEqualTo(unlockTs));
+    assertThat(r2.getDoneTs(), lessThanOrEqualTo(unlockTs));
+  }
+
+  /**
+   * A simple static class that takes a lock and does something with it.
+   *
+   * @author cstamas
+   */
+  public static class LockResourceRunnable
+      implements Runnable
+  {
+    private final Runnable runnable;
+
+    private final RepositoryItemUidLock uidLock;
+
+    private final Action action;
+
+    private long doneTs;
+
+    public LockResourceRunnable(final Runnable runnable, final RepositoryItemUidLock lockResource,
+                                final Action action)
     {
-        final RepositoryItemUidLock slr = getLockResource( "foo" );
-
-        final LockResourceRunnable r1 = new LockResourceRunnable( null, slr, Action.read );
-        final LockResourceRunnable r2 = new LockResourceRunnable( null, slr, Action.read );
-
-        slr.lock( Action.read );
-
-        long unlockTs = -1;
-
-        try
-        {
-            slr.lock( Action.create );
-
-            try
-            {
-                executor.execute( r1 );
-                executor.execute( r2 );
-            }
-            finally
-            {
-                slr.unlock();
-            }
-
-            Thread.sleep( 100 );
-
-            unlockTs = System.currentTimeMillis();
-        }
-        finally
-        {
-            slr.unlock();
-        }
-
-        executor.shutdown();
-        executor.awaitTermination( 1000, TimeUnit.MILLISECONDS );
-
-        assertThat( r1.getDoneTs(), lessThanOrEqualTo( unlockTs ) );
-        assertThat( r2.getDoneTs(), lessThanOrEqualTo( unlockTs ) );
+      this.runnable = runnable;
+      this.uidLock = lockResource;
+      this.action = action;
+      this.doneTs = -1;
     }
 
-    /**
-     * A simple static class that takes a lock and does something with it.
-     * 
-     * @author cstamas
-     */
-    public static class LockResourceRunnable
-        implements Runnable
-    {
-        private final Runnable runnable;
-
-        private final RepositoryItemUidLock uidLock;
-
-        private final Action action;
-
-        private long doneTs;
-
-        public LockResourceRunnable( final Runnable runnable, final RepositoryItemUidLock lockResource,
-                                     final Action action )
-        {
-            this.runnable = runnable;
-            this.uidLock = lockResource;
-            this.action = action;
-            this.doneTs = -1;
-        }
-
-        public long getDoneTs()
-        {
-            return doneTs;
-        }
-
-        @Override
-        public void run()
-        {
-            uidLock.lock( action );
-
-            try
-            {
-                if ( runnable != null )
-                {
-                    runnable.run();
-                }
-            }
-            finally
-            {
-                uidLock.unlock();
-            }
-
-            doneTs = System.currentTimeMillis();
-        }
+    public long getDoneTs() {
+      return doneTs;
     }
+
+    @Override
+    public void run() {
+      uidLock.lock(action);
+
+      try {
+        if (runnable != null) {
+          runnable.run();
+        }
+      }
+      finally {
+        uidLock.unlock();
+      }
+
+      doneTs = System.currentTimeMillis();
+    }
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.events;
 
 import org.sonatype.nexus.plugins.NexusPluginManager;
@@ -23,50 +24,46 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 public final class PluginRejectedEvent
     extends AbstractEvent<NexusPluginManager>
 {
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    private final GAVCoordinate gav;
+  private final GAVCoordinate gav;
 
-    private final Throwable reason;
+  private final Throwable reason;
 
-    // ----------------------------------------------------------------------
-    // Constructors
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constructors
+  // ----------------------------------------------------------------------
 
-    public PluginRejectedEvent( final NexusPluginManager component, final GAVCoordinate gav, final Throwable reason )
-    {
-        super( component );
+  public PluginRejectedEvent(final NexusPluginManager component, final GAVCoordinate gav, final Throwable reason) {
+    super(component);
 
-        this.gav = gav;
-        this.reason = reason;
-    }
+    this.gav = gav;
+    this.reason = reason;
+  }
 
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
 
-    public GAVCoordinate getPluginCoordinates()
-    {
-        return gav;
-    }
+  public GAVCoordinate getPluginCoordinates() {
+    return gav;
+  }
 
-    public Throwable getReason()
-    {
-        return reason;
-    }
+  public Throwable getReason() {
+    return reason;
+  }
 
-    public NexusPluginManager getNexusPluginManager()
-    {
-        return getEventSender();
-    }
+  public NexusPluginManager getNexusPluginManager() {
+    return getEventSender();
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "gav=" + gav +
-            ", reason=" + (reason != null ? reason.getMessage() : null) +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "gav=" + gav +
+        ", reason=" + (reason != null ? reason.getMessage() : null) +
+        '}';
+  }
 }

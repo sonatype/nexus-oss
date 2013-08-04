@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.formfield;
 
 import java.util.ArrayList;
@@ -22,38 +23,34 @@ import org.sonatype.nexus.rest.model.FormFieldResource;
 public abstract class AbstractFormFieldResource
     extends AbstractNexusPlexusResource
 {
-    protected List<? extends FormFieldResource> formFieldToDTO( List<FormField> fields, Class<? extends FormFieldResource> clazz )
-    {
-        List<FormFieldResource> dtoList = new ArrayList<FormFieldResource>();
-        
-        for ( FormField field : fields )
-        {
-            try
-            {
-                FormFieldResource dto = clazz.newInstance();
-                dto.setHelpText( field.getHelpText() );
-                dto.setId( field.getId() );
-                dto.setLabel( field.getLabel() );
-                dto.setRegexValidation( field.getRegexValidation() );
-                dto.setRequired( field.isRequired() );
-                dto.setType( field.getType() );
-                if ( field.getInitialValue() != null )
-                {
-                    dto.setInitialValue( field.getInitialValue().toString() );
-                }
+  protected List<? extends FormFieldResource> formFieldToDTO(List<FormField> fields,
+                                                             Class<? extends FormFieldResource> clazz)
+  {
+    List<FormFieldResource> dtoList = new ArrayList<FormFieldResource>();
 
-                dtoList.add( dto );
-            }
-            catch ( InstantiationException e )
-            {
-                getLogger().error( "Unable to properly translate DTO", e );
-            }
-            catch ( IllegalAccessException e )
-            {
-                getLogger().error( "Unable to properly translate DTO", e );
-            }
+    for (FormField field : fields) {
+      try {
+        FormFieldResource dto = clazz.newInstance();
+        dto.setHelpText(field.getHelpText());
+        dto.setId(field.getId());
+        dto.setLabel(field.getLabel());
+        dto.setRegexValidation(field.getRegexValidation());
+        dto.setRequired(field.isRequired());
+        dto.setType(field.getType());
+        if (field.getInitialValue() != null) {
+          dto.setInitialValue(field.getInitialValue().toString());
         }
-        
-        return dtoList;
+
+        dtoList.add(dto);
+      }
+      catch (InstantiationException e) {
+        getLogger().error("Unable to properly translate DTO", e);
+      }
+      catch (IllegalAccessException e) {
+        getLogger().error("Unable to properly translate DTO", e);
+      }
     }
+
+    return dtoList;
+  }
 }

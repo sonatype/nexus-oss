@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.threads;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Runnable that properly sets MDC context before invoking the delegate. The delegate will execute in a
@@ -23,22 +24,21 @@ import java.util.Map;
  * @author cstamas
  * @since 2.6
  */
-public class MDCAwareRunnable implements Runnable
+public class MDCAwareRunnable
+    implements Runnable
 {
-    private final Runnable delegate;
+  private final Runnable delegate;
 
-    private final Map<String, String> mdcContext;
+  private final Map<String, String> mdcContext;
 
-    public MDCAwareRunnable( final Runnable delegate )
-    {
-        this.delegate = checkNotNull( delegate );
-        this.mdcContext = MDCUtils.getCopyOfContextMap();
-    }
+  public MDCAwareRunnable(final Runnable delegate) {
+    this.delegate = checkNotNull(delegate);
+    this.mdcContext = MDCUtils.getCopyOfContextMap();
+  }
 
-    @Override
-    public void run()
-    {
-        MDCUtils.setContextMap( mdcContext );
-        delegate.run();
-    }
+  @Override
+  public void run() {
+    MDCUtils.setContextMap(mdcContext);
+    delegate.run();
+  }
 }

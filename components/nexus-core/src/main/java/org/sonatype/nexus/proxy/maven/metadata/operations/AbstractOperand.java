@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
@@ -20,15 +21,13 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Ve
  */
 public abstract class AbstractOperand
 {
-    private final Version originModelVersion;
+  private final Version originModelVersion;
 
-    protected AbstractOperand( final Version originModelVersion )
-    {
-        this.originModelVersion = originModelVersion;
-    }
+  protected AbstractOperand(final Version originModelVersion) {
+    this.originModelVersion = originModelVersion;
+  }
 
-    public Version getOriginModelVersion()
-    {
-        return originModelVersion;
-    }
+  public Version getOriginModelVersion() {
+    return originModelVersion;
+  }
 }

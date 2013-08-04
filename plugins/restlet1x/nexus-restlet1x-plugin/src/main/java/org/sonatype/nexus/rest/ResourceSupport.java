@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import javax.ws.rs.Path;
 
+import org.sonatype.plexus.rest.resource.PlexusResource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Support for {@link PlexusResource} implementations.
@@ -27,36 +29,31 @@ public abstract class ResourceSupport
     extends AbstractNexusPlexusResource
 {
 
-    protected final Logger log = LoggerFactory.getLogger( getClass() );
+  protected final Logger log = LoggerFactory.getLogger(getClass());
 
-    private String resourceUri;
+  private String resourceUri;
 
-    protected ResourceSupport()
-    {
-        setAvailable( true );
-        setReadable( true );
-        setModifiable( true );
-        setNegotiateContent( true );
+  protected ResourceSupport() {
+    setAvailable(true);
+    setReadable(true);
+    setModifiable(true);
+    setNegotiateContent(true);
+  }
+
+  @Override
+  public String getResourceUri() {
+    if (resourceUri == null) {
+      Path path = getClass().getAnnotation(Path.class);
+      if (path != null) {
+        resourceUri = path.value();
+      }
     }
+    return resourceUri;
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        if ( resourceUri == null )
-        {
-            Path path = getClass().getAnnotation( Path.class );
-            if ( path != null )
-            {
-                resourceUri = path.value();
-            }
-        }
-        return resourceUri;
-    }
-
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 import java.io.ByteArrayInputStream;
@@ -20,43 +21,38 @@ import java.util.Arrays;
 public class ByteArrayContentLocator
     implements ContentLocator
 {
-    private final byte[] content;
+  private final byte[] content;
 
-    private final String mimeType;
+  private final String mimeType;
 
-    public ByteArrayContentLocator( final byte[] content, final String mimeType )
-    {
-        this.content = Arrays.copyOf( content, content.length );
+  public ByteArrayContentLocator(final byte[] content, final String mimeType) {
+    this.content = Arrays.copyOf(content, content.length);
 
-        this.mimeType = mimeType;
-    }
+    this.mimeType = mimeType;
+  }
 
-    @Override
-    public InputStream getContent()
-        throws IOException
-    {
-        return new ByteArrayInputStream( content );
-    }
+  @Override
+  public InputStream getContent()
+      throws IOException
+  {
+    return new ByteArrayInputStream(content);
+  }
 
-    @Override
-    public String getMimeType()
-    {
-        return mimeType;
-    }
+  @Override
+  public String getMimeType() {
+    return mimeType;
+  }
 
-    @Override
-    public boolean isReusable()
-    {
-        return true;
-    }
+  @Override
+  public boolean isReusable() {
+    return true;
+  }
 
-    public long getLength()
-    {
-        return content.length;
-    }
+  public long getLength() {
+    return content.length;
+  }
 
-    public byte[] getByteArray()
-    {
-        return content;
-    }
+  public byte[] getByteArray() {
+    return content;
+  }
 }

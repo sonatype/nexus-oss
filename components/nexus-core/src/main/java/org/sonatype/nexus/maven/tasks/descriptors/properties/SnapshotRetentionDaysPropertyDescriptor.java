@@ -10,31 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks.descriptors.properties;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.tasks.descriptors.properties.AbstractNumberPropertyDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays", instantiationStrategy = "per-lookup" )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays",
+    instantiationStrategy = "per-lookup")
 public class SnapshotRetentionDaysPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
-    public static final String ID = "removeOlderThanDays";
+  public static final String ID = "removeOlderThanDays";
 
-    public SnapshotRetentionDaysPropertyDescriptor()
-    {
-        setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
-        setRequired( false );
-    }
+  public SnapshotRetentionDaysPropertyDescriptor() {
+    setHelpText(
+        "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep.");
+    setRequired(false);
+  }
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    public String getName()
-    {
-        return "Snapshot retention (days)";
-    }
+  public String getName() {
+    return "Snapshot retention (days)";
+  }
 }

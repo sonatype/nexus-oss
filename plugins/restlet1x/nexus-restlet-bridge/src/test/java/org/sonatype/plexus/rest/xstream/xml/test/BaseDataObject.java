@@ -10,35 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.xml.test;
 
 public class BaseDataObject
 {
 
-    private String type;
-    
-    private String otherField;
+  private String type;
 
-    public String getType()
-    {
-        return type;
-    }
+  private String otherField;
 
-    public void setType( String type )
-    {
-        this.type = type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public String getOtherField()
-    {
-        return otherField;
-    }
+  public void setType(String type) {
+    this.type = type;
+  }
 
-    public void setOtherField( String otherField )
-    {
-        this.otherField = otherField;
-    }
-    
-    
-    
+  public String getOtherField() {
+    return otherField;
+  }
+
+  public void setOtherField(String otherField) {
+    this.otherField = otherField;
+  }
+
+
 }

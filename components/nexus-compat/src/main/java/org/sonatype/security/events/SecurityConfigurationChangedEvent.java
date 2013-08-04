@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.events;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
@@ -25,9 +26,8 @@ public class SecurityConfigurationChangedEvent
     extends AbstractEvent<Object>
 {
 
-    public SecurityConfigurationChangedEvent( Object component )
-    {
-        super( component );
-    }
+  public SecurityConfigurationChangedEvent(Object component) {
+    super(component);
+  }
 
 }

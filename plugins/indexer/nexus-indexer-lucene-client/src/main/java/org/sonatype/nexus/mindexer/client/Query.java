@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mindexer.client;
 
 import java.util.HashMap;
@@ -18,33 +19,28 @@ import java.util.Map;
 public abstract class Query
 {
 
-    private final Map<String, String> terms;
+  private final Map<String, String> terms;
 
-    private Boolean exact;
+  private Boolean exact;
 
-    protected Query()
-    {
-        this.terms = new HashMap<String, String>();
-        this.exact = null; // not given, server default
-    }
+  protected Query() {
+    this.terms = new HashMap<String, String>();
+    this.exact = null; // not given, server default
+  }
 
-    protected Map<String, String> getTerms()
-    {
-        return terms;
-    }
+  protected Map<String, String> getTerms() {
+    return terms;
+  }
 
-    public Boolean getExact()
-    {
-        return exact;
-    }
+  public Boolean getExact() {
+    return exact;
+  }
 
-    public void setExact( Boolean exact )
-    {
-        this.exact = exact;
-    }
+  public void setExact(Boolean exact) {
+    this.exact = exact;
+  }
 
-    public Map<String, String> toMap()
-    {
-        return new HashMap<String, String>( terms );
-    }
+  public Map<String, String> toMap() {
+    return new HashMap<String, String>(terms);
+  }
 }

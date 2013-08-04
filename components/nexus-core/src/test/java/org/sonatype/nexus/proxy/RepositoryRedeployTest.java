@@ -10,83 +10,85 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
-import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
+import org.junit.Test;
+
 public class RepositoryRedeployTest
     extends AbstractProxyTestEnvironment
 {
 
-    private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
+  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
 
-    @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
-        throws Exception
-    {
-        ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
-        return jettyTestsuiteEnvironmentBuilder;
-    }
+  @Override
+  protected EnvironmentBuilder getEnvironmentBuilder()
+      throws Exception
+  {
+    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
+    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
+    return jettyTestsuiteEnvironmentBuilder;
+  }
 
-    protected Repository getRepository()
-        throws NoSuchResourceStoreException, IOException
-    {
-        Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
+  protected Repository getRepository()
+      throws NoSuchResourceStoreException, IOException
+  {
+    Repository repo1 = getRepositoryRegistry().getRepository("repo1");
 
-        repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
+    repo1.setWritePolicy(RepositoryWritePolicy.ALLOW_WRITE);
 
-        getApplicationConfiguration().saveConfiguration();
+    getApplicationConfiguration().saveConfiguration();
 
-        return repo1;
-    }
+    return repo1;
+  }
 
-    public void retrieveItem()
-        throws Exception
-    {
-        StorageItem item = getRepository().retrieveItem(
-            new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+  public void retrieveItem()
+      throws Exception
+  {
+    StorageItem item = getRepository().retrieveItem(
+        new ResourceStoreRequest("/activemq/activemq-core/1.2/activemq-core-1.2.jar", false));
 
-        checkForFileAndMatchContents( item );
-    }
+    checkForFileAndMatchContents(item);
+  }
 
-    @Test
-    public void testSimple()
-        throws Exception
-    {
-        // get some initial proxied content
-        retrieveItem();
+  @Test
+  public void testSimple()
+      throws Exception
+  {
+    // get some initial proxied content
+    retrieveItem();
 
-        StorageFileItem item = (StorageFileItem) getRepository().retrieveItem(
-            new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", true ) );
+    StorageFileItem item = (StorageFileItem) getRepository().retrieveItem(
+        new ResourceStoreRequest("/activemq/activemq-core/1.2/activemq-core-1.2.jar", true));
 
-        ResourceStoreRequest to = new ResourceStoreRequest(
-            "/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy",
-            true );
+    ResourceStoreRequest to = new ResourceStoreRequest(
+        "/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy",
+        true);
 
-        getRepository().storeItem( to, item.getInputStream(), null );
+    getRepository().storeItem(to, item.getInputStream(), null);
 
-        // and repeat all this
-        item = (StorageFileItem) getRepository().retrieveItem(
-            new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", true ) );
+    // and repeat all this
+    item = (StorageFileItem) getRepository().retrieveItem(
+        new ResourceStoreRequest("/activemq/activemq-core/1.2/activemq-core-1.2.jar", true));
 
-        to = new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy", true );
+    to = new ResourceStoreRequest("/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy", true);
 
-        getRepository().storeItem( to, item.getInputStream(), null );
+    getRepository().storeItem(to, item.getInputStream(), null);
 
-        StorageFileItem dest = (StorageFileItem) getRepository().retrieveItem(
-            new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy", true ) );
+    StorageFileItem dest = (StorageFileItem) getRepository().retrieveItem(
+        new ResourceStoreRequest("/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy", true));
 
-        checkForFileAndMatchContents( dest, getRemoteFile( getRepositoryRegistry().getRepository(
-            "repo1" ), "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
+    checkForFileAndMatchContents(dest, getRemoteFile(getRepositoryRegistry().getRepository(
+        "repo1"), "/activemq/activemq-core/1.2/activemq-core-1.2.jar"));
 
-    }
+  }
 
 }

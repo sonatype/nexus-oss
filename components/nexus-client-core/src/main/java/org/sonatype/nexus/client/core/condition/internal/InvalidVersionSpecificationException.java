@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.condition.internal;
 
 /*******************************************************************************
@@ -23,32 +24,30 @@ package org.sonatype.nexus.client.core.condition.internal;
 /******
  * Copied from org.sonatype.aether:aether-api:1.13.1
  ******/
+
 /**
  * Thrown when a version or version range could not be parsed.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class InvalidVersionSpecificationException
     extends RuntimeException //RepositoryException
 {
 
-    private final String version;
+  private final String version;
 
-    public InvalidVersionSpecificationException( String version, String message )
-    {
-        super( message );
-        this.version = version;
-    }
+  public InvalidVersionSpecificationException(String version, String message) {
+    super(message);
+    this.version = version;
+  }
 
-    public InvalidVersionSpecificationException( String version, Throwable cause )
-    {
-        super( "Could not parse version specification " + version, cause );
-        this.version = version;
-    }
+  public InvalidVersionSpecificationException(String version, Throwable cause) {
+    super("Could not parse version specification " + version, cause);
+    this.version = version;
+  }
 
-    public String getVersion()
-    {
-        return version;
-    }
+  public String getVersion() {
+    return version;
+  }
 
 }

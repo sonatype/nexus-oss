@@ -10,13 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
@@ -24,8 +22,12 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A condition that is satisfied when a capability of a specified type exists.
@@ -36,119 +38,100 @@ public class CapabilityOfTypeExistsCondition
     extends ConditionSupport
 {
 
-    private final CapabilityRegistry capabilityRegistry;
+  private final CapabilityRegistry capabilityRegistry;
 
-    private final ReentrantReadWriteLock bindLock;
+  private final ReentrantReadWriteLock bindLock;
 
-    final CapabilityType type;
+  final CapabilityType type;
 
-    final String typeName;
+  final String typeName;
 
-    public CapabilityOfTypeExistsCondition( final EventBus eventBus,
-                                            final CapabilityDescriptorRegistry descriptorRegistry,
-                                            final CapabilityRegistry capabilityRegistry,
-                                            final CapabilityType type )
-    {
-        super( eventBus );
-        this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.type = checkNotNull( type );
-        final CapabilityDescriptor descriptor = checkNotNull( descriptorRegistry ).get( type );
-        typeName = descriptor == null ? type.toString() : descriptor.name();
-        bindLock = new ReentrantReadWriteLock();
+  public CapabilityOfTypeExistsCondition(final EventBus eventBus,
+                                         final CapabilityDescriptorRegistry descriptorRegistry,
+                                         final CapabilityRegistry capabilityRegistry,
+                                         final CapabilityType type)
+  {
+    super(eventBus);
+    this.capabilityRegistry = checkNotNull(capabilityRegistry);
+    this.type = checkNotNull(type);
+    final CapabilityDescriptor descriptor = checkNotNull(descriptorRegistry).get(type);
+    typeName = descriptor == null ? type.toString() : descriptor.name();
+    bindLock = new ReentrantReadWriteLock();
+  }
+
+  @Override
+  protected void doBind() {
+    try {
+      bindLock.writeLock().lock();
+      for (final CapabilityReference reference : capabilityRegistry.getAll()) {
+        handle(new CapabilityEvent.Created(capabilityRegistry, reference));
+      }
     }
-
-    @Override
-    protected void doBind()
-    {
-        try
-        {
-            bindLock.writeLock().lock();
-            for ( final CapabilityReference reference : capabilityRegistry.getAll() )
-            {
-                handle( new CapabilityEvent.Created( capabilityRegistry, reference ) );
-            }
-        }
-        finally
-        {
-            bindLock.writeLock().unlock();
-        }
-        getEventBus().register( this );
+    finally {
+      bindLock.writeLock().unlock();
     }
+    getEventBus().register(this);
+  }
 
-    @Override
-    public void doRelease()
-    {
-        getEventBus().unregister( this );
-    }
+  @Override
+  public void doRelease() {
+    getEventBus().unregister(this);
+  }
 
-    @AllowConcurrentEvents
-    @Subscribe
-    public void handle( final CapabilityEvent.Created event )
-    {
-        if ( !isSatisfied() && type.equals( event.getReference().context().type() ) )
-        {
-            checkAllCapabilities();
-        }
+  @AllowConcurrentEvents
+  @Subscribe
+  public void handle(final CapabilityEvent.Created event) {
+    if (!isSatisfied() && type.equals(event.getReference().context().type())) {
+      checkAllCapabilities();
     }
+  }
 
-    @AllowConcurrentEvents
-    @Subscribe
-    public void handle( final CapabilityEvent.AfterRemove event )
-    {
-        if ( isSatisfied() && type.equals( event.getReference().context().type() ) )
-        {
-            checkAllCapabilities();
-        }
+  @AllowConcurrentEvents
+  @Subscribe
+  public void handle(final CapabilityEvent.AfterRemove event) {
+    if (isSatisfied() && type.equals(event.getReference().context().type())) {
+      checkAllCapabilities();
     }
+  }
 
-    void checkAllCapabilities()
-    {
-        for ( final CapabilityReference ref : capabilityRegistry.getAll() )
-        {
-            if ( isSatisfiedBy( ref ) )
-            {
-                setSatisfied( true );
-                return;
-            }
-        }
-        setSatisfied( false );
+  void checkAllCapabilities() {
+    for (final CapabilityReference ref : capabilityRegistry.getAll()) {
+      if (isSatisfiedBy(ref)) {
+        setSatisfied(true);
+        return;
+      }
     }
+    setSatisfied(false);
+  }
 
-    boolean isSatisfiedBy( final CapabilityReference reference )
-    {
-        return type.equals( reference.context().type() );
-    }
+  boolean isSatisfiedBy(final CapabilityReference reference) {
+    return type.equals(reference.context().type());
+  }
 
-    @Override
-    protected void setSatisfied( final boolean satisfied )
-    {
-        try
-        {
-            bindLock.readLock().lock();
-            super.setSatisfied( satisfied );
-        }
-        finally
-        {
-            bindLock.readLock().unlock();
-        }
+  @Override
+  protected void setSatisfied(final boolean satisfied) {
+    try {
+      bindLock.readLock().lock();
+      super.setSatisfied(satisfied);
     }
+    finally {
+      bindLock.readLock().unlock();
+    }
+  }
 
-    @Override
-    public String toString()
-    {
-        return type + " exists";
-    }
+  @Override
+  public String toString() {
+    return type + " exists";
+  }
 
-    @Override
-    public String explainSatisfied()
-    {
-        return typeName + " exists";
-    }
+  @Override
+  public String explainSatisfied() {
+    return typeName + " exists";
+  }
 
-    @Override
-    public String explainUnsatisfied()
-    {
-        return typeName + " does not exist";
-    }
+  @Override
+  public String explainUnsatisfied() {
+    return typeName + " does not exist";
+  }
 
 }

@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities.support.validator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Central access point for built-in {@link org.sonatype.nexus.plugins.capabilities.Validator}s.
@@ -28,50 +29,47 @@ import javax.inject.Singleton;
 public class Validators
 {
 
-    private final CapabilityValidators capabilityValidators;
+  private final CapabilityValidators capabilityValidators;
 
-    private final LogicalValidators logicalValidators;
+  private final LogicalValidators logicalValidators;
 
-    private final RepositoryValidators repositoryValidators;
+  private final RepositoryValidators repositoryValidators;
 
-    @Inject
-    Validators( final CapabilityValidators capabilityValidators,
-                final LogicalValidators logicalValidators,
-                final RepositoryValidators repositoryValidators )
-    {
-        this.capabilityValidators = checkNotNull( capabilityValidators );
-        this.logicalValidators = checkNotNull( logicalValidators );
-        this.repositoryValidators = checkNotNull( repositoryValidators );
-    }
+  @Inject
+  Validators(final CapabilityValidators capabilityValidators,
+             final LogicalValidators logicalValidators,
+             final RepositoryValidators repositoryValidators)
+  {
+    this.capabilityValidators = checkNotNull(capabilityValidators);
+    this.logicalValidators = checkNotNull(logicalValidators);
+    this.repositoryValidators = checkNotNull(repositoryValidators);
+  }
 
-    /**
-     * Access to capability specific validators.
-     *
-     * @return capability specific validators factory
-     */
-    public CapabilityValidators capability()
-    {
-        return capabilityValidators;
-    }
+  /**
+   * Access to capability specific validators.
+   *
+   * @return capability specific validators factory
+   */
+  public CapabilityValidators capability() {
+    return capabilityValidators;
+  }
 
-    /**
-     * Access to logical validators.
-     *
-     * @return logical validators factory
-     */
-    public LogicalValidators logical()
-    {
-        return logicalValidators;
-    }
+  /**
+   * Access to logical validators.
+   *
+   * @return logical validators factory
+   */
+  public LogicalValidators logical() {
+    return logicalValidators;
+  }
 
-    /**
-     * Access to repository specific validators.
-     *
-     * @return repository specific validators factory
-     */
-    public RepositoryValidators repository()
-    {
-        return repositoryValidators;
-    }
+  /**
+   * Access to repository specific validators.
+   *
+   * @return repository specific validators factory
+   */
+  public RepositoryValidators repository() {
+    return repositoryValidators;
+  }
 
 }

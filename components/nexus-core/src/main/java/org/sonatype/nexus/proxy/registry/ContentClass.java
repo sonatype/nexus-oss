@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.registry;
 
 import javax.inject.Singleton;
@@ -20,11 +21,11 @@ import org.sonatype.plugin.ExtensionPoint;
 @Singleton
 public interface ContentClass
 {
-    String getId();
-    
-    String getName();
+  String getId();
 
-    boolean isCompatible( ContentClass contentClass );
-    
-    boolean isGroupable();
+  String getName();
+
+  boolean isCompatible(ContentClass contentClass);
+
+  boolean isGroupable();
 }

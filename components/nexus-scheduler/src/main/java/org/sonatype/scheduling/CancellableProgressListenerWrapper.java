@@ -10,27 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 public class CancellableProgressListenerWrapper
     extends ProgressListenerWrapper
 {
-    private volatile boolean cancelled;
+  private volatile boolean cancelled;
 
-    public CancellableProgressListenerWrapper( final ProgressListener wrapped )
-    {
-        super( wrapped );
-    }
+  public CancellableProgressListenerWrapper(final ProgressListener wrapped) {
+    super(wrapped);
+  }
 
-    public boolean isCanceled()
-    {
-        return cancelled || super.isCanceled();
-    }
+  public boolean isCanceled() {
+    return cancelled || super.isCanceled();
+  }
 
-    public void cancel()
-    {
-        super.cancel();
+  public void cancel() {
+    super.cancel();
 
-        cancelled = true;
-    }
+    cancelled = true;
+  }
 }

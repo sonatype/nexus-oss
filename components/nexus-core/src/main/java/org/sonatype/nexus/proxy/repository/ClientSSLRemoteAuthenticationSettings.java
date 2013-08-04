@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import java.io.File;
@@ -17,43 +18,39 @@ import java.io.File;
 public class ClientSSLRemoteAuthenticationSettings
     implements RemoteAuthenticationSettings
 {
-    private final File trustStore;
+  private final File trustStore;
 
-    private final String trustStorePassword;
+  private final String trustStorePassword;
 
-    private final File keyStore;
+  private final File keyStore;
 
-    private final String keyStorePassword;
+  private final String keyStorePassword;
 
-    public ClientSSLRemoteAuthenticationSettings( File trustStore, String trustStorePassword, File keyStore,
-                                                  String keyStorePassword )
-    {
-        this.trustStore = trustStore;
+  public ClientSSLRemoteAuthenticationSettings(File trustStore, String trustStorePassword, File keyStore,
+                                               String keyStorePassword)
+  {
+    this.trustStore = trustStore;
 
-        this.trustStorePassword = trustStorePassword;
+    this.trustStorePassword = trustStorePassword;
 
-        this.keyStore = keyStore;
+    this.keyStore = keyStore;
 
-        this.keyStorePassword = keyStorePassword;
-    }
+    this.keyStorePassword = keyStorePassword;
+  }
 
-    public File getTrustStore()
-    {
-        return trustStore;
-    }
+  public File getTrustStore() {
+    return trustStore;
+  }
 
-    public String getTrustStorePassword()
-    {
-        return trustStorePassword;
-    }
+  public String getTrustStorePassword() {
+    return trustStorePassword;
+  }
 
-    public File getKeyStore()
-    {
-        return keyStore;
-    }
+  public File getKeyStore() {
+    return keyStore;
+  }
 
-    public String getKeyStorePassword()
-    {
-        return keyStorePassword;
-    }
+  public String getKeyStorePassword() {
+    return keyStorePassword;
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
@@ -21,10 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.Plugin;
-import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -42,6 +39,10 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
+import org.codehaus.plexus.util.StringUtils;
 
 @Named
 @Singleton
@@ -49,212 +50,198 @@ public class DefaultMetadataUpdater
     extends AbstractLoggingComponent
     implements MetadataUpdater
 {
-    private final MetadataLocator locator;
+  private final MetadataLocator locator;
 
-    @Inject
-    public DefaultMetadataUpdater( MetadataLocator locator )
-    {
-        this.locator = locator;
+  @Inject
+  public DefaultMetadataUpdater(MetadataLocator locator) {
+    this.locator = locator;
+  }
+
+  public void deployArtifact(ArtifactStoreRequest request)
+      throws IOException
+  {
+    if (!doesImpactMavenMetadata(request.getGav())) {
+      return;
     }
 
-    public void deployArtifact( ArtifactStoreRequest request )
-        throws IOException
-    {
-        if ( !doesImpactMavenMetadata( request.getGav() ) )
-        {
-            return;
+    try {
+      List<MetadataOperation> operations = null;
+
+      Gav gav = locator.getGavForRequest(request);
+
+      // GAV
+
+      Metadata gavMd = locator.retrieveGAVMetadata(request);
+
+      operations = new ArrayList<MetadataOperation>();
+
+      // simply making it foolproof?
+      gavMd.setGroupId(gav.getGroupId());
+
+      gavMd.setArtifactId(gav.getArtifactId());
+
+      gavMd.setVersion(gav.getBaseVersion());
+
+      // GAV metadata is only meaningful to snapshot artifacts
+      if (gav.isSnapshot()) {
+        operations.add(new SetSnapshotOperation(new SnapshotOperand(
+            ModelVersionUtility.getModelVersion(gavMd), TimeUtil.getUTCTimestamp(),
+            MetadataBuilder.createSnapshot(request.getVersion()), buildVersioning(gav))));
+
+        MetadataBuilder.changeMetadata(gavMd, operations);
+
+        locator.storeGAVMetadata(request, gavMd);
+      }
+
+      // GA
+
+      operations = new ArrayList<MetadataOperation>();
+
+      Metadata gaMd = locator.retrieveGAMetadata(request);
+
+      operations.add(new AddVersionOperation(new StringOperand(ModelVersionUtility.getModelVersion(gaMd),
+          gav.getBaseVersion())));
+
+      MetadataBuilder.changeMetadata(gaMd, operations);
+
+      locator.storeGAMetadata(request, gaMd);
+
+      // G (if is plugin)
+
+      operations = new ArrayList<MetadataOperation>();
+
+      if (StringUtils.equals("maven-plugin", locator.retrievePackagingFromPom(request))) {
+        Metadata gMd = locator.retrieveGMetadata(request);
+
+        Plugin pluginElem = locator.extractPluginElementFromPom(request);
+
+        if (pluginElem != null) {
+          operations.add(new AddPluginOperation(new PluginOperand(
+              ModelVersionUtility.getModelVersion(gMd), pluginElem)));
+
+          MetadataBuilder.changeMetadata(gMd, operations);
+
+          locator.storeGMetadata(request, gMd);
         }
 
-        try
-        {
-            List<MetadataOperation> operations = null;
+      }
+    }
+    catch (MetadataException e) {
+      throw new LocalStorageException("Not able to apply changes!", e);
+    }
+  }
 
-            Gav gav = locator.getGavForRequest( request );
+  @VisibleForTesting
+  boolean doesImpactMavenMetadata(final Gav requestGav) {
+    // hashes and signatures are "meta"
+    // released artifacts with classifiers do not change metadata
+    return !(requestGav.isHash() || requestGav.isSignature() ||
+        (StringUtils.isNotBlank(requestGav.getClassifier()) && !requestGav.isSnapshot()));
+  }
 
-            // GAV
+  private SnapshotVersion buildVersioning(Gav gav) {
+    SnapshotVersion version = new SnapshotVersion();
+    version.setClassifier(gav.getClassifier());
+    version.setExtension(gav.getExtension());
+    version.setVersion(gav.getVersion());
+    version.setUpdated(TimeUtil.getUTCTimestamp());
+    return version;
+  }
 
-            Metadata gavMd = locator.retrieveGAVMetadata( request );
-
-            operations = new ArrayList<MetadataOperation>();
-
-            // simply making it foolproof?
-            gavMd.setGroupId( gav.getGroupId() );
-
-            gavMd.setArtifactId( gav.getArtifactId() );
-
-            gavMd.setVersion( gav.getBaseVersion() );
-
-            // GAV metadata is only meaningful to snapshot artifacts
-            if ( gav.isSnapshot() )
-            {
-                operations.add( new SetSnapshotOperation( new SnapshotOperand(
-                    ModelVersionUtility.getModelVersion( gavMd ), TimeUtil.getUTCTimestamp(),
-                    MetadataBuilder.createSnapshot( request.getVersion() ), buildVersioning( gav ) ) ) );
-
-                MetadataBuilder.changeMetadata( gavMd, operations );
-
-                locator.storeGAVMetadata( request, gavMd );
-            }
-
-            // GA
-
-            operations = new ArrayList<MetadataOperation>();
-
-            Metadata gaMd = locator.retrieveGAMetadata( request );
-
-            operations.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.getModelVersion( gaMd ),
-                gav.getBaseVersion() ) ) );
-
-            MetadataBuilder.changeMetadata( gaMd, operations );
-
-            locator.storeGAMetadata( request, gaMd );
-
-            // G (if is plugin)
-
-            operations = new ArrayList<MetadataOperation>();
-
-            if ( StringUtils.equals( "maven-plugin", locator.retrievePackagingFromPom( request ) ) )
-            {
-                Metadata gMd = locator.retrieveGMetadata( request );
-
-                Plugin pluginElem = locator.extractPluginElementFromPom( request );
-
-                if ( pluginElem != null )
-                {
-                    operations.add( new AddPluginOperation( new PluginOperand(
-                        ModelVersionUtility.getModelVersion( gMd ), pluginElem ) ) );
-
-                    MetadataBuilder.changeMetadata( gMd, operations );
-
-                    locator.storeGMetadata( request, gMd );
-                }
-
-            }
-        }
-        catch ( MetadataException e )
-        {
-            throw new LocalStorageException( "Not able to apply changes!", e );
-        }
+  public void undeployArtifact(ArtifactStoreRequest request)
+      throws IOException
+  {
+    if (!doesImpactMavenMetadata(request.getGav())) {
+      return;
     }
 
-    @VisibleForTesting
-    boolean doesImpactMavenMetadata( final Gav requestGav )
-    {
-        // hashes and signatures are "meta"
-        // released artifacts with classifiers do not change metadata
-        return !( requestGav.isHash() || requestGav.isSignature() || ( StringUtils.isNotBlank( requestGav.getClassifier() ) && !requestGav.isSnapshot() ) );
-    }
+    try {
+      List<MetadataOperation> operations = null;
 
-    private SnapshotVersion buildVersioning( Gav gav )
-    {
-        SnapshotVersion version = new SnapshotVersion();
-        version.setClassifier( gav.getClassifier() );
-        version.setExtension( gav.getExtension() );
-        version.setVersion( gav.getVersion() );
-        version.setUpdated( TimeUtil.getUTCTimestamp() );
-        return version;
-    }
+      Gav gav = locator.getGavForRequest(request);
 
-    public void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException
-    {
-        if ( !doesImpactMavenMetadata( request.getGav() ) )
-        {
-            return;
+      // GAV
+
+      Metadata gavMd = locator.retrieveGAVMetadata(request);
+
+      operations = new ArrayList<MetadataOperation>();
+
+      // simply making it foolproof?
+      gavMd.setGroupId(gav.getGroupId());
+
+      gavMd.setArtifactId(gav.getArtifactId());
+
+      gavMd.setVersion(gav.getBaseVersion());
+
+      if (gav.isSnapshot()) {
+        operations.add(new SetSnapshotOperation(new SnapshotOperand(
+            ModelVersionUtility.getModelVersion(gavMd), TimeUtil.getUTCTimestamp(),
+            MetadataBuilder.createSnapshot(request.getVersion()), buildVersioning(gav))));
+      }
+
+      MetadataBuilder.changeMetadata(gavMd, operations);
+
+      locator.storeGAVMetadata(request, gavMd);
+
+      // GA
+
+      operations = new ArrayList<MetadataOperation>();
+
+      Metadata gaMd = locator.retrieveGAMetadata(request);
+
+      operations.add(new AddVersionOperation(new StringOperand(ModelVersionUtility.getModelVersion(gaMd),
+          gav.getBaseVersion())));
+
+      MetadataBuilder.changeMetadata(gaMd, operations);
+
+      locator.storeGAMetadata(request, gaMd);
+
+      // G (if is plugin)
+
+      operations = new ArrayList<MetadataOperation>();
+
+      if (StringUtils.equals("maven-plugin", locator.retrievePackagingFromPom(request))) {
+        Metadata gMd = locator.retrieveGMetadata(request);
+
+        Plugin pluginElem = locator.extractPluginElementFromPom(request);
+
+        if (pluginElem != null) {
+          operations.add(new AddPluginOperation(new PluginOperand(
+              ModelVersionUtility.getModelVersion(gMd), pluginElem)));
+
+          MetadataBuilder.changeMetadata(gMd, operations);
+
+          locator.storeGMetadata(request, gMd);
         }
 
-        try
-        {
-            List<MetadataOperation> operations = null;
-
-            Gav gav = locator.getGavForRequest( request );
-
-            // GAV
-
-            Metadata gavMd = locator.retrieveGAVMetadata( request );
-
-            operations = new ArrayList<MetadataOperation>();
-
-            // simply making it foolproof?
-            gavMd.setGroupId( gav.getGroupId() );
-
-            gavMd.setArtifactId( gav.getArtifactId() );
-
-            gavMd.setVersion( gav.getBaseVersion() );
-
-            if ( gav.isSnapshot() )
-            {
-                operations.add( new SetSnapshotOperation( new SnapshotOperand(
-                    ModelVersionUtility.getModelVersion( gavMd ), TimeUtil.getUTCTimestamp(),
-                    MetadataBuilder.createSnapshot( request.getVersion() ), buildVersioning( gav ) ) ) );
-            }
-
-            MetadataBuilder.changeMetadata( gavMd, operations );
-
-            locator.storeGAVMetadata( request, gavMd );
-
-            // GA
-
-            operations = new ArrayList<MetadataOperation>();
-
-            Metadata gaMd = locator.retrieveGAMetadata( request );
-
-            operations.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.getModelVersion( gaMd ),
-                gav.getBaseVersion() ) ) );
-
-            MetadataBuilder.changeMetadata( gaMd, operations );
-
-            locator.storeGAMetadata( request, gaMd );
-
-            // G (if is plugin)
-
-            operations = new ArrayList<MetadataOperation>();
-
-            if ( StringUtils.equals( "maven-plugin", locator.retrievePackagingFromPom( request ) ) )
-            {
-                Metadata gMd = locator.retrieveGMetadata( request );
-
-                Plugin pluginElem = locator.extractPluginElementFromPom( request );
-
-                if ( pluginElem != null )
-                {
-                    operations.add( new AddPluginOperation( new PluginOperand(
-                        ModelVersionUtility.getModelVersion( gMd ), pluginElem ) ) );
-
-                    MetadataBuilder.changeMetadata( gMd, operations );
-
-                    locator.storeGMetadata( request, gMd );
-                }
-
-            }
-        }
-        catch ( MetadataException e )
-        {
-            throw new LocalStorageException( "Not able to apply changes!", e );
-        }
+      }
     }
-
-    // ==
-
-    public void deployArtifacts( Collection<ArtifactStoreRequest> requests )
-        throws IOException
-    {
-        // TODO Auto-generated method stub
-
+    catch (MetadataException e) {
+      throw new LocalStorageException("Not able to apply changes!", e);
     }
+  }
 
-    public void undeployArtifacts( Collection<ArtifactStoreRequest> requests )
-        throws IOException
-    {
-        // TODO Auto-generated method stub
+  // ==
 
-    }
+  public void deployArtifacts(Collection<ArtifactStoreRequest> requests)
+      throws IOException
+  {
+    // TODO Auto-generated method stub
 
-    public void recreateMetadata( StorageCollectionItem coll )
-        throws IOException
-    {
-        // TODO Auto-generated method stub
+  }
 
-    }
+  public void undeployArtifacts(Collection<ArtifactStoreRequest> requests)
+      throws IOException
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void recreateMetadata(StorageCollectionItem coll)
+      throws IOException
+  {
+    // TODO Auto-generated method stub
+
+  }
 
 }

@@ -10,73 +10,71 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao.password;
+
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class SSHAPasswordEncoderTest
     extends TestSupport
 {
-    @Test
-    public void testVerify()
-        throws Exception
-    {
-        String encPassword = "{SSHA}FBProvj7X/SW+7nYtd83uX/noSQ6reGv";
+  @Test
+  public void testVerify()
+      throws Exception
+  {
+    String encPassword = "{SSHA}FBProvj7X/SW+7nYtd83uX/noSQ6reGv";
 
-        SSHAPasswordEncoder encoder = new SSHAPasswordEncoder();
+    SSHAPasswordEncoder encoder = new SSHAPasswordEncoder();
 
-        Assert.assertTrue( encoder.isPasswordValid( encPassword, "password", null ) );
-        Assert.assertTrue( encoder.isPasswordValid( "{ssha}FBProvj7X/SW+7nYtd83uX/noSQ6reGv", "password", null ) );
-        Assert.assertFalse( encoder.isPasswordValid(
-            "{ssha}FBProvj7X/SW+7nYtd83uX/noSQ6reGv",
-            "FBProvj7X/SW+7nYtd83uX/noSQ6reGv",
-            null ) );
-        Assert.assertFalse( encoder.isPasswordValid( encPassword, "Password", null ) );
-        Assert.assertFalse( encoder.isPasswordValid( encPassword, "junk", null ) );
-        Assert.assertFalse( encoder.isPasswordValid( encPassword, "", null ) );
-        Assert.assertFalse( encoder.isPasswordValid( encPassword, null, null ) );
+    Assert.assertTrue(encoder.isPasswordValid(encPassword, "password", null));
+    Assert.assertTrue(encoder.isPasswordValid("{ssha}FBProvj7X/SW+7nYtd83uX/noSQ6reGv", "password", null));
+    Assert.assertFalse(encoder.isPasswordValid(
+        "{ssha}FBProvj7X/SW+7nYtd83uX/noSQ6reGv",
+        "FBProvj7X/SW+7nYtd83uX/noSQ6reGv",
+        null));
+    Assert.assertFalse(encoder.isPasswordValid(encPassword, "Password", null));
+    Assert.assertFalse(encoder.isPasswordValid(encPassword, "junk", null));
+    Assert.assertFalse(encoder.isPasswordValid(encPassword, "", null));
+    Assert.assertFalse(encoder.isPasswordValid(encPassword, null, null));
 
-        Assert.assertTrue( encoder.isPasswordValid( "FBProvj7X/SW+7nYtd83uX/noSQ6reGv", "password", null ) );
-        Assert.assertFalse( encoder.isPasswordValid( "notValid", "password", null ) );
+    Assert.assertTrue(encoder.isPasswordValid("FBProvj7X/SW+7nYtd83uX/noSQ6reGv", "password", null));
+    Assert.assertFalse(encoder.isPasswordValid("notValid", "password", null));
+  }
+
+  @Test
+  public void testEncode()
+      throws Exception
+  {
+    SSHAPasswordEncoder encoder = new SSHAPasswordEncoder();
+    byte[] salt = new byte[]{58, -83, -31, -81};
+
+    Assert.assertEquals("{SSHA}FBProvj7X/SW+7nYtd83uX/noSQ6reGv", encoder.encodePassword("password", salt));
+
+    try {
+      // salt must be byte[], this salt below is string and should throw IAE
+      encoder.encodePassword("password", ":abc");
+      Assert.fail("Expected IllegalArgumentException");
+    }
+    catch (IllegalArgumentException e) {
+      // expected
     }
 
-    @Test
-    public void testEncode()
-        throws Exception
-    {
-        SSHAPasswordEncoder encoder = new SSHAPasswordEncoder();
-        byte[] salt = new byte[] { 58, -83, -31, -81 };
+    String clearPass = "foobar";
+    Assert.assertTrue(encoder.isPasswordValid(encoder.encodePassword(clearPass, null), clearPass, null));
+    Assert.assertTrue(encoder.isPasswordValid(
+        encoder.encodePassword(clearPass, "byte[]".getBytes()),
+        clearPass,
+        null));
 
-        Assert.assertEquals( "{SSHA}FBProvj7X/SW+7nYtd83uX/noSQ6reGv", encoder.encodePassword( "password", salt ) );
-
-        try
-        {
-            // salt must be byte[], this salt below is string and should throw IAE
-            encoder.encodePassword( "password", ":abc" );
-            Assert.fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            // expected
-        }
-
-        String clearPass = "foobar";
-        Assert.assertTrue( encoder.isPasswordValid( encoder.encodePassword( clearPass, null ), clearPass, null ) );
-        Assert.assertTrue( encoder.isPasswordValid(
-            encoder.encodePassword( clearPass, "byte[]".getBytes() ),
-            clearPass,
-            null ) );
-
-        try
-        {
-            encoder.encodePassword( clearPass, new Object() );
-            Assert.fail( "expected: IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            // expected
-        }
+    try {
+      encoder.encodePassword(clearPass, new Object());
+      Assert.fail("expected: IllegalArgumentException");
     }
+    catch (IllegalArgumentException e) {
+      // expected
+    }
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest;
 
 import java.util.Collections;
@@ -24,56 +25,49 @@ import org.sonatype.nexus.client.internal.util.Check;
 public class ConnectionInfo
 {
 
-    private final BaseUrl baseUrl;
+  private final BaseUrl baseUrl;
 
-    private final AuthenticationInfo authenticationInfo;
+  private final AuthenticationInfo authenticationInfo;
 
-    private final Map<Protocol, ProxyInfo> proxyInfos;
+  private final Map<Protocol, ProxyInfo> proxyInfos;
 
-    public ConnectionInfo( final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo,
-                           final Map<Protocol, ProxyInfo> proxyInfos )
-    {
-        this.baseUrl = Check.notNull( baseUrl, "Base URL is null!" );
-        this.authenticationInfo = authenticationInfo;
-        HashMap<Protocol, ProxyInfo> proxies = new HashMap<Protocol, ProxyInfo>();
-        if ( proxyInfos != null )
-        {
-            proxies.putAll( proxyInfos );
-        }
-        this.proxyInfos = Collections.unmodifiableMap( proxies );
+  public ConnectionInfo(final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo,
+                        final Map<Protocol, ProxyInfo> proxyInfos)
+  {
+    this.baseUrl = Check.notNull(baseUrl, "Base URL is null!");
+    this.authenticationInfo = authenticationInfo;
+    HashMap<Protocol, ProxyInfo> proxies = new HashMap<Protocol, ProxyInfo>();
+    if (proxyInfos != null) {
+      proxies.putAll(proxyInfos);
     }
+    this.proxyInfos = Collections.unmodifiableMap(proxies);
+  }
 
-    public BaseUrl getBaseUrl()
-    {
-        return baseUrl;
+  public BaseUrl getBaseUrl() {
+    return baseUrl;
+  }
+
+  public AuthenticationInfo getAuthenticationInfo() {
+    return authenticationInfo;
+  }
+
+  public Map<Protocol, ProxyInfo> getProxyInfos() {
+    return proxyInfos;
+  }
+
+  // ==
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("(");
+    sb.append("url=").append(getBaseUrl());
+    if (getAuthenticationInfo() != null) {
+      sb.append(",authc=").append(getAuthenticationInfo());
     }
-
-    public AuthenticationInfo getAuthenticationInfo()
-    {
-        return authenticationInfo;
+    if (!getProxyInfos().isEmpty()) {
+      sb.append(",proxy=").append(getProxyInfos());
     }
-
-    public Map<Protocol, ProxyInfo> getProxyInfos()
-    {
-        return proxyInfos;
-    }
-
-    // ==
-
-    @Override
-    public String toString()
-    {
-        final StringBuilder sb = new StringBuilder( "(" );
-        sb.append( "url=" ).append( getBaseUrl() );
-        if ( getAuthenticationInfo() != null )
-        {
-            sb.append( ",authc=" ).append( getAuthenticationInfo() );
-        }
-        if ( !getProxyInfos().isEmpty() )
-        {
-            sb.append( ",proxy=" ).append( getProxyInfos() );
-        }
-        sb.append( ")" );
-        return sb.toString();
-    }
+    sb.append(")");
+    return sb.toString();
+  }
 }

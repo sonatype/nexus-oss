@@ -10,120 +10,118 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus;
 
 import java.io.File;
 import java.io.IOException;
+
+import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.context.Context;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 public class MultipleRealmsLdapNotConfiguredIT
     extends NexusLdapTestSupport
 {
 
-    @Test
-    public void testAuthentication()
-        throws Exception
-    {
-        SecuritySystem security = lookup( SecuritySystem.class );
-        security.start();
+  @Test
+  public void testAuthentication()
+      throws Exception
+  {
+    SecuritySystem security = lookup(SecuritySystem.class);
+    security.start();
 
-        // LDAP should fail
-        try
-        {
-            security.authenticate( new UsernamePasswordToken( "cstamas", "cstamas123" ) );
-            Assert.fail( "Expected AuthenticationException to be thrown." );
-        }
-        catch ( AuthenticationException e )
-        {
-            // expected
-        }
-
-        // xml should not
-        Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "admin", "admin123" ) ) );
-
-        Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "deployment", "deployment123" ) ) );
-
+    // LDAP should fail
+    try {
+      security.authenticate(new UsernamePasswordToken("cstamas", "cstamas123"));
+      Assert.fail("Expected AuthenticationException to be thrown.");
+    }
+    catch (AuthenticationException e) {
+      // expected
     }
 
-    @Test
-    public void testAuthorization()
-        throws Exception
-    {
+    // xml should not
+    Assert.assertNotNull(security.authenticate(new UsernamePasswordToken("admin", "admin123")));
 
-        SecuritySystem security = lookup( SecuritySystem.class );
-        security.start();
+    Assert.assertNotNull(security.authenticate(new UsernamePasswordToken("deployment", "deployment123")));
 
-        // LDAP should fail
-        SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
+  }
 
-        // if realm is not configured, the user should not be able to be authorized
-        Assert.assertFalse( security.hasRole( principals, "nx-developer" ) );
-        Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
+  @Test
+  public void testAuthorization()
+      throws Exception
+  {
 
-        // xml user
-        principals = new SimplePrincipalCollection();
-        // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
-        // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
-        principals.add( "deployment", XmlAuthenticatingRealm.ROLE );
+    SecuritySystem security = lookup(SecuritySystem.class);
+    security.start();
 
-        Assert.assertTrue( security.hasRole( principals, "nx-deployment" ) );
-        Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
-    }
+    // LDAP should fail
+    SimplePrincipalCollection principals = new SimplePrincipalCollection();
+    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
 
-    @Test
-    public void testAuthorizationPriv()
-        throws Exception
-    {
-        SecuritySystem security = lookup( SecuritySystem.class );
-        security.start();
+    // if realm is not configured, the user should not be able to be authorized
+    Assert.assertFalse(security.hasRole(principals, "nx-developer"));
+    Assert.assertFalse(security.hasRole(principals, "JUNK"));
 
-        // LDAP
-        SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
+    // xml user
+    principals = new SimplePrincipalCollection();
+    // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
+    // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
+    principals.add("deployment", XmlAuthenticatingRealm.ROLE);
 
-        // if realm is not configured, the user should not be able to be authorized
-        Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:create" ) );
+    Assert.assertTrue(security.hasRole(principals, "nx-deployment"));
+    Assert.assertFalse(security.hasRole(principals, "JUNK"));
+  }
 
-        // XML
-        principals = new SimplePrincipalCollection();
-        // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
-        // was: principals.add( "test-user", new XmlAuthenticatingRealm().getName() );
-        principals.add( "test-user", XmlAuthenticatingRealm.ROLE );
+  @Test
+  public void testAuthorizationPriv()
+      throws Exception
+  {
+    SecuritySystem security = lookup(SecuritySystem.class);
+    security.start();
 
-        Assert.assertTrue( security.isPermitted( principals, "security:usersforgotpw:create" ) );
-        Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:delete" ) );
+    // LDAP
+    SimplePrincipalCollection principals = new SimplePrincipalCollection();
+    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
 
-        Assert.assertTrue( security.isPermitted( principals, "nexus:target:1:*:delete" ) );
-    }
+    // if realm is not configured, the user should not be able to be authorized
+    Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:create"));
 
-    @Override
-    protected void copyDefaultConfigToPlace()
-        throws IOException
-    {
-        copyResource( "/test-conf/security-configuration-multipleRealms.xml", getSecurityConfiguration() );
-    }
+    // XML
+    principals = new SimplePrincipalCollection();
+    // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
+    // was: principals.add( "test-user", new XmlAuthenticatingRealm().getName() );
+    principals.add("test-user", XmlAuthenticatingRealm.ROLE);
 
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
+    Assert.assertTrue(security.isPermitted(principals, "security:usersforgotpw:create"));
+    Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:delete"));
 
-        ctx.put( CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath() );
-    }
+    Assert.assertTrue(security.isPermitted(principals, "nexus:target:1:*:delete"));
+  }
 
-    private File getLdapXml()
-    {
-        return new File( getConfHomeDir(), "no-conf/ldap.xml" );
-    }
+  @Override
+  protected void copyDefaultConfigToPlace()
+      throws IOException
+  {
+    copyResource("/test-conf/security-configuration-multipleRealms.xml", getSecurityConfiguration());
+  }
+
+  @Override
+  protected void customizeContext(Context ctx) {
+    super.customizeContext(ctx);
+
+    ctx.put(CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath());
+  }
+
+  private File getLdapXml() {
+    return new File(getConfHomeDir(), "no-conf/ldap.xml");
+  }
 
 }

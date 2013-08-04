@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.guice.nexus.scanners;
 
 import org.sonatype.guice.plexus.scanners.PlexusTypeListener;
@@ -21,17 +22,17 @@ import org.sonatype.nexus.plugins.RepositoryType;
 public interface NexusTypeListener
     extends PlexusTypeListener
 {
-    /**
-     * Invoked when the {@link NexusTypeListener} finds a public/exported class.
-     * 
-     * @param clazz The fully-qualified class name
-     */
-    void hear( String clazz );
+  /**
+   * Invoked when the {@link NexusTypeListener} finds a public/exported class.
+   *
+   * @param clazz The fully-qualified class name
+   */
+  void hear(String clazz);
 
-    /**
-     * Invoked when the {@link NexusTypeListener} finds a {@link RepositoryType}.
-     * 
-     * @param repositoryType The repository type
-     */
-    void hear( RepositoryType repositoryType );
+  /**
+   * Invoked when the {@link NexusTypeListener} finds a {@link RepositoryType}.
+   *
+   * @param repositoryType The repository type
+   */
+  void hear(RepositoryType repositoryType);
 }

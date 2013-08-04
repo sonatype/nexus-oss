@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.tools;
 
 /**
@@ -17,19 +18,13 @@ package org.sonatype.security.realms.tools;
  */
 public interface SecurityConfigurationCleaner
 {
-    /**
-     * Called when a role is removed so additional cleanup logic can be done.
-     * 
-     * @param configuration
-     * @param roleId
-     */
-    void roleRemoved( EnhancedConfiguration configuration, String roleId );
+  /**
+   * Called when a role is removed so additional cleanup logic can be done.
+   */
+  void roleRemoved(EnhancedConfiguration configuration, String roleId);
 
-    /**
-     * Called when a privilege isremoved so additional cleanup logic can be done.
-     * 
-     * @param configuration
-     * @param privilegeId
-     */
-    void privilegeRemoved( EnhancedConfiguration configuration, String privilegeId );
+  /**
+   * Called when a privilege isremoved so additional cleanup logic can be done.
+   */
+  void privilegeRemoved(EnhancedConfiguration configuration, String privilegeId);
 }

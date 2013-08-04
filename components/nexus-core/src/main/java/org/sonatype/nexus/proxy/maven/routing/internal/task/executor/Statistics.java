@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal.task.executor;
 
 import java.util.Set;
@@ -18,32 +19,28 @@ import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnable;
 
 /**
  * Simple statistics for {@link ConstrainedExecutor}.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class Statistics
 {
-    private final Set<String> currentlyRunningJobKeys;
+  private final Set<String> currentlyRunningJobKeys;
 
-    /**
-     * Constructor.
-     * 
-     * @param currentlyRunningJobKeys
-     */
-    public Statistics( final Set<String> currentlyRunningJobKeys )
-    {
-        this.currentlyRunningJobKeys = currentlyRunningJobKeys;
-    }
+  /**
+   * Constructor.
+   */
+  public Statistics(final Set<String> currentlyRunningJobKeys) {
+    this.currentlyRunningJobKeys = currentlyRunningJobKeys;
+  }
 
-    /**
-     * THe set of currently executing (scheduled or running, but not canceled and still running)
-     * {@link CancelableRunnable} command keys.
-     * 
-     * @return the job keys that are scheduled or running (without canceled ones).
-     */
-    public Set<String> getCurrentlyRunningJobKeys()
-    {
-        return currentlyRunningJobKeys;
-    }
+  /**
+   * THe set of currently executing (scheduled or running, but not canceled and still running)
+   * {@link CancelableRunnable} command keys.
+   *
+   * @return the job keys that are scheduled or running (without canceled ones).
+   */
+  public Set<String> getCurrentlyRunningJobKeys() {
+    return currentlyRunningJobKeys;
+  }
 }

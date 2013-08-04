@@ -10,31 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * {@link ContentClass} representing OBR content.
  */
-@Component( role = ContentClass.class, hint = ObrContentClass.ID )
+@Component(role = ContentClass.class, hint = ObrContentClass.ID)
 public class ObrContentClass
     extends AbstractIdContentClass
 {
-    public static final String ID = "obr";
+  public static final String ID = "obr";
 
-    public static final String NAME = "OBR";
+  public static final String NAME = "OBR";
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
+  @Override
+  public String getName() {
+    return NAME;
+  }
 }

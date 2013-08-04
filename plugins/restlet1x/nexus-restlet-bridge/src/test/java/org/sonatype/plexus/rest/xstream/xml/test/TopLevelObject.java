@@ -10,36 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.xml.test;
 
 
 public class TopLevelObject
 {
 
-    private BaseDataObject data;
-    
-    private String id;
+  private BaseDataObject data;
 
-    public BaseDataObject getData()
-    {
-        return data;
-    }
+  private String id;
 
-    public void setData( BaseDataObject data )
-    {
-        this.data = data;
-    }
+  public BaseDataObject getData() {
+    return data;
+  }
 
-    public String getId()
-    {
-        return id;
-    }
+  public void setData(BaseDataObject data) {
+    this.data = data;
+  }
 
-    public void setId( String id )
-    {
-        this.id = id;
-    }
-    
-    
-    
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+
 }

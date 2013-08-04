@@ -10,79 +10,72 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * Adapter for NexusConfiguration.
- * 
+ *
  * @author cstamas
  */
-@Component( role = ApplicationConfiguration.class )
+@Component(role = ApplicationConfiguration.class)
 public class ApplicationConfigurationAdapter
     implements ApplicationConfiguration
 {
-    @Requirement
-    private NexusConfiguration nexusConfiguration;
+  @Requirement
+  private NexusConfiguration nexusConfiguration;
 
-    @Deprecated
-    public Configuration getConfigurationModel()
-    {
-        return nexusConfiguration.getConfigurationModel();
-    }
+  @Deprecated
+  public Configuration getConfigurationModel() {
+    return nexusConfiguration.getConfigurationModel();
+  }
 
-    public File getWorkingDirectory()
-    {
-        return nexusConfiguration.getWorkingDirectory();
-    }
+  public File getWorkingDirectory() {
+    return nexusConfiguration.getWorkingDirectory();
+  }
 
-    public File getWorkingDirectory( final String key )
-    {
-        return nexusConfiguration.getWorkingDirectory( key );
-    }
+  public File getWorkingDirectory(final String key) {
+    return nexusConfiguration.getWorkingDirectory(key);
+  }
 
-    public File getWorkingDirectory( final String key, final boolean createIfNeeded )
-    {
-        return nexusConfiguration.getWorkingDirectory( key, createIfNeeded );
-    }
+  public File getWorkingDirectory(final String key, final boolean createIfNeeded) {
+    return nexusConfiguration.getWorkingDirectory(key, createIfNeeded);
+  }
 
-    public File getTemporaryDirectory()
-    {
-        return nexusConfiguration.getTemporaryDirectory();
-    }
+  public File getTemporaryDirectory() {
+    return nexusConfiguration.getTemporaryDirectory();
+  }
 
-    public File getConfigurationDirectory()
-    {
-        return nexusConfiguration.getConfigurationDirectory();
-    }
+  public File getConfigurationDirectory() {
+    return nexusConfiguration.getConfigurationDirectory();
+  }
 
-    public void saveConfiguration()
-        throws IOException
-    {
-        nexusConfiguration.saveConfiguration();
-    }
+  public void saveConfiguration()
+      throws IOException
+  {
+    nexusConfiguration.saveConfiguration();
+  }
 
-    public boolean isSecurityEnabled()
-    {
-        return nexusConfiguration.isSecurityEnabled();
-    }
+  public boolean isSecurityEnabled() {
+    return nexusConfiguration.isSecurityEnabled();
+  }
 
-    public LocalStorageContext getGlobalLocalStorageContext()
-    {
-        return nexusConfiguration.getGlobalLocalStorageContext();
-    }
+  public LocalStorageContext getGlobalLocalStorageContext() {
+    return nexusConfiguration.getGlobalLocalStorageContext();
+  }
 
-    public RemoteStorageContext getGlobalRemoteStorageContext()
-    {
-        return nexusConfiguration.getGlobalRemoteStorageContext();
-    }
+  public RemoteStorageContext getGlobalRemoteStorageContext() {
+    return nexusConfiguration.getGlobalRemoteStorageContext();
+  }
 
 }

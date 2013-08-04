@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.metadata;
 
 import java.io.IOException;
@@ -23,40 +24,36 @@ import java.util.zip.ZipInputStream;
 public abstract class AbstractObrSite
     implements ObrSite
 {
-    public final InputStream openStream()
-        throws IOException
-    {
-        if ( "application/zip".equalsIgnoreCase( getContentType() ) )
-        {
-            final ZipInputStream zis = new ZipInputStream( openRawStream() );
-            for ( ZipEntry e = zis.getNextEntry(); e != null; e = zis.getNextEntry() )
-            {
-                // scan for the specific OBR entry
-                final String name = e.getName().toLowerCase();
-                if ( name.endsWith( "repository.xml" ) || name.endsWith( "obr.xml" ) )
-                {
-                    return zis;
-                }
-            }
-            throw new IOException( "No repository.xml or obr.xml in zip: " + getMetadataUrl() );
+  public final InputStream openStream()
+      throws IOException
+  {
+    if ("application/zip".equalsIgnoreCase(getContentType())) {
+      final ZipInputStream zis = new ZipInputStream(openRawStream());
+      for (ZipEntry e = zis.getNextEntry(); e != null; e = zis.getNextEntry()) {
+        // scan for the specific OBR entry
+        final String name = e.getName().toLowerCase();
+        if (name.endsWith("repository.xml") || name.endsWith("obr.xml")) {
+          return zis;
         }
-
-        return openRawStream();
+      }
+      throw new IOException("No repository.xml or obr.xml in zip: " + getMetadataUrl());
     }
 
-    /**
-     * Opens a new raw stream to the OBR metadata, caller must close the stream.
-     * 
-     * @return a new input stream
-     * @throws IOException
-     */
-    protected abstract InputStream openRawStream()
-        throws IOException;
+    return openRawStream();
+  }
 
-    /**
-     * Retrieves the Content-Type of the OBR metadata.
-     * 
-     * @return OBR resource Content-Type
-     */
-    protected abstract String getContentType();
+  /**
+   * Opens a new raw stream to the OBR metadata, caller must close the stream.
+   *
+   * @return a new input stream
+   */
+  protected abstract InputStream openRawStream()
+      throws IOException;
+
+  /**
+   * Retrieves the Content-Type of the OBR metadata.
+   *
+   * @return OBR resource Content-Type
+   */
+  protected abstract String getContentType();
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -24,37 +25,35 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * A simple class that holds Regex interpolator and has reference to Plexus context too, to centralize Plexus coupling
  * but make application Plexus interpolation capable too. This interpolator interpolates with Plexus Context,
  * Environment variables and System Properties, in this order.
- * 
+ *
  * @author cstamas
  */
-@Component( role = ApplicationInterpolatorProvider.class )
+@Component(role = ApplicationInterpolatorProvider.class)
 public class DefaultApplicationInterpolatorProvider
     implements ApplicationInterpolatorProvider, Contextualizable
 {
-    private RegexBasedInterpolator regexBasedInterpolator;
+  private RegexBasedInterpolator regexBasedInterpolator;
 
-    public DefaultApplicationInterpolatorProvider()
-    {
-        super();
+  public DefaultApplicationInterpolatorProvider() {
+    super();
 
-        regexBasedInterpolator = new RegexBasedInterpolator();
-    }
+    regexBasedInterpolator = new RegexBasedInterpolator();
+  }
 
-    public Interpolator getInterpolator()
-    {
-        return regexBasedInterpolator;
-    }
+  public Interpolator getInterpolator() {
+    return regexBasedInterpolator;
+  }
 
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        regexBasedInterpolator.addValueSource( new MapBasedValueSource( context.getContextData() ) );
+  public void contextualize(Context context)
+      throws ContextException
+  {
+    regexBasedInterpolator.addValueSource(new MapBasedValueSource(context.getContextData()));
 
-        // FIXME: bad, everything should come from Plexus context
-        regexBasedInterpolator.addValueSource( new MapBasedValueSource( System.getenv() ) );
+    // FIXME: bad, everything should come from Plexus context
+    regexBasedInterpolator.addValueSource(new MapBasedValueSource(System.getenv()));
 
-        // FIXME: bad, everything should come from Plexus context
-        regexBasedInterpolator.addValueSource( new MapBasedValueSource( System.getProperties() ) );
-    }
+    // FIXME: bad, everything should come from Plexus context
+    regexBasedInterpolator.addValueSource(new MapBasedValueSource(System.getProperties()));
+  }
 
 }

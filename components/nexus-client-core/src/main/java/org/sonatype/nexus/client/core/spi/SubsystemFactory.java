@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.spi;
 
 import org.sonatype.nexus.client.core.Condition;
@@ -21,10 +22,10 @@ import org.sonatype.nexus.client.core.NexusClient;
 public interface SubsystemFactory<T, NC extends NexusClient>
 {
 
-    Condition availableWhen();
+  Condition availableWhen();
 
-    Class<T> getType();
+  Class<T> getType();
 
-    T create( NC nexusClient );
+  T create(NC nexusClient);
 
 }

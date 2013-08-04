@@ -10,79 +10,81 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds;
 
 import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.timeline.Entry;
+
 import com.google.common.base.Predicate;
 
 /**
  * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. For specific (Maven, P2)
  * actions, look into specific sources. Note: This is actually event recorder, not feed recorder.
- * 
+ *
  * @author cstamas
  */
 public interface FeedRecorder
 {
-    /**
-     * System event action: boot
-     */
-    public static final String SYSTEM_BOOT_ACTION = "BOOT";
+  /**
+   * System event action: boot
+   */
+  public static final String SYSTEM_BOOT_ACTION = "BOOT";
 
-    /**
-     * System event action: configuration
-     */
-    public static final String SYSTEM_CONFIG_ACTION = "CONFIG";
+  /**
+   * System event action: configuration
+   */
+  public static final String SYSTEM_CONFIG_ACTION = "CONFIG";
 
-    /**
-     * System event action: repository local status changes
-     */
-    public static final String SYSTEM_REPO_LSTATUS_CHANGES_ACTION = "REPO_LSTATUS_CHANGES";
+  /**
+   * System event action: repository local status changes
+   */
+  public static final String SYSTEM_REPO_LSTATUS_CHANGES_ACTION = "REPO_LSTATUS_CHANGES";
 
-    /**
-     * System event action: repository proxy status auto change
-     */
-    public static final String SYSTEM_REPO_PSTATUS_CHANGES_ACTION = "REPO_PSTATUS_CHANGES";
+  /**
+   * System event action: repository proxy status auto change
+   */
+  public static final String SYSTEM_REPO_PSTATUS_CHANGES_ACTION = "REPO_PSTATUS_CHANGES";
 
-    /**
-     * System event action: repository proxy status auto change
-     */
-    public static final String SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION = "REPO_PSTATUS_AUTO_CHANGES";
+  /**
+   * System event action: repository proxy status auto change
+   */
+  public static final String SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION = "REPO_PSTATUS_AUTO_CHANGES";
 
-    /**
-     * System event action: authentication
-     */
-    public static final String SYSTEM_AUTHC = "AUTHC";
-    
-    /**
-     * System event action: authorization
-     */
-    public static final String SYSTEM_AUTHZ = "AUTHZ";
+  /**
+   * System event action: authentication
+   */
+  public static final String SYSTEM_AUTHC = "AUTHC";
 
-    // creating
+  /**
+   * System event action: authorization
+   */
+  public static final String SYSTEM_AUTHZ = "AUTHZ";
 
-    void addNexusArtifactEvent( NexusArtifactEvent nae );
+  // creating
 
-    void addSystemEvent( String action, String message );
+  void addNexusArtifactEvent(NexusArtifactEvent nae);
 
-    void addAuthcAuthzEvent( AuthcAuthzEvent evt );
+  void addSystemEvent(String action, String message);
 
-    SystemProcess systemProcessStarted( String action, String message );
+  void addAuthcAuthzEvent(AuthcAuthzEvent evt);
 
-    void systemProcessFinished( SystemProcess prc, String finishMessage );
+  SystemProcess systemProcessStarted(String action, String message);
 
-    void systemProcessCanceled( SystemProcess prc, String cancelMessage );
+  void systemProcessFinished(SystemProcess prc, String finishMessage);
 
-    void systemProcessBroken( SystemProcess prc, Throwable e );
+  void systemProcessCanceled(SystemProcess prc, String cancelMessage);
 
-    // reading
+  void systemProcessBroken(SystemProcess prc, Throwable e);
 
-    List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
-        Predicate<Entry> filter );
-    
-    List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
+  // reading
 
-    List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
+  List<NexusArtifactEvent> getNexusArtifectEvents(Set<String> subtypes, Integer from, Integer count,
+                                                  Predicate<Entry> filter);
+
+  List<SystemEvent> getSystemEvents(Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter);
+
+  List<AuthcAuthzEvent> getAuthcAuthzEvents(Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter);
 }

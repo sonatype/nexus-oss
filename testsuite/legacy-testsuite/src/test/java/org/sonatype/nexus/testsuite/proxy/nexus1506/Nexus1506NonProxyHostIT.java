@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.proxy.nexus1506;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
@@ -21,75 +20,78 @@ import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
 import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 public class Nexus1506NonProxyHostIT
-extends AbstractNexusIntegrationTest
+    extends AbstractNexusIntegrationTest
 {
-    @Test
-    public void checkNonProxyHosts()
-        throws Exception
-    {
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+  @Test
+  public void checkNonProxyHosts()
+      throws Exception
+  {
+    GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
 
-        settings.setRemoteProxySettings( new RemoteProxySettingsDTO() );
-        settings.getRemoteProxySettings().setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
-        settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname( "proxyHost" );
-        settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort( 3211 );
-        settings.getRemoteProxySettings().addNonProxyHost( "foo" );
-        settings.getRemoteProxySettings().addNonProxyHost( "bar" );
-        
-        Assert.assertEquals( 204, SettingsMessageUtil.save( settings ).getCode() );
-        
-        settings = SettingsMessageUtil.getCurrentSettings();
-        Assert.assertEquals( 2, settings.getRemoteProxySettings().getNonProxyHosts().size() );
-        
-        CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
-        Assert.assertEquals( proxySettings.getNonProxyHosts().get( 0 ), "foo" );
-        Assert.assertEquals( proxySettings.getNonProxyHosts().get( 1 ), "bar" );
-        Assert.assertEquals( 2, proxySettings.getNonProxyHosts().size() );
-    }
-    
-    @Test
-    public void checkNonProxyHostsEmptyAndNulls()
-        throws Exception
-    {
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+    settings.setRemoteProxySettings(new RemoteProxySettingsDTO());
+    settings.getRemoteProxySettings().setHttpProxySettings(new RemoteHttpProxySettingsDTO());
+    settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname("proxyHost");
+    settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort(3211);
+    settings.getRemoteProxySettings().addNonProxyHost("foo");
+    settings.getRemoteProxySettings().addNonProxyHost("bar");
 
-        settings.setRemoteProxySettings( new RemoteProxySettingsDTO() );
-        settings.getRemoteProxySettings().setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
-        settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname( "proxyHost" );
-        settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort( 3211 );
-        settings.getRemoteProxySettings().addNonProxyHost( "" );
-        settings.getRemoteProxySettings().addNonProxyHost( "foo" );
-        settings.getRemoteProxySettings().addNonProxyHost( null );
-        
-        Assert.assertEquals( 204, SettingsMessageUtil.save( settings ).getCode() );
-        
-        settings = SettingsMessageUtil.getCurrentSettings();
-        Assert.assertEquals( 1, settings.getRemoteProxySettings().getNonProxyHosts().size() );
-        
-        CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
-        Assert.assertEquals( proxySettings.getNonProxyHosts().get( 0 ), "foo" );
-        Assert.assertEquals( 1, proxySettings.getNonProxyHosts().size() );
-    }
-    
-    @Test
-    public void checkNonProxyHostsEmpty()
-        throws Exception
-    {
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+    Assert.assertEquals(204, SettingsMessageUtil.save(settings).getCode());
 
-        settings.setRemoteProxySettings( new RemoteProxySettingsDTO() );
-        settings.getRemoteProxySettings().setHttpProxySettings( new RemoteHttpProxySettingsDTO() );
-        settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname( "proxyHost" );
-        settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort( 3211 );
-        settings.getRemoteProxySettings().getNonProxyHosts().clear();
-        
-        Assert.assertEquals( 204, SettingsMessageUtil.save( settings ).getCode() );
-        
-        settings = SettingsMessageUtil.getCurrentSettings();
-        Assert.assertEquals( 0, settings.getRemoteProxySettings().getNonProxyHosts().size() );
-        
-        CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
-        Assert.assertEquals( 0, proxySettings.getNonProxyHosts().size() );
-    }
+    settings = SettingsMessageUtil.getCurrentSettings();
+    Assert.assertEquals(2, settings.getRemoteProxySettings().getNonProxyHosts().size());
+
+    CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
+    Assert.assertEquals(proxySettings.getNonProxyHosts().get(0), "foo");
+    Assert.assertEquals(proxySettings.getNonProxyHosts().get(1), "bar");
+    Assert.assertEquals(2, proxySettings.getNonProxyHosts().size());
+  }
+
+  @Test
+  public void checkNonProxyHostsEmptyAndNulls()
+      throws Exception
+  {
+    GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+
+    settings.setRemoteProxySettings(new RemoteProxySettingsDTO());
+    settings.getRemoteProxySettings().setHttpProxySettings(new RemoteHttpProxySettingsDTO());
+    settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname("proxyHost");
+    settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort(3211);
+    settings.getRemoteProxySettings().addNonProxyHost("");
+    settings.getRemoteProxySettings().addNonProxyHost("foo");
+    settings.getRemoteProxySettings().addNonProxyHost(null);
+
+    Assert.assertEquals(204, SettingsMessageUtil.save(settings).getCode());
+
+    settings = SettingsMessageUtil.getCurrentSettings();
+    Assert.assertEquals(1, settings.getRemoteProxySettings().getNonProxyHosts().size());
+
+    CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
+    Assert.assertEquals(proxySettings.getNonProxyHosts().get(0), "foo");
+    Assert.assertEquals(1, proxySettings.getNonProxyHosts().size());
+  }
+
+  @Test
+  public void checkNonProxyHostsEmpty()
+      throws Exception
+  {
+    GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+
+    settings.setRemoteProxySettings(new RemoteProxySettingsDTO());
+    settings.getRemoteProxySettings().setHttpProxySettings(new RemoteHttpProxySettingsDTO());
+    settings.getRemoteProxySettings().getHttpProxySettings().setProxyHostname("proxyHost");
+    settings.getRemoteProxySettings().getHttpProxySettings().setProxyPort(3211);
+    settings.getRemoteProxySettings().getNonProxyHosts().clear();
+
+    Assert.assertEquals(204, SettingsMessageUtil.save(settings).getCode());
+
+    settings = SettingsMessageUtil.getCurrentSettings();
+    Assert.assertEquals(0, settings.getRemoteProxySettings().getNonProxyHosts().size());
+
+    CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
+    Assert.assertEquals(0, proxySettings.getNonProxyHosts().size());
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
 
 import javax.inject.Named;
@@ -22,70 +23,60 @@ import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 /**
  * Clear caches task.
  */
-@Named( ExpireCacheTaskDescriptor.ID )
+@Named(ExpireCacheTaskDescriptor.ID)
 public class ExpireCacheTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
-    /**
-     * System event action: expire cache
-     */
-    public static final String ACTION = "EXPIRE_CACHE";
+  /**
+   * System event action: expire cache
+   */
+  public static final String ACTION = "EXPIRE_CACHE";
 
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return ExpireCacheTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+  @Override
+  protected String getRepositoryFieldId() {
+    return ExpireCacheTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+  }
+
+  @Override
+  protected String getRepositoryPathFieldId() {
+    return ExpireCacheTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
+  }
+
+  @Override
+  public Object doRun()
+      throws Exception
+  {
+    ResourceStoreRequest req = new ResourceStoreRequest(getResourceStorePath());
+
+    if (getRepositoryId() != null) {
+      getRepositoryRegistry().getRepository(getRepositoryId()).expireCaches(req);
     }
-
-    @Override
-    protected String getRepositoryPathFieldId()
-    {
-        return ExpireCacheTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
-    }
-
-    @Override
-    public Object doRun()
-        throws Exception
-    {
-        ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
-
-        if ( getRepositoryId() != null )
-        {
-            getRepositoryRegistry().getRepository( getRepositoryId() ).expireCaches( req );
+    else {
+      for (Repository repository : getRepositoryRegistry().getRepositories()) {
+        if (repository.getLocalStatus().shouldServiceRequest()) {
+          repository.expireCaches(req);
         }
-        else
-        {
-            for ( Repository repository : getRepositoryRegistry().getRepositories() )
-            {
-                if ( repository.getLocalStatus().shouldServiceRequest() )
-                {
-                    repository.expireCaches( req );
-                }
-            }
-        }
-
-        return null;
+      }
     }
 
-    @Override
-    protected String getAction()
-    {
-        return ACTION;
-    }
+    return null;
+  }
 
-    @Override
-    protected String getMessage()
-    {
-        if ( getRepositoryId() != null )
-        {
-            return "Expiring caches for repository " + getRepositoryName() + " from path " + getResourceStorePath()
-                + " and below.";
-        }
-        else
-        {
-            return "Expiring caches for all registered repositories from path " + getResourceStorePath()
-                + " and below.";
-        }
+  @Override
+  protected String getAction() {
+    return ACTION;
+  }
+
+  @Override
+  protected String getMessage() {
+    if (getRepositoryId() != null) {
+      return "Expiring caches for repository " + getRepositoryName() + " from path " + getResourceStorePath()
+          + " and below.";
     }
+    else {
+      return "Expiring caches for all registered repositories from path " + getResourceStorePath()
+          + " and below.";
+    }
+  }
 
 }

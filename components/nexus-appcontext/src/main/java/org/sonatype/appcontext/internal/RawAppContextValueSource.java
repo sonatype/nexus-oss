@@ -10,34 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.internal;
 
-import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextEntry;
+
+import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 public class RawAppContextValueSource
     extends AbstractValueSource
 {
-    private final AppContext context;
+  private final AppContext context;
 
-    public RawAppContextValueSource( final AppContext context )
-    {
-        super( false );
-        this.context = context;
+  public RawAppContextValueSource(final AppContext context) {
+    super(false);
+    this.context = context;
+  }
+
+  public Object getValue(String expression) {
+    final AppContextEntry entry = context.getAppContextEntry(expression);
+
+    if (entry != null) {
+      return entry.getRawValue();
     }
-
-    public Object getValue( String expression )
-    {
-        final AppContextEntry entry = context.getAppContextEntry( expression );
-
-        if ( entry != null )
-        {
-            return entry.getRawValue();
-        }
-        else
-        {
-            return null;
-        }
+    else {
+      return null;
     }
+  }
 }

@@ -10,20 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.wastebasket;
 
 /**
  * A Smart Wastebasket, that is able to do some house-cleaning if some limits are reached.
- * 
+ *
  * @author cstamas
  */
 public interface SmartWastebasket
     extends Wastebasket
 {
-    /**
-     * Set size constraint for Wastebasket, from where it delete it's items using FIFO (first-in-first-out).
-     * 
-     * @param constraint
-     */
-    void setMaximumSizeConstraint( MaximumSizeConstraint constraint );
+  /**
+   * Set size constraint for Wastebasket, from where it delete it's items using FIFO (first-in-first-out).
+   */
+  void setMaximumSizeConstraint(MaximumSizeConstraint constraint);
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.log;
 
 import java.io.IOException;
@@ -17,27 +18,27 @@ import java.io.IOException;
 /**
  * LogManager MBean interface (intentionally narrowed to same as UI supports, as this is the only thing proven useful
  * and used).
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
 public interface LogManagerMBean
 {
-    String getRootLoggerLevel()
-        throws IOException;
+  String getRootLoggerLevel()
+      throws IOException;
 
-    void makeRootLoggerLevelTrace()
-        throws IOException;
+  void makeRootLoggerLevelTrace()
+      throws IOException;
 
-    void makeRootLoggerLevelDebug()
-        throws IOException;
+  void makeRootLoggerLevelDebug()
+      throws IOException;
 
-    void makeRootLoggerLevelInfo()
-        throws IOException;
+  void makeRootLoggerLevelInfo()
+      throws IOException;
 
-    void makeRootLoggerLevelWarn()
-        throws IOException;
+  void makeRootLoggerLevelWarn()
+      throws IOException;
 
-    void makeRootLoggerLevelDefault()
-        throws IOException;
+  void makeRootLoggerLevelDefault()
+      throws IOException;
 }

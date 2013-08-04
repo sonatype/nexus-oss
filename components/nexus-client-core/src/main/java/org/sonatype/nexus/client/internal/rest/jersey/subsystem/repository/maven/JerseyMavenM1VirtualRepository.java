@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.maven;
 
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenM1VirtualRepository;
@@ -27,27 +28,25 @@ public class JerseyMavenM1VirtualRepository
     implements MavenM1VirtualRepository
 {
 
-    static final String PROVIDER = "m2-m1-shadow";
+  static final String PROVIDER = "m2-m1-shadow";
 
-    public JerseyMavenM1VirtualRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyMavenM1VirtualRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyMavenM1VirtualRepository( final JerseyNexusClient nexusClient,
-                                           final RepositoryShadowResource settings )
-    {
-        super( nexusClient, settings );
-    }
+  public JerseyMavenM1VirtualRepository(final JerseyNexusClient nexusClient,
+                                        final RepositoryShadowResource settings)
+  {
+    super(nexusClient, settings);
+  }
 
-    @Override
-    protected RepositoryShadowResource createSettings()
-    {
-        final RepositoryShadowResource settings = super.createSettings();
+  @Override
+  protected RepositoryShadowResource createSettings() {
+    final RepositoryShadowResource settings = super.createSettings();
 
-        settings.setProvider( PROVIDER );
+    settings.setProvider(PROVIDER);
 
-        return settings;
-    }
+    return settings;
+  }
 
 }

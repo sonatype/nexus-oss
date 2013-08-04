@@ -10,18 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus133;
 
 import java.io.IOException;
+
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 
 /**
  * Test the privileges for CRUD operations.
@@ -29,207 +31,207 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 public class Nexus133TargetPermissionIT
     extends AbstractPrivilegeTest
 {
-	
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
 
-    @Test
-    public void testCreatePermission()
-        throws IOException
-    {
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testCreatePermission" );
-        target.addPattern( ".*testCreatePermission.*" );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+  @Test
+  public void testCreatePermission()
+      throws IOException
+  {
+    RepositoryTargetResource target = new RepositoryTargetResource();
+    target.setContentClass("maven2");
+    target.setName("testCreatePermission");
+    target.addPattern(".*testCreatePermission.*");
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
-        
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // now give create
-        this.giveUserPrivilege( "test-user", "45" );
+    Response response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        // now.... it should work...
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        target = this.targetUtil.getResourceFromResponse( response );
+    // now give create
+    this.giveUserPrivilege("test-user", "45");
 
-        // read should succeed (inherited)
-        response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    // now.... it should work...
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // update should fail
-        response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    target = this.targetUtil.getResourceFromResponse(response);
 
-        // delete should fail
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // read should succeed (inherited)
+    response = this.targetUtil.sendMessage(Method.GET, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-    }
+    // update should fail
+    response = this.targetUtil.sendMessage(Method.PUT, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-    @Test
-    public void testUpdatePermission()
-        throws IOException
-    {
+    // delete should fail
+    response = this.targetUtil.sendMessage(Method.DELETE, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+  }
 
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testUpdatePermission" );
-        target.addPattern( ".*testUpdatePermission.*" );
+  @Test
+  public void testUpdatePermission()
+      throws IOException
+  {
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        target = this.targetUtil.getResourceFromResponse( response );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    RepositoryTargetResource target = new RepositoryTargetResource();
+    target.setContentClass("maven2");
+    target.setName("testUpdatePermission");
+    target.addPattern(".*testUpdatePermission.*");
 
-        // update user
-        target.setName( "tesUpdatePermission2" );
-        response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    Response response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    target = this.targetUtil.getResourceFromResponse(response);
 
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // now give create
-        this.giveUserPrivilege( "test-user", "47" );
+    // update user
+    target.setName("tesUpdatePermission2");
+    response = this.targetUtil.sendMessage(Method.PUT, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // should work now...
-        response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    // now give create
+    this.giveUserPrivilege("test-user", "47");
 
-        // read should succeed (inherited)
-        response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // update should fail
-        response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // should work now...
+    response = this.targetUtil.sendMessage(Method.PUT, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-        // delete should fail
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // read should succeed (inherited)
+    response = this.targetUtil.sendMessage(Method.GET, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-    }
-    
-    @Test
-    public void testReadPermission()
-        throws IOException
-    {
+    // update should fail
+    response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    // delete should fail
+    response = this.targetUtil.sendMessage(Method.DELETE, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testReadPermission" );
-        target.addPattern( ".*testReadPermission.*" );
+  }
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        target = this.targetUtil.getResourceFromResponse( response );
+  @Test
+  public void testReadPermission()
+      throws IOException
+  {
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // update user
-        target.setName( "tesUpdatePermission2" );
-        response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    RepositoryTargetResource target = new RepositoryTargetResource();
+    target.setContentClass("maven2");
+    target.setName("testReadPermission");
+    target.addPattern(".*testReadPermission.*");
 
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    Response response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    target = this.targetUtil.getResourceFromResponse(response);
 
-        // now give create
-        this.giveUserPrivilege( "test-user", "46" );
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    // update user
+    target.setName("tesUpdatePermission2");
+    response = this.targetUtil.sendMessage(Method.PUT, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        // read should fail
-        response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // update should fail
-        response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // now give create
+    this.giveUserPrivilege("test-user", "46");
 
-        // delete should fail
-        response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
-        
-     // should work now...
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-    }
-    
-    
-    @Test
-    public void testDeletePermission()
-        throws IOException
-    {
+    // read should fail
+    response = this.targetUtil.sendMessage(Method.GET, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    // update should fail
+    response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testDeletePermission" );
-        target.addPattern( ".*testDeletePermission.*" );
+    // delete should fail
+    response = this.targetUtil.sendMessage(Method.PUT, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        target = this.targetUtil.getResourceFromResponse( response );
+    // should work now...
+    response = this.targetUtil.sendMessage(Method.DELETE, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+  }
 
-        // update user
-        target.setName( "tesUpdatePermission2" );
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
 
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+  @Test
+  public void testDeletePermission()
+      throws IOException
+  {
 
-        // now give create
-        this.giveUserPrivilege( "test-user", "48" );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    RepositoryTargetResource target = new RepositoryTargetResource();
+    target.setContentClass("maven2");
+    target.setName("testDeletePermission");
+    target.addPattern(".*testDeletePermission.*");
 
-        // read should succeed (inherited)
-        response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    Response response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    target = this.targetUtil.getResourceFromResponse(response);
 
-        // update should fail
-        response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // delete should fail
-        response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
-        
-     // should work now...
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 204 );
+    // update user
+    target.setName("tesUpdatePermission2");
+    response = this.targetUtil.sendMessage(Method.DELETE, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-    }
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
+
+    // now give create
+    this.giveUserPrivilege("test-user", "48");
+
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
+
+    // read should succeed (inherited)
+    response = this.targetUtil.sendMessage(Method.GET, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
+
+    // update should fail
+    response = this.targetUtil.sendMessage(Method.POST, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
+
+    // delete should fail
+    response = this.targetUtil.sendMessage(Method.PUT, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
+
+    // should work now...
+    response = this.targetUtil.sendMessage(Method.DELETE, target);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 204);
+
+  }
 
 }

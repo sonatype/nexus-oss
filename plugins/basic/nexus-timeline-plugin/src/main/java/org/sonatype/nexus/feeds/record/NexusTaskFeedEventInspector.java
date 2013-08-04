@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds.record;
 
 import java.lang.reflect.Method;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
@@ -26,108 +26,95 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.plexus.appevents.Event;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Event inspector that creates feeds about tasks. Note: this EventInspector is
  * <em>intentionally synchronous EventInspector</em>! Reasoning is mainly to avoid unordered event arrivals (stopped
  * before started), but also, one can easily see by inspecting where these events are fired (see
- * {@link AbstractNexusTask}), that those are fired from already pooled thread (task executing thread), and not the main
+ * {@link AbstractNexusTask}), that those are fired from already pooled thread (task executing thread), and not the
+ * main
  * HTTP request processing ones, hence, this event inspector being synchronous will not steal much CPU cycles from it
- * (well, will do as much to decide does it "accepts" the event, but that is negligible, and will be fixed once we start
+ * (well, will do as much to decide does it "accepts" the event, but that is negligible, and will be fixed once we
+ * start
  * using "event bus" since then it will not even be invoked).
- * 
+ *
  * @author cstamas
  */
-@Component( role = EventInspector.class, hint = "NexusTaskFeedEventInspector" )
+@Component(role = EventInspector.class, hint = "NexusTaskFeedEventInspector")
 public class NexusTaskFeedEventInspector
     extends AbstractFeedRecorderEventInspector
     implements EventInspector
 {
-    public boolean accepts( final Event<?> evt )
-    {
-        return evt != null && evt instanceof NexusTaskEvent;
+  public boolean accepts(final Event<?> evt) {
+    return evt != null && evt instanceof NexusTaskEvent;
+  }
+
+  public void inspect(final Event<?> evt) {
+    if (!accepts(evt)) {
+      return;
     }
 
-    public void inspect( final Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
-
-        if ( evt instanceof NexusTaskEventStarted<?> )
-        {
-            final String action = getActionFromTask( ( (NexusTaskEventStarted<?>) evt ).getNexusTask() );
-            final String message = getMessageFromTask( ( (NexusTaskEventStarted<?>) evt ).getNexusTask() );
-            final SystemProcess prc = getFeedRecorder().systemProcessStarted( action, message );
-            putSystemProcessFromEventContext( (NexusTaskEventStarted<?>) evt, prc );
-        }
-        else if ( evt instanceof NexusTaskEventStoppedDone<?> )
-        {
-            final SystemProcess prc =
-                getSystemProcessFromEventContext( ( (NexusTaskEventStoppedDone<?>) evt ).getStartedEvent() );
-            final String message = getMessageFromTask( ( (NexusTaskEventStoppedDone<?>) evt ).getNexusTask() );
-            getFeedRecorder().systemProcessFinished( prc, message );
-        }
-        else if ( evt instanceof NexusTaskEventStoppedCanceled<?> )
-        {
-            final SystemProcess prc =
-                getSystemProcessFromEventContext( ( (NexusTaskEventStoppedCanceled<?>) evt ).getStartedEvent() );
-            final String message = getMessageFromTask( ( (NexusTaskEventStoppedCanceled<?>) evt ).getNexusTask() );
-            getFeedRecorder().systemProcessCanceled( prc, message );
-        }
-        else if ( evt instanceof NexusTaskEventStoppedFailed<?> )
-        {
-            final SystemProcess prc =
-                getSystemProcessFromEventContext( ( (NexusTaskEventStoppedFailed<?>) evt ).getStartedEvent() );
-            getFeedRecorder().systemProcessBroken( prc, ( (NexusTaskEventStoppedFailed<?>) evt ).getFailureCause() );
-        }
+    if (evt instanceof NexusTaskEventStarted<?>) {
+      final String action = getActionFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());
+      final String message = getMessageFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());
+      final SystemProcess prc = getFeedRecorder().systemProcessStarted(action, message);
+      putSystemProcessFromEventContext((NexusTaskEventStarted<?>) evt, prc);
     }
-
-    // ==
-
-    protected void putSystemProcessFromEventContext( final NexusTaskEventStarted<?> evt, final SystemProcess prc )
-    {
-        evt.getEventContext().put( SystemProcess.class.getName(), prc );
+    else if (evt instanceof NexusTaskEventStoppedDone<?>) {
+      final SystemProcess prc =
+          getSystemProcessFromEventContext(((NexusTaskEventStoppedDone<?>) evt).getStartedEvent());
+      final String message = getMessageFromTask(((NexusTaskEventStoppedDone<?>) evt).getNexusTask());
+      getFeedRecorder().systemProcessFinished(prc, message);
     }
-
-    protected SystemProcess getSystemProcessFromEventContext( final NexusTaskEventStarted<?> evt )
-    {
-        return (SystemProcess) evt.getEventContext().get( SystemProcess.class.getName() );
+    else if (evt instanceof NexusTaskEventStoppedCanceled<?>) {
+      final SystemProcess prc =
+          getSystemProcessFromEventContext(((NexusTaskEventStoppedCanceled<?>) evt).getStartedEvent());
+      final String message = getMessageFromTask(((NexusTaskEventStoppedCanceled<?>) evt).getNexusTask());
+      getFeedRecorder().systemProcessCanceled(prc, message);
     }
-
-    protected String getActionFromTask( final NexusTask<?> task )
-    {
-        if ( task instanceof AbstractNexusTask<?> )
-        {
-            try
-            {
-                final Method getActionMethod = AbstractNexusTask.class.getDeclaredMethod( "getAction" );
-                getActionMethod.setAccessible( true );
-                return (String) getActionMethod.invoke( task );
-            }
-            catch ( Exception e )
-            {
-                // nothing
-            }
-        }
-        return "UNKNOWN";
+    else if (evt instanceof NexusTaskEventStoppedFailed<?>) {
+      final SystemProcess prc =
+          getSystemProcessFromEventContext(((NexusTaskEventStoppedFailed<?>) evt).getStartedEvent());
+      getFeedRecorder().systemProcessBroken(prc, ((NexusTaskEventStoppedFailed<?>) evt).getFailureCause());
     }
+  }
 
-    protected String getMessageFromTask( final NexusTask<?> task )
-    {
-        if ( task instanceof AbstractNexusTask<?> )
-        {
-            try
-            {
-                final Method getMessageMethod = AbstractNexusTask.class.getDeclaredMethod( "getMessage" );
-                getMessageMethod.setAccessible( true );
-                return (String) getMessageMethod.invoke( task );
-            }
-            catch ( Exception e )
-            {
-                // nothing
-            }
-        }
-        return "UNKNOWN";
+  // ==
+
+  protected void putSystemProcessFromEventContext(final NexusTaskEventStarted<?> evt, final SystemProcess prc) {
+    evt.getEventContext().put(SystemProcess.class.getName(), prc);
+  }
+
+  protected SystemProcess getSystemProcessFromEventContext(final NexusTaskEventStarted<?> evt) {
+    return (SystemProcess) evt.getEventContext().get(SystemProcess.class.getName());
+  }
+
+  protected String getActionFromTask(final NexusTask<?> task) {
+    if (task instanceof AbstractNexusTask<?>) {
+      try {
+        final Method getActionMethod = AbstractNexusTask.class.getDeclaredMethod("getAction");
+        getActionMethod.setAccessible(true);
+        return (String) getActionMethod.invoke(task);
+      }
+      catch (Exception e) {
+        // nothing
+      }
     }
+    return "UNKNOWN";
+  }
+
+  protected String getMessageFromTask(final NexusTask<?> task) {
+    if (task instanceof AbstractNexusTask<?>) {
+      try {
+        final Method getMessageMethod = AbstractNexusTask.class.getDeclaredMethod("getMessage");
+        getMessageMethod.setAccessible(true);
+        return (String) getMessageMethod.invoke(task);
+      }
+      catch (Exception e) {
+        // nothing
+      }
+    }
+    return "UNKNOWN";
+  }
 }

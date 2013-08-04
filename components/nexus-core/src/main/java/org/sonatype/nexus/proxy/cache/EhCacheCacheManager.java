@@ -10,44 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.cache;
+
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
- * 
+ *
  * @author cstamas
  */
-@Component( role = CacheManager.class )
+@Component(role = CacheManager.class)
 public class EhCacheCacheManager
     extends AbstractLoggingComponent
     implements CacheManager, Disposable
 {
-    @Requirement
-    private CacheManagerComponent cacheManagerComponent;
+  @Requirement
+  private CacheManagerComponent cacheManagerComponent;
 
-    public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
+  public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
 
-    public PathCache getPathCache( String cache )
-    {
-        final net.sf.ehcache.CacheManager ehCacheManager = cacheManagerComponent.getCacheManager();
+  public PathCache getPathCache(String cache) {
+    final net.sf.ehcache.CacheManager ehCacheManager = cacheManagerComponent.getCacheManager();
 
-        if ( !ehCacheManager.cacheExists( SINGLE_PATH_CACHE_NAME ) )
-        {
-            ehCacheManager.addCache( SINGLE_PATH_CACHE_NAME );
-        }
-
-        return new EhCachePathCache( cache, ehCacheManager.getEhcache( SINGLE_PATH_CACHE_NAME ) );
+    if (!ehCacheManager.cacheExists(SINGLE_PATH_CACHE_NAME)) {
+      ehCacheManager.addCache(SINGLE_PATH_CACHE_NAME);
     }
 
-    @Override
-    public void dispose()
-    {
-        cacheManagerComponent.shutdown();
-    }
+    return new EhCachePathCache(cache, ehCacheManager.getEhcache(SINGLE_PATH_CACHE_NAME));
+  }
+
+  @Override
+  public void dispose() {
+    cacheManagerComponent.shutdown();
+  }
 }

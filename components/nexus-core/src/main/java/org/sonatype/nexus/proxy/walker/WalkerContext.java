@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import java.util.Comparator;
@@ -22,90 +23,70 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The WalkerContext is usable to control the walk and to share some contextual data during the wak.
- * 
+ *
  * @author cstamas
  */
 public interface WalkerContext
 {
-    /**
-     * Gets the resource store request that initiated this walk.
-     * 
-     * @return
-     */
-    ResourceStoreRequest getResourceStoreRequest();
+  /**
+   * Gets the resource store request that initiated this walk.
+   */
+  ResourceStoreRequest getResourceStoreRequest();
 
-    /**
-     * Will not try to reach remote storage.
-     * 
-     * @return
-     */
-    boolean isLocalOnly();
+  /**
+   * Will not try to reach remote storage.
+   */
+  boolean isLocalOnly();
 
-    /**
-     * Returns the context.
-     * 
-     * @return
-     */
-    Map<String, Object> getContext();
+  /**
+   * Returns the context.
+   */
+  Map<String, Object> getContext();
 
-    /**
-     * Gets (and creates in null and empty list) the list of processors.
-     * 
-     * @return
-     */
-    List<WalkerProcessor> getProcessors();
+  /**
+   * Gets (and creates in null and empty list) the list of processors.
+   */
+  List<WalkerProcessor> getProcessors();
 
-    /**
-     * Sets the list of processors to use.
-     * 
-     * @param processors
-     */
-    void setProcessors( List<WalkerProcessor> processors );
+  /**
+   * Sets the list of processors to use.
+   */
+  void setProcessors(List<WalkerProcessor> processors);
 
-    /**
-     * Stops the walker with cause.
-     * 
-     * @param cause
-     */
-    void stop( Throwable cause );
+  /**
+   * Stops the walker with cause.
+   */
+  void stop(Throwable cause);
 
-    /**
-     * Returns true is walker is stopped in the middle of walking.
-     * 
-     * @return
-     */
-    boolean isStopped();
+  /**
+   * Returns true is walker is stopped in the middle of walking.
+   */
+  boolean isStopped();
 
-    /**
-     * Returns the cause of stopping this walker or null if none is given.
-     * 
-     * @return
-     */
-    Throwable getStopCause();
+  /**
+   * Returns the cause of stopping this walker or null if none is given.
+   */
+  Throwable getStopCause();
 
-    /**
-     * Returns the filter used in walk or null.
-     * 
-     * @return the used filter or null.
-     */
-    WalkerFilter getFilter();
+  /**
+   * Returns the filter used in walk or null.
+   *
+   * @return the used filter or null.
+   */
+  WalkerFilter getFilter();
 
-    /**
-     * Returns the resource store instance that is/will be walked over.
-     * 
-     * @return
-     */
-    Repository getRepository();
+  /**
+   * Returns the resource store instance that is/will be walked over.
+   */
+  Repository getRepository();
 
-    /**
-     * Returns the "throttle control" of this context.
-     * 
-     * @return
-     */
-    WalkerThrottleController getThrottleController();
+  /**
+   * Returns the "throttle control" of this context.
+   */
+  WalkerThrottleController getThrottleController();
 
-    /**
-     * Returns a comparator that defines the item order when walking a collection.
-     */
-    Comparator<StorageItem> getItemComparator();
+  /**
+   * Returns a comparator that defines the item order when walking a collection.
+   */
+  Comparator<StorageItem> getItemComparator();
 }

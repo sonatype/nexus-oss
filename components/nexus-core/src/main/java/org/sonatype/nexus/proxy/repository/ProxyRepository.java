@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.Map;
@@ -25,224 +26,189 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 /**
  * A proxy repository is what it's name says :)
- * 
+ *
  * @author cstamas
  */
 public interface ProxyRepository
     extends Repository
 {
-    /**
-     * Marks the proxy cache items as expired. This methods delegates to
-     * {@link #expireProxyCaches(ResourceStoreRequest, WalkerFilter)} method using {@code null} for filter.
-     * 
-     * @param request a path from to start descending. If null, it is taken as "root".
-     * @since 2.0
-     */
-    void expireProxyCaches( ResourceStoreRequest request );
+  /**
+   * Marks the proxy cache items as expired. This methods delegates to
+   * {@link #expireProxyCaches(ResourceStoreRequest, WalkerFilter)} method using {@code null} for filter.
+   *
+   * @param request a path from to start descending. If null, it is taken as "root".
+   * @since 2.0
+   */
+  void expireProxyCaches(ResourceStoreRequest request);
 
-    /**
-     * Marks the proxy cache items as expired (items stored in Local Storage that is actually proxy cache in case of
-     * Proxy repository). This expiration is explicit, and puts a flag in item attribute, that is overriding the aging
-     * algorithm too! Meaning, even if your maxAge is "never", but item is flagged as expired, remote check will happen.
-     * Also, consider that proxy cache might be huge, this method might be a long runner.
-     * 
-     * @param request a path from to start descending. If null, it is taken as "root".
-     * @param filter to apply or {@code null} for "all".
-     * @return {@code true} if cache modified.
-     * @since 2.1
-     */
-    boolean expireProxyCaches( ResourceStoreRequest request, WalkerFilter filter );
+  /**
+   * Marks the proxy cache items as expired (items stored in Local Storage that is actually proxy cache in case of
+   * Proxy repository). This expiration is explicit, and puts a flag in item attribute, that is overriding the aging
+   * algorithm too! Meaning, even if your maxAge is "never", but item is flagged as expired, remote check will
+   * happen.
+   * Also, consider that proxy cache might be huge, this method might be a long runner.
+   *
+   * @param request a path from to start descending. If null, it is taken as "root".
+   * @param filter  to apply or {@code null} for "all".
+   * @return {@code true} if cache modified.
+   * @since 2.1
+   */
+  boolean expireProxyCaches(ResourceStoreRequest request, WalkerFilter filter);
 
-    /**
-     * Gets remote status.
-     */
-    RemoteStatus getRemoteStatus( ResourceStoreRequest request, boolean forceCheck );
+  /**
+   * Gets remote status.
+   */
+  RemoteStatus getRemoteStatus(ResourceStoreRequest request, boolean forceCheck);
 
-    Thread getRepositoryStatusCheckerThread();
+  Thread getRepositoryStatusCheckerThread();
 
-    void setRepositoryStatusCheckerThread( Thread thread );
+  void setRepositoryStatusCheckerThread(Thread thread);
 
-    /**
-     * Returns the current remote status retain time. Does not change or step it's value.
-     * 
-     * @return
-     */
-    long getCurrentRemoteStatusRetainTime();
+  /**
+   * Returns the current remote status retain time. Does not change or step it's value.
+   */
+  long getCurrentRemoteStatusRetainTime();
 
-    /**
-     * Steps and returns the new current remote status retain time. It does change the underlying NumberSequence (if
-     * needed). Also, this method tops the change, and will not increase the NumberSequence over some limit.
-     * 
-     * @return
-     */
-    long getNextRemoteStatusRetainTime();
+  /**
+   * Steps and returns the new current remote status retain time. It does change the underlying NumberSequence (if
+   * needed). Also, this method tops the change, and will not increase the NumberSequence over some limit.
+   */
+  long getNextRemoteStatusRetainTime();
 
-    /**
-     * Gets proxy mode.
-     * 
-     * @return
-     */
-    ProxyMode getProxyMode();
+  /**
+   * Gets proxy mode.
+   */
+  ProxyMode getProxyMode();
 
-    /**
-     * Sets proxy mode.
-     * 
-     * @param val
-     */
-    void setProxyMode( ProxyMode val );
+  /**
+   * Sets proxy mode.
+   */
+  void setProxyMode(ProxyMode val);
 
-    /**
-     * Gets the item max age in (in minutes).
-     * 
-     * @return the item max age in (in minutes)
-     */
-    int getItemMaxAge();
+  /**
+   * Gets the item max age in (in minutes).
+   *
+   * @return the item max age in (in minutes)
+   */
+  int getItemMaxAge();
 
-    /**
-     * Sets the item max age in (in minutes).
-     * 
-     * @param itemMaxAge the new item max age in (in minutes).
-     */
-    void setItemMaxAge( int itemMaxAge );
+  /**
+   * Sets the item max age in (in minutes).
+   *
+   * @param itemMaxAge the new item max age in (in minutes).
+   */
+  void setItemMaxAge(int itemMaxAge);
 
-    /**
-     * Gets the content validation setting.
-     * 
-     * @return
-     */
-    public boolean isFileTypeValidation();
+  /**
+   * Gets the content validation setting.
+   */
+  public boolean isFileTypeValidation();
 
-    /**
-     * Sets the content validation setting.
-     * 
-     * @param doValidate
-     */
-    public void setFileTypeValidation( boolean doValidate );
+  /**
+   * Sets the content validation setting.
+   */
+  public void setFileTypeValidation(boolean doValidate);
 
-    /**
-     * Gets the RepositoryStatusCheckMode.
-     * 
-     * @return
-     */
-    RepositoryStatusCheckMode getRepositoryStatusCheckMode();
+  /**
+   * Gets the RepositoryStatusCheckMode.
+   */
+  RepositoryStatusCheckMode getRepositoryStatusCheckMode();
 
-    /**
-     * Sets the RepositoryStatusCheckMode.
-     * 
-     * @param mode
-     */
-    void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode );
+  /**
+   * Sets the RepositoryStatusCheckMode.
+   */
+  void setRepositoryStatusCheckMode(RepositoryStatusCheckMode mode);
 
-    /**
-     * Returns true if this ProxyRepository should "auto block" itself when the remote repository has transport (or
-     * other) problems, like bad remoteUrl is set.
-     * 
-     * @return
-     */
-    boolean isAutoBlockActive();
+  /**
+   * Returns true if this ProxyRepository should "auto block" itself when the remote repository has transport (or
+   * other) problems, like bad remoteUrl is set.
+   */
+  boolean isAutoBlockActive();
 
-    /**
-     * Sets the ProxyRepository autoBlock feature active or inactive.
-     * 
-     * @param val
-     */
-    void setAutoBlockActive( boolean val );
+  /**
+   * Sets the ProxyRepository autoBlock feature active or inactive.
+   */
+  void setAutoBlockActive(boolean val);
 
-    /**
-     * Returns the remote URL of this repository, if any.
-     * 
-     * @return remote url of this repository, null otherwise.
-     */
-    String getRemoteUrl();
+  /**
+   * Returns the remote URL of this repository, if any.
+   *
+   * @return remote url of this repository, null otherwise.
+   */
+  String getRemoteUrl();
 
-    /**
-     * Sets the remote url.
-     * 
-     * @param url the new remote url
-     */
-    void setRemoteUrl( String url )
-        throws RemoteStorageException;
+  /**
+   * Sets the remote url.
+   *
+   * @param url the new remote url
+   */
+  void setRemoteUrl(String url)
+      throws RemoteStorageException;
 
-    /**
-     * Gets the remote connections settings. Delegates to RemoteStorageContext.
-     * 
-     * @return
-     */
-    RemoteConnectionSettings getRemoteConnectionSettings();
+  /**
+   * Gets the remote connections settings. Delegates to RemoteStorageContext.
+   */
+  RemoteConnectionSettings getRemoteConnectionSettings();
 
-    /**
-     * Set remote connection settings. Delegates to RemoteStorageContext.
-     * 
-     * @param settings
-     */
-    void setRemoteConnectionSettings( RemoteConnectionSettings settings );
+  /**
+   * Set remote connection settings. Delegates to RemoteStorageContext.
+   */
+  void setRemoteConnectionSettings(RemoteConnectionSettings settings);
 
-    /**
-     * Gets remote authentication settings. Delegates to RemoteStorageContext.
-     */
-    RemoteAuthenticationSettings getRemoteAuthenticationSettings();
+  /**
+   * Gets remote authentication settings. Delegates to RemoteStorageContext.
+   */
+  RemoteAuthenticationSettings getRemoteAuthenticationSettings();
 
-    /**
-     * Sets remote authentication settings. Delegates to RemoteStorageContext.
-     * 
-     * @param settings
-     */
-    void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings );
+  /**
+   * Sets remote authentication settings. Delegates to RemoteStorageContext.
+   */
+  void setRemoteAuthenticationSettings(RemoteAuthenticationSettings settings);
 
-    /**
-     * Returns is the "aging" applied to the items in this proxy repository. If false, then this proxy will not apply
-     * "aging" to items, and will always go for remote to check for change.
-     * 
-     * @return
-     */
-    boolean isItemAgingActive();
+  /**
+   * Returns is the "aging" applied to the items in this proxy repository. If false, then this proxy will not apply
+   * "aging" to items, and will always go for remote to check for change.
+   */
+  boolean isItemAgingActive();
 
-    /**
-     * Sets the "aging" algorithm status.
-     * 
-     * @param value
-     */
-    void setItemAgingActive( boolean value );
+  /**
+   * Sets the "aging" algorithm status.
+   */
+  void setItemAgingActive(boolean value);
 
-    // --
+  // --
 
-    /**
-     * Returns repository specific remote connection context.
-     * 
-     * @return null if none
-     */
-    RemoteStorageContext getRemoteStorageContext();
+  /**
+   * Returns repository specific remote connection context.
+   *
+   * @return null if none
+   */
+  RemoteStorageContext getRemoteStorageContext();
 
-    /**
-     * Returns the remoteStorage of the repository. Per repository instance may exists.
-     * 
-     * @return remoteStorage or null.
-     */
-    RemoteRepositoryStorage getRemoteStorage();
+  /**
+   * Returns the remoteStorage of the repository. Per repository instance may exists.
+   *
+   * @return remoteStorage or null.
+   */
+  RemoteRepositoryStorage getRemoteStorage();
 
-    /**
-     * Sets the remote storage of the repository. May be null if this is a Local repository only. Per repository
-     * instance may exists.
-     * 
-     * @param storage the storage
-     */
-    void setRemoteStorage( RemoteRepositoryStorage storage );
+  /**
+   * Sets the remote storage of the repository. May be null if this is a Local repository only. Per repository
+   * instance may exists.
+   *
+   * @param storage the storage
+   */
+  void setRemoteStorage(RemoteRepositoryStorage storage);
 
-    /**
-     * Returns the list of defined item content validators.
-     * 
-     * @return
-     */
-    Map<String, ItemContentValidator> getItemContentValidators();
+  /**
+   * Returns the list of defined item content validators.
+   */
+  Map<String, ItemContentValidator> getItemContentValidators();
 
-    /**
-     * Caches an item.
-     * 
-     * @param item
-     * @return
-     * @throws StorageException
-     */
-    AbstractStorageItem doCacheItem( AbstractStorageItem item )
-        throws LocalStorageException;
+  /**
+   * Caches an item.
+   */
+  AbstractStorageItem doCacheItem(AbstractStorageItem item)
+      throws LocalStorageException;
 
 }

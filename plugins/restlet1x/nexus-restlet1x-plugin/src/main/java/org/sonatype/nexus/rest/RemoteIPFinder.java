@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import java.net.Inet4Address;
@@ -26,90 +27,76 @@ import org.restlet.data.Request;
 
 public class RemoteIPFinder
 {
-    static final String FORWARD_HEADER = "X-Forwarded-For";
+  static final String FORWARD_HEADER = "X-Forwarded-For";
 
-    public static String findIP( HttpServletRequest request )
-    {
-        String forwardedIP = getFirstForwardedIp( request.getHeader( FORWARD_HEADER ) );
+  public static String findIP(HttpServletRequest request) {
+    String forwardedIP = getFirstForwardedIp(request.getHeader(FORWARD_HEADER));
 
-        if ( forwardedIP != null )
-        {
-            return forwardedIP;
-        }
-
-        return request.getRemoteAddr();
+    if (forwardedIP != null) {
+      return forwardedIP;
     }
 
-    public static String findIP( Request request )
-    {
-        Form form = (Form) request.getAttributes().get( "org.restlet.http.headers" );
+    return request.getRemoteAddr();
+  }
 
-        String forwardedIP = getFirstForwardedIp( form.getFirstValue( FORWARD_HEADER ) );
+  public static String findIP(Request request) {
+    Form form = (Form) request.getAttributes().get("org.restlet.http.headers");
 
-        if ( forwardedIP != null )
-        {
-            return forwardedIP;
-        }
+    String forwardedIP = getFirstForwardedIp(form.getFirstValue(FORWARD_HEADER));
 
-        List<String> clientAddresses = request.getClientInfo().getAddresses();
-
-        if ( clientAddresses.size() > 1 )
-        {
-            // restlet1x ClientInfo.getAddresses has *reverse* order to XFF
-            // (this has been fixed in restlet2x, along with a clearer API)
-
-            String[] ipAddresses = new String[clientAddresses.size()];
-            for ( int i = 0, j = ipAddresses.length - 1; j >= 0; i++, j-- )
-            {
-                ipAddresses[i] = clientAddresses.get( j );
-            }
-
-            forwardedIP = resolveIp( ipAddresses );
-
-            if ( forwardedIP != null )
-            {
-                return forwardedIP;
-            }
-        }
-
-        return request.getClientInfo().getAddress();
+    if (forwardedIP != null) {
+      return forwardedIP;
     }
 
-    /**
-     * Returns the *left-most* resolvable IP from the given XFF string; otherwise null.
-     */
-    private static String getFirstForwardedIp( String forwardedFor )
-    {
-        if ( !StringUtils.isEmpty( forwardedFor ) )
-        {
-            return resolveIp( forwardedFor.split( "\\s*,\\s*" ) );
-        }
+    List<String> clientAddresses = request.getClientInfo().getAddresses();
 
-        return null;
+    if (clientAddresses.size() > 1) {
+      // restlet1x ClientInfo.getAddresses has *reverse* order to XFF
+      // (this has been fixed in restlet2x, along with a clearer API)
+
+      String[] ipAddresses = new String[clientAddresses.size()];
+      for (int i = 0, j = ipAddresses.length - 1; j >= 0; i++, j--) {
+        ipAddresses[i] = clientAddresses.get(j);
+      }
+
+      forwardedIP = resolveIp(ipAddresses);
+
+      if (forwardedIP != null) {
+        return forwardedIP;
+      }
     }
 
-    /**
-     * Returns the *left-most* resolvable IP from the given sequence.
-     */
-    private static String resolveIp( String[] ipAddresses )
-    {
-        for ( String ip : ipAddresses )
-        {
-            InetAddress ipAdd;
-            try
-            {
-                ipAdd = InetAddress.getByName( ip );
-            }
-            catch ( UnknownHostException e )
-            {
-                continue;
-            }
-            if ( ipAdd instanceof Inet4Address || ipAdd instanceof Inet6Address )
-            {
-                return ip;
-            }
-        }
+    return request.getClientInfo().getAddress();
+  }
 
-        return null;
+  /**
+   * Returns the *left-most* resolvable IP from the given XFF string; otherwise null.
+   */
+  private static String getFirstForwardedIp(String forwardedFor) {
+    if (!StringUtils.isEmpty(forwardedFor)) {
+      return resolveIp(forwardedFor.split("\\s*,\\s*"));
     }
+
+    return null;
+  }
+
+  /**
+   * Returns the *left-most* resolvable IP from the given sequence.
+   */
+  private static String resolveIp(String[] ipAddresses) {
+    for (String ip : ipAddresses) {
+      InetAddress ipAdd;
+      try {
+        ipAdd = InetAddress.getByName(ip);
+      }
+      catch (UnknownHostException e) {
+        continue;
+      }
+      if (ipAdd instanceof Inet4Address || ipAdd instanceof Inet6Address) {
+        return ip;
+      }
+    }
+
+    return null;
+  }
 }

@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Date;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -25,10 +24,13 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.restlet.data.MediaType;
 
 /**
  * @author Juven Xu
@@ -37,216 +39,183 @@ abstract public class AbstractNexusItemEventEntryBuilder
     extends AbstractLoggingComponent
     implements SyndEntryBuilder<NexusArtifactEvent>
 {
-    @Requirement
-    private Nexus nexus;
+  @Requirement
+  private Nexus nexus;
 
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
+  @Requirement
+  private RepositoryRegistry repositoryRegistry;
 
-    protected Nexus getNexus()
-    {
-        return nexus;
+  protected Nexus getNexus() {
+    return nexus;
+  }
+
+  protected RepositoryRegistry getRepositoryRegistry() {
+    return repositoryRegistry;
+  }
+
+  public SyndEntry buildEntry(NexusArtifactEvent event) {
+    SyndEntry entry = new SyndEntryImpl();
+
+    entry.setTitle(buildTitle(event));
+
+    entry.setLink(buildLink(event));
+
+    entry.setPublishedDate(buildPublishDate(event));
+
+    entry.setAuthor(buildAuthor(event));
+
+    entry.setDescription(buildDescription(event));
+
+    return entry;
+  }
+
+  // better to override to provide more detailed information
+  protected String buildTitle(NexusArtifactEvent event) {
+    return event.getAction();
+  }
+
+  protected String buildLink(NexusArtifactEvent event) {
+    return "content/repositories/" + event.getNexusItemInfo().getRepositoryId()
+        + event.getNexusItemInfo().getPath();
+  }
+
+  protected Date buildPublishDate(NexusArtifactEvent event) {
+    return event.getEventDate();
+  }
+
+  protected String buildAuthor(NexusArtifactEvent event) {
+    if (event.getEventContext().containsKey(AccessManager.REQUEST_USER)) {
+      return (String) event.getEventContext().get(AccessManager.REQUEST_USER);
+    }
+    else {
+      return null;
+    }
+  }
+
+  protected SyndContent buildDescription(NexusArtifactEvent event) {
+    SyndContent content = new SyndContentImpl();
+
+    content.setType(MediaType.TEXT_PLAIN.toString());
+
+    StringBuilder msg = new StringBuilder();
+
+    if (event.getMessage() != null) {
+      msg.append(event.getMessage());
+      msg.append(' ');
     }
 
-    protected RepositoryRegistry getRepositoryRegistry()
-    {
-        return repositoryRegistry;
+    msg.append(buildDescriptionMsgItem(event));
+
+    msg.append(buildDescriptionMsgAction(event));
+
+    msg.append(buildDescriptionMsgAuthor(event));
+
+    msg.append(buildDescriptionMsgAddress(event));
+
+    content.setValue(msg.toString());
+
+    return content;
+  }
+
+  protected String getRepositoryName(NexusArtifactEvent event) {
+    String repoId = event.getNexusItemInfo().getRepositoryId();
+
+    try {
+      Repository repository = getRepositoryRegistry().getRepository(repoId);
+
+      return repository.getName();
+    }
+    catch (NoSuchRepositoryException e) {
+      // that's fine, no need to yell, old timeline entries might correspond to long-time removed reposes
+      return repoId;
+    }
+  }
+
+  abstract protected String buildDescriptionMsgItem(NexusArtifactEvent event);
+
+  protected String buildDescriptionMsgAction(NexusArtifactEvent event) {
+    StringBuilder msg = new StringBuilder(" was ");
+
+    if (NexusArtifactEvent.ACTION_CACHED.equals(event.getAction())) {
+      msg.append("cached from remote URL ").append(event.getNexusItemInfo().getRemoteUrl()).append(".");
+    }
+    else if (NexusArtifactEvent.ACTION_DEPLOYED.equals(event.getAction())) {
+      msg.append("deployed.");
+
+    }
+    else if (NexusArtifactEvent.ACTION_DELETED.equals(event.getAction())) {
+      msg.append("deleted.");
+    }
+    else if (NexusArtifactEvent.ACTION_RETRIEVED.equals(event.getAction())) {
+      msg.append("served downstream.");
+    }
+    else if (NexusArtifactEvent.ACTION_BROKEN.equals(event.getAction())) {
+      msg.append("broken.");
+
+      if (event.getMessage() != null) {
+        msg.append(" Details: \n");
+
+        msg.append(event.getMessage());
+
+        msg.append("\n");
+      }
+    }
+    else if (NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM.equals(event.getAction())) {
+      msg.append("proxied, and the remote repository contains wrong checksum for it.");
+
+      if (event.getMessage() != null) {
+        msg.append(" Details: \n");
+
+        msg.append(event.getMessage());
+
+        msg.append("\n");
+      }
     }
 
-    public SyndEntry buildEntry( NexusArtifactEvent event )
-    {
-        SyndEntry entry = new SyndEntryImpl();
+    return msg.toString();
+  }
 
-        entry.setTitle( buildTitle( event ) );
+  protected String buildDescriptionMsgAuthor(NexusArtifactEvent event) {
+    final String author = buildAuthor(event);
 
-        entry.setLink( buildLink( event ) );
+    if (author != null) {
+      return "Action was initiated by user \"" + author + "\".\n";
 
-        entry.setPublishedDate( buildPublishDate( event ) );
-
-        entry.setAuthor( buildAuthor( event ) );
-
-        entry.setDescription( buildDescription( event ) );
-
-        return entry;
     }
+    return "";
+  }
 
-    // better to override to provide more detailed information
-    protected String buildTitle( NexusArtifactEvent event )
-    {
-        return event.getAction();
+  protected String buildDescriptionMsgAddress(NexusArtifactEvent event) {
+    if (event.getEventContext().containsKey(AccessManager.REQUEST_REMOTE_ADDRESS)) {
+      return "Request originated from IP address "
+          + (String) event.getEventContext().get(AccessManager.REQUEST_REMOTE_ADDRESS) + ".\n";
     }
+    return "";
+  }
 
-    protected String buildLink( NexusArtifactEvent event )
-    {
-        return "content/repositories/" + event.getNexusItemInfo().getRepositoryId()
-            + event.getNexusItemInfo().getPath();
+  protected Gav buildGAV(final NexusArtifactEvent event) {
+    if (event.getNexusItemInfo() == null) {
+      return null;
     }
+    try {
+      final Repository repo = getRepositoryRegistry().getRepository(event.getNexusItemInfo().getRepositoryId());
 
-    protected Date buildPublishDate( NexusArtifactEvent event )
-    {
-        return event.getEventDate();
+      if (MavenRepository.class.isAssignableFrom(repo.getClass())) {
+        return ((MavenRepository) repo).getGavCalculator().pathToGav(event.getNexusItemInfo().getPath());
+      }
+
+      return null;
     }
+    catch (NoSuchRepositoryException e) {
+      getLogger().debug(
+          "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
+          e);
 
-    protected String buildAuthor( NexusArtifactEvent event )
-    {
-        if ( event.getEventContext().containsKey( AccessManager.REQUEST_USER ) )
-        {
-            return (String) event.getEventContext().get( AccessManager.REQUEST_USER );
-        }
-        else
-        {
-            return null;
-        }
+      return null;
     }
+  }
 
-    protected SyndContent buildDescription( NexusArtifactEvent event )
-    {
-        SyndContent content = new SyndContentImpl();
-
-        content.setType( MediaType.TEXT_PLAIN.toString() );
-
-        StringBuilder msg = new StringBuilder();
-
-        if ( event.getMessage() != null )
-        {
-            msg.append( event.getMessage() );
-            msg.append( ' ' );
-        }
-
-        msg.append( buildDescriptionMsgItem( event ) );
-
-        msg.append( buildDescriptionMsgAction( event ) );
-
-        msg.append( buildDescriptionMsgAuthor( event ) );
-
-        msg.append( buildDescriptionMsgAddress( event ) );
-
-        content.setValue( msg.toString() );
-
-        return content;
-    }
-
-    protected String getRepositoryName( NexusArtifactEvent event )
-    {
-        String repoId = event.getNexusItemInfo().getRepositoryId();
-
-        try
-        {
-            Repository repository = getRepositoryRegistry().getRepository( repoId );
-
-            return repository.getName();
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // that's fine, no need to yell, old timeline entries might correspond to long-time removed reposes
-            return repoId;
-        }
-    }
-
-    abstract protected String buildDescriptionMsgItem( NexusArtifactEvent event );
-
-    protected String buildDescriptionMsgAction( NexusArtifactEvent event )
-    {
-        StringBuilder msg = new StringBuilder( " was " );
-
-        if ( NexusArtifactEvent.ACTION_CACHED.equals( event.getAction() ) )
-        {
-            msg.append( "cached from remote URL " ).append( event.getNexusItemInfo().getRemoteUrl() ).append( "." );
-        }
-        else if ( NexusArtifactEvent.ACTION_DEPLOYED.equals( event.getAction() ) )
-        {
-            msg.append( "deployed." );
-
-        }
-        else if ( NexusArtifactEvent.ACTION_DELETED.equals( event.getAction() ) )
-        {
-            msg.append( "deleted." );
-        }
-        else if ( NexusArtifactEvent.ACTION_RETRIEVED.equals( event.getAction() ) )
-        {
-            msg.append( "served downstream." );
-        }
-        else if ( NexusArtifactEvent.ACTION_BROKEN.equals( event.getAction() ) )
-        {
-            msg.append( "broken." );
-
-            if ( event.getMessage() != null )
-            {
-                msg.append( " Details: \n" );
-
-                msg.append( event.getMessage() );
-
-                msg.append( "\n" );
-            }
-        }
-        else if ( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM.equals( event.getAction() ) )
-        {
-            msg.append( "proxied, and the remote repository contains wrong checksum for it." );
-
-            if ( event.getMessage() != null )
-            {
-                msg.append( " Details: \n" );
-
-                msg.append( event.getMessage() );
-
-                msg.append( "\n" );
-            }
-        }
-
-        return msg.toString();
-    }
-
-    protected String buildDescriptionMsgAuthor( NexusArtifactEvent event )
-    {
-        final String author = buildAuthor( event );
-
-        if ( author != null )
-        {
-            return "Action was initiated by user \"" + author + "\".\n";
-
-        }
-        return "";
-    }
-
-    protected String buildDescriptionMsgAddress( NexusArtifactEvent event )
-    {
-        if ( event.getEventContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
-        {
-            return "Request originated from IP address "
-                + (String) event.getEventContext().get( AccessManager.REQUEST_REMOTE_ADDRESS ) + ".\n";
-        }
-        return "";
-    }
-
-    protected Gav buildGAV( final NexusArtifactEvent event )
-    {
-        if ( event.getNexusItemInfo() == null )
-        {
-            return null;
-        }
-        try
-        {
-            final Repository repo = getRepositoryRegistry().getRepository( event.getNexusItemInfo().getRepositoryId() );
-
-            if ( MavenRepository.class.isAssignableFrom( repo.getClass() ) )
-            {
-                return ( (MavenRepository) repo ).getGavCalculator().pathToGav( event.getNexusItemInfo().getPath() );
-            }
-
-            return null;
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().debug(
-                "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
-                e );
-
-            return null;
-        }
-    }
-
-    public boolean shouldBuildEntry( NexusArtifactEvent event )
-    {
-        return true;
-    }
+  public boolean shouldBuildEntry(NexusArtifactEvent event) {
+    return true;
+  }
 }

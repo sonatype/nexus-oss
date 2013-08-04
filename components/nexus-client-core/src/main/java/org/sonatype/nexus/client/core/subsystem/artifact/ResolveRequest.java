@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.artifact;
 
 import org.sonatype.nexus.client.internal.util.Check;
@@ -22,81 +23,72 @@ import org.sonatype.nexus.client.internal.util.Check;
 public class ResolveRequest
 {
 
-    public static final String VERSION_LATEST = "LATEST";
+  public static final String VERSION_LATEST = "LATEST";
 
-    public static final String VERSION_RELEASE = "RELEASE";
+  public static final String VERSION_RELEASE = "RELEASE";
 
-    private final String repositoryId; // mandatory
+  private final String repositoryId; // mandatory
 
-    private final String groupId; // mandatory
+  private final String groupId; // mandatory
 
-    private final String artifactId; // mandatory
+  private final String artifactId; // mandatory
 
-    private final String version; // mandatory
+  private final String version; // mandatory
 
-    private final String packaging;
+  private final String packaging;
 
-    private final String classifier;
+  private final String classifier;
 
-    private final String extension;
+  private final String extension;
 
-    private final Boolean isLocal;
+  private final Boolean isLocal;
 
-    public ResolveRequest( String repositoryId, String groupId, String artifactId, String version )
-    {
-        this( repositoryId, groupId, artifactId, version, null, null, null, null );
-    }
+  public ResolveRequest(String repositoryId, String groupId, String artifactId, String version) {
+    this(repositoryId, groupId, artifactId, version, null, null, null, null);
+  }
 
-    public ResolveRequest( String repositoryId, String groupId, String artifactId, String version, String packaging,
-                           String classifier, String extension, Boolean isLocal )
-    {
-        this.repositoryId = Check.notBlank( repositoryId, "repositoryId" );
-        this.groupId = Check.notBlank( groupId, "groupId" );
-        this.artifactId = Check.notBlank( artifactId, "artifactId" );
-        this.version = Check.notBlank( version, "version" );
-        this.packaging = packaging;
-        this.classifier = classifier;
-        this.extension = extension;
-        this.isLocal = isLocal;
-    }
+  public ResolveRequest(String repositoryId, String groupId, String artifactId, String version, String packaging,
+                        String classifier, String extension, Boolean isLocal)
+  {
+    this.repositoryId = Check.notBlank(repositoryId, "repositoryId");
+    this.groupId = Check.notBlank(groupId, "groupId");
+    this.artifactId = Check.notBlank(artifactId, "artifactId");
+    this.version = Check.notBlank(version, "version");
+    this.packaging = packaging;
+    this.classifier = classifier;
+    this.extension = extension;
+    this.isLocal = isLocal;
+  }
 
-    public String getGroupId()
-    {
-        return groupId;
-    }
+  public String getGroupId() {
+    return groupId;
+  }
 
-    public String getArtifactId()
-    {
-        return artifactId;
-    }
+  public String getArtifactId() {
+    return artifactId;
+  }
 
-    public String getVersion()
-    {
-        return version;
-    }
+  public String getVersion() {
+    return version;
+  }
 
-    public String getPackaging()
-    {
-        return packaging;
-    }
+  public String getPackaging() {
+    return packaging;
+  }
 
-    public String getClassifier()
-    {
-        return classifier;
-    }
+  public String getClassifier() {
+    return classifier;
+  }
 
-    public String getRepositoryId()
-    {
-        return repositoryId;
-    }
+  public String getRepositoryId() {
+    return repositoryId;
+  }
 
-    public String getExtension()
-    {
-        return extension;
-    }
+  public String getExtension() {
+    return extension;
+  }
 
-    public Boolean getIsLocal()
-    {
-        return isLocal;
-    }
+  public Boolean getIsLocal() {
+    return isLocal;
+  }
 }

@@ -10,81 +10,81 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application.source;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.Test;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
+
+import org.junit.Test;
 
 public class StaticConfigurationSourceTest
     extends AbstractApplicationConfigurationSourceTest
 {
 
-    @Override
-    protected ApplicationConfigurationSource getConfigurationSource()
-        throws Exception
-    {
-        return lookup( ApplicationConfigurationSource.class, "static" );
+  @Override
+  protected ApplicationConfigurationSource getConfigurationSource()
+      throws Exception
+  {
+    return lookup(ApplicationConfigurationSource.class, "static");
+  }
+
+  @Override
+  protected InputStream getOriginatingConfigurationInputStream()
+      throws IOException
+  {
+    return getClass().getResourceAsStream("/META-INF/nexus/nexus.xml");
+  }
+
+  @Test
+  public void testStoreConfiguration()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
+
+    configurationSource.loadConfiguration();
+
+    try {
+      configurationSource.storeConfiguration();
+
+      fail();
     }
-
-    @Override
-    protected InputStream getOriginatingConfigurationInputStream()
-        throws IOException
-    {
-        return getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
+    catch (UnsupportedOperationException e) {
+      // good
     }
+  }
 
-    @Test
-    public void testStoreConfiguration()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  @Test
+  public void testIsConfigurationUpgraded()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        configurationSource.loadConfiguration();
+    configurationSource.loadConfiguration();
 
-        try
-        {
-            configurationSource.storeConfiguration();
+    assertEquals(false, configurationSource.isConfigurationUpgraded());
+  }
 
-            fail();
-        }
-        catch ( UnsupportedOperationException e )
-        {
-            // good
-        }
-    }
+  @Test
+  public void testIsConfigurationDefaulted()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-    @Test
-    public void testIsConfigurationUpgraded()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+    configurationSource.loadConfiguration();
 
-        configurationSource.loadConfiguration();
+    assertEquals(false, configurationSource.isConfigurationDefaulted());
+  }
 
-        assertEquals( false, configurationSource.isConfigurationUpgraded() );
-    }
+  @Test
+  public void testGetDefaultsSource()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-    @Test
-    public void testIsConfigurationDefaulted()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
-
-        configurationSource.loadConfiguration();
-
-        assertEquals( false, configurationSource.isConfigurationDefaulted() );
-    }
-
-    @Test
-    public void testGetDefaultsSource()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
-
-        assertEquals( null, configurationSource.getDefaultsSource() );
-    }
+    assertEquals(null, configurationSource.getDefaultsSource());
+  }
 
 }

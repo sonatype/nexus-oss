@@ -10,36 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
+
+import org.sonatype.nexus.plugins.rest.StaticResource;
 
 import org.restlet.Context;
 import org.restlet.Finder;
 import org.restlet.Handler;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.nexus.plugins.rest.StaticResource;
 
 public class StaticResourceFinder
     extends Finder
 {
-    private final Context context;
+  private final Context context;
 
-    private final StaticResource resource;
+  private final StaticResource resource;
 
-    public StaticResourceFinder( Context context, StaticResource resource )
-    {
-        this.context = context;
+  public StaticResourceFinder(Context context, StaticResource resource) {
+    this.context = context;
 
-        this.resource = resource;
-    }
+    this.resource = resource;
+  }
 
-    public Handler createTarget( Request request, Response response )
-    {
-        StaticHeaderUtil.addResponseHeaders( response );
-        
-        StaticResourceResource resourceResource = new StaticResourceResource( context, request, response, resource );
+  public Handler createTarget(Request request, Response response) {
+    StaticHeaderUtil.addResponseHeaders(response);
 
-        return resourceResource;
-    }
+    StaticResourceResource resourceResource = new StaticResourceResource(context, request, response, resource);
+
+    return resourceResource;
+  }
 
 }

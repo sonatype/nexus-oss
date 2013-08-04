@@ -10,34 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.tools;
 
 public class InvalidLdapConfigurationException
     extends RuntimeException
 {
 
-    /**
-     * Generated serial version UID.
-     */
-    private static final long serialVersionUID = 4559396496795216079L;
+  /**
+   * Generated serial version UID.
+   */
+  private static final long serialVersionUID = 4559396496795216079L;
 
-    public InvalidLdapConfigurationException()
-    {
-    }
+  public InvalidLdapConfigurationException() {
+  }
 
-    public InvalidLdapConfigurationException( String message )
-    {
-        super( message );
-    }
+  public InvalidLdapConfigurationException(String message) {
+    super(message);
+  }
 
-    public InvalidLdapConfigurationException( Throwable cause )
-    {
-        super( cause );
-    }
+  public InvalidLdapConfigurationException(Throwable cause) {
+    super(cause);
+  }
 
-    public InvalidLdapConfigurationException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+  public InvalidLdapConfigurationException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

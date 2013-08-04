@@ -10,13 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.capabilities;
+package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
 import java.util.Collection;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -30,9 +29,12 @@ import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
+
 import com.google.common.base.Predicate;
-import com.google.inject.ProvidedBy;
 import com.google.inject.assistedinject.Assisted;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.capabilities;
 
 /**
  * A {@link Validator} that ensures that only one capability of specified type and set of properties can be created.
@@ -45,118 +47,104 @@ public class PrimaryKeyValidator
     implements Validator
 {
 
-    private final CapabilityRegistry capabilityRegistry;
+  private final CapabilityRegistry capabilityRegistry;
 
-    private final CapabilityIdentity excludeId;
+  private final CapabilityIdentity excludeId;
 
-    private final String[] propertyKeys;
+  private final String[] propertyKeys;
 
-    @Inject
-    PrimaryKeyValidator( final CapabilityRegistry capabilityRegistry,
-                         final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
-                         final @Assisted CapabilityType type,
-                         final @Assisted String... propertyKeys )
-    {
-        super( capabilityDescriptorRegistryProvider, type );
-        this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.excludeId = null;
-        this.propertyKeys = propertyKeys;
+  @Inject
+  PrimaryKeyValidator(final CapabilityRegistry capabilityRegistry,
+                      final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
+                      final @Assisted CapabilityType type,
+                      final @Assisted String... propertyKeys)
+  {
+    super(capabilityDescriptorRegistryProvider, type);
+    this.capabilityRegistry = checkNotNull(capabilityRegistry);
+    this.excludeId = null;
+    this.propertyKeys = propertyKeys;
+  }
+
+  PrimaryKeyValidator(final CapabilityRegistry capabilityRegistry,
+                      final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
+                      final CapabilityIdentity excludeId,
+                      final CapabilityType type,
+                      final String... propertyKeys)
+  {
+    super(capabilityDescriptorRegistryProvider, type);
+    this.capabilityRegistry = checkNotNull(capabilityRegistry);
+    this.excludeId = checkNotNull(excludeId);
+    this.propertyKeys = propertyKeys;
+  }
+
+  @Override
+  public ValidationResult validate(final Map<String, String> properties) {
+    final Collection<? extends CapabilityReference> references = capabilityRegistry.get(
+        buildFilter(properties)
+    );
+    if (references == null
+        || references.isEmpty()
+        || (references.size() == 1 && references.iterator().next().context().id().equals(excludeId))) {
+      return ValidationResult.VALID;
     }
+    return new DefaultValidationResult().add(buildMessage(properties));
+  }
 
-    PrimaryKeyValidator( final CapabilityRegistry capabilityRegistry,
-                         final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
-                         final CapabilityIdentity excludeId,
-                         final CapabilityType type,
-                         final String... propertyKeys )
-    {
-        super( capabilityDescriptorRegistryProvider, type );
-        this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.excludeId = checkNotNull( excludeId );
-        this.propertyKeys = propertyKeys;
+  @Override
+  public String explainValid() {
+    final StringBuilder message = new StringBuilder()
+        .append("Only one capability with type '").append(typeName()).append("'");
+
+    if (propertyKeys != null) {
+      for (final String key : propertyKeys) {
+        message.append(", same ").append(propertyName(key).toLowerCase());
+      }
     }
+    message.append(" exists");
 
-    @Override
-    public ValidationResult validate( final Map<String, String> properties )
-    {
-        final Collection<? extends CapabilityReference> references = capabilityRegistry.get(
-            buildFilter( properties )
-        );
-        if ( references == null
-            || references.isEmpty()
-            || ( references.size() == 1 && references.iterator().next().context().id().equals( excludeId ) ) )
-        {
-            return ValidationResult.VALID;
-        }
-        return new DefaultValidationResult().add( buildMessage( properties ) );
+    return message.toString();
+  }
+
+  @Override
+  public String explainInvalid() {
+    final StringBuilder message = new StringBuilder()
+        .append("More then one capability with type '").append(typeName()).append("'");
+
+    if (propertyKeys != null) {
+      for (final String key : propertyKeys) {
+        message.append(", same ").append(propertyName(key).toLowerCase());
+      }
     }
+    message.append(" exists");
 
-    @Override
-    public String explainValid()
-    {
-        final StringBuilder message = new StringBuilder()
-            .append( "Only one capability with type '" ).append( typeName() ).append( "'" );
+    return message.toString();
+  }
 
-        if ( propertyKeys != null )
-        {
-            for ( final String key : propertyKeys )
-            {
-                message.append( ", same " ).append( propertyName( key ).toLowerCase() );
-            }
-        }
-        message.append( " exists" );
+  private String buildMessage(final Map<String, String> properties) {
+    final StringBuilder message = new StringBuilder()
+        .append("Only one capability of type '").append(typeName()).append("'");
 
-        return message.toString();
+    if (properties != null) {
+      for (final String key : propertyKeys) {
+        message.append(", ").append(propertyName(key).toLowerCase()).append(" '")
+            .append(properties.get(key)).append("'");
+      }
     }
+    message.append(" can be created");
 
-    @Override
-    public String explainInvalid()
-    {
-        final StringBuilder message = new StringBuilder()
-            .append( "More then one capability with type '" ).append( typeName() ).append( "'" );
+    return message.toString();
+  }
 
-        if ( propertyKeys != null )
-        {
-            for ( final String key : propertyKeys )
-            {
-                message.append( ", same " ).append( propertyName( key ).toLowerCase() );
-            }
-        }
-        message.append( " exists" );
-
-        return message.toString();
+  private Predicate<CapabilityReference> buildFilter(final Map<String, String> properties) {
+    final CapabilityReferenceFilterBuilder.CapabilityReferenceFilter filter = capabilities().withType(
+        capabilityType()
+    );
+    if (propertyKeys != null) {
+      for (final String key : propertyKeys) {
+        filter.withProperty(key, properties.get(key));
+      }
     }
-
-    private String buildMessage( final Map<String, String> properties )
-    {
-        final StringBuilder message = new StringBuilder()
-            .append( "Only one capability of type '" ).append( typeName() ).append( "'" );
-
-        if ( properties != null )
-        {
-            for ( final String key : propertyKeys )
-            {
-                message.append( ", " ).append( propertyName( key ).toLowerCase() ).append( " '" )
-                    .append( properties.get( key ) ).append( "'" );
-            }
-        }
-        message.append( " can be created" );
-
-        return message.toString();
-    }
-
-    private Predicate<CapabilityReference> buildFilter( final Map<String, String> properties )
-    {
-        final CapabilityReferenceFilterBuilder.CapabilityReferenceFilter filter = capabilities().withType(
-            capabilityType()
-        );
-        if ( propertyKeys != null )
-        {
-            for ( final String key : propertyKeys )
-            {
-                filter.withProperty( key, properties.get( key ) );
-            }
-        }
-        return filter;
-    }
+    return filter;
+  }
 
 }

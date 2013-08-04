@@ -10,41 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.rest.users;
 
 import java.util.Set;
 
-import org.restlet.data.Request;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
+import org.restlet.data.Request;
+
 public abstract class AbstractUserSearchPlexusResource
     extends AbstractSecurityPlexusResource
 {
-    public static final String USER_SOURCE_KEY = "userSource";
+  public static final String USER_SOURCE_KEY = "userSource";
 
-    protected String getUserSource( Request request )
-    {
-        final String source = getRequestAttribute( request, USER_SOURCE_KEY );
+  protected String getUserSource(Request request) {
+    final String source = getRequestAttribute(request, USER_SOURCE_KEY);
 
-        if ( "all".equalsIgnoreCase( source ) )
-        {
-            return null;
-        }
-
-        return source;
+    if ("all".equalsIgnoreCase(source)) {
+      return null;
     }
 
-    protected PlexusUserListResourceResponse search( UserSearchCriteria criteria )
-    {
-        PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
+    return source;
+  }
 
-        Set<User> users = this.getSecuritySystem().searchUsers( criteria );
-        result.setData( this.securityToRestModel( users ) );
+  protected PlexusUserListResourceResponse search(UserSearchCriteria criteria) {
+    PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
 
-        return result;
-    }
+    Set<User> users = this.getSecuritySystem().searchUsers(criteria);
+    result.setData(this.securityToRestModel(users));
+
+    return result;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao.password;
 
 
@@ -19,12 +20,12 @@ package org.sonatype.security.ldap.dao.password;
 public interface PasswordEncoderManager
 {
 
-    public String encodePassword( String password, Object salt );
+  public String encodePassword(String password, Object salt);
 
-    public boolean isPasswordValid( String encodedPassword, String password, Object salt );
+  public boolean isPasswordValid(String encodedPassword, String password, Object salt);
 
-    public String getPreferredEncoding();
+  public String getPreferredEncoding();
 
-    public void setPreferredEncoding( String preferredEncoding );
+  public void setPreferredEncoding(String preferredEncoding);
 
 }

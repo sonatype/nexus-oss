@@ -10,15 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.apache.commons.beanutils.BeanUtils;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.Entity;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+
 import com.google.common.base.Throwables;
+import org.apache.commons.beanutils.BeanUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Jersey {@link Entity} entity support.
@@ -30,120 +32,106 @@ public abstract class JerseyEntitySupport<E extends Entity<E>, S>
     implements Entity<E>
 {
 
-    private final String id;
+  private final String id;
 
-    private final S settings;
+  private final S settings;
 
-    private boolean shouldCreate;
+  private boolean shouldCreate;
 
-    public JerseyEntitySupport( final JerseyNexusClient nexusClient,
-                                final String id )
-    {
-        super( nexusClient );
-        this.id = id;
-        this.settings = checkNotNull( createSettings( id ) );
-        this.shouldCreate = true;
+  public JerseyEntitySupport(final JerseyNexusClient nexusClient,
+                             final String id)
+  {
+    super(nexusClient);
+    this.id = id;
+    this.settings = checkNotNull(createSettings(id));
+    this.shouldCreate = true;
+  }
+
+  public JerseyEntitySupport(final JerseyNexusClient nexusClient,
+                             final String id,
+                             final S settings)
+  {
+    this(nexusClient, checkNotNull(id));
+    this.shouldCreate = false;
+    overwriteWith(settings);
+  }
+
+  @Override
+  public String id() {
+    return id;
+  }
+
+  @Override
+  public synchronized E refresh() {
+    S processed = null;
+
+    if (!shouldCreate) {
+      processed = doGet();
     }
 
-    public JerseyEntitySupport( final JerseyNexusClient nexusClient,
-                                final String id,
-                                final S settings )
-    {
-        this( nexusClient, checkNotNull( id ) );
-        this.shouldCreate = false;
-        overwriteWith( settings );
+    shouldCreate = processed == null;
+
+    overwriteWith(processed);
+
+    return me();
+  }
+
+  @Override
+  public synchronized E save() {
+    final S processed;
+    if (shouldCreate) {
+      processed = doCreate();
     }
-
-    @Override
-    public String id()
-    {
-        return id;
+    else {
+      processed = doUpdate();
     }
+    overwriteWith(processed);
+    shouldCreate = false;
+    return me();
+  }
 
-    @Override
-    public synchronized E refresh()
-    {
-        S processed = null;
+  @Override
+  public synchronized E remove() {
+    doRemove();
+    shouldCreate = true;
+    return me();
+  }
 
-        if ( !shouldCreate )
-        {
-            processed = doGet();
-        }
+  @Override
+  public String toString() {
+    return String.format("%s{id=%s}", getClass().getSimpleName(), id());
+  }
 
-        shouldCreate = processed == null;
-
-        overwriteWith( processed );
-
-        return me();
+  public void overwriteWith(final S source) {
+    try {
+      BeanUtils.copyProperties(settings(), source == null ? checkNotNull(createSettings(id)) : source);
     }
-
-    @Override
-    public synchronized E save()
-    {
-        final S processed;
-        if ( shouldCreate )
-        {
-            processed = doCreate();
-        }
-        else
-        {
-            processed = doUpdate();
-        }
-        overwriteWith( processed );
-        shouldCreate = false;
-        return me();
+    catch (final Exception e) {
+      throw Throwables.propagate(e);
     }
+  }
 
-    @Override
-    public synchronized E remove()
-    {
-        doRemove();
-        shouldCreate = true;
-        return me();
-    }
+  protected S settings() {
+    return settings;
+  }
 
-    @Override
-    public String toString()
-    {
-        return String.format( "%s{id=%s}", getClass().getSimpleName(), id() );
-    }
+  protected boolean shouldCreate() {
+    return shouldCreate;
+  }
 
-    public void overwriteWith( final S source )
-    {
-        try
-        {
-            BeanUtils.copyProperties( settings(), source == null ? checkNotNull( createSettings( id ) ) : source );
-        }
-        catch ( final Exception e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
+  @SuppressWarnings("unchecked")
+  private E me() {
+    return (E) this;
+  }
 
-    protected S settings()
-    {
-        return settings;
-    }
+  protected abstract S createSettings(final String id);
 
-    protected boolean shouldCreate()
-    {
-        return shouldCreate;
-    }
+  protected abstract S doGet();
 
-    @SuppressWarnings( "unchecked" )
-    private E me()
-    {
-        return (E) this;
-    }
+  protected abstract S doCreate();
 
-    protected abstract S createSettings( final String id );
+  protected abstract S doUpdate();
 
-    protected abstract S doGet();
-
-    protected abstract S doCreate();
-
-    protected abstract S doUpdate();
-
-    protected abstract void doRemove();
+  protected abstract void doRemove();
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
 
 import java.io.IOException;
@@ -17,79 +18,76 @@ import java.io.InputStream;
 
 /**
  * This class is a helper to do some stream wrapping easier.
- * 
+ *
  * @author cstamas
  * @since 1.4.0
  */
 public abstract class WrappingInputStream
     extends InputStream
 {
-    private final InputStream wrappedStream;
+  private final InputStream wrappedStream;
 
-    public WrappingInputStream( InputStream wrappedStream )
-    {
-        super();
+  public WrappingInputStream(InputStream wrappedStream) {
+    super();
 
-        this.wrappedStream = wrappedStream;
-    }
-    
-    protected InputStream getWrappedInputStream()
-    {
-        return wrappedStream;
-    }
+    this.wrappedStream = wrappedStream;
+  }
 
-    @Override
-    public int read()
-        throws IOException
-    {
-        return getWrappedInputStream().read();
-    }
+  protected InputStream getWrappedInputStream() {
+    return wrappedStream;
+  }
 
-    @Override
-    public int read( byte b[] )
-        throws IOException
-    {
-        return getWrappedInputStream().read( b );
-    }
+  @Override
+  public int read()
+      throws IOException
+  {
+    return getWrappedInputStream().read();
+  }
 
-    @Override
-    public int read( byte b[], int off, int len )
-        throws IOException
-    {
-        return getWrappedInputStream().read( b, off, len );
-    }
+  @Override
+  public int read(byte b[])
+      throws IOException
+  {
+    return getWrappedInputStream().read(b);
+  }
 
-    @Override
-    public long skip( long n )
-        throws IOException
-    {
-        return getWrappedInputStream().skip( n );
-    }
+  @Override
+  public int read(byte b[], int off, int len)
+      throws IOException
+  {
+    return getWrappedInputStream().read(b, off, len);
+  }
 
-    @Override
-    public int available()
-        throws IOException
-    {
-        return getWrappedInputStream().available();
-    }
+  @Override
+  public long skip(long n)
+      throws IOException
+  {
+    return getWrappedInputStream().skip(n);
+  }
 
-    @Override
-    public synchronized void mark( int readlimit )
-    {
-        getWrappedInputStream().mark( readlimit );
-    }
+  @Override
+  public int available()
+      throws IOException
+  {
+    return getWrappedInputStream().available();
+  }
 
-    @Override
-    public synchronized void reset()
-        throws IOException
-    {
-        getWrappedInputStream().reset();
-    }
+  @Override
+  public synchronized void mark(int readlimit) {
+    getWrappedInputStream().mark(readlimit);
+  }
 
-    @Override
-    public void close()
-        throws IOException
-    {
-        getWrappedInputStream().close();
-    }
+  @Override
+  public synchronized void reset()
+      throws IOException
+  {
+    getWrappedInputStream().reset();
+  }
+
+  @Override
+  public void close()
+      throws IOException
+  {
+    getWrappedInputStream().close();
+  }
 }

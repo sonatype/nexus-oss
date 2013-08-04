@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus4268;
 
 import java.io.IOException;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 
 /**
  * This test tests NEXUS-4268 and Nexus' capability to route properly repository types contributed by plugins, hence
@@ -29,55 +31,51 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
  * "simple" defined. We test it's reachability over {@code /content/repositories/simple} but also
  * {@code /contenet/simply/simple} since the new repository type defines "simply" as path prefix (the
  * {@code repositories} path prefix is reserved for ALL repositories (by design).
- * 
+ *
  * @author cstamas
  */
 public class Nexus4268NewPluginContributedRepositoryTypeRoutingIT
     extends AbstractNexusIntegrationTest
 {
-    @Test
-    public void testRepositoriesPath()
-        throws IOException
-    {
-        // note the ending slash! We query the repo root, and slash is there to
-        // avoid redirect
-        Response response = null;
+  @Test
+  public void testRepositoriesPath()
+      throws IOException
+  {
+    // note the ending slash! We query the repo root, and slash is there to
+    // avoid redirect
+    Response response = null;
 
-        try
-        {
-            final String servicePath = "content/repositories/simple/";
+    try {
+      final String servicePath = "content/repositories/simple/";
 
-            response = RequestFacade.sendMessage( servicePath, Method.GET );
+      response = RequestFacade.sendMessage(servicePath, Method.GET);
 
-            Assert.assertEquals( "Repository should be accessible over "
-                + servicePath, response.getStatus().getCode(), 200 );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+      Assert.assertEquals("Repository should be accessible over "
+          + servicePath, response.getStatus().getCode(), 200);
     }
-
-    @Test
-    public void testPathPrefixPath()
-        throws IOException
-    {
-        // note the ending slash! We query the repo root, and slash is there to
-        // avoid redirect
-        Response response = null;
-
-        try
-        {
-            final String servicePath = "content/simply/simple/";
-
-            response = RequestFacade.sendMessage( servicePath, Method.GET );
-
-            Assert.assertEquals( "Repository should be accessible over "
-                + servicePath, response.getStatus().getCode(), 200 );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+    finally {
+      RequestFacade.releaseResponse(response);
     }
+  }
+
+  @Test
+  public void testPathPrefixPath()
+      throws IOException
+  {
+    // note the ending slash! We query the repo root, and slash is there to
+    // avoid redirect
+    Response response = null;
+
+    try {
+      final String servicePath = "content/simply/simple/";
+
+      response = RequestFacade.sendMessage(servicePath, Method.GET);
+
+      Assert.assertEquals("Repository should be accessible over "
+          + servicePath, response.getStatus().getCode(), 200);
+    }
+    finally {
+      RequestFacade.releaseResponse(response);
+    }
+  }
 }

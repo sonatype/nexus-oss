@@ -10,24 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.plugin.nxcm2124;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
+package org.sonatype.nexus.testsuite.plugin.nxcm2124;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
+import org.sonatype.nexus.testsuite.plugin.nexus2810.AbstractPluginConsoleIT;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.testsuite.plugin.nexus2810.AbstractPluginConsoleIT;
-import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 
 /**
  * Originally, this IT was as it's name says, simply check for presence
@@ -38,33 +40,31 @@ import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 public class NXCM2124CheckConsoleDocumentationIT
     extends AbstractPluginConsoleIT
 {
-    @Test
-    public void checkDoc()
-        throws IOException
-    {
-        String pluginName = "Nexus Core API (Restlet 1.x Plugin)";
+  @Test
+  public void checkDoc()
+      throws IOException
+  {
+    String pluginName = "Nexus Core API (Restlet 1.x Plugin)";
 
-        List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
+    List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
-        assertThat( getPluginsNames( pluginInfos ), hasItem( pluginName ) );
+    assertThat(getPluginsNames(pluginInfos), hasItem(pluginName));
 
-        PluginInfoDTO pluginConsolePlugin =
-            this.getPluginInfoByName( pluginInfos, pluginName );
-        Assert.assertNotNull( pluginConsolePlugin.getDocumentation() );
-        Assert.assertFalse( pluginConsolePlugin.getDocumentation().isEmpty() );
+    PluginInfoDTO pluginConsolePlugin =
+        this.getPluginInfoByName(pluginInfos, pluginName);
+    Assert.assertNotNull(pluginConsolePlugin.getDocumentation());
+    Assert.assertFalse(pluginConsolePlugin.getDocumentation().isEmpty());
 
-        String url = pluginConsolePlugin.getDocumentation().get( 0 ).getUrl();
-        Response r = null;
+    String url = pluginConsolePlugin.getDocumentation().get(0).getUrl();
+    Response r = null;
 
-        try
-        {
-            r = RequestFacade.sendMessage( new URL( url ), Method.GET, null );
-            Status status = r.getStatus();
-            assertThat( status, isSuccess() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( r );
-        }
+    try {
+      r = RequestFacade.sendMessage(new URL(url), Method.GET, null);
+      Status status = r.getStatus();
+      assertThat(status, isSuccess());
     }
+    finally {
+      RequestFacade.releaseResponse(r);
+    }
+  }
 }

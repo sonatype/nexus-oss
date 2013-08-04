@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.targets.Target;
@@ -18,29 +19,26 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * The target registry events superclass.
- * 
+ *
  * @author velo
  */
 public abstract class TargetRegistryEvent
     extends AbstractEvent<TargetRegistry>
 {
 
-    private final Target target;
+  private final Target target;
 
-    public Target getTarget()
-    {
-        return target;
-    }
+  public Target getTarget() {
+    return target;
+  }
 
-    public TargetRegistryEvent( final TargetRegistry targetRegistry, final Target target )
-    {
-        super( targetRegistry );
-        this.target = target;
-    }
+  public TargetRegistryEvent(final TargetRegistry targetRegistry, final Target target) {
+    super(targetRegistry);
+    this.target = target;
+  }
 
-    public TargetRegistry getTargetRegistry()
-    {
-        return getEventSender();
-    }
+  public TargetRegistry getTargetRegistry() {
+    return getEventSender();
+  }
 
 }

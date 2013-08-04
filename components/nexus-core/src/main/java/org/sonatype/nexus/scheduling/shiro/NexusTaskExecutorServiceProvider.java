@@ -10,46 +10,47 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling.shiro;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.threads.FakeAlmightySubject;
 import org.sonatype.nexus.threads.NexusScheduledExecutorService;
 import org.sonatype.scheduling.TaskExecutorProvider;
 import org.sonatype.scheduling.ThreadFactoryImpl;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * {@link TaskExecutorProvider} implementation that provides Shiro specific
- * {@link org.sonatype.nexus.threads.NexusScheduledExecutorService} implementation task executors, to make scheduled task share a valid
+ * {@link org.sonatype.nexus.threads.NexusScheduledExecutorService} implementation task executors, to make scheduled
+ * task share a valid
  * subject.
- * 
+ *
  * @author cstamas
  * @since 2.6
  */
-@Component( role = TaskExecutorProvider.class )
+@Component(role = TaskExecutorProvider.class)
 public class NexusTaskExecutorServiceProvider
     implements TaskExecutorProvider
 {
-    private final NexusScheduledExecutorService shiroFixedSubjectScheduledExecutorService;
+  private final NexusScheduledExecutorService shiroFixedSubjectScheduledExecutorService;
 
-    public NexusTaskExecutorServiceProvider()
-    {
-        final ScheduledThreadPoolExecutor target =
-            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
-                Thread.MIN_PRIORITY ) );
-        target.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
-        target.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
-        shiroFixedSubjectScheduledExecutorService =
-            NexusScheduledExecutorService.forFixedSubject( target, FakeAlmightySubject.TASK_SUBJECT );
-    }
+  public NexusTaskExecutorServiceProvider() {
+    final ScheduledThreadPoolExecutor target =
+        (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(20, new ThreadFactoryImpl(
+            Thread.MIN_PRIORITY));
+    target.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+    target.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+    shiroFixedSubjectScheduledExecutorService =
+        NexusScheduledExecutorService.forFixedSubject(target, FakeAlmightySubject.TASK_SUBJECT);
+  }
 
-    @Override
-    public ScheduledExecutorService getTaskExecutor()
-    {
-        return shiroFixedSubjectScheduledExecutorService;
-    }
+  @Override
+  public ScheduledExecutorService getTaskExecutor() {
+    return shiroFixedSubjectScheduledExecutorService;
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.lvo.config;
 
 import java.io.IOException;
@@ -20,22 +21,22 @@ import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 
 public interface LvoPluginConfiguration
 {
-    CLvoKey getLvoKey( String key )
-        throws NoSuchKeyException;
+  CLvoKey getLvoKey(String key)
+      throws NoSuchKeyException;
 
-    boolean isEnabled();
+  boolean isEnabled();
 
-    /**
-     * Disable the plugin from going remote and checking for new version
-     */
-    void disable()
-        throws ConfigurationException,
-            IOException;
+  /**
+   * Disable the plugin from going remote and checking for new version
+   */
+  void disable()
+      throws ConfigurationException,
+             IOException;
 
-    /**
-     * Enable the remote check for new versions
-     */
-    void enable()
-        throws ConfigurationException,
-            IOException;
+  /**
+   * Enable the remote check for new versions
+   */
+  void enable()
+      throws ConfigurationException,
+             IOException;
 }

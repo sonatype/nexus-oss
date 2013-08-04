@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting.bundle;
 
 import java.io.File;
@@ -18,14 +19,13 @@ import java.io.FileFilter;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.swizzle.IssueSubmissionException;
-import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.FileBundle;
+
+import org.codehaus.plexus.swizzle.IssueSubmissionException;
+import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 
 /**
  * Provide files in the 'conf' directory for inclusion in the error report bundle.
@@ -35,49 +35,46 @@ import org.sonatype.sisu.pr.bundle.FileBundle;
  * @see SecurityConfigurationXmlAssembler
  * @see SecurityXmlAssembler
  */
-@Named( "conf-dir")
+@Named("conf-dir")
 public class ConfigFilesBundleAssembler
     implements BundleAssembler
 {
 
-    private NexusConfiguration nexusConfig;
+  private NexusConfiguration nexusConfig;
 
-    @Inject
-    public ConfigFilesBundleAssembler( final NexusConfiguration nexusConfig )
+  @Inject
+  public ConfigFilesBundleAssembler(final NexusConfiguration nexusConfig) {
+    this.nexusConfig = nexusConfig;
+  }
+
+  @Override
+  public boolean isParticipating(IssueSubmissionRequest request) {
+    return true;
+  }
+
+  @Override
+  public Bundle assemble(IssueSubmissionRequest request)
+      throws IssueSubmissionException
+  {
+    File confDir = nexusConfig.getWorkingDirectory("conf");
+
+    FileFilter filter = new FileFilter()
     {
-        this.nexusConfig = nexusConfig;
-    }
+      @Override
+      public boolean accept(File pathname) {
+        return !pathname.getName().endsWith(".bak")
+            // following files are written with the current in-memory model
+            && !pathname.getName().equals("nexus.xml")
+            && !pathname.getName().equals("security.xml")
+            && !pathname.getName().equals("security-configuration.xml")
+            // ldap plugins add this config themselves
+            && !pathname.getName().equals("ldap.xml");
+      }
+    };
 
-    @Override
-    public boolean isParticipating( IssueSubmissionRequest request )
-    {
-        return true;
-    }
-
-    @Override
-    public Bundle assemble( IssueSubmissionRequest request )
-        throws IssueSubmissionException
-    {
-        File confDir = nexusConfig.getWorkingDirectory( "conf" );
-
-        FileFilter filter = new FileFilter()
-        {
-            @Override
-            public boolean accept( File pathname )
-            {
-                return !pathname.getName().endsWith( ".bak" )
-                    // following files are written with the current in-memory model
-                    && !pathname.getName().equals( "nexus.xml" )
-                    && !pathname.getName().equals( "security.xml" )
-                    && !pathname.getName().equals( "security-configuration.xml" )
-                    // ldap plugins add this config themselves
-                    && !pathname.getName().equals( "ldap.xml" );
-            }
-        };
-
-        FileBundle bundle = new FileBundle( confDir );
-        bundle.setFilter( filter );
-        return bundle;
-    }
+    FileBundle bundle = new FileBundle(confDir);
+    bundle.setFilter(filter);
+    return bundle;
+  }
 
 }

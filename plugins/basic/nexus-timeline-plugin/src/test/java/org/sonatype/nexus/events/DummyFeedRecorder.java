@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.events;
 
 import java.util.List;
@@ -27,80 +28,71 @@ import com.google.common.base.Predicate;
 public class DummyFeedRecorder
     implements FeedRecorder
 {
-    int receivedEventCount = 0;
+  int receivedEventCount = 0;
 
-    public int getReceivedEventCount()
-    {
-        return receivedEventCount;
-    }
+  public int getReceivedEventCount() {
+    return receivedEventCount;
+  }
 
-    public void setReceivedEventCount( int receivedEventCount )
-    {
-        this.receivedEventCount = receivedEventCount;
-    }
+  public void setReceivedEventCount(int receivedEventCount) {
+    this.receivedEventCount = receivedEventCount;
+  }
 
-    @Override
-    public void addNexusArtifactEvent( final NexusArtifactEvent nae )
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public void addNexusArtifactEvent(final NexusArtifactEvent nae) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public void addSystemEvent( final String action, final String message )
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public void addSystemEvent(final String action, final String message) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
-    {
-        receivedEventCount++;
-    }
+  @Override
+  public void addAuthcAuthzEvent(AuthcAuthzEvent evt) {
+    receivedEventCount++;
+  }
 
-    @Override
-    public SystemProcess systemProcessStarted( final String action, final String message )
-    {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public SystemProcess systemProcessStarted(final String action, final String message) {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public void systemProcessFinished( final SystemProcess prc, final String finishMessage )
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public void systemProcessFinished(final SystemProcess prc, final String finishMessage) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public void systemProcessCanceled( final SystemProcess prc, final String cancelMessage )
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public void systemProcessCanceled(final SystemProcess prc, final String cancelMessage) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public void systemProcessBroken( final SystemProcess prc, final Throwable e )
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public void systemProcessBroken(final SystemProcess prc, final Throwable e) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public List<NexusArtifactEvent> getNexusArtifectEvents( final Set<String> subtypes, final Integer from,
-                                                            final Integer count,
-                                                            final Predicate<Entry> filter )
-    {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public List<NexusArtifactEvent> getNexusArtifectEvents(final Set<String> subtypes, final Integer from,
+                                                         final Integer count,
+                                                         final Predicate<Entry> filter)
+  {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public List<SystemEvent> getSystemEvents( final Set<String> subtypes, final Integer from, final Integer count,
-                                              final Predicate<Entry> filter )
-    {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public List<SystemEvent> getSystemEvents(final Set<String> subtypes, final Integer from, final Integer count,
+                                           final Predicate<Entry> filter)
+  {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public List<AuthcAuthzEvent> getAuthcAuthzEvents( final Set<String> subtypes, final Integer from,
-                                                      final Integer count,
-                                                      final Predicate<Entry> filter )
-    {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public List<AuthcAuthzEvent> getAuthcAuthzEvents(final Set<String> subtypes, final Integer from,
+                                                   final Integer count,
+                                                   final Predicate<Entry> filter)
+  {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
 }

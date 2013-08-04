@@ -10,14 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.repotargets;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.restlet.data.Request;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -26,79 +25,73 @@ import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.restlet.data.Request;
+
 public abstract class AbstractRepositoryTargetPlexusResource
     extends AbstractNexusPlexusResource
 {
-    @Requirement
-    private TargetRegistry targetRegistry;
+  @Requirement
+  private TargetRegistry targetRegistry;
 
-    @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
+  @Requirement
+  private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    protected TargetRegistry getTargetRegistry()
-    {
-        return targetRegistry;
+  protected TargetRegistry getTargetRegistry() {
+    return targetRegistry;
+  }
+
+  protected RepositoryTypeRegistry getRepositoryTypeRegistry() {
+    return repositoryTypeRegistry;
+  }
+
+  protected RepositoryTargetResource getNexusToRestResource(Target target, Request request) {
+    RepositoryTargetResource resource = new RepositoryTargetResource();
+
+    resource.setId(target.getId());
+
+    resource.setName(target.getName());
+
+    resource.setResourceURI(request.getResourceRef().getPath());
+
+    resource.setContentClass(target.getContentClass().getId());
+
+    List<String> patterns = new ArrayList<String>(target.getPatternTexts());
+
+    for (String pattern : patterns) {
+      resource.addPattern(pattern);
     }
 
-    protected RepositoryTypeRegistry getRepositoryTypeRegistry()
-    {
-        return repositoryTypeRegistry;
+    return resource;
+  }
+
+  protected Target getRestToNexusResource(RepositoryTargetResource resource)
+      throws ConfigurationException, PatternSyntaxException
+  {
+    ContentClass cc = getRepositoryTypeRegistry().getContentClasses().get(resource.getContentClass());
+
+    if (cc == null) {
+      throw new ConfigurationException("Content class with ID=\"" + resource.getContentClass()
+          + "\" does not exists!");
     }
 
-    protected RepositoryTargetResource getNexusToRestResource( Target target, Request request )
-    {
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    Target target = new Target(resource.getId(), resource.getName(), cc, resource.getPatterns());
 
-        resource.setId( target.getId() );
+    return target;
+  }
 
-        resource.setName( target.getName() );
-
-        resource.setResourceURI( request.getResourceRef().getPath() );
-
-        resource.setContentClass( target.getContentClass().getId() );
-
-        List<String> patterns = new ArrayList<String>( target.getPatternTexts() );
-
-        for ( String pattern : patterns )
-        {
-            resource.addPattern( pattern );
-        }
-
-        return resource;
+  protected boolean validate(boolean isNew, RepositoryTargetResource resource) {
+    if (isNew) {
+      if (resource.getId() == null) {
+        resource.setId(Long.toHexString(System.nanoTime()));
+      }
     }
 
-    protected Target getRestToNexusResource( RepositoryTargetResource resource )
-        throws ConfigurationException, PatternSyntaxException
-    {
-        ContentClass cc = getRepositoryTypeRegistry().getContentClasses().get( resource.getContentClass() );
-
-        if ( cc == null )
-        {
-            throw new ConfigurationException( "Content class with ID=\"" + resource.getContentClass()
-                + "\" does not exists!" );
-        }
-
-        Target target = new Target( resource.getId(), resource.getName(), cc, resource.getPatterns() );
-
-        return target;
+    if (resource.getId() == null) {
+      return false;
     }
 
-    protected boolean validate( boolean isNew, RepositoryTargetResource resource )
-    {
-        if ( isNew )
-        {
-            if ( resource.getId() == null )
-            {
-                resource.setId( Long.toHexString( System.nanoTime() ) );
-            }
-        }
-
-        if ( resource.getId() == null )
-        {
-            return false;
-        }
-        
-        return true;
-    }
+    return true;
+  }
 
 }

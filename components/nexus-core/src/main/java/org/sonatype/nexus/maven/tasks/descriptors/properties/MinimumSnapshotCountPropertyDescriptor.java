@@ -10,31 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks.descriptors.properties;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.tasks.descriptors.properties.AbstractNumberPropertyDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskPropertyDescriptor.class, hint = "MinimumSnapshotCount", instantiationStrategy = "per-lookup" )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = ScheduledTaskPropertyDescriptor.class, hint = "MinimumSnapshotCount",
+    instantiationStrategy = "per-lookup")
 public class MinimumSnapshotCountPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
-    public static final String ID = "minSnapshotsToKeep";
+  public static final String ID = "minSnapshotsToKeep";
 
-    public MinimumSnapshotCountPropertyDescriptor()
-    {
-        setHelpText( "Minimum number of snapshots to keep for one GAV." );
-        setRequired( false );
-    }
+  public MinimumSnapshotCountPropertyDescriptor() {
+    setHelpText("Minimum number of snapshots to keep for one GAV.");
+    setRequired(false);
+  }
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    public String getName()
-    {
-        return "Minimum snapshot count";
-    }
+  public String getName() {
+    return "Minimum snapshot count";
+  }
 }

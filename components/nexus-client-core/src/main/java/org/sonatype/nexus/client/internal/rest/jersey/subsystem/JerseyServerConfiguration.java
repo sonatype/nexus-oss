@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
@@ -28,47 +29,42 @@ public class JerseyServerConfiguration
     implements ServerConfiguration
 {
 
-    /**
-     * Http Proxy configuration segment.
-     * Lazy initialized on first request.
-     */
-    private RemoteProxy remoteProxy;
+  /**
+   * Http Proxy configuration segment.
+   * Lazy initialized on first request.
+   */
+  private RemoteProxy remoteProxy;
 
-    /**
-     * Rest API configuration segment.
-     * Lazy initialized on first request.
-     */
-    private RestApi restApi;
+  /**
+   * Rest API configuration segment.
+   * Lazy initialized on first request.
+   */
+  private RestApi restApi;
 
-    public JerseyServerConfiguration( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
+  public JerseyServerConfiguration(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
+
+  /**
+   * @since 2.6
+   */
+  @Override
+  public RemoteProxy remoteProxySettings() {
+    if (remoteProxy == null) {
+      remoteProxy = new JerseyRemoteProxy(getNexusClient());
     }
+    return remoteProxy;
+  }
 
-    /**
-     * @since 2.6
-     */
-    @Override
-    public RemoteProxy remoteProxySettings()
-    {
-        if ( remoteProxy == null )
-        {
-            remoteProxy = new JerseyRemoteProxy( getNexusClient() );
-        }
-        return remoteProxy;
+  /**
+   * @since 2.7
+   */
+  @Override
+  public RestApi restApi() {
+    if (restApi == null) {
+      restApi = new JerseyRestApi(getNexusClient());
     }
-
-    /**
-     * @since 2.7
-     */
-    @Override
-    public RestApi restApi()
-    {
-        if ( restApi == null )
-        {
-            restApi = new JerseyRestApi( getNexusClient() );
-        }
-        return restApi;
-    }
+    return restApi;
+  }
 
 }

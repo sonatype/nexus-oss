@@ -10,20 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
@@ -38,87 +31,94 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus.DStatus;
-import org.sonatype.nexus.proxy.maven.routing.internal.PropfileDiscoveryStatusSource;
 import org.sonatype.nexus.proxy.repository.Repository;
+
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 public class PropfileDiscoveryStatusSourceTest
     extends AbstractRoutingProxyTest
 {
-    private static final String REPO_ID = "inhouse";
+  private static final String REPO_ID = "inhouse";
 
-    @Override
-    protected EnvironmentBuilder createEnvironmentBuilder()
-        throws Exception
+  @Override
+  protected EnvironmentBuilder createEnvironmentBuilder()
+      throws Exception
+  {
+    // we need one hosted repo only, so build it
+    return new EnvironmentBuilder()
     {
-        // we need one hosted repo only, so build it
-        return new EnvironmentBuilder()
+      @Override
+      public void startService() {
+      }
+
+      @Override
+      public void stopService() {
+      }
+
+      @Override
+      public void buildEnvironment(AbstractProxyTestEnvironment env)
+          throws ConfigurationException, IOException, ComponentLookupException
+      {
+        final PlexusContainer container = env.getPlexusContainer();
+        final List<String> reposes = new ArrayList<String>();
         {
-            @Override
-            public void startService()
-            {
-            }
+          // adding one proxy
+          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          CRepository repoConf = new DefaultCRepository();
+          repoConf.setProviderRole(Repository.class.getName());
+          repoConf.setProviderHint("maven2");
+          repoConf.setId(REPO_ID);
+          repoConf.setName(REPO_ID);
+          repoConf.setNotFoundCacheActive(true);
+          repoConf.setLocalStorage(new CLocalStorage());
+          repoConf.getLocalStorage().setProvider("file");
+          repoConf.getLocalStorage().setUrl(
+              env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + REPO_ID).toURI().toURL()
+                  .toString());
+          Xpp3Dom ex = new Xpp3Dom("externalConfiguration");
+          repoConf.setExternalConfiguration(ex);
+          M2RepositoryConfiguration exConf = new M2RepositoryConfiguration(ex);
+          exConf.setRepositoryPolicy(RepositoryPolicy.RELEASE);
+          exConf.setChecksumPolicy(ChecksumPolicy.STRICT_IF_EXISTS);
+          repoConf.setRemoteStorage(new CRemoteStorage());
+          repoConf.getRemoteStorage().setProvider(
+              env.getRemoteProviderHintFactory().getDefaultHttpRoleHint());
+          repoConf.getRemoteStorage().setUrl("http://localhost:/");
+          repo.configure(repoConf);
+          // repo.setCacheManager( env.getCacheManager() );
+          reposes.add(repo.getId());
+          env.getApplicationConfiguration().getConfigurationModel().addRepository(repoConf);
+          env.getRepositoryRegistry().addRepository(repo);
+        }
+      }
+    };
+  }
 
-            @Override
-            public void stopService()
-            {
-            }
+  @Test
+  public void smoke()
+      throws Exception
+  {
+    final MavenProxyRepository mavenProxyRepository =
+        getRepositoryRegistry().getRepositoryWithFacet(REPO_ID, MavenProxyRepository.class);
 
-            @Override
-            public void buildEnvironment( AbstractProxyTestEnvironment env )
-                throws ConfigurationException, IOException, ComponentLookupException
-            {
-                final PlexusContainer container = env.getPlexusContainer();
-                final List<String> reposes = new ArrayList<String>();
-                {
-                    // adding one proxy
-                    final M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
-                    CRepository repoConf = new DefaultCRepository();
-                    repoConf.setProviderRole( Repository.class.getName() );
-                    repoConf.setProviderHint( "maven2" );
-                    repoConf.setId( REPO_ID );
-                    repoConf.setName( REPO_ID );
-                    repoConf.setNotFoundCacheActive( true );
-                    repoConf.setLocalStorage( new CLocalStorage() );
-                    repoConf.getLocalStorage().setProvider( "file" );
-                    repoConf.getLocalStorage().setUrl(
-                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + REPO_ID ).toURI().toURL().toString() );
-                    Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-                    repoConf.setExternalConfiguration( ex );
-                    M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-                    exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-                    exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-                    repoConf.setRemoteStorage( new CRemoteStorage() );
-                    repoConf.getRemoteStorage().setProvider(
-                        env.getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
-                    repoConf.getRemoteStorage().setUrl( "http://localhost:/" );
-                    repo.configure( repoConf );
-                    // repo.setCacheManager( env.getCacheManager() );
-                    reposes.add( repo.getId() );
-                    env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
-                    env.getRepositoryRegistry().addRepository( repo );
-                }
-            }
-        };
-    }
+    PropfileDiscoveryStatusSource propsSource = new PropfileDiscoveryStatusSource(mavenProxyRepository);
 
-    @Test
-    public void smoke()
-        throws Exception
-    {
-        final MavenProxyRepository mavenProxyRepository =
-            getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenProxyRepository.class );
+    final DiscoveryStatus older =
+        new DiscoveryStatus(DStatus.SUCCESSFUL, "strategyId", "message", System.currentTimeMillis());
+    propsSource.write(older);
+    final DiscoveryStatus newer = propsSource.read();
 
-        PropfileDiscoveryStatusSource propsSource = new PropfileDiscoveryStatusSource( mavenProxyRepository );
-
-        final DiscoveryStatus older =
-            new DiscoveryStatus( DStatus.SUCCESSFUL, "strategyId", "message", System.currentTimeMillis() );
-        propsSource.write( older );
-        final DiscoveryStatus newer = propsSource.read();
-
-        assertThat( System.identityHashCode( older ), not( equalTo( System.identityHashCode( newer ) ) ) );
-        assertThat( older.getStatus(), equalTo( newer.getStatus() ) );
-        assertThat( older.getLastDiscoveryStrategy(), equalTo( newer.getLastDiscoveryStrategy() ) );
-        assertThat( older.getLastDiscoveryMessage(), equalTo( newer.getLastDiscoveryMessage() ) );
-        assertThat( older.getLastDiscoveryTimestamp(), equalTo( newer.getLastDiscoveryTimestamp() ) );
-    }
+    assertThat(System.identityHashCode(older), not(equalTo(System.identityHashCode(newer))));
+    assertThat(older.getStatus(), equalTo(newer.getStatus()));
+    assertThat(older.getLastDiscoveryStrategy(), equalTo(newer.getLastDiscoveryStrategy()));
+    assertThat(older.getLastDiscoveryMessage(), equalTo(newer.getLastDiscoveryMessage()));
+    assertThat(older.getLastDiscoveryTimestamp(), equalTo(newer.getLastDiscoveryTimestamp()));
+  }
 }

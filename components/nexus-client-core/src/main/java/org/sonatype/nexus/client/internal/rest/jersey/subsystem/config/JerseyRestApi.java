@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.config;
 
 import org.sonatype.nexus.client.core.subsystem.config.RestApi;
@@ -25,28 +26,25 @@ public class JerseyRestApi
     implements RestApi
 {
 
-    public JerseyRestApi( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
-    }
+  public JerseyRestApi(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
 
-    @Override
-    protected RestApiSettings getSettingsFrom( final GlobalConfigurationResource configuration )
-    {
-        return configuration.getGlobalRestApiSettings();
-    }
+  @Override
+  protected RestApiSettings getSettingsFrom(final GlobalConfigurationResource configuration) {
+    return configuration.getGlobalRestApiSettings();
+  }
 
-    @Override
-    protected void setSettingsIn( final RestApiSettings settings,
-                                  final GlobalConfigurationResource configuration )
-    {
-        configuration.setGlobalRestApiSettings( settings );
-    }
+  @Override
+  protected void setSettingsIn(final RestApiSettings settings,
+                               final GlobalConfigurationResource configuration)
+  {
+    configuration.setGlobalRestApiSettings(settings);
+  }
 
-    @Override
-    protected RestApiSettings createSettings()
-    {
-        return new RestApiSettings();
-    }
+  @Override
+  protected RestApiSettings createSettings() {
+    return new RestApiSettings();
+  }
 
 }

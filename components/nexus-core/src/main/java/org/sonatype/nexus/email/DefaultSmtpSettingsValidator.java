@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.email;
 
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
@@ -25,54 +24,56 @@ import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * @author velo
  */
-@Component( role = SmtpSettingsValidator.class )
+@Component(role = SmtpSettingsValidator.class)
 public class DefaultSmtpSettingsValidator
     extends AbstractLoggingComponent
     implements SmtpSettingsValidator
 {
-    @Requirement
-    private EMailer emailer;
+  @Requirement
+  private EMailer emailer;
 
-    @Requirement( role = SmtpSessionParametersCustomizer.class )
-    private List<SmtpSessionParametersCustomizer> customizers;
+  @Requirement(role = SmtpSessionParametersCustomizer.class)
+  private List<SmtpSessionParametersCustomizer> customizers;
 
-    private static final String NEXUS_MAIL_ID = "Nexus";
+  private static final String NEXUS_MAIL_ID = "Nexus";
 
-    public boolean sendSmtpConfigurationTest( CSmtpConfiguration smtp, String email )
-        throws EmailerException
-    {
-        final EmailerConfiguration config = new NexusEmailerConfiguration( customizers );
-        config.setDebug( smtp.isDebugMode() );
-        config.setMailHost( smtp.getHostname() );
-        config.setMailPort( smtp.getPort() );
-        config.setPassword( smtp.getPassword() );
-        config.setSsl( smtp.isSslEnabled() );
-        config.setTls( smtp.isTlsEnabled() );
-        config.setUsername( smtp.getUsername() );
+  public boolean sendSmtpConfigurationTest(CSmtpConfiguration smtp, String email)
+      throws EmailerException
+  {
+    final EmailerConfiguration config = new NexusEmailerConfiguration(customizers);
+    config.setDebug(smtp.isDebugMode());
+    config.setMailHost(smtp.getHostname());
+    config.setMailPort(smtp.getPort());
+    config.setPassword(smtp.getPassword());
+    config.setSsl(smtp.isSslEnabled());
+    config.setTls(smtp.isTlsEnabled());
+    config.setUsername(smtp.getUsername());
 
-        emailer.configure( config );
+    emailer.configure(config);
 
-        MailRequest request = new MailRequest( NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
-        request.setFrom( new Address( smtp.getSystemEmailAddress(), "Nexus Repository Manager" ) );
-        request.getToAddresses().add( new Address( email ) );
-        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: SMTP Configuration validation." );
+    MailRequest request = new MailRequest(NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID);
+    request.setFrom(new Address(smtp.getSystemEmailAddress(), "Nexus Repository Manager"));
+    request.getToAddresses().add(new Address(email));
+    request.getBodyContext().put(DefaultMailType.SUBJECT_KEY, "Nexus: SMTP Configuration validation.");
 
-        StringBuilder body = new StringBuilder();
-        body.append( "Your current SMTP configuration is valid!" );
+    StringBuilder body = new StringBuilder();
+    body.append("Your current SMTP configuration is valid!");
 
-        request.getBodyContext().put( DefaultMailType.BODY_KEY, body.toString() );
+    request.getBodyContext().put(DefaultMailType.BODY_KEY, body.toString());
 
-        MailRequestStatus status = emailer.sendSyncedMail( request );
+    MailRequestStatus status = emailer.sendSyncedMail(request);
 
-        if ( status.getErrorCause() != null )
-        {
-            getLogger().error( "Unable to send e-mail", status.getErrorCause() );
-            throw new EmailerException( "Unable to send e-mail", status.getErrorCause() );
-        }
-
-        return status.isSent();
+    if (status.getErrorCause() != null) {
+      getLogger().error("Unable to send e-mail", status.getErrorCause());
+      throw new EmailerException("Unable to send e-mail", status.getErrorCause());
     }
+
+    return status.isSent();
+  }
 }

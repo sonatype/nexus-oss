@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.ldap.realms.api.dto;
 
 import java.util.ArrayList;
@@ -21,33 +22,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias( value = "userList" )
-@XmlRootElement( name = "userList" )
+@XStreamAlias(value = "userList")
+@XmlRootElement(name = "userList")
 public class LdapUserListResponse
 {
 
-    private List<LdapUserResponseDTO> data = new ArrayList<LdapUserResponseDTO>();
+  private List<LdapUserResponseDTO> data = new ArrayList<LdapUserResponseDTO>();
 
-    /**
-     * @return the ldapUserRoleMappings
-     */
-    @XmlElementWrapper( name = "data" )
-    @XmlElement( name = "user" )
-    public List<LdapUserResponseDTO> getLdapUserRoleMappings()
-    {
-        return data;
-    }
+  /**
+   * @return the ldapUserRoleMappings
+   */
+  @XmlElementWrapper(name = "data")
+  @XmlElement(name = "user")
+  public List<LdapUserResponseDTO> getLdapUserRoleMappings() {
+    return data;
+  }
 
-    /**
-     * @param ldapUserRoleMappings the ldapUserRoleMappings to set
-     */
-    public void setLdapUserRoleMappings( List<LdapUserResponseDTO> ldapUserRoleMappings )
-    {
-        this.data = ldapUserRoleMappings;
-    }
+  /**
+   * @param ldapUserRoleMappings the ldapUserRoleMappings to set
+   */
+  public void setLdapUserRoleMappings(List<LdapUserResponseDTO> ldapUserRoleMappings) {
+    this.data = ldapUserRoleMappings;
+  }
 
-    public void addLdapUserRoleMapping( LdapUserResponseDTO ldapUserRoleMapping )
-    {
-        data.add( ldapUserRoleMapping );
-    }
+  public void addLdapUserRoleMapping(LdapUserResponseDTO ldapUserRoleMapping) {
+    data.add(ldapUserRoleMapping);
+  }
 }

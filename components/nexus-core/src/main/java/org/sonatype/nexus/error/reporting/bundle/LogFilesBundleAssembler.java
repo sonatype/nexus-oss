@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting.bundle;
 
 import java.io.File;
@@ -17,14 +18,13 @@ import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.swizzle.IssueSubmissionException;
-import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.FileBundle;
+
+import org.codehaus.plexus.swizzle.IssueSubmissionException;
+import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 
 /**
  * Adds nexus.log to the error report bundle.
@@ -34,25 +34,23 @@ public class LogFilesBundleAssembler
     implements BundleAssembler
 {
 
-    private NexusConfiguration nexusConfig;
+  private NexusConfiguration nexusConfig;
 
-    @Inject
-    public LogFilesBundleAssembler( final NexusConfiguration nexusConfig )
-    {
-        this.nexusConfig = nexusConfig;
-    }
+  @Inject
+  public LogFilesBundleAssembler(final NexusConfiguration nexusConfig) {
+    this.nexusConfig = nexusConfig;
+  }
 
-    @Override
-    public boolean isParticipating( IssueSubmissionRequest request )
-    {
-        return new File(nexusConfig.getWorkingDirectory( "logs" ), "nexus.log").exists();
-    }
+  @Override
+  public boolean isParticipating(IssueSubmissionRequest request) {
+    return new File(nexusConfig.getWorkingDirectory("logs"), "nexus.log").exists();
+  }
 
-    @Override
-    public Bundle assemble( IssueSubmissionRequest request )
-        throws IssueSubmissionException
-    {
-        return new FileBundle( new File(nexusConfig.getWorkingDirectory( "logs" ), "nexus.log") );
-    }
+  @Override
+  public Bundle assemble(IssueSubmissionRequest request)
+      throws IssueSubmissionException
+  {
+    return new FileBundle(new File(nexusConfig.getWorkingDirectory("logs"), "nexus.log"));
+  }
 
 }

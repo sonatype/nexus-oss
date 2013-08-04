@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.test.helper;
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,26 +22,27 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
-@Named( CapabilityBDescriptor.TYPE_ID )
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+
+@Named(CapabilityBDescriptor.TYPE_ID)
 @Singleton
 public class CapabilityBDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    static final String TYPE_ID = "[b]";
+  static final String TYPE_ID = "[b]";
 
-    static final CapabilityType TYPE = capabilityType( TYPE_ID );
+  static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-    static final String PROPERTY_B1 = "b1";
+  static final String PROPERTY_B1 = "b1";
 
-    static final StringTextFormField PROPERTY_A1_FIELD = new StringTextFormField(
-        PROPERTY_B1, "Property B1", "Some help text", FormField.MANDATORY
-    );
+  static final StringTextFormField PROPERTY_A1_FIELD = new StringTextFormField(
+      PROPERTY_B1, "Property B1", "Some help text", FormField.MANDATORY
+  );
 
-    protected CapabilityBDescriptor()
-    {
-        super( TYPE, "Capability B", "What about me?", PROPERTY_A1_FIELD );
-    }
+  protected CapabilityBDescriptor() {
+    super(TYPE, "Capability B", "What about me?", PROPERTY_A1_FIELD);
+  }
 
 }

@@ -10,74 +10,66 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 
 /**
  * adds version to metadata
- * 
+ *
  * @author Oleg Gusakov
  * @version $Id: SetVersionOperation.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
 public class SetVersionOperation
     implements MetadataOperation
 {
-    private String version;
+  private String version;
 
-    /**
-     * @throws MetadataException
-     */
-    public SetVersionOperation( StringOperand data )
-        throws MetadataException
-    {
-        setOperand( data );
+  /**
+   * @throws MetadataException
+   */
+  public SetVersionOperation(StringOperand data)
+      throws MetadataException
+  {
+    setOperand(data);
+  }
+
+  public void setOperand(AbstractOperand data)
+      throws MetadataException
+  {
+    if (data == null || !(data instanceof StringOperand)) {
+      throw new MetadataException("Operand is not correct: expected SnapshotOperand, but got "
+          + (data == null ? "null" : data.getClass().getName()));
     }
 
-    public void setOperand( AbstractOperand data )
-        throws MetadataException
-    {
-        if ( data == null || !( data instanceof StringOperand ) )
-        {
-            throw new MetadataException( "Operand is not correct: expected SnapshotOperand, but got "
-                + ( data == null ? "null" : data.getClass().getName() ) );
-        }
+    version = ((StringOperand) data).getOperand();
+  }
 
-        version = ( (StringOperand) data ).getOperand();
+  /**
+   * add version to the in-memory metadata instance
+   */
+  public boolean perform(Metadata metadata)
+      throws MetadataException
+  {
+    if (metadata == null) {
+      return false;
     }
 
-    /**
-     * add version to the in-memory metadata instance
-     * 
-     * @param metadata
-     * @return
-     * @throws MetadataException
-     */
-    public boolean perform( Metadata metadata )
-        throws MetadataException
-    {
-        if ( metadata == null )
-        {
-            return false;
-        }
+    String vs = metadata.getVersion();
 
-        String vs = metadata.getVersion();
-
-        if ( vs == null )
-        {
-            if ( version == null )
-            {
-                return false;
-            }
-        }
-        else if ( vs.equals( version ) )
-        {
-            return false;
-        }
-
-        metadata.setVersion( version );
-
-        return true;
+    if (vs == null) {
+      if (version == null) {
+        return false;
+      }
     }
+    else if (vs.equals(version)) {
+      return false;
+    }
+
+    metadata.setVersion(version);
+
+    return true;
+  }
 
 }

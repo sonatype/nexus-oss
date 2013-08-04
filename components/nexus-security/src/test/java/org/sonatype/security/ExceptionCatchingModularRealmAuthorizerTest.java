@@ -10,9 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security;
 
 import java.util.Collections;
+
+import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -25,38 +28,36 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
 public class ExceptionCatchingModularRealmAuthorizerTest
 {
-    private static final AuthorizingRealm BROKEN_REALM = new AuthorizingRealm()
+  private static final AuthorizingRealm BROKEN_REALM = new AuthorizingRealm()
+  {
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+        throws AuthenticationException
     {
-        @Override
-        protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
-            throws AuthenticationException
-        {
-            throw new RuntimeException( "This realm only throws exceptions" );
-        }
-
-        @Override
-        protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
-        {
-            throw new RuntimeException( "This realm only throws exceptions" );
-        }
-    };
-
-    @Test
-    public void ignoreRuntimeException()
-        throws Exception
-    {
-        ExceptionCatchingModularRealmAuthorizer subject =
-            new ExceptionCatchingModularRealmAuthorizer( Collections.<Realm> singleton( BROKEN_REALM ) );
-
-        Permission permission = new AllPermission();
-
-        Assert.assertFalse( subject.isPermitted( (PrincipalCollection) null, "" ) );
-        Assert.assertFalse( subject.isPermitted( (PrincipalCollection) null, permission ) );
-        Assert.assertFalse( subject.isPermitted( (PrincipalCollection) null, new String[] { "" } )[0] );
-        Assert.assertFalse( subject.isPermitted( (PrincipalCollection) null, Collections.singletonList( permission ) )[0] );
+      throw new RuntimeException("This realm only throws exceptions");
     }
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+      throw new RuntimeException("This realm only throws exceptions");
+    }
+  };
+
+  @Test
+  public void ignoreRuntimeException()
+      throws Exception
+  {
+    ExceptionCatchingModularRealmAuthorizer subject =
+        new ExceptionCatchingModularRealmAuthorizer(Collections.<Realm>singleton(BROKEN_REALM));
+
+    Permission permission = new AllPermission();
+
+    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, ""));
+    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, permission));
+    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, new String[]{""})[0]);
+    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, Collections.singletonList(permission))[0]);
+  }
 }

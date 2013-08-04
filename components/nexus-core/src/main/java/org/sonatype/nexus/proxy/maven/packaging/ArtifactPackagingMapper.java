@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.packaging;
 
 import java.io.File;
@@ -17,23 +18,18 @@ import java.io.File;
 /**
  * A utility component that resolves POM packaging to artifact extension. Different implementations may provide
  * different means to do it.
- * 
+ *
  * @author cstamas
  */
 public interface ArtifactPackagingMapper
 {
-    /**
-     * Returns the extension belonging to given packaging, like "jar" for "jar", "jar" for "ear", etc.
-     * 
-     * @param packaging
-     * @return
-     */
-    String getExtensionForPackaging( String packaging );
+  /**
+   * Returns the extension belonging to given packaging, like "jar" for "jar", "jar" for "ear", etc.
+   */
+  String getExtensionForPackaging(String packaging);
 
-    /**
-     * Sets the file to source the user provided mappings from, and resets the mappings, forcing it to reload the file.
-     * 
-     * @param file
-     */
-    void setPropertiesFile( File file );
+  /**
+   * Sets the file to source the user provided mappings from, and resets the mappings, forcing it to reload the file.
+   */
+  void setPropertiesFile(File file);
 }

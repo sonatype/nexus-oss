@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest.jersey.subsystem;
 
 import javax.inject.Named;
@@ -19,9 +20,7 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.core.subsystem.security.Privileges;
-import org.sonatype.nexus.client.core.subsystem.security.Roles;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.security.JerseyPrivileges;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.security.JerseyRoles;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
@@ -35,22 +34,19 @@ public class JerseyPrivilegesSubsystemFactory
     implements SubsystemFactory<Privileges, JerseyNexusClient>
 {
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.anyModern();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.anyModern();
+  }
 
-    @Override
-    public Class<Privileges> getType()
-    {
-        return Privileges.class;
-    }
+  @Override
+  public Class<Privileges> getType() {
+    return Privileges.class;
+  }
 
-    @Override
-    public Privileges create( JerseyNexusClient nexusClient )
-    {
-        return new JerseyPrivileges( nexusClient );
-    }
+  @Override
+  public Privileges create(JerseyNexusClient nexusClient) {
+    return new JerseyPrivileges(nexusClient);
+  }
 
 }

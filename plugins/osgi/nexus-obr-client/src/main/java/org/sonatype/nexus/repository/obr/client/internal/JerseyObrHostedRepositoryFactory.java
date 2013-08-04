@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.obr.client.internal;
 
 import javax.inject.Named;
@@ -31,37 +32,32 @@ public class JerseyObrHostedRepositoryFactory
     extends JerseyHostedRepositoryFactory
 {
 
-    @Override
-    public int canAdapt( final RepositoryBaseResource resource )
-    {
-        int score = super.canAdapt( resource );
-        if ( score > 0 )
-        {
-            if ( JerseyObrHostedRepository.PROVIDER.equals( resource.getProvider() ) )
-            {
-                score++;
-            }
-        }
-        return score;
+  @Override
+  public int canAdapt(final RepositoryBaseResource resource) {
+    int score = super.canAdapt(resource);
+    if (score > 0) {
+      if (JerseyObrHostedRepository.PROVIDER.equals(resource.getProvider())) {
+        score++;
+      }
     }
+    return score;
+  }
 
-    @Override
-    public JerseyObrHostedRepository adapt( final JerseyNexusClient nexusClient,
-                                            final RepositoryBaseResource resource )
-    {
-        return new JerseyObrHostedRepository( nexusClient, (RepositoryResource) resource );
-    }
+  @Override
+  public JerseyObrHostedRepository adapt(final JerseyNexusClient nexusClient,
+                                         final RepositoryBaseResource resource)
+  {
+    return new JerseyObrHostedRepository(nexusClient, (RepositoryResource) resource);
+  }
 
-    @Override
-    public boolean canCreate( final Class<? extends Repository> type )
-    {
-        return ObrHostedRepository.class.equals( type );
-    }
+  @Override
+  public boolean canCreate(final Class<? extends Repository> type) {
+    return ObrHostedRepository.class.equals(type);
+  }
 
-    @Override
-    public JerseyObrHostedRepository create( final JerseyNexusClient nexusClient, final String id )
-    {
-        return new JerseyObrHostedRepository( nexusClient, id );
-    }
+  @Override
+  public JerseyObrHostedRepository create(final JerseyNexusClient nexusClient, final String id) {
+    return new JerseyObrHostedRepository(nexusClient, id);
+  }
 
 }

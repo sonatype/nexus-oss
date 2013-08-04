@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest.jersey;
 
 import com.sun.jersey.api.client.ClientResponse;
@@ -18,16 +19,15 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 /**
  * @since 2.3
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public abstract class ContextAwareUniformInterfaceException
     extends UniformInterfaceException
 {
 
-    public ContextAwareUniformInterfaceException( final ClientResponse response )
-    {
-        super( response );
-    }
+  public ContextAwareUniformInterfaceException(final ClientResponse response) {
+    super(response);
+  }
 
-    public abstract String getMessage( int status );
+  public abstract String getMessage(int status);
 
 }

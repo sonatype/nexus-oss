@@ -10,10 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
@@ -22,8 +20,12 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.Evaluable;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A condition that delegates to provided {@link Evaluable} for checking if the condition is satisfied.
@@ -36,76 +38,68 @@ public class EvaluableCondition
     implements CapabilityContextAware
 {
 
-    private CapabilityIdentity capabilityIdentity;
+  private CapabilityIdentity capabilityIdentity;
 
-    private final Evaluable evaluable;
+  private final Evaluable evaluable;
 
-    public EvaluableCondition( final EventBus eventBus,
-                               final Evaluable evaluable,
-                               final CapabilityIdentity capabilityIdentity )
-    {
-        super( eventBus, evaluable.isSatisfied() );
-        this.evaluable = checkNotNull( evaluable );
-        this.capabilityIdentity = checkNotNull( capabilityIdentity );
+  public EvaluableCondition(final EventBus eventBus,
+                            final Evaluable evaluable,
+                            final CapabilityIdentity capabilityIdentity)
+  {
+    super(eventBus, evaluable.isSatisfied());
+    this.evaluable = checkNotNull(evaluable);
+    this.capabilityIdentity = checkNotNull(capabilityIdentity);
+  }
+
+  public EvaluableCondition(final EventBus eventBus,
+                            final Evaluable evaluable)
+  {
+    super(eventBus, false);
+    this.evaluable = checkNotNull(evaluable);
+  }
+
+  @Override
+  public EvaluableCondition setContext(final CapabilityContext context) {
+    checkState(!isActive(), "Cannot contextualize when already bounded");
+    checkState(capabilityIdentity == null, "Already contextualized with id '" + capabilityIdentity + "'");
+    capabilityIdentity = context.id();
+
+    return this;
+  }
+
+  @Override
+  protected void doBind() {
+    checkState(capabilityIdentity != null, "Capability identity not specified");
+    getEventBus().register(this);
+    setSatisfied(evaluable.isSatisfied());
+  }
+
+  @Override
+  public void doRelease() {
+    getEventBus().unregister(this);
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void handle(final CapabilityEvent.AfterUpdate event) {
+    if (event.getReference().context().id().equals(capabilityIdentity)) {
+      setSatisfied(evaluable.isSatisfied());
     }
+  }
 
-    public EvaluableCondition( final EventBus eventBus,
-                               final Evaluable evaluable )
-    {
-        super( eventBus, false );
-        this.evaluable = checkNotNull( evaluable );
-    }
+  @Override
+  public String toString() {
+    return evaluable.toString();
+  }
 
-    @Override
-    public EvaluableCondition setContext( final CapabilityContext context )
-    {
-        checkState( !isActive(), "Cannot contextualize when already bounded" );
-        checkState( capabilityIdentity == null, "Already contextualized with id '" + capabilityIdentity + "'" );
-        capabilityIdentity = context.id();
+  @Override
+  public String explainSatisfied() {
+    return evaluable.explainSatisfied();
+  }
 
-        return this;
-    }
-
-    @Override
-    protected void doBind()
-    {
-        checkState( capabilityIdentity != null, "Capability identity not specified" );
-        getEventBus().register( this );
-        setSatisfied( evaluable.isSatisfied() );
-    }
-
-    @Override
-    public void doRelease()
-    {
-        getEventBus().unregister( this );
-    }
-
-    @AllowConcurrentEvents
-    @Subscribe
-    public void handle( final CapabilityEvent.AfterUpdate event )
-    {
-        if ( event.getReference().context().id().equals( capabilityIdentity ) )
-        {
-            setSatisfied( evaluable.isSatisfied() );
-        }
-    }
-
-    @Override
-    public String toString()
-    {
-        return evaluable.toString();
-    }
-
-    @Override
-    public String explainSatisfied()
-    {
-        return evaluable.explainSatisfied();
-    }
-
-    @Override
-    public String explainUnsatisfied()
-    {
-        return evaluable.explainUnsatisfied();
-    }
+  @Override
+  public String explainUnsatisfied() {
+    return evaluable.explainUnsatisfied();
+  }
 
 }

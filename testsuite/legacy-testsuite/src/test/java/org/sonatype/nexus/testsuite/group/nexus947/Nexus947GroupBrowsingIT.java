@@ -10,11 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.group.nexus947;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.rest.model.ContentListResource;
+import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -22,56 +29,48 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.ContentListResource;
-import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 
 public class Nexus947GroupBrowsingIT
     extends AbstractNexusIntegrationTest
 {
-	
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
+
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
+
+  @Test
+  public void groupTest() throws IOException {
+    ContentListMessageUtil contentUtil = new ContentListMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
+
+    List<ContentListResource> items = contentUtil.getContentListResource("public", "/", true);
+
+    // make sure we have a few items
+    Assert.assertTrue("Expected more then 1 item. ", items.size() > 1);
+
+    // now for a bit more control
+    items = contentUtil.getContentListResource("public", "/nexus947/nexus947/3.2.1/", true);
+
+    ArrayList<String> itemsText = new ArrayList<String>();
+
+    for (ContentListResource resource : items) {
+      itemsText.add(resource.getText());
     }
 
-    @Test
-    public void groupTest() throws IOException
-    {
-        ContentListMessageUtil contentUtil = new ContentListMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
+    // they are sorted in alpha order, so expect the jar, then the pom
+    Assert.assertTrue(itemsText.contains("nexus947-3.2.1.jar"));
+    Assert.assertTrue(itemsText.contains("nexus947-3.2.1.pom"));
+  }
 
-        List<ContentListResource> items = contentUtil.getContentListResource( "public", "/", true );
+  @Test
+  public void redirectTest() throws IOException {
+    String uriPart = RequestFacade.SERVICE_LOCAL + "repo_groups/" + "public" + "/content";
+    Response response = RequestFacade.sendMessage(uriPart, Method.GET);
+    Assert.assertEquals(301, response.getStatus().getCode());
 
-        // make sure we have a few items
-        Assert.assertTrue( "Expected more then 1 item. ", items.size() > 1 );
+    Assert.assertTrue(response.getLocationRef().toString().endsWith(uriPart + "/"));
 
-        // now for a bit more control
-        items = contentUtil.getContentListResource( "public", "/nexus947/nexus947/3.2.1/", true );
+  }
 
-        ArrayList<String> itemsText = new ArrayList<String>();        
-      
-        for(ContentListResource resource: items)
-        {
-            itemsText.add( resource.getText() );
-        }
 
-        // they are sorted in alpha order, so expect the jar, then the pom
-        Assert.assertTrue( itemsText.contains("nexus947-3.2.1.jar") );
-        Assert.assertTrue( itemsText.contains("nexus947-3.2.1.pom") );
-    }
-
-    @Test
-    public void redirectTest() throws IOException
-    {
-        String uriPart = RequestFacade.SERVICE_LOCAL + "repo_groups/" + "public" + "/content";
-        Response response = RequestFacade.sendMessage( uriPart, Method.GET );
-        Assert.assertEquals( 301, response.getStatus().getCode() );
-
-        Assert.assertTrue(response.getLocationRef().toString().endsWith( uriPart + "/" ));
-
-    }
-    
-    
 }

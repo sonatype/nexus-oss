@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.timeline;
 
 import java.util.HashMap;
@@ -17,43 +18,37 @@ import java.util.Map;
 
 public class TimelineRecord
 {
-    private final long timestamp;
+  private final long timestamp;
 
-    private final String type;
+  private final String type;
 
-    private final String subType;
+  private final String subType;
 
-    private final HashMap<String, String> data;
+  private final HashMap<String, String> data;
 
-    public TimelineRecord( final long timestamp, final String type, final String subType, final Map<String, String> data )
-    {
-        if ( type == null || type.trim().length() == 0 || subType == null || subType.trim().length() == 0 )
-        {
-            throw new IllegalArgumentException( "TimelineRecord type or subType must not be blank/null" );
-        }
-        this.timestamp = timestamp;
-        this.type = type;
-        this.subType = subType;
-        this.data = data == null ? new HashMap<String, String>() : new HashMap<String, String>( data );
+  public TimelineRecord(final long timestamp, final String type, final String subType, final Map<String, String> data) {
+    if (type == null || type.trim().length() == 0 || subType == null || subType.trim().length() == 0) {
+      throw new IllegalArgumentException("TimelineRecord type or subType must not be blank/null");
     }
+    this.timestamp = timestamp;
+    this.type = type;
+    this.subType = subType;
+    this.data = data == null ? new HashMap<String, String>() : new HashMap<String, String>(data);
+  }
 
-    public long getTimestamp()
-    {
-        return timestamp;
-    }
+  public long getTimestamp() {
+    return timestamp;
+  }
 
-    public String getType()
-    {
-        return type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public String getSubType()
-    {
-        return subType;
-    }
+  public String getSubType() {
+    return subType;
+  }
 
-    public Map<String, String> getData()
-    {
-        return data;
-    }
+  public Map<String, String> getData() {
+    return data;
+  }
 }

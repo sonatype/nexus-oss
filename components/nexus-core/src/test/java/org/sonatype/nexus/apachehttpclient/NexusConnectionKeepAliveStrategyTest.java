@@ -10,11 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.apachehttpclient;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -27,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Test for NexusConnectionKeepAliveStrategy.
@@ -36,111 +38,99 @@ public class NexusConnectionKeepAliveStrategyTest
     extends TestSupport
 {
 
-    @Mock
-    protected HttpResponse httpResponse;
+  @Mock
+  protected HttpResponse httpResponse;
 
-    @Mock
-    protected HttpContext httpContext;
+  @Mock
+  protected HttpContext httpContext;
 
-    protected NexusConnectionKeepAliveStrategy subject;
+  protected NexusConnectionKeepAliveStrategy subject;
 
-    @Before
-    public void prepare()
-    {
-        subject = new NexusConnectionKeepAliveStrategy( 5000l );
-        Mockito.when( httpResponse.headerIterator( Mockito.anyString() ) ).thenReturn( new BasicListHeaderIterator(
-            Collections.<Header>emptyList(), null ) );
+  @Before
+  public void prepare() {
+    subject = new NexusConnectionKeepAliveStrategy(5000l);
+    Mockito.when(httpResponse.headerIterator(Mockito.anyString())).thenReturn(new BasicListHeaderIterator(
+        Collections.<Header>emptyList(), null));
+  }
+
+  @Test
+  public void constructorValueValidationBad1() {
+    doConstructorValueValidation(-100, true);
+  }
+
+  @Test
+  public void constructorValueValidationBad2() {
+    doConstructorValueValidation(-1, true);
+  }
+
+  @Test
+  public void constructorValueValidationGood1() {
+    doConstructorValueValidation(0, false);
+  }
+
+  @Test
+  public void constructorValueValidationGood2() {
+    doConstructorValueValidation(30000, false);
+  }
+
+  protected void doConstructorValueValidation(final long maxKeepAlive, final boolean shouldFail) {
+    try {
+      new NexusConnectionKeepAliveStrategy(maxKeepAlive);
+      MatcherAssert.assertThat("Value " + maxKeepAlive + " does not fails but should!", !shouldFail);
     }
-
-    @Test
-    public void constructorValueValidationBad1()
-    {
-        doConstructorValueValidation( -100, true );
+    catch (IllegalArgumentException e) {
+      MatcherAssert.assertThat("Value " + maxKeepAlive + " fails but should not!", shouldFail);
     }
+  }
 
-    @Test
-    public void constructorValueValidationBad2()
-    {
-        doConstructorValueValidation( -1, true );
-    }
+  // ==
 
-    @Test
-    public void constructorValueValidationGood1()
-    {
-        doConstructorValueValidation( 0, false );
-    }
+  @Test
+  public void keepAliveDefaulted() {
+    // server response says nothing
+    // nexus default wins
+    final long keepAlive =
+        subject.getKeepAliveDuration(httpResponse, httpContext);
+    MatcherAssert.assertThat(keepAlive, Matchers.is(5000l));
+  }
 
-    @Test
-    public void constructorValueValidationGood2()
-    {
-        doConstructorValueValidation( 30000, false );
-    }
+  @Test
+  public void keepAliveServerValueIfLess() {
+    // server response says 3s
+    // server wins
+    final List<Header> headers = new ArrayList<Header>(1);
+    headers.add(new BasicHeader("Keep-Alive", "timeout=3"));
+    Mockito.when(httpResponse.headerIterator(Mockito.anyString())).thenReturn(new BasicListHeaderIterator(
+        headers, null));
+    final long keepAlive =
+        subject.getKeepAliveDuration(httpResponse, httpContext);
+    MatcherAssert.assertThat(keepAlive, Matchers.is(3000l));
+  }
 
-    protected void doConstructorValueValidation( final long maxKeepAlive, final boolean shouldFail )
-    {
-        try
-        {
-            new NexusConnectionKeepAliveStrategy( maxKeepAlive );
-            MatcherAssert.assertThat( "Value " + maxKeepAlive + " does not fails but should!", !shouldFail );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            MatcherAssert.assertThat( "Value " + maxKeepAlive + " fails but should not!", shouldFail );
-        }
-    }
+  @Test
+  public void keepAliveServerValueIfLessWithMaxConnCount() {
+    // server response says 3s
+    // server wins
+    final List<Header> headers = new ArrayList<Header>(1);
+    headers.add(new BasicHeader("Keep-Alive", "timeout=3, max=100"));
+    Mockito.when(httpResponse.headerIterator(Mockito.anyString())).thenReturn(new BasicListHeaderIterator(
+        headers, null));
+    final long keepAlive =
+        subject.getKeepAliveDuration(httpResponse, httpContext);
+    MatcherAssert.assertThat(keepAlive, Matchers.is(3000l));
+  }
 
-    // ==
-
-    @Test
-    public void keepAliveDefaulted()
-    {
-        // server response says nothing
-        // nexus default wins
-        final long keepAlive =
-            subject.getKeepAliveDuration( httpResponse, httpContext );
-        MatcherAssert.assertThat( keepAlive, Matchers.is( 5000l ) );
-    }
-
-    @Test
-    public void keepAliveServerValueIfLess()
-    {
-        // server response says 3s
-        // server wins
-        final List<Header> headers = new ArrayList<Header>( 1 );
-        headers.add( new BasicHeader( "Keep-Alive", "timeout=3" ) );
-        Mockito.when( httpResponse.headerIterator( Mockito.anyString() ) ).thenReturn( new BasicListHeaderIterator(
-            headers, null ) );
-        final long keepAlive =
-            subject.getKeepAliveDuration( httpResponse, httpContext );
-        MatcherAssert.assertThat( keepAlive, Matchers.is( 3000l ) );
-    }
-
-    @Test
-    public void keepAliveServerValueIfLessWithMaxConnCount()
-    {
-        // server response says 3s
-        // server wins
-        final List<Header> headers = new ArrayList<Header>( 1 );
-        headers.add( new BasicHeader( "Keep-Alive", "timeout=3, max=100" ) );
-        Mockito.when( httpResponse.headerIterator( Mockito.anyString() ) ).thenReturn( new BasicListHeaderIterator(
-            headers, null ) );
-        final long keepAlive =
-            subject.getKeepAliveDuration( httpResponse, httpContext );
-        MatcherAssert.assertThat( keepAlive, Matchers.is( 3000l ) );
-    }
-
-    @Test
-    public void keepAliveDefaultValueIfMore()
-    {
-        // server response says 8s
-        // nexus wins (is capped)
-        final List<Header> headers = new ArrayList<Header>( 1 );
-        headers.add( new BasicHeader( "Keep-Alive", "timeout=8" ) );
-        Mockito.when( httpResponse.headerIterator( Mockito.anyString() ) ).thenReturn( new BasicListHeaderIterator(
-            headers, null ) );
-        final long keepAlive =
-            subject.getKeepAliveDuration( httpResponse, httpContext );
-        MatcherAssert.assertThat( keepAlive, Matchers.is( 5000l ) );
-    }
+  @Test
+  public void keepAliveDefaultValueIfMore() {
+    // server response says 8s
+    // nexus wins (is capped)
+    final List<Header> headers = new ArrayList<Header>(1);
+    headers.add(new BasicHeader("Keep-Alive", "timeout=8"));
+    Mockito.when(httpResponse.headerIterator(Mockito.anyString())).thenReturn(new BasicListHeaderIterator(
+        headers, null));
+    final long keepAlive =
+        subject.getKeepAliveDuration(httpResponse, httpContext);
+    MatcherAssert.assertThat(keepAlive, Matchers.is(5000l));
+  }
 
 }

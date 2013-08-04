@@ -10,21 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.junit.Test;
-
 public class NodeTest
 {
-    @Test
-    public void getPath()
-    {
-        final Node<Object> root = new Node<Object>( null, "/", null );
-        final Node<Object> node = root.addChild( "archetype-catalog.xml", null );
+  @Test
+  public void getPath() {
+    final Node<Object> root = new Node<Object>(null, "/", null);
+    final Node<Object> node = root.addChild("archetype-catalog.xml", null);
 
-        assertThat( node.getPath(), equalTo( "/archetype-catalog.xml" ) );
-    }
+    assertThat(node.getPath(), equalTo("/archetype-catalog.xml"));
+  }
 }

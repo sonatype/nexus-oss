@@ -10,17 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds.record;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -36,80 +28,87 @@ import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 public class ItemChangesFeedEventInspectorTest
     extends TestSupport
 {
 
-    @Mock
-    private FeedRecorder feedRecorder;
+  @Mock
+  private FeedRecorder feedRecorder;
 
-    @Mock
-    private ApplicationStatusSource applicationStatusSource;
+  @Mock
+  private ApplicationStatusSource applicationStatusSource;
 
-    @Mock
-    private Repository repository;
+  @Mock
+  private Repository repository;
 
-    @Mock
-    private StorageFileItem storageFileItem;
+  @Mock
+  private StorageFileItem storageFileItem;
 
-    @Mock
-    private RepositoryItemUid repositoryItemUid;
+  @Mock
+  private RepositoryItemUid repositoryItemUid;
 
-    @Before
-    public void setup()
+  @Before
+  public void setup() {
+    when(repository.getId()).thenReturn("test");
+    when(storageFileItem.getItemContext()).thenReturn(new RequestContext());
+    when(storageFileItem.getRepositoryItemUid()).thenReturn(repositoryItemUid);
+    when(storageFileItem.getRepositoryItemAttributes()).thenReturn(new DefaultAttributes());
+  }
+
+  @Test
+  public void eventsOnHiddenFilesAreNotRecorded() {
+    final ItemChangesFeedEventInspector underTest =
+        new ItemChangesFeedEventInspector(feedRecorder, applicationStatusSource);
+    final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
+    when(repositoryItemUid.getBooleanAttributeValue(IsHiddenAttribute.class)).thenReturn(true);
+    underTest.inspect(evt);
+
+    verifyNoMoreInteractions(feedRecorder);
+  }
+
+  @Test
+  public void eventsOnMavenMetadataSignatureAndHashFilesShouldNotBeRecorded() {
+    final ItemChangesFeedEventInspector underTest =
+        new ItemChangesFeedEventInspector(feedRecorder, applicationStatusSource);
     {
-        when( repository.getId() ).thenReturn( "test" );
-        when( storageFileItem.getItemContext() ).thenReturn( new RequestContext() );
-        when( storageFileItem.getRepositoryItemUid() ).thenReturn( repositoryItemUid );
-        when( storageFileItem.getRepositoryItemAttributes() ).thenReturn( new DefaultAttributes() );
+      final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
+      when(repositoryItemUid.getBooleanAttributeValue(IsMavenRepositoryMetadataAttribute.class)).thenReturn(
+          true);
+      underTest.inspect(evt);
+    }
+    {
+      final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
+      when(repositoryItemUid.getBooleanAttributeValue(IsMavenArtifactSignatureAttribute.class)).thenReturn(
+          true);
+      underTest.inspect(evt);
+    }
+    {
+      final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
+      when(repositoryItemUid.getBooleanAttributeValue(IsMavenChecksumAttribute.class)).thenReturn(true);
+      underTest.inspect(evt);
     }
 
-    @Test
-    public void eventsOnHiddenFilesAreNotRecorded()
-    {
-        final ItemChangesFeedEventInspector underTest =
-            new ItemChangesFeedEventInspector( feedRecorder, applicationStatusSource );
-        final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
-        when( repositoryItemUid.getBooleanAttributeValue( IsHiddenAttribute.class ) ).thenReturn( true );
-        underTest.inspect( evt );
+    // these events above should be filtered out by ItemChangesFeedEventInspector, feedRecordes shall be untouched
+    verifyNoMoreInteractions(feedRecorder);
 
-        verifyNoMoreInteractions( feedRecorder );
-    }
-
-    @Test
-    public void eventsOnMavenMetadataSignatureAndHashFilesShouldNotBeRecorded()
-    {
-        final ItemChangesFeedEventInspector underTest =
-            new ItemChangesFeedEventInspector( feedRecorder, applicationStatusSource );
-        {
-            final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
-            when( repositoryItemUid.getBooleanAttributeValue( IsMavenRepositoryMetadataAttribute.class ) ).thenReturn(
-                true );
-            underTest.inspect( evt );
-        }
-        {
-            final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
-            when( repositoryItemUid.getBooleanAttributeValue( IsMavenArtifactSignatureAttribute.class ) ).thenReturn(
-                true );
-            underTest.inspect( evt );
-        }
-        {
-            final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
-            when( repositoryItemUid.getBooleanAttributeValue( IsMavenChecksumAttribute.class ) ).thenReturn( true );
-            underTest.inspect( evt );
-        }
-
-        // these events above should be filtered out by ItemChangesFeedEventInspector, feedRecordes shall be untouched
-        verifyNoMoreInteractions( feedRecorder );
-
-        // now do touch it (with event that has all the flags we added false)
-        final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
-        when( repositoryItemUid.getBooleanAttributeValue( IsMavenRepositoryMetadataAttribute.class ) ).thenReturn(
-            false );
-        when( repositoryItemUid.getBooleanAttributeValue( IsMavenArtifactSignatureAttribute.class ) ).thenReturn( false );
-        when( repositoryItemUid.getBooleanAttributeValue( IsMavenChecksumAttribute.class ) ).thenReturn( false );
-        underTest.inspect( evt );
-        // method touched only once
-        verify( feedRecorder, times( 1 ) ).addNexusArtifactEvent( any( NexusArtifactEvent.class ) );
-    }
+    // now do touch it (with event that has all the flags we added false)
+    final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
+    when(repositoryItemUid.getBooleanAttributeValue(IsMavenRepositoryMetadataAttribute.class)).thenReturn(
+        false);
+    when(repositoryItemUid.getBooleanAttributeValue(IsMavenArtifactSignatureAttribute.class)).thenReturn(false);
+    when(repositoryItemUid.getBooleanAttributeValue(IsMavenChecksumAttribute.class)).thenReturn(false);
+    underTest.inspect(evt);
+    // method touched only once
+    verify(feedRecorder, times(1)).addNexusArtifactEvent(any(NexusArtifactEvent.class));
+  }
 }

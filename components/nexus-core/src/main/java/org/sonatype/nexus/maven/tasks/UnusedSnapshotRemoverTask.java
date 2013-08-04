@@ -10,11 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.maven.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor.DAYS_SINCE_LAST_REQUESTED_FIELD_ID;
-import static org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+package org.sonatype.nexus.maven.tasks;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,77 +19,73 @@ import javax.inject.Named;
 import org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor.DAYS_SINCE_LAST_REQUESTED_FIELD_ID;
+import static org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+
 /**
  * Unused Snapshot Remover Task.
  *
  * @since 2.7.0
  */
-@Named( UnusedSnapshotRemovalTaskDescriptor.ID )
+@Named(UnusedSnapshotRemovalTaskDescriptor.ID)
 public class UnusedSnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
 
-    public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
+  public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
 
-    private final SnapshotRemover snapshotRemover;
+  private final SnapshotRemover snapshotRemover;
 
-    @Inject
-    public UnusedSnapshotRemoverTask( final SnapshotRemover snapshotRemover )
-    {
-        this.snapshotRemover = checkNotNull( snapshotRemover );
+  @Inject
+  public UnusedSnapshotRemoverTask(final SnapshotRemover snapshotRemover) {
+    this.snapshotRemover = checkNotNull(snapshotRemover);
+  }
+
+  @Override
+  protected String getRepositoryFieldId() {
+    return REPO_OR_GROUP_FIELD_ID;
+  }
+
+  public int getDaysSinceLastRequested() {
+    final String param = getParameters().get(DAYS_SINCE_LAST_REQUESTED_FIELD_ID);
+    return Integer.parseInt(checkNotNull(param, DAYS_SINCE_LAST_REQUESTED_FIELD_ID));
+  }
+
+  public void setDaysSinceLastRequested(int daysSinceLastRequested) {
+    getParameters().put(DAYS_SINCE_LAST_REQUESTED_FIELD_ID, Integer.toString(daysSinceLastRequested));
+  }
+
+  @Override
+  public SnapshotRemovalResult doRun()
+      throws Exception
+  {
+    final SnapshotRemovalRequest req = new SnapshotRemovalRequest(
+        getRepositoryId(),
+        -1,                             // not applicable (minCountOfSnapshotsToKeep)
+        getDaysSinceLastRequested(),
+        false,                          // do not remove if release available
+        -1,                             // not applicable (graceDaysAfterRelease)
+        false,                          // do not delete immediately (will move to trash),
+        true                            // calculate number of days based on last time snapshot was requested
+    );
+
+    return snapshotRemover.removeSnapshots(req);
+  }
+
+  @Override
+  protected String getAction() {
+    return SYSTEM_REMOVE_SNAPSHOTS_ACTION;
+  }
+
+  @Override
+  protected String getMessage() {
+    if (getRepositoryId() != null) {
+      return "Removing unused snapshots from repository " + getRepositoryName();
     }
-
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return REPO_OR_GROUP_FIELD_ID;
+    else {
+      return "Removing unused snapshots from all registered repositories";
     }
-
-    public int getDaysSinceLastRequested()
-    {
-        final String param = getParameters().get( DAYS_SINCE_LAST_REQUESTED_FIELD_ID );
-        return Integer.parseInt( checkNotNull( param, DAYS_SINCE_LAST_REQUESTED_FIELD_ID ) );
-    }
-
-    public void setDaysSinceLastRequested( int daysSinceLastRequested )
-    {
-        getParameters().put( DAYS_SINCE_LAST_REQUESTED_FIELD_ID, Integer.toString( daysSinceLastRequested ) );
-    }
-
-    @Override
-    public SnapshotRemovalResult doRun()
-        throws Exception
-    {
-        final SnapshotRemovalRequest req = new SnapshotRemovalRequest(
-            getRepositoryId(),
-            -1,                             // not applicable (minCountOfSnapshotsToKeep)
-            getDaysSinceLastRequested(),
-            false,                          // do not remove if release available
-            -1,                             // not applicable (graceDaysAfterRelease)
-            false,                          // do not delete immediately (will move to trash),
-            true                            // calculate number of days based on last time snapshot was requested
-        );
-
-        return snapshotRemover.removeSnapshots( req );
-    }
-
-    @Override
-    protected String getAction()
-    {
-        return SYSTEM_REMOVE_SNAPSHOTS_ACTION;
-    }
-
-    @Override
-    protected String getMessage()
-    {
-        if ( getRepositoryId() != null )
-        {
-            return "Removing unused snapshots from repository " + getRepositoryName();
-        }
-        else
-        {
-            return "Removing unused snapshots from all registered repositories";
-        }
-    }
+  }
 
 }

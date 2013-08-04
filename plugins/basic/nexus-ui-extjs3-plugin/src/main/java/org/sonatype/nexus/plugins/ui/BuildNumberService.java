@@ -10,10 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.ui;
 
 import java.io.InputStream;
 import java.util.Properties;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,35 +29,30 @@ import org.slf4j.LoggerFactory;
 public class BuildNumberService
 {
 
-    private static final Logger logger = LoggerFactory.getLogger( BuildNumberService.class );
+  private static final Logger logger = LoggerFactory.getLogger(BuildNumberService.class);
 
-    private final String buildNumber;
+  private final String buildNumber;
 
-    @Inject
-    BuildNumberService()
-    {
-        Properties props = new Properties();
+  @Inject
+  BuildNumberService() {
+    Properties props = new Properties();
 
-        InputStream is = getClass().getResourceAsStream( "version.properties" );
-        try
-        {
-            props.load( is );
-        }
-        catch ( Exception e )
-        {
-            logger.warn( "Could not determine build qualifier", e );
-        }
-        finally
-        {
-            IOUtils.closeQuietly( is );
-        }
-
-        buildNumber = props.getProperty( "version", "unknown-version" );
+    InputStream is = getClass().getResourceAsStream("version.properties");
+    try {
+      props.load(is);
+    }
+    catch (Exception e) {
+      logger.warn("Could not determine build qualifier", e);
+    }
+    finally {
+      IOUtils.closeQuietly(is);
     }
 
-    public String getBuildNumber()
-    {
-        return buildNumber;
-    }
+    buildNumber = props.getProperty("version", "unknown-version");
+  }
+
+  public String getBuildNumber() {
+    return buildNumber;
+  }
 
 }

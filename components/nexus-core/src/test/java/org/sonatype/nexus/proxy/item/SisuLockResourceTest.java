@@ -10,32 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
-import org.junit.After;
 import org.sonatype.sisu.locks.LocalResourceLockFactory;
 import org.sonatype.sisu.locks.ResourceLockFactory;
 
+import org.junit.After;
+
 /**
  * Test using SISU Locks LocalResourceLockFactory and it's created locks.
- * 
+ *
  * @author cstamas
  */
 public class SisuLockResourceTest
     extends LockResourceTestSupport
 {
-    protected ResourceLockFactory resourceLockFactory = new LocalResourceLockFactory();
+  protected ResourceLockFactory resourceLockFactory = new LocalResourceLockFactory();
 
-    @Override
-    protected RepositoryItemUidLock getLockResource( final String key )
-    {
-        return new DefaultRepositoryItemUidLock( key, new SisuLockResource( resourceLockFactory.getResourceLock( key ) ) );
-    }
+  @Override
+  protected RepositoryItemUidLock getLockResource(final String key) {
+    return new DefaultRepositoryItemUidLock(key, new SisuLockResource(resourceLockFactory.getResourceLock(key)));
+  }
 
-    @After
-    public void shutdownLockFactory()
-    {
-        resourceLockFactory.shutdown();
-    }
+  @After
+  public void shutdownLockFactory() {
+    resourceLockFactory.shutdown();
+  }
 
 }

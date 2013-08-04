@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal.task.executor;
 
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnable;
@@ -22,58 +23,55 @@ import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnable;
  * mechanism to lock-with-timeout and to identify and cancel long-running lock holders. Together with
  * CancelableRunnable, ConstrainedExecutor provides ability to avoid multiple concurrent executions of autorouting
  * metadata update for the same repository.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public interface ConstrainedExecutor
 {
-    /**
-     * Returns statistics about this instance.
-     * 
-     * @return statistics.
-     */
-    Statistics getStatistics();
+  /**
+   * Returns statistics about this instance.
+   *
+   * @return statistics.
+   */
+  Statistics getStatistics();
 
-    /**
-     * Cancels all executing jobs. This method call does not wait for all jobs to terminate, it will return immediately.
-     */
-    void cancelAllJobs();
+  /**
+   * Cancels all executing jobs. This method call does not wait for all jobs to terminate, it will return
+   * immediately.
+   */
+  void cancelAllJobs();
 
-    /**
-     * Returns {@code true} if there is a {@link CancelableRunnable} running with given key.
-     * 
-     * @param key
-     * @return {@code true} if there is active task running with given key.
-     */
-    boolean hasRunningWithKey( String key );
+  /**
+   * Returns {@code true} if there is a {@link CancelableRunnable} running with given key.
+   *
+   * @return {@code true} if there is active task running with given key.
+   */
+  boolean hasRunningWithKey(String key);
 
-    /**
-     * Returns {@code true} if there was a {@link CancelableRunnable} running with given key and was cancelled.
-     * 
-     * @param key
-     * @return {@code true} if there is active task running with given key.
-     */
-    boolean cancelRunningWithKey( String key );
+  /**
+   * Returns {@code true} if there was a {@link CancelableRunnable} running with given key and was cancelled.
+   *
+   * @return {@code true} if there is active task running with given key.
+   */
+  boolean cancelRunningWithKey(String key);
 
-    /**
-     * Schedules a command for execution, or, if a command with given key already runs, will simply "forget" (do
-     * nothing) with passed in command instance.
-     * 
-     * @param key
-     * @param command
-     * @return {@code true} if command was scheduled, or {@code false} if dropped.
-     */
-    boolean mayExecute( String key, CancelableRunnable command );
+  /**
+   * Schedules a command for execution, or, if a command with given key already runs, will simply "forget" (do
+   * nothing) with passed in command instance.
+   *
+   * @return {@code true} if command was scheduled, or {@code false} if dropped.
+   */
+  boolean mayExecute(String key, CancelableRunnable command);
 
-    /**
-     * Schedules a command for execution. If command with given key already runs, it will cancel it, and replace it with
-     * new instance passed in parameter.
-     * 
-     * @param key
-     * @param command
-     * @return {@code true} if this command caused a cancelation of other already scheduled command, or {@code false} if
-     *         not.
-     */
-    boolean mustExecute( String key, CancelableRunnable command );
+  /**
+   * Schedules a command for execution. If command with given key already runs, it will cancel it, and replace it
+   * with
+   * new instance passed in parameter.
+   *
+   * @return {@code true} if this command caused a cancelation of other already scheduled command, or {@code false}
+   *         if
+   *         not.
+   */
+  boolean mustExecute(String key, CancelableRunnable command);
 }

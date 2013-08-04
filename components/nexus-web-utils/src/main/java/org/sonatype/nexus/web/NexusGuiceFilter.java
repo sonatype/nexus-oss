@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web;
 
 import java.io.IOException;
@@ -29,68 +30,61 @@ import com.google.inject.servlet.GuiceFilter;
 public final class NexusGuiceFilter
     extends GuiceFilter
 {
-    /*
-     * Guice @Inject instead of JSR330 so Resin/CDI won't try to inject this and fail!
-     */
-    @com.google.inject.Inject
-    static List<FilterPipeline> pipelines = Collections.emptyList();
+  /*
+   * Guice @Inject instead of JSR330 so Resin/CDI won't try to inject this and fail!
+   */
+  @com.google.inject.Inject
+  static List<FilterPipeline> pipelines = Collections.emptyList();
 
-    public NexusGuiceFilter()
+  public NexusGuiceFilter() {
+    super(new MultiFilterPipeline());
+  }
+
+  static final class MultiFilterPipeline
+      implements FilterPipeline
+  {
+    public void initPipeline(ServletContext context)
+        throws ServletException
     {
-        super( new MultiFilterPipeline() );
+      for (final FilterPipeline p : pipelines) {
+        p.initPipeline(context);
+      }
     }
 
-    static final class MultiFilterPipeline
-        implements FilterPipeline
+    public void dispatch(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException
     {
-        public void initPipeline( ServletContext context )
-            throws ServletException
-        {
-            for ( final FilterPipeline p : pipelines )
-            {
-                p.initPipeline( context );
-            }
-        }
-
-        public void dispatch( ServletRequest request, ServletResponse response, FilterChain chain )
-            throws IOException, ServletException
-        {
-            new MultiFilterChain( chain ).doFilter( request, response );
-        }
-
-        public void destroyPipeline()
-        {
-            for ( final FilterPipeline p : pipelines )
-            {
-                p.destroyPipeline();
-            }
-        }
+      new MultiFilterChain(chain).doFilter(request, response);
     }
 
-    static final class MultiFilterChain
-        implements FilterChain
-    {
-        private final Iterator<FilterPipeline> itr;
-
-        private final FilterChain defaultChain;
-
-        MultiFilterChain( final FilterChain chain )
-        {
-            itr = pipelines.iterator();
-            defaultChain = chain;
-        }
-
-        public void doFilter( final ServletRequest request, final ServletResponse response )
-            throws IOException, ServletException
-        {
-            if ( itr.hasNext() )
-            {
-                itr.next().dispatch( request, response, this );
-            }
-            else
-            {
-                defaultChain.doFilter( request, response );
-            }
-        }
+    public void destroyPipeline() {
+      for (final FilterPipeline p : pipelines) {
+        p.destroyPipeline();
+      }
     }
+  }
+
+  static final class MultiFilterChain
+      implements FilterChain
+  {
+    private final Iterator<FilterPipeline> itr;
+
+    private final FilterChain defaultChain;
+
+    MultiFilterChain(final FilterChain chain) {
+      itr = pipelines.iterator();
+      defaultChain = chain;
+    }
+
+    public void doFilter(final ServletRequest request, final ServletResponse response)
+        throws IOException, ServletException
+    {
+      if (itr.hasNext()) {
+        itr.next().dispatch(request, response, this);
+      }
+      else {
+        defaultChain.doFilter(request, response);
+      }
+    }
+  }
 }

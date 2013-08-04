@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
 
 import java.util.Random;
@@ -19,15 +20,14 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * @deprecated this is just plain stupid
  */
-@Component( role = ConfigurationIdGenerator.class )
+@Component(role = ConfigurationIdGenerator.class)
 public class DefaultConfigurationIdGenerator
     implements ConfigurationIdGenerator
 {
-    private Random rand = new Random( System.currentTimeMillis() );
+  private Random rand = new Random(System.currentTimeMillis());
 
-    public String generateId()
-    {
-        return Long.toHexString( System.nanoTime() + rand.nextInt( 2008 ) );
-    }
+  public String generateId() {
+    return Long.toHexString(System.nanoTime() + rand.nextInt(2008));
+  }
 
 }

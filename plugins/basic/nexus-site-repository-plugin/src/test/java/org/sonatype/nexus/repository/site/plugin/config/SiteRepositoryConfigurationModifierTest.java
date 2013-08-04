@@ -10,31 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.site.plugin.config;
 
-import static org.apache.commons.io.FileUtils.readFileToString;
-import static org.hamcrest.MatcherAssert.assertThat;
+package org.sonatype.nexus.repository.site.plugin.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.hamcrest.MatcherAssert;
-import org.junit.Test;
+import javax.inject.Inject;
+
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
-import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
+
+import org.junit.Test;
+
+import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * {@link SiteRepositoryConfigurationModifier} UTs.
@@ -45,32 +39,32 @@ public class SiteRepositoryConfigurationModifierTest
     extends InjectedTestSupport
 {
 
-    @Inject
-    private SiteRepositoryConfigurationModifier modifier;
+  @Inject
+  private SiteRepositoryConfigurationModifier modifier;
 
-    @Test
-    public void modifyConfiguration()
-        throws Exception
-    {
-        final Configuration configuration = new NexusConfigurationXpp3Reader().read(
-            new FileInputStream( util.resolveFile( "target/test-classes/nexus.xml" ) )
-        );
+  @Test
+  public void modifyConfiguration()
+      throws Exception
+  {
+    final Configuration configuration = new NexusConfigurationXpp3Reader().read(
+        new FileInputStream(util.resolveFile("target/test-classes/nexus.xml"))
+    );
 
-        modifier.apply( configuration );
+    modifier.apply(configuration);
 
-        final File modified = util.resolveFile( "target/modified-nexus.xml" );
-        new NexusConfigurationXpp3Writer().write(
-            new FileOutputStream( modified ),
-            configuration
-        );
-        assertThat(
-            normalizeLineEndings(readFileToString(modified)),
-            DiffMatchers.equalToOnlyDiffs( normalizeLineEndings(readFileToString(util.resolveFile("target/test-classes/expected-nexus.xml"))) )
-        );
-    }
+    final File modified = util.resolveFile("target/modified-nexus.xml");
+    new NexusConfigurationXpp3Writer().write(
+        new FileOutputStream(modified),
+        configuration
+    );
+    assertThat(
+        normalizeLineEndings(readFileToString(modified)),
+        DiffMatchers.equalToOnlyDiffs(
+            normalizeLineEndings(readFileToString(util.resolveFile("target/test-classes/expected-nexus.xml"))))
+    );
+  }
 
-    private String normalizeLineEndings( final String text )
-    {
-        return text.replace("\r\n", "\n");
-    }
+  private String normalizeLineEndings(final String text) {
+    return text.replace("\r\n", "\n");
+  }
 }

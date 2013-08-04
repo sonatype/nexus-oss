@@ -10,18 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.email;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.email;
 
 import java.util.List;
 import java.util.Properties;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.Authenticator;
 import javax.mail.Session;
 
 import org.sonatype.micromailer.EmailerConfiguration;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Nexus specific {@link EmailerConfiguration}. Uses available {@link SmtpSessionParametersCustomizer}s to customize
@@ -34,23 +36,20 @@ public class NexusEmailerConfiguration
     extends EmailerConfiguration
 {
 
-    private final List<SmtpSessionParametersCustomizer> customizers;
+  private final List<SmtpSessionParametersCustomizer> customizers;
 
-    @Inject
-    public NexusEmailerConfiguration( final List<SmtpSessionParametersCustomizer> customizers )
-    {
-        this.customizers = checkNotNull( customizers );
-    }
+  @Inject
+  public NexusEmailerConfiguration(final List<SmtpSessionParametersCustomizer> customizers) {
+    this.customizers = checkNotNull(customizers);
+  }
 
-    @Override
-    protected Session createSession( final Properties properties, final Authenticator authenticator )
-    {
-        Properties params = properties;
-        for ( final SmtpSessionParametersCustomizer customizer : customizers )
-        {
-            params = customizer.customize( params );
-        }
-        return super.createSession( params, authenticator );
+  @Override
+  protected Session createSession(final Properties properties, final Authenticator authenticator) {
+    Properties params = properties;
+    for (final SmtpSessionParametersCustomizer customizer : customizers) {
+      params = customizer.customize(params);
     }
+    return super.createSession(params, authenticator);
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest;
 
 import org.sonatype.nexus.client.internal.util.Check;
@@ -20,50 +21,45 @@ import org.sonatype.nexus.client.internal.util.Check;
 public class ProxyInfo
 {
 
-    private final Protocol proxyProtocol;
+  private final Protocol proxyProtocol;
 
-    private final String proxyHost;
+  private final String proxyHost;
 
-    private final int proxyPort;
+  private final int proxyPort;
 
-    private final AuthenticationInfo proxyAuthentication;
+  private final AuthenticationInfo proxyAuthentication;
 
-    public ProxyInfo( final Protocol proxyProtocol, final String proxyHost, final int proxyPort,
-                      final AuthenticationInfo proxyAuthentication )
-    {
-        this.proxyProtocol = Check.notNull( proxyProtocol, Protocol.class );
-        this.proxyHost = Check.notBlank( proxyHost, "proxyHost" );
-        this.proxyPort =
-            Check.argument( proxyPort > 0 && proxyPort < 65536, proxyPort,
-                            "proxyPort out of boundaries (0 < proxyPort < 65536)!" );
-        this.proxyAuthentication = proxyAuthentication;
-    }
+  public ProxyInfo(final Protocol proxyProtocol, final String proxyHost, final int proxyPort,
+                   final AuthenticationInfo proxyAuthentication)
+  {
+    this.proxyProtocol = Check.notNull(proxyProtocol, Protocol.class);
+    this.proxyHost = Check.notBlank(proxyHost, "proxyHost");
+    this.proxyPort =
+        Check.argument(proxyPort > 0 && proxyPort < 65536, proxyPort,
+            "proxyPort out of boundaries (0 < proxyPort < 65536)!");
+    this.proxyAuthentication = proxyAuthentication;
+  }
 
-    public Protocol getProxyProtocol()
-    {
-        return proxyProtocol;
-    }
+  public Protocol getProxyProtocol() {
+    return proxyProtocol;
+  }
 
-    public String getProxyHost()
-    {
-        return proxyHost;
-    }
+  public String getProxyHost() {
+    return proxyHost;
+  }
 
-    public int getProxyPort()
-    {
-        return proxyPort;
-    }
+  public int getProxyPort() {
+    return proxyPort;
+  }
 
-    public AuthenticationInfo getProxyAuthentication()
-    {
-        return proxyAuthentication;
-    }
+  public AuthenticationInfo getProxyAuthentication() {
+    return proxyAuthentication;
+  }
 
-    @Override
-    public String toString()
-    {
-        return "ProxyInfo[proxyProtocol=" + proxyProtocol + ", proxyHost=" + proxyHost + ", proxyPort=" + proxyPort
-            + ", proxyAuthentication=" + proxyAuthentication + "]";
-    }
+  @Override
+  public String toString() {
+    return "ProxyInfo[proxyProtocol=" + proxyProtocol + ", proxyHost=" + proxyHost + ", proxyPort=" + proxyPort
+        + ", proxyAuthentication=" + proxyAuthentication + "]";
+  }
 
 }

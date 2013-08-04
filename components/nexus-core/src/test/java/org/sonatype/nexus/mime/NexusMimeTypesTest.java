@@ -10,7 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mime;
+
+import java.util.Properties;
+
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import com.google.common.base.Joiner;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -20,12 +28,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-import java.util.Properties;
-
-import com.google.common.base.Joiner;
-import org.junit.Test;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
 /**
  * Tests for {@link NexusMimeTypes}
  */
@@ -33,55 +35,50 @@ public class NexusMimeTypesTest
     extends TestSupport
 {
 
-    NexusMimeTypes underTest = new NexusMimeTypes();
+  NexusMimeTypes underTest = new NexusMimeTypes();
 
-    private Properties addMimeType( final Properties properties, final String extension, final String... types )
-    {
-        properties.setProperty( extension, Joiner.on( "," ).join( types ) );
-        return properties;
-    }
+  private Properties addMimeType(final Properties properties, final String extension, final String... types) {
+    properties.setProperty(extension, Joiner.on(",").join(types));
+    return properties;
+  }
 
-    @Test
-    public void unconfigured()
-    {
-        assertThat( underTest.getMimeTypes( "test" ), is( nullValue() ) );
-    }
+  @Test
+  public void unconfigured() {
+    assertThat(underTest.getMimeTypes("test"), is(nullValue()));
+  }
 
-    @Test
-    public void addMimeType()
-    {
-        underTest.initMimeTypes( addMimeType( new Properties(), "test", "application/octet-stream" ) );
-        assertThat( underTest.getMimeTypes( "test" ), is( notNullValue() ) );
-        assertThat( underTest.getMimeTypes( "test" ), hasProperty( "extension", is( "test" ) ) );
-        assertThat( underTest.getMimeTypes( "test" ), hasProperty( "override", is( false ) ) );
-        assertThat( underTest.getMimeTypes( "test" ).getMimetypes(), contains( "application/octet-stream" ));
-    }
+  @Test
+  public void addMimeType() {
+    underTest.initMimeTypes(addMimeType(new Properties(), "test", "application/octet-stream"));
+    assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
+    assertThat(underTest.getMimeTypes("test"), hasProperty("extension", is("test")));
+    assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(false)));
+    assertThat(underTest.getMimeTypes("test").getMimetypes(), contains("application/octet-stream"));
+  }
 
-    @Test
-    public void overrideMimeType()
-    {
-        Properties properties = new Properties();
-        underTest.initMimeTypes( addMimeType( properties, "override.test", "application/octet-stream" ) );
-        assertThat( underTest.getMimeTypes( "test" ), is( notNullValue() ) );
-        assertThat( underTest.getMimeTypes( "test" ), hasProperty( "extension", is( "test" ) ) );
-        assertThat( underTest.getMimeTypes( "test" ), hasProperty( "override", is( true ) ) );
-        assertThat( underTest.getMimeTypes( "test" ).getMimetypes(), contains( "application/octet-stream" ));
-    }
+  @Test
+  public void overrideMimeType() {
+    Properties properties = new Properties();
+    underTest.initMimeTypes(addMimeType(properties, "override.test", "application/octet-stream"));
+    assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
+    assertThat(underTest.getMimeTypes("test"), hasProperty("extension", is("test")));
+    assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(true)));
+    assertThat(underTest.getMimeTypes("test").getMimetypes(), contains("application/octet-stream"));
+  }
 
-    @Test
-    public void mergeOverrideAndAdditional()
-    {
-        Properties types = new Properties();
+  @Test
+  public void mergeOverrideAndAdditional() {
+    Properties types = new Properties();
 
-        addMimeType( types, "override.test", "application/octet-stream" );
-        addMimeType( types, "test", "text/plain" );
+    addMimeType(types, "override.test", "application/octet-stream");
+    addMimeType(types, "test", "text/plain");
 
-        underTest.initMimeTypes( types );
-        assertThat( underTest.getMimeTypes( "test" ), is( notNullValue() ) );
-        assertThat( underTest.getMimeTypes( "test" ), hasProperty( "extension", is( "test" ) ) );
-        assertThat( underTest.getMimeTypes( "test" ), hasProperty( "override", is( true ) ) );
-        assertThat( underTest.getMimeTypes( "test" ).getMimetypes(), hasItems( "application/octet-stream",
-                                                                               "text/plain" ));
-    }
+    underTest.initMimeTypes(types);
+    assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
+    assertThat(underTest.getMimeTypes("test"), hasProperty("extension", is("test")));
+    assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(true)));
+    assertThat(underTest.getMimeTypes("test").getMimetypes(), hasItems("application/octet-stream",
+        "text/plain"));
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest;
 
 import org.restlet.Context;
@@ -24,22 +25,19 @@ import org.restlet.resource.Variant;
 public class SimpleRestletResource
     extends Resource
 {
-    public SimpleRestletResource( Context context, Request request, Response response )
-    {
-        super( context, request, response );
+  public SimpleRestletResource(Context context, Request request, Response response) {
+    super(context, request, response);
 
-        getVariants().add( new Variant( MediaType.TEXT_PLAIN ) );
+    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
+  }
+
+  public Representation represent(Variant variant) {
+    String name = getRequest().getResourceRef().getPath();
+
+    if (name.contains("/")) {
+      name = name.substring(name.lastIndexOf("/") + 1, name.length());
     }
 
-    public Representation represent( Variant variant )
-    {
-        String name = getRequest().getResourceRef().getPath();
-
-        if ( name.contains( "/" ) )
-        {
-            name = name.substring( name.lastIndexOf( "/" ) + 1, name.length() );
-        }
-
-        return new StringRepresentation( name );
-    }
+    return new StringRepresentation(name);
+  }
 }

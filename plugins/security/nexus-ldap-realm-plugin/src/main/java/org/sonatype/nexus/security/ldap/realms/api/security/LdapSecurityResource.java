@@ -10,19 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.ldap.realms.api.security;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
-@Component( role = StaticSecurityResource.class, hint = "LdapSecurityResource" )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = StaticSecurityResource.class, hint = "LdapSecurityResource")
 public class LdapSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
-{    
-    public String getResourcePath()
-    {
-        return "/META-INF/nexus-ldap-plugin-security.xml";
-    }
+{
+  public String getResourcePath() {
+    return "/META-INF/nexus-ldap-plugin-security.xml";
+  }
 }

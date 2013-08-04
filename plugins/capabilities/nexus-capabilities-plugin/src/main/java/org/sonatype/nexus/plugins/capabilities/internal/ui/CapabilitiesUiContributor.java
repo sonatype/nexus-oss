@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.ui;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+package org.sonatype.nexus.plugins.capabilities.internal.ui;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
 /**
  * Capabilities {@link UiContributor}.
@@ -28,13 +29,12 @@ import javax.inject.Singleton;
 public class CapabilitiesUiContributor
     implements UiContributor
 {
-    private static final String GROUP_ID = "org.sonatype.nexus.plugins";
+  private static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
-    private static final String ARTIFACT_ID = "nexus-capabilities-plugin";
+  private static final String ARTIFACT_ID = "nexus-capabilities-plugin";
 
-    @Override
-    public UiContribution contribute( final boolean debug )
-    {
-        return new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID ).build(debug);
-    }
+  @Override
+  public UiContribution contribute(final boolean debug) {
+    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
+  }
 }

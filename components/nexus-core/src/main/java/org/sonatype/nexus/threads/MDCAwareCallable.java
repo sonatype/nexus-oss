@@ -10,12 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.threads;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.threads;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Callable that properly sets MDC context before invoking the delegate. The delegate will execute in a
@@ -24,23 +25,23 @@ import java.util.concurrent.Callable;
  * @author cstamas
  * @since 2.6
  */
-public class MDCAwareCallable<T> implements Callable<T>
+public class MDCAwareCallable<T>
+    implements Callable<T>
 {
-    private final Callable<T> delegate;
+  private final Callable<T> delegate;
 
-    private final Map<String, String> mdcContext;
+  private final Map<String, String> mdcContext;
 
-    public MDCAwareCallable( final Callable<T> delegate )
-    {
-        this.delegate = checkNotNull( delegate );
-        this.mdcContext = MDCUtils.getCopyOfContextMap();
-    }
+  public MDCAwareCallable(final Callable<T> delegate) {
+    this.delegate = checkNotNull(delegate);
+    this.mdcContext = MDCUtils.getCopyOfContextMap();
+  }
 
-    @Override
-    public T call()
-        throws Exception
-    {
-        MDCUtils.setContextMap( mdcContext );
-        return delegate.call();
-    }
+  @Override
+  public T call()
+      throws Exception
+  {
+    MDCUtils.setContextMap(mdcContext);
+    return delegate.call();
+  }
 }

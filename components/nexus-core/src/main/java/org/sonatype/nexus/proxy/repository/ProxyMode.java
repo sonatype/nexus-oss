@@ -10,39 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 /**
  * Proxy mode.
- * 
+ *
  * @author cstamas
  */
 public enum ProxyMode
 {
-    ALLOW,
+  ALLOW,
 
-    BLOCKED_AUTO,
+  BLOCKED_AUTO,
 
-    BLOCKED_MANUAL;
+  BLOCKED_MANUAL;
 
-    public boolean shouldProxy()
-    {
-        return ALLOW.equals( this );
-    }
+  public boolean shouldProxy() {
+    return ALLOW.equals(this);
+  }
 
-    public boolean shouldCheckRemoteStatus()
-    {
-        return ALLOW.equals( this ) || BLOCKED_AUTO.equals( this );
-    }
+  public boolean shouldCheckRemoteStatus() {
+    return ALLOW.equals(this) || BLOCKED_AUTO.equals(this);
+  }
 
-    public boolean shouldAutoBlock()
-    {
-        return ALLOW.equals( this );
-    }
+  public boolean shouldAutoBlock() {
+    return ALLOW.equals(this);
+  }
 
-    public boolean shouldAutoUnblock()
-    {
-        return BLOCKED_AUTO.equals( this );
-    }
+  public boolean shouldAutoUnblock() {
+    return BLOCKED_AUTO.equals(this);
+  }
 
 }

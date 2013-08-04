@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.model;
 
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
@@ -22,13 +23,12 @@ import com.thoughtworks.xstream.XStream;
  * assumes plexus-restlet-bridge is on classpath (untrue in case of clients, at least it's not wanted, as it has huge
  * dependency trail), as it relies on "error message" classes defined over there. If you are on client side, you don't
  * want to use this configurator, use the{@link XStreamConfiguratorLightweight} instead.
- * 
+ *
  * @author cstamas
  */
 public class XStreamConfigurator
 {
-    public static XStream configureXStream( XStream xstream )
-    {
-        return XStreamConfiguratorLightweight.configureXStream( xstream, ErrorResponse.class, ErrorMessage.class );
-    }
+  public static XStream configureXStream(XStream xstream) {
+    return XStreamConfiguratorLightweight.configureXStream(xstream, ErrorResponse.class, ErrorMessage.class);
+  }
 }

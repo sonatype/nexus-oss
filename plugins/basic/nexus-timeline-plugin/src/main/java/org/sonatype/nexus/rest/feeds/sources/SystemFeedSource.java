@@ -10,50 +10,47 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.SystemEvent;
+
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * The system changes feed.
- * 
+ *
  * @author cstamas
  */
-@Component( role = FeedSource.class, hint = "systemChanges" )
+@Component(role = FeedSource.class, hint = "systemChanges")
 public class SystemFeedSource
     extends AbstractSystemFeedSource
 {
-    public static final String CHANNEL_KEY = "systemChanges";
+  public static final String CHANNEL_KEY = "systemChanges";
 
-    public List<SystemEvent> getEventList( Integer from, Integer count, Map<String, String> params )
-    {
-        return getFeedRecorder().getSystemEvents( null, from, count, null );
-    }
+  public List<SystemEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
+    return getFeedRecorder().getSystemEvents(null, from, count, null);
+  }
 
-    public String getFeedKey()
-    {
-        return CHANNEL_KEY;
-    }
+  public String getFeedKey() {
+    return CHANNEL_KEY;
+  }
 
-    public String getFeedName()
-    {
-        return getDescription();
-    }
+  public String getFeedName() {
+    return getDescription();
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "System changes in Nexus.";
-    }
+  @Override
+  public String getDescription() {
+    return "System changes in Nexus.";
+  }
 
-    @Override
-    public String getTitle()
-    {
-        return "System changes";
-    }
+  @Override
+  public String getTitle() {
+    return "System changes";
+  }
 
 }

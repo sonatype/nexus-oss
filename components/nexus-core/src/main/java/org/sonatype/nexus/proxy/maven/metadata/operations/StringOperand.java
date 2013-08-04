@@ -10,36 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
+
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * String storage
- * 
+ *
  * @author Oleg Gusakov
  * @version $Id: StringOperand.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
 public class StringOperand
     extends AbstractOperand
 {
-    private final String str;
+  private final String str;
 
-    public StringOperand( final Version originModelVersion, final String data )
-    {
-        super( originModelVersion );
+  public StringOperand(final Version originModelVersion, final String data) {
+    super(originModelVersion);
 
-        if ( StringUtils.isBlank( data ) )
-        {
-            throw new IllegalArgumentException( "String operand may not carry empty/null string!" );
-        }
-
-        this.str = data;
+    if (StringUtils.isBlank(data)) {
+      throw new IllegalArgumentException("String operand may not carry empty/null string!");
     }
 
-    public String getOperand()
-    {
-        return str;
-    }
+    this.str = data;
+  }
+
+  public String getOperand() {
+    return str;
+  }
 }

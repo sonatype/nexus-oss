@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.source.filter;
 
 import java.util.Arrays;
@@ -23,49 +24,41 @@ import org.sonatype.appcontext.source.WrappingEntrySourceMarker;
 /**
  * EntryFilter that filters on key-prefix (keys are Strings) using key.startsWith() method, hence, this is case
  * sensitive! You can supply a list of key prefixes to accept.
- * 
+ *
  * @author cstamas
  */
 public class KeyPrefixEntryFilter
     implements EntryFilter
 {
-    private final List<String> prefixes;
+  private final List<String> prefixes;
 
-    public KeyPrefixEntryFilter( final String... prefixes )
-    {
-        this( Arrays.asList( prefixes ) );
-    }
+  public KeyPrefixEntryFilter(final String... prefixes) {
+    this(Arrays.asList(prefixes));
+  }
 
-    public KeyPrefixEntryFilter( final List<String> prefixes )
-    {
-        this.prefixes = Collections.unmodifiableList( Preconditions.checkNotNull( prefixes ) );
-    }
+  public KeyPrefixEntryFilter(final List<String> prefixes) {
+    this.prefixes = Collections.unmodifiableList(Preconditions.checkNotNull(prefixes));
+  }
 
-    public boolean accept( final String key, final Object value )
-    {
-        if ( key != null )
-        {
-            for ( String prefix : prefixes )
-            {
-                if ( key.startsWith( prefix ) )
-                {
-                    return true;
-                }
-            }
+  public boolean accept(final String key, final Object value) {
+    if (key != null) {
+      for (String prefix : prefixes) {
+        if (key.startsWith(prefix)) {
+          return true;
         }
-
-        return false;
+      }
     }
 
-    public EntrySourceMarker getFilteredEntrySourceMarker( final EntrySourceMarker source )
+    return false;
+  }
+
+  public EntrySourceMarker getFilteredEntrySourceMarker(final EntrySourceMarker source) {
+    return new WrappingEntrySourceMarker(source)
     {
-        return new WrappingEntrySourceMarker( source )
-        {
-            @Override
-            protected String getDescription( final EntrySourceMarker wrapped )
-            {
-                return String.format( "filter(keyStartsWith:%s, %s)", prefixes, wrapped.getDescription() );
-            }
-        };
-    }
+      @Override
+      protected String getDescription(final EntrySourceMarker wrapped) {
+        return String.format("filter(keyStartsWith:%s, %s)", prefixes, wrapped.getDescription());
+      }
+    };
+  }
 }

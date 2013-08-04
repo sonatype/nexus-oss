@@ -10,29 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
  * Core component doing "aggregation" of attribute sources, possibly contributed by plugins.
- * 
+ *
  * @author cstamas
  */
 public interface RepositoryItemUidAttributeManager
 {
-    /**
-     * Returns the attribute belonging to passed in key or {@code null} if no such attribute.
-     * 
-     * @param <T>
-     * @param attributeKey
-     * @param subject
-     * @return
-     */
-    <T extends Attribute<?>> T getAttribute( Class<T> attributeKey, RepositoryItemUid subject );
+  /**
+   * Returns the attribute belonging to passed in key or {@code null} if no such attribute.
+   */
+  <T extends Attribute<?>> T getAttribute(Class<T> attributeKey, RepositoryItemUid subject);
 
-    /**
-     * Causes to recollect all registered attributes.
-     */
-    void reset();
+  /**
+   * Causes to recollect all registered attributes.
+   */
+  void reset();
 }

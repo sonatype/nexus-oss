@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.capabilities.client.spi;
 
 /**
@@ -19,13 +20,13 @@ package org.sonatype.nexus.capabilities.client.spi;
  */
 @javax.inject.Qualifier
 @java.lang.annotation.Documented
-@java.lang.annotation.Retention( java.lang.annotation.RetentionPolicy.RUNTIME )
+@java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 public @interface CapabilityType
 {
 
-    /**
-     * @return capability type id (never null)
-     */
-    String value();
+  /**
+   * @return capability type id (never null)
+   */
+  String value();
 
 }

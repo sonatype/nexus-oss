@@ -10,12 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.artifact;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.apache.maven.model.Model;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -25,58 +29,55 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * POM Resource handler.
- * 
+ *
  * @author cstamas
  */
-@Component( role = PlexusResource.class, hint = "ArtifactPlexusResource" )
-@Path( ArtifactPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "ArtifactPlexusResource")
+@Path(ArtifactPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class ArtifactPlexusResource
     extends AbstractArtifactPlexusResource
 {
-    public static final String RESOURCE_URI = "/artifact/maven";
+  public static final String RESOURCE_URI = "/artifact/maven";
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:artifact]" );
-    }
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:artifact]");
+  }
 
-    /**
-     * Returns POM model in a serialized form (it is NOT consumable by Maven, the returned content is not XML
-     * representation of Maven POM!) for provided GAV coordinates.
-     * 
-     * @param g Group id of the pom (Required).
-     * @param a Artifact id of the pom (Required).
-     * @param v Version of the artifact (Required) Supports resolving of "LATEST", "RELEASE" and snapshot versions
-     *            ("1.0-SNAPSHOT") too.
-     * @param r Repository to retrieve the pom from (Required).
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( queryParams = { @QueryParam( "g" ), @QueryParam( "a" ), @QueryParam( "v" ),
-        @QueryParam( "r" ) }, output = Model.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        return getPom( variant, request, response );
-    }
+  /**
+   * Returns POM model in a serialized form (it is NOT consumable by Maven, the returned content is not XML
+   * representation of Maven POM!) for provided GAV coordinates.
+   *
+   * @param g Group id of the pom (Required).
+   * @param a Artifact id of the pom (Required).
+   * @param v Version of the artifact (Required) Supports resolving of "LATEST", "RELEASE" and snapshot versions
+   *          ("1.0-SNAPSHOT") too.
+   * @param r Repository to retrieve the pom from (Required).
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(queryParams = {
+      @QueryParam("g"), @QueryParam("a"), @QueryParam("v"),
+      @QueryParam("r")
+  }, output = Model.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    return getPom(variant, request, response);
+  }
 
 }

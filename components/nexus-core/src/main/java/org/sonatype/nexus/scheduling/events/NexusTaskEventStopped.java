@@ -10,29 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling.events;
 
 import org.sonatype.nexus.scheduling.NexusTask;
 
 /**
  * Base class for events fired when a task is stopped, done (whatever the outcome is: finished, cancelled or failed).
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public abstract class NexusTaskEventStopped<T>
     extends NexusTaskEvent<T>
 {
-    private final NexusTaskEventStarted<T> startedEvent;
-    
-    public NexusTaskEventStopped( final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent )
-    {
-        super( task );
-        this.startedEvent = startedEvent;
-    }
+  private final NexusTaskEventStarted<T> startedEvent;
 
-    public NexusTaskEventStarted<T> getStartedEvent()
-    {
-        return startedEvent;
-    }
+  public NexusTaskEventStopped(final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent) {
+    super(task);
+    this.startedEvent = startedEvent;
+  }
+
+  public NexusTaskEventStarted<T> getStartedEvent() {
+    return startedEvent;
+  }
 }

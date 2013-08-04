@@ -10,22 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.threads;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
 /**
- * {@link SubjectProvider} implementation that uses Shiro's {@link SecurityUtils#getSubject()} to grab the current {@link Subject}.
+ * {@link SubjectProvider} implementation that uses Shiro's {@link SecurityUtils#getSubject()} to grab the current
+ * {@link Subject}.
  *
  * @author cstamas
  * @since 2.6
  */
-public class CurrentSubjectProvider implements SubjectProvider
+public class CurrentSubjectProvider
+    implements SubjectProvider
 {
-    @Override
-    public Subject getSubject()
-    {
-        return SecurityUtils.getSubject();
-    }
+  @Override
+  public Subject getSubject() {
+    return SecurityUtils.getSubject();
+  }
 }

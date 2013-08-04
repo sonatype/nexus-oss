@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -23,48 +24,41 @@ public class UnsatisfiedCondition
     implements Condition
 {
 
-    private final String reason;
+  private final String reason;
 
-    public UnsatisfiedCondition( final String reason )
-    {
-        this.reason = reason;
-    }
+  public UnsatisfiedCondition(final String reason) {
+    this.reason = reason;
+  }
 
-    @Override
-    public boolean isSatisfied()
-    {
-        return false;
-    }
+  @Override
+  public boolean isSatisfied() {
+    return false;
+  }
 
-    @Override
-    public UnsatisfiedCondition bind()
-    {
-        // do nothing
-        return this;
-    }
+  @Override
+  public UnsatisfiedCondition bind() {
+    // do nothing
+    return this;
+  }
 
-    @Override
-    public UnsatisfiedCondition release()
-    {
-        // do nothing
-        return this;
-    }
+  @Override
+  public UnsatisfiedCondition release() {
+    // do nothing
+    return this;
+  }
 
-    @Override
-    public String toString()
-    {
-        return reason;
-    }
+  @Override
+  public String toString() {
+    return reason;
+  }
 
-    @Override
-    public String explainSatisfied()
-    {
-        return "Not " + reason;
-    }
+  @Override
+  public String explainSatisfied() {
+    return "Not " + reason;
+  }
 
-    @Override
-    public String explainUnsatisfied()
-    {
-        return reason;
-    }
+  @Override
+  public String explainUnsatisfied() {
+    return reason;
+  }
 }

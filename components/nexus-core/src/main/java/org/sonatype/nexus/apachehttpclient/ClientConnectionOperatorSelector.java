@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.apachehttpclient;
 
 import org.apache.http.HttpHost;
@@ -28,14 +29,14 @@ import org.apache.http.protocol.HttpContext;
 public interface ClientConnectionOperatorSelector
 {
 
-    /**
-     * Selects an operator based on http host, http context and http parameters.
-     *
-     * @param host    http host (not null)
-     * @param context http context (not null)
-     * @param params  http parameters (not null)
-     * @return an operator or null if selector cannot determine one based on provided parameters
-     */
-    ClientConnectionOperator get( HttpHost host, HttpContext context, HttpParams params );
+  /**
+   * Selects an operator based on http host, http context and http parameters.
+   *
+   * @param host    http host (not null)
+   * @param context http context (not null)
+   * @param params  http parameters (not null)
+   * @return an operator or null if selector cannot determine one based on provided parameters
+   */
+  ClientConnectionOperator get(HttpHost host, HttpContext context, HttpParams params);
 
 }

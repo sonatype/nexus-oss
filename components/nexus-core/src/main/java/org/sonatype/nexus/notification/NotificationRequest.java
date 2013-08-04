@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.notification;
 
 import java.util.HashSet;
@@ -17,36 +18,31 @@ import java.util.Set;
 
 public class NotificationRequest
 {
-    public static final NotificationRequest EMPTY = new NotificationRequest( NotificationMessage.EMPTY_MESSAGE );
+  public static final NotificationRequest EMPTY = new NotificationRequest(NotificationMessage.EMPTY_MESSAGE);
 
-    private final Set<NotificationTarget> targets;
+  private final Set<NotificationTarget> targets;
 
-    private final NotificationMessage message;
+  private final NotificationMessage message;
 
-    public NotificationRequest( NotificationMessage message )
-    {
-        this( message, new HashSet<NotificationTarget>() );
-    }
+  public NotificationRequest(NotificationMessage message) {
+    this(message, new HashSet<NotificationTarget>());
+  }
 
-    public NotificationRequest( NotificationMessage message, Set<NotificationTarget> targets )
-    {
-        this.message = message;
+  public NotificationRequest(NotificationMessage message, Set<NotificationTarget> targets) {
+    this.message = message;
 
-        this.targets = targets;
-    }
+    this.targets = targets;
+  }
 
-    public Set<NotificationTarget> getTargets()
-    {
-        return targets;
-    }
+  public Set<NotificationTarget> getTargets() {
+    return targets;
+  }
 
-    public NotificationMessage getMessage()
-    {
-        return message;
-    }
+  public NotificationMessage getMessage() {
+    return message;
+  }
 
-    public boolean isEmpty()
-    {
-        return getTargets().isEmpty();
-    }
+  public boolean isEmpty() {
+    return getTargets().isEmpty();
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.attributes;
 
 import javax.inject.Singleton;
@@ -24,21 +25,21 @@ import org.sonatype.plugin.ExtensionPoint;
 @Singleton
 public interface StorageItemInspector
 {
-    /**
-     * Checks if item is handled.
-     * 
-     * @param item the item
-     * @return true, if is handled
-     */
-    boolean isHandled( StorageItem item );
+  /**
+   * Checks if item is handled.
+   *
+   * @param item the item
+   * @return true, if is handled
+   */
+  boolean isHandled(StorageItem item);
 
-    /**
-     * Process storage item.
-     * 
-     * @param item the item
-     * @throws Exception the exception
-     */
-    void processStorageItem( StorageItem item )
-        throws Exception;
+  /**
+   * Process storage item.
+   *
+   * @param item the item
+   * @throws Exception the exception
+   */
+  void processStorageItem(StorageItem item)
+      throws Exception;
 
 }

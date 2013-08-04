@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
@@ -23,64 +24,57 @@ public class ConditionEvent
     extends AbstractEvent<Condition>
 {
 
-    public ConditionEvent( final Condition condition )
-    {
-        super( condition );
-    }
+  public ConditionEvent(final Condition condition) {
+    super(condition);
+  }
 
-    public Condition getCondition()
-    {
-        return getEventSender();
+  public Condition getCondition() {
+    return getEventSender();
+  }
+
+  @Override
+  public String toString() {
+    return getCondition().toString();
+  }
+
+  /**
+   * Event fired when a condition becomes satisfied.
+   *
+   * @since 2.0
+   */
+  public static class Satisfied
+      extends ConditionEvent
+  {
+
+    public Satisfied(final Condition condition) {
+      super(condition);
     }
 
     @Override
-    public String toString()
-    {
-        return getCondition().toString();
+    public String toString() {
+      return super.toString() + " is satisfied";
     }
 
-    /**
-     * Event fired when a condition becomes satisfied.
-     *
-     * @since 2.0
-     */
-    public static class Satisfied
-        extends ConditionEvent
-    {
+  }
 
-        public Satisfied( final Condition condition )
-        {
-            super( condition );
-        }
+  /**
+   * Event fired when a condition becomes unsatisfied.
+   *
+   * @since 2.0
+   */
+  public static class Unsatisfied
+      extends ConditionEvent
+  {
 
-        @Override
-        public String toString()
-        {
-            return super.toString() + " is satisfied";
-        }
-
+    public Unsatisfied(final Condition condition) {
+      super(condition);
     }
 
-    /**
-     * Event fired when a condition becomes unsatisfied.
-     *
-     * @since 2.0
-     */
-    public static class Unsatisfied
-        extends ConditionEvent
-    {
-
-        public Unsatisfied( final Condition condition )
-        {
-            super( condition );
-        }
-
-        @Override
-        public String toString()
-        {
-            return super.toString() + " is unsatisfied";
-        }
-
+    @Override
+    public String toString() {
+      return super.toString() + " is unsatisfied";
     }
+
+  }
 
 }

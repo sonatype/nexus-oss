@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms;
 
 import java.util.Collection;
@@ -24,8 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.shiro.authz.Permission;
-import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.PermissionFactory;
@@ -35,88 +34,80 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.RolePermissionResolver;
+
 /**
  * The default implementation of the RolePermissionResolver which reads roles from {@link StaticSecurityResource}s to
  * resolve a role into a collection of permissions. This class allows Realm implementations to no know what/how there
  * roles are used.
- * 
+ *
  * @author Brian Demers
  */
 @Singleton
-@Typed( RolePermissionResolver.class )
-@Named( "default" )
+@Typed(RolePermissionResolver.class)
+@Named("default")
 public class XmlRolePermissionResolver
     implements RolePermissionResolver
 {
-    private final ConfigurationManager configuration;
+  private final ConfigurationManager configuration;
 
-    private final List<PrivilegeDescriptor> privilegeDescriptors;
+  private final List<PrivilegeDescriptor> privilegeDescriptors;
 
-    private final PermissionFactory permissionFactory;
+  private final PermissionFactory permissionFactory;
 
-    @Inject
-    public XmlRolePermissionResolver( @Named( "default" ) ConfigurationManager configuration,
-                                      List<PrivilegeDescriptor> privilegeDescriptors,
-                                      @Named( "caching" ) PermissionFactory permissionFactory )
-    {
-        this.configuration = configuration;
-        this.privilegeDescriptors = privilegeDescriptors;
-        this.permissionFactory = permissionFactory;
-    }
+  @Inject
+  public XmlRolePermissionResolver(@Named("default") ConfigurationManager configuration,
+                                   List<PrivilegeDescriptor> privilegeDescriptors,
+                                   @Named("caching") PermissionFactory permissionFactory)
+  {
+    this.configuration = configuration;
+    this.privilegeDescriptors = privilegeDescriptors;
+    this.permissionFactory = permissionFactory;
+  }
 
-    public Collection<Permission> resolvePermissionsInRole( final String roleString )
-    {
-        final LinkedList<String> rolesToProcess = new LinkedList<String>();
-        rolesToProcess.add( roleString ); // initial role
-        final Set<String> processedRoleIds = new LinkedHashSet<String>();
-        final Set<Permission> permissions = new LinkedHashSet<Permission>();
-        while ( !rolesToProcess.isEmpty() )
-        {
-            final String roleId = rolesToProcess.removeFirst();
-            if ( !processedRoleIds.contains( roleId ) )
-            {
-                try
-                {
-                    final CRole role = configuration.readRole( roleId );
-                    processedRoleIds.add( roleId );
+  public Collection<Permission> resolvePermissionsInRole(final String roleString) {
+    final LinkedList<String> rolesToProcess = new LinkedList<String>();
+    rolesToProcess.add(roleString); // initial role
+    final Set<String> processedRoleIds = new LinkedHashSet<String>();
+    final Set<Permission> permissions = new LinkedHashSet<Permission>();
+    while (!rolesToProcess.isEmpty()) {
+      final String roleId = rolesToProcess.removeFirst();
+      if (!processedRoleIds.contains(roleId)) {
+        try {
+          final CRole role = configuration.readRole(roleId);
+          processedRoleIds.add(roleId);
 
-                    // process the roles this role has recursively
-                    rolesToProcess.addAll( role.getRoles() );
-                    // add the permissions this role has
-                    final List<String> privilegeIds = role.getPrivileges();
-                    for ( String privilegeId : privilegeIds )
-                    {
-                        Set<Permission> set = getPermissions( privilegeId );
-                        permissions.addAll( set );
-                    }
-                }
-                catch ( NoSuchRoleException e )
-                {
-                    // skip
-                }
-            }
+          // process the roles this role has recursively
+          rolesToProcess.addAll(role.getRoles());
+          // add the permissions this role has
+          final List<String> privilegeIds = role.getPrivileges();
+          for (String privilegeId : privilegeIds) {
+            Set<Permission> set = getPermissions(privilegeId);
+            permissions.addAll(set);
+          }
         }
-        return permissions;
+        catch (NoSuchRoleException e) {
+          // skip
+        }
+      }
     }
+    return permissions;
+  }
 
-    protected Set<Permission> getPermissions( final String privilegeId )
-    {
-        try
-        {
-            final CPrivilege privilege = configuration.readPrivilege( privilegeId );
-            for ( PrivilegeDescriptor descriptor : privilegeDescriptors )
-            {
-                final String permission = descriptor.buildPermission( privilege );
-                if ( permission != null )
-                {
-                    return Collections.singleton( permissionFactory.create( permission ) );
-                }
-            }
-            return Collections.emptySet();
+  protected Set<Permission> getPermissions(final String privilegeId) {
+    try {
+      final CPrivilege privilege = configuration.readPrivilege(privilegeId);
+      for (PrivilegeDescriptor descriptor : privilegeDescriptors) {
+        final String permission = descriptor.buildPermission(privilege);
+        if (permission != null) {
+          return Collections.singleton(permissionFactory.create(permission));
         }
-        catch ( NoSuchPrivilegeException e )
-        {
-            return Collections.emptySet();
-        }
+      }
+      return Collections.emptySet();
     }
+    catch (NoSuchPrivilegeException e) {
+      return Collections.emptySet();
+    }
+  }
 }

@@ -10,24 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.misc.nexus412;
 
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+
+import org.junit.Test;
 
 public class Nexus412RemoteLeakIT
     extends AbstractNexusIntegrationTest
 {
-    // TODO: This IT is not an IT and will newer work as such. This is actually an UT but was moved from there to ITs.
-    // As long as Nexus and IT runs in separate container, this IT will NEVER work. This is UT!
-    
-    @Test
-    public void testDummy()
-    {
-        
-    }
+  // TODO: This IT is not an IT and will newer work as such. This is actually an UT but was moved from there to ITs.
+  // As long as Nexus and IT runs in separate container, this IT will NEVER work. This is UT!
 
-    // DISABLED: move to IT, it takes too long (no route to host + java)
+  @Test
+  public void testDummy() {
+
+  }
+
+  // DISABLED: move to IT, it takes too long (no route to host + java)
     /* COMMENTED OUT SINCE THIS IS THE ONLY ONE CLASS DEPENDING ON NEXUS CORE INTERNAL CLASSES
      * AND IS EVEN NOT AN IT!!! JUST TO PREVENT COMPILATION ERRORs
     @Test

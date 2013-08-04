@@ -10,18 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.configuration;
 
-import junit.framework.Assert;
-import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.inject.BeanScanning;
-import org.sonatype.sisu.litmus.testsupport.TestUtil;
+package org.sonatype.security.configuration;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+
+import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.inject.BeanScanning;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
+
+import junit.framework.Assert;
+import org.codehaus.plexus.util.FileUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -29,82 +31,80 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 public class SecurityConfigurationManagerTest
     extends InjectedTestCase
 {
-    private final TestUtil util = new TestUtil(this);
+  private final TestUtil util = new TestUtil(this);
 
-    // FIXME: Upgrade to junit4
+  // FIXME: Upgrade to junit4
 
-    private File PLEXUS_HOME = util.createTempDir("plexus-home");
+  private File PLEXUS_HOME = util.createTempDir("plexus-home");
 
-    private File APP_CONF = new File( PLEXUS_HOME, "conf" );
+  private File APP_CONF = new File(PLEXUS_HOME, "conf");
 
-    @Override
-    public void configure( Properties properties )
-    {
-        properties.put( "application-conf", APP_CONF.getAbsolutePath() );
-        super.configure( properties );
-    }
+  @Override
+  public void configure(Properties properties) {
+    properties.put("application-conf", APP_CONF.getAbsolutePath());
+    super.configure(properties);
+  }
 
-    @Override
-    public BeanScanning scanning()
-    {
-        return BeanScanning.INDEX;
-    }
+  @Override
+  public BeanScanning scanning() {
+    return BeanScanning.INDEX;
+  }
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        // delete the plexus home dir
-        FileUtils.deleteDirectory( PLEXUS_HOME );
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    // delete the plexus home dir
+    FileUtils.deleteDirectory(PLEXUS_HOME);
 
-        super.setUp();
-    }
+    super.setUp();
+  }
 
-    //@Test
-    public void testLoadEmptyDefaults()
-        throws Exception
-    {
-        SecurityConfigurationManager config = this.lookup( SecurityConfigurationManager.class );
+  //@Test
+  public void testLoadEmptyDefaults()
+      throws Exception
+  {
+    SecurityConfigurationManager config = this.lookup(SecurityConfigurationManager.class);
 
-        Assert.assertNotNull( config );
+    Assert.assertNotNull(config);
 
-        Assert.assertEquals( "anonymous-pass", config.getAnonymousPassword() );
-        Assert.assertEquals( "anonymous-user", config.getAnonymousUsername() );
+    Assert.assertEquals("anonymous-pass", config.getAnonymousPassword());
+    Assert.assertEquals("anonymous-user", config.getAnonymousUsername());
 
-        Assert.assertEquals( false, config.isAnonymousAccessEnabled() );
-        Assert.assertEquals( true, config.isEnabled() );
+    Assert.assertEquals(false, config.isAnonymousAccessEnabled());
+    Assert.assertEquals(true, config.isEnabled());
 
-        List<String> realms = config.getRealms();
-        assertThat(realms, containsInAnyOrder(
-            "MockRealmA", "MockRealmB", "ExceptionThrowingMockRealm", "FakeRealm1", "FakeRealm2"));
-    }
+    List<String> realms = config.getRealms();
+    assertThat(realms, containsInAnyOrder(
+        "MockRealmA", "MockRealmB", "ExceptionThrowingMockRealm", "FakeRealm1", "FakeRealm2"));
+  }
 
-    //@Test
-    public void testWrite()
-        throws Exception
-    {
-        SecurityConfigurationManager config = this.lookup( SecurityConfigurationManager.class );
+  //@Test
+  public void testWrite()
+      throws Exception
+  {
+    SecurityConfigurationManager config = this.lookup(SecurityConfigurationManager.class);
 
-        config.setAnonymousAccessEnabled( true );
-        config.setEnabled( false );
-        config.setAnonymousPassword( "new-pass" );
-        config.setAnonymousUsername( "new-user" );
+    config.setAnonymousAccessEnabled(true);
+    config.setEnabled(false);
+    config.setAnonymousPassword("new-pass");
+    config.setAnonymousUsername("new-user");
 
-        List<String> realms = Collections.singletonList("FakeRealm1");
-        config.setRealms( realms );
+    List<String> realms = Collections.singletonList("FakeRealm1");
+    config.setRealms(realms);
 
-        config.save();
+    config.save();
 
-        config.clearCache();
+    config.clearCache();
 
-        Assert.assertEquals( "new-pass", config.getAnonymousPassword() );
-        Assert.assertEquals( "new-user", config.getAnonymousUsername() );
+    Assert.assertEquals("new-pass", config.getAnonymousPassword());
+    Assert.assertEquals("new-user", config.getAnonymousUsername());
 
-        Assert.assertEquals( true, config.isAnonymousAccessEnabled() );
-        Assert.assertEquals( false, config.isEnabled() );
+    Assert.assertEquals(true, config.isAnonymousAccessEnabled());
+    Assert.assertEquals(false, config.isEnabled());
 
-        realms = config.getRealms();
-        Assert.assertEquals( 1, realms.size() );
-        Assert.assertEquals( "FakeRealm1", realms.get( 0 ) );
-    }
+    realms = config.getRealms();
+    Assert.assertEquals(1, realms.size());
+    Assert.assertEquals("FakeRealm1", realms.get(0));
+  }
 }

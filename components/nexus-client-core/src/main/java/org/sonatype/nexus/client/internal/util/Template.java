@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.util;
 
 /**
@@ -21,45 +22,38 @@ package org.sonatype.nexus.client.internal.util;
 public class Template
 {
 
-    private final String format;
+  private final String format;
 
-    private final Object[] args;
+  private final Object[] args;
 
-    public Template( final String format, final Object... args )
-    {
-        if ( format == null || format.trim().isEmpty() )
-        {
-            throw new IllegalArgumentException( "Template's format cannot be blank!" );
-        }
-        this.format = format;
-        this.args = args;
+  public Template(final String format, final Object... args) {
+    if (format == null || format.trim().isEmpty()) {
+      throw new IllegalArgumentException("Template's format cannot be blank!");
     }
+    this.format = format;
+    this.args = args;
+  }
 
-    public String evaluate()
-    {
-        return String.format( format, args );
-    }
+  public String evaluate() {
+    return String.format(format, args);
+  }
 
-    public String getFormat()
-    {
-        return format;
-    }
+  public String getFormat() {
+    return format;
+  }
 
-    public Object[] getArgs()
-    {
-        return args;
-    }
+  public Object[] getArgs() {
+    return args;
+  }
 
-    @Override
-    public String toString()
-    {
-        return evaluate();
-    }
+  @Override
+  public String toString() {
+    return evaluate();
+  }
 
-    // ==
+  // ==
 
-    public static Template of( final String format, final Object... args )
-    {
-        return new Template( format, args );
-    }
+  public static Template of(final String format, final Object... args) {
+    return new Template(format, args);
+  }
 }

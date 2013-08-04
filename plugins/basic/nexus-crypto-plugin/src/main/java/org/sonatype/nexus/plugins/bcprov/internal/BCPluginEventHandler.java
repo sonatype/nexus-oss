@@ -10,29 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.bcprov.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.bcprov.internal;
 
 import java.security.Security;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Guava {@link EventBus} handler that listens for Nexus events and performs BC provider registration/removal. This
  * component is marked as {@code EagerSingleton} to be created (and hence to have registration happen) as early as
  * possible, even before any wiring happens in plugins.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
@@ -40,46 +41,42 @@ import com.google.common.eventbus.Subscribe;
 @EagerSingleton
 public class BCPluginEventHandler
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final boolean registered;
+  private final boolean registered;
 
-    /**
-     * Default constructor.
-     * 
-     * @param eventBus the {@link EventBus} to register with.
-     */
-    @Inject
-    public BCPluginEventHandler( final EventBus eventBus )
-    {
-        checkNotNull( eventBus );
+  /**
+   * Default constructor.
+   *
+   * @param eventBus the {@link EventBus} to register with.
+   */
+  @Inject
+  public BCPluginEventHandler(final EventBus eventBus) {
+    checkNotNull(eventBus);
 
-        // register BC and nag if already installed
-        registered = Security.addProvider( new BouncyCastleProvider() ) != -1;
-        if ( registered )
-        {
-            logger.debug("BouncyCastle security provider registered");
-        }
-        else
-        {
-            logger.warn("BouncyCastle security provider already registered; could become problematic");
-        }
-
-        eventBus.register( this );
+    // register BC and nag if already installed
+    registered = Security.addProvider(new BouncyCastleProvider()) != -1;
+    if (registered) {
+      logger.debug("BouncyCastle security provider registered");
+    }
+    else {
+      logger.warn("BouncyCastle security provider already registered; could become problematic");
     }
 
-    /**
-     * {@link NexusStoppedEvent} handler: unregister BC provider if needed (if it was registered by us, not by some 3rd party).
-     * 
-     * @param e the event (not used)
-     */
-    @Subscribe
-    public void onNexusStoppedEvent( final NexusStoppedEvent e )
-    {
-        if ( registered )
-        {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-            logger.debug("BouncyCastle security provider unregistered");
-        }
+    eventBus.register(this);
+  }
+
+  /**
+   * {@link NexusStoppedEvent} handler: unregister BC provider if needed (if it was registered by us, not by some 3rd
+   * party).
+   *
+   * @param e the event (not used)
+   */
+  @Subscribe
+  public void onNexusStoppedEvent(final NexusStoppedEvent e) {
+    if (registered) {
+      Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+      logger.debug("BouncyCastle security provider unregistered");
     }
+  }
 }

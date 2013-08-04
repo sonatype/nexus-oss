@@ -10,16 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.ldap;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationResponse;
@@ -27,151 +22,155 @@ import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConf
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 
 import com.thoughtworks.xstream.XStream;
+import org.junit.Assert;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapUserGroupMessageUtil
 {
 
-    private static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "ldap/user_group_conf";
+  private static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "ldap/user_group_conf";
 
-    private XStream xstream;
+  private XStream xstream;
 
-    private MediaType mediaType;
+  private MediaType mediaType;
 
-    private static final Logger LOG = LoggerFactory.getLogger( GroupMessageUtil.class );
+  private static final Logger LOG = LoggerFactory.getLogger(GroupMessageUtil.class);
 
-    public LdapUserGroupMessageUtil( XStream xstream, MediaType mediaType )
-    {
-        super();
-        this.xstream = xstream;
-        this.mediaType = mediaType;
+  public LdapUserGroupMessageUtil(XStream xstream, MediaType mediaType) {
+    super();
+    this.xstream = xstream;
+    this.mediaType = mediaType;
+  }
+
+  public LdapUserAndGroupConfigurationDTO getUserGroupConfig()
+      throws IOException
+  {
+    Response response = this.sendMessage(Method.GET, null);
+    return this.getResourceFromResponse(response);
+  }
+
+  public LdapUserAndGroupConfigurationDTO updateUserGroupConfig(LdapUserAndGroupConfigurationDTO userGroupConfig)
+      throws Exception
+  {
+    Response response = this.sendMessage(Method.PUT, userGroupConfig);
+
+    if (!response.getStatus().isSuccess()) {
+      String responseText = response.getEntity().getText();
+      Assert.fail("Could not create Repository: " + response.getStatus() + ":\n" + responseText);
     }
+    LdapUserAndGroupConfigurationDTO responseResource = this.getResourceFromResponse(response);
 
-    public LdapUserAndGroupConfigurationDTO getUserGroupConfig()
-        throws IOException
-    {
-        Response response = this.sendMessage( Method.GET, null );
-        return this.getResourceFromResponse( response );
-    }
+    this.validateResourceResponse(userGroupConfig, responseResource);
 
-    public LdapUserAndGroupConfigurationDTO updateUserGroupConfig( LdapUserAndGroupConfigurationDTO userGroupConfig )
-        throws Exception
-    {
-        Response response = this.sendMessage( Method.PUT, userGroupConfig );
+    return responseResource;
+  }
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create Repository: " + response.getStatus() + ":\n" + responseText );
-        }
-        LdapUserAndGroupConfigurationDTO responseResource = this.getResourceFromResponse( response );
+  public Response sendMessage(Method method, LdapUserAndGroupConfigurationDTO resource)
+      throws IOException
+  {
 
-        this.validateResourceResponse( userGroupConfig, responseResource );
+    XStreamRepresentation representation = new XStreamRepresentation(xstream, "", mediaType);
 
-        return responseResource;
-    }
+    String serviceURI = SERVICE_PART;
 
-    public Response sendMessage( Method method, LdapUserAndGroupConfigurationDTO resource )
-        throws IOException
-    {
+    LdapUserAndGroupConfigurationResponse repoResponseRequest = new LdapUserAndGroupConfigurationResponse();
+    repoResponseRequest.setData(resource);
 
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
+    // now set the payload
+    representation.setPayload(repoResponseRequest);
 
-        String serviceURI = SERVICE_PART;
+    LOG.debug("sendMessage: " + representation.getText());
 
-        LdapUserAndGroupConfigurationResponse repoResponseRequest = new LdapUserAndGroupConfigurationResponse();
-        repoResponseRequest.setData( resource );
+    return RequestFacade.sendMessage(serviceURI, method, representation);
+  }
 
-        // now set the payload
-        representation.setPayload( repoResponseRequest );
+  public Response sendTestMessage(LdapUserAndGroupConfigTestRequestDTO resource)
+      throws IOException
+  {
 
-        LOG.debug( "sendMessage: " + representation.getText() );
+    XStreamRepresentation representation = new XStreamRepresentation(xstream, "", mediaType);
 
-        return RequestFacade.sendMessage( serviceURI, method, representation );
-    }
+    String serviceURI = RequestFacade.SERVICE_LOCAL + "ldap/test_user_conf";
 
-    public Response sendTestMessage( LdapUserAndGroupConfigTestRequestDTO resource )
-        throws IOException
-    {
+    LdapUserAndGroupConfigTestRequest repoResponseRequest = new LdapUserAndGroupConfigTestRequest();
+    repoResponseRequest.setData(resource);
 
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
+    // now set the payload
+    representation.setPayload(repoResponseRequest);
 
-        String serviceURI = RequestFacade.SERVICE_LOCAL + "ldap/test_user_conf";
+    LOG.debug("sendMessage: " + representation.getText());
 
-        LdapUserAndGroupConfigTestRequest repoResponseRequest = new LdapUserAndGroupConfigTestRequest();
-        repoResponseRequest.setData( resource );
+    return RequestFacade.sendMessage(serviceURI, Method.PUT, representation);
+  }
 
-        // now set the payload
-        representation.setPayload( repoResponseRequest );
+  public LdapUserAndGroupConfigurationDTO getResourceFromResponse(Response response)
+      throws IOException
+  {
+    String responseString = response.getEntity().getText();
+    LOG.debug(" getResourceFromResponse: " + responseString);
 
-        LOG.debug( "sendMessage: " + representation.getText() );
+    XStreamRepresentation representation = new XStreamRepresentation(xstream, responseString, mediaType);
+    LdapUserAndGroupConfigurationResponse resourceResponse = (LdapUserAndGroupConfigurationResponse) representation
+        .getPayload(new LdapUserAndGroupConfigurationResponse());
 
-        return RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
-    }
+    return resourceResponse.getData();
+  }
 
-    public LdapUserAndGroupConfigurationDTO getResourceFromResponse( Response response )
-        throws IOException
-    {
-        String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
+  @SuppressWarnings("unchecked")
+  public void validateLdapConfig(LdapUserAndGroupConfigurationDTO connInfo)
+      throws Exception
+  {
+    CUserAndGroupAuthConfiguration fileConfig = LdapConfigurationUtil.getConfiguration().getUserAndGroupConfig();
+    Assert.assertEquals(fileConfig.getGroupBaseDn(), connInfo.getGroupBaseDn());
+    Assert.assertEquals(fileConfig.getGroupIdAttribute(), connInfo.getGroupIdAttribute());
+    Assert.assertEquals(fileConfig.getGroupMemberAttribute(), connInfo.getGroupMemberAttribute());
+    Assert.assertEquals(fileConfig.getGroupMemberFormat(), connInfo.getGroupMemberFormat());
+    Assert.assertEquals(fileConfig.getGroupObjectClass(), connInfo.getGroupObjectClass());
+    Assert.assertEquals(fileConfig.getUserBaseDn(), connInfo.getUserBaseDn());
+    Assert.assertEquals(fileConfig.getUserIdAttribute(), connInfo.getUserIdAttribute());
+    Assert.assertEquals(fileConfig.getUserObjectClass(), connInfo.getUserObjectClass());
+    Assert.assertEquals(fileConfig.getUserPasswordAttribute(), connInfo.getUserPasswordAttribute());
+    Assert.assertEquals(fileConfig.getUserRealNameAttribute(), connInfo.getUserRealNameAttribute());
+    Assert.assertEquals(fileConfig.getEmailAddressAttribute(), connInfo.getEmailAddressAttribute());
+    Assert.assertEquals(fileConfig.isLdapGroupsAsRoles(), connInfo.isLdapGroupsAsRoles());
+    Assert.assertEquals(fileConfig.getUserMemberOfAttribute(), connInfo.getUserMemberOfAttribute());
+    Assert.assertEquals(fileConfig.isGroupSubtree(), connInfo.isGroupSubtree());
+    Assert.assertEquals(fileConfig.isUserSubtree(), connInfo.isUserSubtree());
+  }
 
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-        LdapUserAndGroupConfigurationResponse resourceResponse = (LdapUserAndGroupConfigurationResponse) representation
-            .getPayload( new LdapUserAndGroupConfigurationResponse() );
+  public void validateResourceResponse(LdapUserAndGroupConfigurationDTO expected,
+                                       LdapUserAndGroupConfigurationDTO actual)
+      throws Exception
+  {
 
-        return resourceResponse.getData();
-    }
+    // this object has an equals method, but it makes for not so easy debuging, so call it after each field compare to make
+    // sure we didn't forget anything
+    Assert.assertEquals(actual.getGroupBaseDn(), expected.getGroupBaseDn());
+    Assert.assertEquals(actual.getGroupIdAttribute(), expected.getGroupIdAttribute());
+    Assert.assertEquals(actual.getGroupMemberAttribute(), expected.getGroupMemberAttribute());
+    Assert.assertEquals(actual.getGroupMemberFormat(), expected.getGroupMemberFormat());
+    Assert.assertEquals(actual.getGroupObjectClass(), expected.getGroupObjectClass());
+    Assert.assertEquals(actual.getUserBaseDn(), expected.getUserBaseDn());
+    Assert.assertEquals(actual.getUserIdAttribute(), expected.getUserIdAttribute());
+    Assert.assertEquals(actual.getUserObjectClass(), expected.getUserObjectClass());
+    Assert.assertEquals(actual.getUserPasswordAttribute(), expected.getUserPasswordAttribute());
+    Assert.assertEquals(actual.getUserRealNameAttribute(), expected.getUserRealNameAttribute());
+    Assert.assertEquals(actual.getEmailAddressAttribute(), expected.getEmailAddressAttribute());
+    Assert.assertEquals(actual.isLdapGroupsAsRoles(), expected.isLdapGroupsAsRoles());
+    Assert.assertEquals(actual.getUserMemberOfAttribute(), expected.getUserMemberOfAttribute());
+    Assert.assertEquals(actual.isGroupSubtree(), expected.isGroupSubtree());
+    Assert.assertEquals(actual.isUserSubtree(), expected.isUserSubtree());
+    Assert.assertEquals(actual, expected);
 
-    @SuppressWarnings( "unchecked" )
-    public void validateLdapConfig( LdapUserAndGroupConfigurationDTO connInfo )
-        throws Exception
-    {
-        CUserAndGroupAuthConfiguration fileConfig = LdapConfigurationUtil.getConfiguration().getUserAndGroupConfig();
-        Assert.assertEquals(fileConfig.getGroupBaseDn(), connInfo.getGroupBaseDn());
-        Assert.assertEquals(fileConfig.getGroupIdAttribute(), connInfo.getGroupIdAttribute());
-        Assert.assertEquals(fileConfig.getGroupMemberAttribute(), connInfo.getGroupMemberAttribute());
-        Assert.assertEquals(fileConfig.getGroupMemberFormat(), connInfo.getGroupMemberFormat());
-        Assert.assertEquals(fileConfig.getGroupObjectClass(), connInfo.getGroupObjectClass());
-        Assert.assertEquals(fileConfig.getUserBaseDn(), connInfo.getUserBaseDn());
-        Assert.assertEquals(fileConfig.getUserIdAttribute(), connInfo.getUserIdAttribute());
-        Assert.assertEquals(fileConfig.getUserObjectClass(), connInfo.getUserObjectClass());
-        Assert.assertEquals(fileConfig.getUserPasswordAttribute(), connInfo.getUserPasswordAttribute());
-        Assert.assertEquals(fileConfig.getUserRealNameAttribute(), connInfo.getUserRealNameAttribute());
-        Assert.assertEquals(fileConfig.getEmailAddressAttribute(), connInfo.getEmailAddressAttribute());
-        Assert.assertEquals(fileConfig.isLdapGroupsAsRoles(), connInfo.isLdapGroupsAsRoles() );
-        Assert.assertEquals(fileConfig.getUserMemberOfAttribute(), connInfo.getUserMemberOfAttribute() );
-        Assert.assertEquals(fileConfig.isGroupSubtree(), connInfo.isGroupSubtree() );
-        Assert.assertEquals(fileConfig.isUserSubtree(), connInfo.isUserSubtree() );
-    }
-
-    public void validateResourceResponse( LdapUserAndGroupConfigurationDTO expected, LdapUserAndGroupConfigurationDTO actual )
-        throws Exception
-    {
-
-        // this object has an equals method, but it makes for not so easy debuging, so call it after each field compare to make
-        // sure we didn't forget anything
-        Assert.assertEquals(actual.getGroupBaseDn(), expected.getGroupBaseDn());
-        Assert.assertEquals(actual.getGroupIdAttribute(), expected.getGroupIdAttribute());
-        Assert.assertEquals(actual.getGroupMemberAttribute(), expected.getGroupMemberAttribute());
-        Assert.assertEquals(actual.getGroupMemberFormat(), expected.getGroupMemberFormat());
-        Assert.assertEquals(actual.getGroupObjectClass(), expected.getGroupObjectClass());
-        Assert.assertEquals(actual.getUserBaseDn(), expected.getUserBaseDn());
-        Assert.assertEquals(actual.getUserIdAttribute(), expected.getUserIdAttribute());
-        Assert.assertEquals(actual.getUserObjectClass(), expected.getUserObjectClass());
-        Assert.assertEquals(actual.getUserPasswordAttribute(), expected.getUserPasswordAttribute());
-        Assert.assertEquals(actual.getUserRealNameAttribute(), expected.getUserRealNameAttribute());
-        Assert.assertEquals(actual.getEmailAddressAttribute(), expected.getEmailAddressAttribute());
-        Assert.assertEquals(actual.isLdapGroupsAsRoles(), expected.isLdapGroupsAsRoles() );
-        Assert.assertEquals(actual.getUserMemberOfAttribute(), expected.getUserMemberOfAttribute() );
-        Assert.assertEquals(actual.isGroupSubtree(), expected.isGroupSubtree() );
-        Assert.assertEquals(actual.isUserSubtree(), expected.isUserSubtree() );
-        Assert.assertEquals( actual, expected );
-
-        // also validate the file config
-        this.validateLdapConfig( expected );
-    }
+    // also validate the file config
+    this.validateLdapConfig(expected);
+  }
 
 }

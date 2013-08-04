@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
 
 import java.io.PrintStream;
@@ -28,91 +29,76 @@ import java.util.List;
  * (think WAR, but today logback is used) the overridden methods are not used. Hence, in case of logging
  * {@link CompositeException}, the multiple causes will not be logged, you still need to manually log them, or process
  * in any other way, if needed.
- * 
+ *
  * @author cstamas
  * @since 2.2
  */
 public class CompositeException
     extends Exception
 {
-    private static final long serialVersionUID = 1386505977462170509L;
+  private static final long serialVersionUID = 1386505977462170509L;
 
-    private final List<Throwable> causes;
+  private final List<Throwable> causes;
 
-    // ==
+  // ==
 
-    public CompositeException( final Throwable... causes )
-    {
-        this( null, causes );
+  public CompositeException(final Throwable... causes) {
+    this(null, causes);
+  }
+
+  public CompositeException(final String message, final Throwable... causes) {
+    this(message, Arrays.asList(causes));
+  }
+
+  public CompositeException(final List<? extends Throwable> causes) {
+    this(null, causes);
+  }
+
+  public CompositeException(final String message, final List<? extends Throwable> causes) {
+    super(message);
+    final ArrayList<Throwable> c = new ArrayList<Throwable>();
+    if (causes != null && !causes.isEmpty()) {
+      c.addAll(causes);
     }
+    this.causes = Collections.unmodifiableList(c);
+  }
 
-    public CompositeException( final String message, final Throwable... causes )
-    {
-        this( message, Arrays.asList( causes ) );
+  public List<Throwable> getCauses() {
+    return causes;
+  }
+
+  // ==
+
+  @Override
+  public void printStackTrace() {
+    if (causes.isEmpty()) {
+      super.printStackTrace();
+      return;
     }
-
-    public CompositeException( final List<? extends Throwable> causes )
-    {
-        this( null, causes );
+    for (Throwable cause : causes) {
+      cause.printStackTrace();
     }
+  }
 
-    public CompositeException( final String message, final List<? extends Throwable> causes )
-    {
-        super( message );
-        final ArrayList<Throwable> c = new ArrayList<Throwable>();
-        if ( causes != null && !causes.isEmpty() )
-        {
-            c.addAll( causes );
-        }
-        this.causes = Collections.unmodifiableList( c );
+  @Override
+  public void printStackTrace(final PrintStream s) {
+    if (causes.isEmpty()) {
+      super.printStackTrace(s);
+      return;
     }
-
-    public List<Throwable> getCauses()
-    {
-        return causes;
+    for (Throwable cause : causes) {
+      cause.printStackTrace(s);
     }
+  }
 
-    // ==
-
-    @Override
-    public void printStackTrace()
-    {
-        if ( causes.isEmpty() )
-        {
-            super.printStackTrace();
-            return;
-        }
-        for ( Throwable cause : causes )
-        {
-            cause.printStackTrace();
-        }
+  @Override
+  public void printStackTrace(final PrintWriter s) {
+    if (causes.isEmpty()) {
+      super.printStackTrace(s);
+      return;
     }
-
-    @Override
-    public void printStackTrace( final PrintStream s )
-    {
-        if ( causes.isEmpty() )
-        {
-            super.printStackTrace( s );
-            return;
-        }
-        for ( Throwable cause : causes )
-        {
-            cause.printStackTrace( s );
-        }
+    for (Throwable cause : causes) {
+      cause.printStackTrace(s);
     }
-
-    @Override
-    public void printStackTrace( final PrintWriter s )
-    {
-        if ( causes.isEmpty() )
-        {
-            super.printStackTrace( s );
-            return;
-        }
-        for ( Throwable cause : causes )
-        {
-            cause.printStackTrace( s );
-        }
-    }
+  }
 }

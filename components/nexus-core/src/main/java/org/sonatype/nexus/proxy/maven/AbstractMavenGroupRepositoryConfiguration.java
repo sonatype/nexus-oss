@@ -10,28 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfiguration;
+
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public abstract class AbstractMavenGroupRepositoryConfiguration
     extends AbstractGroupRepositoryConfiguration
 {
-    private static final String MERGE_METADATA = "mergeMetadata";
+  private static final String MERGE_METADATA = "mergeMetadata";
 
-    public AbstractMavenGroupRepositoryConfiguration( Xpp3Dom configuration )
-    {
-        super( configuration );
-    }
+  public AbstractMavenGroupRepositoryConfiguration(Xpp3Dom configuration) {
+    super(configuration);
+  }
 
-    public boolean isMergeMetadata()
-    {
-        return Boolean.parseBoolean( getNodeValue( getRootNode(), MERGE_METADATA, Boolean.TRUE.toString() ) );
-    }
+  public boolean isMergeMetadata() {
+    return Boolean.parseBoolean(getNodeValue(getRootNode(), MERGE_METADATA, Boolean.TRUE.toString()));
+  }
 
-    public void setMergeMetadata( boolean val )
-    {
-        setNodeValue( getRootNode(), MERGE_METADATA, Boolean.toString( val ) );
-    }
+  public void setMergeMetadata(boolean val) {
+    setNodeValue(getRootNode(), MERGE_METADATA, Boolean.toString(val));
+  }
 }

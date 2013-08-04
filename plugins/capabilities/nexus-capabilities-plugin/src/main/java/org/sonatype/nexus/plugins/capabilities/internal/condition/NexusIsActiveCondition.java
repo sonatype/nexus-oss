@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import javax.inject.Inject;
@@ -22,6 +23,7 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSuppor
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -37,58 +39,49 @@ public class NexusIsActiveCondition
     implements Condition
 {
 
-    NexusIsActiveCondition( final EventBus eventBus )
-    {
-        super( eventBus, false );
-        bind();
-    }
+  NexusIsActiveCondition(final EventBus eventBus) {
+    super(eventBus, false);
+    bind();
+  }
 
-    @Inject
-    NexusIsActiveCondition( final Provider<EventBus> eventBus )
-    {
-        super( eventBus, false );
-        bind();
-    }
+  @Inject
+  NexusIsActiveCondition(final Provider<EventBus> eventBus) {
+    super(eventBus, false);
+    bind();
+  }
 
-    @Subscribe
-    public void handle( final NexusStartedEvent event )
-    {
-        setSatisfied( true );
-    }
+  @Subscribe
+  public void handle(final NexusStartedEvent event) {
+    setSatisfied(true);
+  }
 
-    @Subscribe
-    public void handle( final NexusStoppedEvent event )
-    {
-        setSatisfied( false );
-    }
+  @Subscribe
+  public void handle(final NexusStoppedEvent event) {
+    setSatisfied(false);
+  }
 
-    @Override
-    protected void doBind()
-    {
-        // do nothing (EventBus registration already done via @EventBus.Managed)
-    }
+  @Override
+  protected void doBind() {
+    // do nothing (EventBus registration already done via @EventBus.Managed)
+  }
 
-    @Override
-    protected void doRelease()
-    {
-        // do nothing (EventBus un-registration already done via @EventBus.Managed)
-    }
+  @Override
+  protected void doRelease() {
+    // do nothing (EventBus un-registration already done via @EventBus.Managed)
+  }
 
-    @Override
-    public String toString()
-    {
-        return "Nexus is active";
-    }
+  @Override
+  public String toString() {
+    return "Nexus is active";
+  }
 
-    @Override
-    public String explainSatisfied()
-    {
-        return "Nexus is active";
-    }
+  @Override
+  public String explainSatisfied() {
+    return "Nexus is active";
+  }
 
-    @Override
-    public String explainUnsatisfied()
-    {
-        return "Nexus is not active";
-    }
+  @Override
+  public String explainUnsatisfied() {
+    return "Nexus is not active";
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import javax.inject.Singleton;
@@ -19,14 +20,14 @@ import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A simple event inspector, a component that receives events emitted by Nexus and processes them in way they want.
- * 
+ *
  * @author cstamas
  */
 @ExtensionPoint
 @Singleton
 public interface EventInspector
 {
-    boolean accepts( Event<?> evt );
+  boolean accepts(Event<?> evt);
 
-    void inspect( Event<?> evt );
+  void inspect(Event<?> evt);
 }

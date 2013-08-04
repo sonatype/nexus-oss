@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.obr.client.internal;
 
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.JerseyVirtualRepository;
@@ -25,26 +26,23 @@ public class JerseyObrVirtualRepository
     implements ObrVirtualRepository
 {
 
-    static final String PROVIDER = "obr-shadow";
+  static final String PROVIDER = "obr-shadow";
 
-    public JerseyObrVirtualRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyObrVirtualRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyObrVirtualRepository( final JerseyNexusClient nexusClient, final RepositoryShadowResource settings )
-    {
-        super( nexusClient, settings );
-    }
+  public JerseyObrVirtualRepository(final JerseyNexusClient nexusClient, final RepositoryShadowResource settings) {
+    super(nexusClient, settings);
+  }
 
-    @Override
-    protected RepositoryShadowResource createSettings()
-    {
-        final RepositoryShadowResource settings = super.createSettings();
+  @Override
+  protected RepositoryShadowResource createSettings() {
+    final RepositoryShadowResource settings = super.createSettings();
 
-        settings.setProvider( JerseyObrVirtualRepository.PROVIDER );
+    settings.setProvider(JerseyObrVirtualRepository.PROVIDER);
 
-        return settings;
-    }
+    return settings;
+  }
 
 }

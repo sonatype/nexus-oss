@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.publickey;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -28,74 +29,68 @@ import org.apache.shiro.subject.PrincipalCollection;
  * part of the TLS handshake. For more info on that <a
  * href="http://en.wikipedia.org/wiki/Transport_Layer_Security#Client-authenticated_TLS_handshake">see this wiki
  * page.<a/>
- * 
- * @see com.sonatype.sshjgit.core.shiro.publickey.PublicKeyRepository
- * @see org.apache.shiro.realm.Realm
+ *
  * @author hugo@josefson.org
  * @author Brian Demers
+ * @see com.sonatype.sshjgit.core.shiro.publickey.PublicKeyRepository
+ * @see org.apache.shiro.realm.Realm
  */
 public class PublicKeyAuthenticatingRealm
     extends AuthorizingRealm
 {
-    protected static final Class<PublicKeyAuthenticationToken> AUTHENTICATION_TOKEN_CLASS =
-        PublicKeyAuthenticationToken.class;
+  protected static final Class<PublicKeyAuthenticationToken> AUTHENTICATION_TOKEN_CLASS =
+      PublicKeyAuthenticationToken.class;
 
-    protected PublicKeyRepository publicKeyRepository;
+  protected PublicKeyRepository publicKeyRepository;
 
-    /**
-     * Default constructor needed for injection.
-     */
-    public PublicKeyAuthenticatingRealm()
-    {
-        setAuthenticationTokenClass( AUTHENTICATION_TOKEN_CLASS );
-        setCredentialsMatcher( new PublicKeyCredentialsMatcher() );
+  /**
+   * Default constructor needed for injection.
+   */
+  public PublicKeyAuthenticatingRealm() {
+    setAuthenticationTokenClass(AUTHENTICATION_TOKEN_CLASS);
+    setCredentialsMatcher(new PublicKeyCredentialsMatcher());
+  }
+
+  /**
+   * Constructs this realm, accepting a {@code PublicKeyRepository} from which all keys will be fetched, and an
+   * {@code Authorizer} to which all authorization will be delegated.
+   *
+   * @param publicKeyRepository public keys will be looked up from this.
+   * @param authorizer          all authorization will be delegated to this. can be for example another
+   *                            {@link org.apache.shiro.realm.Realm}.
+   */
+  public PublicKeyAuthenticatingRealm(PublicKeyRepository publicKeyRepository) {
+    this();
+    this.publicKeyRepository = publicKeyRepository;
+  }
+
+  @Override
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+      throws AuthenticationException
+  {
+    final Object principal = token.getPrincipal();
+
+    if (!publicKeyRepository.hasAccount(principal)) {
+      return null;
     }
 
-    /**
-     * Constructs this realm, accepting a {@code PublicKeyRepository} from which all keys will be fetched, and an
-     * {@code Authorizer} to which all authorization will be delegated.
-     * 
-     * @param publicKeyRepository public keys will be looked up from this.
-     * @param authorizer all authorization will be delegated to this. can be for example another
-     *            {@link org.apache.shiro.realm.Realm}.
-     */
-    public PublicKeyAuthenticatingRealm( PublicKeyRepository publicKeyRepository )
-    {
-        this();
-        this.publicKeyRepository = publicKeyRepository;
-    }
+    return new SimpleAuthenticationInfo(principal, publicKeyRepository.getPublicKeys(principal), getName());
+  }
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
-        throws AuthenticationException
-    {
-        final Object principal = token.getPrincipal();
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    // No Authorization, just Authentication
+    return null;
+  }
 
-        if ( !publicKeyRepository.hasAccount( principal ) )
-        {
-            return null;
-        }
+  @Override
+  public boolean supports(AuthenticationToken token) {
+    // only support PublicKeyAuthenticationToken
+    return PublicKeyAuthenticationToken.class.isInstance(token);
+  }
 
-        return new SimpleAuthenticationInfo( principal, publicKeyRepository.getPublicKeys( principal ), getName() );
-    }
-
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
-    {
-        // No Authorization, just Authentication
-        return null;
-    }
-
-    @Override
-    public boolean supports( AuthenticationToken token )
-    {
-        // only support PublicKeyAuthenticationToken
-        return PublicKeyAuthenticationToken.class.isInstance( token );
-    }
-
-    public void setPublicKeyRepository( PublicKeyRepository publicKeyRepository )
-    {
-        this.publicKeyRepository = publicKeyRepository;
-    }
+  public void setPublicKeyRepository(PublicKeyRepository publicKeyRepository) {
+    this.publicKeyRepository = publicKeyRepository;
+  }
 
 }

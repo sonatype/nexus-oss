@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link PathProtectionDescriptorBuilder}.
@@ -25,74 +27,69 @@ public class PathProtectionDescriptorBuilderTest
     extends TestSupport
 {
 
-    @Test
-    public void pathAndFilters()
-    {
-        PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
-            .path( "/foo" )
-            .authcBasic()
-            .filter( "perms", "foo" )
-            .build();
+  @Test
+  public void pathAndFilters() {
+    PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
+        .path("/foo")
+        .authcBasic()
+        .filter("perms", "foo")
+        .build();
 
-        log( descriptor.getPathPattern() );
-        assertEquals( "/foo", descriptor.getPathPattern() );
+    log(descriptor.getPathPattern());
+    assertEquals("/foo", descriptor.getPathPattern());
 
-        log( descriptor.getFilterExpression() );
-        assertEquals( "authcBasic,perms[foo]", descriptor.getFilterExpression() );
-    }
+    log(descriptor.getFilterExpression());
+    assertEquals("authcBasic,perms[foo]", descriptor.getFilterExpression());
+  }
 
-    @Test
-    public void simplePath()
-    {
-        PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
-            .path( "/foo" )
-            .build();
+  @Test
+  public void simplePath() {
+    PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
+        .path("/foo")
+        .build();
 
-        log( descriptor.getPathPattern() );
-        assertEquals( "/foo", descriptor.getPathPattern() );
+    log(descriptor.getPathPattern());
+    assertEquals("/foo", descriptor.getPathPattern());
 
-        log( descriptor.getFilterExpression() );
-        assertEquals( null, descriptor.getFilterExpression() );
-    }
+    log(descriptor.getFilterExpression());
+    assertEquals(null, descriptor.getFilterExpression());
+  }
 
-    @Test( expected = IllegalStateException.class )
-    public void pathMissing()
-    {
-        new PathProtectionDescriptorBuilder()
-            .authcBasic()
-            .build();
-    }
+  @Test(expected = IllegalStateException.class)
+  public void pathMissing() {
+    new PathProtectionDescriptorBuilder()
+        .authcBasic()
+        .build();
+  }
 
-    @Test
-    public void singlePerm()
-    {
-        PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
-            .path( "/foo" )
-            .authcBasic()
-            .perms( "foo" )
-            .build();
+  @Test
+  public void singlePerm() {
+    PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
+        .path("/foo")
+        .authcBasic()
+        .perms("foo")
+        .build();
 
-        log( descriptor.getPathPattern() );
-        assertEquals( "/foo", descriptor.getPathPattern() );
+    log(descriptor.getPathPattern());
+    assertEquals("/foo", descriptor.getPathPattern());
 
-        log( descriptor.getFilterExpression() );
-        assertEquals( "authcBasic,perms[foo]", descriptor.getFilterExpression() );
-    }
+    log(descriptor.getFilterExpression());
+    assertEquals("authcBasic,perms[foo]", descriptor.getFilterExpression());
+  }
 
-    @Test
-    public void multiplePerms()
-    {
-        PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
-            .path( "/foo" )
-            .authcBasic()
-            .perms( "foo", "bar" )
-            .build();
+  @Test
+  public void multiplePerms() {
+    PathProtectionDescriptor descriptor = new PathProtectionDescriptorBuilder()
+        .path("/foo")
+        .authcBasic()
+        .perms("foo", "bar")
+        .build();
 
-        log( descriptor.getPathPattern() );
-        assertEquals( "/foo", descriptor.getPathPattern() );
+    log(descriptor.getPathPattern());
+    assertEquals("/foo", descriptor.getPathPattern());
 
-        log( descriptor.getFilterExpression() );
-        assertEquals( "authcBasic,perms[foo,bar]", descriptor.getFilterExpression() );
-    }
+    log(descriptor.getFilterExpression());
+    assertEquals("authcBasic,perms[foo,bar]", descriptor.getFilterExpression());
+  }
 
 }

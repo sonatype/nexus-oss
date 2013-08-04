@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rrb;
 
 import java.io.Serializable;
@@ -19,35 +20,31 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement( name = "rrbresponse" )
+@XmlRootElement(name = "rrbresponse")
 public class MavenRepositoryReaderResponse
     implements Serializable
 {
-    private static final long serialVersionUID = 3969716837308011475L;
+  private static final long serialVersionUID = 3969716837308011475L;
 
-    List<RepositoryDirectory> data;
+  List<RepositoryDirectory> data;
 
-    public MavenRepositoryReaderResponse()
-    {
-        super();
-    }
+  public MavenRepositoryReaderResponse() {
+    super();
+  }
 
-    @XmlElementWrapper( name = "data" )
-    @XmlElement( name = "node" )
-    public List<RepositoryDirectory> getData()
-    {
-        return data;
-    }
+  @XmlElementWrapper(name = "data")
+  @XmlElement(name = "node")
+  public List<RepositoryDirectory> getData() {
+    return data;
+  }
 
-    public void setData( List<RepositoryDirectory> data )
-    {
-        this.data = data;
-    }
+  public void setData(List<RepositoryDirectory> data) {
+    this.data = data;
+  }
 
-    @Override
-    public String toString()
-    {
-        return "MavenRepositoryReaderResponse [data=" + data + "]";
-    }
+  @Override
+  public String toString() {
+    return "MavenRepositoryReaderResponse [data=" + data + "]";
+  }
 
 }

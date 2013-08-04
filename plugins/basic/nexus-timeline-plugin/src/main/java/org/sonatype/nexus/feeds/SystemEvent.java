@@ -10,20 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds;
 
 import java.util.Date;
 
 /**
  * A class that encapsulates a Nexus System event, like boot, reconfiguration, etc.
- * 
+ *
  * @author cstamas
  */
 public class SystemEvent
     extends AbstractEvent
 {
-    public SystemEvent( final Date eventDate, final String action, final String message )
-    {
-        super( eventDate, action, message );
-    }
+  public SystemEvent(final Date eventDate, final String action, final String message) {
+    super(eventDate, action, message);
+  }
 }

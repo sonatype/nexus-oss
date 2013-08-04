@@ -10,40 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 public class NexusAetherTest
     extends AbstractMavenRepoContentTests
 {
-    protected NexusAether nexusAether;
+  protected NexusAether nexusAether;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        nexusAether = lookup( NexusAether.class );
+    nexusAether = lookup(NexusAether.class);
 
-        // repositoryRegistry = lookup( RepositoryRegistry.class );
-    }
+    // repositoryRegistry = lookup( RepositoryRegistry.class );
+  }
 
-    @Test
-    public void testDependency()
-    {
-        Gav gav = new Gav( "org.apache.maven", "apache-maven", "3.0-beta-1" );
+  @Test
+  public void testDependency() {
+    Gav gav = new Gav("org.apache.maven", "apache-maven", "3.0-beta-1");
 
-        Dependency dep = Utils.createDependencyFromGav( gav, "compile" );
+    Dependency dep = Utils.createDependencyFromGav(gav, "compile");
 
-        Assert.assertEquals( dep.getArtifact().getGroupId(), gav.getGroupId() );
-        Assert.assertEquals( dep.getArtifact().getArtifactId(), gav.getArtifactId() );
-        Assert.assertEquals( dep.getArtifact().getVersion(), gav.getVersion() );
-        Assert.assertEquals( "compile", dep.getScope() );
-    }
+    Assert.assertEquals(dep.getArtifact().getGroupId(), gav.getGroupId());
+    Assert.assertEquals(dep.getArtifact().getArtifactId(), gav.getArtifactId());
+    Assert.assertEquals(dep.getArtifact().getVersion(), gav.getVersion());
+    Assert.assertEquals("compile", dep.getScope());
+  }
 }

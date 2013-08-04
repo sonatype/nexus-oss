@@ -10,17 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.ldap.realms;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.apache.shiro.realm.Realm;
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 
-@Component( role = Realm.class, hint = NexusLdapAuthenticationRealm.ROLE, description = "OSS LDAP Authentication Realm")
+import org.apache.shiro.realm.Realm;
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = Realm.class, hint = NexusLdapAuthenticationRealm.ROLE, description = "OSS LDAP Authentication Realm")
 public class NexusLdapAuthenticationRealm
     extends AbstractLdapAuthenticatingRealm
 {
 
-    public static final String ROLE = "NexusLdapAuthenticationRealm";
-    
+  public static final String ROLE = "NexusLdapAuthenticationRealm";
+
 }

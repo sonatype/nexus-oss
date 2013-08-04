@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.IOException;
@@ -24,19 +25,19 @@ abstract class AbstractFileNexusWritablePluginRepository
     extends AbstractFileNexusPluginRepository
     implements NexusWritablePluginRepository
 {
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
 
-    public boolean installPluginBundle( final URL bundle )
-        throws IOException
-    {
-        throw new UnsupportedOperationException(); // TODO
-    }
+  public boolean installPluginBundle(final URL bundle)
+      throws IOException
+  {
+    throw new UnsupportedOperationException(); // TODO
+  }
 
-    public boolean deletePluginBundle( final GAVCoordinate gav )
-        throws IOException
-    {
-        throw new UnsupportedOperationException(); // TODO
-    }
+  public boolean deletePluginBundle(final GAVCoordinate gav)
+      throws IOException
+  {
+    throw new UnsupportedOperationException(); // TODO
+  }
 }

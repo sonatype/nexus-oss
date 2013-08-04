@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest;
 
 import org.sonatype.nexus.client.internal.util.Check;
@@ -21,30 +22,26 @@ public class UsernamePasswordAuthenticationInfo
     implements AuthenticationInfo
 {
 
-    private final String username;
+  private final String username;
 
-    private final String password;
+  private final String password;
 
-    public UsernamePasswordAuthenticationInfo( final String username, final String password )
-    {
-        this.username = Check.notBlank( username, "username" );
-        this.password = Check.notBlank( password, "password" );
-    }
+  public UsernamePasswordAuthenticationInfo(final String username, final String password) {
+    this.username = Check.notBlank(username, "username");
+    this.password = Check.notBlank(password, "password");
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    @Override
-    public String toString()
-    {
-        return getClass().getSimpleName() + "[username=" + username + ", password=****]";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "[username=" + username + ", password=****]";
+  }
 
 }

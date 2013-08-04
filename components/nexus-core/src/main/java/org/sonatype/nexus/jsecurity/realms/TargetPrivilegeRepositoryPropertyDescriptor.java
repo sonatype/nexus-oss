@@ -10,34 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.jsecurity.realms;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
-@Component( role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeRepositoryPropertyDescriptor" )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeRepositoryPropertyDescriptor")
 public class TargetPrivilegeRepositoryPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
-    public static final String ID = "repositoryId";
-    
-    public String getHelpText()
-    {
-        return "The repository associated with this privilege.";
-    }
+  public static final String ID = "repositoryId";
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getHelpText() {
+    return "The repository associated with this privilege.";
+  }
 
-    public String getName()
-    {
-        return "Repository";
-    }
-    
-    public String getType()
-    {
-        return "repository";
-    }
+  public String getId() {
+    return ID;
+  }
+
+  public String getName() {
+    return "Repository";
+  }
+
+  public String getType() {
+    return "repository";
+  }
 }

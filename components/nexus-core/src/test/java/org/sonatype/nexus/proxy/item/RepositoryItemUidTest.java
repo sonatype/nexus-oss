@@ -10,58 +10,58 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
-import static org.mockito.Mockito.doReturn;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+import org.sonatype.nexus.proxy.repository.Repository;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
-import org.sonatype.nexus.proxy.repository.Repository;
-import junit.framework.Assert;
+
+import static org.mockito.Mockito.doReturn;
 
 public class RepositoryItemUidTest
     extends AbstractNexusTestEnvironment
 {
 
-    @Mock
-    protected Repository repository;
+  @Mock
+  protected Repository repository;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        MockitoAnnotations.initMocks( this );
-        doReturn("dummy").when(repository).getId();
-    }
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
+    MockitoAnnotations.initMocks(this);
+    doReturn("dummy").when(repository).getId();
+  }
 
-    @Test
-    public void testKey()
-    {
-        DefaultRepositoryItemUidFactory factory = (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory();
+  @Test
+  public void testKey() {
+    DefaultRepositoryItemUidFactory factory = (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory();
 
-        RepositoryItemUid uid = factory.createUid( repository, "/a.txt" );
+    RepositoryItemUid uid = factory.createUid(repository, "/a.txt");
 
-        Assert.assertEquals( repository.getId() + ":/a.txt", uid.getKey() );
-    }
+    Assert.assertEquals(repository.getId() + ":/a.txt", uid.getKey());
+  }
 
-    @Test
-    public void testEquality()
-    {
-        DefaultRepositoryItemUidFactory factory = (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory();
+  @Test
+  public void testEquality() {
+    DefaultRepositoryItemUidFactory factory = (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory();
 
-        RepositoryItemUid uid1 = factory.createUid( repository, "/a.txt" );
+    RepositoryItemUid uid1 = factory.createUid(repository, "/a.txt");
 
-        RepositoryItemUid uid2 = factory.createUid( repository, "/a.txt" );
+    RepositoryItemUid uid2 = factory.createUid(repository, "/a.txt");
 
-        Assert.assertNotSame( uid1, uid2 );
+    Assert.assertNotSame(uid1, uid2);
 
-        Assert.assertEquals( uid1, uid2 );
+    Assert.assertEquals(uid1, uid2);
 
-        Assert.assertEquals( uid1.hashCode(), uid2.hashCode() );
-    }
+    Assert.assertEquals(uid1.hashCode(), uid2.hashCode());
+  }
 
     /*
     @Test

@@ -10,17 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.repo.nexus1765;
 
-import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+package org.sonatype.nexus.testsuite.repo.nexus1765;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -30,196 +24,204 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+
 public class Nexus1765RepositoryFilterIT
     extends AbstractPrivilegeTest
 {
-	
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
 
-    @Test
-    public void getRepositoriesListNoAccessTest()
-        throws Exception
-    {
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        List<RepositoryListResource> repoList = repoUtil.getList();
-        Assert.assertEquals( 0, repoList.size() );
-    }
+  @Test
+  public void getRepositoriesListNoAccessTest()
+      throws Exception
+  {
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    @Test
-    public void getRepositoriesListWithAccessTest()
-        throws Exception
-    {
-        // give the user view access to
-        String repoId = this.getTestRepositoryId();
-        String viewPriv = "repository-" + repoId;
-        this.addPrivilege( TEST_USER_NAME, viewPriv );
+    List<RepositoryListResource> repoList = repoUtil.getList();
+    Assert.assertEquals(0, repoList.size());
+  }
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+  @Test
+  public void getRepositoriesListWithAccessTest()
+      throws Exception
+  {
+    // give the user view access to
+    String repoId = this.getTestRepositoryId();
+    String viewPriv = "repository-" + repoId;
+    this.addPrivilege(TEST_USER_NAME, viewPriv);
 
-        List<RepositoryListResource> repoList = repoUtil.getList();
-        Assert.assertEquals( 1, repoList.size() );
-        Assert.assertEquals( repoList.get( 0 ).getId(), repoId );
-    }
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    @Test
-    public void getRepositoryNoAccessTest()
-        throws Exception
-    {
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    List<RepositoryListResource> repoList = repoUtil.getList();
+    Assert.assertEquals(1, repoList.size());
+    Assert.assertEquals(repoList.get(0).getId(), repoId);
+  }
 
-        RequestFacade.doGet( "service/local/repositories/" + getTestRepositoryId(), respondsWithStatusCode( 403 ) );
-    }
+  @Test
+  public void getRepositoryNoAccessTest()
+      throws Exception
+  {
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    @Test
-    public void updateRepositoryNoAccessTest()
-        throws Exception
-    {
+    RequestFacade.doGet("service/local/repositories/" + getTestRepositoryId(), respondsWithStatusCode(403));
+  }
 
-        RepositoryBaseResource repo = repoUtil.getRepository( getTestRepositoryId() );
-        repo.setName( "new name" );
+  @Test
+  public void updateRepositoryNoAccessTest()
+      throws Exception
+  {
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    RepositoryBaseResource repo = repoUtil.getRepository(getTestRepositoryId());
+    repo.setName("new name");
 
-        Response response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Status: " + response.getStatus(), response.getStatus().getCode(), 403 );
-    }
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    @Test
-    public void createRepositoryNoAccessTest()
-        throws Exception
-    {
+    Response response = this.repoUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Status: " + response.getStatus(), response.getStatus().getCode(), 403);
+  }
 
-        String repoId = "test-repo";
+  @Test
+  public void createRepositoryNoAccessTest()
+      throws Exception
+  {
 
-        RepositoryBaseResource repo = this.repoUtil.getRepository( this.getTestRepositoryId() );
-        repo.setId( repoId );
+    String repoId = "test-repo";
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    RepositoryBaseResource repo = this.repoUtil.getRepository(this.getTestRepositoryId());
+    repo.setId(repoId);
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo, repoId );
-        Assert.assertEquals( "Status: " + response.getStatus(), response.getStatus().getCode(), 403 );
-    }
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    @Test
-    public void deleteRepositoryNoAccessTest()
-        throws Exception
-    {
+    Response response = this.repoUtil.sendMessage(Method.POST, repo, repoId);
+    Assert.assertEquals("Status: " + response.getStatus(), response.getStatus().getCode(), 403);
+  }
 
-        String repoId = this.getTestRepositoryId();
+  @Test
+  public void deleteRepositoryNoAccessTest()
+      throws Exception
+  {
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    String repoId = this.getTestRepositoryId();
 
-        Response response = RequestFacade.sendMessage( "service/local/repositories/" + repoId, Method.DELETE );
-        Assert.assertEquals( "Status: " + response.getStatus(), response.getStatus().getCode(), 403 );
-    }
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    @Test
-    public void getGroupListNoAccessTest()
-        throws Exception
-    {
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    Response response = RequestFacade.sendMessage("service/local/repositories/" + repoId, Method.DELETE);
+    Assert.assertEquals("Status: " + response.getStatus(), response.getStatus().getCode(), 403);
+  }
 
-        List<RepositoryGroupListResource> groupList = groupUtil.getList();
-        Assert.assertEquals( 0, groupList.size() );
-    }
+  @Test
+  public void getGroupListNoAccessTest()
+      throws Exception
+  {
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    @Test
-    public void getGroupListWithAccessTest()
-        throws Exception
-    {
-        // give the user view access to
-        String repoId = "public";
-        String viewPriv = "repository-" + repoId;
-        this.addPrivilege( TEST_USER_NAME, viewPriv );
+    List<RepositoryGroupListResource> groupList = groupUtil.getList();
+    Assert.assertEquals(0, groupList.size());
+  }
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+  @Test
+  public void getGroupListWithAccessTest()
+      throws Exception
+  {
+    // give the user view access to
+    String repoId = "public";
+    String viewPriv = "repository-" + repoId;
+    this.addPrivilege(TEST_USER_NAME, viewPriv);
 
-        List<RepositoryGroupListResource> groupList = groupUtil.getList();
-        Assert.assertEquals( 1, groupList.size() );
-        Assert.assertEquals( groupList.get( 0 ).getId(), repoId );
-    }
-    
-    @Test
-    public void getGroupNoAccessTest()
-        throws Exception
-    {
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        String repoId = "public";
-        RequestFacade.doGet( GroupMessageUtil.SERVICE_PART + "/" + repoId, respondsWithStatusCode( 403 ) );
-    }
-    
-    @Test
-    public void updateGroupNoAccessTest()
-        throws Exception
-    {
+    List<RepositoryGroupListResource> groupList = groupUtil.getList();
+    Assert.assertEquals(1, groupList.size());
+    Assert.assertEquals(groupList.get(0).getId(), repoId);
+  }
 
-        String repoId = "public";
+  @Test
+  public void getGroupNoAccessTest()
+      throws Exception
+  {
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        RepositoryGroupResource repo = this.groupUtil.getGroup( repoId );
-        repo.setName( "new name" );
+    String repoId = "public";
+    RequestFacade.doGet(GroupMessageUtil.SERVICE_PART + "/" + repoId, respondsWithStatusCode(403));
+  }
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+  @Test
+  public void updateGroupNoAccessTest()
+      throws Exception
+  {
 
-        Response response = this.groupUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Status: " + response.getStatus(), response.getStatus().getCode(), 403 );
-    }
+    String repoId = "public";
 
-    @Test
-    public void createGroupNoAccessTest()
-        throws Exception
-    {
+    RepositoryGroupResource repo = this.groupUtil.getGroup(repoId);
+    repo.setName("new name");
 
-        String repoId = "test-group";
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        RepositoryGroupResource repo = this.groupUtil.getGroup( "public" );
-        repo.setId( repoId );
+    Response response = this.groupUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Status: " + response.getStatus(), response.getStatus().getCode(), 403);
+  }
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+  @Test
+  public void createGroupNoAccessTest()
+      throws Exception
+  {
 
-        Response response = this.groupUtil.sendMessage( Method.POST, repo, repoId );
-        Assert.assertEquals( "Status: " + response.getStatus(), response.getStatus().getCode(), 403 );
-    }
+    String repoId = "test-group";
 
-    @Test
-    public void deleteGroupNoAccessTest()
-        throws Exception
-    {
+    RepositoryGroupResource repo = this.groupUtil.getGroup("public");
+    repo.setId(repoId);
 
-        String repoId = "public";
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        // use test user
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+    Response response = this.groupUtil.sendMessage(Method.POST, repo, repoId);
+    Assert.assertEquals("Status: " + response.getStatus(), response.getStatus().getCode(), 403);
+  }
 
-        Response response = RequestFacade.sendMessage( GroupMessageUtil.SERVICE_PART +"/" + repoId, Method.DELETE );
-        Assert.assertEquals( "Status: " + response.getStatus(), response.getStatus().getCode(), 403 );
-    }
+  @Test
+  public void deleteGroupNoAccessTest()
+      throws Exception
+  {
+
+    String repoId = "public";
+
+    // use test user
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
+
+    Response response = RequestFacade.sendMessage(GroupMessageUtil.SERVICE_PART + "/" + repoId, Method.DELETE);
+    Assert.assertEquals("Status: " + response.getStatus(), response.getStatus().getCode(), 403);
+  }
 
 }

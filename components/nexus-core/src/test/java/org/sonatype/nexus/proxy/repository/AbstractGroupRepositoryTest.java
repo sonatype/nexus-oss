@@ -10,14 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -26,9 +21,14 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
-import org.mockito.Mock;
 
-import static org.mockito.Mockito.*;
+import org.junit.Test;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.Spy;
+
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Unit tests for {@link AbstractGroupRepository}
@@ -39,86 +39,74 @@ public class AbstractGroupRepositoryTest
     extends TestSupport
 {
 
-    @Mock(answer = Answers.RETURNS_SMART_NULLS)
-    private Repository repo;
+  @Mock(answer = Answers.RETURNS_SMART_NULLS)
+  private Repository repo;
 
-    @Mock
-    private Event basicEvent;
+  @Mock
+  private Event basicEvent;
 
-    @Mock
-    private RepositoryRegistryEventRemove removeEvent;
+  @Mock
+  private RepositoryRegistryEventRemove removeEvent;
 
-    @Mock
-    private ConfigurationPrepareForSaveEvent prepSaveEvent;
+  @Mock
+  private ConfigurationPrepareForSaveEvent prepSaveEvent;
 
-    @Mock
-    private CRepository cRepo;
+  @Mock
+  private CRepository cRepo;
 
-    @Mock(answer = Answers.RETURNS_SMART_NULLS)
-    private AbstractGroupRepositoryConfiguration extConfig;
+  @Mock(answer = Answers.RETURNS_SMART_NULLS)
+  private AbstractGroupRepositoryConfiguration extConfig;
 
-    @Spy
-    private AbstractGroupRepository groupRepo = new AbstractGroupRepository()
-        {
-            @Override
-            protected Configurator getConfigurator()
-            {
-                return null;
-            }
-
-            @Override
-            protected CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory()
-            {
-                return null;
-            }
-
-            @Override
-            public RepositoryKind getRepositoryKind()
-            {
-                return null;
-            }
-
-            @Override
-            public ContentClass getRepositoryContentClass()
-            {
-                return null;
-            }
-        };
-
-
-    @Test
-    public void onEventNullExternalConfigurationShouldNotNPE()
-        throws Exception
-    {
-        doReturn( null ).when( groupRepo ).getExternalConfiguration( anyBoolean() );
-        groupRepo.onEvent( removeEvent );
-        groupRepo.onEvent( prepSaveEvent );
+  @Spy
+  private AbstractGroupRepository groupRepo = new AbstractGroupRepository()
+  {
+    @Override
+    protected Configurator getConfigurator() {
+      return null;
     }
 
-    @Test
-    public void onEventNullCurrentConfigurationShouldNotNPE()
-    {
-        doReturn( null ).when( groupRepo ).getCurrentConfiguration( anyBoolean() );
-        groupRepo.onEvent( removeEvent );
-        groupRepo.onEvent( prepSaveEvent );
+    @Override
+    protected CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory() {
+      return null;
     }
 
-    @Test
-    public void onEventCurrentConfigurationShouldNotNPE()
-    {
-        doReturn( repo ).when( removeEvent ).getRepository(); // not expected to return null
-        doReturn( extConfig ).when( groupRepo ).getExternalConfiguration( anyBoolean() );
-        doReturn( cRepo ).when( groupRepo ).getCurrentConfiguration( anyBoolean() );
-        groupRepo.onEvent( removeEvent );
-        groupRepo.onEvent( prepSaveEvent );
-
+    @Override
+    public RepositoryKind getRepositoryKind() {
+      return null;
     }
 
+    @Override
+    public ContentClass getRepositoryContentClass() {
+      return null;
+    }
+  };
 
 
+  @Test
+  public void onEventNullExternalConfigurationShouldNotNPE()
+      throws Exception
+  {
+    doReturn(null).when(groupRepo).getExternalConfiguration(anyBoolean());
+    groupRepo.onEvent(removeEvent);
+    groupRepo.onEvent(prepSaveEvent);
+  }
 
+  @Test
+  public void onEventNullCurrentConfigurationShouldNotNPE() {
+    doReturn(null).when(groupRepo).getCurrentConfiguration(anyBoolean());
+    groupRepo.onEvent(removeEvent);
+    groupRepo.onEvent(prepSaveEvent);
+  }
 
+  @Test
+  public void onEventCurrentConfigurationShouldNotNPE() {
+    doReturn(repo).when(removeEvent).getRepository(); // not expected to return null
+    doReturn(extConfig).when(groupRepo).getExternalConfiguration(anyBoolean());
+    doReturn(cRepo).when(groupRepo).getCurrentConfiguration(anyBoolean());
+    groupRepo.onEvent(removeEvent);
+    groupRepo.onEvent(prepSaveEvent);
 
+  }
 
 
 }

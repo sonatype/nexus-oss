@@ -10,35 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.auth;
 
 /**
  * Event fired when authentication validation is performed (someone tries to log in).
- * 
+ *
  * @author cstamas
  */
 public class NexusAuthenticationEvent
     extends AbstractSecurityEvent
 {
-    private final boolean successful;
+  private final boolean successful;
 
-    public NexusAuthenticationEvent( final Object sender, final ClientInfo info, final boolean successful )
-    {
-        super( sender, info );
-        this.successful = successful;
-    }
+  public NexusAuthenticationEvent(final Object sender, final ClientInfo info, final boolean successful) {
+    super(sender, info);
+    this.successful = successful;
+  }
 
-    public boolean isSuccessful()
-    {
-        return successful;
-    }
+  public boolean isSuccessful() {
+    return successful;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "userId='" + getClientInfo().getUserid() + "'," +
-            "remoteIp='" + getClientInfo().getRemoteIP() + "'," +
-            "successful=" + successful +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "userId='" + getClientInfo().getUserid() + "'," +
+        "remoteIp='" + getClientInfo().getRemoteIP() + "'," +
+        "successful=" + successful +
+        '}';
+  }
 }

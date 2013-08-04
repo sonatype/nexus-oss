@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.mirror;
 
 import java.util.ArrayList;
@@ -24,58 +25,50 @@ import org.sonatype.nexus.proxy.repository.Mirror;
 public class DefaultPublishedMirrors
     implements PublishedMirrors
 {
-    private final CRepositoryCoreConfiguration configuration;
+  private final CRepositoryCoreConfiguration configuration;
 
-    public DefaultPublishedMirrors( CRepositoryCoreConfiguration configuration )
-    {
-        this.configuration = configuration;
+  public DefaultPublishedMirrors(CRepositoryCoreConfiguration configuration) {
+    this.configuration = configuration;
+  }
+
+  public void setMirrors(List<Mirror> mirrors) {
+    if (mirrors == null || mirrors.isEmpty()) {
+      getConfiguration(true).getMirrors().clear();
+    }
+    else {
+      ArrayList<CMirror> modelMirrors = new ArrayList<CMirror>(mirrors.size());
+
+      for (Mirror mirror : mirrors) {
+        CMirror model = new CMirror();
+
+        model.setId(mirror.getId());
+
+        model.setUrl(mirror.getUrl());
+
+        modelMirrors.add(model);
+      }
+
+      getConfiguration(true).setMirrors(modelMirrors);
+    }
+  }
+
+  public List<Mirror> getMirrors() {
+    List<CMirror> modelMirrors = getConfiguration(false).getMirrors();
+
+    ArrayList<Mirror> mirrors = new ArrayList<Mirror>(modelMirrors.size());
+
+    for (CMirror model : modelMirrors) {
+      Mirror mirror = new Mirror(model.getId(), model.getUrl());
+
+      mirrors.add(mirror);
     }
 
-    public void setMirrors( List<Mirror> mirrors )
-    {
-        if ( mirrors == null || mirrors.isEmpty() )
-        {
-            getConfiguration( true ).getMirrors().clear();
-        }
-        else
-        {
-            ArrayList<CMirror> modelMirrors = new ArrayList<CMirror>( mirrors.size() );
+    return Collections.unmodifiableList(mirrors);
+  }
 
-            for ( Mirror mirror : mirrors )
-            {
-                CMirror model = new CMirror();
+  // ==
 
-                model.setId( mirror.getId() );
-
-                model.setUrl( mirror.getUrl() );
-
-                modelMirrors.add( model );
-            }
-
-            getConfiguration( true ).setMirrors( modelMirrors );
-        }
-    }
-
-    public List<Mirror> getMirrors()
-    {
-        List<CMirror> modelMirrors = getConfiguration( false ).getMirrors();
-
-        ArrayList<Mirror> mirrors = new ArrayList<Mirror>( modelMirrors.size() );
-
-        for ( CMirror model : modelMirrors )
-        {
-            Mirror mirror = new Mirror( model.getId(), model.getUrl() );
-
-            mirrors.add( mirror );
-        }
-
-        return Collections.unmodifiableList( mirrors );
-    }
-
-    // ==
-
-    protected CRepository getConfiguration( boolean forWrite )
-    {
-        return (CRepository) configuration.getConfiguration( forWrite );
-    }
+  protected CRepository getConfiguration(boolean forWrite) {
+    return (CRepository) configuration.getConfiguration(forWrite);
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository;
 
 import org.sonatype.nexus.client.core.subsystem.repository.RepositoryStatus;
@@ -23,17 +24,15 @@ public class RepositoryStatusImpl
     implements RepositoryStatus
 {
 
-    private final boolean inService;
+  private final boolean inService;
 
-    public RepositoryStatusImpl( final boolean inService )
-    {
-        this.inService = inService;
-    }
+  public RepositoryStatusImpl(final boolean inService) {
+    this.inService = inService;
+  }
 
-    @Override
-    public boolean isInService()
-    {
-        return inService;
-    }
+  @Override
+  public boolean isInService() {
+    return inService;
+  }
 
 }

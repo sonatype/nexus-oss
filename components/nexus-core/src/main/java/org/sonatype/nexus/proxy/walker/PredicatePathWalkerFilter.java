@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -20,83 +21,77 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 /**
- * A walker filter that is based on Google Guava Predicates, checking for item paths only. What path to use (the mutable
+ * A walker filter that is based on Google Guava Predicates, checking for item paths only. What path to use (the
+ * mutable
  * {@link StorageItem#getPath()} or immutable UID {@link StorageItem#getRepositoryItemUid()} depends on
  * {@link PathExtractor} passed in.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
 public class PredicatePathWalkerFilter
     implements WalkerFilter
 {
-    private final Predicate<String> itemPredicate;
+  private final Predicate<String> itemPredicate;
 
-    private final Predicate<String> collectionPredicate;
+  private final Predicate<String> collectionPredicate;
 
-    private final PathExtractor pathExtractor;
+  private final PathExtractor pathExtractor;
 
-    public PredicatePathWalkerFilter( final PathExtractor pathExtractor, final Predicate<String> itemPredicate )
-    {
-        this( pathExtractor, itemPredicate, Predicates.<String> alwaysTrue() );
-    }
+  public PredicatePathWalkerFilter(final PathExtractor pathExtractor, final Predicate<String> itemPredicate) {
+    this(pathExtractor, itemPredicate, Predicates.<String>alwaysTrue());
+  }
 
-    public PredicatePathWalkerFilter( final PathExtractor pathExtractor, final Predicate<String> itemPredicate,
-                                      final Predicate<String> collectionPredicate )
-    {
-        this.pathExtractor = Preconditions.checkNotNull( pathExtractor, "PathExtractor is null!" );
-        this.itemPredicate = Preconditions.checkNotNull( itemPredicate, "Item predicate is null!" );
-        this.collectionPredicate = Preconditions.checkNotNull( collectionPredicate, "Collection predicate is null!" );
+  public PredicatePathWalkerFilter(final PathExtractor pathExtractor, final Predicate<String> itemPredicate,
+                                   final Predicate<String> collectionPredicate)
+  {
+    this.pathExtractor = Preconditions.checkNotNull(pathExtractor, "PathExtractor is null!");
+    this.itemPredicate = Preconditions.checkNotNull(itemPredicate, "Item predicate is null!");
+    this.collectionPredicate = Preconditions.checkNotNull(collectionPredicate, "Collection predicate is null!");
+  }
+
+  @Override
+  public boolean shouldProcess(WalkerContext context, StorageItem item) {
+    return itemPredicate.apply(pathExtractor.extractItemPath(item));
+  }
+
+  @Override
+  public boolean shouldProcessRecursively(WalkerContext context, StorageCollectionItem coll) {
+    return collectionPredicate.apply(pathExtractor.extractCollectionItemPath(coll));
+  }
+
+  // ==
+
+  public static final PathExtractor ITEM_PATH_EXTRACTOR = new PathExtractor()
+  {
+    @Override
+    public String extractItemPath(StorageItem item) {
+      return item.getPath();
     }
 
     @Override
-    public boolean shouldProcess( WalkerContext context, StorageItem item )
-    {
-        return itemPredicate.apply( pathExtractor.extractItemPath( item ) );
+    public String extractCollectionItemPath(StorageCollectionItem coll) {
+      return extractItemPath(coll);
+    }
+  };
+
+  public static final PathExtractor ITEM_UID_PATH_EXTRACTOR = new PathExtractor()
+  {
+    @Override
+    public String extractItemPath(StorageItem item) {
+      return item.getRepositoryItemUid().getPath();
     }
 
     @Override
-    public boolean shouldProcessRecursively( WalkerContext context, StorageCollectionItem coll )
-    {
-        return collectionPredicate.apply( pathExtractor.extractCollectionItemPath( coll ) );
+    public String extractCollectionItemPath(StorageCollectionItem coll) {
+      return extractItemPath(coll);
     }
+  };
 
-    // ==
+  public interface PathExtractor
+  {
+    String extractItemPath(StorageItem item);
 
-    public static final PathExtractor ITEM_PATH_EXTRACTOR = new PathExtractor()
-    {
-        @Override
-        public String extractItemPath( StorageItem item )
-        {
-            return item.getPath();
-        }
-
-        @Override
-        public String extractCollectionItemPath( StorageCollectionItem coll )
-        {
-            return extractItemPath( coll );
-        }
-    };
-
-    public static final PathExtractor ITEM_UID_PATH_EXTRACTOR = new PathExtractor()
-    {
-        @Override
-        public String extractItemPath( StorageItem item )
-        {
-            return item.getRepositoryItemUid().getPath();
-        }
-
-        @Override
-        public String extractCollectionItemPath( StorageCollectionItem coll )
-        {
-            return extractItemPath( coll );
-        }
-    };
-
-    public interface PathExtractor
-    {
-        String extractItemPath( StorageItem item );
-
-        String extractCollectionItemPath( StorageCollectionItem coll );
-    }
+    String extractCollectionItemPath(StorageCollectionItem coll);
+  }
 }

@@ -10,17 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.feed.nexus3882;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.hasStatusCode;
+package org.sonatype.nexus.testsuite.feed.nexus3882;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FeedUtil;
@@ -28,6 +24,11 @@ import org.sonatype.nexus.test.utils.UserCreationUtil;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.hasStatusCode;
 
 /**
  * Tests for fail to login entries in feeds.
@@ -36,54 +37,53 @@ public class Nexus3882IPAtAthenticationFailureFeedIT
     extends AbstractPrivilegeTest
 {
 
-    @SuppressWarnings( "unchecked" )
-    @Test
-    public void failAuthentication()
-        throws Exception
-    {
-        TestContainer.getInstance().getTestContext().setUsername( "juka" );
-        TestContainer.getInstance().getTestContext().setPassword( "juka" );
+  @SuppressWarnings("unchecked")
+  @Test
+  public void failAuthentication()
+      throws Exception
+  {
+    TestContainer.getInstance().getTestContext().setUsername("juka");
+    TestContainer.getInstance().getTestContext().setPassword("juka");
 
-        assertThat( UserCreationUtil.login(), hasStatusCode( 401 ) );
+    assertThat(UserCreationUtil.login(), hasStatusCode(401));
 
-        // NexusAuthenticationEventInspector is asynchronous
-        getEventInspectorsUtil().waitForCalmPeriod();
+    // NexusAuthenticationEventInspector is asynchronous
+    getEventInspectorsUtil().waitForCalmPeriod();
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        SyndFeed feed = FeedUtil.getFeed( "authcAuthz" );
+    SyndFeed feed = FeedUtil.getFeed("authcAuthz");
 
-        List<SyndEntry> entries = feed.getEntries();
+    List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - "
-            + entries, entries.size() >= 1 );
+    Assert.assertTrue("Expected more then 1 entries, but got " + entries.size() + " - "
+        + entries, entries.size() >= 1);
 
-        validateIP( entries );
+    validateIP(entries);
+  }
+
+  private static final Pattern V4 =
+      Pattern.compile(
+          "(([2]([5][0-5]|[0-4][0-9]))|([1][0-9]{2})|([1-9]?[0-9]))(\\.(([2]([5][0-5]|[0-4][0-9]))|([1][0-9]{2})|([1-9]?[0-9]))){3}");
+
+  private void validateIP(List<SyndEntry> entries)
+      throws Exception
+  {
+    StringBuilder titles = new StringBuilder();
+
+    for (SyndEntry entry : entries) {
+      // check if the title contains the file name (pom or jar)
+      String title = entry.getDescription().getValue();
+      titles.append(title);
+      titles.append(',');
+
+      Matcher match = V4.matcher(title);
+      if (match.find()) {
+        return;
+      }
     }
 
-    private static final Pattern V4 =
-        Pattern.compile( "(([2]([5][0-5]|[0-4][0-9]))|([1][0-9]{2})|([1-9]?[0-9]))(\\.(([2]([5][0-5]|[0-4][0-9]))|([1][0-9]{2})|([1-9]?[0-9]))){3}" );
-
-    private void validateIP( List<SyndEntry> entries )
-        throws Exception
-    {
-        StringBuilder titles = new StringBuilder();
-
-        for ( SyndEntry entry : entries )
-        {
-            // check if the title contains the file name (pom or jar)
-            String title = entry.getDescription().getValue();
-            titles.append( title );
-            titles.append( ',' );
-
-            Matcher match = V4.matcher( title );
-            if ( match.find() )
-            {
-                return;
-            }
-        }
-
-        Assert.fail( titles.toString() );
-    }
+    Assert.fail(titles.toString());
+  }
 
 }

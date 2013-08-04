@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.internal;
 
 import org.sonatype.appcontext.AppContextEntry;
@@ -18,56 +19,50 @@ import org.sonatype.appcontext.source.EntrySourceMarker;
 public class AppContextEntryImpl
     implements AppContextEntry
 {
-    private final long created;
-    
-    private final String key;
+  private final long created;
 
-    private final Object rawValue;
+  private final String key;
 
-    private final Object value;
+  private final Object rawValue;
 
-    private final EntrySourceMarker entrySourceMarker;
+  private final Object value;
 
-    public AppContextEntryImpl( final long created, final String key, final Object rawValue, final Object value,
-                                final EntrySourceMarker entrySourceMarker )
-    {
-        this.created = created;
-        this.key = Preconditions.checkNotNull( key );
-        this.rawValue = rawValue;
-        this.value = value;
-        this.entrySourceMarker = Preconditions.checkNotNull( entrySourceMarker );
-    }
+  private final EntrySourceMarker entrySourceMarker;
 
-    public long getCreated()
-    {
-        return created;
-    }
+  public AppContextEntryImpl(final long created, final String key, final Object rawValue, final Object value,
+                             final EntrySourceMarker entrySourceMarker)
+  {
+    this.created = created;
+    this.key = Preconditions.checkNotNull(key);
+    this.rawValue = rawValue;
+    this.value = value;
+    this.entrySourceMarker = Preconditions.checkNotNull(entrySourceMarker);
+  }
 
-    public String getKey()
-    {
-        return key;
-    }
+  public long getCreated() {
+    return created;
+  }
 
-    public Object getRawValue()
-    {
-        return rawValue;
-    }
+  public String getKey() {
+    return key;
+  }
 
-    public Object getValue()
-    {
-        return value;
-    }
+  public Object getRawValue() {
+    return rawValue;
+  }
 
-    public EntrySourceMarker getEntrySourceMarker()
-    {
-        return entrySourceMarker;
-    }
+  public Object getValue() {
+    return value;
+  }
 
-    // ==
+  public EntrySourceMarker getEntrySourceMarker() {
+    return entrySourceMarker;
+  }
 
-    public String toString()
-    {
-        return String.format( "\"%s\"=\"%s\" (raw: \"%s\", src: %s)", key, String.valueOf( value ),
-            String.valueOf( rawValue ), entrySourceMarker.getDescription() );
-    }
+  // ==
+
+  public String toString() {
+    return String.format("\"%s\"=\"%s\" (raw: \"%s\", src: %s)", key, String.valueOf(value),
+        String.valueOf(rawValue), entrySourceMarker.getDescription());
+  }
 }

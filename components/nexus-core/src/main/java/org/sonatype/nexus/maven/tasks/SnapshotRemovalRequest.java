@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import java.util.HashSet;
@@ -17,112 +18,103 @@ import java.util.Set;
 
 public class SnapshotRemovalRequest
 {
-    private final String repositoryId;
+  private final String repositoryId;
 
-    private final int minCountOfSnapshotsToKeep;
+  private final int minCountOfSnapshotsToKeep;
 
-    private final int removeSnapshotsOlderThanDays;
+  private final int removeSnapshotsOlderThanDays;
 
-    private final boolean removeIfReleaseExists;
+  private final boolean removeIfReleaseExists;
 
-    private final int graceDaysAfterRelease;
+  private final int graceDaysAfterRelease;
 
-    private final Set<String> processedRepos;
+  private final Set<String> processedRepos;
 
-    private final boolean deleteImmediately;
+  private final boolean deleteImmediately;
 
-    private final boolean useLastRequestedTimestamp;
+  private final boolean useLastRequestedTimestamp;
 
-    /**
-     * Old behavior without changing trash or delete (always trash).
-     * <p/>
-     * (see NEXUS-4579)
-     */
-    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
-                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
-    {
+  /**
+   * Old behavior without changing trash or delete (always trash).
+   * <p/>
+   * (see NEXUS-4579)
+   */
+  public SnapshotRemovalRequest(String repositoryId, int minCountOfSnapshotsToKeep,
+                                int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists)
+  {
 
-        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays,
-              removeIfReleaseExists, 0, false, false );
-    }
+    this(repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays,
+        removeIfReleaseExists, 0, false, false);
+  }
 
-    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
-                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
-                                   int graceDaysAfterRelease, boolean deleteImmediately )
-    {
-        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays,
-              removeIfReleaseExists, graceDaysAfterRelease, deleteImmediately, false );
-    }
+  public SnapshotRemovalRequest(String repositoryId, int minCountOfSnapshotsToKeep,
+                                int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
+                                int graceDaysAfterRelease, boolean deleteImmediately)
+  {
+    this(repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays,
+        removeIfReleaseExists, graceDaysAfterRelease, deleteImmediately, false);
+  }
 
-    /**
-     * @since 2.7.0
-     */
-    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
-                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
-                                   int graceDaysAfterRelease, boolean deleteImmediately,
-                                   boolean useLastRequestedTimestamp )
-    {
-        this.repositoryId = repositoryId;
+  /**
+   * @since 2.7.0
+   */
+  public SnapshotRemovalRequest(String repositoryId, int minCountOfSnapshotsToKeep,
+                                int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
+                                int graceDaysAfterRelease, boolean deleteImmediately,
+                                boolean useLastRequestedTimestamp)
+  {
+    this.repositoryId = repositoryId;
 
-        this.minCountOfSnapshotsToKeep = minCountOfSnapshotsToKeep;
+    this.minCountOfSnapshotsToKeep = minCountOfSnapshotsToKeep;
 
-        this.removeSnapshotsOlderThanDays = removeSnapshotsOlderThanDays;
+    this.removeSnapshotsOlderThanDays = removeSnapshotsOlderThanDays;
 
-        this.removeIfReleaseExists = removeIfReleaseExists;
+    this.removeIfReleaseExists = removeIfReleaseExists;
 
-        this.graceDaysAfterRelease = graceDaysAfterRelease;
+    this.graceDaysAfterRelease = graceDaysAfterRelease;
 
-        this.processedRepos = new HashSet<String>();
+    this.processedRepos = new HashSet<String>();
 
-        this.deleteImmediately = deleteImmediately;
+    this.deleteImmediately = deleteImmediately;
 
-        this.useLastRequestedTimestamp = useLastRequestedTimestamp;
+    this.useLastRequestedTimestamp = useLastRequestedTimestamp;
 
-    }
+  }
 
-    public String getRepositoryId()
-    {
-        return repositoryId;
-    }
+  public String getRepositoryId() {
+    return repositoryId;
+  }
 
-    public int getMinCountOfSnapshotsToKeep()
-    {
-        return minCountOfSnapshotsToKeep;
-    }
+  public int getMinCountOfSnapshotsToKeep() {
+    return minCountOfSnapshotsToKeep;
+  }
 
-    public int getRemoveSnapshotsOlderThanDays()
-    {
-        return removeSnapshotsOlderThanDays;
-    }
+  public int getRemoveSnapshotsOlderThanDays() {
+    return removeSnapshotsOlderThanDays;
+  }
 
-    public boolean isRemoveIfReleaseExists()
-    {
-        return removeIfReleaseExists;
-    }
+  public boolean isRemoveIfReleaseExists() {
+    return removeIfReleaseExists;
+  }
 
-    public int getGraceDaysAfterRelease()
-    {
-        return graceDaysAfterRelease;
-    }
+  public int getGraceDaysAfterRelease() {
+    return graceDaysAfterRelease;
+  }
 
-    public void addProcessedRepo( String repoId )
-    {
-        this.processedRepos.add( repoId );
-    }
+  public void addProcessedRepo(String repoId) {
+    this.processedRepos.add(repoId);
+  }
 
-    public boolean isProcessedRepo( String repoId )
-    {
-        return this.processedRepos.contains( repoId );
-    }
+  public boolean isProcessedRepo(String repoId) {
+    return this.processedRepos.contains(repoId);
+  }
 
-    public boolean isDeleteImmediately()
-    {
-        return deleteImmediately;
-    }
+  public boolean isDeleteImmediately() {
+    return deleteImmediately;
+  }
 
-    public boolean shouldUseLastRequestedTimestamp()
-    {
-        return useLastRequestedTimestamp;
-    }
+  public boolean shouldUseLastRequestedTimestamp() {
+    return useLastRequestedTimestamp;
+  }
 
 }

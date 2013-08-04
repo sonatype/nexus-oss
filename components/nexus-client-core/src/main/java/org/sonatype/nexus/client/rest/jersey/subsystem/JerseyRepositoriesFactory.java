@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest.jersey.subsystem;
 
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -34,30 +36,26 @@ public class JerseyRepositoriesFactory
     implements SubsystemFactory<Repositories, JerseyNexusClient>
 {
 
-    private final Set<RepositoryFactory> repositoryFactories;
+  private final Set<RepositoryFactory> repositoryFactories;
 
-    @Inject
-    public JerseyRepositoriesFactory( final Set<RepositoryFactory> repositoryFactories )
-    {
-        this.repositoryFactories = repositoryFactories;
-    }
+  @Inject
+  public JerseyRepositoriesFactory(final Set<RepositoryFactory> repositoryFactories) {
+    this.repositoryFactories = repositoryFactories;
+  }
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.anyModern();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.anyModern();
+  }
 
-    @Override
-    public Class<Repositories> getType()
-    {
-        return Repositories.class;
-    }
+  @Override
+  public Class<Repositories> getType() {
+    return Repositories.class;
+  }
 
-    @Override
-    public Repositories create( final JerseyNexusClient nexusClient )
-    {
-        return new JerseyRepositories( nexusClient, repositoryFactories );
-    }
+  @Override
+  public Repositories create(final JerseyNexusClient nexusClient) {
+    return new JerseyRepositories(nexusClient, repositoryFactories);
+  }
 
 }

@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -29,74 +31,61 @@ public class RepositoryExistsCondition
     extends RepositoryConditionSupport
 {
 
-    public RepositoryExistsCondition( final EventBus eventBus,
-                                      final RepositoryRegistry repositoryRegistry,
-                                      final RepositoryConditions.RepositoryId repositoryId )
-    {
-        super( eventBus, repositoryRegistry, repositoryId );
-    }
+  public RepositoryExistsCondition(final EventBus eventBus,
+                                   final RepositoryRegistry repositoryRegistry,
+                                   final RepositoryConditions.RepositoryId repositoryId)
+  {
+    super(eventBus, repositoryRegistry, repositoryId);
+  }
 
-    @Override
-    @AllowConcurrentEvents
-    @Subscribe
-    public void handle( final RepositoryRegistryEventAdd event )
-    {
-        if ( sameRepositoryAs( event.getRepository().getId() ) )
-        {
-            setSatisfied( true );
-        }
+  @Override
+  @AllowConcurrentEvents
+  @Subscribe
+  public void handle(final RepositoryRegistryEventAdd event) {
+    if (sameRepositoryAs(event.getRepository().getId())) {
+      setSatisfied(true);
     }
+  }
 
-    @AllowConcurrentEvents
-    @Subscribe
-    public void handle( final RepositoryRegistryEventRemove event )
-    {
-        if ( sameRepositoryAs( event.getRepository().getId() ) )
-        {
-            setSatisfied( false );
-        }
+  @AllowConcurrentEvents
+  @Subscribe
+  public void handle(final RepositoryRegistryEventRemove event) {
+    if (sameRepositoryAs(event.getRepository().getId())) {
+      setSatisfied(false);
     }
+  }
 
-    @Override
-    public String toString()
-    {
-        try
-        {
-            final String id = getRepositoryId();
-            return String.format( "Repository '%s' exists", id );
-        }
-        catch ( Exception ignore )
-        {
-            return "Repository '(could not be evaluated)' exists";
-        }
+  @Override
+  public String toString() {
+    try {
+      final String id = getRepositoryId();
+      return String.format("Repository '%s' exists", id);
     }
+    catch (Exception ignore) {
+      return "Repository '(could not be evaluated)' exists";
+    }
+  }
 
-    @Override
-    public String explainSatisfied()
-    {
-        try
-        {
-            final String id = getRepositoryId();
-            return String.format( "Repository '%s' exists", id );
-        }
-        catch ( Exception ignore )
-        {
-            return "Repository '(could not be evaluated)' exists";
-        }
+  @Override
+  public String explainSatisfied() {
+    try {
+      final String id = getRepositoryId();
+      return String.format("Repository '%s' exists", id);
     }
+    catch (Exception ignore) {
+      return "Repository '(could not be evaluated)' exists";
+    }
+  }
 
-    @Override
-    public String explainUnsatisfied()
-    {
-        try
-        {
-            final String id = getRepositoryId();
-            return String.format( "Repository '%s' does not exist", id );
-        }
-        catch ( Exception ignore )
-        {
-            return "Repository '(could not be evaluated)' does not exist";
-        }
+  @Override
+  public String explainUnsatisfied() {
+    try {
+      final String id = getRepositoryId();
+      return String.format("Repository '%s' does not exist", id);
     }
+    catch (Exception ignore) {
+      return "Repository '(could not be evaluated)' does not exist";
+    }
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
@@ -18,7 +19,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Event fired when maven checksum content validation failed.
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
@@ -26,10 +27,10 @@ public class MavenChecksumContentValidationEventFailed
     extends RepositoryItemValidationEventFailedChecksum
 {
 
-    public MavenChecksumContentValidationEventFailed( final Repository repository, final StorageItem item,
-                                                 final String message )
-    {
-        super( repository, item, message );
-    }
+  public MavenChecksumContentValidationEventFailed(final Repository repository, final StorageItem item,
+                                                   final String message)
+  {
+    super(repository, item, message);
+  }
 
 }

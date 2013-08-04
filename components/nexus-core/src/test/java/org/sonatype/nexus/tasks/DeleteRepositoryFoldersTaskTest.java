@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
 
 import java.io.File;
 
-import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
 import org.sonatype.scheduling.SchedulerTask;
+
+import org.junit.Test;
 
 /**
  * Test if the repo folders(storage, indexer, proxy attributes) were deleted correctly
@@ -27,57 +28,59 @@ import org.sonatype.scheduling.SchedulerTask;
 public class DeleteRepositoryFoldersTaskTest
     extends AbstractMavenRepoContentTests
 {
-    @Test
-    public void testTrashRepositoryFolders()
-        throws Exception
-    {
-        fillInRepo();
+  @Test
+  public void testTrashRepositoryFolders()
+      throws Exception
+  {
+    fillInRepo();
 
-        String repoId = snapshots.getId();
+    String repoId = snapshots.getId();
 
-        DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup( SchedulerTask.class, DeleteRepositoryFoldersTask.class.getSimpleName() );
-        task.setRepository( snapshots );
-        task.setDeleteForever( false );
+    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(SchedulerTask.class,
+        DeleteRepositoryFoldersTask.class.getSimpleName());
+    task.setRepository(snapshots);
+    task.setDeleteForever(false);
 
-        task.call();
+    task.call();
 
-        File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
-        File trashDir = new File( workDir, "trash" );
+    File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
+    File trashDir = new File(workDir, "trash");
 
-        assertFalse( new File( new File( workDir, "storage" ), repoId ).exists() );
-        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-local" ).exists() );
-        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-remote" ).exists() );
-        assertFalse( new File( new File( new File( workDir, "proxy" ), "attributes" ), repoId ).exists() );
+    assertFalse(new File(new File(workDir, "storage"), repoId).exists());
+    assertFalse(new File(new File(workDir, "indexer"), repoId + "-local").exists());
+    assertFalse(new File(new File(workDir, "indexer"), repoId + "-remote").exists());
+    assertFalse(new File(new File(new File(workDir, "proxy"), "attributes"), repoId).exists());
 
-        assertTrue( new File( trashDir, repoId ).exists() );
-        assertFalse( new File( trashDir, repoId + "-local" ).exists() );
-        assertFalse( new File( trashDir, repoId + "-remote" ).exists() );
-    }
+    assertTrue(new File(trashDir, repoId).exists());
+    assertFalse(new File(trashDir, repoId + "-local").exists());
+    assertFalse(new File(trashDir, repoId + "-remote").exists());
+  }
 
-    @Test
-    public void testDeleteForeverRepositoryFolders()
-        throws Exception
-    {
-        fillInRepo();
+  @Test
+  public void testDeleteForeverRepositoryFolders()
+      throws Exception
+  {
+    fillInRepo();
 
-        String repoId = snapshots.getId();
+    String repoId = snapshots.getId();
 
-        DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup( SchedulerTask.class, DeleteRepositoryFoldersTask.class.getSimpleName() );
-        task.setRepository( snapshots );
-        task.setDeleteForever( true );
+    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(SchedulerTask.class,
+        DeleteRepositoryFoldersTask.class.getSimpleName());
+    task.setRepository(snapshots);
+    task.setDeleteForever(true);
 
-        task.call();
+    task.call();
 
-        File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
-        File trashDir = new File( workDir, "trash" );
+    File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
+    File trashDir = new File(workDir, "trash");
 
-        assertFalse( new File( new File( workDir, "storage" ), repoId ).exists() );
-        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-local" ).exists() );
-        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-remote" ).exists() );
-        assertFalse( new File( new File( new File( workDir, "proxy" ), "attributes" ), repoId ).exists() );
+    assertFalse(new File(new File(workDir, "storage"), repoId).exists());
+    assertFalse(new File(new File(workDir, "indexer"), repoId + "-local").exists());
+    assertFalse(new File(new File(workDir, "indexer"), repoId + "-remote").exists());
+    assertFalse(new File(new File(new File(workDir, "proxy"), "attributes"), repoId).exists());
 
-        assertFalse( new File( trashDir, repoId ).exists() );
-        assertFalse( new File( trashDir, repoId + "-local" ).exists() );
-        assertFalse( new File( trashDir, repoId + "-remote" ).exists() );
-    }
+    assertFalse(new File(trashDir, repoId).exists());
+    assertFalse(new File(trashDir, repoId + "-local").exists());
+    assertFalse(new File(trashDir, repoId + "-remote").exists());
+  }
 }

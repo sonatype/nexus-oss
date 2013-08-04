@@ -10,20 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
 
 /**
  * A content locator that emits a InputStream using a File. Reusable.
- * 
+ *
  * @author cstamas
  */
 public class FileContentLocator
     extends org.sonatype.nexus.proxy.item.FileContentLocator
 {
-    public FileContentLocator( final File file, final String mimeType )
-    {
-        super( file, mimeType, false );
-    }
+  public FileContentLocator(final File file, final String mimeType) {
+    super(file, mimeType, false);
+  }
 }

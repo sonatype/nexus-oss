@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -22,24 +23,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FilterChain
 {
 
-    private final String pathPattern;
+  private final String pathPattern;
 
-    private final String filterExpression;
+  private final String filterExpression;
 
-    public FilterChain( final String pathPattern, final String filterExpression )
-    {
-        this.pathPattern = checkNotNull( pathPattern );
-        this.filterExpression = checkNotNull( filterExpression );
-    }
+  public FilterChain(final String pathPattern, final String filterExpression) {
+    this.pathPattern = checkNotNull(pathPattern);
+    this.filterExpression = checkNotNull(filterExpression);
+  }
 
-    public String getPathPattern()
-    {
-        return pathPattern;
-    }
+  public String getPathPattern() {
+    return pathPattern;
+  }
 
-    public String getFilterExpression()
-    {
-        return filterExpression;
-    }
+  public String getFilterExpression() {
+    return filterExpression;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.json;
 
 import java.io.IOException;
@@ -17,137 +18,133 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
-
 import com.thoughtworks.xstream.XStream;
+import org.codehaus.plexus.PlexusTestCase;
 
 public class JsonOrgHierarchicalStreamWriterTest
     extends PlexusTestCase
 {
 
-    protected XStream xstream;
+  protected XStream xstream;
 
-    protected void prepare()
-    {
-        this.xstream = new XStream( new JsonOrgHierarchicalStreamDriver() );
+  protected void prepare() {
+    this.xstream = new XStream(new JsonOrgHierarchicalStreamDriver());
 
-        this.xstream.registerConverter( new PrimitiveKeyedMapConverter( xstream.getMapper() ) );
-    }
+    this.xstream.registerConverter(new PrimitiveKeyedMapConverter(xstream.getMapper()));
+  }
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        prepare();
-    }
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
+    prepare();
+  }
 
-    protected void serialize( Object o )
-        throws IOException
-    {
-        String result = xstream.toXML( o );
-        
-        System.out.println( result );
-    }
+  protected void serialize(Object o)
+      throws IOException
+  {
+    String result = xstream.toXML(o);
 
-    public void testList()
-        throws Exception
-    {
-        System.out.println( " == LISTS ==" );
+    System.out.println(result);
+  }
 
-        List<String> strings = new ArrayList<String>( 3 );
-        strings.add( "oneList" );
-        strings.add( "twoList" );
-        strings.add( "threeList" );
-        serialize( strings );
-    }
+  public void testList()
+      throws Exception
+  {
+    System.out.println(" == LISTS ==");
 
-    public void testMap()
-        throws Exception
-    {
-        System.out.println( " == MAP ==" );
+    List<String> strings = new ArrayList<String>(3);
+    strings.add("oneList");
+    strings.add("twoList");
+    strings.add("threeList");
+    serialize(strings);
+  }
 
-        HashMap map = new HashMap();
-        map.put( "key", "value" );
-        map.put( "aNumber", 1975 );
-        map.put( "aBoolean", Boolean.TRUE );
-        map.put( "one-nine-seven-five", 1975 );
-        serialize( map );
+  public void testMap()
+      throws Exception
+  {
+    System.out.println(" == MAP ==");
 
-        HashMap complicated = new HashMap();
-        complicated.put( "simpleKey", "someValue" );
-        complicated.put( "aMap", map );
-        Object[] objects = new Object[3];
-        objects[0] = "text";
-        objects[1] = 1975;
-        objects[2] = Boolean.TRUE;
-        complicated.put( "arrayOfObjects", objects );
-        serialize( complicated );
-    }
+    HashMap map = new HashMap();
+    map.put("key", "value");
+    map.put("aNumber", 1975);
+    map.put("aBoolean", Boolean.TRUE);
+    map.put("one-nine-seven-five", 1975);
+    serialize(map);
 
-    public void testArray()
-        throws Exception
-    {
-        System.out.println( " == ARRAYS ==" );
+    HashMap complicated = new HashMap();
+    complicated.put("simpleKey", "someValue");
+    complicated.put("aMap", map);
+    Object[] objects = new Object[3];
+    objects[0] = "text";
+    objects[1] = 1975;
+    objects[2] = Boolean.TRUE;
+    complicated.put("arrayOfObjects", objects);
+    serialize(complicated);
+  }
 
-        String[] strings = new String[2];
-        strings[0] = "one";
-        strings[1] = "two";
-        serialize( strings );
+  public void testArray()
+      throws Exception
+  {
+    System.out.println(" == ARRAYS ==");
 
-        int[] ints = new int[3];
-        ints[0] = 1;
-        ints[1] = 2;
-        ints[2] = 3;
-        serialize( ints );
+    String[] strings = new String[2];
+    strings[0] = "one";
+    strings[1] = "two";
+    serialize(strings);
 
-        Object[] objects = new Object[3];
-        objects[0] = "text";
-        objects[1] = 1975;
-        objects[2] = Boolean.TRUE;
-        serialize( objects );
-    }
+    int[] ints = new int[3];
+    ints[0] = 1;
+    ints[1] = 2;
+    ints[2] = 3;
+    serialize(ints);
 
-    public void testCustomObjects()
-        throws Exception
-    {
-        System.out.println( " == CUSTOM OBJECTS ==" );
+    Object[] objects = new Object[3];
+    objects[0] = "text";
+    objects[1] = 1975;
+    objects[2] = Boolean.TRUE;
+    serialize(objects);
+  }
 
-        OneValued ovn = new OneValued();
-        ovn.stringValue = null;
-        serialize( ovn );
+  public void testCustomObjects()
+      throws Exception
+  {
+    System.out.println(" == CUSTOM OBJECTS ==");
 
-        OneValued ov = new OneValued();
-        ov.stringValue = "some string value";
-        serialize( ov );
+    OneValued ovn = new OneValued();
+    ovn.stringValue = null;
+    serialize(ovn);
 
-        ThreeValued tw = new ThreeValued();
-        tw.stringValue = "again some string field";
-        tw.intValue = 1975;
-        tw.boolValue = true;
-        serialize( tw );
+    OneValued ov = new OneValued();
+    ov.stringValue = "some string value";
+    serialize(ov);
 
-        CombinedValued co = new CombinedValued();
-        co.stringValue = "custom object";
-        int[] ints = new int[3];
-        ints[0] = 1;
-        ints[1] = 2;
-        ints[2] = 3;
-        co.ints = ints;
+    ThreeValued tw = new ThreeValued();
+    tw.stringValue = "again some string field";
+    tw.intValue = 1975;
+    tw.boolValue = true;
+    serialize(tw);
 
-        List<String> strings = new ArrayList<String>( 3 );
-        strings.add( "oneList" );
-        strings.add( "twoList" );
-        strings.add( "threeList" );
-        co.objectsList = strings;
+    CombinedValued co = new CombinedValued();
+    co.stringValue = "custom object";
+    int[] ints = new int[3];
+    ints[0] = 1;
+    ints[1] = 2;
+    ints[2] = 3;
+    co.ints = ints;
 
-        HashMap map = new HashMap();
-        map.put( "key", "value" );
-        map.put( "aNumber", 1975 );
-        co.objectMap = map;
+    List<String> strings = new ArrayList<String>(3);
+    strings.add("oneList");
+    strings.add("twoList");
+    strings.add("threeList");
+    co.objectsList = strings;
 
-        serialize( co );
-    }
+    HashMap map = new HashMap();
+    map.put("key", "value");
+    map.put("aNumber", 1975);
+    co.objectMap = map;
+
+    serialize(co);
+  }
 
 }

@@ -10,37 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling.events;
 
 import org.sonatype.nexus.scheduling.NexusTask;
 
 /**
  * Event fired when a task failed with some error.
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public class NexusTaskEventStoppedFailed<T>
     extends NexusTaskEventStopped<T>
 {
-    /**
-     * Failure cause.
-     */
-    private final Throwable throwable;
+  /**
+   * Failure cause.
+   */
+  private final Throwable throwable;
 
-    public NexusTaskEventStoppedFailed( final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent, final Throwable throwable )
-    {
-        super( task, startedEvent );
-        this.throwable = throwable;
-    }
+  public NexusTaskEventStoppedFailed(final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent,
+                                     final Throwable throwable)
+  {
+    super(task, startedEvent);
+    this.throwable = throwable;
+  }
 
-    /**
-     * Returns the failure cause.
-     * 
-     * @return
-     */
-    public Throwable getFailureCause()
-    {
-        return throwable;
-    }
+  /**
+   * Returns the failure cause.
+   */
+  public Throwable getFailureCause() {
+    return throwable;
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 /**
@@ -20,26 +21,26 @@ package org.sonatype.nexus.plugins.capabilities;
 public interface CapabilityReference
 {
 
-    /**
-     * Returns capability context.
-     *
-     * @return capability context (never null)
-     */
-    CapabilityContext context();
+  /**
+   * Returns capability context.
+   *
+   * @return capability context (never null)
+   */
+  CapabilityContext context();
 
-    /**
-     * Returns the referenced capability.
-     *
-     * @return referenced capability
-     */
-    Capability capability();
+  /**
+   * Returns the referenced capability.
+   *
+   * @return referenced capability
+   */
+  Capability capability();
 
-    /**
-     * Returns the referenced capability.
-     *
-     * @param type Capability class type
-     * @return referenced capability
-     */
-    <T extends Capability> T capabilityAs(Class<T> type);
+  /**
+   * Returns the referenced capability.
+   *
+   * @param type Capability class type
+   * @return referenced capability
+   */
+  <T extends Capability> T capabilityAs(Class<T> type);
 
 }

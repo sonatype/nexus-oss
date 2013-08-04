@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities;
 
 import java.util.Map;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link Capability} related events.
@@ -27,202 +28,190 @@ public class CapabilityEvent
     extends AbstractEvent<CapabilityRegistry>
 {
 
-    private final CapabilityReference reference;
+  private final CapabilityReference reference;
 
-    public CapabilityEvent( final CapabilityRegistry capabilityRegistry,
-                            final CapabilityReference reference )
-    {
-        super( checkNotNull( capabilityRegistry ) );
-        this.reference = checkNotNull( reference );
-    }
+  public CapabilityEvent(final CapabilityRegistry capabilityRegistry,
+                         final CapabilityReference reference)
+  {
+    super(checkNotNull(capabilityRegistry));
+    this.reference = checkNotNull(reference);
+  }
 
-    public CapabilityReference getReference()
+  public CapabilityReference getReference() {
+    return reference;
+  }
+
+  @Override
+  public String toString() {
+    return getReference().toString();
+  }
+
+  /**
+   * Event fired after a capability was activated.
+   *
+   * @since 2.0
+   */
+  public static class AfterActivated
+      extends CapabilityEvent
+  {
+
+    public AfterActivated(final CapabilityRegistry capabilityRegistry,
+                          final CapabilityReference reference)
     {
-        return reference;
+      super(capabilityRegistry, reference);
     }
 
     @Override
-    public String toString()
-    {
-        return getReference().toString();
+    public String toString() {
+      return "Activated " + super.toString();
     }
 
-    /**
-     * Event fired after a capability was activated.
-     *
-     * @since 2.0
-     */
-    public static class AfterActivated
-        extends CapabilityEvent
+  }
+
+  /**
+   * Event fired before a capability is passivated.
+   *
+   * @since 2.0
+   */
+  public static class BeforePassivated
+      extends CapabilityEvent
+  {
+
+    public BeforePassivated(final CapabilityRegistry capabilityRegistry,
+                            final CapabilityReference reference)
     {
-
-        public AfterActivated( final CapabilityRegistry capabilityRegistry,
-                               final CapabilityReference reference )
-        {
-            super( capabilityRegistry, reference );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Activated " + super.toString();
-        }
-
+      super(capabilityRegistry, reference);
     }
 
-    /**
-     * Event fired before a capability is passivated.
-     *
-     * @since 2.0
-     */
-    public static class BeforePassivated
-        extends CapabilityEvent
-    {
-
-        public BeforePassivated( final CapabilityRegistry capabilityRegistry,
-                                 final CapabilityReference reference )
-        {
-            super( capabilityRegistry, reference );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Passivated " + super.toString();
-        }
-
+    @Override
+    public String toString() {
+      return "Passivated " + super.toString();
     }
 
-    /**
-     * Event fired before a capability is updated.
-     *
-     * @since 2.0
-     */
-    public static class BeforeUpdate
-        extends CapabilityEvent
+  }
+
+  /**
+   * Event fired before a capability is updated.
+   *
+   * @since 2.0
+   */
+  public static class BeforeUpdate
+      extends CapabilityEvent
+  {
+
+    private final Map<String, String> properties;
+
+    private final Map<String, String> previousProperties;
+
+    public BeforeUpdate(final CapabilityRegistry capabilityRegistry,
+                        final CapabilityReference reference,
+                        final Map<String, String> properties,
+                        final Map<String, String> previousProperties)
     {
-
-        private final Map<String, String> properties;
-
-        private final Map<String, String> previousProperties;
-
-        public BeforeUpdate( final CapabilityRegistry capabilityRegistry,
-                             final CapabilityReference reference,
-                             final Map<String, String> properties,
-                             final Map<String, String> previousProperties )
-        {
-            super( capabilityRegistry, reference );
-            this.properties = checkNotNull( properties );
-            this.previousProperties = checkNotNull( previousProperties );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Before update of " + super.toString();
-        }
-
-        public Map<String, String> properties()
-        {
-            return properties;
-        }
-
-        public Map<String, String> previousProperties()
-        {
-            return previousProperties;
-        }
-
+      super(capabilityRegistry, reference);
+      this.properties = checkNotNull(properties);
+      this.previousProperties = checkNotNull(previousProperties);
     }
 
-    /**
-     * Event fired after a capability was updated.
-     *
-     * @since 2.0
-     */
-    public static class AfterUpdate
-        extends CapabilityEvent
-    {
-
-        private final Map<String, String> properties;
-
-        private final Map<String, String> previousProperties;
-
-        public AfterUpdate( final CapabilityRegistry capabilityRegistry,
-                            final CapabilityReference reference,
-                            final Map<String, String> properties,
-                            final Map<String, String> previousProperties )
-        {
-            super( capabilityRegistry, reference );
-            this.properties = checkNotNull( properties );
-            this.previousProperties = checkNotNull( previousProperties );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "After update of " + super.toString();
-        }
-
-        public Map<String, String> properties()
-        {
-            return properties;
-        }
-
-        public Map<String, String> previousProperties()
-        {
-            return previousProperties;
-        }
-
+    @Override
+    public String toString() {
+      return "Before update of " + super.toString();
     }
 
-    /**
-     * Event fired when a capability is created (added to registry).
-     * <p/>
-     * Called before {@link Capability#onCreate(java.util.Map)} / {@link Capability#onLoad(java.util.Map)} are called.
-     *
-     * @since 2.0
-     */
-    public static class Created
-        extends CapabilityEvent
-    {
-
-        public Created( final CapabilityRegistry capabilityRegistry,
-                        final CapabilityReference reference )
-        {
-            super( capabilityRegistry, reference );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Created " + super.toString();
-        }
-
+    public Map<String, String> properties() {
+      return properties;
     }
 
-    /**
-     * Event fired when a capability is removed from registry.
-     * <p/>
-     * Called after {@link Capability#onRemove()} is called.
-     *
-     * @since 2.0
-     */
-    public static class AfterRemove
-        extends CapabilityEvent
-    {
-
-        public AfterRemove( final CapabilityRegistry capabilityRegistry,
-                            final CapabilityReference reference )
-        {
-            super( capabilityRegistry, reference );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "After remove of " + super.toString();
-        }
-
+    public Map<String, String> previousProperties() {
+      return previousProperties;
     }
+
+  }
+
+  /**
+   * Event fired after a capability was updated.
+   *
+   * @since 2.0
+   */
+  public static class AfterUpdate
+      extends CapabilityEvent
+  {
+
+    private final Map<String, String> properties;
+
+    private final Map<String, String> previousProperties;
+
+    public AfterUpdate(final CapabilityRegistry capabilityRegistry,
+                       final CapabilityReference reference,
+                       final Map<String, String> properties,
+                       final Map<String, String> previousProperties)
+    {
+      super(capabilityRegistry, reference);
+      this.properties = checkNotNull(properties);
+      this.previousProperties = checkNotNull(previousProperties);
+    }
+
+    @Override
+    public String toString() {
+      return "After update of " + super.toString();
+    }
+
+    public Map<String, String> properties() {
+      return properties;
+    }
+
+    public Map<String, String> previousProperties() {
+      return previousProperties;
+    }
+
+  }
+
+  /**
+   * Event fired when a capability is created (added to registry).
+   * <p/>
+   * Called before {@link Capability#onCreate(java.util.Map)} / {@link Capability#onLoad(java.util.Map)} are called.
+   *
+   * @since 2.0
+   */
+  public static class Created
+      extends CapabilityEvent
+  {
+
+    public Created(final CapabilityRegistry capabilityRegistry,
+                   final CapabilityReference reference)
+    {
+      super(capabilityRegistry, reference);
+    }
+
+    @Override
+    public String toString() {
+      return "Created " + super.toString();
+    }
+
+  }
+
+  /**
+   * Event fired when a capability is removed from registry.
+   * <p/>
+   * Called after {@link Capability#onRemove()} is called.
+   *
+   * @since 2.0
+   */
+  public static class AfterRemove
+      extends CapabilityEvent
+  {
+
+    public AfterRemove(final CapabilityRegistry capabilityRegistry,
+                       final CapabilityReference reference)
+    {
+      super(capabilityRegistry, reference);
+    }
+
+    @Override
+    public String toString() {
+      return "After remove of " + super.toString();
+    }
+
+  }
 
 }

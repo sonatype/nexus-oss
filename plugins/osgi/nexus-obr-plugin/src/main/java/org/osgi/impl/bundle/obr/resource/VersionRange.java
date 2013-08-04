@@ -10,104 +10,125 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.osgi.impl.bundle.obr.resource;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.framework.Version;
 
-public class VersionRange implements Comparable {
-	Version high;
-	Version low;
-	char start = '[';
-	char end = ']';
+public class VersionRange
+    implements Comparable
+{
+  Version high;
 
-	static String V = "[0-9]+(\\.[0-9]+(\\.[0-9]+(\\.[a-zA-Z0-9_-]+)?)?)?";
-	static Pattern RANGE = Pattern.compile("(\\(|\\[)\\s*(" + V + ")\\s*,\\s*(" + V
-			+ ")\\s*(\\)|\\])");
+  Version low;
 
-	public VersionRange(String string) {
-		string = string.trim();
-		Matcher m = RANGE.matcher(string);
-		if (m.matches()) {
-			start = m.group(1).charAt(0);
-			low = new Version(m.group(2));
-			high = new Version(m.group(6));
-			end = m.group(10).charAt(0);
-			if (low.compareTo(high) > 0)
-				throw new IllegalArgumentException(
-						"Low Range is higher than High Range: " + low + "-"
-								+ high);
+  char start = '[';
 
-		} else
-			high = low = new Version(string);
-	}
+  char end = ']';
 
-	public boolean isRange() {
-		return high != low;
-	}
+  static String V = "[0-9]+(\\.[0-9]+(\\.[0-9]+(\\.[a-zA-Z0-9_-]+)?)?)?";
 
-	public boolean includeLow() {
-		return start == '[';
-	}
+  static Pattern RANGE = Pattern.compile("(\\(|\\[)\\s*(" + V + ")\\s*,\\s*(" + V
+      + ")\\s*(\\)|\\])");
 
-	public boolean includeHigh() {
-		return end == ']';
-	}
+  public VersionRange(String string) {
+    string = string.trim();
+    Matcher m = RANGE.matcher(string);
+    if (m.matches()) {
+      start = m.group(1).charAt(0);
+      low = new Version(m.group(2));
+      high = new Version(m.group(6));
+      end = m.group(10).charAt(0);
+      if (low.compareTo(high) > 0) {
+        throw new IllegalArgumentException(
+            "Low Range is higher than High Range: " + low + "-"
+                + high);
+      }
 
-	public String toString() {
-		if (high == low)
-			return high.toString();
+    }
+    else {
+      high = low = new Version(string);
+    }
+  }
 
-		StringBuffer sb = new StringBuffer();
-		sb.append(start);
-		sb.append(low);
-		sb.append(',');
-		sb.append(high);
-		sb.append(end);
-		return sb.toString();
-	}
+  public boolean isRange() {
+    return high != low;
+  }
 
-	public boolean equals(Object other) {
-		if (other instanceof VersionRange) {
-			return compareTo(other)==0;
-		}
-		return false;
-	}
+  public boolean includeLow() {
+    return start == '[';
+  }
 
-	public int hashCode() {
-		return low.hashCode() * high.hashCode();
-	}
+  public boolean includeHigh() {
+    return end == ']';
+  }
 
-	public int compareTo(Object other) {
-		VersionRange range = (VersionRange) other;
-		VersionRange a = this, b = range;
-		if (range.isRange()) {
-			a = range;
-			b = this;
-		} else {
-			if ( !isRange() )
-				return low.compareTo(range.high);
-		}
-		int l = a.low.compareTo(b.low);
-		boolean ll = false;
-		if (a.includeLow())
-			ll = l <= 0;
-		else
-			ll = l < 0;
+  public String toString() {
+    if (high == low) {
+      return high.toString();
+    }
 
-		if (!ll)
-			return -1;
+    StringBuffer sb = new StringBuffer();
+    sb.append(start);
+    sb.append(low);
+    sb.append(',');
+    sb.append(high);
+    sb.append(end);
+    return sb.toString();
+  }
 
-		int h = a.high.compareTo(b.high);
-		if (a.includeHigh())
-			ll = h >= 0;
-		else
-			ll = h > 0;
+  public boolean equals(Object other) {
+    if (other instanceof VersionRange) {
+      return compareTo(other) == 0;
+    }
+    return false;
+  }
 
-		if (ll)
-			return 0;
-		else
-			return 1;
-	}
+  public int hashCode() {
+    return low.hashCode() * high.hashCode();
+  }
+
+  public int compareTo(Object other) {
+    VersionRange range = (VersionRange) other;
+    VersionRange a = this, b = range;
+    if (range.isRange()) {
+      a = range;
+      b = this;
+    }
+    else {
+      if (!isRange()) {
+        return low.compareTo(range.high);
+      }
+    }
+    int l = a.low.compareTo(b.low);
+    boolean ll = false;
+    if (a.includeLow()) {
+      ll = l <= 0;
+    }
+    else {
+      ll = l < 0;
+    }
+
+    if (!ll) {
+      return -1;
+    }
+
+    int h = a.high.compareTo(b.high);
+    if (a.includeHigh()) {
+      ll = h >= 0;
+    }
+    else {
+      ll = h > 0;
+    }
+
+    if (ll) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
 }

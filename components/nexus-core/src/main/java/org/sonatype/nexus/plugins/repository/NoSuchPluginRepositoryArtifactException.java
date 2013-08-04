@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -17,20 +18,18 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 public final class NoSuchPluginRepositoryArtifactException
     extends Exception
 {
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final GAVCoordinate gav;
+  private final GAVCoordinate gav;
 
-    public NoSuchPluginRepositoryArtifactException( final NexusPluginRepository repo, final GAVCoordinate gav )
-    {
-        super( "Plugin artifact \"" + gav + "\" not found"
-            + ( repo == null ? "!" : " in repository \"" + repo.getId() + "\"!" ) );
+  public NoSuchPluginRepositoryArtifactException(final NexusPluginRepository repo, final GAVCoordinate gav) {
+    super("Plugin artifact \"" + gav + "\" not found"
+        + (repo == null ? "!" : " in repository \"" + repo.getId() + "\"!"));
 
-        this.gav = gav;
-    }
+    this.gav = gav;
+  }
 
-    public GAVCoordinate getCoordinate()
-    {
-        return gav;
-    }
+  public GAVCoordinate getCoordinate() {
+    return gav;
+  }
 }

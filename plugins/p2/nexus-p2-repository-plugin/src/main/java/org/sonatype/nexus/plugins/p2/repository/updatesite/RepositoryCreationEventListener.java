@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
@@ -23,34 +22,34 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.ScheduledTask;
 
-@Component( role = EventInspector.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT )
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
+@Component(role = EventInspector.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT)
 public class RepositoryCreationEventListener
     extends AbstractEventInspector
     implements EventInspector
 {
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
+  @Requirement
+  private ApplicationStatusSource applicationStatusSource;
 
-    @Requirement
-    private NexusScheduler scheduler;
+  @Requirement
+  private NexusScheduler scheduler;
 
-    @Override
-    public boolean accepts( final Event<?> evt )
-    {
-        return evt instanceof RepositoryRegistryEventAdd && applicationStatusSource.getSystemStatus().isNexusStarted();
+  @Override
+  public boolean accepts(final Event<?> evt) {
+    return evt instanceof RepositoryRegistryEventAdd && applicationStatusSource.getSystemStatus().isNexusStarted();
+  }
+
+  @Override
+  public void inspect(final Event<?> evt) {
+    final UpdateSiteProxyRepository updateSite =
+        ((RepositoryRegistryEventAdd) evt).getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
+
+    if (updateSite != null) {
+      updateSite.setExposed(false);
+      final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit(scheduler, updateSite, true);
+      getLogger().debug("Submitted " + mirrorTask.getName());
     }
-
-    @Override
-    public void inspect( final Event<?> evt )
-    {
-        final UpdateSiteProxyRepository updateSite =
-            ( (RepositoryRegistryEventAdd) evt ).getRepository().adaptToFacet( UpdateSiteProxyRepository.class );
-
-        if ( updateSite != null )
-        {
-            updateSite.setExposed( false );
-            final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit( scheduler, updateSite, true );
-            getLogger().debug( "Submitted " + mirrorTask.getName() );
-        }
-    }
+  }
 }

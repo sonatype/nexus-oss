@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -19,92 +20,80 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 public class ArtifactStoreRequest
     extends ResourceStoreRequest
 {
-    private final MavenRepository mavenRepository;
+  private final MavenRepository mavenRepository;
 
-    private final Gav gav;
+  private final Gav gav;
 
-    public ArtifactStoreRequest( MavenRepository repository, String path, boolean localOnly )
-    {
-        super( path, localOnly );
+  public ArtifactStoreRequest(MavenRepository repository, String path, boolean localOnly) {
+    super(path, localOnly);
 
-        this.mavenRepository = repository;
+    this.mavenRepository = repository;
 
-        this.gav = mavenRepository.getGavCalculator().pathToGav( path );
+    this.gav = mavenRepository.getGavCalculator().pathToGav(path);
 
-        if ( gav == null )
-        {
-            throw new IllegalArgumentException( "The path does not represent an artifact!" );
-        }
+    if (gav == null) {
+      throw new IllegalArgumentException("The path does not represent an artifact!");
     }
+  }
 
-    public ArtifactStoreRequest( MavenRepository repository, Gav gav, boolean localOnly )
-    {
-        this( repository, gav, localOnly, false );
-    }
+  public ArtifactStoreRequest(MavenRepository repository, Gav gav, boolean localOnly) {
+    this(repository, gav, localOnly, false);
+  }
 
-    public ArtifactStoreRequest( MavenRepository repository, Gav gav, boolean localOnly, boolean remoteOnly )
-    {
-        super( repository.getGavCalculator().gavToPath( gav ), localOnly, remoteOnly );
+  public ArtifactStoreRequest(MavenRepository repository, Gav gav, boolean localOnly, boolean remoteOnly) {
+    super(repository.getGavCalculator().gavToPath(gav), localOnly, remoteOnly);
 
-        this.mavenRepository = repository;
+    this.mavenRepository = repository;
 
-        this.gav = gav;
-    }
+    this.gav = gav;
+  }
 
-    public MavenRepository getMavenRepository()
-    {
-        return mavenRepository;
-    }
+  public MavenRepository getMavenRepository() {
+    return mavenRepository;
+  }
 
-    public Gav getGav()
-    {
-        return gav;
-    }
+  public Gav getGav() {
+    return gav;
+  }
 
-    public String getGroupId()
-    {
-        return gav.getGroupId();
-    }
+  public String getGroupId() {
+    return gav.getGroupId();
+  }
 
-    public String getArtifactId()
-    {
-        return gav.getArtifactId();
-    }
+  public String getArtifactId() {
+    return gav.getArtifactId();
+  }
 
-    public String getVersion()
-    {
-        return gav.getVersion();
-    }
+  public String getVersion() {
+    return gav.getVersion();
+  }
 
-    public String getClassifier()
-    {
-        return gav.getClassifier();
-    }
+  public String getClassifier() {
+    return gav.getClassifier();
+  }
 
-    public String getExtension()
-    {
-        return gav.getExtension();
-    }
+  public String getExtension() {
+    return gav.getExtension();
+  }
 
-    @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder( super.toString() );
-        sb.append( "(GAVCE=" );
-        sb.append( getGroupId() );
-        sb.append( ":" );
-        sb.append( getArtifactId() );
-        sb.append( ":" );
-        sb.append( getVersion() );
-        sb.append( ":c=" );
-        sb.append( getClassifier() );
-        sb.append( ":e=" );
-        sb.append( getExtension() );
-        sb.append( ", for " );
-        sb.append( RepositoryStringUtils.getHumanizedNameString( getMavenRepository() ) );
-        sb.append( ") " );
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(super.toString());
+    sb.append("(GAVCE=");
+    sb.append(getGroupId());
+    sb.append(":");
+    sb.append(getArtifactId());
+    sb.append(":");
+    sb.append(getVersion());
+    sb.append(":c=");
+    sb.append(getClassifier());
+    sb.append(":e=");
+    sb.append(getExtension());
+    sb.append(", for ");
+    sb.append(RepositoryStringUtils.getHumanizedNameString(getMavenRepository()));
+    sb.append(") ");
 
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 
 }

@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.error.reporting.modifier;
 
-import static org.sonatype.sisu.pr.Modifier.Priority.FILLIN;
+package org.sonatype.nexus.error.reporting.modifier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.sonatype.nexus.error.report.ErrorReportComponent;
 import org.sonatype.sisu.pr.Modifier;
+
+import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
+
+import static org.sonatype.sisu.pr.Modifier.Priority.FILLIN;
 
 /**
  * Sets the JIRA component as specified in the {@link ErrorReportComponent}.
@@ -29,24 +31,21 @@ public class ComponentModifier
     implements Modifier
 {
 
-    ErrorReportComponent component;
+  ErrorReportComponent component;
 
-    @Inject
-    public ComponentModifier( final ErrorReportComponent component )
-    {
-        this.component = component;
-    }
+  @Inject
+  public ComponentModifier(final ErrorReportComponent component) {
+    this.component = component;
+  }
 
-    @Override
-    public IssueSubmissionRequest modify( final IssueSubmissionRequest request )
-    {
-        request.setComponent( component.getComponent() );
-        return request;
-    }
+  @Override
+  public IssueSubmissionRequest modify(final IssueSubmissionRequest request) {
+    request.setComponent(component.getComponent());
+    return request;
+  }
 
-    @Override
-    public int getPriority()
-    {
-        return FILLIN.priority();
-    }
+  @Override
+  public int getPriority() {
+    return FILLIN.priority();
+  }
 }

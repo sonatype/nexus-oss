@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins;
 
 import java.io.IOException;
@@ -27,79 +28,70 @@ import org.sonatype.nexus.plugins.rest.StaticResource;
 public final class PluginStaticResource
     implements StaticResource
 {
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    private final URL resourceURL;
+  private final URL resourceURL;
 
-    private final String publishedPath;
+  private final String publishedPath;
 
-    private final String contentType;
+  private final String contentType;
 
-    // ----------------------------------------------------------------------
-    // Constructors
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constructors
+  // ----------------------------------------------------------------------
 
-    public PluginStaticResource( final URL resourceURL, final String publishedPath, final String contentType )
-    {
-        this.resourceURL = resourceURL;
-        this.publishedPath = publishedPath;
-        this.contentType = contentType;
+  public PluginStaticResource(final URL resourceURL, final String publishedPath, final String contentType) {
+    this.resourceURL = resourceURL;
+    this.publishedPath = publishedPath;
+    this.contentType = contentType;
+  }
+
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
+
+  public String getPath() {
+    return publishedPath;
+  }
+
+  public String getContentType() {
+    return contentType;
+  }
+
+  public long getSize() {
+    try {
+      return resourceURL.openConnection().getContentLength();
     }
-
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
-
-    public String getPath()
+    catch (final Throwable e) // NOPMD
     {
-        return publishedPath;
+      // default to unknown size
     }
+    return -1;
+  }
 
-    public String getContentType()
-    {
-        return contentType;
-    }
+  public InputStream getInputStream()
+      throws IOException
+  {
+    return resourceURL.openStream();
+  }
 
-    public long getSize()
-    {
-        try
-        {
-            return resourceURL.openConnection().getContentLength();
+  public Long getLastModified() {
+    try {
+      final URLConnection urlConn = resourceURL.openConnection();
+      if (urlConn instanceof JarURLConnection) {
+        final JarEntry jarEntry = ((JarURLConnection) urlConn).getJarEntry();
+        if (jarEntry != null) {
+          return Long.valueOf(jarEntry.getTime());
         }
-        catch ( final Throwable e ) // NOPMD
-        {
-            // default to unknown size
-        }
-        return -1;
+        // This is a jar, not an entry in a jar
+      }
+      return Long.valueOf(urlConn.getLastModified());
     }
-
-    public InputStream getInputStream()
-        throws IOException
+    catch (final Throwable e) // NOPMD
     {
-        return resourceURL.openStream();
+      return null; // default to unknown last modified time
     }
-
-    public Long getLastModified()
-    {
-        try
-        {
-            final URLConnection urlConn = resourceURL.openConnection();
-            if ( urlConn instanceof JarURLConnection )
-            {
-                final JarEntry jarEntry = ( (JarURLConnection) urlConn ).getJarEntry();
-                if ( jarEntry != null )
-                {
-                    return Long.valueOf( jarEntry.getTime() );
-                }
-                // This is a jar, not an entry in a jar
-            }
-            return Long.valueOf( urlConn.getLastModified() );
-        }
-        catch ( final Throwable e ) // NOPMD
-        {
-            return null; // default to unknown last modified time
-        }
-    }
+  }
 }

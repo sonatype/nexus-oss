@@ -10,15 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.site.plugin;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -33,6 +33,9 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -40,78 +43,71 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author cstamas
  */
-@Named( SiteRepository.ID )
+@Named(SiteRepository.ID)
 public class DefaultSiteRepository
     extends AbstractWebSiteRepository
     implements SiteRepository, WebSiteRepository
 {
 
-    private final ContentClass contentClass;
+  private final ContentClass contentClass;
 
-    private final Configurator repositoryConfigurator;
+  private final Configurator repositoryConfigurator;
 
-    @Inject
-    public DefaultSiteRepository( final @Named( SiteRepository.ID ) ContentClass contentClass,
-                                  final @Named( SiteRepository.ID ) Configurator repositoryConfigurator )
-    {
+  @Inject
+  public DefaultSiteRepository(final @Named(SiteRepository.ID) ContentClass contentClass,
+                               final @Named(SiteRepository.ID) Configurator repositoryConfigurator)
+  {
 
-        this.contentClass = checkNotNull( contentClass );
-        this.repositoryConfigurator = checkNotNull( repositoryConfigurator );
+    this.contentClass = checkNotNull(contentClass);
+    this.repositoryConfigurator = checkNotNull(repositoryConfigurator);
+  }
+
+  private RepositoryKind repositoryKind;
+
+  public ContentClass getRepositoryContentClass() {
+    return contentClass;
+  }
+
+  public RepositoryKind getRepositoryKind() {
+    if (repositoryKind == null) {
+      repositoryKind = new DefaultRepositoryKind(SiteRepository.class, null);
     }
 
-    private RepositoryKind repositoryKind;
+    return repositoryKind;
+  }
 
-    public ContentClass getRepositoryContentClass()
+  public void deploySiteBundle(String prefix, InputStream bundle)
+      throws IOException
+  {
+    throw new UnsupportedOperationException("Deploy of the bundle is not yet implemented!");
+  }
+
+  @Override
+  protected CRepositoryExternalConfigurationHolderFactory<DefaultSiteRepositoryConfiguration> getExternalConfigurationHolderFactory() {
+    return new CRepositoryExternalConfigurationHolderFactory<DefaultSiteRepositoryConfiguration>()
     {
-        return contentClass;
+      public DefaultSiteRepositoryConfiguration createExternalConfigurationHolder(CRepository config) {
+        return new DefaultSiteRepositoryConfiguration((Xpp3Dom) config.getExternalConfiguration());
+      }
+    };
+  }
+
+  @Override
+  public Configurator getConfigurator() {
+    return repositoryConfigurator;
+  }
+
+  @Override
+  public void storeItem(boolean fromTask, StorageItem item)
+      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
+  {
+    // strip the '.' from the path
+    if (AbstractStorageItem.class.isAssignableFrom(item.getClass())) {
+      String normalizedPath = FileUtils.normalize(item.getPath());
+      AbstractStorageItem fileItem = (AbstractStorageItem) item;
+      fileItem.setPath(normalizedPath);
     }
 
-    public RepositoryKind getRepositoryKind()
-    {
-        if ( repositoryKind == null )
-        {
-            repositoryKind = new DefaultRepositoryKind( SiteRepository.class, null );
-        }
-
-        return repositoryKind;
-    }
-
-    public void deploySiteBundle( String prefix, InputStream bundle )
-        throws IOException
-    {
-        throw new UnsupportedOperationException( "Deploy of the bundle is not yet implemented!" );
-    }
-
-    @Override
-    protected CRepositoryExternalConfigurationHolderFactory<DefaultSiteRepositoryConfiguration> getExternalConfigurationHolderFactory()
-    {
-        return new CRepositoryExternalConfigurationHolderFactory<DefaultSiteRepositoryConfiguration>()
-        {
-            public DefaultSiteRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
-            {
-                return new DefaultSiteRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
-            }
-        };
-    }
-
-    @Override
-    public Configurator getConfigurator()
-    {
-        return repositoryConfigurator;
-    }
-
-    @Override
-    public void storeItem( boolean fromTask, StorageItem item )
-        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
-    {
-        // strip the '.' from the path
-        if ( AbstractStorageItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            String normalizedPath = FileUtils.normalize( item.getPath() );
-            AbstractStorageItem fileItem = (AbstractStorageItem) item;
-            fileItem.setPath( normalizedPath );
-        }
-
-        super.storeItem( fromTask, item );
-    }
+    super.storeItem(fromTask, item);
+  }
 }

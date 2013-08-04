@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
@@ -19,10 +20,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthorizationEvent;
 import org.sonatype.nexus.auth.ResourceInfo;
@@ -32,62 +29,63 @@ import org.sonatype.nexus.security.Constants;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A filter that maps the action from the HTTP Verb.
- * 
+ *
  * @author cstamas
  */
 public class FailureLoggingHttpMethodPermissionFilter
     extends HttpMethodPermissionFilter
 {
-    private final Logger logger = LoggerFactory.getLogger( this.getClass() );
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Inject
-    private SecuritySystem securitySystem;
+  @Inject
+  private SecuritySystem securitySystem;
 
-    @Inject
-    private EventBus eventBus;
+  @Inject
+  private EventBus eventBus;
 
-    protected Logger getLogger()
-    {
-        return logger;
+  protected Logger getLogger() {
+    return logger;
+  }
+
+  @Override
+  protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
+      throws IOException
+  {
+    recordAuthzFailureEvent(request, response);
+
+    request.setAttribute(Constants.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
+
+    return false;
+  }
+
+  private void recordAuthzFailureEvent(ServletRequest request, ServletResponse response) {
+    Subject subject = getSubject(request, response);
+
+    if (securitySystem.getAnonymousUsername().equals(subject.getPrincipal())) {
+      return;
     }
 
-    @Override
-    protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
-        throws IOException
-    {
-        recordAuthzFailureEvent( request, response );
+    final Action action = Action.valueOf(getHttpMethodAction(request));
 
-        request.setAttribute( Constants.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
+    final ClientInfo clientInfo =
+        new ClientInfo(String.valueOf(subject.getPrincipal()),
+            RemoteIPFinder.findIP((HttpServletRequest) request), "n/a");
+    final ResourceInfo resInfo =
+        new ResourceInfo("HTTP", ((HttpServletRequest) request).getMethod(), action,
+            ((HttpServletRequest) request).getRequestURI());
 
-        return false;
-    }
+    eventBus.post(new NexusAuthorizationEvent(this, clientInfo, resInfo, false));
 
-    private void recordAuthzFailureEvent( ServletRequest request, ServletResponse response )
-    {
-        Subject subject = getSubject( request, response );
+  }
 
-        if ( securitySystem.getAnonymousUsername().equals( subject.getPrincipal() ) )
-        {
-            return;
-        }
-
-        final Action action = Action.valueOf( getHttpMethodAction( request ) );
-
-        final ClientInfo clientInfo =
-            new ClientInfo( String.valueOf( subject.getPrincipal() ),
-                RemoteIPFinder.findIP( (HttpServletRequest) request ), "n/a" );
-        final ResourceInfo resInfo =
-            new ResourceInfo( "HTTP", ( (HttpServletRequest) request ).getMethod(), action,
-                ( (HttpServletRequest) request ).getRequestURI() );
-
-        eventBus.post( new NexusAuthorizationEvent( this, clientInfo, resInfo, false ) );
-
-    }
-
-    protected Object getAttribute( String key )
-    {
-        return getFilterConfig().getServletContext().getAttribute( key );
-    }
+  protected Object getAttribute(String key) {
+    return getFilterConfig().getServletContext().getAttribute(key);
+  }
 }

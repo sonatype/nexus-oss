@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
 
 import javax.inject.Singleton;
@@ -21,21 +22,21 @@ import org.sonatype.plugin.ExtensionPoint;
 /**
  * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps for all those config
  * elements that does not map directly to a model and some extra processing is needed.
- * 
+ *
  * @author cstamas
  */
 @ExtensionPoint
 @Singleton
 public interface Configurator
 {
-    /**
-     * Will apply the configuration parameters from coreConfiguratuin to the target.
-     */
-    void applyConfiguration( Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration )
-        throws ConfigurationException;
+  /**
+   * Will apply the configuration parameters from coreConfiguratuin to the target.
+   */
+  void applyConfiguration(Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration)
+      throws ConfigurationException;
 
-    /**
-     * Will prepare model for save, by syncing it with target state (if needed).
-     */
-    void prepareForSave( Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration );
+  /**
+   * Will prepare model for save, by syncing it with target state (if needed).
+   */
+  void prepareForSave(Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration);
 }

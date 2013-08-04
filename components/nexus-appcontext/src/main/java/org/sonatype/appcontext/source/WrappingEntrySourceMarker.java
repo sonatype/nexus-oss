@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.source;
 
 import org.sonatype.appcontext.internal.Preconditions;
@@ -17,19 +18,17 @@ import org.sonatype.appcontext.internal.Preconditions;
 public abstract class WrappingEntrySourceMarker
     implements EntrySourceMarker
 {
-    private final EntrySourceMarker wrapped;
+  private final EntrySourceMarker wrapped;
 
-    public WrappingEntrySourceMarker( final EntrySourceMarker wrapped )
-    {
-        this.wrapped = Preconditions.checkNotNull( wrapped );
-    }
+  public WrappingEntrySourceMarker(final EntrySourceMarker wrapped) {
+    this.wrapped = Preconditions.checkNotNull(wrapped);
+  }
 
-    public String getDescription()
-    {
-        return getDescription( wrapped );
-    }
+  public String getDescription() {
+    return getDescription(wrapped);
+  }
 
-    // =
+  // =
 
-    protected abstract String getDescription( final EntrySourceMarker wrapped );
+  protected abstract String getDescription(final EntrySourceMarker wrapped);
 }

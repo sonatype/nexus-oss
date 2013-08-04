@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.metadata.validation;
 
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
@@ -17,20 +18,17 @@ import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 public class ValidationException
     extends MetadataHandlerException
 {
-    private static final long serialVersionUID = -8892632174114363043L;
+  private static final long serialVersionUID = -8892632174114363043L;
 
-    public ValidationException( String message )
-    {
-        super( message );
-    }
+  public ValidationException(String message) {
+    super(message);
+  }
 
-    public ValidationException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+  public ValidationException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public ValidationException( Throwable cause )
-    {
-        super( cause );
-    }
+  public ValidationException(Throwable cause) {
+    super(cause);
+  }
 }

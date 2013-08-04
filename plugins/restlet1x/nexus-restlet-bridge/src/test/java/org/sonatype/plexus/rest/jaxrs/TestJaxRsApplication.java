@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.jaxrs;
 
 import java.util.Set;
@@ -19,16 +20,15 @@ import javax.ws.rs.core.Application;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component( role = Application.class )
+@Component(role = Application.class)
 public class TestJaxRsApplication
     extends Application
 {
-    @Requirement
-    private PlexusObjectFactory objectFactory;
+  @Requirement
+  private PlexusObjectFactory objectFactory;
 
-    @Override
-    public Set<Class<?>> getClasses()
-    {
-        return objectFactory.getResourceClasses();
-    }
+  @Override
+  public Set<Class<?>> getClasses() {
+    return objectFactory.getResourceClasses();
+  }
 }

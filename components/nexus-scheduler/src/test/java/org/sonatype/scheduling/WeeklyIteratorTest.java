@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 import java.util.Calendar;
@@ -27,36 +28,35 @@ import static org.junit.Assert.assertTrue;
 public class WeeklyIteratorTest
     extends TestSupport
 {
-    public void testWeeklyIterator()
-        throws Exception
-    {
-        Calendar nearFuture = Calendar.getInstance();
-        nearFuture.add( Calendar.MINUTE, 15 );
+  public void testWeeklyIterator()
+      throws Exception
+  {
+    Calendar nearFuture = Calendar.getInstance();
+    nearFuture.add(Calendar.MINUTE, 15);
 
-        HashSet<Integer> days = new HashSet<Integer>();
+    HashSet<Integer> days = new HashSet<Integer>();
 
-        days.add( 1 );
-        days.add( 2 );
-        days.add( 3 );
-        days.add( 4 );
-        days.add( 5 );
-        days.add( 6 );
-        days.add( 7 );
+    days.add(1);
+    days.add(2);
+    days.add(3);
+    days.add(4);
+    days.add(5);
+    days.add(6);
+    days.add(7);
 
-        WeeklySchedulerIterator iter = new WeeklySchedulerIterator( nearFuture.getTime(), null, days );
+    WeeklySchedulerIterator iter = new WeeklySchedulerIterator(nearFuture.getTime(), null, days);
 
-        Date nextDate = iter.next();
+    Date nextDate = iter.next();
 
-        assertTrue( nearFuture.getTime().equals( nextDate ) );
+    assertTrue(nearFuture.getTime().equals(nextDate));
 
-        // Just validate the next 20 days in a row
-        for ( int i = 0; i < 20; i++ )
-        {
-            nextDate = iter.next();
+    // Just validate the next 20 days in a row
+    for (int i = 0; i < 20; i++) {
+      nextDate = iter.next();
 
-            nearFuture.add( Calendar.DAY_OF_YEAR, 1 );
+      nearFuture.add(Calendar.DAY_OF_YEAR, 1);
 
-            assertTrue( nearFuture.getTime().equals( nextDate ) );
-        }
+      assertTrue(nearFuture.getTime().equals(nextDate));
     }
+  }
 }

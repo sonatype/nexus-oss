@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.templates;
 
 import javax.inject.Singleton;
@@ -18,41 +19,31 @@ import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A template provider provides a set of templates for one implementation.
- * 
+ *
  * @author cstamas
  */
 @ExtensionPoint
 @Singleton
 public interface TemplateProvider
 {
-    /**
-     * Lists all templates.
-     * 
-     * @return
-     */
-    TemplateSet getTemplates();
+  /**
+   * Lists all templates.
+   */
+  TemplateSet getTemplates();
 
-    /**
-     * Lists all templates that fits supplied filter.
-     * 
-     * @return
-     */
-    TemplateSet getTemplates( Object filter );
+  /**
+   * Lists all templates that fits supplied filter.
+   */
+  TemplateSet getTemplates(Object filter);
 
-    /**
-     * Lists all templates that fits supplied filters.
-     * @param clazz
-     * @return
-     */
-    TemplateSet getTemplates( Object... filters );
+  /**
+   * Lists all templates that fits supplied filters.
+   */
+  TemplateSet getTemplates(Object... filters);
 
-    /**
-     * Search a template by it's ID.
-     * 
-     * @param id
-     * @return
-     * @throws NoSuchTemplateIdException
-     */
-    Template getTemplateById( String id )
-        throws NoSuchTemplateIdException;
+  /**
+   * Search a template by it's ID.
+   */
+  Template getTemplateById(String id)
+      throws NoSuchTemplateIdException;
 }

@@ -10,39 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao.password;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
+
+import junit.framework.Assert;
+import org.junit.Test;
 
 public class MD5CryptPasswordEncoderTest
     extends PlexusTestCaseSupport
 {
 
-    @Test
-    public void testEncryptAndVerify()
-        throws Exception
-    {
-        PasswordEncoder encoder = lookup( PasswordEncoder.class, "crypt" );
+  @Test
+  public void testEncryptAndVerify()
+      throws Exception
+  {
+    PasswordEncoder encoder = lookup(PasswordEncoder.class, "crypt");
 
-        String crypted = encoder.encodePassword( "test", null );
+    String crypted = encoder.encodePassword("test", null);
 
-        // System.out.println( "Crypted password: \'" + crypted + "\'" );
+    // System.out.println( "Crypted password: \'" + crypted + "\'" );
 
-        int lastIdx = crypted.lastIndexOf( '$' );
-        int firstIdx = crypted.indexOf( '$' );
+    int lastIdx = crypted.lastIndexOf('$');
+    int firstIdx = crypted.indexOf('$');
 
-        String salt = crypted.substring( firstIdx + "$1$".length(), lastIdx );
+    String salt = crypted.substring(firstIdx + "$1$".length(), lastIdx);
 
-        String check = "{CRYPT}" + new MD5Crypt().crypt( "test", salt );
+    String check = "{CRYPT}" + new MD5Crypt().crypt("test", salt);
 
-        // System.out.println( "Check value: \'" + check + "\'" );
+    // System.out.println( "Check value: \'" + check + "\'" );
 
-        Assert.assertEquals( check, crypted );
+    Assert.assertEquals(check, crypted);
 
-        Assert.assertTrue( encoder.isPasswordValid( crypted, "test", null ) );
-    }
+    Assert.assertTrue(encoder.isPasswordValid(crypted, "test", null));
+  }
 }

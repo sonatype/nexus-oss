@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.condition.internal;
 
 /*******************************************************************************
@@ -23,44 +24,48 @@ package org.sonatype.nexus.client.core.condition.internal;
 /******
  * Copied from org.sonatype.aether:aether-api:1.13.1
  ******/
+
 /**
  * A version scheme that handles interpretation of version strings to facilitate their comparison.
- * 
+ *
  * @author Benjamin Bentmann
  * @author Alin Dreghiciu
  */
 public interface VersionScheme
 {
 
-    /**
-     * Parses the specified version string, for example "1.0".
-     * 
-     * @param version The version string to parse, must not be {@code null}.
-     * @return The parsed version, never {@code null}.
-     * @throws InvalidVersionSpecificationException If the string violates the syntax rules of this scheme.
-     */
-    Version parseVersion( String version )
-        throws InvalidVersionSpecificationException;
+  /**
+   * Parses the specified version string, for example "1.0".
+   *
+   * @param version The version string to parse, must not be {@code null}.
+   * @return The parsed version, never {@code null}.
+   * @throws InvalidVersionSpecificationException
+   *          If the string violates the syntax rules of this scheme.
+   */
+  Version parseVersion(String version)
+      throws InvalidVersionSpecificationException;
 
-    /**
-     * Parses the specified version range specification, for example "[1.0,2.0)".
-     * 
-     * @param range The range specification to parse, must not be {@code null}.
-     * @return The parsed version range, never {@code null}.
-     * @throws InvalidVersionSpecificationException If the range specification violates the syntax rules of this scheme.
-     */
-    VersionRange parseVersionRange( String range )
-        throws InvalidVersionSpecificationException;
+  /**
+   * Parses the specified version range specification, for example "[1.0,2.0)".
+   *
+   * @param range The range specification to parse, must not be {@code null}.
+   * @return The parsed version range, never {@code null}.
+   * @throws InvalidVersionSpecificationException
+   *          If the range specification violates the syntax rules of this scheme.
+   */
+  VersionRange parseVersionRange(String range)
+      throws InvalidVersionSpecificationException;
 
-    /**
-     * Parses the specified version constraint specification, for example "1.0" or "[1.0,2.0),(2.0,)".
-     * 
-     * @param constraint The constraint specification to parse, must not be {@code null}.
-     * @return The parsed version constraint, never {@code null}.
-     * @throws InvalidVersionSpecificationException If the constraint specification violates the syntax rules of this
-     *             scheme.
-     */
-    VersionConstraint parseVersionConstraint( final String constraint )
-        throws InvalidVersionSpecificationException;
+  /**
+   * Parses the specified version constraint specification, for example "1.0" or "[1.0,2.0),(2.0,)".
+   *
+   * @param constraint The constraint specification to parse, must not be {@code null}.
+   * @return The parsed version constraint, never {@code null}.
+   * @throws InvalidVersionSpecificationException
+   *          If the constraint specification violates the syntax rules of this
+   *          scheme.
+   */
+  VersionConstraint parseVersionConstraint(final String constraint)
+      throws InvalidVersionSpecificationException;
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -17,36 +18,36 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The superclass of repository related registry events.
- * 
+ *
  * @author cstamas
  */
 public abstract class RepositoryRegistryRepositoryEvent
     extends RepositoryRegistryEvent
 {
-    /** The repository. */
-    private Repository repository;
+  /**
+   * The repository.
+   */
+  private Repository repository;
 
-    public RepositoryRegistryRepositoryEvent( final RepositoryRegistry repositoryRegistry, final Repository repository )
-    {
-        super( repositoryRegistry );
+  public RepositoryRegistryRepositoryEvent(final RepositoryRegistry repositoryRegistry, final Repository repository) {
+    super(repositoryRegistry);
 
-        this.repository = repository;
-    }
+    this.repository = repository;
+  }
 
-    /**
-     * Gets the repository.
-     * 
-     * @return the repository
-     */
-    public Repository getRepository()
-    {
-        return this.repository;
-    }
+  /**
+   * Gets the repository.
+   *
+   * @return the repository
+   */
+  public Repository getRepository() {
+    return this.repository;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "repositoryId=" + repository.getId() +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "repositoryId=" + repository.getId() +
+        '}';
+  }
 }

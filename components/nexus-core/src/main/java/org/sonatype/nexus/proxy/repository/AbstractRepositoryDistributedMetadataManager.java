@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -17,35 +18,33 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 /**
  * AbstractRepositoryMetadataManager specialization leaning to repositories that has "distributed" meta data files
- * (usually files spread around a repository, having or does not having same name, implementation dependent). Repository
+ * (usually files spread around a repository, having or does not having same name, implementation dependent).
+ * Repository
  * like these usually have no "central meta data" or one single monolithic meta data. These usually make possible
  * quicker "turn-around" (as "in a moment artifact is deployed is also available to consumers"). Typical example is
  * Maven2 repository layout.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
 public abstract class AbstractRepositoryDistributedMetadataManager
     extends AbstractRepositoryMetadataManager
 {
-    public AbstractRepositoryDistributedMetadataManager( final Repository repository )
-    {
-        super( repository );
-    }
+  public AbstractRepositoryDistributedMetadataManager(final Repository repository) {
+    super(repository);
+  }
 
-    @Override
-    public boolean expireMetadataCaches( final ResourceStoreRequest request )
-    {
-        return getRepository().expireCaches( request, getMetadataWalkerFilter() );
-    }
+  @Override
+  public boolean expireMetadataCaches(final ResourceStoreRequest request) {
+    return getRepository().expireCaches(request, getMetadataWalkerFilter());
+  }
 
-    @Override
-    public boolean expireNotFoundMetadataCaches( final ResourceStoreRequest request )
-    {
-        return getRepository().expireNotFoundCaches( request, getMetadataWalkerFilter() );
-    }
+  @Override
+  public boolean expireNotFoundMetadataCaches(final ResourceStoreRequest request) {
+    return getRepository().expireNotFoundCaches(request, getMetadataWalkerFilter());
+  }
 
-    // ==
+  // ==
 
-    protected abstract WalkerFilter getMetadataWalkerFilter();
+  protected abstract WalkerFilter getMetadataWalkerFilter();
 }

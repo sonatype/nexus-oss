@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins;
 
 import java.io.File;
@@ -17,15 +18,13 @@ import java.io.File;
 /**
  * The plugin repository context. UNDER HEAVY CONSTRUCTION, this is in flux! Please consider major changes on this
  * inferface!
- * 
+ *
  * @author cstamas
  */
 public interface PluginContext
 {
-    /**
-     * The directory on disk provided for the plugin to use for persistencing extra stuff if needed.
-     * 
-     * @return
-     */
-    File getBasedir();
+  /**
+   * The directory on disk provided for the plugin to use for persistencing extra stuff if needed.
+   */
+  File getBasedir();
 }

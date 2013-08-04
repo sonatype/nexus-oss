@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.log;
 
 import java.io.File;
@@ -21,28 +22,28 @@ import org.sonatype.nexus.NexusStreamResponse;
 
 /**
  * LogManager.
- * 
+ *
  * @author cstamas
  * @author juven
  * @author adreghiciu@gmail.com
  */
 public interface LogManager
 {
-    Set<File> getLogFiles();
+  Set<File> getLogFiles();
 
-    File getLogFile( String filename );
+  File getLogFile(String filename);
 
-    Collection<NexusStreamResponse> getApplicationLogFiles()
-        throws IOException;
+  Collection<NexusStreamResponse> getApplicationLogFiles()
+      throws IOException;
 
-    NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
-        throws IOException;
+  NexusStreamResponse getApplicationLogAsStream(String logFile, long fromByte, long bytesCount)
+      throws IOException;
 
-    LogConfiguration getConfiguration()
-        throws IOException;
+  LogConfiguration getConfiguration()
+      throws IOException;
 
-    void setConfiguration( LogConfiguration configuration )
-        throws IOException;
+  void setConfiguration(LogConfiguration configuration)
+      throws IOException;
 
-    void configure();
+  void configure();
 }

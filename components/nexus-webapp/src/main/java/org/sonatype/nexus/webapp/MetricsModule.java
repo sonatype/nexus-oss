@@ -10,7 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.webapp;
+
+import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,8 +34,6 @@ import com.yammer.metrics.util.DeadlockHealthCheck;
 import com.yammer.metrics.web.DefaultWebappMetricsFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.guice.FilterChainModule;
-import org.sonatype.security.web.guice.SecurityWebFilter;
 
 /**
  * <a href="http://metrics.codahale.com">Yammer Metrics</a> guice configuration.
@@ -39,10 +41,10 @@ import org.sonatype.security.web.guice.SecurityWebFilter;
  * Installs servlet endpoints:
  *
  * <ul>
- *     <li>/internal/ping</li>
- *     <li>/internal/threads</li>
- *     <li>/internal/metrics</li>
- *     <li>/internal/healthcheck</li>
+ * <li>/internal/ping</li>
+ * <li>/internal/threads</li>
+ * <li>/internal/metrics</li>
+ * <li>/internal/healthcheck</li>
  * </ul>
  *
  * Protected by {@code nexus:metrics-endpoints} permission.
@@ -52,71 +54,71 @@ import org.sonatype.security.web.guice.SecurityWebFilter;
 public class MetricsModule
     extends AbstractModule
 {
-    private static final Logger log = LoggerFactory.getLogger(MetricsModule.class);
+  private static final Logger log = LoggerFactory.getLogger(MetricsModule.class);
 
-    private static final String MOUNT_POINT = "/internal";
+  private static final String MOUNT_POINT = "/internal";
 
-    @Override
-    protected void configure() {
-        // NOTE: AdminServletModule (metrics-guice intgegration) generates invalid links, so wire up servlets ourselves
+  @Override
+  protected void configure() {
+    // NOTE: AdminServletModule (metrics-guice intgegration) generates invalid links, so wire up servlets ourselves
 
-        final Clock clock = Clock.defaultClock();
-        bind(Clock.class).toInstance(clock);
+    final Clock clock = Clock.defaultClock();
+    bind(Clock.class).toInstance(clock);
 
-        final VirtualMachineMetrics virtualMachineMetrics = VirtualMachineMetrics.getInstance();
-        bind(VirtualMachineMetrics.class).toInstance(virtualMachineMetrics);
+    final VirtualMachineMetrics virtualMachineMetrics = VirtualMachineMetrics.getInstance();
+    bind(VirtualMachineMetrics.class).toInstance(virtualMachineMetrics);
 
-        final HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
-        bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
+    final HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
+    bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
 
-        // TODO: Consider making a component which can mediate (via sisu) adding/removing healthcheck components to/from the registry
-        // TODO: For now new instances must be explicitly registered, like this one:
-        healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
+    // TODO: Consider making a component which can mediate (via sisu) adding/removing healthcheck components to/from the registry
+    // TODO: For now new instances must be explicitly registered, like this one:
+    healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
 
-        final MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
-        bind(MetricsRegistry.class).toInstance(metricsRegistry);
+    final MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
+    bind(MetricsRegistry.class).toInstance(metricsRegistry);
 
-        final JsonFactory jsonFactory = new JsonFactory(new ObjectMapper());
-        bind(JsonFactory.class).toInstance(jsonFactory);
+    final JsonFactory jsonFactory = new JsonFactory(new ObjectMapper());
+    bind(JsonFactory.class).toInstance(jsonFactory);
 
-        // FIXME: Sort out if we need to do this.  Its noted in SiestaModule, may be needed here too :-(
-        //bind(SecurityWebFilter.class);
+    // FIXME: Sort out if we need to do this.  Its noted in SiestaModule, may be needed here too :-(
+    //bind(SecurityWebFilter.class);
 
-        install(new ServletModule()
-        {
-            @Override
-            protected void configureServlets() {
-                serve(MOUNT_POINT + "/ping").with(new PingServlet());
+    install(new ServletModule()
+    {
+      @Override
+      protected void configureServlets() {
+        serve(MOUNT_POINT + "/ping").with(new PingServlet());
 
-                serve(MOUNT_POINT + "/threads").with(new ThreadDumpServlet(virtualMachineMetrics));
+        serve(MOUNT_POINT + "/threads").with(new ThreadDumpServlet(virtualMachineMetrics));
 
-                serve(MOUNT_POINT + "/metrics").with(new MetricsServlet(
-                    clock,
-                    virtualMachineMetrics,
-                    metricsRegistry,
-                    jsonFactory,
-                    true
-                ));
+        serve(MOUNT_POINT + "/metrics").with(new MetricsServlet(
+            clock,
+            virtualMachineMetrics,
+            metricsRegistry,
+            jsonFactory,
+            true
+        ));
 
-                serve(MOUNT_POINT + "/healthcheck").with(new HealthCheckServlet(healthCheckRegistry));
+        serve(MOUNT_POINT + "/healthcheck").with(new HealthCheckServlet(healthCheckRegistry));
 
-                // record metrics for all webapp access
-                filter("/*").through(new DefaultWebappMetricsFilter());
+        // record metrics for all webapp access
+        filter("/*").through(new DefaultWebappMetricsFilter());
 
-                // configure security
-                filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
-            }
-        });
+        // configure security
+        filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+      }
+    });
 
-        // require permission to use endpoints
-        install(new FilterChainModule()
-        {
-            @Override
-            protected void configure() {
-                addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,perms[nexus:metrics-endpoints]");
-            }
-        });
+    // require permission to use endpoints
+    install(new FilterChainModule()
+    {
+      @Override
+      protected void configure() {
+        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,perms[nexus:metrics-endpoints]");
+      }
+    });
 
-        log.info("Metrics support configured");
-    }
+    log.info("Metrics support configured");
+  }
 }

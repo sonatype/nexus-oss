@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
 
 import javax.inject.Named;
@@ -18,33 +19,30 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.tasks.descriptors.PurgeApiKeysTaskDescriptor;
 import org.sonatype.security.events.UserPrincipalsExpiredEvent;
 
-@Named( PurgeApiKeysTaskDescriptor.ID )
+@Named(PurgeApiKeysTaskDescriptor.ID)
 public class PurgeApiKeysTask
     extends AbstractNexusTask<Void>
 {
-    /**
-     * System event action: purge API keys
-     */
-    public static final String ACTION = "PURGE_API_KEYS";
+  /**
+   * System event action: purge API keys
+   */
+  public static final String ACTION = "PURGE_API_KEYS";
 
-    @Override
-    protected Void doRun()
-    {
-        // triggers the expiry of any orphaned cached user principals
-        notifyEventListeners( new UserPrincipalsExpiredEvent( null ) );
-        return null;
-    }
+  @Override
+  protected Void doRun() {
+    // triggers the expiry of any orphaned cached user principals
+    notifyEventListeners(new UserPrincipalsExpiredEvent(null));
+    return null;
+  }
 
-    @Override
-    protected String getAction()
-    {
-        return ACTION;
-    }
+  @Override
+  protected String getAction() {
+    return ACTION;
+  }
 
-    @Override
-    protected String getMessage()
-    {
-        return "Purging Orphaned API Keys.";
-    }
+  @Override
+  protected String getMessage() {
+    return "Purging Orphaned API Keys.";
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling.schedules;
 
 import java.util.Date;
@@ -19,40 +20,35 @@ import org.sonatype.scheduling.iterators.SchedulerIterator;
 public abstract class AbstractSchedule
     implements Schedule
 {
-    private final Date startDate;
+  private final Date startDate;
 
-    private final Date endDate;
+  private final Date endDate;
 
-    private SchedulerIterator schedulerIterator;
+  private SchedulerIterator schedulerIterator;
 
-    public AbstractSchedule( Date startDate, Date endDate )
-    {
-        super();
+  public AbstractSchedule(Date startDate, Date endDate) {
+    super();
 
-        this.startDate = startDate;
+    this.startDate = startDate;
 
-        this.endDate = endDate;
+    this.endDate = endDate;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
+
+  public SchedulerIterator getIterator() {
+    if (schedulerIterator == null) {
+      schedulerIterator = createIterator();
     }
 
-    public Date getStartDate()
-    {
-        return startDate;
-    }
+    return schedulerIterator;
+  }
 
-    public Date getEndDate()
-    {
-        return endDate;
-    }
-
-    public SchedulerIterator getIterator()
-    {
-        if ( schedulerIterator == null )
-        {
-            schedulerIterator = createIterator();
-        }
-
-        return schedulerIterator;
-    }
-
-    protected abstract SchedulerIterator createIterator();
+  protected abstract SchedulerIterator createIterator();
 }

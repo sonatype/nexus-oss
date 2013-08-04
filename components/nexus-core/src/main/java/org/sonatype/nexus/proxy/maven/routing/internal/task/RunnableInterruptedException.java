@@ -10,26 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal.task;
 
 /**
  * Runtime exception thrown in cases when runnable task's running thread is interrupted. Semantical meaning is almost
  * same as {@link InterruptedException} meaning, except this one is unchecked exception.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class RunnableInterruptedException
     extends RuntimeException
 {
-    /**
-     * Constructor.
-     * 
-     * @param message the interruption message.
-     */
-    public RunnableInterruptedException( final String message )
-    {
-        super( message );
-    }
+  /**
+   * Constructor.
+   *
+   * @param message the interruption message.
+   */
+  public RunnableInterruptedException(final String message) {
+    super(message);
+  }
 }

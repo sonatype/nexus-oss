@@ -10,9 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.cache;
 
 public interface CacheManager
 {
-    PathCache getPathCache( String cache );
+  PathCache getPathCache(String cache);
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.gav;
 
 /**
@@ -17,37 +18,33 @@ package org.sonatype.nexus.proxy.maven.gav;
  */
 public class M1ArtifactRecognizer
 {
-    /**
-     * Is this item M1 Checksum?
-     */
-    public static boolean isChecksum( String path )
-    {
-        return path.endsWith( ".sha1" ) || path.endsWith( ".md5" );
-    }
+  /**
+   * Is this item M1 Checksum?
+   */
+  public static boolean isChecksum(String path) {
+    return path.endsWith(".sha1") || path.endsWith(".md5");
+  }
 
-    /**
-     * Is this item M1 POM?
-     */
-    public static boolean isPom( String path )
-    {
-        return path.endsWith( ".pom" ) || path.endsWith( ".pom.sha1" ) || path.endsWith( ".pom.md5" );
-    }
+  /**
+   * Is this item M1 POM?
+   */
+  public static boolean isPom(String path) {
+    return path.endsWith(".pom") || path.endsWith(".pom.sha1") || path.endsWith(".pom.md5");
+  }
 
-    /**
-     * Is this item M1 snapshot?
-     */
-    public static boolean isSnapshot( String path )
-    {
-        return path.indexOf( "SNAPSHOT" ) != -1;
-    }
+  /**
+   * Is this item M1 snapshot?
+   */
+  public static boolean isSnapshot(String path) {
+    return path.indexOf("SNAPSHOT") != -1;
+  }
 
-    /**
-     * Is this item M1 metadata? There is no such!
-     */
-    public static boolean isMetadata( String path )
-    {
-        return path.endsWith( "maven-metadata.xml" ) || path.endsWith( "maven-metadata.xml.sha1" )
-            || path.endsWith( "maven-metadata.xml.md5" );
-    }
+  /**
+   * Is this item M1 metadata? There is no such!
+   */
+  public static boolean isMetadata(String path) {
+    return path.endsWith("maven-metadata.xml") || path.endsWith("maven-metadata.xml.sha1")
+        || path.endsWith("maven-metadata.xml.md5");
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.log;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Default implementation of LogManager MBean interface.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
@@ -28,67 +29,66 @@ public class DefaultLogManagerMBean
     extends StandardMBean
     implements LogManagerMBean
 {
-    private final LogManager logManager;
+  private final LogManager logManager;
 
-    public DefaultLogManagerMBean( final LogManager logManager )
-    {
-        super( LogManagerMBean.class, false );
-        this.logManager = Preconditions.checkNotNull( logManager, "Managed LogManager instance cannot be null!" );
-    }
+  public DefaultLogManagerMBean(final LogManager logManager) {
+    super(LogManagerMBean.class, false);
+    this.logManager = Preconditions.checkNotNull(logManager, "Managed LogManager instance cannot be null!");
+  }
 
-    @Override
-    public String getRootLoggerLevel()
-        throws IOException
-    {
-        final LogConfiguration logConfiguration = logManager.getConfiguration();
-        return logConfiguration.getRootLoggerLevel();
-    }
+  @Override
+  public String getRootLoggerLevel()
+      throws IOException
+  {
+    final LogConfiguration logConfiguration = logManager.getConfiguration();
+    return logConfiguration.getRootLoggerLevel();
+  }
 
-    @Override
-    public void makeRootLoggerLevelTrace()
-        throws IOException
-    {
-        setRootLoggerLevel( LoggerLevel.TRACE );
-    }
+  @Override
+  public void makeRootLoggerLevelTrace()
+      throws IOException
+  {
+    setRootLoggerLevel(LoggerLevel.TRACE);
+  }
 
-    @Override
-    public void makeRootLoggerLevelDebug()
-        throws IOException
-    {
-        setRootLoggerLevel( LoggerLevel.DEBUG );
-    }
+  @Override
+  public void makeRootLoggerLevelDebug()
+      throws IOException
+  {
+    setRootLoggerLevel(LoggerLevel.DEBUG);
+  }
 
-    @Override
-    public void makeRootLoggerLevelInfo()
-        throws IOException
-    {
-        setRootLoggerLevel( LoggerLevel.INFO );
-    }
+  @Override
+  public void makeRootLoggerLevelInfo()
+      throws IOException
+  {
+    setRootLoggerLevel(LoggerLevel.INFO);
+  }
 
-    @Override
-    public void makeRootLoggerLevelWarn()
-        throws IOException
-    {
-        setRootLoggerLevel( LoggerLevel.WARN );
-    }
+  @Override
+  public void makeRootLoggerLevelWarn()
+      throws IOException
+  {
+    setRootLoggerLevel(LoggerLevel.WARN);
+  }
 
-    @Override
-    public void makeRootLoggerLevelDefault()
-        throws IOException
-    {
-        makeRootLoggerLevelInfo();
-    }
+  @Override
+  public void makeRootLoggerLevelDefault()
+      throws IOException
+  {
+    makeRootLoggerLevelInfo();
+  }
 
-    protected void setRootLoggerLevel( final LoggerLevel value )
-        throws IOException
-    {
-        final LogConfiguration oldConfiguration = logManager.getConfiguration();
-        final DefaultLogConfiguration newConfiguration = new DefaultLogConfiguration();
+  protected void setRootLoggerLevel(final LoggerLevel value)
+      throws IOException
+  {
+    final LogConfiguration oldConfiguration = logManager.getConfiguration();
+    final DefaultLogConfiguration newConfiguration = new DefaultLogConfiguration();
 
-        newConfiguration.setFileAppenderLocation( oldConfiguration.getFileAppenderLocation() );
-        newConfiguration.setFileAppenderPattern( oldConfiguration.getFileAppenderPattern() );
-        newConfiguration.setRootLoggerAppenders( oldConfiguration.getRootLoggerAppenders() );
-        newConfiguration.setRootLoggerLevel( value.name() );
-        logManager.setConfiguration( newConfiguration );
-    }
+    newConfiguration.setFileAppenderLocation(oldConfiguration.getFileAppenderLocation());
+    newConfiguration.setFileAppenderPattern(oldConfiguration.getFileAppenderPattern());
+    newConfiguration.setRootLoggerAppenders(oldConfiguration.getRootLoggerAppenders());
+    newConfiguration.setRootLoggerLevel(value.name());
+    logManager.setConfiguration(newConfiguration);
+  }
 }

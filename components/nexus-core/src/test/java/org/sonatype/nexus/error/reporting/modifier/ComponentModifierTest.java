@@ -10,17 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting.modifier;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.sonatype.nexus.error.report.ErrorReportComponent;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.error.report.ErrorReportComponent;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link ComponentModifier}
@@ -31,27 +33,26 @@ public class ComponentModifierTest
     extends TestSupport
 {
 
-    @Mock
-    private ErrorReportComponent cmp;
+  @Mock
+  private ErrorReportComponent cmp;
 
-    @Mock
-    private IssueSubmissionRequest request;
+  @Mock
+  private IssueSubmissionRequest request;
 
-    private ComponentModifier underTest;
+  private ComponentModifier underTest;
 
-    @Before
-    public void init()
-    {
-        when( cmp.getComponent() ).thenReturn( "cmp" );
+  @Before
+  public void init() {
+    when(cmp.getComponent()).thenReturn("cmp");
 
-        underTest = new ComponentModifier( cmp );
-    }
+    underTest = new ComponentModifier(cmp);
+  }
 
-    @Test
-    public void testModify()
-        throws Exception
-    {
-        underTest.modify( request );
-        verify( request ).setComponent( "cmp" );
-    }
+  @Test
+  public void testModify()
+      throws Exception
+  {
+    underTest.modify(request);
+    verify(request).setComponent("cmp");
+  }
 }

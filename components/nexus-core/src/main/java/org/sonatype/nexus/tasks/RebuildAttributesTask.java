@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -25,71 +27,62 @@ import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 /**
  * Rebuild attributes task.
  */
-@Named( RebuildAttributesTaskDescriptor.ID )
+@Named(RebuildAttributesTaskDescriptor.ID)
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
-    /**
-     * System event action: rebuildAttributes
-     */
-    public static final String ACTION = "REBUILDATTRIBUTES";
+  /**
+   * System event action: rebuildAttributes
+   */
+  public static final String ACTION = "REBUILDATTRIBUTES";
 
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return RebuildAttributesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+  @Override
+  protected String getRepositoryFieldId() {
+    return RebuildAttributesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+  }
+
+  @Override
+  protected String getRepositoryPathFieldId() {
+    return RebuildAttributesTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
+  }
+
+  @Override
+  public Object doRun()
+      throws Exception
+  {
+    ResourceStoreRequest req = new ResourceStoreRequest(getResourceStorePath());
+
+    Map<String, String> initialData = new HashMap<String, String>();
+
+    if (getRepositoryId() != null) {
+      getRepositoryRegistry().getRepository(getRepositoryId()).recreateAttributes(req, initialData);
+    }
+    else {
+      List<Repository> reposes = getRepositoryRegistry().getRepositories();
+
+      for (Repository repo : reposes) {
+        repo.recreateAttributes(req, null);
+      }
     }
 
-    @Override
-    protected String getRepositoryPathFieldId()
-    {
-        return RebuildAttributesTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
+    return null;
+  }
+
+  @Override
+  protected String getAction() {
+    return ACTION;
+  }
+
+  @Override
+  protected String getMessage() {
+    if (getRepositoryId() != null) {
+      return "Rebuilding attributes of repository " + getRepositoryName() + " from path "
+          + getResourceStorePath() + " and below.";
     }
-
-    @Override
-    public Object doRun()
-        throws Exception
-    {
-        ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
-
-        Map<String, String> initialData = new HashMap<String, String>();
-
-        if ( getRepositoryId() != null )
-        {
-            getRepositoryRegistry().getRepository( getRepositoryId() ).recreateAttributes( req, initialData );
-        }
-        else
-        {
-            List<Repository> reposes = getRepositoryRegistry().getRepositories();
-
-            for ( Repository repo : reposes )
-            {
-                repo.recreateAttributes( req, null );
-            }
-        }
-
-        return null;
+    else {
+      return "Rebuilding attributes of all registered repositories from path " + getResourceStorePath()
+          + " and below.";
     }
-
-    @Override
-    protected String getAction()
-    {
-        return ACTION;
-    }
-
-    @Override
-    protected String getMessage()
-    {
-        if ( getRepositoryId() != null )
-        {
-            return "Rebuilding attributes of repository " + getRepositoryName() + " from path "
-                + getResourceStorePath() + " and below.";
-        }
-        else
-        {
-            return "Rebuilding attributes of all registered repositories from path " + getResourceStorePath()
-                + " and below.";
-        }
-    }
+  }
 
 }

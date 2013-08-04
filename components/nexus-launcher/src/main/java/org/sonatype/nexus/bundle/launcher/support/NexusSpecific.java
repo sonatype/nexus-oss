@@ -10,7 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bundle.launcher.support;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -18,16 +24,11 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.inject.Qualifier;
-
 @Qualifier
-@Target( { TYPE, FIELD, PARAMETER, METHOD } )
-@Retention( RUNTIME )
+@Target({TYPE, FIELD, PARAMETER, METHOD})
+@Retention(RUNTIME)
 public @interface NexusSpecific
 {
-    // empty
+  // empty
 }
 

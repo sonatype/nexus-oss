@@ -10,21 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.web;
 
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
 
 /**
  * This class marks the ability to have a FilterChainManager set (if it cannot be injected).
- * 
+ *
  * @author Brian Demers
  */
 public interface FilterChainManagerAware
 {
-    /**
-     * Sets the PathMatchingFilterChainResolver.
-     * 
-     * @param originalFilterChainResolver
-     */
-    public void setFilterChainManager( FilterChainManager filterChainManager );
+  /**
+   * Sets the PathMatchingFilterChainResolver.
+   */
+  public void setFilterChainManager(FilterChainManager filterChainManager);
 }

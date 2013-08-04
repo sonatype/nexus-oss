@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.templates.repository;
 
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -18,20 +19,19 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 public class ManuallyConfiguredRepositoryTemplate
     extends AbstractRepositoryTemplate
 {
-    private final CRepositoryCoreConfiguration repoConfig;
+  private final CRepositoryCoreConfiguration repoConfig;
 
-    public ManuallyConfiguredRepositoryTemplate( AbstractRepositoryTemplateProvider provider, String id,
-                                                 String description, ContentClass contentClass, Class<?> mainFacet,
-                                                 CRepositoryCoreConfiguration repoConfig )
-    {
-        super( provider, id, description, contentClass, mainFacet );
+  public ManuallyConfiguredRepositoryTemplate(AbstractRepositoryTemplateProvider provider, String id,
+                                              String description, ContentClass contentClass, Class<?> mainFacet,
+                                              CRepositoryCoreConfiguration repoConfig)
+  {
+    super(provider, id, description, contentClass, mainFacet);
 
-        this.repoConfig = repoConfig;
-    }
+    this.repoConfig = repoConfig;
+  }
 
-    @Override
-    protected CRepositoryCoreConfiguration initCoreConfiguration()
-    {
-        return repoConfig;
-    }
+  @Override
+  protected CRepositoryCoreConfiguration initCoreConfiguration() {
+    return repoConfig;
+  }
 }

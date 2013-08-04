@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.plugin.console;
 
 import java.util.List;
@@ -21,5 +22,5 @@ import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
  */
 public interface PluginConsoleManager
 {
-    List<PluginInfo> listPluginInfo();
+  List<PluginInfo> listPluginInfo();
 }

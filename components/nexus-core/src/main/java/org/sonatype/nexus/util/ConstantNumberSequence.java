@@ -10,40 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
 
 /**
  * A simple sequence that is a constant number sequence.
- * 
+ *
  * @author cstamas
  */
 public class ConstantNumberSequence
     implements NumberSequence
 {
-    private final long val;
+  private final long val;
 
-    public ConstantNumberSequence( long val )
-    {
-        this.val = val;
-    }
+  public ConstantNumberSequence(long val) {
+    this.val = val;
+  }
 
-    public long next()
-    {
-        return peek();
-    }
+  public long next() {
+    return peek();
+  }
 
-    public long prev()
-    {
-        return peek();
-    }
+  public long prev() {
+    return peek();
+  }
 
-    public long peek()
-    {
-        return val;
-    }
+  public long peek() {
+    return val;
+  }
 
-    public void reset()
-    {
-        // nothing
-    }
+  public void reset() {
+    // nothing
+  }
 }

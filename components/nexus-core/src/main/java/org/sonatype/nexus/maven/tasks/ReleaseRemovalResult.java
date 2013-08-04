@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -21,49 +22,42 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ReleaseRemovalResult
 {
-    private final String repoId;
+  private final String repoId;
 
-    private int deletedFileCount;
+  private int deletedFileCount;
 
-    private boolean isSuccessful = false;
+  private boolean isSuccessful = false;
 
-    public ReleaseRemovalResult( final String repoId )
-    {
-        this.repoId = checkNotNull(repoId);
-    }
+  public ReleaseRemovalResult(final String repoId) {
+    this.repoId = checkNotNull(repoId);
+  }
 
-    public String getRepoId()
-    {
-        return repoId;
-    }
+  public String getRepoId() {
+    return repoId;
+  }
 
-    public int getDeletedFileCount()
-    {
-        return deletedFileCount;
-    }
+  public int getDeletedFileCount() {
+    return deletedFileCount;
+  }
 
-    public void setDeletedFileCount( final int deletedFileCount )
-    {
-        this.deletedFileCount = deletedFileCount;
-    }
+  public void setDeletedFileCount(final int deletedFileCount) {
+    this.deletedFileCount = deletedFileCount;
+  }
 
-    public boolean isSuccessful()
-    {
-        return isSuccessful;
-    }
+  public boolean isSuccessful() {
+    return isSuccessful;
+  }
 
-    public void setSuccessful( final boolean successful )
-    {
-        isSuccessful = successful;
-    }
+  public void setSuccessful(final boolean successful) {
+    isSuccessful = successful;
+  }
 
-    @Override
-    public String toString()
-    {
-        return "ReleaseRemovalResult{" +
-            "repoId='" + repoId + '\'' +
-            ", deletedFileCount=" + deletedFileCount +
-            ", isSuccessful=" + isSuccessful +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return "ReleaseRemovalResult{" +
+        "repoId='" + repoId + '\'' +
+        ", deletedFileCount=" + deletedFileCount +
+        ", isSuccessful=" + isSuccessful +
+        '}';
+  }
 }

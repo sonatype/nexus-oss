@@ -10,22 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repositories.nexus4807;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
-import org.sonatype.nexus.proxy.registry.ContentClass;
 
 // see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
 //@Component( role = ContentClass.class, hint = Nexus4807ContentClass.ID )
 public class Nexus4807ContentClass
     extends AbstractIdContentClass
 {
-    public static final String ID = "nexus4807";
+  public static final String ID = "nexus4807";
 
-    @Override
-    public String getId()
-    {
-        return ID;
-    }
+  @Override
+  public String getId() {
+    return ID;
+  }
 }

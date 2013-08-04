@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import java.util.Iterator;
@@ -20,7 +21,7 @@ import org.apache.maven.artifact.repository.metadata.Plugin;
 
 /**
  * removes a Plugin from Metadata
- * 
+ *
  * @author Oleg Gusakov
  * @version $Id: RemovePluginOperation.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
@@ -28,61 +29,52 @@ public class RemovePluginOperation
     implements MetadataOperation
 {
 
-    private Plugin plugin;
+  private Plugin plugin;
 
-    /**
-     * @throws MetadataException
-     */
-    public RemovePluginOperation( PluginOperand data )
-        throws MetadataException
-    {
-        setOperand( data );
+  /**
+   * @throws MetadataException
+   */
+  public RemovePluginOperation(PluginOperand data)
+      throws MetadataException
+  {
+    setOperand(data);
+  }
+
+  public void setOperand(AbstractOperand data)
+      throws MetadataException
+  {
+    if (data == null || !(data instanceof PluginOperand)) {
+      throw new MetadataException("Operand is not correct: expected PluginOperand, but got "
+          + (data == null ? "null" : data.getClass().getName()));
     }
 
-    public void setOperand( AbstractOperand data )
-        throws MetadataException
-    {
-        if ( data == null || !( data instanceof PluginOperand ) )
-        {
-            throw new MetadataException( "Operand is not correct: expected PluginOperand, but got "
-                + ( data == null ? "null" : data.getClass().getName() ) );
-        }
+    plugin = ((PluginOperand) data).getOperand();
+  }
 
-        plugin = ( (PluginOperand) data ).getOperand();
+  /**
+   * remove version to the in-memory metadata instance
+   */
+  public boolean perform(Metadata metadata)
+      throws MetadataException
+  {
+    if (metadata == null) {
+      return false;
     }
 
-    /**
-     * remove version to the in-memory metadata instance
-     * 
-     * @param metadata
-     * @param version
-     * @return
-     */
-    public boolean perform( Metadata metadata )
-        throws MetadataException
-    {
-        if ( metadata == null )
-        {
-            return false;
+    List<Plugin> plugins = metadata.getPlugins();
+
+    if (plugins != null && plugins.size() > 0) {
+      for (Iterator<Plugin> pi = plugins.iterator(); pi.hasNext(); ) {
+        Plugin p = pi.next();
+
+        if (p.getArtifactId().equals(plugin.getArtifactId())) {
+          pi.remove();
+
+          return true;
         }
-
-        List<Plugin> plugins = metadata.getPlugins();
-
-        if ( plugins != null && plugins.size() > 0 )
-        {
-            for ( Iterator<Plugin> pi = plugins.iterator(); pi.hasNext(); )
-            {
-                Plugin p = pi.next();
-
-                if ( p.getArtifactId().equals( plugin.getArtifactId() ) )
-                {
-                    pi.remove();
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
+      }
     }
+
+    return false;
+  }
 }

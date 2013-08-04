@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.proxy.nexus1101;
 
 import java.net.InetSocketAddress;
@@ -19,41 +20,40 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.testsuite.proxy.AbstractNexusWebProxyIntegrationTest;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-import org.sonatype.nexus.testsuite.proxy.AbstractNexusWebProxyIntegrationTest;
-import org.sonatype.nexus.test.utils.TestProperties;
 
 public class ProxyIT
     extends AbstractNexusWebProxyIntegrationTest
 {
-    @Test @Category( PROXY.class )
-    public void checkWebProxy()
-        throws Exception
-    {
-        SocketAddress sa = new InetSocketAddress( "127.0.0.1", TestProperties.getInteger( "webproxy.server.port" ) );
-        Proxy p = new Proxy( Proxy.Type.HTTP, sa );
+  @Test
+  @Category(PROXY.class)
+  public void checkWebProxy()
+      throws Exception
+  {
+    SocketAddress sa = new InetSocketAddress("127.0.0.1", TestProperties.getInteger("webproxy.server.port"));
+    Proxy p = new Proxy(Proxy.Type.HTTP, sa);
 
-        URL url = new URL( "http://www.google.com/index.html" );
-        URLConnection conn = url.openConnection( p );
-        conn.getInputStream();
+    URL url = new URL("http://www.google.com/index.html");
+    URLConnection conn = url.openConnection(p);
+    conn.getInputStream();
 
-        for ( int i = 0; i < 100; i++ )
-        {
-            Thread.sleep( 200 );
+    for (int i = 0; i < 100; i++) {
+      Thread.sleep(200);
 
-            List<String> uris = server.getAccessedUris();
-            for ( String uri : uris )
-            {
-                if ( uri.contains( "google.com" ) )
-                {
-                    return;
-                }
-            }
+      List<String> uris = server.getAccessedUris();
+      for (String uri : uris) {
+        if (uri.contains("google.com")) {
+          return;
         }
-
-        Assert.fail( "Proxy was not able to access google.com" );
+      }
     }
+
+    Assert.fail("Proxy was not able to access google.com");
+  }
 }

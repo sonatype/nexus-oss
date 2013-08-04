@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.tasks;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,66 +20,60 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Publish indexes task.
  */
-@Named( DownloadIndexesTaskDescriptor.ID )
+@Named(DownloadIndexesTaskDescriptor.ID)
 public class DownloadIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
 
-    /**
-     * System event action: download indexes
-     */
-    public static final String ACTION = "DOWNLOADINDEX";
+  /**
+   * System event action: download indexes
+   */
+  public static final String ACTION = "DOWNLOADINDEX";
 
-    private final IndexerManager indexerManager;
+  private final IndexerManager indexerManager;
 
-    @Inject
-    public DownloadIndexesTask( final IndexerManager indexerManager )
-    {
-        this.indexerManager = checkNotNull( indexerManager );
+  @Inject
+  public DownloadIndexesTask(final IndexerManager indexerManager) {
+    this.indexerManager = checkNotNull(indexerManager);
+  }
+
+  @Override
+  protected String getRepositoryFieldId() {
+    return DownloadIndexesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+  }
+
+  @Override
+  protected Object doRun()
+      throws Exception
+  {
+    if (getRepositoryId() != null) {
+      indexerManager.downloadRepositoryIndex(getRepositoryId());
+    }
+    else {
+      indexerManager.downloadAllIndex();
     }
 
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return DownloadIndexesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-    }
+    return null;
+  }
 
-    @Override
-    protected Object doRun()
-        throws Exception
-    {
-        if ( getRepositoryId() != null )
-        {
-            indexerManager.downloadRepositoryIndex( getRepositoryId() );
-        }
-        else
-        {
-            indexerManager.downloadAllIndex();
-        }
+  @Override
+  protected String getAction() {
+    return ACTION;
+  }
 
-        return null;
+  @Override
+  protected String getMessage() {
+    if (getRepositoryId() != null) {
+      return "Downloading indexes for repository " + getRepositoryName();
     }
-
-    @Override
-    protected String getAction()
-    {
-        return ACTION;
+    else {
+      return "Downloading indexes for all registered repositories";
     }
-
-    @Override
-    protected String getMessage()
-    {
-        if ( getRepositoryId() != null )
-        {
-            return "Downloading indexes for repository " + getRepositoryName();
-        }
-        else
-        {
-            return "Downloading indexes for all registered repositories";
-        }
-    }
+  }
 
 }

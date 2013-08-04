@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.ArrayList;
@@ -20,90 +21,81 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * All NexusArtifactEvent related FeedSource should be inherited from this class. </br> Here we name it with
  * "NexusItemEvent" is because file is a kind of item, maven artifact is another, (maybe there will be p2 items) so
  * NexusArtifactEvent is misleading.
- * 
+ *
  * @author Juven Xu
  */
 public abstract class AbstractNexusItemEventFeedSource
     extends AbstractFeedSource
 {
-    public abstract List<NexusArtifactEvent> getEventList( Integer from, Integer count, Map<String, String> params );
+  public abstract List<NexusArtifactEvent> getEventList(Integer from, Integer count, Map<String, String> params);
 
-    public abstract SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder( NexusArtifactEvent event );
+  public abstract SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder(NexusArtifactEvent event);
 
-    public SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
-    {
-        SyndFeedImpl feed = createFeed();
+  public SyndFeed getFeed(Integer from, Integer count, Map<String, String> params) {
+    SyndFeedImpl feed = createFeed();
 
-        List<NexusArtifactEvent> events = getEventList( from, count, params );
+    List<NexusArtifactEvent> events = getEventList(from, count, params);
 
-        List<SyndEntry> entries = new ArrayList<SyndEntry>( events.size() );
+    List<SyndEntry> entries = new ArrayList<SyndEntry>(events.size());
 
-        for ( NexusArtifactEvent event : events )
-        {
-            SyndEntryBuilder<NexusArtifactEvent> entryBuilder = getSyndEntryBuilder( event );
+    for (NexusArtifactEvent event : events) {
+      SyndEntryBuilder<NexusArtifactEvent> entryBuilder = getSyndEntryBuilder(event);
 
-            if ( entryBuilder.shouldBuildEntry( event ) )
-            {
-                entries.add( getSyndEntryBuilder( event ).buildEntry( event ) );
-            }
-        }
-
-        feed.setEntries( entries );
-
-        return feed;
+      if (entryBuilder.shouldBuildEntry(event)) {
+        entries.add(getSyndEntryBuilder(event).buildEntry(event));
+      }
     }
 
-    private SyndFeedImpl createFeed()
-    {
-        SyndFeedImpl feed = new SyndFeedImpl();
+    feed.setEntries(entries);
 
-        feed.setTitle( getTitle() );
+    return feed;
+  }
 
-        feed.setDescription( getDescription() );
+  private SyndFeedImpl createFeed() {
+    SyndFeedImpl feed = new SyndFeedImpl();
 
-        feed.setAuthor( "Nexus " + getApplicationStatusSource().getSystemStatus().getVersion() );
+    feed.setTitle(getTitle());
 
-        feed.setPublishedDate( new Date() );
+    feed.setDescription(getDescription());
 
-        return feed;
+    feed.setAuthor("Nexus " + getApplicationStatusSource().getSystemStatus().getVersion());
+
+    feed.setPublishedDate(new Date());
+
+    return feed;
+  }
+
+  protected Set<String> getRepoIdsFromParams(Map<String, String> params) {
+    if (params != null && params.containsKey("r")) {
+      HashSet<String> result = new HashSet<String>();
+
+      String value = params.get("r");
+
+      if (value.contains(",")) {
+        String[] values = StringUtils.split(value, ",");
+
+        result.addAll(Arrays.asList(values));
+      }
+      else {
+        result.add(value);
+      }
+
+      return result;
     }
-
-    protected Set<String> getRepoIdsFromParams( Map<String, String> params )
-    {
-        if ( params != null && params.containsKey( "r" ) )
-        {
-            HashSet<String> result = new HashSet<String>();
-
-            String value = params.get( "r" );
-
-            if ( value.contains( "," ) )
-            {
-                String[] values = StringUtils.split( value, "," );
-
-                result.addAll( Arrays.asList( values ) );
-            }
-            else
-            {
-                result.add( value );
-            }
-
-            return result;
-        }
-        else
-        {
-            return null;
-        }
+    else {
+      return null;
     }
+  }
 
 }

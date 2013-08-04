@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.model.upgrade;
 
 import java.util.List;
@@ -24,27 +25,23 @@ public class MockSecurityDataUpgrader
     implements SecurityDataUpgrader
 {
 
-    @Override
-    public void doUpgrade( Configuration configuration )
-        throws ConfigurationIsCorruptedException
-    {
-        // replace the admin user's name with admin-user
-        for ( CUser user : (List<CUser>) configuration.getUsers() )
-        {
-            if ( user.getId().equals( "admin" ) )
-            {
-                user.setId( "admin-user" );
-            }
-        }
-
-        for ( CUserRoleMapping roleMapping : (List<CUserRoleMapping>) configuration.getUserRoleMappings() )
-        {
-            if ( roleMapping.getUserId().equals( "admin" ) )
-            {
-                roleMapping.setUserId( "admin-user" );
-            }
-        }
-
+  @Override
+  public void doUpgrade(Configuration configuration)
+      throws ConfigurationIsCorruptedException
+  {
+    // replace the admin user's name with admin-user
+    for (CUser user : (List<CUser>) configuration.getUsers()) {
+      if (user.getId().equals("admin")) {
+        user.setId("admin-user");
+      }
     }
+
+    for (CUserRoleMapping roleMapping : (List<CUserRoleMapping>) configuration.getUserRoleMappings()) {
+      if (roleMapping.getUserId().equals("admin")) {
+        roleMapping.setUserId("admin-user");
+      }
+    }
+
+  }
 
 }

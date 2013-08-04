@@ -10,118 +10,83 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.proxy.maven.gav.Gav;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
-import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 /**
  * An adapter in charge for doing the IO against the storage, hiding the fact where it runs.
- * 
+ *
  * @author cstamas
  */
 public interface MetadataLocator
 {
-    /**
-     * Calculates the GAV for the request.
-     * 
-     * @param request
-     * @return
-     */
-    Gav getGavForRequest( ArtifactStoreRequest request );
+  /**
+   * Calculates the GAV for the request.
+   */
+  Gav getGavForRequest(ArtifactStoreRequest request);
 
-    /**
-     * Constructs a Plugin elem for given request. It returns null if the artifacts's POM pointed out by request is not
-     * "maven-plugin".
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    Plugin extractPluginElementFromPom( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Constructs a Plugin elem for given request. It returns null if the artifacts's POM pointed out by request is not
+   * "maven-plugin".
+   */
+  Plugin extractPluginElementFromPom(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Constructs a POM for given request.
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    Model retrievePom( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Constructs a POM for given request.
+   */
+  Model retrievePom(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Gets the packaging from POM for given request.
-     * 
-     * @param request
-     * @return packaging, or null if not found on the request path
-     * @throws IOException
-     */
-    String retrievePackagingFromPom( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Gets the packaging from POM for given request.
+   *
+   * @return packaging, or null if not found on the request path
+   */
+  String retrievePackagingFromPom(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Retrieves the GAV level metadata.
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    Metadata retrieveGAVMetadata( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Retrieves the GAV level metadata.
+   */
+  Metadata retrieveGAVMetadata(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Retrieves the GA level metadata.
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    Metadata retrieveGAMetadata( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Retrieves the GA level metadata.
+   */
+  Metadata retrieveGAMetadata(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Retrieves the G level metadata.
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    Metadata retrieveGMetadata( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Retrieves the G level metadata.
+   */
+  Metadata retrieveGMetadata(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Stores the GAV level metadata.
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    void storeGAVMetadata( ArtifactStoreRequest request, Metadata metadata )
-        throws IOException;
+  /**
+   * Stores the GAV level metadata.
+   */
+  void storeGAVMetadata(ArtifactStoreRequest request, Metadata metadata)
+      throws IOException;
 
-    /**
-     * Stores the GA level metadata.
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    void storeGAMetadata( ArtifactStoreRequest request, Metadata metadata )
-        throws IOException;
+  /**
+   * Stores the GA level metadata.
+   */
+  void storeGAMetadata(ArtifactStoreRequest request, Metadata metadata)
+      throws IOException;
 
-    /**
-     * Stores the G level metadata.
-     * 
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    void storeGMetadata( ArtifactStoreRequest request, Metadata metadata )
-        throws IOException;
+  /**
+   * Stores the G level metadata.
+   */
+  void storeGMetadata(ArtifactStoreRequest request, Metadata metadata)
+      throws IOException;
 }

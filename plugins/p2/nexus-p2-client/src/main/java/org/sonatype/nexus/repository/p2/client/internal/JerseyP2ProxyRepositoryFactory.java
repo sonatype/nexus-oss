@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.p2.client.internal;
 
 import javax.inject.Named;
@@ -31,37 +32,32 @@ public class JerseyP2ProxyRepositoryFactory
     extends JerseyProxyRepositoryFactory
 {
 
-    @Override
-    public int canAdapt( final RepositoryBaseResource resource )
-    {
-        int score = super.canAdapt( resource );
-        if ( score > 0 )
-        {
-            if ( JerseyP2ProxyRepository.PROVIDER.equals( resource.getProvider() ) )
-            {
-                score++;
-            }
-        }
-        return score;
+  @Override
+  public int canAdapt(final RepositoryBaseResource resource) {
+    int score = super.canAdapt(resource);
+    if (score > 0) {
+      if (JerseyP2ProxyRepository.PROVIDER.equals(resource.getProvider())) {
+        score++;
+      }
     }
+    return score;
+  }
 
-    @Override
-    public JerseyP2ProxyRepository adapt( final JerseyNexusClient nexusClient,
-                                          final RepositoryBaseResource resource )
-    {
-        return new JerseyP2ProxyRepository( nexusClient, (RepositoryProxyResource) resource );
-    }
+  @Override
+  public JerseyP2ProxyRepository adapt(final JerseyNexusClient nexusClient,
+                                       final RepositoryBaseResource resource)
+  {
+    return new JerseyP2ProxyRepository(nexusClient, (RepositoryProxyResource) resource);
+  }
 
-    @Override
-    public boolean canCreate( final Class<? extends Repository> type )
-    {
-        return P2ProxyRepository.class.equals( type );
-    }
+  @Override
+  public boolean canCreate(final Class<? extends Repository> type) {
+    return P2ProxyRepository.class.equals(type);
+  }
 
-    @Override
-    public JerseyP2ProxyRepository create( final JerseyNexusClient nexusClient, final String id )
-    {
-        return new JerseyP2ProxyRepository( nexusClient, id );
-    }
+  @Override
+  public JerseyP2ProxyRepository create(final JerseyNexusClient nexusClient, final String id) {
+    return new JerseyP2ProxyRepository(nexusClient, id);
+  }
 
 }

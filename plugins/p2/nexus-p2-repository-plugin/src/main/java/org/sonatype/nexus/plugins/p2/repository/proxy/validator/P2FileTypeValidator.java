@@ -10,83 +10,78 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.proxy.validator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.p2.repository.P2Repository;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractMimeMagicFileTypeValidator;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
 
+import org.codehaus.plexus.util.IOUtil;
+
 /**
  * {@link FileTypeValidator} for P2 repositories.
  *
  * @since 2.6
  */
-@Named( "p2" )
+@Named("p2")
 @Singleton
 public class P2FileTypeValidator
     extends AbstractMimeMagicFileTypeValidator
 {
 
-    private final byte[] PACK200_MAGIC = new byte[]{ 31, -117, 8, 0 };
+  private final byte[] PACK200_MAGIC = new byte[]{31, -117, 8, 0};
 
-    private final byte[] JAR_MAGIC = new byte[]{ 80, 75, 3, 4 };
+  private final byte[] JAR_MAGIC = new byte[]{80, 75, 3, 4};
 
-    @Inject
-    public P2FileTypeValidator( final MimeSupport mimeSupport )
-    {
-        super( mimeSupport );
+  @Inject
+  public P2FileTypeValidator(final MimeSupport mimeSupport) {
+    super(mimeSupport);
+  }
+
+  @Override
+  public FileTypeValidity isExpectedFileType(final StorageFileItem file) {
+    // only check content from p2 repositories
+    if (file.getRepositoryItemUid().getRepository().adaptToFacet(P2Repository.class) == null) {
+      return FileTypeValidity.NEUTRAL;
     }
 
-    @Override
-    public FileTypeValidity isExpectedFileType( final StorageFileItem file )
-    {
-        // only check content from p2 repositories
-        if ( file.getRepositoryItemUid().getRepository().adaptToFacet( P2Repository.class ) == null )
-        {
-            return FileTypeValidity.NEUTRAL;
+    if (file.getRepositoryItemUid().getPath().endsWith(".pack.gz")) {
+      InputStream input = null;
+
+      try {
+        final byte[] magicBytes = new byte[4];
+
+        input = file.getInputStream();
+
+        if (input.read(magicBytes) > 0) {
+          if (Arrays.equals(magicBytes, PACK200_MAGIC)  // real pack.gz
+              || Arrays.equals(magicBytes, JAR_MAGIC)) // plain jar works too
+          {
+            return FileTypeValidity.VALID;
+          }
         }
+      }
+      catch (final IOException e) {
+        getLogger().error("Unable to read pack200 magic bytes", e);
+      }
+      finally {
+        IOUtil.close(input);
+      }
 
-        if ( file.getRepositoryItemUid().getPath().endsWith( ".pack.gz" ) )
-        {
-            InputStream input = null;
-
-            try
-            {
-                final byte[] magicBytes = new byte[4];
-
-                input = file.getInputStream();
-
-                if ( input.read( magicBytes ) > 0 )
-                {
-                    if ( Arrays.equals( magicBytes, PACK200_MAGIC )  // real pack.gz
-                        || Arrays.equals( magicBytes, JAR_MAGIC ) ) // plain jar works too
-                    {
-                        return FileTypeValidity.VALID;
-                    }
-                }
-            }
-            catch ( final IOException e )
-            {
-                getLogger().error( "Unable to read pack200 magic bytes", e );
-            }
-            finally
-            {
-                IOUtil.close( input );
-            }
-
-            return FileTypeValidity.INVALID;
-        }
-
-        return super.isExpectedFileType( file );
+      return FileTypeValidity.INVALID;
     }
+
+    return super.isExpectedFileType(file);
+  }
 }

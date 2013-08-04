@@ -22,1135 +22,1070 @@ package org.sonatype.nexus.configuration.model.v1_4_5.upgrade;
 /**
  * Converts from version 1.4.3 (with version in package name) to version 1.4.3 (without version in package name) of the
  * model.
- * 
+ *
  * @version $Revision: 7811 $ $Date: 2011-02-02 11:22:58 -0600 (Wed, 02 Feb 2011) $
  */
-@SuppressWarnings( "all" )
+@SuppressWarnings("all")
 public class BasicVersionConverter
     implements VersionConverter
 {
 
-    // -----------/
-    // - Methods -/
-    // -----------/
+  // -----------/
+  // - Methods -/
+  // -----------/
 
-    /**
-     * Method convertCErrorReporting.
-     * 
-     * @param cErrorReporting
-     * @return CErrorReporting
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting( org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting cErrorReporting )
+  /**
+   * Method convertCErrorReporting.
+   *
+   * @return CErrorReporting
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting(
+      org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting cErrorReporting)
+  {
+    return convertCErrorReporting(cErrorReporting,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting )
+
+  /**
+   * Method convertCErrorReporting.
+   *
+   * @return CErrorReporting
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting(
+      org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting cErrorReporting,
+      org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting value)
+  {
+    if (cErrorReporting == null) {
+      return null;
+    }
+    // Convert field enabled
+    value.setEnabled(cErrorReporting.isEnabled());
+    // Convert field jiraUrl
+    value.setJiraUrl(cErrorReporting.getJiraUrl());
+    // Convert field jiraProject
+    value.setJiraProject(cErrorReporting.getJiraProject());
+    // Convert field jiraUsername
+    value.setJiraUsername(cErrorReporting.getJiraUsername());
+    // Convert field jiraPassword
+    value.setJiraPassword(cErrorReporting.getJiraPassword());
+    // Convert field useGlobalProxy
+    value.setUseGlobalProxy(cErrorReporting.isUseGlobalProxy());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting )
+
+  /**
+   * Method convertCHttpProxySettings.
+   *
+   * @return CHttpProxySettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings cHttpProxySettings)
+  {
+    return convertCHttpProxySettings(cHttpProxySettings,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings )
+
+  /**
+   * Method convertCHttpProxySettings.
+   *
+   * @return CHttpProxySettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings cHttpProxySettings,
+      org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings value)
+  {
+    if (cHttpProxySettings == null) {
+      return null;
+    }
+    // Convert field enabled
+    value.setEnabled(cHttpProxySettings.isEnabled());
+    // Convert field port
+    value.setPort(cHttpProxySettings.getPort());
+    // Convert field proxyPolicy
+    value.setProxyPolicy(cHttpProxySettings.getProxyPolicy());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings )
+
+  /**
+   * Method convertCLocalStorage.
+   *
+   * @return CLocalStorage
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage(
+      org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage cLocalStorage)
+  {
+    return convertCLocalStorage(cLocalStorage, new org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage )
+
+  /**
+   * Method convertCLocalStorage.
+   *
+   * @return CLocalStorage
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage(
+      org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage cLocalStorage,
+      org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage value)
+  {
+    if (cLocalStorage == null) {
+      return null;
+    }
+    // Convert field provider
+    value.setProvider(cLocalStorage.getProvider());
+    // Convert field url
+    value.setUrl(cLocalStorage.getUrl());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage )
+
+  /**
+   * Method convertCMirror.
+   *
+   * @return CMirror
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror(
+      org.sonatype.nexus.configuration.model.v1_4_4.CMirror cMirror)
+  {
+    return convertCMirror(cMirror, new org.sonatype.nexus.configuration.model.v1_4_5.CMirror());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CMirror )
+
+  /**
+   * Method convertCMirror.
+   *
+   * @return CMirror
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror(
+      org.sonatype.nexus.configuration.model.v1_4_4.CMirror cMirror,
+      org.sonatype.nexus.configuration.model.v1_4_5.CMirror value)
+  {
+    if (cMirror == null) {
+      return null;
+    }
+    // Convert field id
+    value.setId(cMirror.getId());
+    // Convert field url
+    value.setUrl(cMirror.getUrl());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CMirror, org.sonatype.nexus.configuration.model.v1_4_5.CMirror )
+
+  /**
+   * Method convertCNotification.
+   *
+   * @return CNotification
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification(
+      org.sonatype.nexus.configuration.model.v1_4_4.CNotification cNotification)
+  {
+    return convertCNotification(cNotification, new org.sonatype.nexus.configuration.model.v1_4_5.CNotification());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CNotification )
+
+  /**
+   * Method convertCNotification.
+   *
+   * @return CNotification
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification(
+      org.sonatype.nexus.configuration.model.v1_4_4.CNotification cNotification,
+      org.sonatype.nexus.configuration.model.v1_4_5.CNotification value)
+  {
+    if (cNotification == null) {
+      return null;
+    }
+    // Convert field enabled
+    value.setEnabled(cNotification.isEnabled());
     {
-        return convertCErrorReporting( cErrorReporting,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting )
+      java.util.List list = new java.util.ArrayList/* <CNotificationTarget> */();
+      for (java.util.Iterator i = cNotification.getNotificationTargets().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget) i.next();
+        list.add(convertCNotificationTarget(v));
+      }
+      value.setNotificationTargets(list);
+    }
 
-    /**
-     * Method convertCErrorReporting.
-     * 
-     * @param cErrorReporting
-     * @param value
-     * @return CErrorReporting
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting( org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting cErrorReporting,
-                                                                                                 org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting value )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CNotification,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CNotification )
+
+  /**
+   * Method convertCNotificationTarget.
+   *
+   * @return CNotificationTarget
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget(
+      org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget cNotificationTarget)
+  {
+    return convertCNotificationTarget(cNotificationTarget,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget )
+
+  /**
+   * Method convertCNotificationTarget.
+   *
+   * @return CNotificationTarget
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget(
+      org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget cNotificationTarget,
+      org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget value)
+  {
+    if (cNotificationTarget == null) {
+      return null;
+    }
+    // Convert field targetId
+    value.setTargetId(cNotificationTarget.getTargetId());
     {
-        if ( cErrorReporting == null )
-        {
-            return null;
-        }
-        // Convert field enabled
-        value.setEnabled( cErrorReporting.isEnabled() );
-        // Convert field jiraUrl
-        value.setJiraUrl( cErrorReporting.getJiraUrl() );
-        // Convert field jiraProject
-        value.setJiraProject( cErrorReporting.getJiraProject() );
-        // Convert field jiraUsername
-        value.setJiraUsername( cErrorReporting.getJiraUsername() );
-        // Convert field jiraPassword
-        value.setJiraPassword( cErrorReporting.getJiraPassword() );
-        // Convert field useGlobalProxy
-        value.setUseGlobalProxy( cErrorReporting.isUseGlobalProxy() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting convertCErrorReporting(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CErrorReporting,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CErrorReporting )
-
-    /**
-     * Method convertCHttpProxySettings.
-     * 
-     * @param cHttpProxySettings
-     * @return CHttpProxySettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings( org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings cHttpProxySettings )
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cNotificationTarget.getTargetRoles().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setTargetRoles(list);
+    }
     {
-        return convertCHttpProxySettings( cHttpProxySettings,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings )
-
-    /**
-     * Method convertCHttpProxySettings.
-     * 
-     * @param cHttpProxySettings
-     * @param value
-     * @return CHttpProxySettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings( org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings cHttpProxySettings,
-                                                                                                       org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings value )
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cNotificationTarget.getTargetUsers().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setTargetUsers(list);
+    }
     {
-        if ( cHttpProxySettings == null )
-        {
-            return null;
-        }
-        // Convert field enabled
-        value.setEnabled( cHttpProxySettings.isEnabled() );
-        // Convert field port
-        value.setPort( cHttpProxySettings.getPort() );
-        // Convert field proxyPolicy
-        value.setProxyPolicy( cHttpProxySettings.getProxyPolicy() );
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cNotificationTarget.getTargetExternals().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setTargetExternals(list);
+    }
 
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings convertCHttpProxySettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CHttpProxySettings,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CHttpProxySettings )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget )
 
-    /**
-     * Method convertCLocalStorage.
-     * 
-     * @param cLocalStorage
-     * @return CLocalStorage
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage( org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage cLocalStorage )
+  /**
+   * Method convertCPathMappingItem.
+   *
+   * @return CPathMappingItem
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem(
+      org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem cPathMappingItem)
+  {
+    return convertCPathMappingItem(cPathMappingItem,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem )
+
+  /**
+   * Method convertCPathMappingItem.
+   *
+   * @return CPathMappingItem
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem(
+      org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem cPathMappingItem,
+      org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem value)
+  {
+    if (cPathMappingItem == null) {
+      return null;
+    }
+    // Convert field id
+    value.setId(cPathMappingItem.getId());
+    // Convert field groupId
+    value.setGroupId(cPathMappingItem.getGroupId());
+    // Convert field routeType
+    value.setRouteType(cPathMappingItem.getRouteType());
     {
-        return convertCLocalStorage( cLocalStorage, new org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage )
-
-    /**
-     * Method convertCLocalStorage.
-     * 
-     * @param cLocalStorage
-     * @param value
-     * @return CLocalStorage
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage( org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage cLocalStorage,
-                                                                                             org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage value )
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cPathMappingItem.getRoutePatterns().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setRoutePatterns(list);
+    }
     {
-        if ( cLocalStorage == null )
-        {
-            return null;
-        }
-        // Convert field provider
-        value.setProvider( cLocalStorage.getProvider() );
-        // Convert field url
-        value.setUrl( cLocalStorage.getUrl() );
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cPathMappingItem.getRepositories().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setRepositories(list);
+    }
 
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage convertCLocalStorage(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CLocalStorage,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CLocalStorage )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem )
 
-    /**
-     * Method convertCMirror.
-     * 
-     * @param cMirror
-     * @return CMirror
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror( org.sonatype.nexus.configuration.model.v1_4_4.CMirror cMirror )
+  /**
+   * Method convertCPlugin.
+   *
+   * @return CPlugin
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin(
+      org.sonatype.nexus.configuration.model.v1_4_4.CPlugin cPlugin)
+  {
+    return convertCPlugin(cPlugin, new org.sonatype.nexus.configuration.model.v1_4_5.CPlugin());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CPlugin )
+
+  /**
+   * Method convertCPlugin.
+   *
+   * @return CPlugin
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin(
+      org.sonatype.nexus.configuration.model.v1_4_4.CPlugin cPlugin,
+      org.sonatype.nexus.configuration.model.v1_4_5.CPlugin value)
+  {
+    if (cPlugin == null) {
+      return null;
+    }
+    // Convert field type
+    value.setType(cPlugin.getType());
+    // Convert field id
+    value.setId(cPlugin.getId());
+    // Convert field name
+    value.setName(cPlugin.getName());
+    // Convert field status
+    value.setStatus(cPlugin.getStatus());
+    // Convert field externalConfiguration
+    value.setExternalConfiguration(cPlugin.getExternalConfiguration());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CPlugin, org.sonatype.nexus.configuration.model.v1_4_5.CPlugin )
+
+  /**
+   * Method convertCProps.
+   *
+   * @return CProps
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps(
+      org.sonatype.nexus.configuration.model.v1_4_4.CProps cProps)
+  {
+    return convertCProps(cProps, new org.sonatype.nexus.configuration.model.v1_4_5.CProps());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CProps )
+
+  /**
+   * Method convertCProps.
+   *
+   * @return CProps
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps(
+      org.sonatype.nexus.configuration.model.v1_4_4.CProps cProps,
+      org.sonatype.nexus.configuration.model.v1_4_5.CProps value)
+  {
+    if (cProps == null) {
+      return null;
+    }
+    // Convert field key
+    value.setKey(cProps.getKey());
+    // Convert field value
+    value.setValue(cProps.getValue());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CProps, org.sonatype.nexus.configuration.model.v1_4_5.CProps )
+
+  /**
+   * Method convertCRemoteAuthentication.
+   *
+   * @return CRemoteAuthentication
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication cRemoteAuthentication)
+  {
+    return convertCRemoteAuthentication(cRemoteAuthentication,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication )
+
+  /**
+   * Method convertCRemoteAuthentication.
+   *
+   * @return CRemoteAuthentication
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication cRemoteAuthentication,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication value)
+  {
+    if (cRemoteAuthentication == null) {
+      return null;
+    }
+    // Convert field username
+    value.setUsername(cRemoteAuthentication.getUsername());
+    // Convert field password
+    value.setPassword(cRemoteAuthentication.getPassword());
+    // Convert field ntlmHost
+    value.setNtlmHost(cRemoteAuthentication.getNtlmHost());
+    // Convert field ntlmDomain
+    value.setNtlmDomain(cRemoteAuthentication.getNtlmDomain());
+    // Convert field trustStore
+    value.setTrustStore(cRemoteAuthentication.getTrustStore());
+    // Convert field trustStorePassword
+    value.setTrustStorePassword(cRemoteAuthentication.getTrustStorePassword());
+    // Convert field keyStore
+    value.setKeyStore(cRemoteAuthentication.getKeyStore());
+    // Convert field keyStorePassword
+    value.setKeyStorePassword(cRemoteAuthentication.getKeyStorePassword());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication )
+
+  /**
+   * Method convertCRemoteConnectionSettings.
+   *
+   * @return CRemoteConnectionSettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings cRemoteConnectionSettings)
+  {
+    return convertCRemoteConnectionSettings(cRemoteConnectionSettings,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings )
+
+  /**
+   * Method convertCRemoteConnectionSettings.
+   *
+   * @return CRemoteConnectionSettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings cRemoteConnectionSettings,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings value)
+  {
+    if (cRemoteConnectionSettings == null) {
+      return null;
+    }
+    // Convert field connectionTimeout
+    value.setConnectionTimeout(cRemoteConnectionSettings.getConnectionTimeout());
+    // Convert field retrievalRetryCount
+    value.setRetrievalRetryCount(cRemoteConnectionSettings.getRetrievalRetryCount());
+    // Convert field queryString
+    value.setQueryString(cRemoteConnectionSettings.getQueryString());
+    // Convert field userAgentCustomizationString
+    value.setUserAgentCustomizationString(cRemoteConnectionSettings.getUserAgentCustomizationString());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings )
+
+  /**
+   * Method convertCRemoteHttpProxySettings.
+   *
+   * @return CRemoteHttpProxySettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings cRemoteHttpProxySettings)
+  {
+    return convertCRemoteHttpProxySettings(cRemoteHttpProxySettings,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings )
+
+  /**
+   * Method convertCRemoteHttpProxySettings.
+   *
+   * @return CRemoteHttpProxySettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings cRemoteHttpProxySettings,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings value)
+  {
+    if (cRemoteHttpProxySettings == null) {
+      return null;
+    }
+    // Convert field blockInheritance
+    value.setBlockInheritance(cRemoteHttpProxySettings.isBlockInheritance());
+    // Convert field proxyHostname
+    value.setProxyHostname(cRemoteHttpProxySettings.getProxyHostname());
+    // Convert field proxyPort
+    value.setProxyPort(cRemoteHttpProxySettings.getProxyPort());
+    value.setAuthentication(convertCRemoteAuthentication(cRemoteHttpProxySettings.getAuthentication()));
     {
-        return convertCMirror( cMirror, new org.sonatype.nexus.configuration.model.v1_4_5.CMirror() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CMirror )
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cRemoteHttpProxySettings.getNonProxyHosts().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setNonProxyHosts(list);
+    }
 
-    /**
-     * Method convertCMirror.
-     * 
-     * @param cMirror
-     * @param value
-     * @return CMirror
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror( org.sonatype.nexus.configuration.model.v1_4_4.CMirror cMirror,
-                                                                                 org.sonatype.nexus.configuration.model.v1_4_5.CMirror value )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings )
+
+  /**
+   * Method convertCRemoteNexusInstance.
+   *
+   * @return CRemoteNexusInstance
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance cRemoteNexusInstance)
+  {
+    return convertCRemoteNexusInstance(cRemoteNexusInstance,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance )
+
+  /**
+   * Method convertCRemoteNexusInstance.
+   *
+   * @return CRemoteNexusInstance
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance cRemoteNexusInstance,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance value)
+  {
+    if (cRemoteNexusInstance == null) {
+      return null;
+    }
+    // Convert field alias
+    value.setAlias(cRemoteNexusInstance.getAlias());
+    // Convert field instanceUrl
+    value.setInstanceUrl(cRemoteNexusInstance.getInstanceUrl());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance )
+
+  /**
+   * Method convertCRemoteStorage.
+   *
+   * @return CRemoteStorage
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage cRemoteStorage)
+  {
+    return convertCRemoteStorage(cRemoteStorage,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage )
+
+  /**
+   * Method convertCRemoteStorage.
+   *
+   * @return CRemoteStorage
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage cRemoteStorage,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage value)
+  {
+    if (cRemoteStorage == null) {
+      return null;
+    }
+    // Convert field provider
+    value.setProvider(cRemoteStorage.getProvider());
+    // Convert field url
+    value.setUrl(cRemoteStorage.getUrl());
+    value.setAuthentication(convertCRemoteAuthentication(cRemoteStorage.getAuthentication()));
+    value.setConnectionSettings(convertCRemoteConnectionSettings(cRemoteStorage.getConnectionSettings()));
+    // Convert field inheritHttpProxySettings
+    value.setInheritHttpProxySettings(cRemoteStorage.isInheritHttpProxySettings());
+    value.setHttpProxySettings(convertCRemoteHttpProxySettings(cRemoteStorage.getHttpProxySettings()));
     {
-        if ( cMirror == null )
-        {
-            return null;
-        }
-        // Convert field id
-        value.setId( cMirror.getId() );
-        // Convert field url
-        value.setUrl( cMirror.getUrl() );
+      java.util.List list = new java.util.ArrayList/* <CMirror> */();
+      for (java.util.Iterator i = cRemoteStorage.getMirrors().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CMirror v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CMirror) i.next();
+        list.add(convertCMirror(v));
+      }
+      value.setMirrors(list);
+    }
 
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CMirror convertCMirror(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CMirror, org.sonatype.nexus.configuration.model.v1_4_5.CMirror )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage )
 
-    /**
-     * Method convertCNotification.
-     * 
-     * @param cNotification
-     * @return CNotification
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification( org.sonatype.nexus.configuration.model.v1_4_4.CNotification cNotification )
+  /**
+   * Method convertCRepository.
+   *
+   * @return CRepository
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRepository cRepository)
+  {
+    return convertCRepository(cRepository, new org.sonatype.nexus.configuration.model.v1_4_5.CRepository());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRepository )
+
+  /**
+   * Method convertCRepository.
+   *
+   * @return CRepository
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRepository cRepository,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRepository value)
+  {
+    if (cRepository == null) {
+      return null;
+    }
+    // Convert field id
+    value.setId(cRepository.getId());
+    // Convert field name
+    value.setName(cRepository.getName());
+    // Convert field providerRole
+    value.setProviderRole(cRepository.getProviderRole());
+    // Convert field providerHint
+    value.setProviderHint(cRepository.getProviderHint());
+    // Convert field pathPrefix
+    value.setPathPrefix(cRepository.getPathPrefix());
+    // Convert field localStatus
+    value.setLocalStatus(cRepository.getLocalStatus());
+    // Convert field notFoundCacheActive
+    value.setNotFoundCacheActive(cRepository.isNotFoundCacheActive());
+    // Convert field notFoundCacheTTL
+    value.setNotFoundCacheTTL(cRepository.getNotFoundCacheTTL());
+    // Convert field userManaged
+    value.setUserManaged(cRepository.isUserManaged());
+    // Convert field exposed
+    value.setExposed(cRepository.isExposed());
+    // Convert field browseable
+    value.setBrowseable(cRepository.isBrowseable());
+    // Convert field writePolicy
+    value.setWritePolicy(cRepository.getWritePolicy());
+    // Convert field indexable
+    value.setIndexable(cRepository.isIndexable());
+    // Convert field searchable
+    value.setSearchable(cRepository.isSearchable());
+    value.setLocalStorage(convertCLocalStorage(cRepository.getLocalStorage()));
+    value.setRemoteStorage(convertCRemoteStorage(cRepository.getRemoteStorage()));
     {
-        return convertCNotification( cNotification, new org.sonatype.nexus.configuration.model.v1_4_5.CNotification() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CNotification )
+      java.util.List list = new java.util.ArrayList/* <CMirror> */();
+      for (java.util.Iterator i = cRepository.getMirrors().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CMirror v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CMirror) i.next();
+        list.add(convertCMirror(v));
+      }
+      value.setMirrors(list);
+    }
+    // Convert field externalConfiguration
+    value.setExternalConfiguration(cRepository.getExternalConfiguration());
 
-    /**
-     * Method convertCNotification.
-     * 
-     * @param cNotification
-     * @param value
-     * @return CNotification
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification( org.sonatype.nexus.configuration.model.v1_4_4.CNotification cNotification,
-                                                                                             org.sonatype.nexus.configuration.model.v1_4_5.CNotification value )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRepository,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRepository )
+
+  /**
+   * Method convertCRepositoryGrouping.
+   *
+   * @return CRepositoryGrouping
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping cRepositoryGrouping)
+  {
+    return convertCRepositoryGrouping(cRepositoryGrouping,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping )
+
+  /**
+   * Method convertCRepositoryGrouping.
+   *
+   * @return CRepositoryGrouping
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping cRepositoryGrouping,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping value)
+  {
+    if (cRepositoryGrouping == null) {
+      return null;
+    }
     {
-        if ( cNotification == null )
-        {
-            return null;
-        }
-        // Convert field enabled
-        value.setEnabled( cNotification.isEnabled() );
-        {
-            java.util.List list = new java.util.ArrayList/* <CNotificationTarget> */();
-            for ( java.util.Iterator i = cNotification.getNotificationTargets().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget) i.next();
-                list.add( convertCNotificationTarget( v ) );
-            }
-            value.setNotificationTargets( list );
-        }
+      java.util.List list = new java.util.ArrayList/* <CPathMappingItem> */();
+      for (java.util.Iterator i = cRepositoryGrouping.getPathMappings().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem) i.next();
+        list.add(convertCPathMappingItem(v));
+      }
+      value.setPathMappings(list);
+    }
 
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotification convertCNotification(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CNotification,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CNotification )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping )
 
-    /**
-     * Method convertCNotificationTarget.
-     * 
-     * @param cNotificationTarget
-     * @return CNotificationTarget
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget( org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget cNotificationTarget )
+  /**
+   * Method convertCRepositoryTarget.
+   *
+   * @return CRepositoryTarget
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget cRepositoryTarget)
+  {
+    return convertCRepositoryTarget(cRepositoryTarget,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget )
+
+  /**
+   * Method convertCRepositoryTarget.
+   *
+   * @return CRepositoryTarget
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget cRepositoryTarget,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget value)
+  {
+    if (cRepositoryTarget == null) {
+      return null;
+    }
+    // Convert field id
+    value.setId(cRepositoryTarget.getId());
+    // Convert field name
+    value.setName(cRepositoryTarget.getName());
+    // Convert field contentClass
+    value.setContentClass(cRepositoryTarget.getContentClass());
     {
-        return convertCNotificationTarget( cNotificationTarget,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget )
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cRepositoryTarget.getPatterns().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setPatterns(list);
+    }
 
-    /**
-     * Method convertCNotificationTarget.
-     * 
-     * @param cNotificationTarget
-     * @param value
-     * @return CNotificationTarget
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget( org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget cNotificationTarget,
-                                                                                                         org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget value )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget )
+
+  /**
+   * Method convertCRestApiSettings.
+   *
+   * @return CRestApiSettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings cRestApiSettings)
+  {
+    return convertCRestApiSettings(cRestApiSettings,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings )
+
+  /**
+   * Method convertCRestApiSettings.
+   *
+   * @return CRestApiSettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings cRestApiSettings,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings value)
+  {
+    if (cRestApiSettings == null) {
+      return null;
+    }
+    // Convert field baseUrl
+    value.setBaseUrl(cRestApiSettings.getBaseUrl());
+    // Convert field forceBaseUrl
+    value.setForceBaseUrl(cRestApiSettings.isForceBaseUrl());
+    // Convert field uiTimeout
+    value.setUiTimeout(cRestApiSettings.getUiTimeout());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings )
+
+  /**
+   * Method convertCRouting.
+   *
+   * @return CRouting
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRouting cRouting)
+  {
+    return convertCRouting(cRouting, new org.sonatype.nexus.configuration.model.v1_4_5.CRouting());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRouting )
+
+  /**
+   * Method convertCRouting.
+   *
+   * @return CRouting
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting(
+      org.sonatype.nexus.configuration.model.v1_4_4.CRouting cRouting,
+      org.sonatype.nexus.configuration.model.v1_4_5.CRouting value)
+  {
+    if (cRouting == null) {
+      return null;
+    }
+    // Convert field resolveLinks
+    value.setResolveLinks(cRouting.isResolveLinks());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CRouting, org.sonatype.nexus.configuration.model.v1_4_5.CRouting
+  // )
+
+  /**
+   * Method convertCScheduleConfig.
+   *
+   * @return CScheduleConfig
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig(
+      org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig cScheduleConfig)
+  {
+    return convertCScheduleConfig(cScheduleConfig,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig )
+
+  /**
+   * Method convertCScheduleConfig.
+   *
+   * @return CScheduleConfig
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig(
+      org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig cScheduleConfig,
+      org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig value)
+  {
+    if (cScheduleConfig == null) {
+      return null;
+    }
+    // Convert field type
+    value.setType(cScheduleConfig.getType());
+    // Convert field startDate
+    value.setStartDate(cScheduleConfig.getStartDate());
+    // Convert field endDate
+    value.setEndDate(cScheduleConfig.getEndDate());
     {
-        if ( cNotificationTarget == null )
-        {
-            return null;
-        }
-        // Convert field targetId
-        value.setTargetId( cNotificationTarget.getTargetId() );
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cNotificationTarget.getTargetRoles().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setTargetRoles( list );
-        }
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cNotificationTarget.getTargetUsers().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setTargetUsers( list );
-        }
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cNotificationTarget.getTargetExternals().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setTargetExternals( list );
-        }
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget convertCNotificationTarget(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CNotificationTarget,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CNotificationTarget )
-
-    /**
-     * Method convertCPathMappingItem.
-     * 
-     * @param cPathMappingItem
-     * @return CPathMappingItem
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem( org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem cPathMappingItem )
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cScheduleConfig.getDaysOfWeek().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setDaysOfWeek(list);
+    }
     {
-        return convertCPathMappingItem( cPathMappingItem,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem )
+      java.util.List list = new java.util.ArrayList/* <String> */();
+      for (java.util.Iterator i = cScheduleConfig.getDaysOfMonth().iterator(); i.hasNext(); ) {
+        String v = (String) i.next();
+        list.add(v);
+      }
+      value.setDaysOfMonth(list);
+    }
+    // Convert field cronCommand
+    value.setCronCommand(cScheduleConfig.getCronCommand());
 
-    /**
-     * Method convertCPathMappingItem.
-     * 
-     * @param cPathMappingItem
-     * @param value
-     * @return CPathMappingItem
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem( org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem cPathMappingItem,
-                                                                                                   org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem value )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig )
+
+  /**
+   * Method convertCScheduledTask.
+   *
+   * @return CScheduledTask
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask(
+      org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask cScheduledTask)
+  {
+    return convertCScheduledTask(cScheduledTask,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask )
+
+  /**
+   * Method convertCScheduledTask.
+   *
+   * @return CScheduledTask
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask(
+      org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask cScheduledTask,
+      org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask value)
+  {
+    if (cScheduledTask == null) {
+      return null;
+    }
+    // Convert field id
+    value.setId(cScheduledTask.getId());
+    // Convert field name
+    value.setName(cScheduledTask.getName());
+    // Convert field enabled
+    value.setEnabled(cScheduledTask.isEnabled());
+    // Convert field type
+    value.setType(cScheduledTask.getType());
+    // Convert field status
+    value.setStatus(cScheduledTask.getStatus());
+    // Convert field lastRun
+    value.setLastRun(cScheduledTask.getLastRun());
+    // Convert field nextRun
+    value.setNextRun(cScheduledTask.getNextRun());
+    value.setSchedule(convertCScheduleConfig(cScheduledTask.getSchedule()));
     {
-        if ( cPathMappingItem == null )
-        {
-            return null;
-        }
-        // Convert field id
-        value.setId( cPathMappingItem.getId() );
-        // Convert field groupId
-        value.setGroupId( cPathMappingItem.getGroupId() );
-        // Convert field routeType
-        value.setRouteType( cPathMappingItem.getRouteType() );
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cPathMappingItem.getRoutePatterns().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setRoutePatterns( list );
-        }
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cPathMappingItem.getRepositories().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setRepositories( list );
-        }
+      java.util.List list = new java.util.ArrayList/* <CProps> */();
+      for (java.util.Iterator i = cScheduledTask.getProperties().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CProps v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CProps) i.next();
+        list.add(convertCProps(v));
+      }
+      value.setProperties(list);
+    }
 
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem convertCPathMappingItem(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CPathMappingItem )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask )
 
-    /**
-     * Method convertCPlugin.
-     * 
-     * @param cPlugin
-     * @return CPlugin
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin( org.sonatype.nexus.configuration.model.v1_4_4.CPlugin cPlugin )
+  /**
+   * Method convertCSmtpConfiguration.
+   *
+   * @return CSmtpConfiguration
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration(
+      org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration cSmtpConfiguration)
+  {
+    return convertCSmtpConfiguration(cSmtpConfiguration,
+        new org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration )
+
+  /**
+   * Method convertCSmtpConfiguration.
+   *
+   * @return CSmtpConfiguration
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration(
+      org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration cSmtpConfiguration,
+      org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration value)
+  {
+    if (cSmtpConfiguration == null) {
+      return null;
+    }
+    // Convert field hostname
+    value.setHostname(cSmtpConfiguration.getHostname());
+    // Convert field port
+    value.setPort(cSmtpConfiguration.getPort());
+    // Convert field sslEnabled
+    value.setSslEnabled(cSmtpConfiguration.isSslEnabled());
+    // Convert field tlsEnabled
+    value.setTlsEnabled(cSmtpConfiguration.isTlsEnabled());
+    // Convert field username
+    value.setUsername(cSmtpConfiguration.getUsername());
+    // Convert field password
+    value.setPassword(cSmtpConfiguration.getPassword());
+    // Convert field debugMode
+    value.setDebugMode(cSmtpConfiguration.isDebugMode());
+    // Convert field systemEmailAddress
+    value.setSystemEmailAddress(cSmtpConfiguration.getSystemEmailAddress());
+
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration(
+  // org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration,
+  // org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration )
+
+  /**
+   * Method convertConfiguration.
+   *
+   * @return Configuration
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration(
+      org.sonatype.nexus.configuration.model.v1_4_4.Configuration configuration)
+  {
+    return convertConfiguration(configuration, new org.sonatype.nexus.configuration.model.v1_4_5.Configuration());
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration(
+  // org.sonatype.nexus.configuration.model.v1_4_4.Configuration )
+
+  /**
+   * Method convertConfiguration.
+   *
+   * @return Configuration
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration(
+      org.sonatype.nexus.configuration.model.v1_4_4.Configuration configuration,
+      org.sonatype.nexus.configuration.model.v1_4_5.Configuration value)
+  {
+    if (configuration == null) {
+      return null;
+    }
+    // Convert field version
+    value.setVersion(configuration.getVersion());
+    value.setGlobalConnectionSettings(convertCRemoteConnectionSettings(configuration.getGlobalConnectionSettings()));
+    value.setGlobalHttpProxySettings(convertCRemoteHttpProxySettings(configuration.getGlobalHttpProxySettings()));
+    value.setRestApi(convertCRestApiSettings(configuration.getRestApi()));
+    value.setHttpProxy(convertCHttpProxySettings(configuration.getHttpProxy()));
+    value.setRouting(convertCRouting(configuration.getRouting()));
     {
-        return convertCPlugin( cPlugin, new org.sonatype.nexus.configuration.model.v1_4_5.CPlugin() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CPlugin )
-
-    /**
-     * Method convertCPlugin.
-     * 
-     * @param cPlugin
-     * @param value
-     * @return CPlugin
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin( org.sonatype.nexus.configuration.model.v1_4_4.CPlugin cPlugin,
-                                                                                 org.sonatype.nexus.configuration.model.v1_4_5.CPlugin value )
+      java.util.List list = new java.util.ArrayList/* <CRepository> */();
+      for (java.util.Iterator i = configuration.getRepositories().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CRepository v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CRepository) i.next();
+        list.add(convertCRepository(v));
+      }
+      value.setRepositories(list);
+    }
+    value.setRepositoryGrouping(convertCRepositoryGrouping(configuration.getRepositoryGrouping()));
     {
-        if ( cPlugin == null )
-        {
-            return null;
-        }
-        // Convert field type
-        value.setType( cPlugin.getType() );
-        // Convert field id
-        value.setId( cPlugin.getId() );
-        // Convert field name
-        value.setName( cPlugin.getName() );
-        // Convert field status
-        value.setStatus( cPlugin.getStatus() );
-        // Convert field externalConfiguration
-        value.setExternalConfiguration( cPlugin.getExternalConfiguration() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CPlugin convertCPlugin(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CPlugin, org.sonatype.nexus.configuration.model.v1_4_5.CPlugin )
-
-    /**
-     * Method convertCProps.
-     * 
-     * @param cProps
-     * @return CProps
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps( org.sonatype.nexus.configuration.model.v1_4_4.CProps cProps )
+      java.util.List list = new java.util.ArrayList/* <CRemoteNexusInstance> */();
+      for (java.util.Iterator i = configuration.getRemoteNexusInstances().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance) i.next();
+        list.add(convertCRemoteNexusInstance(v));
+      }
+      value.setRemoteNexusInstances(list);
+    }
     {
-        return convertCProps( cProps, new org.sonatype.nexus.configuration.model.v1_4_5.CProps() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CProps )
-
-    /**
-     * Method convertCProps.
-     * 
-     * @param cProps
-     * @param value
-     * @return CProps
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps( org.sonatype.nexus.configuration.model.v1_4_4.CProps cProps,
-                                                                               org.sonatype.nexus.configuration.model.v1_4_5.CProps value )
+      java.util.List list = new java.util.ArrayList/* <CRepositoryTarget> */();
+      for (java.util.Iterator i = configuration.getRepositoryTargets().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget) i.next();
+        list.add(convertCRepositoryTarget(v));
+      }
+      value.setRepositoryTargets(list);
+    }
     {
-        if ( cProps == null )
-        {
-            return null;
-        }
-        // Convert field key
-        value.setKey( cProps.getKey() );
-        // Convert field value
-        value.setValue( cProps.getValue() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CProps convertCProps(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CProps, org.sonatype.nexus.configuration.model.v1_4_5.CProps )
-
-    /**
-     * Method convertCRemoteAuthentication.
-     * 
-     * @param cRemoteAuthentication
-     * @return CRemoteAuthentication
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication cRemoteAuthentication )
+      java.util.List list = new java.util.ArrayList/* <CScheduledTask> */();
+      for (java.util.Iterator i = configuration.getTasks().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask) i.next();
+        list.add(convertCScheduledTask(v));
+      }
+      value.setTasks(list);
+    }
+    value.setSmtpConfiguration(convertCSmtpConfiguration(configuration.getSmtpConfiguration()));
+    value.setErrorReporting(convertCErrorReporting(configuration.getErrorReporting()));
     {
-        return convertCRemoteAuthentication( cRemoteAuthentication,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication )
+      java.util.List list = new java.util.ArrayList/* <CPlugin> */();
+      for (java.util.Iterator i = configuration.getPlugins().iterator(); i.hasNext(); ) {
+        org.sonatype.nexus.configuration.model.v1_4_4.CPlugin v =
+            (org.sonatype.nexus.configuration.model.v1_4_4.CPlugin) i.next();
+        list.add(convertCPlugin(v));
+      }
+      value.setPlugins(list);
+    }
+    value.setNotification(convertCNotification(configuration.getNotification()));
 
-    /**
-     * Method convertCRemoteAuthentication.
-     * 
-     * @param cRemoteAuthentication
-     * @param value
-     * @return CRemoteAuthentication
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication cRemoteAuthentication,
-                                                                                                             org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication value )
-    {
-        if ( cRemoteAuthentication == null )
-        {
-            return null;
-        }
-        // Convert field username
-        value.setUsername( cRemoteAuthentication.getUsername() );
-        // Convert field password
-        value.setPassword( cRemoteAuthentication.getPassword() );
-        // Convert field ntlmHost
-        value.setNtlmHost( cRemoteAuthentication.getNtlmHost() );
-        // Convert field ntlmDomain
-        value.setNtlmDomain( cRemoteAuthentication.getNtlmDomain() );
-        // Convert field trustStore
-        value.setTrustStore( cRemoteAuthentication.getTrustStore() );
-        // Convert field trustStorePassword
-        value.setTrustStorePassword( cRemoteAuthentication.getTrustStorePassword() );
-        // Convert field keyStore
-        value.setKeyStore( cRemoteAuthentication.getKeyStore() );
-        // Convert field keyStorePassword
-        value.setKeyStorePassword( cRemoteAuthentication.getKeyStorePassword() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication convertCRemoteAuthentication(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteAuthentication,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteAuthentication )
-
-    /**
-     * Method convertCRemoteConnectionSettings.
-     * 
-     * @param cRemoteConnectionSettings
-     * @return CRemoteConnectionSettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings cRemoteConnectionSettings )
-    {
-        return convertCRemoteConnectionSettings( cRemoteConnectionSettings,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings )
-
-    /**
-     * Method convertCRemoteConnectionSettings.
-     * 
-     * @param cRemoteConnectionSettings
-     * @param value
-     * @return CRemoteConnectionSettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings cRemoteConnectionSettings,
-                                                                                                                     org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings value )
-    {
-        if ( cRemoteConnectionSettings == null )
-        {
-            return null;
-        }
-        // Convert field connectionTimeout
-        value.setConnectionTimeout( cRemoteConnectionSettings.getConnectionTimeout() );
-        // Convert field retrievalRetryCount
-        value.setRetrievalRetryCount( cRemoteConnectionSettings.getRetrievalRetryCount() );
-        // Convert field queryString
-        value.setQueryString( cRemoteConnectionSettings.getQueryString() );
-        // Convert field userAgentCustomizationString
-        value.setUserAgentCustomizationString( cRemoteConnectionSettings.getUserAgentCustomizationString() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings convertCRemoteConnectionSettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteConnectionSettings,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteConnectionSettings )
-
-    /**
-     * Method convertCRemoteHttpProxySettings.
-     * 
-     * @param cRemoteHttpProxySettings
-     * @return CRemoteHttpProxySettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings cRemoteHttpProxySettings )
-    {
-        return convertCRemoteHttpProxySettings( cRemoteHttpProxySettings,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings )
-
-    /**
-     * Method convertCRemoteHttpProxySettings.
-     * 
-     * @param cRemoteHttpProxySettings
-     * @param value
-     * @return CRemoteHttpProxySettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings cRemoteHttpProxySettings,
-                                                                                                                   org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings value )
-    {
-        if ( cRemoteHttpProxySettings == null )
-        {
-            return null;
-        }
-        // Convert field blockInheritance
-        value.setBlockInheritance( cRemoteHttpProxySettings.isBlockInheritance() );
-        // Convert field proxyHostname
-        value.setProxyHostname( cRemoteHttpProxySettings.getProxyHostname() );
-        // Convert field proxyPort
-        value.setProxyPort( cRemoteHttpProxySettings.getProxyPort() );
-        value.setAuthentication( convertCRemoteAuthentication( cRemoteHttpProxySettings.getAuthentication() ) );
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cRemoteHttpProxySettings.getNonProxyHosts().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setNonProxyHosts( list );
-        }
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings convertCRemoteHttpProxySettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteHttpProxySettings,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteHttpProxySettings )
-
-    /**
-     * Method convertCRemoteNexusInstance.
-     * 
-     * @param cRemoteNexusInstance
-     * @return CRemoteNexusInstance
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance cRemoteNexusInstance )
-    {
-        return convertCRemoteNexusInstance( cRemoteNexusInstance,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance )
-
-    /**
-     * Method convertCRemoteNexusInstance.
-     * 
-     * @param cRemoteNexusInstance
-     * @param value
-     * @return CRemoteNexusInstance
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance cRemoteNexusInstance,
-                                                                                                           org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance value )
-    {
-        if ( cRemoteNexusInstance == null )
-        {
-            return null;
-        }
-        // Convert field alias
-        value.setAlias( cRemoteNexusInstance.getAlias() );
-        // Convert field instanceUrl
-        value.setInstanceUrl( cRemoteNexusInstance.getInstanceUrl() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance convertCRemoteNexusInstance(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteNexusInstance )
-
-    /**
-     * Method convertCRemoteStorage.
-     * 
-     * @param cRemoteStorage
-     * @return CRemoteStorage
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage cRemoteStorage )
-    {
-        return convertCRemoteStorage( cRemoteStorage,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage )
-
-    /**
-     * Method convertCRemoteStorage.
-     * 
-     * @param cRemoteStorage
-     * @param value
-     * @return CRemoteStorage
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage cRemoteStorage,
-                                                                                               org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage value )
-    {
-        if ( cRemoteStorage == null )
-        {
-            return null;
-        }
-        // Convert field provider
-        value.setProvider( cRemoteStorage.getProvider() );
-        // Convert field url
-        value.setUrl( cRemoteStorage.getUrl() );
-        value.setAuthentication( convertCRemoteAuthentication( cRemoteStorage.getAuthentication() ) );
-        value.setConnectionSettings( convertCRemoteConnectionSettings( cRemoteStorage.getConnectionSettings() ) );
-        // Convert field inheritHttpProxySettings
-        value.setInheritHttpProxySettings( cRemoteStorage.isInheritHttpProxySettings() );
-        value.setHttpProxySettings( convertCRemoteHttpProxySettings( cRemoteStorage.getHttpProxySettings() ) );
-        {
-            java.util.List list = new java.util.ArrayList/* <CMirror> */();
-            for ( java.util.Iterator i = cRemoteStorage.getMirrors().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CMirror v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CMirror) i.next();
-                list.add( convertCMirror( v ) );
-            }
-            value.setMirrors( list );
-        }
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage convertCRemoteStorage(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRemoteStorage )
-
-    /**
-     * Method convertCRepository.
-     * 
-     * @param cRepository
-     * @return CRepository
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository( org.sonatype.nexus.configuration.model.v1_4_4.CRepository cRepository )
-    {
-        return convertCRepository( cRepository, new org.sonatype.nexus.configuration.model.v1_4_5.CRepository() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRepository )
-
-    /**
-     * Method convertCRepository.
-     * 
-     * @param cRepository
-     * @param value
-     * @return CRepository
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository( org.sonatype.nexus.configuration.model.v1_4_4.CRepository cRepository,
-                                                                                         org.sonatype.nexus.configuration.model.v1_4_5.CRepository value )
-    {
-        if ( cRepository == null )
-        {
-            return null;
-        }
-        // Convert field id
-        value.setId( cRepository.getId() );
-        // Convert field name
-        value.setName( cRepository.getName() );
-        // Convert field providerRole
-        value.setProviderRole( cRepository.getProviderRole() );
-        // Convert field providerHint
-        value.setProviderHint( cRepository.getProviderHint() );
-        // Convert field pathPrefix
-        value.setPathPrefix( cRepository.getPathPrefix() );
-        // Convert field localStatus
-        value.setLocalStatus( cRepository.getLocalStatus() );
-        // Convert field notFoundCacheActive
-        value.setNotFoundCacheActive( cRepository.isNotFoundCacheActive() );
-        // Convert field notFoundCacheTTL
-        value.setNotFoundCacheTTL( cRepository.getNotFoundCacheTTL() );
-        // Convert field userManaged
-        value.setUserManaged( cRepository.isUserManaged() );
-        // Convert field exposed
-        value.setExposed( cRepository.isExposed() );
-        // Convert field browseable
-        value.setBrowseable( cRepository.isBrowseable() );
-        // Convert field writePolicy
-        value.setWritePolicy( cRepository.getWritePolicy() );
-        // Convert field indexable
-        value.setIndexable( cRepository.isIndexable() );
-        // Convert field searchable
-        value.setSearchable( cRepository.isSearchable() );
-        value.setLocalStorage( convertCLocalStorage( cRepository.getLocalStorage() ) );
-        value.setRemoteStorage( convertCRemoteStorage( cRepository.getRemoteStorage() ) );
-        {
-            java.util.List list = new java.util.ArrayList/* <CMirror> */();
-            for ( java.util.Iterator i = cRepository.getMirrors().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CMirror v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CMirror) i.next();
-                list.add( convertCMirror( v ) );
-            }
-            value.setMirrors( list );
-        }
-        // Convert field externalConfiguration
-        value.setExternalConfiguration( cRepository.getExternalConfiguration() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepository convertCRepository(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRepository,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRepository )
-
-    /**
-     * Method convertCRepositoryGrouping.
-     * 
-     * @param cRepositoryGrouping
-     * @return CRepositoryGrouping
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping( org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping cRepositoryGrouping )
-    {
-        return convertCRepositoryGrouping( cRepositoryGrouping,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping )
-
-    /**
-     * Method convertCRepositoryGrouping.
-     * 
-     * @param cRepositoryGrouping
-     * @param value
-     * @return CRepositoryGrouping
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping( org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping cRepositoryGrouping,
-                                                                                                         org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping value )
-    {
-        if ( cRepositoryGrouping == null )
-        {
-            return null;
-        }
-        {
-            java.util.List list = new java.util.ArrayList/* <CPathMappingItem> */();
-            for ( java.util.Iterator i = cRepositoryGrouping.getPathMappings().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CPathMappingItem) i.next();
-                list.add( convertCPathMappingItem( v ) );
-            }
-            value.setPathMappings( list );
-        }
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping convertCRepositoryGrouping(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryGrouping,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryGrouping )
-
-    /**
-     * Method convertCRepositoryTarget.
-     * 
-     * @param cRepositoryTarget
-     * @return CRepositoryTarget
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget( org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget cRepositoryTarget )
-    {
-        return convertCRepositoryTarget( cRepositoryTarget,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget )
-
-    /**
-     * Method convertCRepositoryTarget.
-     * 
-     * @param cRepositoryTarget
-     * @param value
-     * @return CRepositoryTarget
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget( org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget cRepositoryTarget,
-                                                                                                     org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget value )
-    {
-        if ( cRepositoryTarget == null )
-        {
-            return null;
-        }
-        // Convert field id
-        value.setId( cRepositoryTarget.getId() );
-        // Convert field name
-        value.setName( cRepositoryTarget.getName() );
-        // Convert field contentClass
-        value.setContentClass( cRepositoryTarget.getContentClass() );
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cRepositoryTarget.getPatterns().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setPatterns( list );
-        }
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget convertCRepositoryTarget(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRepositoryTarget )
-
-    /**
-     * Method convertCRestApiSettings.
-     * 
-     * @param cRestApiSettings
-     * @return CRestApiSettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings( org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings cRestApiSettings )
-    {
-        return convertCRestApiSettings( cRestApiSettings,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings )
-
-    /**
-     * Method convertCRestApiSettings.
-     * 
-     * @param cRestApiSettings
-     * @param value
-     * @return CRestApiSettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings( org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings cRestApiSettings,
-                                                                                                   org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings value )
-    {
-        if ( cRestApiSettings == null )
-        {
-            return null;
-        }
-        // Convert field baseUrl
-        value.setBaseUrl( cRestApiSettings.getBaseUrl() );
-        // Convert field forceBaseUrl
-        value.setForceBaseUrl( cRestApiSettings.isForceBaseUrl() );
-        // Convert field uiTimeout
-        value.setUiTimeout( cRestApiSettings.getUiTimeout() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings convertCRestApiSettings(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRestApiSettings,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CRestApiSettings )
-
-    /**
-     * Method convertCRouting.
-     * 
-     * @param cRouting
-     * @return CRouting
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting( org.sonatype.nexus.configuration.model.v1_4_4.CRouting cRouting )
-    {
-        return convertCRouting( cRouting, new org.sonatype.nexus.configuration.model.v1_4_5.CRouting() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRouting )
-
-    /**
-     * Method convertCRouting.
-     * 
-     * @param cRouting
-     * @param value
-     * @return CRouting
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting( org.sonatype.nexus.configuration.model.v1_4_4.CRouting cRouting,
-                                                                                   org.sonatype.nexus.configuration.model.v1_4_5.CRouting value )
-    {
-        if ( cRouting == null )
-        {
-            return null;
-        }
-        // Convert field resolveLinks
-        value.setResolveLinks( cRouting.isResolveLinks() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CRouting convertCRouting(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CRouting, org.sonatype.nexus.configuration.model.v1_4_5.CRouting
-      // )
-
-    /**
-     * Method convertCScheduleConfig.
-     * 
-     * @param cScheduleConfig
-     * @return CScheduleConfig
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig( org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig cScheduleConfig )
-    {
-        return convertCScheduleConfig( cScheduleConfig,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig )
-
-    /**
-     * Method convertCScheduleConfig.
-     * 
-     * @param cScheduleConfig
-     * @param value
-     * @return CScheduleConfig
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig( org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig cScheduleConfig,
-                                                                                                 org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig value )
-    {
-        if ( cScheduleConfig == null )
-        {
-            return null;
-        }
-        // Convert field type
-        value.setType( cScheduleConfig.getType() );
-        // Convert field startDate
-        value.setStartDate( cScheduleConfig.getStartDate() );
-        // Convert field endDate
-        value.setEndDate( cScheduleConfig.getEndDate() );
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cScheduleConfig.getDaysOfWeek().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setDaysOfWeek( list );
-        }
-        {
-            java.util.List list = new java.util.ArrayList/* <String> */();
-            for ( java.util.Iterator i = cScheduleConfig.getDaysOfMonth().iterator(); i.hasNext(); )
-            {
-                String v = (String) i.next();
-                list.add( v );
-            }
-            value.setDaysOfMonth( list );
-        }
-        // Convert field cronCommand
-        value.setCronCommand( cScheduleConfig.getCronCommand() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig convertCScheduleConfig(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CScheduleConfig,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CScheduleConfig )
-
-    /**
-     * Method convertCScheduledTask.
-     * 
-     * @param cScheduledTask
-     * @return CScheduledTask
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask( org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask cScheduledTask )
-    {
-        return convertCScheduledTask( cScheduledTask,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask )
-
-    /**
-     * Method convertCScheduledTask.
-     * 
-     * @param cScheduledTask
-     * @param value
-     * @return CScheduledTask
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask( org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask cScheduledTask,
-                                                                                               org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask value )
-    {
-        if ( cScheduledTask == null )
-        {
-            return null;
-        }
-        // Convert field id
-        value.setId( cScheduledTask.getId() );
-        // Convert field name
-        value.setName( cScheduledTask.getName() );
-        // Convert field enabled
-        value.setEnabled( cScheduledTask.isEnabled() );
-        // Convert field type
-        value.setType( cScheduledTask.getType() );
-        // Convert field status
-        value.setStatus( cScheduledTask.getStatus() );
-        // Convert field lastRun
-        value.setLastRun( cScheduledTask.getLastRun() );
-        // Convert field nextRun
-        value.setNextRun( cScheduledTask.getNextRun() );
-        value.setSchedule( convertCScheduleConfig( cScheduledTask.getSchedule() ) );
-        {
-            java.util.List list = new java.util.ArrayList/* <CProps> */();
-            for ( java.util.Iterator i = cScheduledTask.getProperties().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CProps v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CProps) i.next();
-                list.add( convertCProps( v ) );
-            }
-            value.setProperties( list );
-        }
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask convertCScheduledTask(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CScheduledTask )
-
-    /**
-     * Method convertCSmtpConfiguration.
-     * 
-     * @param cSmtpConfiguration
-     * @return CSmtpConfiguration
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration( org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration cSmtpConfiguration )
-    {
-        return convertCSmtpConfiguration( cSmtpConfiguration,
-            new org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration )
-
-    /**
-     * Method convertCSmtpConfiguration.
-     * 
-     * @param cSmtpConfiguration
-     * @param value
-     * @return CSmtpConfiguration
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration( org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration cSmtpConfiguration,
-                                                                                                       org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration value )
-    {
-        if ( cSmtpConfiguration == null )
-        {
-            return null;
-        }
-        // Convert field hostname
-        value.setHostname( cSmtpConfiguration.getHostname() );
-        // Convert field port
-        value.setPort( cSmtpConfiguration.getPort() );
-        // Convert field sslEnabled
-        value.setSslEnabled( cSmtpConfiguration.isSslEnabled() );
-        // Convert field tlsEnabled
-        value.setTlsEnabled( cSmtpConfiguration.isTlsEnabled() );
-        // Convert field username
-        value.setUsername( cSmtpConfiguration.getUsername() );
-        // Convert field password
-        value.setPassword( cSmtpConfiguration.getPassword() );
-        // Convert field debugMode
-        value.setDebugMode( cSmtpConfiguration.isDebugMode() );
-        // Convert field systemEmailAddress
-        value.setSystemEmailAddress( cSmtpConfiguration.getSystemEmailAddress() );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration convertCSmtpConfiguration(
-      // org.sonatype.nexus.configuration.model.v1_4_4.CSmtpConfiguration,
-      // org.sonatype.nexus.configuration.model.v1_4_5.CSmtpConfiguration )
-
-    /**
-     * Method convertConfiguration.
-     * 
-     * @param configuration
-     * @return Configuration
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration( org.sonatype.nexus.configuration.model.v1_4_4.Configuration configuration )
-    {
-        return convertConfiguration( configuration, new org.sonatype.nexus.configuration.model.v1_4_5.Configuration() );
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration(
-      // org.sonatype.nexus.configuration.model.v1_4_4.Configuration )
-
-    /**
-     * Method convertConfiguration.
-     * 
-     * @param configuration
-     * @param value
-     * @return Configuration
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration( org.sonatype.nexus.configuration.model.v1_4_4.Configuration configuration,
-                                                                                             org.sonatype.nexus.configuration.model.v1_4_5.Configuration value )
-    {
-        if ( configuration == null )
-        {
-            return null;
-        }
-        // Convert field version
-        value.setVersion( configuration.getVersion() );
-        value.setGlobalConnectionSettings( convertCRemoteConnectionSettings( configuration.getGlobalConnectionSettings() ) );
-        value.setGlobalHttpProxySettings( convertCRemoteHttpProxySettings( configuration.getGlobalHttpProxySettings() ) );
-        value.setRestApi( convertCRestApiSettings( configuration.getRestApi() ) );
-        value.setHttpProxy( convertCHttpProxySettings( configuration.getHttpProxy() ) );
-        value.setRouting( convertCRouting( configuration.getRouting() ) );
-        {
-            java.util.List list = new java.util.ArrayList/* <CRepository> */();
-            for ( java.util.Iterator i = configuration.getRepositories().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CRepository v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CRepository) i.next();
-                list.add( convertCRepository( v ) );
-            }
-            value.setRepositories( list );
-        }
-        value.setRepositoryGrouping( convertCRepositoryGrouping( configuration.getRepositoryGrouping() ) );
-        {
-            java.util.List list = new java.util.ArrayList/* <CRemoteNexusInstance> */();
-            for ( java.util.Iterator i = configuration.getRemoteNexusInstances().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CRemoteNexusInstance) i.next();
-                list.add( convertCRemoteNexusInstance( v ) );
-            }
-            value.setRemoteNexusInstances( list );
-        }
-        {
-            java.util.List list = new java.util.ArrayList/* <CRepositoryTarget> */();
-            for ( java.util.Iterator i = configuration.getRepositoryTargets().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CRepositoryTarget) i.next();
-                list.add( convertCRepositoryTarget( v ) );
-            }
-            value.setRepositoryTargets( list );
-        }
-        {
-            java.util.List list = new java.util.ArrayList/* <CScheduledTask> */();
-            for ( java.util.Iterator i = configuration.getTasks().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask) i.next();
-                list.add( convertCScheduledTask( v ) );
-            }
-            value.setTasks( list );
-        }
-        value.setSmtpConfiguration( convertCSmtpConfiguration( configuration.getSmtpConfiguration() ) );
-        value.setErrorReporting( convertCErrorReporting( configuration.getErrorReporting() ) );
-        {
-            java.util.List list = new java.util.ArrayList/* <CPlugin> */();
-            for ( java.util.Iterator i = configuration.getPlugins().iterator(); i.hasNext(); )
-            {
-                org.sonatype.nexus.configuration.model.v1_4_4.CPlugin v =
-                    (org.sonatype.nexus.configuration.model.v1_4_4.CPlugin) i.next();
-                list.add( convertCPlugin( v ) );
-            }
-            value.setPlugins( list );
-        }
-        value.setNotification( convertCNotification( configuration.getNotification() ) );
-
-        return value;
-    } // -- org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration(
-      // org.sonatype.nexus.configuration.model.v1_4_4.Configuration,
-      // org.sonatype.nexus.configuration.model.v1_4_5.Configuration )
+    return value;
+  } // -- org.sonatype.nexus.configuration.model.v1_4_5.Configuration convertConfiguration(
+  // org.sonatype.nexus.configuration.model.v1_4_4.Configuration,
+  // org.sonatype.nexus.configuration.model.v1_4_5.Configuration )
 
 }

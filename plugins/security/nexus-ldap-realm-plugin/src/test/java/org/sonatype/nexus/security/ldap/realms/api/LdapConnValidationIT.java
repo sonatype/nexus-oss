@@ -10,10 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.ldap.realms.api;
 
-import org.junit.Assert;
-import org.junit.Test;
+package org.sonatype.nexus.security.ldap.realms.api;
 
 import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -22,78 +20,76 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 
 public class LdapConnValidationIT
     extends NexusLdapTestSupport
 {
 
-    private PlexusResource getResource()
-        throws Exception
-    {
-        return this.lookup( PlexusResource.class, "LdapConnectionInfoPlexusResource" );
+  private PlexusResource getResource()
+      throws Exception
+  {
+    return this.lookup(PlexusResource.class, "LdapConnectionInfoPlexusResource");
+  }
+
+  private LdapConnectionInfoDTO getPopulatedDTO() {
+    LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
+    connectionInfo.setHost("localhost");
+    connectionInfo.setPort(this.getLdapPort());
+    connectionInfo.setSearchBase("o=sonatype");
+    connectionInfo.setSystemPassword("secret");
+    connectionInfo.setSystemUsername("uid=admin,ou=system");
+    connectionInfo.setProtocol("ldap");
+    connectionInfo.setAuthScheme("simple");
+    return connectionInfo;
+  }
+
+  @Test
+  public void testNoHost()
+      throws Exception
+  {
+    PlexusResource resource = getResource();
+
+    LdapConnectionInfoResponse response = new LdapConnectionInfoResponse();
+    LdapConnectionInfoDTO connectionInfo = this.getPopulatedDTO();
+    response.setData(connectionInfo);
+
+    connectionInfo.setHost(null);
+
+    try {
+      resource.put(null, null, null, response);
+      Assert.fail("Expected PlexusResourceException");
+    }
+    catch (PlexusResourceException e) {
+      ErrorResponse result = (ErrorResponse) e.getResultObject();
+      Assert.assertEquals(1, result.getErrors().size());
+      Assert.assertTrue("Expected error to have the work 'host', was: " + this.getErrorString(result, 0),
+          (this.getErrorString(result, 0).toString().toLowerCase().contains("host")));
     }
 
-    private LdapConnectionInfoDTO getPopulatedDTO()
-    {
-        LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
-        connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( this.getLdapPort() );
-        connectionInfo.setSearchBase( "o=sonatype" );
-        connectionInfo.setSystemPassword( "secret" );
-        connectionInfo.setSystemUsername( "uid=admin,ou=system" );
-        connectionInfo.setProtocol( "ldap" );
-        connectionInfo.setAuthScheme( "simple" );
-        return connectionInfo;
+  }
+
+  @Test
+  public void testMultipleErrors()
+      throws Exception
+  {
+    PlexusResource resource = getResource();
+
+    LdapConnectionInfoResponse response = new LdapConnectionInfoResponse();
+    LdapConnectionInfoDTO connectionInfo = this.getPopulatedDTO();
+    response.setData(connectionInfo);
+
+    connectionInfo.setHost(null);
+    connectionInfo.setPort(0);
+    try {
+      resource.put(null, null, null, response);
+      Assert.fail("Expected PlexusResourceException");
     }
-
-    @Test
-    public void testNoHost()
-        throws Exception
-    {
-        PlexusResource resource = getResource();
-
-        LdapConnectionInfoResponse response = new LdapConnectionInfoResponse();
-        LdapConnectionInfoDTO connectionInfo = this.getPopulatedDTO();
-        response.setData( connectionInfo );
-
-        connectionInfo.setHost( null );
-
-        try
-        {
-            resource.put( null, null, null, response );
-            Assert.fail( "Expected PlexusResourceException" );
-        }
-        catch ( PlexusResourceException e )
-        {
-            ErrorResponse result = (ErrorResponse) e.getResultObject();
-            Assert.assertEquals( 1, result.getErrors().size() );
-            Assert.assertTrue( "Expected error to have the work 'host', was: " + this.getErrorString( result, 0 ),
-                               ( this.getErrorString( result, 0 ).toString().toLowerCase().contains( "host" ) ) );
-        }
-
+    catch (PlexusResourceException e) {
+      ErrorResponse result = (ErrorResponse) e.getResultObject();
+      Assert.assertEquals(2, result.getErrors().size());
     }
-
-    @Test
-    public void testMultipleErrors()
-        throws Exception
-    {
-        PlexusResource resource = getResource();
-
-        LdapConnectionInfoResponse response = new LdapConnectionInfoResponse();
-        LdapConnectionInfoDTO connectionInfo = this.getPopulatedDTO();
-        response.setData( connectionInfo );
-
-        connectionInfo.setHost( null );
-        connectionInfo.setPort( 0 );
-        try
-        {
-            resource.put( null, null, null, response );
-            Assert.fail( "Expected PlexusResourceException" );
-        }
-        catch ( PlexusResourceException e )
-        {
-            ErrorResponse result = (ErrorResponse) e.getResultObject();
-            Assert.assertEquals( 2, result.getErrors().size() );
-        }
-    }
+  }
 }

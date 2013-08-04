@@ -10,12 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bundle.launcher.support;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import javax.annotation.Nullable;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 
@@ -30,24 +31,24 @@ public class NexusBundleResolver
     extends MavenBridgedBundleResolver
 {
 
-    /**
-     * Bundle coordinates configuration property key.
-     */
-    public static final String BUNDLE_COORDINATES = "nexus.launcher.bundleCoordinates";
+  /**
+   * Bundle coordinates configuration property key.
+   */
+  public static final String BUNDLE_COORDINATES = "nexus.launcher.bundleCoordinates";
 
-    /**
-     * Constructor.
-     *
-     * @param bundleCoordinates Maven artifact coordinates of bundle to be resolved. If injected will use the
-     *                          coordinates bounded to {@link #BUNDLE_COORDINATES}
-     * @param artifactResolver  artifact resolver to be used to resolve the bundle
-     * @since 2.1
-     */
-    @Inject
-    public NexusBundleResolver( final @Nullable @Named( "${" + BUNDLE_COORDINATES + "}" ) String bundleCoordinates,
-                                final MavenArtifactResolver artifactResolver )
-    {
-        super( bundleCoordinates, artifactResolver );
-    }
+  /**
+   * Constructor.
+   *
+   * @param bundleCoordinates Maven artifact coordinates of bundle to be resolved. If injected will use the
+   *                          coordinates bounded to {@link #BUNDLE_COORDINATES}
+   * @param artifactResolver  artifact resolver to be used to resolve the bundle
+   * @since 2.1
+   */
+  @Inject
+  public NexusBundleResolver(final @Nullable @Named("${" + BUNDLE_COORDINATES + "}") String bundleCoordinates,
+                             final MavenArtifactResolver artifactResolver)
+  {
+    super(bundleCoordinates, artifactResolver);
+  }
 
 }

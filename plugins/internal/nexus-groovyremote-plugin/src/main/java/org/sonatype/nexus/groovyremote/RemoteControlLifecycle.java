@@ -10,18 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.groovyremote;
 
-import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import javax.inject.Named;
-import javax.inject.Provider;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,23 +37,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RemoteControlLifecycle
     extends ComponentSupport
 {
-    private final Provider<RemoteControl> service;
+  private final Provider<RemoteControl> service;
 
-    @Inject
-    public RemoteControlLifecycle(final Provider<RemoteControl> service,
-                                  final EventBus eventBus)
-    {
-        this.service = checkNotNull(service);
-        eventBus.register(this);
-    }
+  @Inject
+  public RemoteControlLifecycle(final Provider<RemoteControl> service,
+                                final EventBus eventBus)
+  {
+    this.service = checkNotNull(service);
+    eventBus.register(this);
+  }
 
-    @Subscribe
-    public void handle(final NexusStartedEvent event) throws Exception {
-        service.get().start();
-    }
+  @Subscribe
+  public void handle(final NexusStartedEvent event) throws Exception {
+    service.get().start();
+  }
 
-    @Subscribe
-    public void handle(final NexusStoppedEvent event) throws Exception {
-        service.get().stop();
-    }
+  @Subscribe
+  public void handle(final NexusStoppedEvent event) throws Exception {
+    service.get().stop();
+  }
 }

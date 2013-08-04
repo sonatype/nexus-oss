@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.timeline.filter;
 
 import org.sonatype.timeline.TimelineFilter;
@@ -18,20 +19,16 @@ import org.sonatype.timeline.TimelineRecord;
 public class AndTimelineFilter
     extends MultiTimelineFilter
 {
-    public AndTimelineFilter( TimelineFilter... terms )
-    {
-        super( terms );
-    }
+  public AndTimelineFilter(TimelineFilter... terms) {
+    super(terms);
+  }
 
-    public boolean accept( final TimelineRecord hit )
-    {
-        for ( TimelineFilter term : getTerms() )
-        {
-            if ( !term.accept( hit ) )
-            {
-                return false;
-            }
-        }
-        return true;
+  public boolean accept(final TimelineRecord hit) {
+    for (TimelineFilter term : getTerms()) {
+      if (!term.accept(hit)) {
+        return false;
+      }
     }
+    return true;
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.site.plugin;
 
 import javax.inject.Named;
@@ -18,28 +19,25 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
-@Named( SiteRepositoryTemplateProvider.PROVIDER_ID )
+@Named(SiteRepositoryTemplateProvider.PROVIDER_ID)
 @Singleton
 public class SiteRepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
 {
 
-    public static final String PROVIDER_ID = "site-repository";
+  public static final String PROVIDER_ID = "site-repository";
 
-    public TemplateSet getTemplates()
-    {
-        TemplateSet templates = new TemplateSet( null );
+  public TemplateSet getTemplates() {
+    TemplateSet templates = new TemplateSet(null);
 
-        try
-        {
-            templates.add( new SiteRepositoryTemplate( this, SiteRepository.ID, "Site (hosted)" ) );
-        }
-        catch ( Exception e )
-        {
-            // will not happen
-        }
-
-        return templates;
+    try {
+      templates.add(new SiteRepositoryTemplate(this, SiteRepository.ID, "Site (hosted)"));
     }
+    catch (Exception e) {
+      // will not happen
+    }
+
+    return templates;
+  }
 
 }

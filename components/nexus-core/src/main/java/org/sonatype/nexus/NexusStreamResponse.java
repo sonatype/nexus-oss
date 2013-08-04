@@ -10,81 +10,70 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus;
 
 import java.io.InputStream;
 
 public class NexusStreamResponse
 {
-    private String name;
-    
-    private InputStream inputStream;
+  private String name;
 
-    private long size;
+  private InputStream inputStream;
 
-    private String mimeType;
+  private long size;
 
-    private long fromByte;
+  private String mimeType;
 
-    private long bytesCount;
+  private long fromByte;
 
-    public String getName()
-    {
-        return name;
-    }
+  private long bytesCount;
 
-    public void setName( String name )
-    {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public InputStream getInputStream()
-    {
-        return inputStream;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setInputStream( InputStream inputStream )
-    {
-        this.inputStream = inputStream;
-    }
+  public InputStream getInputStream() {
+    return inputStream;
+  }
 
-    public long getSize()
-    {
-        return size;
-    }
+  public void setInputStream(InputStream inputStream) {
+    this.inputStream = inputStream;
+  }
 
-    public void setSize( long contentLength )
-    {
-        this.size = contentLength;
-    }
+  public long getSize() {
+    return size;
+  }
 
-    public String getMimeType()
-    {
-        return mimeType;
-    }
+  public void setSize(long contentLength) {
+    this.size = contentLength;
+  }
 
-    public void setMimeType( String contentType )
-    {
-        this.mimeType = contentType;
-    }
+  public String getMimeType() {
+    return mimeType;
+  }
 
-    public long getFromByte()
-    {
-        return fromByte;
-    }
+  public void setMimeType(String contentType) {
+    this.mimeType = contentType;
+  }
 
-    public void setFromByte( long fromByte )
-    {
-        this.fromByte = fromByte;
-    }
+  public long getFromByte() {
+    return fromByte;
+  }
 
-    public long getBytesCount()
-    {
-        return bytesCount;
-    }
+  public void setFromByte(long fromByte) {
+    this.fromByte = fromByte;
+  }
 
-    public void setBytesCount( long bytesCount )
-    {
-        this.bytesCount = bytesCount;
-    }
+  public long getBytesCount() {
+    return bytesCount;
+  }
+
+  public void setBytesCount(long bytesCount) {
+    this.bytesCount = bytesCount;
+  }
 }

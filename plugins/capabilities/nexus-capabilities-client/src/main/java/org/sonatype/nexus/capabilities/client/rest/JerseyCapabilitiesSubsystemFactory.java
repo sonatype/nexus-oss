@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.capabilities.client.rest;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,7 +26,10 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+
 import com.google.common.collect.Sets;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Jersey based Capabilities Nexus Client Subsystem factory.
@@ -39,35 +42,30 @@ public class JerseyCapabilitiesSubsystemFactory
     implements SubsystemFactory<Capabilities, JerseyNexusClient>
 {
 
-    private final Set<JerseyCapabilityFactory> capabilityFactories;
+  private final Set<JerseyCapabilityFactory> capabilityFactories;
 
-    public JerseyCapabilitiesSubsystemFactory()
-    {
-        this.capabilityFactories = Sets.newHashSet();
-    }
+  public JerseyCapabilitiesSubsystemFactory() {
+    this.capabilityFactories = Sets.newHashSet();
+  }
 
-    @Inject
-    public JerseyCapabilitiesSubsystemFactory( final Set<JerseyCapabilityFactory> capabilityFactories )
-    {
-        this.capabilityFactories = checkNotNull( capabilityFactories );
-    }
+  @Inject
+  public JerseyCapabilitiesSubsystemFactory(final Set<JerseyCapabilityFactory> capabilityFactories) {
+    this.capabilityFactories = checkNotNull(capabilityFactories);
+  }
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.any20AndLater();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.any20AndLater();
+  }
 
-    @Override
-    public Class<Capabilities> getType()
-    {
-        return Capabilities.class;
-    }
+  @Override
+  public Class<Capabilities> getType() {
+    return Capabilities.class;
+  }
 
-    @Override
-    public Capabilities create( final JerseyNexusClient nexusClient )
-    {
-        return new JerseyCapabilities( nexusClient, capabilityFactories );
-    }
+  @Override
+  public Capabilities create(final JerseyNexusClient nexusClient) {
+    return new JerseyCapabilities(nexusClient, capabilityFactories);
+  }
 
 }

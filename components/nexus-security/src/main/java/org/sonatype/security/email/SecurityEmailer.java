@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.email;
 
 import java.util.List;
@@ -19,28 +20,18 @@ import java.util.List;
  */
 public interface SecurityEmailer
 {
-    /**
-     * Send an email to the user telling them they have a new account.
-     * 
-     * @param email
-     * @param userid
-     * @param password
-     */
-    void sendNewUserCreated( String email, String userid, String password );
+  /**
+   * Send an email to the user telling them they have a new account.
+   */
+  void sendNewUserCreated(String email, String userid, String password);
 
-    /**
-     * Send an email to the user telling them their password has changed.
-     * 
-     * @param email
-     * @param password
-     */
-    void sendResetPassword( String email, String password );
+  /**
+   * Send an email to the user telling them their password has changed.
+   */
+  void sendResetPassword(String email, String password);
 
-    /**
-     * Send an email to the user reminding them of their username.
-     * 
-     * @param email
-     * @param userIds
-     */
-    void sendForgotUsername( String email, List<String> userIds );
+  /**
+   * Send an email to the user reminding them of their username.
+   */
+  void sendForgotUsername(String email, List<String> userIds);
 }

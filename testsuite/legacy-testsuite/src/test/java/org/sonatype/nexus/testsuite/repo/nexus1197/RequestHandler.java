@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus1197;
 
 import java.io.IOException;
@@ -25,17 +26,16 @@ public class RequestHandler
     extends AbstractHandler
 {
 
-    private String userAgent;
+  private String userAgent;
 
-    public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-        throws IOException, ServletException
-    {
-        this.userAgent = request.getHeader( "User-Agent" );
-    }
+  public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+      throws IOException, ServletException
+  {
+    this.userAgent = request.getHeader("User-Agent");
+  }
 
-    public String getUserAgent()
-    {
-        return userAgent;
-    }
+  public String getUserAgent() {
+    return userAgent;
+  }
 
 }

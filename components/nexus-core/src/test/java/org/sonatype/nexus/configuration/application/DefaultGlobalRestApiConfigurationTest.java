@@ -10,35 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
-import org.junit.Test;
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.test.NexusTestSupport;
+
 import junit.framework.Assert;
+import org.junit.Test;
 
 public class DefaultGlobalRestApiConfigurationTest
     extends NexusAppTestSupport
 {
 
-    @Test
-    public void testNoConfiguration()
-        throws Exception
-    {
-        final GlobalRestApiSettings settings = lookup( GlobalRestApiSettings.class );
-        ApplicationConfiguration cfg = lookup( ApplicationConfiguration.class );
-        cfg.getConfigurationModel().setRestApi( null );
-        settings.configure( cfg );
+  @Test
+  public void testNoConfiguration()
+      throws Exception
+  {
+    final GlobalRestApiSettings settings = lookup(GlobalRestApiSettings.class);
+    ApplicationConfiguration cfg = lookup(ApplicationConfiguration.class);
+    cfg.getConfigurationModel().setRestApi(null);
+    settings.configure(cfg);
 
-        Assert.assertNull( settings.getBaseUrl() );
-        Assert.assertEquals( 0, settings.getUITimeout() );
+    Assert.assertNull(settings.getBaseUrl());
+    Assert.assertEquals(0, settings.getUITimeout());
 
-        settings.setUITimeout( 1000 );
-        settings.setBaseUrl( "http://invalid.url" );
-        Assert.assertTrue( settings.commitChanges() );
+    settings.setUITimeout(1000);
+    settings.setBaseUrl("http://invalid.url");
+    Assert.assertTrue(settings.commitChanges());
 
-        Assert.assertEquals( "http://invalid.url", settings.getBaseUrl() );
-        Assert.assertEquals( 1000, settings.getUITimeout() );
-    }
+    Assert.assertEquals("http://invalid.url", settings.getBaseUrl());
+    Assert.assertEquals(1000, settings.getUITimeout());
+  }
 
 }

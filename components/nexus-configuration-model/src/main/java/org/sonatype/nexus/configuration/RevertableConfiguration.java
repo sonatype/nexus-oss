@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -22,31 +23,29 @@ import org.sonatype.configuration.ConfigurationException;
  */
 public interface RevertableConfiguration
 {
-    /**
-     * Returns true if this configuration holds some changes that are not persisted.
-     *
-     * @return
-     */
-    boolean isDirty();
+  /**
+   * Returns true if this configuration holds some changes that are not persisted.
+   */
+  boolean isDirty();
 
-    /**
-     * Validates the changes, if any.
-     */
-    void validateChanges()
-        throws ConfigurationException;
+  /**
+   * Validates the changes, if any.
+   */
+  void validateChanges()
+      throws ConfigurationException;
 
-    /**
-     * Commits the changes. Resets the state of config "back to normal" (saved). Will call validateChanges() if needed.
-     */
-    void commitChanges()
-        throws ConfigurationException;
+  /**
+   * Commits the changes. Resets the state of config "back to normal" (saved). Will call validateChanges() if needed.
+   */
+  void commitChanges()
+      throws ConfigurationException;
 
-    /**
-     * Rollback the changes. Resets the state of config "back to normal" (saved).
-     */
-    void rollbackChanges();
+  /**
+   * Rollback the changes. Resets the state of config "back to normal" (saved).
+   */
+  void rollbackChanges();
 
-    // ==
+  // ==
 
-    Object getConfiguration( boolean forWrite );
+  Object getConfiguration(boolean forWrite);
 }

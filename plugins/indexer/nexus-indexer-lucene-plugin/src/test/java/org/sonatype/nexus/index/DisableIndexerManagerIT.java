@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.index;
 
 import org.junit.Test;
@@ -19,20 +20,20 @@ public class DisableIndexerManagerIT
     extends AbstractIndexerManagerTest
 {
 
-    @Test
-    public void testDisableIndex()
-        throws Exception
-    {
-        fillInRepo();
+  @Test
+  public void testDisableIndex()
+      throws Exception
+  {
+    fillInRepo();
 
-        indexerManager.reindexRepository( "/", snapshots.getId(), false );
+    indexerManager.reindexRepository("/", snapshots.getId(), false);
 
-        searchFor( "org.sonatype.plexus", 1 );
+    searchFor("org.sonatype.plexus", 1);
 
-        snapshots.setSearchable( false );
+    snapshots.setSearchable(false);
 
-        nexusConfiguration.saveConfiguration();
+    nexusConfiguration.saveConfiguration();
 
-        searchFor( "org.sonatype.plexus", 0 );
-    }
+    searchFor("org.sonatype.plexus", 0);
+  }
 }

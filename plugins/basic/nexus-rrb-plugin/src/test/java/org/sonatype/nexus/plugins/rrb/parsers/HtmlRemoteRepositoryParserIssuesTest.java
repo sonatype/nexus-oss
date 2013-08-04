@@ -10,24 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.rrb.parsers;
 
-import static org.junit.Assert.assertEquals;
+package org.sonatype.nexus.plugins.rrb.parsers;
 
 import org.junit.Test;
 
-public class HtmlRemoteRepositoryParserIssuesTest {
+public class HtmlRemoteRepositoryParserIssuesTest
+{
 
-	
-	/**
-	 * "Browse Remote" is rendering href's from an index.html page as tree nodes.
-	 * https://issues.sonatype.org/browse/NEXUS-3230
-	 * @throws Exception
-	 */
-	 @Test
-	 public void hrefsInIndexHTML()
-	    throws Exception
-	 {
-	     //assertEquals( );
-	 }
+
+  /**
+   * "Browse Remote" is rendering href's from an index.html page as tree nodes.
+   * https://issues.sonatype.org/browse/NEXUS-3230
+   */
+  @Test
+  public void hrefsInIndexHTML()
+      throws Exception
+  {
+    //assertEquals( );
+  }
 }

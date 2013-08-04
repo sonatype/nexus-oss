@@ -10,32 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.maven1;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * The Maven1 content class.
- * 
+ *
  * @author cstamas
  */
-@Component( role = ContentClass.class, hint = Maven1ContentClass.ID )
+@Component(role = ContentClass.class, hint = Maven1ContentClass.ID)
 public class Maven1ContentClass
     extends AbstractIdContentClass
 {
-    public static final String ID = "maven1";
-    public static final String NAME = "Maven1";
+  public static final String ID = "maven1";
 
-    public String getId()
-    {
-        return ID;
-    }
+  public static final String NAME = "Maven1";
 
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
+  public String getId() {
+    return ID;
+  }
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
 }

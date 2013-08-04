@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.apachehttpclient;
 
 import java.io.IOException;
@@ -37,60 +38,56 @@ public class Hc4ClientConnectionOperator
     implements ClientConnectionOperator
 {
 
-    private final List<ClientConnectionOperatorSelector> selectors;
+  private final List<ClientConnectionOperatorSelector> selectors;
 
-    private final DefaultClientConnectionOperator defaultOperator;
+  private final DefaultClientConnectionOperator defaultOperator;
 
-    public Hc4ClientConnectionOperator( final SchemeRegistry defaultSchemeRegistry,
-                                        final List<ClientConnectionOperatorSelector> selectors )
-    {
-        this.selectors = selectors;
-        defaultOperator = new DefaultClientConnectionOperator( defaultSchemeRegistry );
-    }
+  public Hc4ClientConnectionOperator(final SchemeRegistry defaultSchemeRegistry,
+                                     final List<ClientConnectionOperatorSelector> selectors)
+  {
+    this.selectors = selectors;
+    defaultOperator = new DefaultClientConnectionOperator(defaultSchemeRegistry);
+  }
 
-    @Override
-    public OperatedClientConnection createConnection()
-    {
-        return defaultOperator.createConnection();
-    }
+  @Override
+  public OperatedClientConnection createConnection() {
+    return defaultOperator.createConnection();
+  }
 
-    @Override
-    public void openConnection( final OperatedClientConnection conn,
-                                final HttpHost target,
-                                final InetAddress local,
-                                final HttpContext context,
-                                final HttpParams params )
-        throws IOException
-    {
-        selectOperator( target, context, params ).openConnection( conn, target, local, context, params );
-    }
+  @Override
+  public void openConnection(final OperatedClientConnection conn,
+                             final HttpHost target,
+                             final InetAddress local,
+                             final HttpContext context,
+                             final HttpParams params)
+      throws IOException
+  {
+    selectOperator(target, context, params).openConnection(conn, target, local, context, params);
+  }
 
-    @Override
-    public void updateSecureConnection( final OperatedClientConnection conn,
-                                        final HttpHost target,
-                                        final HttpContext context,
-                                        final HttpParams params )
-        throws IOException
-    {
-        selectOperator( target, context, params ).updateSecureConnection( conn, target, context, params );
-    }
+  @Override
+  public void updateSecureConnection(final OperatedClientConnection conn,
+                                     final HttpHost target,
+                                     final HttpContext context,
+                                     final HttpParams params)
+      throws IOException
+  {
+    selectOperator(target, context, params).updateSecureConnection(conn, target, context, params);
+  }
 
-    private ClientConnectionOperator selectOperator( final HttpHost host,
-                                                     final HttpContext context,
-                                                     final HttpParams params )
-    {
-        if ( selectors != null )
-        {
-            for ( final ClientConnectionOperatorSelector selector : selectors )
-            {
-                final ClientConnectionOperator operator = selector.get( host, context, params );
-                if ( operator != null )
-                {
-                    return operator;
-                }
-            }
+  private ClientConnectionOperator selectOperator(final HttpHost host,
+                                                  final HttpContext context,
+                                                  final HttpParams params)
+  {
+    if (selectors != null) {
+      for (final ClientConnectionOperatorSelector selector : selectors) {
+        final ClientConnectionOperator operator = selector.get(host, context, params);
+        if (operator != null) {
+          return operator;
         }
-        return defaultOperator;
+      }
     }
+    return defaultOperator;
+  }
 
 }

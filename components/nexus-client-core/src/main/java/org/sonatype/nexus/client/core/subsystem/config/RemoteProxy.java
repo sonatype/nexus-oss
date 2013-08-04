@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.config;
 
 import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
@@ -23,14 +24,14 @@ public interface RemoteProxy
     extends Segment<RemoteProxy, RemoteProxySettingsDTO>
 {
 
-    /**
-     * Disables http proxy.
-     */
-    RemoteProxy disableHttpProxy();
+  /**
+   * Disables http proxy.
+   */
+  RemoteProxy disableHttpProxy();
 
-    /**
-     * Disables https proxy.
-     */
-    RemoteProxy disableHttpsProxy();
+  /**
+   * Disables https proxy.
+   */
+  RemoteProxy disableHttpsProxy();
 
 }

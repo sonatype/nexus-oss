@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.model.source;
 
 import java.io.File;
@@ -20,78 +21,76 @@ public class FileConfigurationSourceTest
     extends AbstractSecurityConfigurationSourceTest
 
 {
-    protected SecurityModelConfigurationSource getConfigurationSource()
-        throws Exception
-    {
-        FileModelConfigurationSource source =
-            (FileModelConfigurationSource) lookup( SecurityModelConfigurationSource.class, "file" );
+  protected SecurityModelConfigurationSource getConfigurationSource()
+      throws Exception
+  {
+    FileModelConfigurationSource source =
+        (FileModelConfigurationSource) lookup(SecurityModelConfigurationSource.class, "file");
 
-        source.setConfigurationFile( new File( getSecurityConfiguration() ) );
+    source.setConfigurationFile(new File(getSecurityConfiguration()));
 
-        return source;
+    return source;
+  }
+
+  protected InputStream getOriginatingConfigurationInputStream()
+      throws IOException
+  {
+    return getClass().getResourceAsStream("/META-INF/security/security.xml");
+  }
+
+  public void testStoreConfiguration()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
+
+    configurationSource.loadConfiguration();
+
+    try {
+      configurationSource.storeConfiguration();
     }
-
-    protected InputStream getOriginatingConfigurationInputStream()
-        throws IOException
-    {
-        return getClass().getResourceAsStream( "/META-INF/security/security.xml" );
+    catch (UnsupportedOperationException e) {
+      fail();
     }
+  }
 
-    public void testStoreConfiguration()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  public void testIsConfigurationUpgraded()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        configurationSource.loadConfiguration();
+    configurationSource.loadConfiguration();
 
-        try
-        {
-            configurationSource.storeConfiguration();
-        }
-        catch ( UnsupportedOperationException e )
-        {
-            fail();
-        }
-    }
+    assertEquals(false, configurationSource.isConfigurationUpgraded());
+  }
 
-    public void testIsConfigurationUpgraded()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  public void testIsConfigurationDefaulted()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        configurationSource.loadConfiguration();
+    configurationSource.loadConfiguration();
 
-        assertEquals( false, configurationSource.isConfigurationUpgraded() );
-    }
+    assertEquals(true, configurationSource.isConfigurationDefaulted());
+  }
 
-    public void testIsConfigurationDefaulted()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  public void testIsConfigurationDefaultedShouldNot()
+      throws Exception
+  {
+    copyDefaultSecurityConfigToPlace();
 
-        configurationSource.loadConfiguration();
+    configurationSource = getConfigurationSource();
 
-        assertEquals( true, configurationSource.isConfigurationDefaulted() );
-    }
+    configurationSource.loadConfiguration();
 
-    public void testIsConfigurationDefaultedShouldNot()
-        throws Exception
-    {
-        copyDefaultSecurityConfigToPlace();
+    assertEquals(false, configurationSource.isConfigurationDefaulted());
+  }
 
-        configurationSource = getConfigurationSource();
-
-        configurationSource.loadConfiguration();
-
-        assertEquals( false, configurationSource.isConfigurationDefaulted() );
-    }
-
-    // NOT EXPOSED
-    // public void testGetDefaultsSource()
-    // throws Exception
-    // {
-    // configurationSource = getConfigurationSource();
-    //
-    // assertFalse( configurationSource.getDefaultsSource() == null );
-    // }
+  // NOT EXPOSED
+  // public void testGetDefaultsSource()
+  // throws Exception
+  // {
+  // configurationSource = getConfigurationSource();
+  //
+  // assertFalse( configurationSource.getDefaultsSource() == null );
+  // }
 }

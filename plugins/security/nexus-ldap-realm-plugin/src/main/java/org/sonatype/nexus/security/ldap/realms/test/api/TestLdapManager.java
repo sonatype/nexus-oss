@@ -10,31 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.ldap.realms.test.api;
 
-import org.codehaus.plexus.component.annotations.Component;
+package org.sonatype.nexus.security.ldap.realms.test.api;
 
 import org.sonatype.nexus.security.ldap.realms.DefaultLdapManager;
 import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 
-@Component(role=LdapManager.class, hint="TestLdapManager")
-public class TestLdapManager extends DefaultLdapManager
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = LdapManager.class, hint = "TestLdapManager")
+public class TestLdapManager
+    extends DefaultLdapManager
 {
-    
-    private LdapConfiguration ldapConfiguration;
 
-    public LdapConfiguration getLdapConfiguration()
-    {
-        return ldapConfiguration;
-    }
+  private LdapConfiguration ldapConfiguration;
 
-    public void setLdapConfiguration( LdapConfiguration ldapConfiguration )
-    {
-        this.ldapConfiguration = ldapConfiguration;
-    }
-    
-    
-    
+  public LdapConfiguration getLdapConfiguration() {
+    return ldapConfiguration;
+  }
+
+  public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
+    this.ldapConfiguration = ldapConfiguration;
+  }
+
 
 }

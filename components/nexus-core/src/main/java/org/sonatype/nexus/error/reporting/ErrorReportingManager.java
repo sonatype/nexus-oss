@@ -10,14 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import org.sonatype.nexus.configuration.Configurable;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
-import org.sonatype.nexus.configuration.Configurable;
 
 /**
  * An error reporting component.
@@ -25,59 +23,59 @@ import org.sonatype.nexus.configuration.Configurable;
 public interface ErrorReportingManager
     extends Configurable
 {
-    boolean isEnabled();
+  boolean isEnabled();
 
-    void setEnabled( boolean value );
+  void setEnabled(boolean value);
 
-    /**
-     * @return the URL of the JIRA instance the manager connects to.
-     */
-    String getJIRAUrl();
+  /**
+   * @return the URL of the JIRA instance the manager connects to.
+   */
+  String getJIRAUrl();
 
-    /**
-     * @param url the URL of the JIRA instance the manager connects to.
-     */
-    void setJIRAUrl( String url );
+  /**
+   * @param url the URL of the JIRA instance the manager connects to.
+   */
+  void setJIRAUrl(String url);
 
-    /**
-     * @return the key of the JIRA project new issues will be filed in.
-     */
-    String getJIRAProject();
+  /**
+   * @return the key of the JIRA project new issues will be filed in.
+   */
+  String getJIRAProject();
 
-    /**
-     * @param pkey the key of the JIRA project new issues will be filed in.
-     */
-    void setJIRAProject( String pkey );
+  /**
+   * @param pkey the key of the JIRA project new issues will be filed in.
+   */
+  void setJIRAProject(String pkey);
 
-    /**
-     * @return the username to use for connections.
-     */
-    String getJIRAUsername();
+  /**
+   * @return the username to use for connections.
+   */
+  String getJIRAUsername();
 
-    /**
-     * @param username the username to use for connections.
-     */
-    void setJIRAUsername( String username );
+  /**
+   * @param username the username to use for connections.
+   */
+  void setJIRAUsername(String username);
 
-    /**
-     * @return the password to use for connections.
-     */
-    String getJIRAPassword();
+  /**
+   * @return the password to use for connections.
+   */
+  String getJIRAPassword();
 
-    /**
-     * @param password the password to use for connections.
-     */
-    void setJIRAPassword( String password );
+  /**
+   * @param password the password to use for connections.
+   */
+  void setJIRAPassword(String password);
 
-    // ==
+  // ==
 
-    /**
-     * File an issue based on the given error report request.
-     */
-    ErrorReportResponse handleError( ErrorReportRequest request )
-        throws IssueSubmissionException;
+  /**
+   * File an issue based on the given error report request.
+   */
+  ErrorReportResponse handleError(ErrorReportRequest request)
+      throws IssueSubmissionException;
 
-    ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword )
-        throws IssueSubmissionException;
+  ErrorReportResponse handleError(ErrorReportRequest request, String jiraUsername, String jiraPassword)
+      throws IssueSubmissionException;
 
 }

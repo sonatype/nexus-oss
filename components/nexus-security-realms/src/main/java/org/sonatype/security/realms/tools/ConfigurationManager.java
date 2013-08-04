@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.tools;
 
 import java.util.List;
@@ -29,291 +30,228 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 /**
  * The ConfigurationManager is a facade in front of the security modello model. It supports CRUD operations for
  * users/roles/privileges and user to role mappings.
- * 
+ *
  * Any direct calls to write-based ConfigurationManager methods will throw an IllegalStateException, as they
  * cannot be used directly in a thread-safe manner
- * 
+ *
  * Direct calls to read-based ConfigurationManager methods can be called in a thread-safe manner. However, operations
  * that require multiple read-based calls should be encapsulated into an action and executed via the runRead method
- * 
+ *
  * @author Brian Demers
  */
 public interface ConfigurationManager
 {
-    /*
-     * Runs the provided action in a thread-safe way. Any read-based operations requiring multiple
-     * ConfigurationManager calls should be executed in an action via a call to this method.
-     * 
-     * @since 3.1
-     */
-    void runRead(ConfigurationManagerAction action) throws Exception;
-    
-    /*
-     * Runs the provided action in a thread-safe way. Any write-based ConfigurationManager calls must be executed
-     * in an action via a call to this method.
-     * 
-     * @since 3.1
-     */
-    void runWrite(ConfigurationManagerAction action) throws Exception;
-    
-    /**
-     * Retrieve all users
-     * 
-     * @return
-     */
-    List<CUser> listUsers();
+  /*
+   * Runs the provided action in a thread-safe way. Any read-based operations requiring multiple
+   * ConfigurationManager calls should be executed in an action via a call to this method.
+   *
+   * @since 3.1
+   */
+  void runRead(ConfigurationManagerAction action) throws Exception;
 
-    /**
-     * Retrieve all roles
-     * 
-     * @return
-     */
-    List<CRole> listRoles();
+  /*
+   * Runs the provided action in a thread-safe way. Any write-based ConfigurationManager calls must be executed
+   * in an action via a call to this method.
+   *
+   * @since 3.1
+   */
+  void runWrite(ConfigurationManagerAction action) throws Exception;
 
-    /**
-     * Retrieve all privileges
-     * 
-     * @return
-     */
-    List<CPrivilege> listPrivileges();
+  /**
+   * Retrieve all users
+   */
+  List<CUser> listUsers();
 
-    /**
-     * Retrieve all descriptors of available privileges
-     * 
-     * @return
-     */
-    List<PrivilegeDescriptor> listPrivilegeDescriptors();
+  /**
+   * Retrieve all roles
+   */
+  List<CRole> listRoles();
 
-    /**
-     * Create a new user.
-     * 
-     * @param user
-     */
-    void createUser( CUser user, Set<String> roles )
-        throws InvalidConfigurationException;
+  /**
+   * Retrieve all privileges
+   */
+  List<CPrivilege> listPrivileges();
 
-    /**
-     * Create a new user and sets the password.
-     * 
-     * @param user
-     * @param password
-     */
-    void createUser( CUser user, String password, Set<String> roles )
-        throws InvalidConfigurationException;
+  /**
+   * Retrieve all descriptors of available privileges
+   */
+  List<PrivilegeDescriptor> listPrivilegeDescriptors();
 
-    /**
-     * Create a new user with a context to validate in.
-     * 
-     * @param user
-     */
-    void createUser( CUser user, Set<String> roles, SecurityValidationContext context )
-        throws InvalidConfigurationException;
+  /**
+   * Create a new user.
+   */
+  void createUser(CUser user, Set<String> roles)
+      throws InvalidConfigurationException;
 
-    /**
-     * Create a new user/password with a context to validate in.
-     * 
-     * @param user
-     * @param password
-     */
-    void createUser( CUser user, String password, Set<String> roles, SecurityValidationContext context )
-        throws InvalidConfigurationException;
+  /**
+   * Create a new user and sets the password.
+   */
+  void createUser(CUser user, String password, Set<String> roles)
+      throws InvalidConfigurationException;
 
-    /**
-     * Create a new role
-     * 
-     * @param role
-     */
-    void createRole( CRole role )
-        throws InvalidConfigurationException;
+  /**
+   * Create a new user with a context to validate in.
+   */
+  void createUser(CUser user, Set<String> roles, SecurityValidationContext context)
+      throws InvalidConfigurationException;
 
-    /**
-     * Create a new role with a context to validate in
-     * 
-     * @param role
-     */
-    void createRole( CRole role, SecurityValidationContext context )
-        throws InvalidConfigurationException;
+  /**
+   * Create a new user/password with a context to validate in.
+   */
+  void createUser(CUser user, String password, Set<String> roles, SecurityValidationContext context)
+      throws InvalidConfigurationException;
 
-    /**
-     * Create a new privilege
-     * 
-     * @param privilege
-     */
-    void createPrivilege( CPrivilege privilege )
-        throws InvalidConfigurationException;
+  /**
+   * Create a new role
+   */
+  void createRole(CRole role)
+      throws InvalidConfigurationException;
 
-    /**
-     * Create a new privilege with a context to validate in
-     * 
-     * @param privilege
-     */
-    void createPrivilege( CPrivilege privilege, SecurityValidationContext context )
-        throws InvalidConfigurationException;
+  /**
+   * Create a new role with a context to validate in
+   */
+  void createRole(CRole role, SecurityValidationContext context)
+      throws InvalidConfigurationException;
 
-    /**
-     * Retrieve an existing user
-     * 
-     * @param id
-     * @return
-     */
-    CUser readUser( String id )
-        throws UserNotFoundException;
+  /**
+   * Create a new privilege
+   */
+  void createPrivilege(CPrivilege privilege)
+      throws InvalidConfigurationException;
 
-    /**
-     * Retrieve an existing role
-     * 
-     * @param id
-     * @return
-     */
-    CRole readRole( String id )
-        throws NoSuchRoleException;
+  /**
+   * Create a new privilege with a context to validate in
+   */
+  void createPrivilege(CPrivilege privilege, SecurityValidationContext context)
+      throws InvalidConfigurationException;
 
-    /**
-     * Retrieve an existing privilege
-     * 
-     * @param id
-     * @return
-     */
-    CPrivilege readPrivilege( String id )
-        throws NoSuchPrivilegeException;
-    
-    /**
-     * Update an existing user. Roles are unchanged
-     * 
-     * @param user to update
-     */
-    public void updateUser( CUser user )
-        throws InvalidConfigurationException, UserNotFoundException;
+  /**
+   * Retrieve an existing user
+   */
+  CUser readUser(String id)
+      throws UserNotFoundException;
 
-    /**
-     * Update an existing user and their roles
-     * 
-     * @param user
-     */
-    void updateUser( CUser user, Set<String> roles )
-        throws InvalidConfigurationException, UserNotFoundException;
+  /**
+   * Retrieve an existing role
+   */
+  CRole readRole(String id)
+      throws NoSuchRoleException;
 
-    /**
-     * Update an existing user with a context to validate in
-     * 
-     * @param user
-     */
-    void updateUser( CUser user, Set<String> roles, SecurityValidationContext context )
-        throws InvalidConfigurationException, UserNotFoundException;
+  /**
+   * Retrieve an existing privilege
+   */
+  CPrivilege readPrivilege(String id)
+      throws NoSuchPrivilegeException;
 
-    /**
-     * Update an existing role
-     * 
-     * @param role
-     */
-    void updateRole( CRole role )
-        throws InvalidConfigurationException, NoSuchRoleException;
+  /**
+   * Update an existing user. Roles are unchanged
+   *
+   * @param user to update
+   */
+  public void updateUser(CUser user)
+      throws InvalidConfigurationException, UserNotFoundException;
 
-    /**
-     * Update an existing role with a context to validate in
-     * 
-     * @param role
-     */
-    void updateRole( CRole role, SecurityValidationContext context )
-        throws InvalidConfigurationException, NoSuchRoleException;
+  /**
+   * Update an existing user and their roles
+   */
+  void updateUser(CUser user, Set<String> roles)
+      throws InvalidConfigurationException, UserNotFoundException;
 
-    void createUserRoleMapping( CUserRoleMapping userRoleMapping )
-        throws InvalidConfigurationException;
+  /**
+   * Update an existing user with a context to validate in
+   */
+  void updateUser(CUser user, Set<String> roles, SecurityValidationContext context)
+      throws InvalidConfigurationException, UserNotFoundException;
 
-    void createUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
-        throws InvalidConfigurationException;
+  /**
+   * Update an existing role
+   */
+  void updateRole(CRole role)
+      throws InvalidConfigurationException, NoSuchRoleException;
 
-    void updateUserRoleMapping( CUserRoleMapping userRoleMapping )
-        throws InvalidConfigurationException, NoSuchRoleMappingException;
+  /**
+   * Update an existing role with a context to validate in
+   */
+  void updateRole(CRole role, SecurityValidationContext context)
+      throws InvalidConfigurationException, NoSuchRoleException;
 
-    void updateUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
-        throws InvalidConfigurationException, NoSuchRoleMappingException;
+  void createUserRoleMapping(CUserRoleMapping userRoleMapping)
+      throws InvalidConfigurationException;
 
-    CUserRoleMapping readUserRoleMapping( String userId, String source )
-        throws NoSuchRoleMappingException;
+  void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
+      throws InvalidConfigurationException;
 
-    List<CUserRoleMapping> listUserRoleMappings();
+  void updateUserRoleMapping(CUserRoleMapping userRoleMapping)
+      throws InvalidConfigurationException, NoSuchRoleMappingException;
 
-    void deleteUserRoleMapping( String userId, String source )
-        throws NoSuchRoleMappingException;
+  void updateUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
+      throws InvalidConfigurationException, NoSuchRoleMappingException;
 
-    /**
-     * Update an existing privilege
-     * 
-     * @param privilege
-     */
-    void updatePrivilege( CPrivilege privilege )
-        throws InvalidConfigurationException, NoSuchPrivilegeException;
+  CUserRoleMapping readUserRoleMapping(String userId, String source)
+      throws NoSuchRoleMappingException;
 
-    /**
-     * Update an existing privilege with a context to validate in
-     * 
-     * @param privilege
-     */
-    void updatePrivilege( CPrivilege privilege, SecurityValidationContext context )
-        throws InvalidConfigurationException, NoSuchPrivilegeException;
+  List<CUserRoleMapping> listUserRoleMappings();
 
-    /**
-     * Delete an existing user
-     * 
-     * @param id
-     */
-    void deleteUser( String id )
-        throws UserNotFoundException;
+  void deleteUserRoleMapping(String userId, String source)
+      throws NoSuchRoleMappingException;
 
-    /**
-     * Delete an existing role
-     * 
-     * @param id
-     */
-    void deleteRole( String id )
-        throws NoSuchRoleException;
+  /**
+   * Update an existing privilege
+   */
+  void updatePrivilege(CPrivilege privilege)
+      throws InvalidConfigurationException, NoSuchPrivilegeException;
 
-    /**
-     * Delete an existing privilege
-     * 
-     * @param id
-     */
-    void deletePrivilege( String id )
-        throws NoSuchPrivilegeException;
+  /**
+   * Update an existing privilege with a context to validate in
+   */
+  void updatePrivilege(CPrivilege privilege, SecurityValidationContext context)
+      throws InvalidConfigurationException, NoSuchPrivilegeException;
 
-    /**
-     * Helper method to retrieve a property from the privilege
-     * 
-     * @param privilege
-     * @param key
-     * @return
-     */
-    String getPrivilegeProperty( CPrivilege privilege, String key );
+  /**
+   * Delete an existing user
+   */
+  void deleteUser(String id)
+      throws UserNotFoundException;
 
-    /**
-     * Helper method to retrieve a property from the privilege
-     * 
-     * @param id
-     * @param key
-     * @return
-     */
-    String getPrivilegeProperty( String id, String key )
-        throws NoSuchPrivilegeException;
+  /**
+   * Delete an existing role
+   */
+  void deleteRole(String id)
+      throws NoSuchRoleException;
 
-    /**
-     * Clear the cache and reload from file
-     */
-    void clearCache();
+  /**
+   * Delete an existing privilege
+   */
+  void deletePrivilege(String id)
+      throws NoSuchPrivilegeException;
 
-    /**
-     * Save to disk what is currently cached in memory
-     */
-    void save();
+  /**
+   * Helper method to retrieve a property from the privilege
+   */
+  String getPrivilegeProperty(CPrivilege privilege, String key);
 
-    /**
-     * Initialize the context used for validation
-     * 
-     * @return
-     */
-    SecurityValidationContext initializeContext();
+  /**
+   * Helper method to retrieve a property from the privilege
+   */
+  String getPrivilegeProperty(String id, String key)
+      throws NoSuchPrivilegeException;
 
-    void cleanRemovedRole( String roleId );
+  /**
+   * Clear the cache and reload from file
+   */
+  void clearCache();
 
-    void cleanRemovedPrivilege( String privilegeId );
+  /**
+   * Save to disk what is currently cached in memory
+   */
+  void save();
+
+  /**
+   * Initialize the context used for validation
+   */
+  SecurityValidationContext initializeContext();
+
+  void cleanRemovedRole(String roleId);
+
+  void cleanRemovedPrivilege(String privilegeId);
 }

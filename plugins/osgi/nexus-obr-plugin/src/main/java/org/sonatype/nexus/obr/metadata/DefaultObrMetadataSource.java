@@ -10,17 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.metadata;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
-import org.osgi.impl.bundle.obr.resource.BundleInfo;
-import org.osgi.service.obr.Resource;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.obr.ObrPluginConfiguration;
@@ -29,80 +24,76 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.IOUtil;
+import org.osgi.impl.bundle.obr.resource.BundleInfo;
+import org.osgi.service.obr.Resource;
+
 /**
  * Bindex based {@link ObrMetadataSource} component.
  */
-@Component( role = ObrMetadataSource.class, hint = "obr-bindex", description = "bindex" )
+@Component(role = ObrMetadataSource.class, hint = "obr-bindex", description = "bindex")
 public class DefaultObrMetadataSource
     extends AbstractLogEnabled
     implements ObrMetadataSource
 {
-    @Requirement
-    private ObrPluginConfiguration obrConfiguration;
+  @Requirement
+  private ObrPluginConfiguration obrConfiguration;
 
-    @Requirement
-    private NexusConfiguration nexusConfiguration;
+  @Requirement
+  private NexusConfiguration nexusConfiguration;
 
-    @Requirement
-    private MimeSupport mimeSupport;
+  @Requirement
+  private MimeSupport mimeSupport;
 
-    public ObrResourceReader getReader( final ObrSite site )
-        throws StorageException
-    {
-        try
-        {
-            return new DefaultObrResourceReader( site, obrConfiguration.isBundleCacheActive() );
-        }
-        catch ( final IOException e )
-        {
-            throw new StorageException( e );
-        }
+  public ObrResourceReader getReader(final ObrSite site)
+      throws StorageException
+  {
+    try {
+      return new DefaultObrResourceReader(site, obrConfiguration.isBundleCacheActive());
+    }
+    catch (final IOException e) {
+      throw new StorageException(e);
+    }
+  }
+
+  public Resource buildResource(final StorageFileItem item) {
+    if (!ObrUtils.acceptItem(item)) {
+      return null; // ignore non-OBR resource items
     }
 
-    public Resource buildResource( final StorageFileItem item )
-    {
-        if ( !ObrUtils.acceptItem( item ) )
-        {
-            return null; // ignore non-OBR resource items
-        }
+    InputStream is = null;
 
-        InputStream is = null;
-
-        try
-        {
-            is = item.getInputStream();
-            if ( is != null )
-            {
-                final RepositoryItemUid uid = item.getRepositoryItemUid();
-                final BundleInfo info = new BundleInfo( null, is, "file:" + uid.getPath(), item.getLength() );
-                if ( info.isOSGiBundle() )
-                {
-                    return info.build();
-                }
-            }
+    try {
+      is = item.getInputStream();
+      if (is != null) {
+        final RepositoryItemUid uid = item.getRepositoryItemUid();
+        final BundleInfo info = new BundleInfo(null, is, "file:" + uid.getPath(), item.getLength());
+        if (info.isOSGiBundle()) {
+          return info.build();
         }
-        catch ( final Exception e )
-        {
-            getLogger().warn( "Unable to generate OBR metadata for item " + item.getRepositoryItemUid(), e );
-        }
-        finally
-        {
-            IOUtil.close( is );
-        }
-
-        return null;
+      }
+    }
+    catch (final Exception e) {
+      getLogger().warn("Unable to generate OBR metadata for item " + item.getRepositoryItemUid(), e);
+    }
+    finally {
+      IOUtil.close(is);
     }
 
-    public ObrResourceWriter getWriter( final RepositoryItemUid uid )
-        throws StorageException
-    {
-        try
-        {
-            return new DefaultObrResourceWriter( uid, nexusConfiguration.getTemporaryDirectory(), mimeSupport );
-        }
-        catch ( final IOException e )
-        {
-            throw new StorageException( e );
-        }
+    return null;
+  }
+
+  public ObrResourceWriter getWriter(final RepositoryItemUid uid)
+      throws StorageException
+  {
+    try {
+      return new DefaultObrResourceWriter(uid, nexusConfiguration.getTemporaryDirectory(), mimeSupport);
     }
+    catch (final IOException e) {
+      throw new StorageException(e);
+    }
+  }
 }

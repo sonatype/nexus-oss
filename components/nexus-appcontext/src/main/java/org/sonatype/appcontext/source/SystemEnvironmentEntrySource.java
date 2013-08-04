@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.source;
 
 import java.util.HashMap;
@@ -26,31 +27,28 @@ import org.sonatype.appcontext.AppContextRequest;
  * <li>replaces all occurrences of character '_' (underscore) to '.' (dot)</li>
  * </ul>
  * This is needed to make it possible to have different sources have same keys.
- * 
+ *
  * @author cstamas
  */
 public class SystemEnvironmentEntrySource
     implements EntrySource, EntrySourceMarker
 {
-    public String getDescription()
-    {
-        return "system(env)";
-    }
+  public String getDescription() {
+    return "system(env)";
+  }
 
-    public EntrySourceMarker getEntrySourceMarker()
-    {
-        return this;
-    }
+  public EntrySourceMarker getEntrySourceMarker() {
+    return this;
+  }
 
-    public Map<String, Object> getEntries( AppContextRequest request )
-        throws AppContextException
-    {
-        final Map<String, String> envMap = System.getenv();
-        final Map<String, Object> result = new HashMap<String, Object>();
-        for ( Map.Entry<String, String> entry : envMap.entrySet() )
-        {
-            result.put( entry.getKey(), entry.getValue() );
-        }
-        return result;
+  public Map<String, Object> getEntries(AppContextRequest request)
+      throws AppContextException
+  {
+    final Map<String, String> envMap = System.getenv();
+    final Map<String, Object> result = new HashMap<String, Object>();
+    for (Map.Entry<String, String> entry : envMap.entrySet()) {
+      result.put(entry.getKey(), entry.getValue());
     }
+    return result;
+  }
 }

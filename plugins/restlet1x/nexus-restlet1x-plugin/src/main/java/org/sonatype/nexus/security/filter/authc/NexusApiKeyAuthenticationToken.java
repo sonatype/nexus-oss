@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authc;
 
 import org.apache.shiro.authc.AuthenticationToken;
@@ -21,51 +22,44 @@ import org.apache.shiro.authc.HostAuthenticationToken;
 public class NexusApiKeyAuthenticationToken
     implements HostAuthenticationToken
 {
-    private Object principal;
+  private Object principal;
 
-    private final char[] credentials;
+  private final char[] credentials;
 
-    private final String host;
+  private final String host;
 
-    public NexusApiKeyAuthenticationToken( final Object principal, final char[] credentials, final String host )
-    {
-        this.principal = principal;
-        this.credentials = credentials;
-        this.host = host;
+  public NexusApiKeyAuthenticationToken(final Object principal, final char[] credentials, final String host) {
+    this.principal = principal;
+    this.credentials = credentials;
+    this.host = host;
+  }
+
+  public Object getPrincipal() {
+    return principal;
+  }
+
+  public Object getCredentials() {
+    return credentials;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  /**
+   * Assigns a new account identity to the current authentication token.
+   */
+  public void setPrincipal(final Object principal) {
+    this.principal = principal;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder buf = new StringBuilder(getClass().getName());
+    buf.append(" - ").append(getPrincipal());
+    if (host != null) {
+      buf.append(" (").append(host).append(")");
     }
-
-    public Object getPrincipal()
-    {
-        return principal;
-    }
-
-    public Object getCredentials()
-    {
-        return credentials;
-    }
-
-    public String getHost()
-    {
-        return host;
-    }
-
-    /**
-     * Assigns a new account identity to the current authentication token.
-     */
-    public void setPrincipal( final Object principal )
-    {
-        this.principal = principal;
-    }
-
-    @Override
-    public String toString()
-    {
-        final StringBuilder buf = new StringBuilder( getClass().getName() );
-        buf.append( " - " ).append( getPrincipal() );
-        if ( host != null )
-        {
-            buf.append( " (" ).append( host ).append( ")" );
-        }
-        return buf.toString();
-    }
+    return buf.toString();
+  }
 }

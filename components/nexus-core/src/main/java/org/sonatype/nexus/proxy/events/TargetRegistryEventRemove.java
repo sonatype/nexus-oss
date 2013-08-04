@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.targets.Target;
@@ -17,14 +18,13 @@ import org.sonatype.nexus.proxy.targets.TargetRegistry;
 
 /**
  * The event fired when a target is removed from registry.
- * 
+ *
  * @author velo
  */
 public class TargetRegistryEventRemove
     extends TargetRegistryEvent
-{    
-    public TargetRegistryEventRemove( final TargetRegistry targetRegistry, final Target target )
-    {
-        super( targetRegistry, target );
-    }
+{
+  public TargetRegistryEventRemove(final TargetRegistry targetRegistry, final Target target) {
+    super(targetRegistry, target);
+  }
 }

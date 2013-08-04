@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.webapp;
 
-import com.google.inject.AbstractModule;
-
 import javax.inject.Named;
+
+import com.google.inject.AbstractModule;
 
 /**
  * Nexus webapp module.
@@ -25,8 +26,8 @@ import javax.inject.Named;
 public class WebappModule
     extends AbstractModule
 {
-    @Override
-    protected void configure() {
-        install(new MetricsModule());
-    }
+  @Override
+  protected void configure() {
+    install(new MetricsModule());
+  }
 }

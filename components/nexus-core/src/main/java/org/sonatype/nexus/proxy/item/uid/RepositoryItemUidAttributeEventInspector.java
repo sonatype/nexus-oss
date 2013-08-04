@@ -10,38 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item.uid;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.plexus.appevents.Event;
 
-@Component( role = EventInspector.class, hint = "RepositoryItemUidAttributeEventInspector" )
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
+
+@Component(role = EventInspector.class, hint = "RepositoryItemUidAttributeEventInspector")
 public class RepositoryItemUidAttributeEventInspector
     extends AbstractEventInspector
     implements EventInspector
 {
-    @Requirement
-    private RepositoryItemUidAttributeManager manager;
+  @Requirement
+  private RepositoryItemUidAttributeManager manager;
 
-    @Override
-    public boolean accepts( Event<?> evt )
-    {
-        final String simpleName = evt.getClass().getName();
+  @Override
+  public boolean accepts(Event<?> evt) {
+    final String simpleName = evt.getClass().getName();
 
-        // TODO: nexus-proxy module does not reference plugin manager, so this is a quick'n'dirty workaround for now
-        return evt instanceof NexusInitializedEvent // for core
-            || StringUtils.equals( simpleName, "org.sonatype.nexus.plugins.events.PluginActivatedEvent" ) // for plugin loaded
-            || StringUtils.equals( simpleName, "org.sonatype.nexus.plugins.events.PluginDeactivatedEvent" ); // for plugin unloaded
-    }
+    // TODO: nexus-proxy module does not reference plugin manager, so this is a quick'n'dirty workaround for now
+    return evt instanceof NexusInitializedEvent // for core
+        || StringUtils.equals(simpleName, "org.sonatype.nexus.plugins.events.PluginActivatedEvent") // for plugin loaded
+        || StringUtils
+        .equals(simpleName, "org.sonatype.nexus.plugins.events.PluginDeactivatedEvent"); // for plugin unloaded
+  }
 
-    @Override
-    public void inspect( Event<?> evt )
-    {
-        manager.reset();
-    }
+  @Override
+  public void inspect(Event<?> evt) {
+    manager.reset();
+  }
 }

@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,213 +34,185 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 import com.google.common.io.Closeables;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Utility class to persist discovery results. This is a simple implementation that uses {@link Properties} file, and
  * stores it in {@link MavenProxyRepository}'s local storage.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class PropfileDiscoveryStatusSource
 {
-    private static final String DISCOVERY_STATUS_FILE_PATH = "/.meta/discovery-status.txt";
+  private static final String DISCOVERY_STATUS_FILE_PATH = "/.meta/discovery-status.txt";
 
-    private static final String LAST_DISCOVERY_STATUS_KEY = "lastDiscoveryStatus";
+  private static final String LAST_DISCOVERY_STATUS_KEY = "lastDiscoveryStatus";
 
-    private static final String LAST_DISCOVERY_STRATEGY_KEY = "lastDiscoveryStrategy";
+  private static final String LAST_DISCOVERY_STRATEGY_KEY = "lastDiscoveryStrategy";
 
-    private static final String LAST_DISCOVERY_MESSAGE_KEY = "lastDiscoveryMessage";
+  private static final String LAST_DISCOVERY_MESSAGE_KEY = "lastDiscoveryMessage";
 
-    private static final String LAST_DISCOVERY_TIMESTAMP_KEY = "lastDiscoveryTimestamp";
+  private static final String LAST_DISCOVERY_TIMESTAMP_KEY = "lastDiscoveryTimestamp";
 
-    private final MavenProxyRepository mavenProxyRepository;
+  private final MavenProxyRepository mavenProxyRepository;
 
-    /**
-     * Constructor.
-     * 
-     * @param mavenProxyRepository
-     */
-    public PropfileDiscoveryStatusSource( final MavenProxyRepository mavenProxyRepository )
-    {
-        this.mavenProxyRepository = checkNotNull( mavenProxyRepository );
+  /**
+   * Constructor.
+   */
+  public PropfileDiscoveryStatusSource(final MavenProxyRepository mavenProxyRepository) {
+    this.mavenProxyRepository = checkNotNull(mavenProxyRepository);
+  }
+
+  /**
+   * Returns {@code true} if "last" results exists, or {@code false} if never run discovery yet.
+   *
+   * @return {@code true} if "last" results exists, or {@code false} if never run discovery yet.
+   */
+  public boolean exists() {
+    try {
+      return getFileItem() != null;
+    }
+    catch (IOException e) {
+      // bam
+    }
+    return false;
+  }
+
+  /**
+   * Reads up the last discovery status.
+   *
+   * @return last discovery status.
+   */
+  public DiscoveryStatus read()
+      throws IOException
+  {
+    final StorageFileItem file = getFileItem();
+    if (file == null) {
+      return null;
     }
 
-    /**
-     * Returns {@code true} if "last" results exists, or {@code false} if never run discovery yet.
-     * 
-     * @return {@code true} if "last" results exists, or {@code false} if never run discovery yet.
-     */
-    public boolean exists()
-    {
-        try
-        {
-            return getFileItem() != null;
-        }
-        catch ( IOException e )
-        {
-            // bam
-        }
-        return false;
+    final Properties props = new Properties();
+    final InputStream inputStream = file.getInputStream();
+    try {
+      props.load(inputStream);
+      final DStatus lastDiscoveryStatus = DStatus.valueOf(props.getProperty(LAST_DISCOVERY_STATUS_KEY));
+      final String lastDiscoveryStrategy = props.getProperty(LAST_DISCOVERY_STRATEGY_KEY, "unknown");
+      final String lastDiscoveryMessage = props.getProperty(LAST_DISCOVERY_MESSAGE_KEY, "");
+      final long lastDiscoveryTimestamp =
+          Long.parseLong(props.getProperty(LAST_DISCOVERY_TIMESTAMP_KEY, Long.toString(-1L)));
+
+      return new DiscoveryStatus(lastDiscoveryStatus, lastDiscoveryStrategy, lastDiscoveryMessage,
+          lastDiscoveryTimestamp);
     }
-
-    /**
-     * Reads up the last discovery status.
-     * 
-     * @return last discovery status.
-     * @throws IOException
-     */
-    public DiscoveryStatus read()
-        throws IOException
-    {
-        final StorageFileItem file = getFileItem();
-        if ( file == null )
-        {
-            return null;
-        }
-
-        final Properties props = new Properties();
-        final InputStream inputStream = file.getInputStream();
-        try
-        {
-            props.load( inputStream );
-            final DStatus lastDiscoveryStatus = DStatus.valueOf( props.getProperty( LAST_DISCOVERY_STATUS_KEY ) );
-            final String lastDiscoveryStrategy = props.getProperty( LAST_DISCOVERY_STRATEGY_KEY, "unknown" );
-            final String lastDiscoveryMessage = props.getProperty( LAST_DISCOVERY_MESSAGE_KEY, "" );
-            final long lastDiscoveryTimestamp =
-                Long.parseLong( props.getProperty( LAST_DISCOVERY_TIMESTAMP_KEY, Long.toString( -1L ) ) );
-
-            return new DiscoveryStatus( lastDiscoveryStatus, lastDiscoveryStrategy, lastDiscoveryMessage,
-                lastDiscoveryTimestamp );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            deleteFileItem();
-            return null;
-        }
-        catch ( NullPointerException e )
-        {
-            deleteFileItem();
-            return null;
-        }
-        finally
-        {
-            Closeables.closeQuietly( inputStream );
-        }
+    catch (IllegalArgumentException e) {
+      deleteFileItem();
+      return null;
     }
-
-    /**
-     * Persists last discovery status.
-     * 
-     * @param discoveryStatus
-     * @throws IOException
-     */
-    public void write( final DiscoveryStatus discoveryStatus )
-        throws IOException
-    {
-        checkNotNull( discoveryStatus );
-        final Properties props = new Properties();
-        props.put( LAST_DISCOVERY_STATUS_KEY, discoveryStatus.getStatus().name() );
-        props.put( LAST_DISCOVERY_STRATEGY_KEY, discoveryStatus.getLastDiscoveryStrategy() );
-        props.put( LAST_DISCOVERY_MESSAGE_KEY, discoveryStatus.getLastDiscoveryMessage() );
-        props.put( LAST_DISCOVERY_TIMESTAMP_KEY, Long.toString( discoveryStatus.getLastDiscoveryTimestamp() ) );
-
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        props.store( bos, "Nexus discovery status" );
-        putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
+    catch (NullPointerException e) {
+      deleteFileItem();
+      return null;
     }
-
-    /**
-     * Deletes last discovery status.
-     * 
-     * @throws IOException
-     */
-    public void delete()
-        throws IOException
-    {
-        deleteFileItem();
+    finally {
+      Closeables.closeQuietly(inputStream);
     }
+  }
 
-    // ==
+  /**
+   * Persists last discovery status.
+   */
+  public void write(final DiscoveryStatus discoveryStatus)
+      throws IOException
+  {
+    checkNotNull(discoveryStatus);
+    final Properties props = new Properties();
+    props.put(LAST_DISCOVERY_STATUS_KEY, discoveryStatus.getStatus().name());
+    props.put(LAST_DISCOVERY_STRATEGY_KEY, discoveryStatus.getLastDiscoveryStrategy());
+    props.put(LAST_DISCOVERY_MESSAGE_KEY, discoveryStatus.getLastDiscoveryMessage());
+    props.put(LAST_DISCOVERY_TIMESTAMP_KEY, Long.toString(discoveryStatus.getLastDiscoveryTimestamp()));
 
-    protected MavenProxyRepository getMavenProxyRepository()
-    {
-        return mavenProxyRepository;
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    props.store(bos, "Nexus discovery status");
+    putFileItem(new PreparedContentLocator(new ByteArrayInputStream(bos.toByteArray()), "text/plain"));
+  }
+
+  /**
+   * Deletes last discovery status.
+   */
+  public void delete()
+      throws IOException
+  {
+    deleteFileItem();
+  }
+
+  // ==
+
+  protected MavenProxyRepository getMavenProxyRepository() {
+    return mavenProxyRepository;
+  }
+
+  protected StorageFileItem getFileItem()
+      throws IOException
+  {
+    try {
+      final ResourceStoreRequest request = new ResourceStoreRequest(DISCOVERY_STATUS_FILE_PATH);
+      request.setRequestLocalOnly(true);
+      request.setRequestGroupLocalOnly(true);
+      @SuppressWarnings("deprecation")
+      final StorageItem item = getMavenProxyRepository().retrieveItem(true, request);
+      if (item instanceof StorageFileItem) {
+        return (StorageFileItem) item;
+      }
+      else {
+        return null;
+      }
     }
-
-    protected StorageFileItem getFileItem()
-        throws IOException
-    {
-        try
-        {
-            final ResourceStoreRequest request = new ResourceStoreRequest( DISCOVERY_STATUS_FILE_PATH );
-            request.setRequestLocalOnly( true );
-            request.setRequestGroupLocalOnly( true );
-            @SuppressWarnings( "deprecation" )
-            final StorageItem item = getMavenProxyRepository().retrieveItem( true, request );
-            if ( item instanceof StorageFileItem )
-            {
-                return (StorageFileItem) item;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
-            return null;
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // not present
-            return null;
-        }
+    catch (IllegalOperationException e) {
+      // eh?
+      return null;
     }
-
-    protected void putFileItem( final ContentLocator content )
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( DISCOVERY_STATUS_FILE_PATH );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        final DefaultStorageFileItem file =
-            new DefaultStorageFileItem( getMavenProxyRepository(), request, true, true, content );
-        try
-        {
-            getMavenProxyRepository().storeItem( true, file );
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
-        }
+    catch (ItemNotFoundException e) {
+      // not present
+      return null;
     }
+  }
 
-    protected void deleteFileItem()
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( DISCOVERY_STATUS_FILE_PATH );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        try
-        {
-            getMavenProxyRepository().deleteItemWithChecksums( true, request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // ignore
-        }
+  protected void putFileItem(final ContentLocator content)
+      throws IOException
+  {
+    final ResourceStoreRequest request = new ResourceStoreRequest(DISCOVERY_STATUS_FILE_PATH);
+    request.setRequestLocalOnly(true);
+    request.setRequestGroupLocalOnly(true);
+    final DefaultStorageFileItem file =
+        new DefaultStorageFileItem(getMavenProxyRepository(), request, true, true, content);
+    try {
+      getMavenProxyRepository().storeItem(true, file);
     }
+    catch (UnsupportedStorageOperationException e) {
+      // eh?
+    }
+    catch (IllegalOperationException e) {
+      // eh?
+    }
+  }
+
+  protected void deleteFileItem()
+      throws IOException
+  {
+    final ResourceStoreRequest request = new ResourceStoreRequest(DISCOVERY_STATUS_FILE_PATH);
+    request.setRequestLocalOnly(true);
+    request.setRequestGroupLocalOnly(true);
+    try {
+      getMavenProxyRepository().deleteItemWithChecksums(true, request);
+    }
+    catch (ItemNotFoundException e) {
+      // ignore
+    }
+    catch (UnsupportedStorageOperationException e) {
+      // eh?
+    }
+    catch (IllegalOperationException e) {
+      // ignore
+    }
+  }
 }

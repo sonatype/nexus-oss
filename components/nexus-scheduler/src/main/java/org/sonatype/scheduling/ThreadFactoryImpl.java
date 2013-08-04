@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 import java.util.concurrent.ThreadFactory;
@@ -18,39 +19,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThreadFactoryImpl
     implements ThreadFactory
 {
-    private static final AtomicInteger poolNumber = new AtomicInteger( 1 );
+  private static final AtomicInteger poolNumber = new AtomicInteger(1);
 
-    private final AtomicInteger threadNumber = new AtomicInteger( 1 );
+  private final AtomicInteger threadNumber = new AtomicInteger(1);
 
-    private final String namePrefix;
+  private final String namePrefix;
 
-    private final ThreadGroup schedulerThreadGroup;
+  private final ThreadGroup schedulerThreadGroup;
 
-    private final int threadPriority;
+  private final int threadPriority;
 
-    public ThreadFactoryImpl()
-    {
-        this( Thread.MIN_PRIORITY );
-    }
+  public ThreadFactoryImpl() {
+    this(Thread.MIN_PRIORITY);
+  }
 
-    public ThreadFactoryImpl( final int threadPriority )
-    {
-        int poolNum = poolNumber.getAndIncrement();
-        this.schedulerThreadGroup = new ThreadGroup( "Sisu scheduler #" + poolNum );
-        this.namePrefix = "pxpool-" + poolNum + "-thread-";
-        this.threadPriority = threadPriority;
-    }
+  public ThreadFactoryImpl(final int threadPriority) {
+    int poolNum = poolNumber.getAndIncrement();
+    this.schedulerThreadGroup = new ThreadGroup("Sisu scheduler #" + poolNum);
+    this.namePrefix = "pxpool-" + poolNum + "-thread-";
+    this.threadPriority = threadPriority;
+  }
 
-    public Thread newThread( final Runnable r )
-    {
-        final Thread result = new Thread( getSchedulerThreadGroup(), r, namePrefix + threadNumber.getAndIncrement() );
-        result.setDaemon( false );
-        result.setPriority( this.threadPriority );
-        return result;
-    }
+  public Thread newThread(final Runnable r) {
+    final Thread result = new Thread(getSchedulerThreadGroup(), r, namePrefix + threadNumber.getAndIncrement());
+    result.setDaemon(false);
+    result.setPriority(this.threadPriority);
+    return result;
+  }
 
-    public ThreadGroup getSchedulerThreadGroup()
-    {
-        return this.schedulerThreadGroup;
-    }
+  public ThreadGroup getSchedulerThreadGroup() {
+    return this.schedulerThreadGroup;
+  }
 }

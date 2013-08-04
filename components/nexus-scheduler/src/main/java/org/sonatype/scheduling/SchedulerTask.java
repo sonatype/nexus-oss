@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 import java.util.List;
@@ -19,13 +20,13 @@ import java.util.concurrent.Callable;
 public interface SchedulerTask<T>
     extends Callable<T>
 {
-    boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> currentActiveTasks );
+  boolean allowConcurrentSubmission(Map<String, List<ScheduledTask<?>>> currentActiveTasks);
 
-    boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> currentActiveTasks );
+  boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> currentActiveTasks);
 
-    void addParameter( String key, String value );
+  void addParameter(String key, String value);
 
-    String getParameter( String key );
+  String getParameter(String key);
 
-    Map<String, String> getParameters();
+  Map<String, String> getParameters();
 }

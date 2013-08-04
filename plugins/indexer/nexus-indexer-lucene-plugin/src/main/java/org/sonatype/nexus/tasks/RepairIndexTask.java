@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
 
 import javax.inject.Named;
@@ -19,14 +20,13 @@ import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
 /**
  * Repair index task.
  */
-@Named( RepairIndexTaskDescriptor.ID )
+@Named(RepairIndexTaskDescriptor.ID)
 public class RepairIndexTask
     extends AbstractIndexerTask
 {
 
-    public RepairIndexTask()
-    {
-        super( "Repairing", true );
-    }
+  public RepairIndexTask() {
+    super("Repairing", true);
+  }
 
 }

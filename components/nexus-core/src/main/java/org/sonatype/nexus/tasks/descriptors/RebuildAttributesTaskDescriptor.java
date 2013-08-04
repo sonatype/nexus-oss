@@ -10,10 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -21,51 +23,47 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 
-@Named( "RebuildAttributes" )
+@Named("RebuildAttributes")
 @Singleton
 public class RebuildAttributesTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-    public static final String ID = "RebuildAttributesTask";
+  public static final String ID = "RebuildAttributesTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
+  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-    public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
+  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 
-    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
-                                                                                       FormField.MANDATORY );
+  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
+      FormField.MANDATORY);
 
-    private final StringTextFormField resourceStorePathField =
-        new StringTextFormField(
-                                 RESOURCE_STORE_PATH_FIELD_ID,
-                                 "Repository path",
-                                 "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-                                 FormField.OPTIONAL );
+  private final StringTextFormField resourceStorePathField =
+      new StringTextFormField(
+          RESOURCE_STORE_PATH_FIELD_ID,
+          "Repository path",
+          "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+          FormField.OPTIONAL);
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    public String getName()
-    {
-        return "Rebuild Repository Attributes";
-    }
+  public String getName() {
+    return "Rebuild Repository Attributes";
+  }
 
-    public List<FormField> formFields()
-    {
-        List<FormField> fields = new ArrayList<FormField>();
+  public List<FormField> formFields() {
+    List<FormField> fields = new ArrayList<FormField>();
 
-        fields.add( repoField );
-        
-        fields.add( resourceStorePathField );
+    fields.add(repoField);
 
-        return fields;
-    }
+    fields.add(resourceStorePathField);
 
-    @Override
-    public boolean isExposed()
-    {
-        return false;
-    }
+    return fields;
+  }
+
+  @Override
+  public boolean isExposed() {
+    return false;
+  }
 }

@@ -10,44 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.uid;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeSource;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * The attributes implemented in Nexus Maven plugin contributing Maven specific UID attributes.
- * 
+ *
  * @author cstamas
  */
-@Component( role = RepositoryItemUidAttributeSource.class, hint = "maven" )
+@Component(role = RepositoryItemUidAttributeSource.class, hint = "maven")
 public class MavenRepositoryItemUidAttributeSource
     implements RepositoryItemUidAttributeSource
 {
-    private final Map<Class<?>, Attribute<?>> attributes;
+  private final Map<Class<?>, Attribute<?>> attributes;
 
-    public MavenRepositoryItemUidAttributeSource()
-    {
-        Map<Class<?>, Attribute<?>> attrs = new HashMap<Class<?>, Attribute<?>>( 6 );
+  public MavenRepositoryItemUidAttributeSource() {
+    Map<Class<?>, Attribute<?>> attrs = new HashMap<Class<?>, Attribute<?>>(6);
 
-        attrs.put( IsMavenArtifactAttribute.class, new IsMavenArtifactAttribute() );
-        attrs.put( IsMavenSnapshotArtifactAttribute.class, new IsMavenSnapshotArtifactAttribute() );
-        attrs.put( IsMavenChecksumAttribute.class, new IsMavenChecksumAttribute() );
-        attrs.put( IsMavenPomAttribute.class, new IsMavenPomAttribute() );
-        attrs.put( IsMavenRepositoryMetadataAttribute.class, new IsMavenRepositoryMetadataAttribute() );
-        attrs.put( IsMavenArtifactSignatureAttribute.class, new IsMavenArtifactSignatureAttribute() );
+    attrs.put(IsMavenArtifactAttribute.class, new IsMavenArtifactAttribute());
+    attrs.put(IsMavenSnapshotArtifactAttribute.class, new IsMavenSnapshotArtifactAttribute());
+    attrs.put(IsMavenChecksumAttribute.class, new IsMavenChecksumAttribute());
+    attrs.put(IsMavenPomAttribute.class, new IsMavenPomAttribute());
+    attrs.put(IsMavenRepositoryMetadataAttribute.class, new IsMavenRepositoryMetadataAttribute());
+    attrs.put(IsMavenArtifactSignatureAttribute.class, new IsMavenArtifactSignatureAttribute());
 
-        this.attributes = Collections.unmodifiableMap( attrs );
-    }
+    this.attributes = Collections.unmodifiableMap(attrs);
+  }
 
-    @Override
-    public Map<Class<?>, Attribute<?>> getAttributes()
-    {
-        return attributes;
-    }
+  @Override
+  public Map<Class<?>, Attribute<?>> getAttributes() {
+    return attributes;
+  }
 }

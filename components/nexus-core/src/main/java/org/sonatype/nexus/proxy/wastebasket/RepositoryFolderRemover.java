@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.IOException;
@@ -18,11 +19,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * A "hub" for invoking all registered RepositoryFolderCleaners.
- * 
+ *
  * @author cstamas
  */
 public interface RepositoryFolderRemover
 {
-    void deleteRepositoryFolders( Repository repository, boolean deleteForever )
-        throws IOException;
+  void deleteRepositoryFolders(Repository repository, boolean deleteForever)
+      throws IOException;
 }

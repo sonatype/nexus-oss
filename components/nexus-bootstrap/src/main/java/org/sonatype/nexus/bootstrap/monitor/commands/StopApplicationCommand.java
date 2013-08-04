@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.monitor.commands;
 
 import org.sonatype.nexus.bootstrap.log.LogProxy;
@@ -24,35 +25,31 @@ public class StopApplicationCommand
     implements CommandMonitorThread.Command
 {
 
-    private static final LogProxy log = LogProxy.getLogger( StopApplicationCommand.class );
+  private static final LogProxy log = LogProxy.getLogger(StopApplicationCommand.class);
 
-    public static final String NAME = "STOP";
+  public static final String NAME = "STOP";
 
-    private final Runnable shutdown;
+  private final Runnable shutdown;
 
-    public StopApplicationCommand( final Runnable shutdown )
-    {
-        if ( shutdown == null )
-        {
-            throw new NullPointerException();
-        }
-        this.shutdown = shutdown;
+  public StopApplicationCommand(final Runnable shutdown) {
+    if (shutdown == null) {
+      throw new NullPointerException();
     }
+    this.shutdown = shutdown;
+  }
 
-    @Override
-    public String getId()
-    {
-        return NAME;
-    }
+  @Override
+  public String getId() {
+    return NAME;
+  }
 
-    @Override
-    public boolean execute()
-    {
-        log.debug( "Requesting application stop" );
-        shutdown.run();
+  @Override
+  public boolean execute() {
+    log.debug("Requesting application stop");
+    shutdown.run();
 
-        // Do not terminate the monitor on application stop, leave that to the jvm death
-        return false;
-    }
+    // Do not terminate the monitor on application stop, leave that to the jvm death
+    return false;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Arrays;
@@ -18,63 +19,57 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.Entry;
 
 import com.google.common.base.Predicate;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component( role = FeedSource.class, hint = "brokenArtifacts" )
+@Component(role = FeedSource.class, hint = "brokenArtifacts")
 public class BrokenArtifactsFeedSource
     extends AbstractNexusItemEventFeedSource
 {
-    @Requirement( hint = "artifact" )
-    private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
-    
-    public static final String CHANNEL_KEY = "brokenArtifacts";
+  @Requirement(hint = "artifact")
+  private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
 
-    public String getFeedKey()
-    {
-        return CHANNEL_KEY;
-    }
+  public static final String CHANNEL_KEY = "brokenArtifacts";
 
-    public String getFeedName()
-    {
-        return getDescription();
-    }
+  public String getFeedKey() {
+    return CHANNEL_KEY;
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "Broken artifacts in all Nexus repositories (checksum errors, wrong POMs, ...).";
-    }
+  public String getFeedName() {
+    return getDescription();
+  }
 
-    @Override
-    public List<NexusArtifactEvent> getEventList( Integer from, Integer count, Map<String, String> params )
-    {
-        final Set<String> repositoryIds = getRepoIdsFromParams( params );
-        final Predicate<Entry> filter =
-            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
-                : new RepositoryIdTimelineFilter( repositoryIds );
+  @Override
+  public String getDescription() {
+    return "Broken artifacts in all Nexus repositories (checksum errors, wrong POMs, ...).";
+  }
 
-        return getFeedRecorder().getNexusArtifectEvents(
-            new HashSet<String>( Arrays.asList( NexusArtifactEvent.ACTION_BROKEN,
-                NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM,
-                NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT ) ), from, count, filter );
-    }
+  @Override
+  public List<NexusArtifactEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
+    final Set<String> repositoryIds = getRepoIdsFromParams(params);
+    final Predicate<Entry> filter =
+        (repositoryIds == null || repositoryIds.isEmpty()) ? null
+            : new RepositoryIdTimelineFilter(repositoryIds);
 
-    @Override
-    public String getTitle()
-    {
-        return "Broken artifacts";
-    }
+    return getFeedRecorder().getNexusArtifectEvents(
+        new HashSet<String>(Arrays.asList(NexusArtifactEvent.ACTION_BROKEN,
+            NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM,
+            NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT)), from, count, filter);
+  }
 
-    @Override
-    public SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder( NexusArtifactEvent event )
-    {
-        return entryBuilder;
-    }
+  @Override
+  public String getTitle() {
+    return "Broken artifacts";
+  }
+
+  @Override
+  public SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder(NexusArtifactEvent event) {
+    return entryBuilder;
+  }
 
 }

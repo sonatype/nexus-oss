@@ -10,37 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.plugin.console.api.dto;
 
 import javax.xml.bind.annotation.XmlType;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias( value = "pluginDocumentation" )
-@XmlType( name = "pluginDocumentation" )
+@XStreamAlias(value = "pluginDocumentation")
+@XmlType(name = "pluginDocumentation")
 public class DocumentationLinkDTO
 {
-    private String label;
-    
-    private String url;
+  private String label;
 
-    public String getLabel()
-    {
-        return label;
-    }
+  private String url;
 
-    public void setLabel( String label )
-    {
-        this.label = label;
-    }
+  public String getLabel() {
+    return label;
+  }
 
-    public String getUrl()
-    {
-        return url;
-    }
+  public void setLabel(String label) {
+    this.label = label;
+  }
 
-    public void setUrl( String url )
-    {
-        this.url = url;
-    }
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
+  }
 }

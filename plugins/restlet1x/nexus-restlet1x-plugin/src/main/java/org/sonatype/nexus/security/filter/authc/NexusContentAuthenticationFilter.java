@@ -10,77 +10,73 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authc;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
-import javax.annotation.Nullable;
-
-import javax.inject.Inject;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
-import java.util.List;
 
 /**
  * Nexus {code}/content{code} {@link AuthenticationFilter}.
  *
  * @see NexusContentRestrictionConstituent
  * @see NexusContentRestrictedToken
- *
  * @since 2.1
  */
 public class NexusContentAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
-    @Inject
-    @Nullable
-    private List<NexusContentRestrictionConstituent> constituents;
+  @Inject
+  @Nullable
+  private List<NexusContentRestrictionConstituent> constituents;
 
-    public NexusContentAuthenticationFilter()
-    {
-        super();
-    }
+  public NexusContentAuthenticationFilter() {
+    super();
+  }
 
-    @VisibleForTesting
-    public NexusContentAuthenticationFilter( final List<NexusContentRestrictionConstituent> constituents)
-    {
-        this.constituents = constituents;
-    }
+  @VisibleForTesting
+  public NexusContentAuthenticationFilter(final List<NexusContentRestrictionConstituent> constituents) {
+    this.constituents = constituents;
+  }
 
-    /**
-     * Determine if content restriction is enabled, by asking each constituent.
-     * If any constituent reports a restriction then returns true.
-     */
-    private boolean isRestricted( final ServletRequest request )
-    {
-        //noinspection ConstantConditions
-        if ( constituents != null ) {
-            for ( NexusContentRestrictionConstituent constituent : constituents ) {
-                if ( constituent.isContentRestricted( request ) ) {
-                    return true;
-                }
-            }
+  /**
+   * Determine if content restriction is enabled, by asking each constituent.
+   * If any constituent reports a restriction then returns true.
+   */
+  private boolean isRestricted(final ServletRequest request) {
+    //noinspection ConstantConditions
+    if (constituents != null) {
+      for (NexusContentRestrictionConstituent constituent : constituents) {
+        if (constituent.isContentRestricted(request)) {
+          return true;
         }
-        return false;
+      }
     }
+    return false;
+  }
 
-    @Override
-    protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
-    {
-        if ( isRestricted( request ) ) {
-            getLogger().debug( "Content authentication for request is restricted" );
+  @Override
+  protected AuthenticationToken createToken(final ServletRequest request, final ServletResponse response) {
+    if (isRestricted(request)) {
+      getLogger().debug("Content authentication for request is restricted");
 
-            // We know our super-class makes UsernamePasswordTokens, ask super to pull out the relevant details
-            UsernamePasswordToken basis = ( UsernamePasswordToken ) super.createToken( request, response );
+      // We know our super-class makes UsernamePasswordTokens, ask super to pull out the relevant details
+      UsernamePasswordToken basis = (UsernamePasswordToken) super.createToken(request, response);
 
-            // And include more information than is normally provided to a token (ie. the request)
-            return new NexusContentRestrictedToken( basis, request );
-        }
-        else {
-            return super.createToken( request, response );
-        }
+      // And include more information than is normally provided to a token (ie. the request)
+      return new NexusContentRestrictedToken(basis, request);
     }
+    else {
+      return super.createToken(request, response);
+    }
+  }
 }

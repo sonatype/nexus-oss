@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.wastebasket;
 
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -17,27 +18,23 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class RelativeMaximumSizeConstraint
     implements MaximumSizeConstraint
 {
-    private final double ratioThreshold;
+  private final double ratioThreshold;
 
-    public RelativeMaximumSizeConstraint( final double ratioThreshold )
-    {
-        this.ratioThreshold = ratioThreshold;
+  public RelativeMaximumSizeConstraint(final double ratioThreshold) {
+    this.ratioThreshold = ratioThreshold;
+  }
+
+  public boolean isOverMaximum(SmartWastebasket wastebasket, Repository repository) {
+    Long wastebasketSize = wastebasket.getSize(repository);
+
+    if (wastebasketSize != null) {
+      double actualRatio = wastebasketSize / 1; // repository.getStatistics().getRepositoryUsefulSize();
+
+      return actualRatio > ratioThreshold;
+    }
+    else {
+      return false;
     }
 
-    public boolean isOverMaximum( SmartWastebasket wastebasket, Repository repository )
-    {
-        Long wastebasketSize = wastebasket.getSize( repository );
-
-        if ( wastebasketSize != null )
-        {
-            double actualRatio = wastebasketSize / 1; // repository.getStatistics().getRepositoryUsefulSize();
-
-            return actualRatio > ratioThreshold;
-        }
-        else
-        {
-            return false;
-        }
-
-    }
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 /**
@@ -20,87 +21,79 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 public class GenericP2Artifact
 {
 
-    /**
-     * The artifact id.
-     */
-    private String id;
+  /**
+   * The artifact id.
+   */
+  private String id;
 
-    /**
-     * The artifact version.
-     */
-    private String version;
+  /**
+   * The artifact version.
+   */
+  private String version;
 
-    /**
-     * The artifact type.
-     */
-    private P2ArtifactType type;
+  /**
+   * The artifact type.
+   */
+  private P2ArtifactType type;
 
-    /**
-     * Default constructor.
-     */
-    public GenericP2Artifact()
-    {
-    }
+  /**
+   * Default constructor.
+   */
+  public GenericP2Artifact() {
+  }
 
-    /**
-     * Initializing constructor.
-     *
-     * @param id      The artifact id
-     * @param version The artifact version
-     * @param type    The artifact type
-     */
-    public GenericP2Artifact( String id, String version, P2ArtifactType type )
-    {
-        this.id = id;
-        this.version = version;
-        this.type = type;
-    }
+  /**
+   * Initializing constructor.
+   *
+   * @param id      The artifact id
+   * @param version The artifact version
+   * @param type    The artifact type
+   */
+  public GenericP2Artifact(String id, String version, P2ArtifactType type) {
+    this.id = id;
+    this.version = version;
+    this.type = type;
+  }
 
-    /**
-     * @return the id
-     */
-    public String getId()
-    {
-        return id;
-    }
+  /**
+   * @return the id
+   */
+  public String getId() {
+    return id;
+  }
 
-    /**
-     * @param id the id to set
-     */
-    public void setId( String id )
-    {
-        this.id = id;
-    }
+  /**
+   * @param id the id to set
+   */
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    /**
-     * @return the version
-     */
-    public String getVersion()
-    {
-        return version;
-    }
+  /**
+   * @return the version
+   */
+  public String getVersion() {
+    return version;
+  }
 
-    /**
-     * @param version the version to set
-     */
-    public void setVersion( String version )
-    {
-        this.version = version;
-    }
+  /**
+   * @param version the version to set
+   */
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
-    /**
-     * @return the type
-     */
-    public P2ArtifactType getType()
-    {
-        return type;
-    }
+  /**
+   * @return the type
+   */
+  public P2ArtifactType getType() {
+    return type;
+  }
 
-    /**
-     * @param type the type to set
-     */
-    public void setType( P2ArtifactType type )
-    {
-        this.type = type;
-    }
+  /**
+   * @param type the type to set
+   */
+  public void setType(P2ArtifactType type) {
+    this.type = type;
+  }
 }

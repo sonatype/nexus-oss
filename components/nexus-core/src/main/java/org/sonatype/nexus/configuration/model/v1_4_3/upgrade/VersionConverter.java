@@ -19,137 +19,160 @@
 
 package org.sonatype.nexus.configuration.model.v1_4_3.upgrade;
 
-  //---------------------------------/
- //- Imported classes and packages -/
+//---------------------------------/
+//- Imported classes and packages -/
 //---------------------------------/
 
 
 /**
  * Converts from version 1.4.3 (with version in package name) to
  * version 1.4.3 (without version in package name) of the model.
- * 
+ *
  * @version $Revision$ $Date$
  */
-@SuppressWarnings( "all" )
+@SuppressWarnings("all")
 public interface VersionConverter
 {
 
-    //-----------/
-    // - Methods -/
-    // -----------/
+  //-----------/
+  // - Methods -/
+  // -----------/
 
   /**
-     * @param cErrorReporting
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CErrorReporting convertCErrorReporting( org.sonatype.nexus.configuration.model.v1_4_2.CErrorReporting cErrorReporting );
+   * @param cErrorReporting
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CErrorReporting convertCErrorReporting(
+      org.sonatype.nexus.configuration.model.v1_4_2.CErrorReporting cErrorReporting);
 
-    /**
-     * @param cHttpProxySettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CHttpProxySettings convertCHttpProxySettings( org.sonatype.nexus.configuration.model.v1_4_2.CHttpProxySettings cHttpProxySettings );
+  /**
+   * @param cHttpProxySettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CHttpProxySettings convertCHttpProxySettings(
+      org.sonatype.nexus.configuration.model.v1_4_2.CHttpProxySettings cHttpProxySettings);
 
-    /**
-     * @param cLocalStorage
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CLocalStorage convertCLocalStorage( org.sonatype.nexus.configuration.model.v1_4_2.CLocalStorage cLocalStorage );
+  /**
+   * @param cLocalStorage
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CLocalStorage convertCLocalStorage(
+      org.sonatype.nexus.configuration.model.v1_4_2.CLocalStorage cLocalStorage);
 
-    /**
-     * @param cMirror
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CMirror convertCMirror( org.sonatype.nexus.configuration.model.v1_4_2.CMirror cMirror );
+  /**
+   * @param cMirror
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CMirror convertCMirror(
+      org.sonatype.nexus.configuration.model.v1_4_2.CMirror cMirror);
 
-    /**
-     * @param cNotification
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CNotification convertCNotification( org.sonatype.nexus.configuration.model.v1_4_2.CNotification cNotification );
+  /**
+   * @param cNotification
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CNotification convertCNotification(
+      org.sonatype.nexus.configuration.model.v1_4_2.CNotification cNotification);
 
-    /**
-     * @param cNotificationTarget
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CNotificationTarget convertCNotificationTarget( org.sonatype.nexus.configuration.model.v1_4_2.CNotificationTarget cNotificationTarget );
+  /**
+   * @param cNotificationTarget
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CNotificationTarget convertCNotificationTarget(
+      org.sonatype.nexus.configuration.model.v1_4_2.CNotificationTarget cNotificationTarget);
 
-    /**
-     * @param cPathMappingItem
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CPathMappingItem convertCPathMappingItem( org.sonatype.nexus.configuration.model.v1_4_2.CPathMappingItem cPathMappingItem );
+  /**
+   * @param cPathMappingItem
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CPathMappingItem convertCPathMappingItem(
+      org.sonatype.nexus.configuration.model.v1_4_2.CPathMappingItem cPathMappingItem);
 
-    /**
-     * @param cPlugin
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CPlugin convertCPlugin( org.sonatype.nexus.configuration.model.v1_4_2.CPlugin cPlugin );
+  /**
+   * @param cPlugin
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CPlugin convertCPlugin(
+      org.sonatype.nexus.configuration.model.v1_4_2.CPlugin cPlugin);
 
-    /**
-     * @param cProps
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CProps convertCProps( org.sonatype.nexus.configuration.model.v1_4_2.CProps cProps );
+  /**
+   * @param cProps
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CProps convertCProps(
+      org.sonatype.nexus.configuration.model.v1_4_2.CProps cProps);
 
-    /**
-     * @param cRemoteAuthentication
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteAuthentication convertCRemoteAuthentication( org.sonatype.nexus.configuration.model.v1_4_2.CRemoteAuthentication cRemoteAuthentication );
+  /**
+   * @param cRemoteAuthentication
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteAuthentication convertCRemoteAuthentication(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRemoteAuthentication cRemoteAuthentication);
 
-    /**
-     * @param cRemoteConnectionSettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteConnectionSettings convertCRemoteConnectionSettings( org.sonatype.nexus.configuration.model.v1_4_2.CRemoteConnectionSettings cRemoteConnectionSettings );
+  /**
+   * @param cRemoteConnectionSettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteConnectionSettings convertCRemoteConnectionSettings(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRemoteConnectionSettings cRemoteConnectionSettings);
 
-    /**
-     * @param cRemoteHttpProxySettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteHttpProxySettings convertCRemoteHttpProxySettings( org.sonatype.nexus.configuration.model.v1_4_2.CRemoteHttpProxySettings cRemoteHttpProxySettings );
+  /**
+   * @param cRemoteHttpProxySettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteHttpProxySettings convertCRemoteHttpProxySettings(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRemoteHttpProxySettings cRemoteHttpProxySettings);
 
-    /**
-     * @param cRemoteNexusInstance
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteNexusInstance convertCRemoteNexusInstance( org.sonatype.nexus.configuration.model.v1_4_2.CRemoteNexusInstance cRemoteNexusInstance );
+  /**
+   * @param cRemoteNexusInstance
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteNexusInstance convertCRemoteNexusInstance(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRemoteNexusInstance cRemoteNexusInstance);
 
-    /**
-     * @param cRemoteStorage
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteStorage convertCRemoteStorage( org.sonatype.nexus.configuration.model.v1_4_2.CRemoteStorage cRemoteStorage );
+  /**
+   * @param cRemoteStorage
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRemoteStorage convertCRemoteStorage(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRemoteStorage cRemoteStorage);
 
-    /**
-     * @param cRepository
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRepository convertCRepository( org.sonatype.nexus.configuration.model.v1_4_2.CRepository cRepository );
+  /**
+   * @param cRepository
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRepository convertCRepository(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRepository cRepository);
 
-    /**
-     * @param cRepositoryGrouping
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRepositoryGrouping convertCRepositoryGrouping( org.sonatype.nexus.configuration.model.v1_4_2.CRepositoryGrouping cRepositoryGrouping );
+  /**
+   * @param cRepositoryGrouping
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRepositoryGrouping convertCRepositoryGrouping(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRepositoryGrouping cRepositoryGrouping);
 
-    /**
-     * @param cRepositoryTarget
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRepositoryTarget convertCRepositoryTarget( org.sonatype.nexus.configuration.model.v1_4_2.CRepositoryTarget cRepositoryTarget );
+  /**
+   * @param cRepositoryTarget
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRepositoryTarget convertCRepositoryTarget(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRepositoryTarget cRepositoryTarget);
 
-    /**
-     * @param cRestApiSettings
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRestApiSettings convertCRestApiSettings( org.sonatype.nexus.configuration.model.v1_4_2.CRestApiSettings cRestApiSettings );
+  /**
+   * @param cRestApiSettings
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRestApiSettings convertCRestApiSettings(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRestApiSettings cRestApiSettings);
 
-    /**
-     * @param cRouting
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CRouting convertCRouting( org.sonatype.nexus.configuration.model.v1_4_2.CRouting cRouting );
+  /**
+   * @param cRouting
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CRouting convertCRouting(
+      org.sonatype.nexus.configuration.model.v1_4_2.CRouting cRouting);
 
-    /**
-     * @param cScheduleConfig
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CScheduleConfig convertCScheduleConfig( org.sonatype.nexus.configuration.model.v1_4_2.CScheduleConfig cScheduleConfig );
+  /**
+   * @param cScheduleConfig
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CScheduleConfig convertCScheduleConfig(
+      org.sonatype.nexus.configuration.model.v1_4_2.CScheduleConfig cScheduleConfig);
 
-    /**
-     * @param cScheduledTask
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CScheduledTask convertCScheduledTask( org.sonatype.nexus.configuration.model.v1_4_2.CScheduledTask cScheduledTask );
+  /**
+   * @param cScheduledTask
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CScheduledTask convertCScheduledTask(
+      org.sonatype.nexus.configuration.model.v1_4_2.CScheduledTask cScheduledTask);
 
-    /**
-     * @param cSmtpConfiguration
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.CSmtpConfiguration convertCSmtpConfiguration( org.sonatype.nexus.configuration.model.v1_4_2.CSmtpConfiguration cSmtpConfiguration );
+  /**
+   * @param cSmtpConfiguration
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.CSmtpConfiguration convertCSmtpConfiguration(
+      org.sonatype.nexus.configuration.model.v1_4_2.CSmtpConfiguration cSmtpConfiguration);
 
-    /**
-     * @param configuration
-     */
-    public org.sonatype.nexus.configuration.model.v1_4_3.Configuration convertConfiguration( org.sonatype.nexus.configuration.model.v1_4_2.Configuration configuration );
+  /**
+   * @param configuration
+   */
+  public org.sonatype.nexus.configuration.model.v1_4_3.Configuration convertConfiguration(
+      org.sonatype.nexus.configuration.model.v1_4_2.Configuration configuration);
 }

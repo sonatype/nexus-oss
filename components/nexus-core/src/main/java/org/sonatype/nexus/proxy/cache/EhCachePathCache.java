@@ -10,163 +10,143 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.cache;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+
+import com.google.common.base.Preconditions;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.Statistics;
 
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-
-import com.google.common.base.Preconditions;
-
 /**
  * The Class EhCacheCache is a thin wrapper around EHCache just to make things going.
- * 
+ *
  * @author cstamas
  */
 public class EhCachePathCache
     extends AbstractPathCache
 {
-    private final String _repositoryId;
+  private final String _repositoryId;
 
-    /** The ec. */
-    private final Ehcache _ec;
+  /**
+   * The ec.
+   */
+  private final Ehcache _ec;
 
-    /**
-     * Instantiates a new eh cache cache.
-     * 
-     * @param cache the cache
-     */
-    public EhCachePathCache( final String repositoryId, final Ehcache cache )
-    {
-        this._repositoryId = Preconditions.checkNotNull( repositoryId );
-        this._ec = Preconditions.checkNotNull( cache );
+  /**
+   * Instantiates a new eh cache cache.
+   *
+   * @param cache the cache
+   */
+  public EhCachePathCache(final String repositoryId, final Ehcache cache) {
+    this._repositoryId = Preconditions.checkNotNull(repositoryId);
+    this._ec = Preconditions.checkNotNull(cache);
+  }
+
+  protected String getRepositoryId() {
+    return _repositoryId;
+  }
+
+  protected Ehcache getEHCache() {
+    return _ec;
+  }
+
+  public boolean doContains(final String key) {
+    return getEHCache().get(key) != null;
+  }
+
+  public boolean doIsExpired(final String key) {
+    if (getEHCache().isKeyInCache(key)) {
+      Element el = getEHCache().get(key);
+      if (el != null) {
+        return el.isExpired();
+      }
+      else {
+        return true;
+      }
+    }
+    else {
+      return false;
+    }
+  }
+
+  public void doPut(final String key, final Object element, final int expiration) {
+    Element el = new Element(key, element);
+    if (expiration > -1) {
+      el.setTimeToLive(expiration);
+    }
+    getEHCache().put(el);
+  }
+
+  public boolean doRemove(String key) {
+    return getEHCache().remove(key);
+  }
+
+  public boolean removeWithChildren(String path) {
+    @SuppressWarnings("unchecked")
+    List<String> keys = getEHCache().getKeys();
+
+    String keyToRemove = makeKeyFromPath(path);
+
+    boolean removed = false;
+    for (String key : keys) {
+      if (key.startsWith(keyToRemove)) {
+        removed = getEHCache().remove(key) || removed;
+      }
+    }
+    return removed;
+  }
+
+  public boolean doPurge() {
+    // getEHCache().removeAll();
+    // getEHCache().flush();
+
+    // this above is not true anymore, since the "shared-cache" implementor forgot about the fact that using purge()
+    // will purge _all_ caches (it purges the one shared!), not just this repo's cache
+    return removeWithChildren(RepositoryItemUid.PATH_ROOT);
+  }
+
+  public CacheStatistics getStatistics() {
+    Statistics stats = getEHCache().getStatistics();
+
+    return new CacheStatistics(stats.getObjectCount(), stats.getCacheMisses(), stats.getCacheHits());
+  }
+
+  @SuppressWarnings("unchecked")
+  public Collection<String> listKeysInCache() {
+    getEHCache().evictExpiredElements();
+
+    List<String> keys = new ArrayList<String>();
+
+    // this is going to be slow (if we have lots of items) but if you are concerned about speed you shouldn't call
+    // this method anyway, this should only be used for information purposes
+
+    String startsWithString = getKeyPrefix();
+
+    for (String key : (List<String>) getEHCache().getKeys()) {
+      if (key.startsWith(startsWithString)) {
+        keys.add(key.substring(startsWithString.length()));
+      }
     }
 
-    protected String getRepositoryId()
-    {
-        return _repositoryId;
-    }
+    return keys;
+  }
 
-    protected Ehcache getEHCache()
-    {
-        return _ec;
-    }
+  @Override
+  protected String makeKeyFromPath(String path) {
+    path = super.makeKeyFromPath(path);
 
-    public boolean doContains( final String key )
-    {
-        return getEHCache().get( key ) != null;
-    }
+    return getKeyPrefix() + path;
+  }
 
-    public boolean doIsExpired( final String key )
-    {
-        if ( getEHCache().isKeyInCache( key ) )
-        {
-            Element el = getEHCache().get( key );
-            if ( el != null )
-            {
-                return el.isExpired();
-            }
-            else
-            {
-                return true;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public void doPut( final String key, final Object element, final int expiration )
-    {
-        Element el = new Element( key, element );
-        if ( expiration > -1 )
-        {
-            el.setTimeToLive( expiration );
-        }
-        getEHCache().put( el );
-    }
-
-    public boolean doRemove( String key )
-    {
-        return getEHCache().remove( key );
-    }
-
-    public boolean removeWithChildren( String path )
-    {
-        @SuppressWarnings( "unchecked" )
-        List<String> keys = getEHCache().getKeys();
-
-        String keyToRemove = makeKeyFromPath( path );
-
-        boolean removed = false;
-        for ( String key : keys )
-        {
-            if ( key.startsWith( keyToRemove ) )
-            {
-                removed = getEHCache().remove( key ) || removed;
-            }
-        }
-        return removed;
-    }
-
-    public boolean doPurge()
-    {
-        // getEHCache().removeAll();
-        // getEHCache().flush();
-
-        // this above is not true anymore, since the "shared-cache" implementor forgot about the fact that using purge()
-        // will purge _all_ caches (it purges the one shared!), not just this repo's cache
-        return removeWithChildren( RepositoryItemUid.PATH_ROOT );
-    }
-
-    public CacheStatistics getStatistics()
-    {
-        Statistics stats = getEHCache().getStatistics();
-
-        return new CacheStatistics( stats.getObjectCount(), stats.getCacheMisses(), stats.getCacheHits() );
-    }
-
-    @SuppressWarnings( "unchecked" )
-    public Collection<String> listKeysInCache()
-    {
-        getEHCache().evictExpiredElements();
-
-        List<String> keys = new ArrayList<String>();
-
-        // this is going to be slow (if we have lots of items) but if you are concerned about speed you shouldn't call
-        // this method anyway, this should only be used for information purposes
-
-        String startsWithString = getKeyPrefix();
-
-        for ( String key : (List<String>) getEHCache().getKeys() )
-        {
-            if ( key.startsWith( startsWithString ) )
-            {
-                keys.add( key.substring( startsWithString.length() ) );
-            }
-        }
-
-        return keys;
-    }
-
-    @Override
-    protected String makeKeyFromPath( String path )
-    {
-        path = super.makeKeyFromPath( path );
-
-        return getKeyPrefix() + path;
-    }
-
-    protected String getKeyPrefix()
-    {
-        return getRepositoryId() + ":";
-    }
+  protected String getKeyPrefix() {
+    return getRepositoryId() + ":";
+  }
 
 }

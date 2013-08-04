@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.attributes.internal;
 
 import java.util.Collection;
@@ -26,102 +27,88 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * tied to existence of that method. Note: this adapter breaks the Map contract on three methods: {@link #keySet()},
  * {@link #values()} and {@link #entrySet()}. Here, we provide an unmodifiable "view" only, and iterator modification
  * methods will fail.
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public class AttributesMapAdapter
     implements Map<String, String>
 {
-    private final Attributes attributes;
+  private final Attributes attributes;
 
-    private Map<String, String> view;
+  private Map<String, String> view;
 
-    public AttributesMapAdapter( final Attributes attributes )
-    {
-        this.attributes = attributes;
-        resetView();
-    }
+  public AttributesMapAdapter(final Attributes attributes) {
+    this.attributes = attributes;
+    resetView();
+  }
 
-    protected void resetView()
-    {
-        view = attributes.asMap();
-    }
+  protected void resetView() {
+    view = attributes.asMap();
+  }
 
-    @Override
-    public int size()
-    {
-        return view.size();
-    }
+  @Override
+  public int size() {
+    return view.size();
+  }
 
-    @Override
-    public boolean isEmpty()
-    {
-        return view.isEmpty();
-    }
+  @Override
+  public boolean isEmpty() {
+    return view.isEmpty();
+  }
 
-    @Override
-    public boolean containsKey( Object key )
-    {
-        return view.containsKey( key );
-    }
+  @Override
+  public boolean containsKey(Object key) {
+    return view.containsKey(key);
+  }
 
-    @Override
-    public boolean containsValue( Object value )
-    {
-        return view.containsValue( value );
-    }
+  @Override
+  public boolean containsValue(Object value) {
+    return view.containsValue(value);
+  }
 
-    @Override
-    public String get( Object key )
-    {
-        return view.get( key );
-    }
+  @Override
+  public String get(Object key) {
+    return view.get(key);
+  }
 
-    @Override
-    public String put( String key, String value )
-    {
-        final String result = attributes.put( key, value );
-        resetView();
-        return result;
-    }
+  @Override
+  public String put(String key, String value) {
+    final String result = attributes.put(key, value);
+    resetView();
+    return result;
+  }
 
-    @Override
-    public String remove( Object key )
-    {
-        final String result = attributes.remove( String.valueOf( key ) );
-        resetView();
-        return result;
-    }
+  @Override
+  public String remove(Object key) {
+    final String result = attributes.remove(String.valueOf(key));
+    resetView();
+    return result;
+  }
 
-    @Override
-    public void putAll( Map<? extends String, ? extends String> m )
-    {
-        attributes.putAll( m );
-        resetView();
-    }
+  @Override
+  public void putAll(Map<? extends String, ? extends String> m) {
+    attributes.putAll(m);
+    resetView();
+  }
 
-    @Override
-    public void clear()
-    {
-        throw new UnsupportedOperationException( "Cannot clear() item attributes!" );
-    }
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException("Cannot clear() item attributes!");
+  }
 
-    @Override
-    public Set<String> keySet()
-    {
-        return Collections.unmodifiableSet( view.keySet() );
-    }
+  @Override
+  public Set<String> keySet() {
+    return Collections.unmodifiableSet(view.keySet());
+  }
 
-    @Override
-    public Collection<String> values()
-    {
-        return Collections.unmodifiableCollection( view.values() );
-    }
+  @Override
+  public Collection<String> values() {
+    return Collections.unmodifiableCollection(view.values());
+  }
 
-    @Override
-    public Set<java.util.Map.Entry<String, String>> entrySet()
-    {
-        return Collections.unmodifiableSet( view.entrySet() );
-    }
+  @Override
+  public Set<java.util.Map.Entry<String, String>> entrySet() {
+    return Collections.unmodifiableSet(view.entrySet());
+  }
 }

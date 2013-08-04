@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest;
 
 import org.sonatype.nexus.client.core.NexusClient;
@@ -20,19 +21,19 @@ import org.sonatype.nexus.client.core.NexusClient;
 public interface NexusClientFactory
 {
 
-    /**
-     * Creates a {@link NexusClient} against given baseUrl.
-     */
-    NexusClient createFor( BaseUrl baseUrl );
+  /**
+   * Creates a {@link NexusClient} against given baseUrl.
+   */
+  NexusClient createFor(BaseUrl baseUrl);
 
-    /**
-     * Creates a {@link NexusClient} against given baseUrl and authentication info (Nexus authentication).
-     */
-    NexusClient createFor( BaseUrl baseUrl, AuthenticationInfo authenticationInfo );
+  /**
+   * Creates a {@link NexusClient} against given baseUrl and authentication info (Nexus authentication).
+   */
+  NexusClient createFor(BaseUrl baseUrl, AuthenticationInfo authenticationInfo);
 
-    /**
-     * Creates a {@link NexusClient} against given data in the provided {@link ConnectionInfo}.
-     */
-    NexusClient createFor( ConnectionInfo connectionInfo );
+  /**
+   * Creates a {@link NexusClient} against given data in the provided {@link ConnectionInfo}.
+   */
+  NexusClient createFor(ConnectionInfo connectionInfo);
 
 }

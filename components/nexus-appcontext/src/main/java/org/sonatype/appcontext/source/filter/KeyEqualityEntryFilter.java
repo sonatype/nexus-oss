@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.source.filter;
 
 import java.util.Arrays;
@@ -21,43 +22,39 @@ import org.sonatype.appcontext.source.EntrySourceMarker;
 import org.sonatype.appcontext.source.WrappingEntrySourceMarker;
 
 /**
- * EntryFilter that filters on key-equality (keys are Strings) using key.equals() method, hence, this is case sensitive!
+ * EntryFilter that filters on key-equality (keys are Strings) using key.equals() method, hence, this is case
+ * sensitive!
  * You can supply a list of keys to accept.
- * 
+ *
  * @author cstamas
  */
 public class KeyEqualityEntryFilter
     implements EntryFilter
 {
-    /**
-     * The list of keys to accept.
-     */
-    private final List<String> keys;
+  /**
+   * The list of keys to accept.
+   */
+  private final List<String> keys;
 
-    public KeyEqualityEntryFilter( final String... keys )
-    {
-        this( Arrays.asList( keys ) );
-    }
+  public KeyEqualityEntryFilter(final String... keys) {
+    this(Arrays.asList(keys));
+  }
 
-    public KeyEqualityEntryFilter( final List<String> keys )
-    {
-        this.keys = Collections.unmodifiableList( Preconditions.checkNotNull( keys ) );
-    }
+  public KeyEqualityEntryFilter(final List<String> keys) {
+    this.keys = Collections.unmodifiableList(Preconditions.checkNotNull(keys));
+  }
 
-    public boolean accept( final String key, final Object value )
-    {
-        return keys.contains( key );
-    }
+  public boolean accept(final String key, final Object value) {
+    return keys.contains(key);
+  }
 
-    public EntrySourceMarker getFilteredEntrySourceMarker( final EntrySourceMarker source )
+  public EntrySourceMarker getFilteredEntrySourceMarker(final EntrySourceMarker source) {
+    return new WrappingEntrySourceMarker(source)
     {
-        return new WrappingEntrySourceMarker( source )
-        {
-            @Override
-            protected String getDescription( final EntrySourceMarker wrapped )
-            {
-                return String.format( "filter(keyIsIn:%s, %s)", keys, wrapped.getDescription() );
-            }
-        };
-    }
+      @Override
+      protected String getDescription(final EntrySourceMarker wrapped) {
+        return String.format("filter(keyIsIn:%s, %s)", keys, wrapped.getDescription());
+      }
+    };
+  }
 }

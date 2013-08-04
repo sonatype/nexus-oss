@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.apachehttpclient;
 
 import com.yammer.metrics.Metrics;
@@ -18,7 +19,11 @@ import com.yammer.metrics.httpclient.InstrumentedClientConnManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.ConnectionReuseStrategy;
-import org.apache.http.client.*;
+import org.apache.http.client.AuthenticationStrategy;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.RequestDirector;
+import org.apache.http.client.UserTokenHandler;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.routing.HttpRoutePlanner;
@@ -30,57 +35,61 @@ import org.apache.http.protocol.HttpRequestExecutor;
 // NOTE: Duplicated and augmented from original 2.2.0 source to change signature of CTOR ClientConnectionManager parameter
 // NOTE: Should get this changes into metrics-httpclient and avoid needing this
 
-public class InstrumentedHttpClient extends DefaultHttpClient {
-    private final Log log = LogFactory.getLog(getClass());
+public class InstrumentedHttpClient
+    extends DefaultHttpClient
+{
+  private final Log log = LogFactory.getLog(getClass());
 
-    private final MetricsRegistry registry;
+  private final MetricsRegistry registry;
 
-    public InstrumentedHttpClient(MetricsRegistry registry,
-                                  ClientConnectionManager manager,
-                                  HttpParams params) {
-        super(manager, params);
-        this.registry = registry;
-    }
+  public InstrumentedHttpClient(MetricsRegistry registry,
+                                ClientConnectionManager manager,
+                                HttpParams params)
+  {
+    super(manager, params);
+    this.registry = registry;
+  }
 
-    public InstrumentedHttpClient(ClientConnectionManager manager, HttpParams params) {
-        this(Metrics.defaultRegistry(), manager, params);
-    }
+  public InstrumentedHttpClient(ClientConnectionManager manager, HttpParams params) {
+    this(Metrics.defaultRegistry(), manager, params);
+  }
 
-    public InstrumentedHttpClient(HttpParams params) {
-        this(new InstrumentedClientConnManager(), params);
-    }
+  public InstrumentedHttpClient(HttpParams params) {
+    this(new InstrumentedClientConnManager(), params);
+  }
 
-    public InstrumentedHttpClient() {
-        this(null);
-    }
+  public InstrumentedHttpClient() {
+    this(null);
+  }
 
-    @Override
-    protected RequestDirector createClientRequestDirector(HttpRequestExecutor requestExec,
-                                                          ClientConnectionManager conman,
-                                                          ConnectionReuseStrategy reustrat,
-                                                          ConnectionKeepAliveStrategy kastrat,
-                                                          HttpRoutePlanner rouplan,
-                                                          HttpProcessor httpProcessor,
-                                                          HttpRequestRetryHandler retryHandler,
-                                                          RedirectStrategy redirectStrategy,
-                                                          AuthenticationStrategy targetAuthStrategy,
-                                                          AuthenticationStrategy proxyAuthStrategy,
-                                                          UserTokenHandler userTokenHandler,
-                                                          HttpParams params) {
-        return new InstrumentedRequestDirector(
-                registry,
-                log,
-                requestExec,
-                conman,
-                reustrat,
-                kastrat,
-                rouplan,
-                httpProcessor,
-                retryHandler,
-                redirectStrategy,
-                targetAuthStrategy,
-                proxyAuthStrategy,
-                userTokenHandler,
-                params);
-    }
+  @Override
+  protected RequestDirector createClientRequestDirector(HttpRequestExecutor requestExec,
+                                                        ClientConnectionManager conman,
+                                                        ConnectionReuseStrategy reustrat,
+                                                        ConnectionKeepAliveStrategy kastrat,
+                                                        HttpRoutePlanner rouplan,
+                                                        HttpProcessor httpProcessor,
+                                                        HttpRequestRetryHandler retryHandler,
+                                                        RedirectStrategy redirectStrategy,
+                                                        AuthenticationStrategy targetAuthStrategy,
+                                                        AuthenticationStrategy proxyAuthStrategy,
+                                                        UserTokenHandler userTokenHandler,
+                                                        HttpParams params)
+  {
+    return new InstrumentedRequestDirector(
+        registry,
+        log,
+        requestExec,
+        conman,
+        reustrat,
+        kastrat,
+        rouplan,
+        httpProcessor,
+        retryHandler,
+        redirectStrategy,
+        targetAuthStrategy,
+        proxyAuthStrategy,
+        userTokenHandler,
+        params);
+  }
 }

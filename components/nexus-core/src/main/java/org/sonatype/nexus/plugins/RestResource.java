@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins;
 
 import java.lang.annotation.Documented;
@@ -22,15 +23,14 @@ import java.lang.annotation.Target;
 /**
  * This annotation just marks a non-abstract class to be a REST resource, but does not imply anything on the underlying
  * implementation.
- * 
- * @author cstamas
  *
+ * @author cstamas
  * @deprecated pending removal
  */
 @Documented
 @Inherited
-@Target( ElementType.TYPE )
-@Retention( RetentionPolicy.RUNTIME )
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 @Deprecated
 public @interface RestResource
 {

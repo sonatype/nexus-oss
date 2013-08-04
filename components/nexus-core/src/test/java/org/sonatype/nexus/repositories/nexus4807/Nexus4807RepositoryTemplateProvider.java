@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repositories.nexus4807;
 
 import org.sonatype.nexus.templates.TemplateSet;
@@ -20,13 +21,12 @@ public class Nexus4807RepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
 {
 
-    public TemplateSet getTemplates()
-    {
-        TemplateSet templates = new TemplateSet( null );
+  public TemplateSet getTemplates() {
+    TemplateSet templates = new TemplateSet(null);
 
-        templates.add( new Nexus4807RepositoryTemplate( this, "nexus4807", "NEXUS-4807 (test repository)" ) );
+    templates.add(new Nexus4807RepositoryTemplate(this, "nexus4807", "NEXUS-4807 (test repository)"));
 
-        return templates;
-    }
+    return templates;
+  }
 
 }

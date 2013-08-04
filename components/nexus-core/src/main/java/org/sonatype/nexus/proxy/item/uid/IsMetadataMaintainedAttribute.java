@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -17,8 +18,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public class IsMetadataMaintainedAttribute
     implements Attribute<Boolean>
 {
-    public Boolean getValueFor( RepositoryItemUid subject )
-    {
-        return !subject.getBooleanAttributeValue( IsMetacontentAttribute.class );
-    }
+  public Boolean getValueFor(RepositoryItemUid subject) {
+    return !subject.getBooleanAttributeValue(IsMetacontentAttribute.class);
+  }
 }

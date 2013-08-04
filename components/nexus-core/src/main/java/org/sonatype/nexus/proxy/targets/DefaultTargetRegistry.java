@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.targets;
 
 import java.util.ArrayList;
@@ -22,11 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -43,262 +39,233 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The default implementation of target registry.
- * 
+ *
  * @author cstamas
  */
-@Component( role = TargetRegistry.class )
+@Component(role = TargetRegistry.class)
 public class DefaultTargetRegistry
     extends AbstractConfigurable
     implements TargetRegistry
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Requirement
-    private ApplicationConfiguration applicationConfiguration;
+  @Requirement
+  private ApplicationConfiguration applicationConfiguration;
 
-    @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
+  @Requirement
+  private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    @Requirement
-    private ApplicationConfigurationValidator validator;
+  @Requirement
+  private ApplicationConfigurationValidator validator;
 
-    // a cache view of "live" targets, keyed by target ID
-    // eagerly rebuilt on every configuration change
-    private Map<String, Target> targets;
+  // a cache view of "live" targets, keyed by target ID
+  // eagerly rebuilt on every configuration change
+  private Map<String, Target> targets;
 
-    // ==
+  // ==
 
-    @Override
-    protected void initializeConfiguration()
-        throws ConfigurationException
-    {
-        if ( getApplicationConfiguration().getConfigurationModel() != null )
-        {
-            configure( getApplicationConfiguration() );
+  @Override
+  protected void initializeConfiguration()
+      throws ConfigurationException
+  {
+    if (getApplicationConfiguration().getConfigurationModel() != null) {
+      configure(getApplicationConfiguration());
+    }
+  }
+
+  @Override
+  protected ApplicationConfiguration getApplicationConfiguration() {
+    return applicationConfiguration;
+  }
+
+  @Override
+  protected Configurator getConfigurator() {
+    return null;
+  }
+
+  @Override
+  protected List<CRepositoryTarget> getCurrentConfiguration(boolean forWrite) {
+    return ((CRepositoryTargetCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
+  }
+
+  @Override
+  protected CoreConfiguration wrapConfiguration(Object configuration)
+      throws ConfigurationException
+  {
+    if (configuration instanceof ApplicationConfiguration) {
+      return new CRepositoryTargetCoreConfiguration((ApplicationConfiguration) configuration);
+    }
+    else {
+      throw new ConfigurationException("The passed configuration object is of class \""
+          + configuration.getClass().getName() + "\" and not the required \""
+          + ApplicationConfiguration.class.getName() + "\"!");
+    }
+  }
+
+  @Override
+  protected void doConfigure()
+      throws ConfigurationException
+  {
+    super.doConfigure();
+    // rebuild the view
+    rebuildView();
+  }
+
+  /**
+   * Gets the effective configuration and rebuilds the "view" of live target objects, that is a map, keyed by target
+   * IDs.
+   */
+  protected void rebuildView() {
+    synchronized (getCurrentCoreConfiguration()) {
+      // rebuild the view
+      List<CRepositoryTarget> ctargets = getCurrentConfiguration(false);
+      final Map<String, Target> newView = new HashMap<String, Target>(ctargets.size());
+      for (CRepositoryTarget ctarget : ctargets) {
+        Target target = convert(ctarget);
+        if (target != null) {
+          newView.put(target.getId(), target);
         }
+      }
+      targets = newView;
+    }
+  }
+
+  // ==
+
+  protected Target convert(CRepositoryTarget target) {
+    ContentClass contentClass = getContentClassById(target.getContentClass());
+
+    // If content class is null, we have a target for a repo type that no longer exists
+    // plugin was removed most likely, so we ignore in this case
+    if (contentClass != null) {
+      return new Target(target.getId(), target.getName(), contentClass, target.getPatterns());
     }
 
-    @Override
-    protected ApplicationConfiguration getApplicationConfiguration()
-    {
-        return applicationConfiguration;
-    }
+    return null;
+  }
 
-    @Override
-    protected Configurator getConfigurator()
-    {
-        return null;
-    }
+  protected CRepositoryTarget convert(Target target) {
+    CRepositoryTarget result = new CRepositoryTarget();
+    result.setId(target.getId());
+    result.setName(target.getName());
+    result.setContentClass(target.getContentClass().getId());
+    ArrayList<String> patterns = new ArrayList<String>(target.getPatternTexts().size());
+    patterns.addAll(target.getPatternTexts());
+    result.setPatterns(patterns);
+    return result;
+  }
 
-    @Override
-    protected List<CRepositoryTarget> getCurrentConfiguration( boolean forWrite )
-    {
-        return ( (CRepositoryTargetCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+  protected void validate(CRepositoryTarget target)
+      throws InvalidConfigurationException
+  {
+    ValidationResponse response = validator.validateRepositoryTarget(null, target);
+    if (!response.isValid()) {
+      throw new InvalidConfigurationException(response);
     }
+  }
 
-    @Override
-    protected CoreConfiguration wrapConfiguration( Object configuration )
-        throws ConfigurationException
-    {
-        if ( configuration instanceof ApplicationConfiguration )
-        {
-            return new CRepositoryTargetCoreConfiguration( (ApplicationConfiguration) configuration );
+  protected ContentClass getContentClassById(String id) {
+    return repositoryTypeRegistry.getContentClasses().get(id);
+  }
+
+  // ==
+
+  public Collection<Target> getRepositoryTargets() {
+    return Collections.unmodifiableCollection(targets.values());
+  }
+
+  public Target getRepositoryTarget(String id) {
+    return targets.get(id);
+  }
+
+  public synchronized boolean addRepositoryTarget(Target target)
+      throws ConfigurationException
+  {
+    CRepositoryTarget cnf = convert(target);
+    validate(cnf);
+    removeRepositoryTarget(cnf.getId(), true);
+    getCurrentConfiguration(true).add(cnf);
+    eventBus().post(new TargetRegistryEventAdd(this, target));
+    return true;
+  }
+
+  public synchronized boolean removeRepositoryTarget(String id) {
+    return removeRepositoryTarget(id, false);
+  }
+
+  protected boolean removeRepositoryTarget(String id, boolean forUpdate) {
+    final List<CRepositoryTarget> targets = getCurrentConfiguration(true);
+    for (Iterator<CRepositoryTarget> ti = targets.iterator(); ti.hasNext(); ) {
+      CRepositoryTarget cTarget = ti.next();
+      if (StringUtils.equals(id, cTarget.getId())) {
+        Target target = getRepositoryTarget(id);
+        ti.remove();
+        if (!forUpdate) {
+          eventBus().post(new TargetRegistryEventRemove(this, target));
         }
-        else
-        {
-            throw new ConfigurationException( "The passed configuration object is of class \""
-                + configuration.getClass().getName() + "\" and not the required \""
-                + ApplicationConfiguration.class.getName() + "\"!" );
-        }
-    }
-
-    @Override
-    protected void doConfigure()
-        throws ConfigurationException
-    {
-        super.doConfigure();
-        // rebuild the view
-        rebuildView();
-    }
-
-    /**
-     * Gets the effective configuration and rebuilds the "view" of live target objects, that is a map, keyed by target
-     * IDs.
-     */
-    protected void rebuildView()
-    {
-        synchronized ( getCurrentCoreConfiguration() )
-        {
-            // rebuild the view
-            List<CRepositoryTarget> ctargets = getCurrentConfiguration( false );
-            final Map<String, Target> newView = new HashMap<String, Target>( ctargets.size() );
-            for ( CRepositoryTarget ctarget : ctargets )
-            {
-                Target target = convert( ctarget );
-                if ( target != null )
-                {
-                    newView.put( target.getId(), target );
-                }
-            }
-            targets = newView;
-        }
-    }
-
-    // ==
-
-    protected Target convert( CRepositoryTarget target )
-    {
-        ContentClass contentClass = getContentClassById( target.getContentClass() );
-
-        // If content class is null, we have a target for a repo type that no longer exists
-        // plugin was removed most likely, so we ignore in this case
-        if ( contentClass != null )
-        {
-            return new Target( target.getId(), target.getName(), contentClass, target.getPatterns() );
-        }
-
-        return null;
-    }
-
-    protected CRepositoryTarget convert( Target target )
-    {
-        CRepositoryTarget result = new CRepositoryTarget();
-        result.setId( target.getId() );
-        result.setName( target.getName() );
-        result.setContentClass( target.getContentClass().getId() );
-        ArrayList<String> patterns = new ArrayList<String>( target.getPatternTexts().size() );
-        patterns.addAll( target.getPatternTexts() );
-        result.setPatterns( patterns );
-        return result;
-    }
-
-    protected void validate( CRepositoryTarget target )
-        throws InvalidConfigurationException
-    {
-        ValidationResponse response = validator.validateRepositoryTarget( null, target );
-        if ( !response.isValid() )
-        {
-            throw new InvalidConfigurationException( response );
-        }
-    }
-
-    protected ContentClass getContentClassById( String id )
-    {
-        return repositoryTypeRegistry.getContentClasses().get( id );
-    }
-
-    // ==
-
-    public Collection<Target> getRepositoryTargets()
-    {
-        return Collections.unmodifiableCollection( targets.values() );
-    }
-
-    public Target getRepositoryTarget( String id )
-    {
-        return targets.get( id );
-    }
-
-    public synchronized boolean addRepositoryTarget( Target target )
-        throws ConfigurationException
-    {
-        CRepositoryTarget cnf = convert( target );
-        validate( cnf );
-        removeRepositoryTarget( cnf.getId(), true );
-        getCurrentConfiguration( true ).add( cnf );
-        eventBus().post( new TargetRegistryEventAdd( this, target ) );
         return true;
+      }
     }
 
-    public synchronized boolean removeRepositoryTarget( String id )
-    {
-        return removeRepositoryTarget( id, false );
+    return false;
+  }
+
+  public Set<Target> getTargetsForContentClass(ContentClass contentClass) {
+    logger.debug("Resolving targets for contentClass='{}'", contentClass.getId());
+
+    final Set<Target> result = new HashSet<Target>();
+    for (Target t : getRepositoryTargets()) {
+      if (t.getContentClass().equals(contentClass)) {
+        result.add(t);
+      }
     }
+    return result;
+  }
 
-    protected boolean removeRepositoryTarget( String id, boolean forUpdate )
-    {
-        final List<CRepositoryTarget> targets = getCurrentConfiguration( true );
-        for ( Iterator<CRepositoryTarget> ti = targets.iterator(); ti.hasNext(); )
-        {
-            CRepositoryTarget cTarget = ti.next();
-            if ( StringUtils.equals( id, cTarget.getId() ) )
-            {
-                Target target = getRepositoryTarget( id );
-                ti.remove();
-                if ( !forUpdate )
-                {
-                    eventBus().post( new TargetRegistryEventRemove( this, target ) );
-                }
-                return true;
-            }
-        }
+  public Set<Target> getTargetsForContentClassPath(ContentClass contentClass, String path) {
+    logger.debug("Resolving targets for contentClass='{}' for path='{}'", contentClass.getId(), path);
 
-        return false;
+    final Set<Target> result = new HashSet<Target>();
+    for (Target t : getRepositoryTargets()) {
+      if (t.isPathContained(contentClass, path)) {
+        result.add(t);
+      }
     }
+    return result;
+  }
 
-    public Set<Target> getTargetsForContentClass( ContentClass contentClass )
-    {
-        logger.debug( "Resolving targets for contentClass='{}'", contentClass.getId() );
+  public TargetSet getTargetsForRepositoryPath(Repository repository, String path) {
+    logger.debug("Resolving targets for repository='{}' for path='{}'", repository.getId(), path);
 
-        final Set<Target> result = new HashSet<Target>();
-        for ( Target t : getRepositoryTargets() )
-        {
-            if ( t.getContentClass().equals( contentClass ) )
-            {
-                result.add( t );
-            }
-        }
-        return result;
+    final TargetSet result = new TargetSet();
+    for (Target t : getRepositoryTargets()) {
+      if (t.isPathContained(repository.getRepositoryContentClass(), path)) {
+        result.addTargetMatch(new TargetMatch(t, repository));
+      }
     }
+    return result;
+  }
 
-    public Set<Target> getTargetsForContentClassPath( ContentClass contentClass, String path )
-    {
-        logger.debug("Resolving targets for contentClass='{}' for path='{}'", contentClass.getId(), path );
+  public boolean hasAnyApplicableTarget(Repository repository) {
+    logger.debug("Looking for any targets for repository='{}'", repository.getId());
 
-        final Set<Target> result = new HashSet<Target>();
-        for ( Target t : getRepositoryTargets() )
-        {
-            if ( t.isPathContained( contentClass, path ) )
-            {
-                result.add( t );
-            }
-        }
-        return result;
+    for (Target t : getRepositoryTargets()) {
+      if (t.getContentClass().isCompatible(repository.getRepositoryContentClass())) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    public TargetSet getTargetsForRepositoryPath( Repository repository, String path )
-    {
-        logger.debug( "Resolving targets for repository='{}' for path='{}'", repository.getId(), path );
-
-        final TargetSet result = new TargetSet();
-        for ( Target t : getRepositoryTargets() )
-        {
-            if ( t.isPathContained( repository.getRepositoryContentClass(), path ) )
-            {
-                result.addTargetMatch( new TargetMatch( t, repository ) );
-            }
-        }
-        return result;
-    }
-
-    public boolean hasAnyApplicableTarget( Repository repository )
-    {
-        logger.debug( "Looking for any targets for repository='{}'", repository.getId() );
-
-        for ( Target t : getRepositoryTargets() )
-        {
-            if ( t.getContentClass().isCompatible( repository.getRepositoryContentClass() ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public String getName()
-    {
-        return "Repository Target Configuration";
-    }
+  public String getName() {
+    return "Repository Target Configuration";
+  }
 }

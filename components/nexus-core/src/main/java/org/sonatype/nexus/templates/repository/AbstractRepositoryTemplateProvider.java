@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.templates.repository;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.IOException;
+
 import javax.inject.Inject;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -29,89 +29,83 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * An abstract class for template providers that provides templates for Repositories.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractRepositoryTemplateProvider
     extends AbstractTemplateProvider<RepositoryTemplate>
 {
 
-    private RepositoryTypeRegistry repositoryTypeRegistry;
+  private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    private NexusConfiguration nexusConfiguration;
+  private NexusConfiguration nexusConfiguration;
 
-    private RemoteProviderHintFactory remoteProviderHintFactory;
+  private RemoteProviderHintFactory remoteProviderHintFactory;
 
-    @Inject
-    public void setNexusConfiguration( final NexusConfiguration nexusConfiguration )
-    {
-        this.nexusConfiguration = checkNotNull( nexusConfiguration );
+  @Inject
+  public void setNexusConfiguration(final NexusConfiguration nexusConfiguration) {
+    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+  }
+
+  @Inject
+  public void setRemoteProviderHintFactory(final RemoteProviderHintFactory remoteProviderHintFactory) {
+    this.remoteProviderHintFactory = checkNotNull(remoteProviderHintFactory);
+  }
+
+  @Inject
+  public void setRepositoryTypeRegistry(final RepositoryTypeRegistry repositoryTypeRegistry) {
+    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
+  }
+
+  protected Repository createRepository(CRepository repository)
+      throws ConfigurationException, IOException
+  {
+    return nexusConfiguration.createRepository(repository);
+  }
+
+  public RemoteProviderHintFactory getRemoteProviderHintFactory() {
+    return remoteProviderHintFactory;
+  }
+
+  public Class<RepositoryTemplate> getTemplateClass() {
+    return RepositoryTemplate.class;
+  }
+
+  public TemplateSet getTemplates(Object filter) {
+    return getTemplates().getTemplates(filter);
+  }
+
+  public TemplateSet getTemplates(Object... filters) {
+    return getTemplates().getTemplates(filters);
+  }
+
+  public ManuallyConfiguredRepositoryTemplate createManuallyTemplate(CRepositoryCoreConfiguration configuration)
+      throws ConfigurationException
+  {
+    final CRepository repoConfig = configuration.getConfiguration(false);
+
+    RepositoryTypeDescriptor rtd =
+        repositoryTypeRegistry.getRepositoryTypeDescriptor(repoConfig.getProviderRole(),
+            repoConfig.getProviderHint());
+
+    if (rtd == null) {
+      final String msg =
+          String.format(
+              "Repository being created \"%s\" (repoId=%s) has corresponding type that is not registered in Core: Repository type %s:%s is unknown to Nexus Core. It is probably contributed by an old Nexus plugin. Please contact plugin developers to upgrade the plugin, and register the new repository type(s) properly!",
+              repoConfig.getName(), repoConfig.getId(), repoConfig.getProviderRole(),
+              repoConfig.getProviderHint());
+
+      throw new ConfigurationException(msg);
     }
 
-    @Inject
-    public void setRemoteProviderHintFactory( final RemoteProviderHintFactory remoteProviderHintFactory )
-    {
-        this.remoteProviderHintFactory = checkNotNull( remoteProviderHintFactory );
-    }
+    ContentClass contentClass = repositoryTypeRegistry.getRepositoryContentClass(rtd.getRole(), rtd.getHint());
 
-    @Inject
-    public void setRepositoryTypeRegistry( final RepositoryTypeRegistry repositoryTypeRegistry )
-    {
-        this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
-    }
-
-    protected Repository createRepository( CRepository repository )
-        throws ConfigurationException, IOException
-    {
-        return nexusConfiguration.createRepository( repository );
-    }
-
-    public RemoteProviderHintFactory getRemoteProviderHintFactory()
-    {
-        return remoteProviderHintFactory;
-    }
-
-    public Class<RepositoryTemplate> getTemplateClass()
-    {
-        return RepositoryTemplate.class;
-    }
-
-    public TemplateSet getTemplates( Object filter )
-    {
-        return getTemplates().getTemplates( filter );
-    }
-
-    public TemplateSet getTemplates( Object... filters )
-    {
-        return getTemplates().getTemplates( filters );
-    }
-
-    public ManuallyConfiguredRepositoryTemplate createManuallyTemplate( CRepositoryCoreConfiguration configuration )
-        throws ConfigurationException
-    {
-        final CRepository repoConfig = configuration.getConfiguration( false );
-
-        RepositoryTypeDescriptor rtd =
-            repositoryTypeRegistry.getRepositoryTypeDescriptor( repoConfig.getProviderRole(),
-                repoConfig.getProviderHint() );
-
-        if ( rtd == null )
-        {
-            final String msg =
-                String.format(
-                    "Repository being created \"%s\" (repoId=%s) has corresponding type that is not registered in Core: Repository type %s:%s is unknown to Nexus Core. It is probably contributed by an old Nexus plugin. Please contact plugin developers to upgrade the plugin, and register the new repository type(s) properly!",
-                    repoConfig.getName(), repoConfig.getId(), repoConfig.getProviderRole(),
-                    repoConfig.getProviderHint() );
-
-            throw new ConfigurationException( msg );
-        }
-
-        ContentClass contentClass = repositoryTypeRegistry.getRepositoryContentClass( rtd.getRole(), rtd.getHint() );
-
-        return new ManuallyConfiguredRepositoryTemplate( this, "manual", "Manually created template", contentClass,
-            null, configuration );
-    }
+    return new ManuallyConfiguredRepositoryTemplate(this, "manual", "Manually created template", contentClass,
+        null, configuration);
+  }
 
 }

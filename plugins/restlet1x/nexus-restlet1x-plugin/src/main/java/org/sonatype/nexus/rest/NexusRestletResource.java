@@ -10,11 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentMap;
+
+import org.sonatype.nexus.error.reporting.ErrorReportRequest;
+import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.RestletResource;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.restlet.Context;
@@ -24,116 +28,127 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.error.reporting.ErrorReportRequest;
-import org.sonatype.nexus.error.reporting.ErrorReportingManager;
-import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.plexus.rest.resource.RestletResource;
 
 public class NexusRestletResource
-    extends RestletResource {
+    extends RestletResource
+{
 
-    public NexusRestletResource( Context context, Request request, Response response, PlexusResource delegate ) {
-        super( context, request, response, delegate );
+  public NexusRestletResource(Context context, Request request, Response response, PlexusResource delegate) {
+    super(context, request, response, delegate);
+  }
+
+  @Override
+  public Representation represent(Variant variant)
+      throws ResourceException
+  {
+    try {
+      return super.represent(variant);
     }
-
-    @Override
-    public Representation represent( Variant variant )
-        throws ResourceException {
-        try {
-            return super.represent( variant );
-        } catch ( ResourceException e ) {
-            // NEXUS-4238, NEXUS-4290
-            // if it's server error based on HTTP Code, but NOT when Nexus throws a known 503 
-            // (see org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource.handleException(Request, Response, Exception))
-            final Status status = e.getStatus();
-            if ( status == null ) {
-                handleError( e );
-            } else {
-                final int code = status.getCode();
-                if ( Status.isServerError( code ) && Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode() != code ) {
-                    handleError( e );
-                }
-            }
-
-            throw e;
-        } catch ( RuntimeException e ) {
-            handleError( e );
-
-            throw e;
+    catch (ResourceException e) {
+      // NEXUS-4238, NEXUS-4290
+      // if it's server error based on HTTP Code, but NOT when Nexus throws a known 503
+      // (see org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource.handleException(Request, Response, Exception))
+      final Status status = e.getStatus();
+      if (status == null) {
+        handleError(e);
+      }
+      else {
+        final int code = status.getCode();
+        if (Status.isServerError(code) && Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode() != code) {
+          handleError(e);
         }
+      }
+
+      throw e;
     }
+    catch (RuntimeException e) {
+      handleError(e);
 
-    @Override
-    public void acceptRepresentation( Representation representation )
-        throws ResourceException {
-        try {
-            super.acceptRepresentation( representation );
-        } catch ( ResourceException e ) {
-            if ( Status.isServerError( e.getStatus().getCode() ) ) {
-                handleError( e );
-            }
-
-            throw e;
-        } catch ( RuntimeException e ) {
-            handleError( e );
-
-            throw e;
-        }
+      throw e;
     }
+  }
 
-    @Override
-    public void storeRepresentation( Representation representation )
-        throws ResourceException {
-        try {
-            super.storeRepresentation( representation );
-        } catch ( ResourceException e ) {
-            if ( Status.isServerError( e.getStatus().getCode() ) ) {
-                handleError( e );
-            }
-
-            throw e;
-        } catch ( RuntimeException e ) {
-            handleError( e );
-
-            throw e;
-        }
+  @Override
+  public void acceptRepresentation(Representation representation)
+      throws ResourceException
+  {
+    try {
+      super.acceptRepresentation(representation);
     }
+    catch (ResourceException e) {
+      if (Status.isServerError(e.getStatus().getCode())) {
+        handleError(e);
+      }
 
-    @Override
-    public void removeRepresentations()
-        throws ResourceException {
-        try {
-            super.removeRepresentations();
-        } catch ( ResourceException e ) {
-            if ( Status.isServerError( e.getStatus().getCode() ) ) {
-                handleError( e );
-            }
-            throw e;
-        } catch ( RuntimeException e ) {
-            handleError( e );
-
-            throw e;
-        }
+      throw e;
     }
+    catch (RuntimeException e) {
+      handleError(e);
 
-    protected void handleError( Throwable throwable ) {
-        Context c = getContext();
-        ConcurrentMap<String, Object> attrs = c.getAttributes();
-        ErrorReportingManager manager =
-            ( ErrorReportingManager ) attrs.get( ErrorReportingManager.class.getName() );
-
-        if ( manager != null ) {
-            ErrorReportRequest request = new ErrorReportRequest();
-
-            request.getContext().putAll( getContext().getAttributes() );
-
-            request.setThrowable( throwable );
-
-            try {
-                manager.handleError( request );
-            } catch ( IssueSubmissionException e ) {
-                logger.error("Unable to submit error report to jira", e );
-            }
-        }
+      throw e;
     }
+  }
+
+  @Override
+  public void storeRepresentation(Representation representation)
+      throws ResourceException
+  {
+    try {
+      super.storeRepresentation(representation);
+    }
+    catch (ResourceException e) {
+      if (Status.isServerError(e.getStatus().getCode())) {
+        handleError(e);
+      }
+
+      throw e;
+    }
+    catch (RuntimeException e) {
+      handleError(e);
+
+      throw e;
+    }
+  }
+
+  @Override
+  public void removeRepresentations()
+      throws ResourceException
+  {
+    try {
+      super.removeRepresentations();
+    }
+    catch (ResourceException e) {
+      if (Status.isServerError(e.getStatus().getCode())) {
+        handleError(e);
+      }
+      throw e;
+    }
+    catch (RuntimeException e) {
+      handleError(e);
+
+      throw e;
+    }
+  }
+
+  protected void handleError(Throwable throwable) {
+    Context c = getContext();
+    ConcurrentMap<String, Object> attrs = c.getAttributes();
+    ErrorReportingManager manager =
+        (ErrorReportingManager) attrs.get(ErrorReportingManager.class.getName());
+
+    if (manager != null) {
+      ErrorReportRequest request = new ErrorReportRequest();
+
+      request.getContext().putAll(getContext().getAttributes());
+
+      request.setThrowable(throwable);
+
+      try {
+        manager.handleError(request);
+      }
+      catch (IssueSubmissionException e) {
+        logger.error("Unable to submit error report to jira", e);
+      }
+    }
+  }
 }

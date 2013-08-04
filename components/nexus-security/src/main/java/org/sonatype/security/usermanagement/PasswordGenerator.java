@@ -10,30 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.usermanagement;
 
 /**
  * Generates passwords for users.
- * 
+ *
  * @author Brian Demers
  */
 public interface PasswordGenerator
 {
-    /**
-     * Generates a password.
-     * 
-     * @param minChars the minimum number of characters in the password.
-     * @param maxChars the maximum number of characters in the password.
-     * @return
-     */
-    String generatePassword( int minChars, int maxChars );
+  /**
+   * Generates a password.
+   *
+   * @param minChars the minimum number of characters in the password.
+   * @param maxChars the maximum number of characters in the password.
+   */
+  String generatePassword(int minChars, int maxChars);
 
-    /**
-     * Hash a password String.
-     * 
-     * @param password to be hashed.
-     * @return the hash password String.
-     * @deprecated use only to generate legacy unsalted password hashes
-     */
-    String hashPassword( String password );
+  /**
+   * Hash a password String.
+   *
+   * @param password to be hashed.
+   * @return the hash password String.
+   * @deprecated use only to generate legacy unsalted password hashes
+   */
+  String hashPassword(String password);
 }

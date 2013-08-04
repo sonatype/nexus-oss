@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins;
 
 import java.io.PrintWriter;
@@ -23,112 +24,98 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
  */
 public final class PluginResponse
 {
-    // ----------------------------------------------------------------------
-    // Constants
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constants
+  // ----------------------------------------------------------------------
 
-    private static final String LS = System.getProperty( "line.separator" );
+  private static final String LS = System.getProperty("line.separator");
 
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    private final GAVCoordinate gav;
+  private final GAVCoordinate gav;
 
-    private final PluginActivationRequest request;
+  private final PluginActivationRequest request;
 
-    private PluginActivationResult result;
+  private PluginActivationResult result;
 
-    private PluginDescriptor descriptor;
+  private PluginDescriptor descriptor;
 
-    private Throwable reason;
+  private Throwable reason;
 
-    // ----------------------------------------------------------------------
-    // Constructors
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constructors
+  // ----------------------------------------------------------------------
 
-    PluginResponse( final GAVCoordinate gav, final PluginActivationRequest request )
-    {
-        this.gav = gav;
-        this.request = request;
+  PluginResponse(final GAVCoordinate gav, final PluginActivationRequest request) {
+    this.gav = gav;
+    this.request = request;
+  }
+
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
+
+  public GAVCoordinate getPluginCoordinates() {
+    return gav;
+  }
+
+  public PluginActivationRequest getWantedGoal() {
+    return request;
+  }
+
+  public PluginActivationResult getAchievedGoal() {
+    return result;
+  }
+
+  public PluginDescriptor getPluginDescriptor() {
+    return descriptor;
+  }
+
+  public Throwable getThrowable() {
+    return reason;
+  }
+
+  public boolean isSuccessful() {
+    return request.isSuccessful(result);
+  }
+
+  public String formatAsString(final boolean detailed) {
+    final StringBuilder buf = new StringBuilder();
+
+    buf.append("... ").append(gav);
+    buf.append(" :: action=").append(request).append(" result=").append(result).append(LS);
+    if (!isSuccessful() && null != reason) {
+      buf.append("       Reason: ").append(reason.getLocalizedMessage()).append(LS);
+      if (detailed) {
+        final Writer writer = new StringWriter();
+        reason.printStackTrace(new PrintWriter(writer));
+        buf.append("Stack trace:").append(LS).append(writer).append(LS);
+      }
     }
 
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
-
-    public GAVCoordinate getPluginCoordinates()
-    {
-        return gav;
+    if (detailed && null != descriptor) {
+      buf.append(LS).append(descriptor.formatAsString());
     }
 
-    public PluginActivationRequest getWantedGoal()
-    {
-        return request;
-    }
+    return buf.toString();
+  }
 
-    public PluginActivationResult getAchievedGoal()
-    {
-        return result;
-    }
+  // ----------------------------------------------------------------------
+  // Locally-shared methods
+  // ----------------------------------------------------------------------
 
-    public PluginDescriptor getPluginDescriptor()
-    {
-        return descriptor;
-    }
+  void setAchievedGoal(final PluginActivationResult result) {
+    this.result = result;
+  }
 
-    public Throwable getThrowable()
-    {
-        return reason;
-    }
+  void setPluginDescriptor(final PluginDescriptor descriptor) {
+    this.descriptor = descriptor;
+  }
 
-    public boolean isSuccessful()
-    {
-        return request.isSuccessful( result );
-    }
-
-    public String formatAsString( final boolean detailed )
-    {
-        final StringBuilder buf = new StringBuilder();
-
-        buf.append( "... " ).append( gav );
-        buf.append( " :: action=" ).append( request ).append( " result=" ).append( result ).append( LS );
-        if ( !isSuccessful() && null != reason )
-        {
-            buf.append( "       Reason: " ).append( reason.getLocalizedMessage() ).append( LS );
-            if ( detailed )
-            {
-                final Writer writer = new StringWriter();
-                reason.printStackTrace( new PrintWriter( writer ) );
-                buf.append( "Stack trace:" ).append( LS ).append( writer ).append( LS );
-            }
-        }
-
-        if ( detailed && null != descriptor )
-        {
-            buf.append( LS ).append( descriptor.formatAsString() );
-        }
-
-        return buf.toString();
-    }
-
-    // ----------------------------------------------------------------------
-    // Locally-shared methods
-    // ----------------------------------------------------------------------
-
-    void setAchievedGoal( final PluginActivationResult result )
-    {
-        this.result = result;
-    }
-
-    void setPluginDescriptor( final PluginDescriptor descriptor )
-    {
-        this.descriptor = descriptor;
-    }
-
-    void setThrowable( final Throwable reason )
-    {
-        this.reason = reason;
-        result = PluginActivationResult.BROKEN;
-    }
+  void setThrowable(final Throwable reason) {
+    this.reason = reason;
+    result = PluginActivationResult.BROKEN;
+  }
 }

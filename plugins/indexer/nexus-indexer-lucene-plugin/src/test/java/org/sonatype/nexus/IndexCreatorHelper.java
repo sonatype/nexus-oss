@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus;
 
 import java.util.ArrayList;
@@ -20,37 +21,39 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- *  Creators that can be used in tests.
+ * Creators that can be used in tests.
  */
 public class IndexCreatorHelper
 {
-    private List<IndexCreator> m_fullCreators = new ArrayList<IndexCreator>();
-    private List<IndexCreator> m_defaultCreators =  new ArrayList<IndexCreator>();
-    private List<IndexCreator> m_minCreators =  new ArrayList<IndexCreator>();
+  private List<IndexCreator> m_fullCreators = new ArrayList<IndexCreator>();
 
-    public IndexCreatorHelper( PlexusContainer testCaseContainer )
-        throws ComponentLookupException
-    {
-          IndexCreator min = testCaseContainer.lookup( IndexCreator.class, "min" );
-        IndexCreator jar = testCaseContainer.lookup( IndexCreator.class, "jarContent" );
+  private List<IndexCreator> m_defaultCreators = new ArrayList<IndexCreator>();
 
-        m_minCreators.add( min );
+  private List<IndexCreator> m_minCreators = new ArrayList<IndexCreator>();
 
-        m_fullCreators.add( min );
-        m_fullCreators.add( jar );
+  public IndexCreatorHelper(PlexusContainer testCaseContainer)
+      throws ComponentLookupException
+  {
+    IndexCreator min = testCaseContainer.lookup(IndexCreator.class, "min");
+    IndexCreator jar = testCaseContainer.lookup(IndexCreator.class, "jarContent");
 
-        m_defaultCreators.addAll( m_fullCreators );
-    }
+    m_minCreators.add(min);
 
-    public List<IndexCreator> getDefaultCreators() {
-        return m_defaultCreators;
-    }
+    m_fullCreators.add(min);
+    m_fullCreators.add(jar);
 
-    public List<IndexCreator> getFullCreators() {
-        return m_fullCreators;
-    }
+    m_defaultCreators.addAll(m_fullCreators);
+  }
 
-    public List<IndexCreator> getMinCreators() {
-        return m_minCreators;
-    }
+  public List<IndexCreator> getDefaultCreators() {
+    return m_defaultCreators;
+  }
+
+  public List<IndexCreator> getFullCreators() {
+    return m_fullCreators;
+  }
+
+  public List<IndexCreator> getMinCreators() {
+    return m_minCreators;
+  }
 }

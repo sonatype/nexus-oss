@@ -10,21 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 /**
  * Local status of a Repository.
- * 
+ *
  * @author cstamas
  */
 public enum LocalStatus
 {
-    IN_SERVICE,
+  IN_SERVICE,
 
-    OUT_OF_SERVICE;
+  OUT_OF_SERVICE;
 
-    public boolean shouldServiceRequest()
-    {
-        return IN_SERVICE.equals( this );
-    }
+  public boolean shouldServiceRequest() {
+    return IN_SERVICE.equals(this);
+  }
 }

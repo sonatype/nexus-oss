@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application.upgrade;
 
 import java.io.File;
@@ -20,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -49,558 +48,503 @@ import org.sonatype.nexus.configuration.model.v1_0_6.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_6.CSmtpConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 /**
  * Upgrades configuration model from version 1.0.5 to 1.0.6.
- * 
+ *
  * @author cstamas
  */
-@Component( role = SingleVersionUpgrader.class, hint = "1.0.5" )
+@Component(role = SingleVersionUpgrader.class, hint = "1.0.5")
 public class Upgrade105to106
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
-    public Object loadConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException
-    {
-        FileReader fr = null;
+  public Object loadConfiguration(File file)
+      throws IOException,
+             ConfigurationIsCorruptedException
+  {
+    FileReader fr = null;
 
-        Configuration conf = null;
+    Configuration conf = null;
 
-        try
-        {
-            // reading without interpolation to preserve user settings as variables
-            fr = new FileReader( file );
+    try {
+      // reading without interpolation to preserve user settings as variables
+      fr = new FileReader(file);
 
-            NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
+      NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
 
-            conf = reader.read( fr );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ConfigurationIsCorruptedException( file.getAbsolutePath(), e );
-        }
-        finally
-        {
-            if ( fr != null )
-            {
-                fr.close();
-            }
-        }
-
-        return conf;
+      conf = reader.read(fr);
+    }
+    catch (XmlPullParserException e) {
+      throw new ConfigurationIsCorruptedException(file.getAbsolutePath(), e);
+    }
+    finally {
+      if (fr != null) {
+        fr.close();
+      }
     }
 
-    public void upgrade( UpgradeMessage message )
-        throws ConfigurationIsCorruptedException
-    {
-        Configuration oldc = (Configuration) message.getConfiguration();
-        org.sonatype.nexus.configuration.model.v1_0_6.Configuration newc = new org.sonatype.nexus.configuration.model.v1_0_6.Configuration();
+    return conf;
+  }
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.v1_0_6.Configuration.MODEL_VERSION );
-        // Working & log directories removed in this revision
-        // newc.setWorkingDirectory( oldc.getWorkingDirectory() );
-        // newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
+  public void upgrade(UpgradeMessage message)
+      throws ConfigurationIsCorruptedException
+  {
+    Configuration oldc = (Configuration) message.getConfiguration();
+    org.sonatype.nexus.configuration.model.v1_0_6.Configuration newc = new org.sonatype.nexus.configuration.model.v1_0_6.Configuration();
 
-        newc.setSmtpConfiguration( copyCSmtpConfiguration1_0_5( oldc.getSmtpConfiguration() ) );
+    newc.setVersion(org.sonatype.nexus.configuration.model.v1_0_6.Configuration.MODEL_VERSION);
+    // Working & log directories removed in this revision
+    // newc.setWorkingDirectory( oldc.getWorkingDirectory() );
+    // newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
 
-        newc.setSecurity( copyCSecurity1_0_5( oldc.getSecurity() ) );
+    newc.setSmtpConfiguration(copyCSmtpConfiguration1_0_5(oldc.getSmtpConfiguration()));
 
-        newc.setGlobalConnectionSettings( copyCRemoteConnectionSettings1_0_5( oldc.getGlobalConnectionSettings() ) );
+    newc.setSecurity(copyCSecurity1_0_5(oldc.getSecurity()));
 
-        newc.setGlobalHttpProxySettings( copyCRemoteHttpProxySettings1_0_5( oldc.getGlobalHttpProxySettings() ) );
+    newc.setGlobalConnectionSettings(copyCRemoteConnectionSettings1_0_5(oldc.getGlobalConnectionSettings()));
 
-        newc.setRouting( copyCRouting1_0_5( oldc.getRouting() ) );
+    newc.setGlobalHttpProxySettings(copyCRemoteHttpProxySettings1_0_5(oldc.getGlobalHttpProxySettings()));
 
-        newc.setRestApi( copyCRestApi1_0_5( oldc.getRestApi() ) );
+    newc.setRouting(copyCRouting1_0_5(oldc.getRouting()));
 
-        newc.setHttpProxy( copyCHttpProxySettings1_0_5( oldc.getHttpProxy() ) );
+    newc.setRestApi(copyCRestApi1_0_5(oldc.getRestApi()));
 
-        List<CRepositoryTarget> targets = new ArrayList<CRepositoryTarget>( oldc.getRepositoryTargets().size() );
+    newc.setHttpProxy(copyCHttpProxySettings1_0_5(oldc.getHttpProxy()));
 
-        for ( org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryTarget oldtargets : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryTarget>) oldc
-            .getRepositoryTargets() )
-        {
-            targets.add( copyCRepositoryTarget1_0_5( oldtargets ) );
-        }
+    List<CRepositoryTarget> targets = new ArrayList<CRepositoryTarget>(oldc.getRepositoryTargets().size());
 
-        newc.setRepositoryTargets( targets );
-
-        checkRepositoryTargetsForDefaults( newc.getRepositoryTargets() );
-
-        List<CScheduledTask> tasks = new ArrayList<CScheduledTask>( oldc.getTasks().size() );
-
-        for ( org.sonatype.nexus.configuration.model.v1_0_5.CScheduledTask oldtasks : (List<org.sonatype.nexus.configuration.model.v1_0_5.CScheduledTask>) oldc
-            .getTasks() )
-        {
-            tasks.add( copyCScheduledTask1_0_5( oldtasks ) );
-        }
-
-        newc.setTasks( tasks );
-
-        List<CRepository> repositories = new ArrayList<CRepository>( oldc.getRepositories().size() );
-        for ( org.sonatype.nexus.configuration.model.v1_0_5.CRepository oldrepos : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepository>) oldc
-            .getRepositories() )
-        {
-            CRepository newrepos = copyCRepository1_0_5( oldrepos );
-            newrepos.setRepositoryPolicy( oldrepos.getRepositoryPolicy() );
-            repositories.add( newrepos );
-        }
-
-        newc.setRepositories( repositories );
-
-        if ( oldc.getRepositoryShadows() != null )
-        {
-            List<CRepositoryShadow> repositoryShadows = new ArrayList<CRepositoryShadow>( oldc
-                .getRepositoryShadows().size() );
-            for ( org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryShadow oldshadow : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryShadow>) oldc
-                .getRepositoryShadows() )
-            {
-                repositoryShadows.add( copyCRepositoryShadow1_0_5( oldshadow ) );
-            }
-            newc.setRepositoryShadows( repositoryShadows );
-        }
-
-        if ( oldc.getRepositoryGrouping() != null )
-        {
-            CRepositoryGrouping repositoryGrouping = new CRepositoryGrouping();
-            if ( oldc.getRepositoryGrouping().getPathMappings() != null )
-            {
-                for ( org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSettingPathMappingItem oldItem : (List<org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSettingPathMappingItem>) oldc
-                    .getRepositoryGrouping().getPathMappings() )
-                {
-                    repositoryGrouping.addPathMapping( copyCGroupsSettingPathMappingItem1_0_5( oldItem ) );
-                }
-            }
-            List<CRepositoryGroup> repositoryGroups = new ArrayList<CRepositoryGroup>( oldc
-                .getRepositoryGrouping().getRepositoryGroups().size() );
-            for ( org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGroup oldgroup : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGroup>) oldc
-                .getRepositoryGrouping().getRepositoryGroups() )
-            {
-                repositoryGroups.add( copyCRepositoryGroup1_0_5( oldgroup ) );
-            }
-            repositoryGrouping.setRepositoryGroups( repositoryGroups );
-            newc.setRepositoryGrouping( repositoryGrouping );
-        }
-
-        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_0_6.Configuration.MODEL_VERSION );
-        message.setConfiguration( newc );
+    for (org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryTarget oldtargets : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryTarget>) oldc
+        .getRepositoryTargets()) {
+      targets.add(copyCRepositoryTarget1_0_5(oldtargets));
     }
 
-    protected List<CProps> copyCProps1_0_5( List<org.sonatype.nexus.configuration.model.v1_0_5.CProps> oldprops )
-    {
-        List<CProps> properties = new ArrayList<CProps>( oldprops.size() );
-        for ( org.sonatype.nexus.configuration.model.v1_0_5.CProps oldprop : oldprops )
-        {
-            CProps newprop = new CProps();
-            newprop.setKey( oldprop.getKey() );
-            newprop.setValue( oldprop.getValue() );
-            properties.add( newprop );
-        }
-        return properties;
+    newc.setRepositoryTargets(targets);
+
+    checkRepositoryTargetsForDefaults(newc.getRepositoryTargets());
+
+    List<CScheduledTask> tasks = new ArrayList<CScheduledTask>(oldc.getTasks().size());
+
+    for (org.sonatype.nexus.configuration.model.v1_0_5.CScheduledTask oldtasks : (List<org.sonatype.nexus.configuration.model.v1_0_5.CScheduledTask>) oldc
+        .getTasks()) {
+      tasks.add(copyCScheduledTask1_0_5(oldtasks));
     }
 
-    protected CRemoteAuthentication copyCRemoteAuthentication1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CRemoteAuthentication oldauth )
-    {
-        if ( oldauth != null )
-        {
-            CRemoteAuthentication newauth = new CRemoteAuthentication();
-            newauth.setUsername( oldauth.getUsername() );
-            newauth.setPassword( oldauth.getPassword() );
-            newauth.setNtlmHost( oldauth.getNtlmHost() );
-            newauth.setNtlmDomain( oldauth.getNtlmDomain() );
-            newauth.setPrivateKey( oldauth.getPrivateKey() );
-            newauth.setPassphrase( oldauth.getPassphrase() );
-            return newauth;
-        }
-        else
-        {
-            return null;
-        }
+    newc.setTasks(tasks);
+
+    List<CRepository> repositories = new ArrayList<CRepository>(oldc.getRepositories().size());
+    for (org.sonatype.nexus.configuration.model.v1_0_5.CRepository oldrepos : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepository>) oldc
+        .getRepositories()) {
+      CRepository newrepos = copyCRepository1_0_5(oldrepos);
+      newrepos.setRepositoryPolicy(oldrepos.getRepositoryPolicy());
+      repositories.add(newrepos);
     }
 
-    protected CRemoteConnectionSettings copyCRemoteConnectionSettings1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CRemoteConnectionSettings old )
-    {
-        CRemoteConnectionSettings cs = new CRemoteConnectionSettings();
+    newc.setRepositories(repositories);
 
-        if ( old != null )
-        {
-            cs.setConnectionTimeout( old.getConnectionTimeout() );
-            cs.setRetrievalRetryCount( old.getRetrievalRetryCount() );
-            if ( old.getQueryString() != null )
-            {
-                cs.setQueryString( old.getQueryString() );
-            }
-            if ( old.getUserAgentString() != null )
-            {
-                cs.setUserAgentString( old.getUserAgentString() );
-            }
-        }
-        return cs;
+    if (oldc.getRepositoryShadows() != null) {
+      List<CRepositoryShadow> repositoryShadows = new ArrayList<CRepositoryShadow>(oldc
+          .getRepositoryShadows().size());
+      for (org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryShadow oldshadow : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryShadow>) oldc
+          .getRepositoryShadows()) {
+        repositoryShadows.add(copyCRepositoryShadow1_0_5(oldshadow));
+      }
+      newc.setRepositoryShadows(repositoryShadows);
     }
 
-    protected CRemoteHttpProxySettings copyCRemoteHttpProxySettings1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CRemoteHttpProxySettings old )
-    {
-        if ( old == null )
-        {
-            return null;
+    if (oldc.getRepositoryGrouping() != null) {
+      CRepositoryGrouping repositoryGrouping = new CRepositoryGrouping();
+      if (oldc.getRepositoryGrouping().getPathMappings() != null) {
+        for (org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSettingPathMappingItem oldItem : (List<org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSettingPathMappingItem>) oldc
+            .getRepositoryGrouping().getPathMappings()) {
+          repositoryGrouping.addPathMapping(copyCGroupsSettingPathMappingItem1_0_5(oldItem));
         }
-
-        CRemoteHttpProxySettings cs = new CRemoteHttpProxySettings();
-        cs.setProxyHostname( old.getProxyHostname() );
-        cs.setProxyPort( old.getProxyPort() );
-        cs.setAuthentication( copyCRemoteAuthentication1_0_5( old.getAuthentication() ) );
-        return cs;
+      }
+      List<CRepositoryGroup> repositoryGroups = new ArrayList<CRepositoryGroup>(oldc
+          .getRepositoryGrouping().getRepositoryGroups().size());
+      for (org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGroup oldgroup : (List<org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGroup>) oldc
+          .getRepositoryGrouping().getRepositoryGroups()) {
+        repositoryGroups.add(copyCRepositoryGroup1_0_5(oldgroup));
+      }
+      repositoryGrouping.setRepositoryGroups(repositoryGroups);
+      newc.setRepositoryGrouping(repositoryGrouping);
     }
 
-    protected CRepository copyCRepository1_0_5( org.sonatype.nexus.configuration.model.v1_0_5.CRepository oldrepos )
-    {
-        CRepository newrepos = new CRepository();
-        newrepos.setId( oldrepos.getId() );
-        newrepos.setName( oldrepos.getName() );
-        newrepos.setType( oldrepos.getType() );
-        newrepos.setLocalStatus( oldrepos.getLocalStatus() );
-        newrepos.setProxyMode( oldrepos.getProxyMode() );
-        newrepos.setAllowWrite( oldrepos.isAllowWrite() );
-        newrepos.setBrowseable( oldrepos.isBrowseable() );
-        newrepos.setIndexable( oldrepos.isIndexable() );
-        newrepos.setNotFoundCacheTTL( oldrepos.getNotFoundCacheTTL() );
-        newrepos.setArtifactMaxAge( oldrepos.getArtifactMaxAge() );
-        newrepos.setMetadataMaxAge( oldrepos.getMetadataMaxAge() );
-        newrepos.setMaintainProxiedRepositoryMetadata( oldrepos.isMaintainProxiedRepositoryMetadata() );
-        newrepos.setDownloadRemoteIndexes( oldrepos.isDownloadRemoteIndexes() );
-        newrepos.setChecksumPolicy( oldrepos.getChecksumPolicy() );
+    message.setModelVersion(org.sonatype.nexus.configuration.model.v1_0_6.Configuration.MODEL_VERSION);
+    message.setConfiguration(newc);
+  }
 
-        if ( oldrepos.getLocalStorage() != null )
-        {
-            CLocalStorage localStorage = new CLocalStorage();
-            localStorage.setUrl( oldrepos.getLocalStorage().getUrl() );
-            newrepos.setLocalStorage( localStorage );
-        }
+  protected List<CProps> copyCProps1_0_5(List<org.sonatype.nexus.configuration.model.v1_0_5.CProps> oldprops) {
+    List<CProps> properties = new ArrayList<CProps>(oldprops.size());
+    for (org.sonatype.nexus.configuration.model.v1_0_5.CProps oldprop : oldprops) {
+      CProps newprop = new CProps();
+      newprop.setKey(oldprop.getKey());
+      newprop.setValue(oldprop.getValue());
+      properties.add(newprop);
+    }
+    return properties;
+  }
 
-        if ( oldrepos.getRemoteStorage() != null )
-        {
-            CRemoteStorage remoteStorage = new CRemoteStorage();
-            remoteStorage.setUrl( oldrepos.getRemoteStorage().getUrl() );
-            if ( oldrepos.getRemoteStorage().getAuthentication() != null )
-            {
-                remoteStorage.setAuthentication( copyCRemoteAuthentication1_0_5( oldrepos
-                    .getRemoteStorage().getAuthentication() ) );
-            }
-            if ( oldrepos.getRemoteStorage().getConnectionSettings() != null )
-            {
-                remoteStorage.setConnectionSettings( copyCRemoteConnectionSettings1_0_5( oldrepos
-                    .getRemoteStorage().getConnectionSettings() ) );
-            }
-            if ( oldrepos.getRemoteStorage().getHttpProxySettings() != null )
-            {
-                remoteStorage.setHttpProxySettings( copyCRemoteHttpProxySettings1_0_5( oldrepos
-                    .getRemoteStorage().getHttpProxySettings() ) );
-            }
-            newrepos.setRemoteStorage( remoteStorage );
-        }
-        return newrepos;
+  protected CRemoteAuthentication copyCRemoteAuthentication1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CRemoteAuthentication oldauth)
+  {
+    if (oldauth != null) {
+      CRemoteAuthentication newauth = new CRemoteAuthentication();
+      newauth.setUsername(oldauth.getUsername());
+      newauth.setPassword(oldauth.getPassword());
+      newauth.setNtlmHost(oldauth.getNtlmHost());
+      newauth.setNtlmDomain(oldauth.getNtlmDomain());
+      newauth.setPrivateKey(oldauth.getPrivateKey());
+      newauth.setPassphrase(oldauth.getPassphrase());
+      return newauth;
+    }
+    else {
+      return null;
+    }
+  }
+
+  protected CRemoteConnectionSettings copyCRemoteConnectionSettings1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CRemoteConnectionSettings old)
+  {
+    CRemoteConnectionSettings cs = new CRemoteConnectionSettings();
+
+    if (old != null) {
+      cs.setConnectionTimeout(old.getConnectionTimeout());
+      cs.setRetrievalRetryCount(old.getRetrievalRetryCount());
+      if (old.getQueryString() != null) {
+        cs.setQueryString(old.getQueryString());
+      }
+      if (old.getUserAgentString() != null) {
+        cs.setUserAgentString(old.getUserAgentString());
+      }
+    }
+    return cs;
+  }
+
+  protected CRemoteHttpProxySettings copyCRemoteHttpProxySettings1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CRemoteHttpProxySettings old)
+  {
+    if (old == null) {
+      return null;
     }
 
-    protected CSmtpConfiguration copyCSmtpConfiguration1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CSmtpConfiguration oldsmtp )
-    {
-        CSmtpConfiguration smtp = new CSmtpConfiguration();
+    CRemoteHttpProxySettings cs = new CRemoteHttpProxySettings();
+    cs.setProxyHostname(old.getProxyHostname());
+    cs.setProxyPort(old.getProxyPort());
+    cs.setAuthentication(copyCRemoteAuthentication1_0_5(old.getAuthentication()));
+    return cs;
+  }
 
-        if ( oldsmtp != null )
-        {
-            smtp.setDebugMode( oldsmtp.isDebugMode() );
-            smtp.setHost( oldsmtp.getHost() );
-            smtp.setPassword( oldsmtp.getPassword() );
-            smtp.setPort( oldsmtp.getPort() );
-            smtp.setSslEnabled( oldsmtp.isSslEnabled() );
-            smtp.setSystemEmailAddress( oldsmtp.getSystemEmailAddress() );
-            smtp.setTlsEnabled( oldsmtp.isTlsEnabled() );
-            smtp.setUsername( oldsmtp.getUsername() );
-        }
+  protected CRepository copyCRepository1_0_5(org.sonatype.nexus.configuration.model.v1_0_5.CRepository oldrepos) {
+    CRepository newrepos = new CRepository();
+    newrepos.setId(oldrepos.getId());
+    newrepos.setName(oldrepos.getName());
+    newrepos.setType(oldrepos.getType());
+    newrepos.setLocalStatus(oldrepos.getLocalStatus());
+    newrepos.setProxyMode(oldrepos.getProxyMode());
+    newrepos.setAllowWrite(oldrepos.isAllowWrite());
+    newrepos.setBrowseable(oldrepos.isBrowseable());
+    newrepos.setIndexable(oldrepos.isIndexable());
+    newrepos.setNotFoundCacheTTL(oldrepos.getNotFoundCacheTTL());
+    newrepos.setArtifactMaxAge(oldrepos.getArtifactMaxAge());
+    newrepos.setMetadataMaxAge(oldrepos.getMetadataMaxAge());
+    newrepos.setMaintainProxiedRepositoryMetadata(oldrepos.isMaintainProxiedRepositoryMetadata());
+    newrepos.setDownloadRemoteIndexes(oldrepos.isDownloadRemoteIndexes());
+    newrepos.setChecksumPolicy(oldrepos.getChecksumPolicy());
 
-        return smtp;
+    if (oldrepos.getLocalStorage() != null) {
+      CLocalStorage localStorage = new CLocalStorage();
+      localStorage.setUrl(oldrepos.getLocalStorage().getUrl());
+      newrepos.setLocalStorage(localStorage);
     }
 
-    protected CSecurity copyCSecurity1_0_5( org.sonatype.nexus.configuration.model.v1_0_5.CSecurity oldsecurity )
-    {
-        CSecurity security = new CSecurity();
+    if (oldrepos.getRemoteStorage() != null) {
+      CRemoteStorage remoteStorage = new CRemoteStorage();
+      remoteStorage.setUrl(oldrepos.getRemoteStorage().getUrl());
+      if (oldrepos.getRemoteStorage().getAuthentication() != null) {
+        remoteStorage.setAuthentication(copyCRemoteAuthentication1_0_5(oldrepos
+            .getRemoteStorage().getAuthentication()));
+      }
+      if (oldrepos.getRemoteStorage().getConnectionSettings() != null) {
+        remoteStorage.setConnectionSettings(copyCRemoteConnectionSettings1_0_5(oldrepos
+            .getRemoteStorage().getConnectionSettings()));
+      }
+      if (oldrepos.getRemoteStorage().getHttpProxySettings() != null) {
+        remoteStorage.setHttpProxySettings(copyCRemoteHttpProxySettings1_0_5(oldrepos
+            .getRemoteStorage().getHttpProxySettings()));
+      }
+      newrepos.setRemoteStorage(remoteStorage);
+    }
+    return newrepos;
+  }
 
-        if ( oldsecurity != null )
-        {
-            security.setAnonymousAccessEnabled( oldsecurity.isAnonymousAccessEnabled() );
-            security.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
-            security.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
-            security.setEnabled( oldsecurity.isEnabled() );
-        }
+  protected CSmtpConfiguration copyCSmtpConfiguration1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CSmtpConfiguration oldsmtp)
+  {
+    CSmtpConfiguration smtp = new CSmtpConfiguration();
 
-        security.addRealm( "XmlAuthenticatingRealm" );
-        security.addRealm( "NexusMethodAuthorizingRealm" );
-        security.addRealm( "NexusTargetAuthorizingRealm" );
-
-        return security;
+    if (oldsmtp != null) {
+      smtp.setDebugMode(oldsmtp.isDebugMode());
+      smtp.setHost(oldsmtp.getHost());
+      smtp.setPassword(oldsmtp.getPassword());
+      smtp.setPort(oldsmtp.getPort());
+      smtp.setSslEnabled(oldsmtp.isSslEnabled());
+      smtp.setSystemEmailAddress(oldsmtp.getSystemEmailAddress());
+      smtp.setTlsEnabled(oldsmtp.isTlsEnabled());
+      smtp.setUsername(oldsmtp.getUsername());
     }
 
-    protected CRouting copyCRouting1_0_5( org.sonatype.nexus.configuration.model.v1_0_5.CRouting oldrouting )
-    {
-        CRouting routing = new CRouting();
+    return smtp;
+  }
 
-        if ( oldrouting != null )
-        {
-            routing.setFollowLinks( oldrouting.isFollowLinks() );
-            routing.setNotFoundCacheTTL( oldrouting.getNotFoundCacheTTL() );
-            if ( oldrouting.getGroups() != null )
-            {
-                CGroupsSetting groups = new CGroupsSetting();
-                groups.setStopItemSearchOnFirstFoundFile( oldrouting.getGroups().isStopItemSearchOnFirstFoundFile() );
-                groups.setMergeMetadata( oldrouting.getGroups().isMergeMetadata() );
-                routing.setGroups( groups );
-            }
-        }
+  protected CSecurity copyCSecurity1_0_5(org.sonatype.nexus.configuration.model.v1_0_5.CSecurity oldsecurity) {
+    CSecurity security = new CSecurity();
 
-        return routing;
+    if (oldsecurity != null) {
+      security.setAnonymousAccessEnabled(oldsecurity.isAnonymousAccessEnabled());
+      security.setAnonymousPassword(oldsecurity.getAnonymousPassword());
+      security.setAnonymousUsername(oldsecurity.getAnonymousUsername());
+      security.setEnabled(oldsecurity.isEnabled());
     }
 
-    protected CRestApiSettings copyCRestApi1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CRestApiSettings oldrestapi )
-    {
-        CRestApiSettings restapi = new CRestApiSettings();
+    security.addRealm("XmlAuthenticatingRealm");
+    security.addRealm("NexusMethodAuthorizingRealm");
+    security.addRealm("NexusTargetAuthorizingRealm");
 
-        if ( oldrestapi != null )
-        {
-            restapi.setAccessAllowedFrom( oldrestapi.getAccessAllowedFrom() );
-            restapi.setBaseUrl( oldrestapi.getBaseUrl() );
-        }
+    return security;
+  }
 
-        return restapi;
+  protected CRouting copyCRouting1_0_5(org.sonatype.nexus.configuration.model.v1_0_5.CRouting oldrouting) {
+    CRouting routing = new CRouting();
+
+    if (oldrouting != null) {
+      routing.setFollowLinks(oldrouting.isFollowLinks());
+      routing.setNotFoundCacheTTL(oldrouting.getNotFoundCacheTTL());
+      if (oldrouting.getGroups() != null) {
+        CGroupsSetting groups = new CGroupsSetting();
+        groups.setStopItemSearchOnFirstFoundFile(oldrouting.getGroups().isStopItemSearchOnFirstFoundFile());
+        groups.setMergeMetadata(oldrouting.getGroups().isMergeMetadata());
+        routing.setGroups(groups);
+      }
     }
 
-    protected CHttpProxySettings copyCHttpProxySettings1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CHttpProxySettings oldproxy )
-    {
-        CHttpProxySettings proxy = new CHttpProxySettings();
+    return routing;
+  }
 
-        if ( oldproxy != null )
-        {
-            proxy.setEnabled( oldproxy.isEnabled() );
-            proxy.setPort( oldproxy.getPort() );
-            proxy.setProxyPolicy( oldproxy.getProxyPolicy() );
-        }
+  protected CRestApiSettings copyCRestApi1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CRestApiSettings oldrestapi)
+  {
+    CRestApiSettings restapi = new CRestApiSettings();
 
-        return proxy;
+    if (oldrestapi != null) {
+      restapi.setAccessAllowedFrom(oldrestapi.getAccessAllowedFrom());
+      restapi.setBaseUrl(oldrestapi.getBaseUrl());
     }
 
-    protected CRepositoryTarget copyCRepositoryTarget1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryTarget oldtarget )
-    {
-        CRepositoryTarget target = new CRepositoryTarget();
+    return restapi;
+  }
 
-        if ( oldtarget != null )
-        {
-            target.setContentClass( oldtarget.getContentClass() );
-            target.setId( oldtarget.getId() );
-            target.setName( oldtarget.getName() );
-            target.setPatterns( oldtarget.getPatterns() );
-        }
+  protected CHttpProxySettings copyCHttpProxySettings1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CHttpProxySettings oldproxy)
+  {
+    CHttpProxySettings proxy = new CHttpProxySettings();
 
-        return target;
+    if (oldproxy != null) {
+      proxy.setEnabled(oldproxy.isEnabled());
+      proxy.setPort(oldproxy.getPort());
+      proxy.setProxyPolicy(oldproxy.getProxyPolicy());
     }
 
-    protected void checkRepositoryTargetsForDefaults( List<CRepositoryTarget> targets )
-    {
-        // check are the defaults here, if not, add them
-        Set<String> existingIds = new HashSet<String>();
+    return proxy;
+  }
 
-        for ( CRepositoryTarget target : targets )
-        {
-            existingIds.add( target.getId() );
-        }
+  protected CRepositoryTarget copyCRepositoryTarget1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryTarget oldtarget)
+  {
+    CRepositoryTarget target = new CRepositoryTarget();
 
-        if ( !existingIds.contains( "1" ) )
-        {
-            // add it
-            CRepositoryTarget t = new CRepositoryTarget();
-            t.setId( "1" );
-            t.setName( "All (Maven2)" );
-            t.setContentClass( "maven2" );
-            t.addPattern( ".*" );
-
-            targets.add( t );
-        }
-        if ( !existingIds.contains( "2" ) )
-        {
-            // add it
-            CRepositoryTarget t = new CRepositoryTarget();
-            t.setId( "2" );
-            t.setName( "All (Maven1)" );
-            t.setContentClass( "maven1" );
-            t.addPattern( ".*" );
-
-            targets.add( t );
-        }
-        if ( !existingIds.contains( "3" ) )
-        {
-            // add it
-            CRepositoryTarget t = new CRepositoryTarget();
-            t.setId( "3" );
-            t.setName( "All but sources (Maven2)" );
-            t.setContentClass( "maven2" );
-            t.addPattern( "(?!.*-sources.*).*" );
-
-            targets.add( t );
-        }
-        if ( !existingIds.contains( "4" ) )
-        {
-            // add it
-            CRepositoryTarget t = new CRepositoryTarget();
-            t.setId( "4" );
-            t.setName( "All Metadata (Maven2)" );
-            t.setContentClass( "maven2" );
-            t.addPattern( ".*maven-metadata\\.xml.*" );
-
-            targets.add( t );
-        }
-
+    if (oldtarget != null) {
+      target.setContentClass(oldtarget.getContentClass());
+      target.setId(oldtarget.getId());
+      target.setName(oldtarget.getName());
+      target.setPatterns(oldtarget.getPatterns());
     }
 
-    protected CScheduledTask copyCScheduledTask1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CScheduledTask oldtask )
-    {
-        CScheduledTask task = new CScheduledTask();
+    return target;
+  }
 
-        if ( oldtask != null )
-        {
-            if ( "org.sonatype.nexus.tasks.PublishIndexesTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "PublishIndexesTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.ReindexTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "ReindexTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.RebuildAttributesTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "RebuildAttributesTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.ClearCacheTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "ClearCacheTask" );
-            }
-            else if ( "org.sonatype.nexus.maven.tasks.SnapshotRemoverTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "SnapshotRemoverTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "EvictUnusedProxiedItemsTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.PurgeTimeline".equals( oldtask.getType() ) )
-            {
-                task.setType( "PurgeTimeline" );
-            }
-            else if ( "org.sonatype.nexus.tasks.SynchronizeShadowsTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "SynchronizeShadowsTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.EmptyTrashTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "EmptyTrashTask" );
-            }
+  protected void checkRepositoryTargetsForDefaults(List<CRepositoryTarget> targets) {
+    // check are the defaults here, if not, add them
+    Set<String> existingIds = new HashSet<String>();
 
-            task.setEnabled( oldtask.isEnabled() );
-            task.setId( oldtask.getId() );
-            task.setLastRun( oldtask.getLastRun() );
-            task.setNextRun( oldtask.getNextRun() );
-            task.setName( oldtask.getName() );
-            task.setStatus( oldtask.getStatus() );
-            task.setProperties( copyCProps1_0_5( (List<org.sonatype.nexus.configuration.model.v1_0_5.CProps>) oldtask
-                .getProperties() ) );
-            task.setSchedule( copyCScheduleConfig1_0_5( oldtask.getSchedule() ) );
-        }
-
-        return task;
+    for (CRepositoryTarget target : targets) {
+      existingIds.add(target.getId());
     }
 
-    protected CScheduleConfig copyCScheduleConfig1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CScheduleConfig oldschedule )
-    {
-        CScheduleConfig schedule = new CScheduleConfig();
+    if (!existingIds.contains("1")) {
+      // add it
+      CRepositoryTarget t = new CRepositoryTarget();
+      t.setId("1");
+      t.setName("All (Maven2)");
+      t.setContentClass("maven2");
+      t.addPattern(".*");
 
-        if ( oldschedule != null )
-        {
-            schedule.setCronCommand( oldschedule.getCronCommand() );
-            schedule.setDaysOfMonth( oldschedule.getDaysOfMonth() );
+      targets.add(t);
+    }
+    if (!existingIds.contains("2")) {
+      // add it
+      CRepositoryTarget t = new CRepositoryTarget();
+      t.setId("2");
+      t.setName("All (Maven1)");
+      t.setContentClass("maven1");
+      t.addPattern(".*");
 
-            for ( String dayOfWeek : (List<String>) oldschedule.getDaysOfWeek() )
-            {
-                schedule.addDaysOfWeek( Integer.toString( Integer.parseInt( dayOfWeek ) + 1 ) );
-            }
+      targets.add(t);
+    }
+    if (!existingIds.contains("3")) {
+      // add it
+      CRepositoryTarget t = new CRepositoryTarget();
+      t.setId("3");
+      t.setName("All but sources (Maven2)");
+      t.setContentClass("maven2");
+      t.addPattern("(?!.*-sources.*).*");
 
-            schedule.setEndDate( oldschedule.getEndDate() );
-            schedule.setStartDate( oldschedule.getStartDate() );
-            schedule.setType( oldschedule.getType() );
-            
-            // Fix for NEXUS-1252
-            if ( schedule.getDaysOfWeek() != null 
-                && schedule.getDaysOfWeek().size() > 0 )
-            {
-                schedule.setType( "weekly" );
-            }
-        }
+      targets.add(t);
+    }
+    if (!existingIds.contains("4")) {
+      // add it
+      CRepositoryTarget t = new CRepositoryTarget();
+      t.setId("4");
+      t.setName("All Metadata (Maven2)");
+      t.setContentClass("maven2");
+      t.addPattern(".*maven-metadata\\.xml.*");
 
-        return schedule;
+      targets.add(t);
     }
 
-    protected CRepositoryShadow copyCRepositoryShadow1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryShadow oldshadow )
-    {
-        CRepositoryShadow shadow = new CRepositoryShadow();
+  }
 
-        if ( oldshadow != null )
-        {
-            shadow.setId( oldshadow.getId() );
-            shadow.setName( oldshadow.getName() );
-            shadow.setLocalStatus( oldshadow.getLocalStatus() );
-            shadow.setShadowOf( oldshadow.getShadowOf() );
-            shadow.setType( oldshadow.getType() );
-            shadow.setSyncAtStartup( oldshadow.isSyncAtStartup() );
-        }
+  protected CScheduledTask copyCScheduledTask1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CScheduledTask oldtask)
+  {
+    CScheduledTask task = new CScheduledTask();
 
-        return shadow;
+    if (oldtask != null) {
+      if ("org.sonatype.nexus.tasks.PublishIndexesTask".equals(oldtask.getType())) {
+        task.setType("PublishIndexesTask");
+      }
+      else if ("org.sonatype.nexus.tasks.ReindexTask".equals(oldtask.getType())) {
+        task.setType("ReindexTask");
+      }
+      else if ("org.sonatype.nexus.tasks.RebuildAttributesTask".equals(oldtask.getType())) {
+        task.setType("RebuildAttributesTask");
+      }
+      else if ("org.sonatype.nexus.tasks.ClearCacheTask".equals(oldtask.getType())) {
+        task.setType("ClearCacheTask");
+      }
+      else if ("org.sonatype.nexus.maven.tasks.SnapshotRemoverTask".equals(oldtask.getType())) {
+        task.setType("SnapshotRemoverTask");
+      }
+      else if ("org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask".equals(oldtask.getType())) {
+        task.setType("EvictUnusedProxiedItemsTask");
+      }
+      else if ("org.sonatype.nexus.tasks.PurgeTimeline".equals(oldtask.getType())) {
+        task.setType("PurgeTimeline");
+      }
+      else if ("org.sonatype.nexus.tasks.SynchronizeShadowsTask".equals(oldtask.getType())) {
+        task.setType("SynchronizeShadowsTask");
+      }
+      else if ("org.sonatype.nexus.tasks.EmptyTrashTask".equals(oldtask.getType())) {
+        task.setType("EmptyTrashTask");
+      }
+
+      task.setEnabled(oldtask.isEnabled());
+      task.setId(oldtask.getId());
+      task.setLastRun(oldtask.getLastRun());
+      task.setNextRun(oldtask.getNextRun());
+      task.setName(oldtask.getName());
+      task.setStatus(oldtask.getStatus());
+      task.setProperties(copyCProps1_0_5((List<org.sonatype.nexus.configuration.model.v1_0_5.CProps>) oldtask
+          .getProperties()));
+      task.setSchedule(copyCScheduleConfig1_0_5(oldtask.getSchedule()));
     }
 
-    protected CGroupsSettingPathMappingItem copyCGroupsSettingPathMappingItem1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSettingPathMappingItem oldpathmapping )
-    {
-        CGroupsSettingPathMappingItem pathmapping = new CGroupsSettingPathMappingItem();
+    return task;
+  }
 
-        if ( oldpathmapping != null )
-        {
-            pathmapping.setGroupId( oldpathmapping.getGroupId() );
-            pathmapping.setId( oldpathmapping.getId() );
-            pathmapping.setRepositories( oldpathmapping.getRepositories() );
-            pathmapping.setRoutePattern( oldpathmapping.getRoutePattern() );
-            pathmapping.setRouteType( oldpathmapping.getRouteType() );
-        }
+  protected CScheduleConfig copyCScheduleConfig1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CScheduleConfig oldschedule)
+  {
+    CScheduleConfig schedule = new CScheduleConfig();
 
-        return pathmapping;
+    if (oldschedule != null) {
+      schedule.setCronCommand(oldschedule.getCronCommand());
+      schedule.setDaysOfMonth(oldschedule.getDaysOfMonth());
+
+      for (String dayOfWeek : (List<String>) oldschedule.getDaysOfWeek()) {
+        schedule.addDaysOfWeek(Integer.toString(Integer.parseInt(dayOfWeek) + 1));
+      }
+
+      schedule.setEndDate(oldschedule.getEndDate());
+      schedule.setStartDate(oldschedule.getStartDate());
+      schedule.setType(oldschedule.getType());
+
+      // Fix for NEXUS-1252
+      if (schedule.getDaysOfWeek() != null
+          && schedule.getDaysOfWeek().size() > 0) {
+        schedule.setType("weekly");
+      }
     }
 
-    protected CRepositoryGroup copyCRepositoryGroup1_0_5(
-        org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGroup oldgroup )
-    {
-        CRepositoryGroup group = new CRepositoryGroup();
+    return schedule;
+  }
 
-        if ( oldgroup != null )
-        {
-            group.setGroupId( oldgroup.getGroupId() );
-            group.setName( oldgroup.getName() );
-            group.setRepositories( oldgroup.getRepositories() );
-        }
+  protected CRepositoryShadow copyCRepositoryShadow1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryShadow oldshadow)
+  {
+    CRepositoryShadow shadow = new CRepositoryShadow();
 
-        return group;
+    if (oldshadow != null) {
+      shadow.setId(oldshadow.getId());
+      shadow.setName(oldshadow.getName());
+      shadow.setLocalStatus(oldshadow.getLocalStatus());
+      shadow.setShadowOf(oldshadow.getShadowOf());
+      shadow.setType(oldshadow.getType());
+      shadow.setSyncAtStartup(oldshadow.isSyncAtStartup());
     }
+
+    return shadow;
+  }
+
+  protected CGroupsSettingPathMappingItem copyCGroupsSettingPathMappingItem1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSettingPathMappingItem oldpathmapping)
+  {
+    CGroupsSettingPathMappingItem pathmapping = new CGroupsSettingPathMappingItem();
+
+    if (oldpathmapping != null) {
+      pathmapping.setGroupId(oldpathmapping.getGroupId());
+      pathmapping.setId(oldpathmapping.getId());
+      pathmapping.setRepositories(oldpathmapping.getRepositories());
+      pathmapping.setRoutePattern(oldpathmapping.getRoutePattern());
+      pathmapping.setRouteType(oldpathmapping.getRouteType());
+    }
+
+    return pathmapping;
+  }
+
+  protected CRepositoryGroup copyCRepositoryGroup1_0_5(
+      org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGroup oldgroup)
+  {
+    CRepositoryGroup group = new CRepositoryGroup();
+
+    if (oldgroup != null) {
+      group.setGroupId(oldgroup.getGroupId());
+      group.setName(oldgroup.getName());
+      group.setRepositories(oldgroup.getRepositories());
+    }
+
+    return group;
+  }
 }

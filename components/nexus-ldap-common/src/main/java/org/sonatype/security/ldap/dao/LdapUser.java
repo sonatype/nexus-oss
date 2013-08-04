@@ -10,124 +10,109 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class LdapUser
-implements Comparable<LdapUser>
+    implements Comparable<LdapUser>
 {
-    
-    private String username;
-    
-    private String realName;
-    
-    private String email;
-    
-    private String website;
-    
-    private String password;
-    
-    private Set<String> membership = new HashSet<String>();
-    
-    private String dn;
 
-    public String getEmail()
-    {
-        return email;
-    }
+  private String username;
 
-    public void setEmail( String email )
-    {
-        this.email = email;
-    }
+  private String realName;
 
-    public String getRealName()
-    {
-        return realName;
-    }
+  private String email;
 
-    public void setRealName( String realName )
-    {
-        this.realName = realName;
-    }
+  private String website;
 
-    public String getUsername()
-    {
-        return username;
-    }
+  private String password;
 
-    public void setUsername( String username )
-    {
-        this.username = username;
-    }
+  private Set<String> membership = new HashSet<String>();
 
-    public Set<String> getMembership()
-    {
-        return membership;
-    }
+  private String dn;
 
-    public void setMembership( Set<String> membership )
-    {
-        this.membership = membership;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public String getWebsite()
-    {
-        return website;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public void setWebsite( String website )
-    {
-        this.website = website;
-    }
+  public String getRealName() {
+    return realName;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public void setRealName(String realName) {
+    this.realName = realName;
+  }
 
-    public void setPassword( String password )
-    {
-        this.password = password;
-    }
-    
-    public String getDn()
-    {
-        return dn;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public void setDn( String dn )
-    {
-        this.dn = dn;
-    }
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-    public String toString()
-    {
-        StringBuilder buffer = new StringBuilder();
-        
-        buffer.append( "User:" );
-        buffer.append( "\n\tUsername: " ).append( username );
-        buffer.append( "\n\tDN: " ).append( dn );
-        buffer.append( "\n\tReal Name: " ).append( realName );
-        buffer.append( "\n\tEmail: " ).append( email );
-        buffer.append( "\n\tWebsite: " ).append( website );
-        
-        if(getMembership() != null && !getMembership().isEmpty())
-        {
-            buffer.append( "\n\tMembership: " ).append( getMembership() );
-        }
-        
-        return buffer.toString();
+  public Set<String> getMembership() {
+    return membership;
+  }
+
+  public void setMembership(Set<String> membership) {
+    this.membership = membership;
+  }
+
+  public String getWebsite() {
+    return website;
+  }
+
+  public void setWebsite(String website) {
+    this.website = website;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public String getDn() {
+    return dn;
+  }
+
+  public void setDn(String dn) {
+    this.dn = dn;
+  }
+
+  public String toString() {
+    StringBuilder buffer = new StringBuilder();
+
+    buffer.append("User:");
+    buffer.append("\n\tUsername: ").append(username);
+    buffer.append("\n\tDN: ").append(dn);
+    buffer.append("\n\tReal Name: ").append(realName);
+    buffer.append("\n\tEmail: ").append(email);
+    buffer.append("\n\tWebsite: ").append(website);
+
+    if (getMembership() != null && !getMembership().isEmpty()) {
+      buffer.append("\n\tMembership: ").append(getMembership());
     }
 
-    public int compareTo( LdapUser o )
-    {
-        if ( o == null )
-            return 1;
-        
-        return this.getUsername().compareTo( o.getUsername() );
+    return buffer.toString();
+  }
+
+  public int compareTo(LdapUser o) {
+    if (o == null) {
+      return 1;
     }
+
+    return this.getUsername().compareTo(o.getUsername());
+  }
 
 }

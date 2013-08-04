@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest.jersey.subsystem;
 
 import javax.inject.Named;
@@ -18,10 +19,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.core.subsystem.security.Roles;
-import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTarget;
 import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTargets;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.security.JerseyRoles;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.targets.JerseyRepositoryTargets;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
@@ -36,22 +34,19 @@ public class JerseyRepositoryTargetsSubsystemFactory
     implements SubsystemFactory<RepositoryTargets, JerseyNexusClient>
 {
 
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.anyModern();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.anyModern();
+  }
 
-    @Override
-    public Class<RepositoryTargets> getType()
-    {
-        return RepositoryTargets.class;
-    }
+  @Override
+  public Class<RepositoryTargets> getType() {
+    return RepositoryTargets.class;
+  }
 
-    @Override
-    public RepositoryTargets create( JerseyNexusClient nexusClient )
-    {
-        return new JerseyRepositoryTargets( nexusClient );
-    }
+  @Override
+  public RepositoryTargets create(JerseyNexusClient nexusClient) {
+    return new JerseyRepositoryTargets(nexusClient);
+  }
 
 }

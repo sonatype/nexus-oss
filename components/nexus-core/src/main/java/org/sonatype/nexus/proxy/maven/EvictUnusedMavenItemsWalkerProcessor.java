@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -26,64 +27,55 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 public class EvictUnusedMavenItemsWalkerProcessor
     extends EvictUnusedItemsWalkerProcessor
 {
-    public EvictUnusedMavenItemsWalkerProcessor( long timestamp )
-    {
-        super( timestamp );
-    }
+  public EvictUnusedMavenItemsWalkerProcessor(long timestamp) {
+    super(timestamp);
+  }
 
-    // added filter for maven reposes to exclude .index dirs
-    // and all hash files, as they will be removed if main artifact
-    // is removed
-    public static class EvictUnusedMavenItemsWalkerFilter
-        extends EvictUnusedItemsWalkerFilter
-    {
-        public boolean shouldProcess( WalkerContext context, StorageItem item )
-        {
-            return super.shouldProcess( context, item ) && !item.getPath().startsWith( "/.index" )
-                && !item.getPath().endsWith( ".asc" ) && !item.getPath().endsWith( ".sha1" )
-                && !item.getPath().endsWith( ".md5" );
-        }
+  // added filter for maven reposes to exclude .index dirs
+  // and all hash files, as they will be removed if main artifact
+  // is removed
+  public static class EvictUnusedMavenItemsWalkerFilter
+      extends EvictUnusedItemsWalkerFilter
+  {
+    public boolean shouldProcess(WalkerContext context, StorageItem item) {
+      return super.shouldProcess(context, item) && !item.getPath().startsWith("/.index")
+          && !item.getPath().endsWith(".asc") && !item.getPath().endsWith(".sha1")
+          && !item.getPath().endsWith(".md5");
     }
+  }
 
-    @Override
-    public void doDelete( WalkerContext ctx, StorageFileItem item )
-        throws StorageException, UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException
-    {
-        MavenRepository repository = (MavenRepository) getRepository( ctx );
+  @Override
+  public void doDelete(WalkerContext ctx, StorageFileItem item)
+      throws StorageException, UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException
+  {
+    MavenRepository repository = (MavenRepository) getRepository(ctx);
 
-        repository.deleteItemWithChecksums( false, new ResourceStoreRequest( item ) );
+    repository.deleteItemWithChecksums(false, new ResourceStoreRequest(item));
+  }
+
+  // on maven repositories, we must use another delete method
+  @Override
+  public void onCollectionExit(WalkerContext ctx, StorageCollectionItem coll) {
+    // expiring now empty directories
+    try {
+      if (getRepository(ctx).list(false, coll).size() == 0) {
+        ((MavenRepository) getRepository(ctx)).deleteItemWithChecksums(false, new ResourceStoreRequest(
+            coll));
+      }
     }
-
-    // on maven repositories, we must use another delete method
-    @Override
-    public void onCollectionExit( WalkerContext ctx, StorageCollectionItem coll )
-    {
-        // expiring now empty directories
-        try
-        {
-            if ( getRepository( ctx ).list( false, coll ).size() == 0 )
-            {
-                ( (MavenRepository) getRepository( ctx ) ).deleteItemWithChecksums( false, new ResourceStoreRequest(
-                    coll ) );
-            }
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // if op not supported (R/O repo?)
-            ctx.stop( e );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // will not happen
-        }
-        catch ( IllegalOperationException e )
-        {
-            // simply stop if set during processing
-            ctx.stop( e );
-        }
-        catch ( StorageException e )
-        {
-            ctx.stop( e );
-        }
+    catch (UnsupportedStorageOperationException e) {
+      // if op not supported (R/O repo?)
+      ctx.stop(e);
     }
+    catch (ItemNotFoundException e) {
+      // will not happen
+    }
+    catch (IllegalOperationException e) {
+      // simply stop if set during processing
+      ctx.stop(e);
+    }
+    catch (StorageException e) {
+      ctx.stop(e);
+    }
+  }
 }

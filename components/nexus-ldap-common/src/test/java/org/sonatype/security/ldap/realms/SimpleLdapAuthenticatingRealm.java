@@ -10,22 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.apache.shiro.realm.Realm;
+import org.codehaus.plexus.component.annotations.Component;
 
-@Component( role = Realm.class, hint = SimpleLdapAuthenticatingRealm.ROLE, description = "Test Authentication LDAP Realm" )
+@Component(role = Realm.class, hint = SimpleLdapAuthenticatingRealm.ROLE,
+    description = "Test Authentication LDAP Realm")
 public class SimpleLdapAuthenticatingRealm
     extends AbstractLdapAuthenticatingRealm
 {
 
-    public static final String ROLE = "LdapAuthenticatingRealm";
-    
-    @Override
-    public String getName()
-    {
-        return ROLE;
-    }
+  public static final String ROLE = "LdapAuthenticatingRealm";
+
+  @Override
+  public String getName() {
+    return ROLE;
+  }
 
 }

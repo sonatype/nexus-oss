@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -22,50 +23,42 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CapabilityIdentity
 {
 
-    private final String value;
+  private final String value;
 
-    public CapabilityIdentity( final String value )
-    {
-        this.value = checkNotNull( value, "Capability identity value cannot be null" );
+  public CapabilityIdentity(final String value) {
+    this.value = checkNotNull(value, "Capability identity value cannot be null");
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CapabilityIdentity)) {
+      return false;
     }
 
-    @Override
-    public boolean equals( final Object o )
-    {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( !( o instanceof CapabilityIdentity ) )
-        {
-            return false;
-        }
+    final CapabilityIdentity that = (CapabilityIdentity) o;
 
-        final CapabilityIdentity that = (CapabilityIdentity) o;
-
-        if ( value != null ? !value.equals( that.value ) : that.value != null )
-        {
-            return false;
-        }
-
-        return true;
+    if (value != null ? !value.equals(that.value) : that.value != null) {
+      return false;
     }
 
-    @Override
-    public int hashCode()
-    {
-        return value != null ? value.hashCode() : 0;
-    }
+    return true;
+  }
 
-    @Override
-    public String toString()
-    {
-        return value;
-    }
+  @Override
+  public int hashCode() {
+    return value != null ? value.hashCode() : 0;
+  }
 
-    public static CapabilityIdentity capabilityIdentity( final String value )
-    {
-        return new CapabilityIdentity( value );
-    }
+  @Override
+  public String toString() {
+    return value;
+  }
+
+  public static CapabilityIdentity capabilityIdentity(final String value) {
+    return new CapabilityIdentity(value);
+  }
 
 }

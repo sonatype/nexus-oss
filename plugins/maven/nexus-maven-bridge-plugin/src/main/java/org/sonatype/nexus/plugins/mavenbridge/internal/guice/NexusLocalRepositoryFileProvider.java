@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge.internal.guice;
 
 import java.io.File;
@@ -26,25 +27,23 @@ import org.sonatype.sisu.maven.bridge.Names;
 /**
  * This component is present only to satisfy sisu-maven-bridge dep graph, but IS NOT USED! This property is needed for
  * "shared" session, but in Nexus' "embedded server" use case, we always explicitly provide session!
- * 
+ *
  * @author cstamas
  */
-@Named( Names.LOCAL_REPOSITORY_DIR )
+@Named(Names.LOCAL_REPOSITORY_DIR)
 @Singleton
 public class NexusLocalRepositoryFileProvider
     implements Provider<File>
 {
-    private final ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
-    @Inject
-    public NexusLocalRepositoryFileProvider( final ApplicationConfiguration applicationConfiguration )
-    {
-        this.applicationConfiguration = applicationConfiguration;
-    }
+  @Inject
+  public NexusLocalRepositoryFileProvider(final ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = applicationConfiguration;
+  }
 
-    @Override
-    public File get()
-    {
-        return applicationConfiguration.getWorkingDirectory( DefaultNexusAether.LOCAL_REPO_DIR );
-    }
+  @Override
+  public File get() {
+    return applicationConfiguration.getWorkingDirectory(DefaultNexusAether.LOCAL_REPO_DIR);
+  }
 }

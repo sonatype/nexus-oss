@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 /**
@@ -19,37 +20,35 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
  */
 public enum P2ArtifactType
 {
-    /**
-     * OSGi Bundle.
-     */
-    BUNDLE( "osgi.bundle" ),
-    /**
-     * Eclipse feature.
-     */
-    FEATURE( "org.eclipse.update.feature" );
+  /**
+   * OSGi Bundle.
+   */
+  BUNDLE("osgi.bundle"),
+  /**
+   * Eclipse feature.
+   */
+  FEATURE("org.eclipse.update.feature");
 
-    /**
-     * Default constructor.
-     *
-     * @param classifier The classifier
-     */
-    private P2ArtifactType( String classifier )
-    {
-        this.classifier = classifier;
-    }
+  /**
+   * Default constructor.
+   *
+   * @param classifier The classifier
+   */
+  private P2ArtifactType(String classifier) {
+    this.classifier = classifier;
+  }
 
-    /**
-     * The classifier.
-     */
-    private final String classifier;
+  /**
+   * The classifier.
+   */
+  private final String classifier;
 
-    /**
-     * Returns the artifacts classifier.
-     *
-     * @return The classifier
-     */
-    public String getClassifier()
-    {
-        return classifier;
-    }
+  /**
+   * Returns the artifacts classifier.
+   *
+   * @return The classifier
+   */
+  public String getClassifier() {
+    return classifier;
+  }
 }

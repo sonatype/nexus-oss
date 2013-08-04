@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.index;
 
 import java.io.File;
@@ -17,139 +18,127 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+
 import org.apache.lucene.search.Query;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.context.IndexingContext;
-import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 
 public abstract class AbstractIndexerManagerTest
     extends AbstractMavenRepoContentTests
 {
-    protected DefaultIndexerManager indexerManager;
+  protected DefaultIndexerManager indexerManager;
 
-    protected NexusScheduler nexusScheduler;
+  protected NexusScheduler nexusScheduler;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        nexusConfiguration.setSecurityEnabled( false );
+    nexusConfiguration.setSecurityEnabled(false);
 
-        nexusConfiguration.saveConfiguration();
+    nexusConfiguration.saveConfiguration();
 
-        indexerManager = (DefaultIndexerManager) lookup( IndexerManager.class );
+    indexerManager = (DefaultIndexerManager) lookup(IndexerManager.class);
 
-        nexusScheduler = lookup( NexusScheduler.class );
+    nexusScheduler = lookup(NexusScheduler.class);
+  }
+
+  protected void searchFor(String groupId, int expected)
+      throws IOException
+  {
+    Query query = indexerManager.constructQuery(MAVEN.GROUP_ID, groupId, SearchType.EXACT);
+
+    IteratorSearchResponse response;
+
+    try {
+      response = indexerManager.searchQueryIterator(query, null, null, null, null, false, null);
+    }
+    catch (NoSuchRepositoryException e) {
+      // will not happen since we are not selecting a repo to search
+      throw new IOException("Huh?");
     }
 
-    protected void searchFor( String groupId, int expected )
-        throws IOException
-    {
-        Query query = indexerManager.constructQuery( MAVEN.GROUP_ID, groupId, SearchType.EXACT );
+    try {
+      ArrayList<ArtifactInfo> results = new ArrayList<ArtifactInfo>(response.getTotalHits());
 
-        IteratorSearchResponse response;
+      for (ArtifactInfo hit : response) {
+        results.add(hit);
+      }
 
-        try
-        {
-            response = indexerManager.searchQueryIterator( query, null, null, null, null, false, null );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // will not happen since we are not selecting a repo to search
-            throw new IOException( "Huh?" );
-        }
-
-        try
-        {
-        ArrayList<ArtifactInfo> results = new ArrayList<ArtifactInfo>( response.getTotalHits() );
-    
-            for ( ArtifactInfo hit : response )
-            {
-                results.add( hit );
-            }
-    
-            assertEquals( "Query \"" + query + "\" returned wrong results: " + results + "!", expected, results.size() );
-        }
-        finally
-        {
-            response.close();
-        }
+      assertEquals("Query \"" + query + "\" returned wrong results: " + results + "!", expected, results.size());
     }
-
-    protected void searchForKeywordNG( String term, int expected )
-        throws Exception
-    {
-        IteratorSearchResponse result =
-            indexerManager.searchArtifactIterator( term, null, null, null, null, false, SearchType.SCORED, null );
-
-        try
-        {
-            if ( expected != result.getTotalHits() )
-            {
-                // dump the stuff
-                StringBuilder sb = new StringBuilder( "Found artifacts:\n" );
-
-                for ( ArtifactInfo ai : result )
-                {
-                    sb.append( ai.context ).append( " : " ).append( ai.toString() ).append( "\n" );
-                }
-
-                fail( sb.toString() + "\nUnexpected result set size! We expected " + expected + " but got "
-                    + result.getTotalHits() );
-            }
-        }
-        finally
-        {
-            result.close();
-        }
+    finally {
+      response.close();
     }
+  }
 
-    protected void searchFor( String groupId, int expected, String repoId )
-        throws IOException, Exception
-    {
-        Query q = indexerManager.constructQuery( MAVEN.GROUP_ID, groupId, SearchType.EXACT );
+  protected void searchForKeywordNG(String term, int expected)
+      throws Exception
+  {
+    IteratorSearchResponse result =
+        indexerManager.searchArtifactIterator(term, null, null, null, null, false, SearchType.SCORED, null);
 
-        IteratorSearchResponse response = indexerManager.searchQueryIterator( q, repoId, null, null, null, false, null );
-        try
-        {
-            ArrayList<ArtifactInfo> ais = new ArrayList<ArtifactInfo>( response.getTotalHits() );
-    
-            for ( ArtifactInfo ai : response )
-            {
-                ais.add( ai );
-            }
-    
-            assertEquals( ais.toString(), expected, ais.size() );
+    try {
+      if (expected != result.getTotalHits()) {
+        // dump the stuff
+        StringBuilder sb = new StringBuilder("Found artifacts:\n");
+
+        for (ArtifactInfo ai : result) {
+          sb.append(ai.context).append(" : ").append(ai.toString()).append("\n");
         }
-        finally
-        {
-            response.close();
-        }
-    }
 
-    protected void assertTemporatyContexts( final Repository repo )
-        throws Exception
+        fail(sb.toString() + "\nUnexpected result set size! We expected " + expected + " but got "
+            + result.getTotalHits());
+      }
+    }
+    finally {
+      result.close();
+    }
+  }
+
+  protected void searchFor(String groupId, int expected, String repoId)
+      throws IOException, Exception
+  {
+    Query q = indexerManager.constructQuery(MAVEN.GROUP_ID, groupId, SearchType.EXACT);
+
+    IteratorSearchResponse response = indexerManager.searchQueryIterator(q, repoId, null, null, null, false, null);
+    try {
+      ArrayList<ArtifactInfo> ais = new ArrayList<ArtifactInfo>(response.getTotalHits());
+
+      for (ArtifactInfo ai : response) {
+        ais.add(ai);
+      }
+
+      assertEquals(ais.toString(), expected, ais.size());
+    }
+    finally {
+      response.close();
+    }
+  }
+
+  protected void assertTemporatyContexts(final Repository repo)
+      throws Exception
+  {
+    IndexingContext context =
+        ((DefaultIndexerManager) indexerManager).getRepositoryIndexContext(repo.getId());
+    File dir = context.getIndexDirectoryFile().getParentFile();
+
+    File[] contextDirs = dir.listFiles(new FilenameFilter()
     {
-        IndexingContext context =
-            ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( repo.getId() );
-        File dir = context.getIndexDirectoryFile().getParentFile();
+      public boolean accept(File dir, String name) {
+        return name.startsWith(repo.getId() + "-ctx");
+      }
+    });
 
-        File[] contextDirs = dir.listFiles( new FilenameFilter()
-        {
-            public boolean accept( File dir, String name )
-            {
-                return name.startsWith( repo.getId() + "-ctx" );
-            }
-        } );
-
-        assertEquals( 1, contextDirs.length );
-    }
+    assertEquals(1, contextDirs.length);
+  }
 }

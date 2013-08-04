@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus156;
 
 import java.io.IOException;
+
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.RoleMessageUtil;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.RoleMessageUtil;
 
 /**
  * CRUD tests for XML request/response.
@@ -28,23 +30,21 @@ public class Nexus156RolesCrudXmlIT
     extends Nexus156RolesCrudJsonIT
 {
 
-    @BeforeClass
-    public static void setSecureTest()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-    @Before
-    public void setUp()
-    {
-        this.messageUtil = new RoleMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-    }
+  @Before
+  public void setUp() {
+    this.messageUtil = new RoleMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+  }
 
-    @Test
-    public void readTest()
-        throws IOException
-    {
-        super.readTest();
-    }
+  @Test
+  public void readTest()
+      throws IOException
+  {
+    super.readTest();
+  }
 
 }

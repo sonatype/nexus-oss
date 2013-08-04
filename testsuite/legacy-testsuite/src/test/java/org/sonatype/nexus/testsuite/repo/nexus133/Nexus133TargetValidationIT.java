@@ -10,11 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus133;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.test.utils.TargetMessageUtil;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
@@ -24,10 +30,6 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.RepositoryTargetResource;
-import org.sonatype.nexus.test.utils.TargetMessageUtil;
 
 /**
  * Extra CRUD validation tests.
@@ -36,453 +38,437 @@ public class Nexus133TargetValidationIT
     extends AbstractNexusIntegrationTest
 {
 
-    protected TargetMessageUtil messageUtil;
+  protected TargetMessageUtil messageUtil;
 
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
+
+  @Before
+  public void setUp() {
+    this.messageUtil = new TargetMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+  }
+
+  @Test
+  public void noPatternsTest()
+      throws IOException
+  {
+
+    RepositoryTargetResource resource = new RepositoryTargetResource();
+
+    // resource.setId( "createTest" );
+    resource.setContentClass("maven1");
+    resource.setName("noPatternsTest");
+
+    // List<String> patterns = new ArrayList<String>();
+    // patterns.add( ".*foo.*" );
+    // patterns.add( ".*bar.*" );
+    // resource.setPatterns( patterns );
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+    String responseText = response.getEntity().getText();
+
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus() + "\n" + responseText);
     }
-    
-    @Before
-    public void setUp()
-    {
-        this.messageUtil = new TargetMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    Assert.assertTrue("Response text did not contain an error message. \nResponse Text:\n " + responseText,
+        responseText.startsWith("{\"errors\":"));
+  }
+
+  @Test
+  public void noNameTest()
+      throws IOException
+  {
+
+    RepositoryTargetResource resource = new RepositoryTargetResource();
+
+    // resource.setId( "createTest" );
+    resource.setContentClass("maven1");
+    resource.setName(null);
+
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+    String responseText = response.getEntity().getText();
+
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus() + "\n" + responseText);
     }
+    Assert.assertTrue("Response text did not contain an error message. \nResponse Text:\n " + responseText,
+        responseText.startsWith("{\"errors\":"));
+  }
 
-    @Test
-    public void noPatternsTest()
-        throws IOException
-    {
+  @Test
+  public void invalidRegExTest()
+      throws IOException
+  {
 
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    RepositoryTargetResource resource = new RepositoryTargetResource();
 
-        // resource.setId( "createTest" );
-        resource.setContentClass( "maven1" );
-        resource.setName( "noPatternsTest" );
+    // resource.setId( "createTest" );
+    resource.setContentClass("maven1");
+    resource.setName("invalidRegExTest");
 
-        // List<String> patterns = new ArrayList<String>();
-        // patterns.add( ".*foo.*" );
-        // patterns.add( ".*bar.*" );
-        // resource.setPatterns( patterns );
+    List<String> patterns = new ArrayList<String>();
+    patterns.add("*.foo.*");
+    resource.setPatterns(patterns);
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-        String responseText = response.getEntity().getText();
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+    String responseText = response.getEntity().getText();
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
-        }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus() + "\n" + responseText);
     }
+    Assert.assertTrue("Response text did not contain an error message. \nResponse Text:\n " + responseText,
+        responseText.startsWith("{\"errors\":"));
+  }
 
-    @Test
-    public void noNameTest()
-        throws IOException
-    {
+  @Test
+  public void invalidContentClass()
+      throws IOException
+  {
 
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    RepositoryTargetResource resource = new RepositoryTargetResource();
 
-        // resource.setId( "createTest" );
-        resource.setContentClass( "maven1" );
-        resource.setName( null );
+    // resource.setId( "createTest" );
+    resource.setContentClass("INVALID_CLASS");
+    resource.setName("invalidContentClass");
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-        String responseText = response.getEntity().getText();
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+    String responseText = response.getEntity().getText();
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
-        }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus() + "\n" + responseText);
     }
+    Assert.assertTrue("Response text did not contain an error message. \nResponse Text:\n " + responseText,
+        responseText.startsWith("{\"errors\":"));
+  }
 
-    @Test
-    public void invalidRegExTest()
-        throws IOException
-    {
+  @Test
+  public void duplicateTargetTest()
+      throws IOException
+  {
+    RepositoryTargetResource resource = new RepositoryTargetResource();
+    // resource.setId( "createTest" );
+    resource.setContentClass("maven1");
+    resource.setName("duplicateTargetTest");
 
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
 
-        // resource.setId( "createTest" );
-        resource.setContentClass( "maven1" );
-        resource.setName( "invalidRegExTest" );
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( "*.foo.*" );
-        resource.setPatterns( patterns );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-        String responseText = response.getEntity().getText();
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
-        }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
-    }
-
-    @Test
-    public void invalidContentClass()
-        throws IOException
-    {
-
-        RepositoryTargetResource resource = new RepositoryTargetResource();
-
-        // resource.setId( "createTest" );
-        resource.setContentClass( "INVALID_CLASS" );
-        resource.setName( "invalidContentClass" );
-
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-        String responseText = response.getEntity().getText();
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
-        }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
-    }
-
-    @Test
-    public void duplicateTargetTest()
-        throws IOException
-    {
-        RepositoryTargetResource resource = new RepositoryTargetResource();
-        // resource.setId( "createTest" );
-        resource.setContentClass( "maven1" );
-        resource.setName( "duplicateTargetTest" );
-
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Target: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        String id1 = responseResource.getId();
-
-        // make sure it was updated
-        this.messageUtil.verifyTargetsConfig( responseResource );
-
-        // send again
-        response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Target: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        responseResource = this.messageUtil.getResourceFromResponse( response );
-        String id2 = responseResource.getId();
-
-        // make sure it was updated
-        this.messageUtil.verifyTargetsConfig( responseResource );
-
-        Assert.assertNotSame( id1, id2 );
-
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create Target: " + response.getStatus());
     }
 
-    @Test
-    public void updateValidation()
-        throws IOException
-    {
-        RepositoryTargetResource resource = new RepositoryTargetResource();
-        // resource.setId( "createTest" );
-        resource.setContentClass( "maven1" );
-        resource.setName( "updateValidation" );
+    // get the Resource object
+    RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
+    String id1 = responseResource.getId();
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+    // make sure it was updated
+    this.messageUtil.verifyTargetsConfig(responseResource);
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create user: " + response.getStatus() );
-        }
+    // send again
+    response = this.messageUtil.sendMessage(Method.POST, resource);
 
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create Target: " + response.getStatus());
+    }
 
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+    // get the Resource object
+    responseResource = this.messageUtil.getResourceFromResponse(response);
+    String id2 = responseResource.getId();
 
-        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
-        Assert.assertEquals( responseResource.getName(), resource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
+    // make sure it was updated
+    this.messageUtil.verifyTargetsConfig(responseResource);
 
-        // verify config
-        this.messageUtil.verifyTargetsConfig( responseResource );
+    Assert.assertNotSame(id1, id2);
 
-        // update the Id
-        resource.setId( responseResource.getId() );
+  }
+
+  @Test
+  public void updateValidation()
+      throws IOException
+  {
+    RepositoryTargetResource resource = new RepositoryTargetResource();
+    // resource.setId( "createTest" );
+    resource.setContentClass("maven1");
+    resource.setName("updateValidation");
+
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create user: " + response.getStatus());
+    }
+
+    // get the Resource object
+    RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse(response);
+
+    // make sure the id != null
+    Assert.assertTrue(StringUtils.isNotEmpty(responseResource.getId()));
+
+    Assert.assertEquals(responseResource.getContentClass(), resource.getContentClass());
+    Assert.assertEquals(responseResource.getName(), resource.getName());
+    Assert.assertEquals(resource.getPatterns(), responseResource.getPatterns());
+
+    // verify config
+    this.messageUtil.verifyTargetsConfig(responseResource);
+
+    // update the Id
+    resource.setId(responseResource.getId());
 
         /*
          * NO Name
          */
-        resource.setContentClass( "maven1" );
-        resource.setName( null );
-        patterns.clear();
-        patterns.add( ".*new.*" );
+    resource.setContentClass("maven1");
+    resource.setName(null);
+    patterns.clear();
+    patterns.add(".*new.*");
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() );
-        }
-        String responseText = response.getEntity().getText();
-        Assert.assertTrue("responseText does not contain an error message:\n"+ responseText, responseText.startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus());
+    }
+    String responseText = response.getEntity().getText();
+    Assert.assertTrue("responseText does not contain an error message:\n" + responseText,
+        responseText.startsWith("{\"errors\":"));
 
         /*
          * Invalid RegEx
          */
 
-        resource.setContentClass( "maven1" );
-        resource.setName( "updateValidation" );
-        patterns.clear();
-        patterns.add( "*.new.*" );
+    resource.setContentClass("maven1");
+    resource.setName("updateValidation");
+    patterns.clear();
+    patterns.add("*.new.*");
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
 
         /*
          * NO Patterns
          */
-        resource.setContentClass( "maven1" );
-        resource.setName( "updateValidation" );
-        patterns.clear();
+    resource.setContentClass("maven1");
+    resource.setName("updateValidation");
+    patterns.clear();
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
 
         /*
          * NO Content Class
          */
-        resource.setContentClass( null );
-        resource.setName( "updateValidation" );
-        patterns.clear();
-        patterns.add( ".*new.*" );
+    resource.setContentClass(null);
+    resource.setName("updateValidation");
+    patterns.clear();
+    patterns.add(".*new.*");
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Target should not have been created: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Target should not have been created: " + response.getStatus());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
 
+  }
+
+  @Test
+  public void maven1ContentClassTest()
+      throws IOException
+  {
+
+    RepositoryTargetResource resource = new RepositoryTargetResource();
+
+    // resource.setId( "createTest" );
+    resource.setContentClass("maven1");
+    resource.setName("maven1ContentClassTest");
+
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create Repository Target: " + response.getStatus());
     }
 
-    @Test
-    public void maven1ContentClassTest()
-        throws IOException
-    {
+    // get the Resource object
+    RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    // make sure the id != null
+    Assert.assertTrue(StringUtils.isNotEmpty(responseResource.getId()));
 
-        // resource.setId( "createTest" );
-        resource.setContentClass( "maven1" );
-        resource.setName( "maven1ContentClassTest" );
+    Assert.assertEquals(responseResource.getContentClass(), resource.getContentClass());
+    Assert.assertEquals(responseResource.getName(), resource.getName());
+    Assert.assertEquals(resource.getPatterns(), responseResource.getPatterns());
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
+    this.messageUtil.verifyTargetsConfig(responseResource);
+  }
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+  @Test
+  public void maven2ContentClassTest()
+      throws IOException
+  {
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
-        }
+    RepositoryTargetResource resource = new RepositoryTargetResource();
 
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
+    // resource.setId( "createTest" );
+    resource.setContentClass("maven2");
+    resource.setName("maven2ContentClassTest");
 
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
 
-        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
-        Assert.assertEquals( responseResource.getName(), resource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
-        this.messageUtil.verifyTargetsConfig( responseResource );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create Repository Target: " + response.getStatus());
     }
 
-    @Test
-    public void maven2ContentClassTest()
-        throws IOException
-    {
+    // get the Resource object
+    RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    // make sure the id != null
+    Assert.assertTrue(StringUtils.isNotEmpty(responseResource.getId()));
 
-        // resource.setId( "createTest" );
-        resource.setContentClass( "maven2" );
-        resource.setName( "maven2ContentClassTest" );
+    Assert.assertEquals(responseResource.getContentClass(), resource.getContentClass());
+    Assert.assertEquals(responseResource.getName(), resource.getName());
+    Assert.assertEquals(resource.getPatterns(), responseResource.getPatterns());
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
+    this.messageUtil.verifyTargetsConfig(responseResource);
+  }
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+  //@Test
+  // eclipseContentClass is disabled for beta5!
+  public void eclipseContentClassTest()
+      throws IOException
+  {
+    // m2namespace
+    RepositoryTargetResource resource = new RepositoryTargetResource();
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
-        }
+    // resource.setId( "createTest" );
+    resource.setContentClass("eclipse-update-site");
+    resource.setName("eclipseContentClassTest");
 
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
 
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
-        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
-        Assert.assertEquals( responseResource.getName(), resource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
-
-        this.messageUtil.verifyTargetsConfig( responseResource );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create Repository Target: " + response.getStatus());
     }
 
-    //@Test
-    // eclipseContentClass is disabled for beta5!
-    public void eclipseContentClassTest()
-        throws IOException
-    {
-        // m2namespace
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    // get the Resource object
+    RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        // resource.setId( "createTest" );
-        resource.setContentClass( "eclipse-update-site" );
-        resource.setName( "eclipseContentClassTest" );
+    // make sure the id != null
+    Assert.assertTrue(StringUtils.isNotEmpty(responseResource.getId()));
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
+    Assert.assertEquals(responseResource.getContentClass(), resource.getContentClass());
+    Assert.assertEquals(responseResource.getName(), resource.getName());
+    Assert.assertEquals(resource.getPatterns(), responseResource.getPatterns());
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+    this.messageUtil.verifyTargetsConfig(responseResource);
+  }
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
-        }
+  //@Test
+  // m2NamespaceContentclass is disabled for beta5!
+  public void m2NamespaceContentClassTest()
+      throws IOException
+  {
 
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
+    RepositoryTargetResource resource = new RepositoryTargetResource();
 
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+    // resource.setId( "createTest" );
+    resource.setContentClass("m2namespace");
+    resource.setName("m2NamespaceContentClassTest");
 
-        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
-        Assert.assertEquals( responseResource.getName(), resource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    resource.setPatterns(patterns);
 
-        this.messageUtil.verifyTargetsConfig( responseResource );
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create Repository Target: " + response.getStatus());
     }
 
-    //@Test
-    // m2NamespaceContentclass is disabled for beta5!
-    public void m2NamespaceContentClassTest()
-        throws IOException
-    {
+    // get the Resource object
+    RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    // make sure the id != null
+    Assert.assertTrue(StringUtils.isNotEmpty(responseResource.getId()));
 
-        // resource.setId( "createTest" );
-        resource.setContentClass( "m2namespace" );
-        resource.setName( "m2NamespaceContentClassTest" );
+    Assert.assertEquals(responseResource.getContentClass(), resource.getContentClass());
+    Assert.assertEquals(responseResource.getName(), resource.getName());
+    Assert.assertEquals(resource.getPatterns(), responseResource.getPatterns());
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        resource.setPatterns( patterns );
+    this.messageUtil.verifyTargetsConfig(responseResource);
+  }
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+  @Test
+  public void createTestWithId()
+      throws IOException
+  {
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
-        }
+    RepositoryTargetResource resource = new RepositoryTargetResource();
 
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
+    // FIXME: This should be allowed
+    // resource.setId( "createTestWithId" );
+    resource.setContentClass("maven1");
+    resource.setName("createTestWithId");
 
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+    List<String> patterns = new ArrayList<String>();
+    patterns.add(".*foo.*");
+    patterns.add(".*bar.*");
+    resource.setPatterns(patterns);
 
-        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
-        Assert.assertEquals( responseResource.getName(), resource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
-        this.messageUtil.verifyTargetsConfig( responseResource );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create Repository Target: " + response.getStatus());
     }
 
-    @Test
-    public void createTestWithId()
-        throws IOException
-    {
+    // get the Resource object
+    RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        RepositoryTargetResource resource = new RepositoryTargetResource();
+    // make sure the id != null
+    Assert.assertTrue(StringUtils.isNotEmpty(responseResource.getId()));
 
-        // FIXME: This should be allowed
-        // resource.setId( "createTestWithId" );
-        resource.setContentClass( "maven1" );
-        resource.setName( "createTestWithId" );
+    // FIXME: This should be allowed
+    // Assert.assertEquals( resource.getId(), responseResource.getId() );
+    Assert.assertEquals(responseResource.getContentClass(), resource.getContentClass());
+    Assert.assertEquals(responseResource.getName(), resource.getName());
+    Assert.assertEquals(resource.getPatterns(), responseResource.getPatterns());
 
-        List<String> patterns = new ArrayList<String>();
-        patterns.add( ".*foo.*" );
-        patterns.add( ".*bar.*" );
-        resource.setPatterns( patterns );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
-
-        // FIXME: This should be allowed
-        // Assert.assertEquals( resource.getId(), responseResource.getId() );
-        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
-        Assert.assertEquals( responseResource.getName(), resource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
-
-        this.messageUtil.verifyTargetsConfig( responseResource );
-    }
+    this.messageUtil.verifyTargetsConfig(responseResource);
+  }
 
 }

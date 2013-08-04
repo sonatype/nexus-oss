@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.maven.nexus634;
 
 import java.io.File;
@@ -20,22 +21,23 @@ import org.junit.Test;
 
 /**
  * Test SnapshotRemoverTask to remove old artifacts but keep updated artifacts
+ *
  * @author marvin
  */
 public class Nexus634KeepTwoSnapshotsIT
     extends AbstractSnapshotRemoverIT
 {
 
-    @Test
-    public void keepTwoSnapshots()
-        throws Exception
-    {
+  @Test
+  public void keepTwoSnapshots()
+      throws Exception
+  {
 
-        // This is THE important part
-        runSnapshotRemover( "nexus-test-harness-snapshot-repo", 2, 0, true );
+    // This is THE important part
+    runSnapshotRemover("nexus-test-harness-snapshot-repo", 2, 0, true);
 
-        Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
-        Assert.assertEquals( "SnapshotRemoverTask should remove only old artifacts", jars.size(), 2 );
-    }
+    Collection<File> jars = listFiles(artifactFolder, new String[]{"jar"}, false);
+    Assert.assertEquals("SnapshotRemoverTask should remove only old artifacts", jars.size(), 2);
+  }
 
 }

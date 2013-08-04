@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -26,29 +27,25 @@ public class DottedStoreWalkerFilter
     implements WalkerFilter
 {
 
-    public boolean shouldProcess( WalkerContext ctx, StorageItem item )
-    {
-        return shouldProcessItem( item );
-    }
+  public boolean shouldProcess(WalkerContext ctx, StorageItem item) {
+    return shouldProcessItem(item);
+  }
 
-    public boolean shouldProcessRecursively( WalkerContext ctx, StorageCollectionItem coll )
-    {
-        return shouldProcessItem( coll );
-    }
+  public boolean shouldProcessRecursively(WalkerContext ctx, StorageCollectionItem coll) {
+    return shouldProcessItem(coll);
+  }
 
-    protected boolean shouldProcessItem( StorageItem item )
-    {
-        return !item.getName().startsWith( "." );
-    }
+  protected boolean shouldProcessItem(StorageItem item) {
+    return !item.getName().startsWith(".");
+  }
 
-    /**
-     * Builder method.
-     *
-     * @return new DottedStoreWalkerFilter
-     */
-    public static DottedStoreWalkerFilter excludeItemsStartingWithDot()
-    {
-        return new DottedStoreWalkerFilter();
-    }
+  /**
+   * Builder method.
+   *
+   * @return new DottedStoreWalkerFilter
+   */
+  public static DottedStoreWalkerFilter excludeItemsStartingWithDot() {
+    return new DottedStoreWalkerFilter();
+  }
 
 }

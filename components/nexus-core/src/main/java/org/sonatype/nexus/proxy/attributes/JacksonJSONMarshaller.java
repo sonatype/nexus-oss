@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.attributes;
 
 import java.io.CharConversionException;
@@ -19,10 +20,11 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
+
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 
 /**
  * Jackson JSON Attribute marshaller. Part of NEXUS-4628 "alternate" AttributeStorage implementations.
@@ -30,56 +32,51 @@ import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 public class JacksonJSONMarshaller
     implements Marshaller
 {
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-    public JacksonJSONMarshaller()
-    {
-        this.objectMapper = new ObjectMapper();
-        // intent was to pretty-print, and this below will turn it on, but unsure
-        // abou the perf penalty, and do we really want to fiddle with it now
-        // this.objectMapper.configure( SerializationConfig.Feature.INDENT_OUTPUT, true );
+  public JacksonJSONMarshaller() {
+    this.objectMapper = new ObjectMapper();
+    // intent was to pretty-print, and this below will turn it on, but unsure
+    // abou the perf penalty, and do we really want to fiddle with it now
+    // this.objectMapper.configure( SerializationConfig.Feature.INDENT_OUTPUT, true );
+  }
+
+  @Override
+  public void marshal(final Attributes item, final OutputStream outputStream)
+      throws IOException
+  {
+    final Map<String, String> attrs = new HashMap<String, String>(item.asMap());
+    objectMapper.writeValue(outputStream, attrs);
+    outputStream.flush();
+  }
+
+  @Override
+  public Attributes unmarshal(final InputStream inputStream)
+      throws IOException, InvalidInputException
+  {
+    try {
+      final Map<String, String> attributesMap =
+          objectMapper.readValue(inputStream, new TypeReference<Map<String, String>>()
+          {
+          });
+      return new DefaultAttributes(attributesMap);
     }
-
-    @Override
-    public void marshal( final Attributes item, final OutputStream outputStream )
-        throws IOException
-    {
-        final Map<String, String> attrs = new HashMap<String, String>( item.asMap() );
-        objectMapper.writeValue( outputStream, attrs );
-        outputStream.flush();
+    catch (JsonProcessingException e) {
+      throw new InvalidInputException("Persisted attribute malformed!", e);
     }
-
-    @Override
-    public Attributes unmarshal( final InputStream inputStream )
-        throws IOException, InvalidInputException
-    {
-        try
-        {
-            final Map<String, String> attributesMap =
-                objectMapper.readValue( inputStream, new TypeReference<Map<String, String>>()
-                {
-                } );
-            return new DefaultAttributes( attributesMap );
-        }
-        catch ( JsonProcessingException e )
-        {
-            throw new InvalidInputException( "Persisted attribute malformed!", e );
-        }
-        catch ( CharConversionException e )
-        {
-            // see NEXUS-5505
-            // we trigger invalid input, and the attribute file (or actual Finder file)
-            // will be removed from attribute storage. Since we use same name for content 
-            // and attribute files, this is most we can do here. Downside is that 
-            // Finder preferences for given folder are lost.
-            throw new InvalidInputException( "Persisted attribute malformed!", e );
-        }
+    catch (CharConversionException e) {
+      // see NEXUS-5505
+      // we trigger invalid input, and the attribute file (or actual Finder file)
+      // will be removed from attribute storage. Since we use same name for content
+      // and attribute files, this is most we can do here. Downside is that
+      // Finder preferences for given folder are lost.
+      throw new InvalidInputException("Persisted attribute malformed!", e);
     }
+  }
 
-    // ==
+  // ==
 
-    public String toString()
-    {
-        return "JacksonJSON";
-    }
+  public String toString() {
+    return "JacksonJSON";
+  }
 }

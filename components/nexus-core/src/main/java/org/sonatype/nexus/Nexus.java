@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus;
 
 import java.io.IOException;
@@ -36,109 +37,99 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 /**
  * The main Nexus application interface.
- * 
+ *
  * @author Jason van Zyl
  * @author cstamas
  */
 public interface Nexus
     extends ApplicationStatusSource
 {
-    // ------------------------------------------------------------------
-    // Configuration
+  // ------------------------------------------------------------------
+  // Configuration
 
-    NexusConfiguration getNexusConfiguration();
+  NexusConfiguration getNexusConfiguration();
 
-    // ----------------------------------------------------------------------------
-    // Reposes
-    // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // Reposes
+  // ----------------------------------------------------------------------------
 
-    StorageItem dereferenceLinkItem( StorageLinkItem item )
-        throws NoSuchResourceStoreException, ItemNotFoundException, AccessDeniedException, IllegalOperationException,
-        StorageException;
+  StorageItem dereferenceLinkItem(StorageLinkItem item)
+      throws NoSuchResourceStoreException, ItemNotFoundException, AccessDeniedException, IllegalOperationException,
+             StorageException;
 
-    RepositoryRouter getRootRouter();
+  RepositoryRouter getRootRouter();
 
-    // ----------------------------------------------------------------------------
-    // Repo maintenance
-    // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // Repo maintenance
+  // ----------------------------------------------------------------------------
 
-    /**
-     * Delete a user managed repository
-     * 
-     * @param id
-     * @throws NoSuchRepositoryException
-     * @throws IOException
-     * @throws ConfigurationException
-     * @throws AccessDeniedException
-     * @see #deleteRepository(String, boolean)
-     */
-    public void deleteRepository( String id )
-        throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
+  /**
+   * Delete a user managed repository
+   *
+   * @see #deleteRepository(String, boolean)
+   */
+  public void deleteRepository(String id)
+      throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
 
-    /**
-     * Delete a repository, can only delete user managed repository unless force == true
-     * 
-     * @param id
-     * @param force
-     * @throws NoSuchRepositoryException
-     * @throws IOException
-     * @throws ConfigurationException
-     * @throws AccessDeniedException when try to delete a non-user-managed repository and without force enabled
-     */
-    public void deleteRepository( String id, boolean force )
-        throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
+  /**
+   * Delete a repository, can only delete user managed repository unless force == true
+   *
+   * @throws AccessDeniedException when try to delete a non-user-managed repository and without force enabled
+   */
+  public void deleteRepository(String id, boolean force)
+      throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
 
-    // ----------------------------------------------------------------------------
-    // Maintenance
-    // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // Maintenance
+  // ----------------------------------------------------------------------------
 
-    NexusStreamResponse getConfigurationAsStream()
-        throws IOException;
+  NexusStreamResponse getConfigurationAsStream()
+      throws IOException;
 
-    @Deprecated
-    void expireAllCaches( ResourceStoreRequest request );
+  @Deprecated
+  void expireAllCaches(ResourceStoreRequest request);
 
-    @Deprecated
-    void reindexAllRepositories( String path, boolean fullReindex )
-        throws IOException;
+  @Deprecated
+  void reindexAllRepositories(String path, boolean fullReindex)
+      throws IOException;
 
-    @Deprecated
-    void rebuildAttributesAllRepositories( ResourceStoreRequest request )
-        throws IOException;
+  @Deprecated
+  void rebuildAttributesAllRepositories(ResourceStoreRequest request)
+      throws IOException;
 
-    @Deprecated
-    void rebuildMavenMetadataAllRepositories( ResourceStoreRequest request )
-        throws IOException;
+  @Deprecated
+  void rebuildMavenMetadataAllRepositories(ResourceStoreRequest request)
+      throws IOException;
 
-    @Deprecated
-    Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest request, long timestamp )
-        throws IOException;
+  @Deprecated
+  Collection<String> evictAllUnusedProxiedItems(ResourceStoreRequest request, long timestamp)
+      throws IOException;
 
-    @Deprecated
-    SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-        throws NoSuchRepositoryException, IllegalArgumentException;
+  @Deprecated
+  SnapshotRemovalResult removeSnapshots(SnapshotRemovalRequest request)
+      throws NoSuchRepositoryException, IllegalArgumentException;
 
-    /**
-     * List the names of files in nexus-work/conf
-     */
-    Map<String, String> getConfigurationFiles();
+  /**
+   * List the names of files in nexus-work/conf
+   */
+  Map<String, String> getConfigurationFiles();
 
-    /**
-     * Get the content of configuration file based on the key
-     * 
-     * @param key index in configuration file name list
-     * @return
-     * @throws IOException
-     */
-    NexusStreamResponse getConfigurationAsStreamByKey( String key )
-        throws IOException;
+  /**
+   * Get the content of configuration file based on the key
+   *
+   * @param key index in configuration file name list
+   */
+  NexusStreamResponse getConfigurationAsStreamByKey(String key)
+      throws IOException;
 
-    // ----------------------------------------------------------------------------
-    // Repo templates
-    // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // Repo templates
+  // ----------------------------------------------------------------------------
 
-    TemplateSet getRepositoryTemplates();
+  TemplateSet getRepositoryTemplates();
 
-    RepositoryTemplate getRepositoryTemplateById( String id )
-        throws NoSuchTemplateIdException;;
+  RepositoryTemplate getRepositoryTemplateById(String id)
+      throws NoSuchTemplateIdException;
+
+  ;
 }

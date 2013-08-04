@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.index;
 
 import java.util.Collection;
@@ -18,12 +19,12 @@ import org.apache.maven.index.ArtifactInfo;
 
 /**
  * Filters the search result by various conditions.
- * 
+ *
  * @author cstamas
  */
 public interface IndexArtifactFilter
 {
-    Collection<ArtifactInfo> filterArtifactInfos( Collection<ArtifactInfo> artifactInfos );
+  Collection<ArtifactInfo> filterArtifactInfos(Collection<ArtifactInfo> artifactInfos);
 
-    boolean filterArtifactInfo( ArtifactInfo artifactInfo );
+  boolean filterArtifactInfo(ArtifactInfo artifactInfo);
 }

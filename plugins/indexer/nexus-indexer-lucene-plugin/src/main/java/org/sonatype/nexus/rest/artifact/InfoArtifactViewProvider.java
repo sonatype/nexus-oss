@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.artifact;
 
 import java.io.IOException;
@@ -18,11 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.index.ArtifactInfo;
-import org.apache.maven.index.IteratorSearchResponse;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.restlet.data.Request;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -44,203 +40,184 @@ import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryUrlResource;
 import org.sonatype.plexus.rest.ReferenceFactory;
 
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.IteratorSearchResponse;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.restlet.data.Request;
+
 /**
  * Artifact info view provider.
- * 
+ *
  * @author Velo
  * @author cstamas
  */
-@Component( role = ArtifactViewProvider.class, hint = "info" )
+@Component(role = ArtifactViewProvider.class, hint = "info")
 public class InfoArtifactViewProvider
     extends AbstractArtifactViewProvider
 {
-    @Requirement
-    private IndexerManager indexerManager;
+  @Requirement
+  private IndexerManager indexerManager;
 
-    @Requirement( hint = "protected" )
-    private RepositoryRegistry protectedRepositoryRegistry;
+  @Requirement(hint = "protected")
+  private RepositoryRegistry protectedRepositoryRegistry;
 
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
+  @Requirement
+  private RepositoryRegistry repositoryRegistry;
 
-    @Requirement
-    private ReferenceFactory referenceFactory;
+  @Requirement
+  private ReferenceFactory referenceFactory;
 
-    @Requirement
-    private AccessManager accessManager;
+  @Requirement
+  private AccessManager accessManager;
 
-    @Override
-    protected Object retrieveView( ResourceStoreRequest request, RepositoryItemUid itemUid, StorageItem item,
-                                   Request req )
-        throws IOException
-    {
-        StorageFileItem fileItem = (StorageFileItem) item;
+  @Override
+  protected Object retrieveView(ResourceStoreRequest request, RepositoryItemUid itemUid, StorageItem item,
+                                Request req)
+      throws IOException
+  {
+    StorageFileItem fileItem = (StorageFileItem) item;
 
-        Set<String> repositories = new LinkedHashSet<String>();
+    Set<String> repositories = new LinkedHashSet<String>();
 
-        // the artifact does exists on the repository it was found =D
-        repositories.add( itemUid.getRepository().getId() );
+    // the artifact does exists on the repository it was found =D
+    repositories.add(itemUid.getRepository().getId());
 
-        final String checksum =
-            fileItem == null ? null : fileItem.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
-        if ( checksum != null )
-        {
-            IteratorSearchResponse searchResponse = null;
-            
-            try
-            {
-                searchResponse =
-                    indexerManager.searchArtifactSha1ChecksumIterator( checksum, null, null, null, null, null );
+    final String checksum =
+        fileItem == null ? null : fileItem.getRepositoryItemAttributes()
+            .get(DigestCalculatingInspector.DIGEST_SHA1_KEY);
+    if (checksum != null) {
+      IteratorSearchResponse searchResponse = null;
 
-                for ( ArtifactInfo info : searchResponse )
-                {
-                    repositories.add( info.repository );
-                }
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // should never trigger this exception since I'm searching on all repositories
-                getLogger().error( e.getMessage(), e );
-            }
-            finally
-            {
-                if ( searchResponse != null )
-                {
-                    searchResponse.close();
-                }
-            }
+      try {
+        searchResponse =
+            indexerManager.searchArtifactSha1ChecksumIterator(checksum, null, null, null, null, null);
+
+        for (ArtifactInfo info : searchResponse) {
+          repositories.add(info.repository);
         }
-
-        // hosted / cache check useful if the index is out to date or disable
-        for ( Repository repo : protectedRepositoryRegistry.getRepositories() )
-        {
-            // already found the artifact on this repo
-            if ( repositories.contains( repo.getId() ) )
-            {
-                continue;
-            }
-
-            final ResourceStoreRequest repoRequest =
-                new ResourceStoreRequest( itemUid.getPath(), request.isRequestLocalOnly(),
-                    request.isRequestRemoteOnly() );
-            if ( repo.getLocalStorage().containsItem( repo, repoRequest ) )
-            {
-                try
-                {
-                    StorageItem repoItem = repo.retrieveItem( repoRequest );
-                    if ( checksum == null
-                        || checksum.equals( repoItem.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) ) )
-                    {
-                        repositories.add( repo.getId() );
-                    }
-                }
-                catch ( AccessDeniedException e )
-                {
-                    // that is fine, user doesn't have access
-                    continue;
-                }
-                catch (RepositoryNotAvailableException e) {
-                    // this could happen normally if a repository is not available, do not complain too loudly
-                    getLogger().trace("Repository not available; ignoring", e);
-                }
-                catch ( Exception e )
-                {
-                    getLogger().error( e.getMessage(), e );
-                }
-            }
+      }
+      catch (NoSuchRepositoryException e) {
+        // should never trigger this exception since I'm searching on all repositories
+        getLogger().error(e.getMessage(), e);
+      }
+      finally {
+        if (searchResponse != null) {
+          searchResponse.close();
         }
-
-        ArtifactInfoResourceResponse result = new ArtifactInfoResourceResponse();
-
-        ArtifactInfoResource resource = new ArtifactInfoResource();
-        resource.setRepositoryId( itemUid.getRepository().getId() );
-        resource.setRepositoryName( itemUid.getRepository().getName() );
-        resource.setRepositoryPath( itemUid.getPath() );
-        resource.setRepositories( createRepositoriesUrl( repositories, req, itemUid.getPath() ) );
-        resource.setPresentLocally( fileItem != null );
-
-        if ( fileItem != null )
-        {
-            resource.setMd5Hash( fileItem.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
-            resource.setSha1Hash( checksum );
-            resource.setLastChanged( fileItem.getModified() );
-            resource.setSize( fileItem.getLength() );
-            resource.setUploaded( fileItem.getCreated() );
-            resource.setUploader( fileItem.getRepositoryItemAttributes().get( AccessManager.REQUEST_USER ) );
-            resource.setMimeType( fileItem.getMimeType() );
-
-            try
-            {
-                accessManager.decide( itemUid.getRepository(), request, Action.delete );
-                resource.setCanDelete( true );
-            }
-            catch ( AccessDeniedException e )
-            {
-                resource.setCanDelete( false );
-            }
-        }
-
-        result.setData( resource );
-
-        return result;
+      }
     }
 
-    /**
-     * Here, we do want _real_ data: hashes, size, dates of link targets too, if any.
-     * 
-     * @return
-     */
-    @Override
-    protected boolean dereferenceLinks()
-    {
-        return true;
+    // hosted / cache check useful if the index is out to date or disable
+    for (Repository repo : protectedRepositoryRegistry.getRepositories()) {
+      // already found the artifact on this repo
+      if (repositories.contains(repo.getId())) {
+        continue;
+      }
+
+      final ResourceStoreRequest repoRequest =
+          new ResourceStoreRequest(itemUid.getPath(), request.isRequestLocalOnly(),
+              request.isRequestRemoteOnly());
+      if (repo.getLocalStorage().containsItem(repo, repoRequest)) {
+        try {
+          StorageItem repoItem = repo.retrieveItem(repoRequest);
+          if (checksum == null
+              ||
+              checksum.equals(repoItem.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY))) {
+            repositories.add(repo.getId());
+          }
+        }
+        catch (AccessDeniedException e) {
+          // that is fine, user doesn't have access
+          continue;
+        }
+        catch (RepositoryNotAvailableException e) {
+          // this could happen normally if a repository is not available, do not complain too loudly
+          getLogger().trace("Repository not available; ignoring", e);
+        }
+        catch (Exception e) {
+          getLogger().error(e.getMessage(), e);
+        }
+      }
     }
 
-    private List<RepositoryUrlResource> createRepositoriesUrl( Set<String> repositories, Request req, String path )
-    {
-        if ( !path.startsWith( "/" ) )
-        {
-            path = "/" + path;
-        }
+    ArtifactInfoResourceResponse result = new ArtifactInfoResourceResponse();
 
-        List<RepositoryUrlResource> urls = new ArrayList<RepositoryUrlResource>();
-        for ( String repositoryId : repositories )
-        {
-            RepositoryUrlResource repoUrl = new RepositoryUrlResource();
+    ArtifactInfoResource resource = new ArtifactInfoResource();
+    resource.setRepositoryId(itemUid.getRepository().getId());
+    resource.setRepositoryName(itemUid.getRepository().getName());
+    resource.setRepositoryPath(itemUid.getPath());
+    resource.setRepositories(createRepositoriesUrl(repositories, req, itemUid.getPath()));
+    resource.setPresentLocally(fileItem != null);
 
-            try
-            {
-                protectedRepositoryRegistry.getRepository( repositoryId );
-                repoUrl.setCanView( true );
-            }
-            catch ( NoSuchRepositoryAccessException e )
-            {
-                // don't have view access, so won't see it!
-                repoUrl.setCanView( false );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // completely unexpect, probably another thread removed this repo
-                getLogger().error( e.getMessage(), e );
-                continue;
-            }
+    if (fileItem != null) {
+      resource.setMd5Hash(fileItem.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_MD5_KEY));
+      resource.setSha1Hash(checksum);
+      resource.setLastChanged(fileItem.getModified());
+      resource.setSize(fileItem.getLength());
+      resource.setUploaded(fileItem.getCreated());
+      resource.setUploader(fileItem.getRepositoryItemAttributes().get(AccessManager.REQUEST_USER));
+      resource.setMimeType(fileItem.getMimeType());
 
-            repoUrl.setRepositoryId( repositoryId );
-            try
-            {
-                repoUrl.setRepositoryName( repositoryRegistry.getRepository( repositoryId ).getName() );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // should never happen;
-                getLogger().error( e.getMessage(), e );
-            }
-            repoUrl.setArtifactUrl( referenceFactory.createReference( req,
-                "content/repositories/" + repositoryId + path ).toString() );
-            repoUrl.setPath( path );
-
-            urls.add( repoUrl );
-        }
-        return urls;
+      try {
+        accessManager.decide(itemUid.getRepository(), request, Action.delete);
+        resource.setCanDelete(true);
+      }
+      catch (AccessDeniedException e) {
+        resource.setCanDelete(false);
+      }
     }
+
+    result.setData(resource);
+
+    return result;
+  }
+
+  /**
+   * Here, we do want _real_ data: hashes, size, dates of link targets too, if any.
+   */
+  @Override
+  protected boolean dereferenceLinks() {
+    return true;
+  }
+
+  private List<RepositoryUrlResource> createRepositoriesUrl(Set<String> repositories, Request req, String path) {
+    if (!path.startsWith("/")) {
+      path = "/" + path;
+    }
+
+    List<RepositoryUrlResource> urls = new ArrayList<RepositoryUrlResource>();
+    for (String repositoryId : repositories) {
+      RepositoryUrlResource repoUrl = new RepositoryUrlResource();
+
+      try {
+        protectedRepositoryRegistry.getRepository(repositoryId);
+        repoUrl.setCanView(true);
+      }
+      catch (NoSuchRepositoryAccessException e) {
+        // don't have view access, so won't see it!
+        repoUrl.setCanView(false);
+      }
+      catch (NoSuchRepositoryException e) {
+        // completely unexpect, probably another thread removed this repo
+        getLogger().error(e.getMessage(), e);
+        continue;
+      }
+
+      repoUrl.setRepositoryId(repositoryId);
+      try {
+        repoUrl.setRepositoryName(repositoryRegistry.getRepository(repositoryId).getName());
+      }
+      catch (NoSuchRepositoryException e) {
+        // should never happen;
+        getLogger().error(e.getMessage(), e);
+      }
+      repoUrl.setArtifactUrl(referenceFactory.createReference(req,
+          "content/repositories/" + repositoryId + path).toString());
+      repoUrl.setPath(path);
+
+      urls.add(repoUrl);
+    }
+    return urls;
+  }
 }

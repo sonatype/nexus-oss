@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem;
 
 import java.util.Collection;
@@ -22,27 +23,27 @@ import java.util.Collection;
 public interface EntityRepository<E extends Entity<E>>
 {
 
-    /**
-     * Creates a new entity with specified id.
-     *
-     * @param id of new entity
-     * @return created entity (never null)
-     */
-    E create( String id );
+  /**
+   * Creates a new entity with specified id.
+   *
+   * @param id of new entity
+   * @return created entity (never null)
+   */
+  E create(String id);
 
-    /**
-     * Retrieves an existing entity by id.
-     *
-     * @param id of entity to be retrieved (cannot be null)
-     * @return entity with specified id
-     */
-    E get( String id );
+  /**
+   * Retrieves an existing entity by id.
+   *
+   * @param id of entity to be retrieved (cannot be null)
+   * @return entity with specified id
+   */
+  E get(String id);
 
-    /**
-     * Retrieves all existing entities.
-     *
-     * @return all existing entities (never null)
-     */
-    Collection<E> get();
+  /**
+   * Retrieves all existing entities.
+   *
+   * @return all existing entities (never null)
+   */
+  Collection<E> get();
 
 }

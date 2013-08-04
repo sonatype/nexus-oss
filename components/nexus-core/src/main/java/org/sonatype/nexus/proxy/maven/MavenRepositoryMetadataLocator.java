@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.ByteArrayOutputStream;
@@ -18,17 +19,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.Plugin;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -43,484 +33,454 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.MXParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 /**
  * A MetadataLocator powered by Nexus' MavenRepository.
- * 
+ *
  * @author cstamas
  */
-@Component( role = MetadataLocator.class )
+@Component(role = MetadataLocator.class)
 public class MavenRepositoryMetadataLocator
     implements MetadataLocator
 {
-    public Gav getGavForRequest( ArtifactStoreRequest request )
-    {
-        return request.getGav();
+  public Gav getGavForRequest(ArtifactStoreRequest request) {
+    return request.getGav();
+  }
+
+  public Plugin extractPluginElementFromPom(ArtifactStoreRequest request)
+      throws IOException
+  {
+    Model pom = retrievePom(request);
+
+    if (!"maven-plugin".equals(pom.getPackaging())) {
+      return null;
     }
 
-    public Plugin extractPluginElementFromPom( ArtifactStoreRequest request )
-        throws IOException
-    {
-        Model pom = retrievePom( request );
+    Plugin plugin = new Plugin();
 
-        if ( !"maven-plugin".equals( pom.getPackaging() ) )
-        {
-            return null;
-        }
+    plugin.setArtifactId(pom.getArtifactId());
 
-        Plugin plugin = new Plugin();
+    plugin.setName(pom.getName());
 
-        plugin.setArtifactId( pom.getArtifactId() );
-
-        plugin.setName( pom.getName() );
-
-        if ( "maven-plugin-plugin".equals( pom.getArtifactId() ) )
-        {
-            plugin.setPrefix( "plugin" );
-        }
-        else
-        {
-            plugin.setPrefix( pom.getArtifactId().replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" ) );
-        }
-
-        return plugin;
+    if ("maven-plugin-plugin".equals(pom.getArtifactId())) {
+      plugin.setPrefix("plugin");
+    }
+    else {
+      plugin.setPrefix(pom.getArtifactId().replaceAll("-?maven-?", "").replaceAll("-?plugin-?", ""));
     }
 
-    protected Gav getPomGav( ArtifactStoreRequest request )
-    {
-        Gav pomGav = new Gav( request.getGav().getGroupId(), // groupId
-            request.getGav().getArtifactId(), // artifactId
-            request.getGav().getVersion(), // version
-            null, // classifier
-            "pom", // extension
-            request.getGav().getSnapshotBuildNumber(), // snapshotBuildNumber
-            request.getGav().getSnapshotTimeStamp(), // snapshotTimeStamp
-            null, // name
-            false, // hash
-            null, // hashType
-            false, // signature
-            null // signatureType
-            );
+    return plugin;
+  }
 
-        return pomGav;
+  protected Gav getPomGav(ArtifactStoreRequest request) {
+    Gav pomGav = new Gav(request.getGav().getGroupId(), // groupId
+        request.getGav().getArtifactId(), // artifactId
+        request.getGav().getVersion(), // version
+        null, // classifier
+        "pom", // extension
+        request.getGav().getSnapshotBuildNumber(), // snapshotBuildNumber
+        request.getGav().getSnapshotTimeStamp(), // snapshotTimeStamp
+        null, // name
+        false, // hash
+        null, // hashType
+        false, // signature
+        null // signatureType
+    );
+
+    return pomGav;
+  }
+
+  public String retrievePackagingFromPom(ArtifactStoreRequest request)
+      throws IOException
+  {
+    String packaging;
+
+    GavCalculator gavCalculator = request.getMavenRepository().getGavCalculator();
+
+    Reader reader = null;
+
+    try {
+      Gav pomGav = getPomGav(request);
+
+      if (pomGav == null) {
+        return null;
+      }
+
+      String pomPath = gavCalculator.gavToPath(pomGav);
+
+      request.setRequestPath(pomPath);
+
+      StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(false, request);
+
+      reader = ReaderFactory.newXmlReader(pomFile.getInputStream());
+
+      packaging = getPackaging(reader);
+    }
+    catch (ItemNotFoundException e) {
+      return null;
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+    finally {
+      IOUtil.close(reader);
     }
 
-    public String retrievePackagingFromPom( ArtifactStoreRequest request )
-        throws IOException
-    {
-        String packaging;
+    return packaging;
+  }
 
-        GavCalculator gavCalculator = request.getMavenRepository().getGavCalculator();
+  private String getPackaging(Reader reader)
+      throws XmlPullParserException, IOException
+  {
+    String packaging = "jar";
 
-        Reader reader = null;
+    XmlPullParser parser = new MXParser();
 
-        try
-        {
-            Gav pomGav = getPomGav( request );
+    parser.setInput(reader);
 
-            if ( pomGav == null )
-            {
-                return null;
-            }
+    boolean foundRoot = false;
 
-            String pomPath = gavCalculator.gavToPath( pomGav );
+    int eventType = parser.getEventType();
 
-            request.setRequestPath( pomPath );
-
-            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem( false, request );
-
-            reader = ReaderFactory.newXmlReader( pomFile.getInputStream() );
-
-            packaging = getPackaging( reader );
+    while (eventType != XmlPullParser.END_DOCUMENT) {
+      if (eventType == XmlPullParser.START_TAG) {
+        if (parser.getName().equals("project")) {
+          foundRoot = true;
         }
-        catch ( ItemNotFoundException e )
-        {
-            return null;
+        else if (parser.getName().equals("packaging")) {
+          // 1st: if found project/packaging -> overwrite
+          if (parser.getDepth() == 2) {
+            packaging = StringUtils.trim(parser.nextText());
+            break;
+          }
         }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
+        else if (!foundRoot) {
+          throw new XmlPullParserException("Unrecognised tag: '" + parser.getName() + "'", parser, null);
         }
-        finally
-        {
-            IOUtil.close( reader );
-        }
+      }
 
-        return packaging;
+      eventType = parser.next();
     }
 
-    private String getPackaging( Reader reader )
-        throws XmlPullParserException, IOException
-    {
-        String packaging = "jar";
+    return packaging;
+  }
 
-        XmlPullParser parser = new MXParser();
+  public Model retrievePom(ArtifactStoreRequest request)
+      throws IOException
+  {
+    try {
+      Gav gav = getPomGav(request);
 
-        parser.setInput( reader );
+      if (gav == null) {
+        return null;
+      }
 
-        boolean foundRoot = false;
+      String pomPath = request.getMavenRepository().getGavCalculator().gavToPath(gav);
 
-        int eventType = parser.getEventType();
+      request.setRequestPath(pomPath);
 
-        while ( eventType != XmlPullParser.END_DOCUMENT )
-        {
-            if ( eventType == XmlPullParser.START_TAG )
-            {
-                if ( parser.getName().equals( "project" ) )
-                {
-                    foundRoot = true;
-                }
-                else if ( parser.getName().equals( "packaging" ) )
-                {
-                    // 1st: if found project/packaging -> overwrite
-                    if ( parser.getDepth() == 2 )
-                    {
-                        packaging = StringUtils.trim( parser.nextText() );
-                        break;
-                    }
-                }
-                else if ( !foundRoot )
-                {
-                    throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
-                }
-            }
+      StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(false, request);
 
-            eventType = parser.next();
+      Model model = null;
+
+      InputStream is = pomFile.getInputStream();
+
+      try {
+        MavenXpp3Reader rd = new MavenXpp3Reader();
+
+        model = rd.read(is);
+
+        return model;
+      }
+      catch (XmlPullParserException e) {
+        throw createIOExceptionWithCause(e.getMessage(), e);
+      }
+      finally {
+        IOUtil.close(is);
+      }
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+  }
+
+  public Metadata retrieveGAVMetadata(ArtifactStoreRequest request)
+      throws IOException
+  {
+    try {
+      Gav gav = getGavForRequest(request);
+
+      return readOrCreateGAVMetadata(request, gav);
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+  }
+
+  public Metadata retrieveGAMetadata(ArtifactStoreRequest request)
+      throws IOException
+  {
+    try {
+      Gav gav = getGavForRequest(request);
+
+      return readOrCreateGAMetadata(request, gav);
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+  }
+
+  public Metadata retrieveGMetadata(ArtifactStoreRequest request)
+      throws IOException
+  {
+    try {
+      Gav gav = getGavForRequest(request);
+
+      return readOrCreateGMetadata(request, gav);
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+  }
+
+  public void storeGAVMetadata(ArtifactStoreRequest request, Metadata metadata)
+      throws IOException
+  {
+    try {
+      Gav gav = getGavForRequest(request);
+
+      writeGAVMetadata(request, gav, metadata);
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+  }
+
+  public void storeGAMetadata(ArtifactStoreRequest request, Metadata metadata)
+      throws IOException
+  {
+    try {
+      Gav gav = getGavForRequest(request);
+
+      writeGAMetadata(request, gav, metadata);
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+  }
+
+  public void storeGMetadata(ArtifactStoreRequest request, Metadata metadata)
+      throws IOException
+  {
+    try {
+      Gav gav = getGavForRequest(request);
+
+      writeGMetadata(request, gav, metadata);
+    }
+    catch (Exception e) {
+      throw createIOExceptionWithCause(e.getMessage(), e);
+    }
+  }
+
+  // ==================================================
+  // -- internal stuff below
+  // ==================================================
+
+  private IOException createIOExceptionWithCause(String message, Throwable cause) {
+    IOException result = new IOException(message);
+
+    result.initCause(cause);
+
+    return result;
+  }
+
+  protected Metadata readOrCreateMetadata(RepositoryItemUid uid, ArtifactStoreRequest request)
+      throws IllegalOperationException, IOException, MetadataException
+  {
+    Metadata result = null;
+
+    String storedPath = request.getRequestPath();
+
+    try {
+      request.setRequestPath(uid.getPath());
+
+      StorageItem item = uid.getRepository().retrieveItem(false, request);
+
+      if (StorageFileItem.class.isAssignableFrom(item.getClass())) {
+        StorageFileItem fileItem = (StorageFileItem) item;
+
+        InputStream is = null;
+
+        try {
+          is = fileItem.getInputStream();
+
+          result = MetadataBuilder.read(is);
         }
-
-        return packaging;
+        finally {
+          IOUtil.close(is);
+        }
+      }
+      else {
+        throw new IllegalArgumentException("The UID " + uid.toString() + " is not a file!");
+      }
+    }
+    catch (ItemNotFoundException e) {
+      result = new Metadata();
+    }
+    finally {
+      request.setRequestPath(storedPath);
     }
 
-    public Model retrievePom( ArtifactStoreRequest request )
-        throws IOException
-    {
-        try
-        {
-            Gav gav = getPomGav( request );
-
-            if ( gav == null )
-            {
-                return null;
-            }
-
-            String pomPath = request.getMavenRepository().getGavCalculator().gavToPath( gav );
-
-            request.setRequestPath( pomPath );
-
-            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem( false, request );
-
-            Model model = null;
-
-            InputStream is = pomFile.getInputStream();
-
-            try
-            {
-                MavenXpp3Reader rd = new MavenXpp3Reader();
-
-                model = rd.read( is );
-
-                return model;
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw createIOExceptionWithCause( e.getMessage(), e );
-            }
-            finally
-            {
-                IOUtil.close( is );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
-        }
-    }
-
-    public Metadata retrieveGAVMetadata( ArtifactStoreRequest request )
-        throws IOException
-    {
-        try
-        {
-            Gav gav = getGavForRequest( request );
-
-            return readOrCreateGAVMetadata( request, gav );
-        }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
-        }
-    }
-
-    public Metadata retrieveGAMetadata( ArtifactStoreRequest request )
-        throws IOException
-    {
-        try
-        {
-            Gav gav = getGavForRequest( request );
-
-            return readOrCreateGAMetadata( request, gav );
-        }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
-        }
-    }
-
-    public Metadata retrieveGMetadata( ArtifactStoreRequest request )
-        throws IOException
-    {
-        try
-        {
-            Gav gav = getGavForRequest( request );
-
-            return readOrCreateGMetadata( request, gav );
-        }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
-        }
-    }
-
-    public void storeGAVMetadata( ArtifactStoreRequest request, Metadata metadata )
-        throws IOException
-    {
-        try
-        {
-            Gav gav = getGavForRequest( request );
-
-            writeGAVMetadata( request, gav, metadata );
-        }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
-        }
-    }
-
-    public void storeGAMetadata( ArtifactStoreRequest request, Metadata metadata )
-        throws IOException
-    {
-        try
-        {
-            Gav gav = getGavForRequest( request );
-
-            writeGAMetadata( request, gav, metadata );
-        }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
-        }
-    }
-
-    public void storeGMetadata( ArtifactStoreRequest request, Metadata metadata )
-        throws IOException
-    {
-        try
-        {
-            Gav gav = getGavForRequest( request );
-
-            writeGMetadata( request, gav, metadata );
-        }
-        catch ( Exception e )
-        {
-            throw createIOExceptionWithCause( e.getMessage(), e );
-        }
-    }
-
-    // ==================================================
-    // -- internal stuff below
-    // ==================================================
-
-    private IOException createIOExceptionWithCause( String message, Throwable cause )
-    {
-        IOException result = new IOException( message );
-
-        result.initCause( cause );
-
-        return result;
-    }
-
-    protected Metadata readOrCreateMetadata( RepositoryItemUid uid, ArtifactStoreRequest request )
-        throws IllegalOperationException, IOException, MetadataException
-    {
-        Metadata result = null;
+    return result;
+  }
 
-        String storedPath = request.getRequestPath();
+  protected void writeMetadata(RepositoryItemUid uid, Map<String, Object> ctx, Metadata md)
+      throws IllegalOperationException, UnsupportedStorageOperationException, MetadataException, IOException
+  {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        try
-        {
-            request.setRequestPath( uid.getPath() );
+    MetadataBuilder.write(md, outputStream);
 
-            StorageItem item = uid.getRepository().retrieveItem( false, request );
+    String mdString = outputStream.toString("UTF-8");
 
-            if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
-            {
-                StorageFileItem fileItem = (StorageFileItem) item;
+    outputStream.close();
 
-                InputStream is = null;
+    DefaultStorageFileItem file =
+        new DefaultStorageFileItem(uid.getRepository(), new ResourceStoreRequest(uid.getPath()), true, true,
+            new StringContentLocator(mdString));
 
-                try
-                {
-                    is = fileItem.getInputStream();
+    ((MavenRepository) uid.getRepository()).storeItemWithChecksums(false, file);
+  }
 
-                    result = MetadataBuilder.read( is );
-                }
-                finally
-                {
-                    IOUtil.close( is );
-                }
-            }
-            else
-            {
-                throw new IllegalArgumentException( "The UID " + uid.toString() + " is not a file!" );
-            }
-        }
-        catch ( ItemNotFoundException e )
-        {
-            result = new Metadata();
-        }
-        finally
-        {
-            request.setRequestPath( storedPath );
-        }
+  protected Metadata readOrCreateGAVMetadata(ArtifactStoreRequest request, Gav gav)
+      throws IllegalOperationException, IOException, MetadataException
+  {
+    String mdPath = request.getRequestPath();
 
-        return result;
-    }
+    // GAV
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR)) + "/maven-metadata.xml";
 
-    protected void writeMetadata( RepositoryItemUid uid, Map<String, Object> ctx, Metadata md )
-        throws IllegalOperationException, UnsupportedStorageOperationException, MetadataException, IOException
-    {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    RepositoryItemUid uid = request.getMavenRepository().createUid(mdPath);
 
-        MetadataBuilder.write( md, outputStream );
+    Metadata result = readOrCreateMetadata(uid, request);
 
-        String mdString = outputStream.toString( "UTF-8" );
+    result.setGroupId(gav.getGroupId());
 
-        outputStream.close();
+    result.setArtifactId(gav.getArtifactId());
 
-        DefaultStorageFileItem file =
-            new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid.getPath() ), true, true,
-                new StringContentLocator( mdString ) );
+    result.setVersion(gav.getBaseVersion());
 
-        ( (MavenRepository) uid.getRepository() ).storeItemWithChecksums( false, file );
-    }
+    return result;
+  }
 
-    protected Metadata readOrCreateGAVMetadata( ArtifactStoreRequest request, Gav gav )
-        throws IllegalOperationException, IOException, MetadataException
-    {
-        String mdPath = request.getRequestPath();
+  protected Metadata readOrCreateGAMetadata(ArtifactStoreRequest request, Gav gav)
+      throws IllegalOperationException, IOException, MetadataException
+  {
+    String mdPath = request.getRequestPath();
 
-        // GAV
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
+    // GAV
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR));
 
-        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
+    // GA
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR)) + "/maven-metadata.xml";
 
-        Metadata result = readOrCreateMetadata( uid, request );
+    RepositoryItemUid uid = request.getMavenRepository().createUid(mdPath);
 
-        result.setGroupId( gav.getGroupId() );
+    Metadata result = readOrCreateMetadata(uid, request);
 
-        result.setArtifactId( gav.getArtifactId() );
+    result.setGroupId(gav.getGroupId());
 
-        result.setVersion( gav.getBaseVersion() );
+    result.setArtifactId(gav.getArtifactId());
 
-        return result;
-    }
+    result.setVersion(null);
 
-    protected Metadata readOrCreateGAMetadata( ArtifactStoreRequest request, Gav gav )
-        throws IllegalOperationException, IOException, MetadataException
-    {
-        String mdPath = request.getRequestPath();
+    return result;
+  }
 
-        // GAV
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
+  protected Metadata readOrCreateGMetadata(ArtifactStoreRequest request, Gav gav)
+      throws IllegalOperationException, IOException, MetadataException
+  {
+    String mdPath = request.getRequestPath();
 
-        // GA
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
+    // GAV
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR));
 
-        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
+    // GA
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR));
 
-        Metadata result = readOrCreateMetadata( uid, request );
+    // G
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR)) + "/maven-metadata.xml";
 
-        result.setGroupId( gav.getGroupId() );
+    RepositoryItemUid uid = request.getMavenRepository().createUid(mdPath);
 
-        result.setArtifactId( gav.getArtifactId() );
+    Metadata result = readOrCreateMetadata(uid, request);
 
-        result.setVersion( null );
+    result.setGroupId(null);
 
-        return result;
-    }
+    result.setArtifactId(null);
 
-    protected Metadata readOrCreateGMetadata( ArtifactStoreRequest request, Gav gav )
-        throws IllegalOperationException, IOException, MetadataException
-    {
-        String mdPath = request.getRequestPath();
+    result.setVersion(null);
 
-        // GAV
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
+    return result;
+  }
 
-        // GA
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
+  protected void writeGAVMetadata(ArtifactStoreRequest request, Gav gav, Metadata md)
+      throws UnsupportedStorageOperationException, IllegalOperationException, MetadataException, IOException
+  {
+    String mdPath = request.getRequestPath();
 
-        // G
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
+    // GAV
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR)) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
+    RepositoryItemUid uid = request.getMavenRepository().createUid(mdPath);
 
-        Metadata result = readOrCreateMetadata( uid, request );
+    writeMetadata(uid, request.getRequestContext(), md);
+  }
 
-        result.setGroupId( null );
+  protected void writeGAMetadata(ArtifactStoreRequest request, Gav gav, Metadata md)
+      throws UnsupportedStorageOperationException, IllegalOperationException, MetadataException, IOException
+  {
+    String mdPath = request.getRequestPath();
 
-        result.setArtifactId( null );
+    // GAV
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR));
 
-        result.setVersion( null );
+    // GA
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR)) + "/maven-metadata.xml";
 
-        return result;
-    }
+    RepositoryItemUid uid = request.getMavenRepository().createUid(mdPath);
 
-    protected void writeGAVMetadata( ArtifactStoreRequest request, Gav gav, Metadata md )
-        throws UnsupportedStorageOperationException, IllegalOperationException, MetadataException, IOException
-    {
-        String mdPath = request.getRequestPath();
+    writeMetadata(uid, request.getRequestContext(), md);
+  }
 
-        // GAV
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
+  protected void writeGMetadata(ArtifactStoreRequest request, Gav gav, Metadata md)
+      throws UnsupportedStorageOperationException, IllegalOperationException, MetadataException, IOException
+  {
+    String mdPath = request.getRequestPath();
 
-        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
+    // GAV
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR));
 
-        writeMetadata( uid, request.getRequestContext(), md );
-    }
+    // GA
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR));
 
-    protected void writeGAMetadata( ArtifactStoreRequest request, Gav gav, Metadata md )
-        throws UnsupportedStorageOperationException, IllegalOperationException, MetadataException, IOException
-    {
-        String mdPath = request.getRequestPath();
+    // G
+    mdPath = mdPath.substring(0, mdPath.lastIndexOf(RepositoryItemUid.PATH_SEPARATOR)) + "/maven-metadata.xml";
 
-        // GAV
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
+    RepositoryItemUid uid = request.getMavenRepository().createUid(mdPath);
 
-        // GA
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
-
-        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
-
-        writeMetadata( uid, request.getRequestContext(), md );
-    }
-
-    protected void writeGMetadata( ArtifactStoreRequest request, Gav gav, Metadata md )
-        throws UnsupportedStorageOperationException, IllegalOperationException, MetadataException, IOException
-    {
-        String mdPath = request.getRequestPath();
-
-        // GAV
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
-
-        // GA
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
-
-        // G
-        mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
-
-        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
-
-        writeMetadata( uid, request.getRequestContext(), md );
-    }
+    writeMetadata(uid, request.getRequestContext(), md);
+  }
 
 }

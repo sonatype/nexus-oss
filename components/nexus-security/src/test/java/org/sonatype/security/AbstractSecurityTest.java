@@ -10,78 +10,74 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security;
 
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.Binder;
+import org.apache.shiro.util.ThreadContext;
+import org.codehaus.plexus.util.FileUtils;
 
 public abstract class AbstractSecurityTest
     extends InjectedTestCase
 {
 
-    protected File PLEXUS_HOME = new File( "./target/plexus-home/" );
+  protected File PLEXUS_HOME = new File("./target/plexus-home/");
 
-    protected File APP_CONF = new File( PLEXUS_HOME, "conf" );
+  protected File APP_CONF = new File(PLEXUS_HOME, "conf");
 
-    @Override
-    public void configure( Properties properties )
-    {
-        properties.put( "application-conf", APP_CONF.getAbsolutePath() );
-        super.configure( properties );
+  @Override
+  public void configure(Properties properties) {
+    properties.put("application-conf", APP_CONF.getAbsolutePath());
+    super.configure(properties);
+  }
+
+  @Override
+  public void configure(final Binder binder) {
+    binder.install(new SecurityModule());
+  }
+
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
+
+    // delete the plexus home dir
+    FileUtils.deleteDirectory(PLEXUS_HOME);
+
+    getSecuritySystem().start();
+  }
+
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    try {
+      getSecuritySystem().stop();
+      lookup(CacheManagerComponent.class).shutdown();
     }
-
-    @Override
-    public void configure( final Binder binder )
-    {
-        binder.install( new SecurityModule() );
+    finally {
+      ThreadContext.remove();
+      super.tearDown();
     }
+  }
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  public BeanScanning scanning() {
+    return BeanScanning.INDEX;
+  }
 
-        // delete the plexus home dir
-        FileUtils.deleteDirectory( PLEXUS_HOME );
-
-        getSecuritySystem().start();
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        try
-        {
-            getSecuritySystem().stop();
-            lookup( CacheManagerComponent.class ).shutdown();
-        }
-        finally
-        {
-            ThreadContext.remove();
-            super.tearDown();
-        }
-    }
-
-    @Override
-    public BeanScanning scanning()
-    {
-        return BeanScanning.INDEX;
-    }
-
-    protected SecuritySystem getSecuritySystem()
-        throws Exception
-    {
-        return this.lookup( SecuritySystem.class );
-    }
+  protected SecuritySystem getSecuritySystem()
+      throws Exception
+  {
+    return this.lookup(SecuritySystem.class);
+  }
 }

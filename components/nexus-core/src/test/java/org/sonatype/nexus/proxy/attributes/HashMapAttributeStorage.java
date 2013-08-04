@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.attributes;
 
 import java.util.HashMap;
@@ -24,30 +25,27 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  * A HashMap implementation of Attribute Storage. Usable for tests etc, since it actually does not persists anything.
  * Part of NEXUS-4628 "alternate" AttributeStorage implementations.
  */
-@Typed( AttributeStorage.class )
-@Named( "hashmap" )
+@Typed(AttributeStorage.class)
+@Named("hashmap")
 @Singleton
 public class HashMapAttributeStorage
     extends AbstractAttributeStorage
     implements AttributeStorage
 {
-    private HashMap<String, Attributes> storageMap = new HashMap<String, Attributes>();
+  private HashMap<String, Attributes> storageMap = new HashMap<String, Attributes>();
 
-    @Override
-    public Attributes getAttributes( final RepositoryItemUid uid )
-    {
-        return storageMap.get( uid.getKey() );
-    }
+  @Override
+  public Attributes getAttributes(final RepositoryItemUid uid) {
+    return storageMap.get(uid.getKey());
+  }
 
-    @Override
-    public void putAttributes( final RepositoryItemUid uid, final Attributes item )
-    {
-        storageMap.put( uid.getKey(), item );
-    }
+  @Override
+  public void putAttributes(final RepositoryItemUid uid, final Attributes item) {
+    storageMap.put(uid.getKey(), item);
+  }
 
-    @Override
-    public boolean deleteAttributes( RepositoryItemUid uid )
-    {
-        return storageMap.remove( uid.getKey() ) != null;
-    }
+  @Override
+  public boolean deleteAttributes(RepositoryItemUid uid) {
+    return storageMap.remove(uid.getKey()) != null;
+  }
 }

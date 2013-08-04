@@ -10,30 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 /**
  * IllegalRequestException is thrown when an illegal request is tried against a ResourceStore.
- * 
+ *
  * @author cstamas
  */
 public class IllegalRequestException
     extends IllegalOperationException
 {
-    private static final long serialVersionUID = -1683012685732920168L;
+  private static final long serialVersionUID = -1683012685732920168L;
 
-    private final ResourceStoreRequest request;
+  private final ResourceStoreRequest request;
 
-    public IllegalRequestException( ResourceStoreRequest request, String message )
-    {
-        super( message );
+  public IllegalRequestException(ResourceStoreRequest request, String message) {
+    super(message);
 
-        this.request = request;
-    }
+    this.request = request;
+  }
 
-    public ResourceStoreRequest getRequest()
-    {
-        return request;
-    }
+  public ResourceStoreRequest getRequest() {
+    return request;
+  }
 
 }

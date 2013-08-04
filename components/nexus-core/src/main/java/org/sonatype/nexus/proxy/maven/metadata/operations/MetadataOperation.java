@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -19,16 +20,15 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
  *
  * @author Oleg Gusakov
  * @version $Id: MetadataOperation.java 726701 2008-12-15 14:31:34Z hboutemy $
- *
  */
 public interface MetadataOperation
 {
-    /**
-     * performs the operation
-     * 
-     * @param metadata to perform on
-     * @return true if operation changed the data
-     */
-    public boolean perform( Metadata metadata )
-        throws MetadataException;
+  /**
+   * performs the operation
+   *
+   * @param metadata to perform on
+   * @return true if operation changed the data
+   */
+  public boolean perform(Metadata metadata)
+      throws MetadataException;
 }

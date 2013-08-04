@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.locators;
 
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
@@ -19,8 +20,7 @@ public class MockStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    protected String getResourcePath()
-    {
-        return "/org/sonatype/security/locators/static-security.xml";
-    }
+  protected String getResourcePath() {
+    return "/org/sonatype/security/locators/static-security.xml";
+  }
 }

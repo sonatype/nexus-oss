@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem;
 
 /**
@@ -20,27 +21,27 @@ package org.sonatype.nexus.client.core.subsystem;
 public interface Entity<T>
 {
 
-    String id();
+  String id();
 
-    /**
-     * Refresh, replacing any current changes.
-     *
-     * @return itself, for fluent api usage
-     */
-    T refresh();
+  /**
+   * Refresh, replacing any current changes.
+   *
+   * @return itself, for fluent api usage
+   */
+  T refresh();
 
-    /**
-     * Saves current changes.
-     *
-     * @return itself, for fluent api usage
-     */
-    T save();
+  /**
+   * Saves current changes.
+   *
+   * @return itself, for fluent api usage
+   */
+  T save();
 
-    /**
-     * Removes.
-     *
-     * @return itself, for fluent api usage
-     */
-    T remove();
+  /**
+   * Removes.
+   *
+   * @return itself, for fluent api usage
+   */
+  T remove();
 
 }

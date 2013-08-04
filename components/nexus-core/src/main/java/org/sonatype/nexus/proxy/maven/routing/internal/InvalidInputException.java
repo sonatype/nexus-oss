@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
@@ -17,20 +18,17 @@ import java.io.IOException;
 /**
  * Exception thrown when the input of the {@link TextFilePrefixSourceMarshaller} (or any other future marshaller) does
  * not meet expectations, and the content of the prefix file should be considered as "garbage", must not be used.
- * 
+ *
  * @since 2.4
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class InvalidInputException
     extends IOException
 {
-    /**
-     * Constructor.
-     * 
-     * @param message
-     */
-    public InvalidInputException( String message )
-    {
-        super( message );
-    }
+  /**
+   * Constructor.
+   */
+  public InvalidInputException(String message) {
+    super(message);
+  }
 }

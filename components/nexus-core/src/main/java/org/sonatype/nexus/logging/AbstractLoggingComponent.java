@@ -10,12 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.logging;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Similar to Plexus' AbstractLogEnabled, but using Slf4j and straight-forward stuff! Consider using
@@ -26,34 +27,30 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractLoggingComponent
 {
 
-    private final Logger logger;
+  private final Logger logger;
 
-    /**
-     * Default constructor that creates logger for component upon instantiation.
-     */
-    protected AbstractLoggingComponent()
-    {
-        this.logger = checkNotNull( createLogger() );
-    }
+  /**
+   * Default constructor that creates logger for component upon instantiation.
+   */
+  protected AbstractLoggingComponent() {
+    this.logger = checkNotNull(createLogger());
+  }
 
-    /**
-     * Creates logger instance to be used with component instance. It might be overridden by subclasses to implement
-     * alternative logger naming strategy. By default, this method does the "usual" fluff: {@code LoggerFactory.getLogger(getClass())}.
-     *
-     * @return The Logger instance to be used by component for logging.
-     */
-    protected Logger createLogger()
-    {
-        return LoggerFactory.getLogger( getClass() );
-    }
+  /**
+   * Creates logger instance to be used with component instance. It might be overridden by subclasses to implement
+   * alternative logger naming strategy. By default, this method does the "usual" fluff: {@code
+   * LoggerFactory.getLogger(getClass())}.
+   *
+   * @return The Logger instance to be used by component for logging.
+   */
+  protected Logger createLogger() {
+    return LoggerFactory.getLogger(getClass());
+  }
 
-    /**
-     * Returns the Logger instance of this component. Never returns {@code null}.
-     *
-     * @return
-     */
-    protected Logger getLogger()
-    {
-        return logger;
-    }
+  /**
+   * Returns the Logger instance of this component. Never returns {@code null}.
+   */
+  protected Logger getLogger() {
+    return logger;
+  }
 }

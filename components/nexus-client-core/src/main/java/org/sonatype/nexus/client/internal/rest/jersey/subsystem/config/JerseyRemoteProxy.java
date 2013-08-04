@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.config;
 
 import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
@@ -25,42 +26,37 @@ public class JerseyRemoteProxy
     implements RemoteProxy
 {
 
-    public JerseyRemoteProxy( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
-    }
+  public JerseyRemoteProxy(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
 
-    @Override
-    protected RemoteProxySettingsDTO getSettingsFrom( final GlobalConfigurationResource configuration )
-    {
-        return configuration.getRemoteProxySettings();
-    }
+  @Override
+  protected RemoteProxySettingsDTO getSettingsFrom(final GlobalConfigurationResource configuration) {
+    return configuration.getRemoteProxySettings();
+  }
 
-    @Override
-    protected void setSettingsIn( final RemoteProxySettingsDTO settings,
-                                  final GlobalConfigurationResource configuration )
-    {
-        configuration.setRemoteProxySettings( settings );
-    }
+  @Override
+  protected void setSettingsIn(final RemoteProxySettingsDTO settings,
+                               final GlobalConfigurationResource configuration)
+  {
+    configuration.setRemoteProxySettings(settings);
+  }
 
-    @Override
-    protected RemoteProxySettingsDTO createSettings()
-    {
-        return new RemoteProxySettingsDTO();
-    }
+  @Override
+  protected RemoteProxySettingsDTO createSettings() {
+    return new RemoteProxySettingsDTO();
+  }
 
-    @Override
-    public RemoteProxy disableHttpProxy()
-    {
-        settings().setHttpProxySettings( null );
-        return save();
-    }
+  @Override
+  public RemoteProxy disableHttpProxy() {
+    settings().setHttpProxySettings(null);
+    return save();
+  }
 
-    @Override
-    public RemoteProxy disableHttpsProxy()
-    {
-        settings().setHttpsProxySettings( null );
-        return save();
-    }
+  @Override
+  public RemoteProxy disableHttpsProxy() {
+    settings().setHttpsProxySettings(null);
+    return save();
+  }
 
 }

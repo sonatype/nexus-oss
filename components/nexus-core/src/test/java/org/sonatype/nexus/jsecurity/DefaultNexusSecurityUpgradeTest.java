@@ -10,34 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.jsecurity;
 
-import java.io.File;
+import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.security.SecuritySystem;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.security.SecuritySystem;
 
 public class DefaultNexusSecurityUpgradeTest
     extends NexusAppTestSupport
 {
 
-    private static final String ORG_CONFIG_FILE = "target/test-classes/org/sonatype/nexus/jsecurity/security.xml";
+  private static final String ORG_CONFIG_FILE = "target/test-classes/org/sonatype/nexus/jsecurity/security.xml";
 
-    @Test
-    public void testDoUpgrade() throws Exception
-    {
-       this.lookup( SecuritySystem.class );
-    }
+  @Test
+  public void testDoUpgrade() throws Exception {
+    this.lookup(SecuritySystem.class);
+  }
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        // copy the file to a different location because we are going to change it
-        FileUtils.copyFileToDirectory( util.resolveFile(  ORG_CONFIG_FILE) ,  getConfHomeDir() );
-    }
+    // copy the file to a different location because we are going to change it
+    FileUtils.copyFileToDirectory(util.resolveFile(ORG_CONFIG_FILE), getConfHomeDir());
+  }
 }

@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities.support.validator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,6 +20,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Factory of {@link Validator}s related to repositories.
@@ -32,41 +33,40 @@ import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFacto
 public class RepositoryValidators
 {
 
-    private final ValidatorFactory validatorFactory;
+  private final ValidatorFactory validatorFactory;
 
-    @Inject
-    public RepositoryValidators( final ValidatorFactory validatorFactory )
-    {
-        this.validatorFactory = checkNotNull( validatorFactory );
-    }
+  @Inject
+  public RepositoryValidators(final ValidatorFactory validatorFactory) {
+    this.validatorFactory = checkNotNull(validatorFactory);
+  }
 
-    /**
-     * Creates a new validator that checks that a repository referenced by specified property key is of specified type.
-     *
-     * @param type        capability type
-     * @param propertyKey key of property that contains teh repository id
-     * @param facet       type of repository
-     * @return created validator
-     */
-    public Validator repositoryOfType( final CapabilityType type,
-                                       final String propertyKey,
-                                       final Class<?> facet )
-    {
-        return validatorFactory.repositoryOfType( type, propertyKey, facet );
-    }
+  /**
+   * Creates a new validator that checks that a repository referenced by specified property key is of specified type.
+   *
+   * @param type        capability type
+   * @param propertyKey key of property that contains teh repository id
+   * @param facet       type of repository
+   * @return created validator
+   */
+  public Validator repositoryOfType(final CapabilityType type,
+                                    final String propertyKey,
+                                    final Class<?> facet)
+  {
+    return validatorFactory.repositoryOfType(type, propertyKey, facet);
+  }
 
-    /**
-     * Creates a new validator that checks that a repository referenced by specified property key exists.
-     *
-     * @param type        capability type
-     * @param propertyKey key of property that contains the repository id
-     * @return created validator
-     * @since 2.3
-     */
-    public Validator repositoryExists( final CapabilityType type,
-                                       final String propertyKey )
-    {
-        return validatorFactory.repositoryExists( type, propertyKey );
-    }
+  /**
+   * Creates a new validator that checks that a repository referenced by specified property key exists.
+   *
+   * @param type        capability type
+   * @param propertyKey key of property that contains the repository id
+   * @return created validator
+   * @since 2.3
+   */
+  public Validator repositoryExists(final CapabilityType type,
+                                    final String propertyKey)
+  {
+    return validatorFactory.repositoryExists(type, propertyKey);
+  }
 
 }

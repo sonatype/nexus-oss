@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.validator;
 
 import java.util.List;
@@ -34,142 +35,92 @@ import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.
- * 
+ *
  * @author cstamas
  * @deprecated see Configurable
  */
 public interface ApplicationConfigurationValidator
     extends ConfigurationValidator
 {
-    /**
-     * Validates a repository configuration.
-     * 
-     * @param repository
-     * @return
-     */
-    ValidationResponse validateRepository( ApplicationValidationContext ctx, CRepository repository );
+  /**
+   * Validates a repository configuration.
+   */
+  ValidationResponse validateRepository(ApplicationValidationContext ctx, CRepository repository);
 
-    /**
-     * Validates remote connection settings.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRemoteConnectionSettings( ApplicationValidationContext ctx,
-        CRemoteConnectionSettings settings );
+  /**
+   * Validates remote connection settings.
+   */
+  ValidationResponse validateRemoteConnectionSettings(ApplicationValidationContext ctx,
+                                                      CRemoteConnectionSettings settings);
 
-    /**
-     * Validates remote proxy settings.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRemoteHttpProxySettings( ApplicationValidationContext ctx,
-        CRemoteHttpProxySettings settings );
+  /**
+   * Validates remote proxy settings.
+   */
+  ValidationResponse validateRemoteHttpProxySettings(ApplicationValidationContext ctx,
+                                                     CRemoteHttpProxySettings settings);
 
-    /**
-     * Validates remote authentication.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRemoteAuthentication( ApplicationValidationContext ctx, CRemoteAuthentication settings );
+  /**
+   * Validates remote authentication.
+   */
+  ValidationResponse validateRemoteAuthentication(ApplicationValidationContext ctx, CRemoteAuthentication settings);
 
-    /**
-     * Validates rest api settings.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRestApiSettings( ApplicationValidationContext ctx, CRestApiSettings settings );
+  /**
+   * Validates rest api settings.
+   */
+  ValidationResponse validateRestApiSettings(ApplicationValidationContext ctx, CRestApiSettings settings);
 
-    /**
-     * Validates Nexus built-in HTTP proxy settings.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateHttpProxySettings( ApplicationValidationContext ctx, CHttpProxySettings settings );
+  /**
+   * Validates Nexus built-in HTTP proxy settings.
+   */
+  ValidationResponse validateHttpProxySettings(ApplicationValidationContext ctx, CHttpProxySettings settings);
 
-    /**
-     * Validates routing.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRouting( ApplicationValidationContext ctx, CRouting settings );
+  /**
+   * Validates routing.
+   */
+  ValidationResponse validateRouting(ApplicationValidationContext ctx, CRouting settings);
 
-    /**
-     * Validates remote nexus instance.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRemoteNexusInstance( ApplicationValidationContext ctx, CRemoteNexusInstance settings );
+  /**
+   * Validates remote nexus instance.
+   */
+  ValidationResponse validateRemoteNexusInstance(ApplicationValidationContext ctx, CRemoteNexusInstance settings);
 
-    /**
-     * Validates repository grouping.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRepositoryGrouping( ApplicationValidationContext ctx, CRepositoryGrouping settings );
+  /**
+   * Validates repository grouping.
+   */
+  ValidationResponse validateRepositoryGrouping(ApplicationValidationContext ctx, CRepositoryGrouping settings);
 
-    /**
-     * Validates mapping.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateGroupsSettingPathMappingItem( ApplicationValidationContext ctx, CPathMappingItem settings );
+  /**
+   * Validates mapping.
+   */
+  ValidationResponse validateGroupsSettingPathMappingItem(ApplicationValidationContext ctx, CPathMappingItem settings);
 
-    /**
-     * Validates repository target item.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRepositoryTarget( ApplicationValidationContext ctx, CRepositoryTarget settings );
+  /**
+   * Validates repository target item.
+   */
+  ValidationResponse validateRepositoryTarget(ApplicationValidationContext ctx, CRepositoryTarget settings);
 
-    /**
-     * Validates scheduled task.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateScheduledTask( ApplicationValidationContext ctx, CScheduledTask settings );
+  /**
+   * Validates scheduled task.
+   */
+  ValidationResponse validateScheduledTask(ApplicationValidationContext ctx, CScheduledTask settings);
 
-    /**
-     * Validates schedule.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateSchedule( ApplicationValidationContext ctx, CScheduleConfig settings );
+  /**
+   * Validates schedule.
+   */
+  ValidationResponse validateSchedule(ApplicationValidationContext ctx, CScheduleConfig settings);
 
-    /**
-     * Validates smtp
-     * 
-     * @param ctx
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateSmtpConfiguration( ApplicationValidationContext ctx, CSmtpConfiguration settings );
+  /**
+   * Validates smtp
+   */
+  ValidationResponse validateSmtpConfiguration(ApplicationValidationContext ctx, CSmtpConfiguration settings);
 
-    /**
-     * Validate mirror config
-     * 
-     * @param ctx
-     * @param mirror
-     * @return
-     */
-    ValidationResponse validateRepositoryMirrors( ApplicationValidationContext ctx, List<CMirror> mirrors );
-    
-    /**
-     * Validates error reporting
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateErrorReporting( ApplicationValidationContext ctx, CErrorReporting settings );
+  /**
+   * Validate mirror config
+   */
+  ValidationResponse validateRepositoryMirrors(ApplicationValidationContext ctx, List<CMirror> mirrors);
+
+  /**
+   * Validates error reporting
+   */
+  ValidationResponse validateErrorReporting(ApplicationValidationContext ctx, CErrorReporting settings);
 }

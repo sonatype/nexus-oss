@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest;
 
 import java.net.MalformedURLException;
@@ -23,85 +24,74 @@ import org.sonatype.nexus.client.internal.util.Check;
 public class BaseUrl
 {
 
-    private final Protocol protocol;
+  private final Protocol protocol;
 
-    private final String host;
+  private final String host;
 
-    private final int port;
+  private final int port;
 
-    private final String path;
+  private final String path;
 
-    public BaseUrl( final Protocol protocol, final String host, final int port, final String path )
-    {
-        this.protocol = Check.notNull( protocol, Protocol.class );
-        this.host = Check.notBlank( host, "host" );
-        this.port = Check.argument( port > 0 && port < 65536, port, "Port out of boundaries (0 < port < 65536)!" );
-        String fixedPath = path;
-        if ( !fixedPath.endsWith( "/" ) )
-        {
-            fixedPath = fixedPath + "/";
-        }
-        this.path = fixedPath;
+  public BaseUrl(final Protocol protocol, final String host, final int port, final String path) {
+    this.protocol = Check.notNull(protocol, Protocol.class);
+    this.host = Check.notBlank(host, "host");
+    this.port = Check.argument(port > 0 && port < 65536, port, "Port out of boundaries (0 < port < 65536)!");
+    String fixedPath = path;
+    if (!fixedPath.endsWith("/")) {
+      fixedPath = fixedPath + "/";
     }
+    this.path = fixedPath;
+  }
 
-    public Protocol getProtocol()
-    {
-        return protocol;
+  public Protocol getProtocol() {
+    return protocol;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public String getPath() {
+    return path;
+  }
+
+  // ==
+
+  public String toUrl() {
+    return getProtocol().name().toLowerCase() + "://" + getHost() + ":" + getPort() + getPath();
+  }
+
+  // ==
+
+  @Override
+  public String toString() {
+    return toUrl();
+  }
+
+  // ==
+
+  public static BaseUrl baseUrlFrom(final String url)
+      throws MalformedURLException
+  {
+    return baseUrlFrom(new URL(Check.notBlank(url, "URL")));
+  }
+
+  public static BaseUrl baseUrlFrom(final URL url) {
+    Check.notNull(url, URL.class);
+    final Protocol protocol = Protocol.valueOf(url.getProtocol().toUpperCase());
+    final String host = url.getHost();
+    final int port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
+    String fixedPath = url.getPath();
+    if (!fixedPath.startsWith("/")) {
+      fixedPath = "/" + fixedPath;
     }
-
-    public String getHost()
-    {
-        return host;
+    if (!fixedPath.endsWith("/")) {
+      fixedPath = fixedPath + "/";
     }
-
-    public int getPort()
-    {
-        return port;
-    }
-
-    public String getPath()
-    {
-        return path;
-    }
-
-    // ==
-
-    public String toUrl()
-    {
-        return getProtocol().name().toLowerCase() + "://" + getHost() + ":" + getPort() + getPath();
-    }
-
-    // ==
-
-    @Override
-    public String toString()
-    {
-        return toUrl();
-    }
-
-    // ==
-
-    public static BaseUrl baseUrlFrom( final String url )
-        throws MalformedURLException
-    {
-        return baseUrlFrom( new URL( Check.notBlank( url, "URL" ) ) );
-    }
-
-    public static BaseUrl baseUrlFrom( final URL url )
-    {
-        Check.notNull( url, URL.class );
-        final Protocol protocol = Protocol.valueOf( url.getProtocol().toUpperCase() );
-        final String host = url.getHost();
-        final int port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
-        String fixedPath = url.getPath();
-        if ( !fixedPath.startsWith( "/" ) )
-        {
-            fixedPath = "/" + fixedPath;
-        }
-        if ( !fixedPath.endsWith( "/" ) )
-        {
-            fixedPath = fixedPath + "/";
-        }
-        return new BaseUrl( protocol, host, port, fixedPath );
-    }
+    return new BaseUrl(protocol, host, port, fixedPath);
+  }
 }

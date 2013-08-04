@@ -10,69 +10,70 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.jsecurity;
+
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.security.usermanagement.DefaultPasswordGenerator;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.junit.Test;
-import org.sonatype.security.usermanagement.DefaultPasswordGenerator;
-import org.sonatype.security.usermanagement.PasswordGenerator;
 
 public class DefaultPasswordGeneratorTest
     extends PlexusTestCaseSupport
 {
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
+  @Override
+  protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
+    configuration.setAutoWiring(true);
+    configuration.setClassPathScanning(PlexusConstants.SCANNING_CACHE);
+  }
 
-    protected DefaultPasswordGenerator pwGenerator;
+  protected DefaultPasswordGenerator pwGenerator;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        pwGenerator = (DefaultPasswordGenerator) this.lookup( PasswordGenerator.class );
-    }
+    pwGenerator = (DefaultPasswordGenerator) this.lookup(PasswordGenerator.class);
+  }
 
-    @Test
-    public void testGeneratePassword()
-        throws Exception
-    {
-        String pw = pwGenerator.generatePassword( 10, 10 );
+  @Test
+  public void testGeneratePassword()
+      throws Exception
+  {
+    String pw = pwGenerator.generatePassword(10, 10);
 
-        assertTrue( pw != null );
-        assertTrue( pw.length() == 10 );
+    assertTrue(pw != null);
+    assertTrue(pw.length() == 10);
 
-        String encrypted = pwGenerator.hashPassword( pw );
-        String encrypted2 = pwGenerator.hashPassword( pw );
+    String encrypted = pwGenerator.hashPassword(pw);
+    String encrypted2 = pwGenerator.hashPassword(pw);
 
-        assertTrue( encrypted != null );
-        assertTrue( encrypted2 != null );
-        assertFalse( pw.equals( encrypted ) );
-        assertFalse( pw.equals( encrypted2 ) );
-        assertTrue( encrypted.equals( encrypted2 ) );
+    assertTrue(encrypted != null);
+    assertTrue(encrypted2 != null);
+    assertFalse(pw.equals(encrypted));
+    assertFalse(pw.equals(encrypted2));
+    assertTrue(encrypted.equals(encrypted2));
 
-        String newPw = pwGenerator.generatePassword( 10, 10 );
+    String newPw = pwGenerator.generatePassword(10, 10);
 
-        assertTrue( newPw != null );
-        assertTrue( newPw.length() == 10 );
-        assertFalse( pw.equals( newPw ) );
+    assertTrue(newPw != null);
+    assertTrue(newPw.length() == 10);
+    assertFalse(pw.equals(newPw));
 
-        String newEncrypted = pwGenerator.hashPassword( newPw );
-        String newEncrypted2 = pwGenerator.hashPassword( newPw );
+    String newEncrypted = pwGenerator.hashPassword(newPw);
+    String newEncrypted2 = pwGenerator.hashPassword(newPw);
 
-        assertTrue( newEncrypted != null );
-        assertTrue( newEncrypted2 != null );
-        assertFalse( newPw.equals( newEncrypted ) );
-        assertFalse( newPw.equals( newEncrypted2 ) );
-        assertTrue( newEncrypted.equals( newEncrypted2 ) );
-        assertFalse( encrypted.equals( newEncrypted ) );
-    }
+    assertTrue(newEncrypted != null);
+    assertTrue(newEncrypted2 != null);
+    assertFalse(newPw.equals(newEncrypted));
+    assertFalse(newPw.equals(newEncrypted2));
+    assertTrue(newEncrypted.equals(newEncrypted2));
+    assertFalse(encrypted.equals(newEncrypted));
+  }
 }

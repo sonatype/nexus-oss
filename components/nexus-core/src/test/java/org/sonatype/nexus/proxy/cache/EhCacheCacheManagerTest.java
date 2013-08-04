@@ -10,144 +10,145 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.cache;
 
 import java.util.Collection;
 
-import org.junit.Test;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+
+import org.junit.Test;
 
 public class EhCacheCacheManagerTest
     extends AbstractNexusTestEnvironment
 {
 
-    @Test
-    public void testGetCache()
-        throws Exception
-    {
-        CacheManager cm = lookup( CacheManager.class );
+  @Test
+  public void testGetCache()
+      throws Exception
+  {
+    CacheManager cm = lookup(CacheManager.class);
 
-        PathCache c = cm.getPathCache( "test" );
+    PathCache c = cm.getPathCache("test");
 
-        assertEquals( true, null != c );
-    }
+    assertEquals(true, null != c);
+  }
 
-    @Test
-    public void testRemoveWithParents()
-        throws Exception
-    {
-        CacheManager cm = lookup( CacheManager.class );
+  @Test
+  public void testRemoveWithParents()
+      throws Exception
+  {
+    CacheManager cm = lookup(CacheManager.class);
 
-        PathCache c = cm.getPathCache( "test" );
+    PathCache c = cm.getPathCache("test");
 
-        c.put( "/com", Boolean.TRUE );
-        c.put( "/com/sonatype", Boolean.TRUE );
-        c.put( "/com/sonatype/nexus", Boolean.TRUE );
+    c.put("/com", Boolean.TRUE);
+    c.put("/com/sonatype", Boolean.TRUE);
+    c.put("/com/sonatype/nexus", Boolean.TRUE);
 
-        boolean removed = c.removeWithParents( "/com/sonatype" );
+    boolean removed = c.removeWithParents("/com/sonatype");
 
-        assertEquals(true, removed);
-        assertTrue( c.contains( "/com/sonatype/nexus" ) );
-        assertFalse( c.contains( "/com/sonatype" ) );
-        assertFalse( c.contains( "/com" ) );
+    assertEquals(true, removed);
+    assertTrue(c.contains("/com/sonatype/nexus"));
+    assertFalse(c.contains("/com/sonatype"));
+    assertFalse(c.contains("/com"));
 
-        removed = c.removeWithParents( "/com/sonatype/nexus" );
+    removed = c.removeWithParents("/com/sonatype/nexus");
 
-        assertEquals(true, removed);
-        assertFalse( c.contains( "/com/sonatype/nexus" ) );
-        assertFalse( c.contains( "/com/sonatype" ) );
-        assertFalse( c.contains( "/com" ) );
+    assertEquals(true, removed);
+    assertFalse(c.contains("/com/sonatype/nexus"));
+    assertFalse(c.contains("/com/sonatype"));
+    assertFalse(c.contains("/com"));
 
-        removed = c.removeWithParents( "/com/sonatype/nexus" );
-        assertEquals(false, removed);
-    }
-    
-    @Test
-    public void testRemoveWithChildren()
-        throws Exception
-    {
-        CacheManager cm = lookup( CacheManager.class );
+    removed = c.removeWithParents("/com/sonatype/nexus");
+    assertEquals(false, removed);
+  }
 
-        PathCache c = cm.getPathCache( "test" );
+  @Test
+  public void testRemoveWithChildren()
+      throws Exception
+  {
+    CacheManager cm = lookup(CacheManager.class);
 
-        c.put( "/com", Boolean.TRUE );
-        c.put( "/com/sonatype", Boolean.TRUE );
-        c.put( "/com/sonatype/nexus", Boolean.TRUE );
-        c.put( "/org", Boolean.TRUE );
-        c.put( "/org/sonatype", Boolean.TRUE );
-        c.put( "/org/sonatype/nexus", Boolean.TRUE );
-        
-        boolean removed = c.removeWithChildren( "/com" );
+    PathCache c = cm.getPathCache("test");
 
-        assertTrue( removed ); // this should have removed stuff
-        assertFalse( c.contains( "/com/sonatype/nexus" ) );
-        assertFalse( c.contains( "/com/sonatype" ) );
-        assertFalse( c.contains( "/com" ) );
-        assertTrue( c.contains( "/org/sonatype/nexus" ) );
-        assertTrue( c.contains( "/org/sonatype" ) );
-        assertTrue( c.contains( "/org" ) );
+    c.put("/com", Boolean.TRUE);
+    c.put("/com/sonatype", Boolean.TRUE);
+    c.put("/com/sonatype/nexus", Boolean.TRUE);
+    c.put("/org", Boolean.TRUE);
+    c.put("/org/sonatype", Boolean.TRUE);
+    c.put("/org/sonatype/nexus", Boolean.TRUE);
 
-        removed = c.removeWithChildren( "/com" );
+    boolean removed = c.removeWithChildren("/com");
 
-        assertFalse( removed ); // this should have removed nothing
+    assertTrue(removed); // this should have removed stuff
+    assertFalse(c.contains("/com/sonatype/nexus"));
+    assertFalse(c.contains("/com/sonatype"));
+    assertFalse(c.contains("/com"));
+    assertTrue(c.contains("/org/sonatype/nexus"));
+    assertTrue(c.contains("/org/sonatype"));
+    assertTrue(c.contains("/org"));
 
-        removed = c.removeWithChildren( "/" );
+    removed = c.removeWithChildren("/com");
 
-        assertTrue( removed ); // this should have removed everything
+    assertFalse(removed); // this should have removed nothing
 
-        assertFalse( c.contains( "/org/sonatype/nexus" ) );
-        assertFalse( c.contains( "/org/sonatype" ) );
-        assertFalse( c.contains( "/org" ) );
-    }
+    removed = c.removeWithChildren("/");
 
-    @Test
-    public void testPathAsKey()
-        throws Exception
-    {
-        CacheManager cm = lookup( CacheManager.class );
+    assertTrue(removed); // this should have removed everything
 
-        PathCache c = cm.getPathCache( "test" );
+    assertFalse(c.contains("/org/sonatype/nexus"));
+    assertFalse(c.contains("/org/sonatype"));
+    assertFalse(c.contains("/org"));
+  }
 
-        c.put( "/com/", Boolean.TRUE );
-        assertTrue( c.contains( "/com/" ) );
-        assertTrue( c.contains( "/com" ) );
-        assertTrue( c.contains( "com" ) );
+  @Test
+  public void testPathAsKey()
+      throws Exception
+  {
+    CacheManager cm = lookup(CacheManager.class);
 
-        c.put( "/com/sonatype", Boolean.TRUE );
-        assertTrue( c.contains( "/com/sonatype/" ) );
-        assertTrue( c.contains( "/com/sonatype" ) );
-        assertTrue( c.contains( "com/sonatype" ) );
-        assertTrue( c.contains( "com/sonatype/" ) );
+    PathCache c = cm.getPathCache("test");
 
-        c.removeWithParents( "/com/sonatype/" );
+    c.put("/com/", Boolean.TRUE);
+    assertTrue(c.contains("/com/"));
+    assertTrue(c.contains("/com"));
+    assertTrue(c.contains("com"));
 
-        assertFalse( c.contains( "/com/sonatype/" ) );
-        assertFalse( c.contains( "/com/sonatype" ) );
-        assertFalse( c.contains( "/com/" ) );
-        assertFalse( c.contains( "/com" ) );
-    }
+    c.put("/com/sonatype", Boolean.TRUE);
+    assertTrue(c.contains("/com/sonatype/"));
+    assertTrue(c.contains("/com/sonatype"));
+    assertTrue(c.contains("com/sonatype"));
+    assertTrue(c.contains("com/sonatype/"));
 
-    @Test
-    public void testListKeys() throws Exception
-    {
+    c.removeWithParents("/com/sonatype/");
 
-        CacheManager cm = lookup( CacheManager.class );
+    assertFalse(c.contains("/com/sonatype/"));
+    assertFalse(c.contains("/com/sonatype"));
+    assertFalse(c.contains("/com/"));
+    assertFalse(c.contains("/com"));
+  }
 
-        PathCache c = cm.getPathCache( "test" );
+  @Test
+  public void testListKeys() throws Exception {
 
-        c.put( "/com/", Boolean.TRUE );
-        c.put( "/com/sonatype", Boolean.TRUE );
-        c.put( "/com/sonatype/nexus", Boolean.TRUE );
+    CacheManager cm = lookup(CacheManager.class);
 
+    PathCache c = cm.getPathCache("test");
 
-        Collection<String> keys = c.listKeysInCache();
-
-        // NOTE keys are stored with the front and end '/' removed
-        assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com" ) );
-        assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com/sonatype" ) );
-        assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com/sonatype/nexus" ) );
+    c.put("/com/", Boolean.TRUE);
+    c.put("/com/sonatype", Boolean.TRUE);
+    c.put("/com/sonatype/nexus", Boolean.TRUE);
 
 
-    }
+    Collection<String> keys = c.listKeysInCache();
+
+    // NOTE keys are stored with the front and end '/' removed
+    assertTrue("expected key not found, keys are: " + keys, keys.contains("com"));
+    assertTrue("expected key not found, keys are: " + keys, keys.contains("com/sonatype"));
+    assertTrue("expected key not found, keys are: " + keys, keys.contains("com/sonatype/nexus"));
+
+
+  }
 
 }

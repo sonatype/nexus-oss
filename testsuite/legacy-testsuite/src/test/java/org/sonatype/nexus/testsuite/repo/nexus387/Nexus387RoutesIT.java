@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus387;
 
 import java.io.BufferedReader;
@@ -18,12 +19,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+
 import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 
 /**
  * Blocking, Exclusive, Inclusive Routes Tests
@@ -31,111 +33,107 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 public class Nexus387RoutesIT
     extends AbstractNexusIntegrationTest
 {
-	
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
+
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
+
+  @Test
+  public void testExclusive()
+      throws Exception
+  {
+
+    Gav gav =
+        new Gav(this.getTestId() + ".exclusive", "exclusive", "1.0.0", null, "jar", 0, new Date().getTime(),
+            "Simple Test Artifact", false, null, false, null);
+
+    try {
+      // should fail
+      this.downloadArtifactFromGroup("exclusive-single", gav, "target/downloads/exclude");
+      Assert.fail("Resource should not have been found.");
+    }
+    catch (IOException e) {
     }
 
-    @Test
-    public void testExclusive()
-        throws Exception
-    {
+    File artifact = this.downloadArtifactFromGroup("exclusive-group", gav, "target/downloads/exclude");
+    Assert.assertNotNull(artifact);
 
-        Gav gav =
-            new Gav( this.getTestId() + ".exclusive", "exclusive", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, null, false, null );
+    String line = this.getFirstLineOfFile(artifact);
+    Assert.assertEquals("Jar contained: " + this.getFirstLineOfFile(artifact)
+        + ", expected: exclusive2", line, "exclusive2");
 
-        try
-        {
-            // should fail
-            this.downloadArtifactFromGroup( "exclusive-single", gav, "target/downloads/exclude" );
-            Assert.fail( "Resource should not have been found." );
-        }
-        catch ( IOException e )
-        {
-        }
+    artifact = this.downloadArtifactFromGroup("other-group", gav, "target/downloads/exclude");
+    Assert.assertNotNull(artifact);
 
-        File artifact = this.downloadArtifactFromGroup( "exclusive-group", gav, "target/downloads/exclude" );
-        Assert.assertNotNull( artifact );
+    line = this.getFirstLineOfFile(artifact);
+    Assert.assertEquals("Jar contained: " + line + ", expected: exclusive1", line, "exclusive1");
 
-        String line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: exclusive2", line, "exclusive2" );
+  }
 
-        artifact = this.downloadArtifactFromGroup( "other-group", gav, "target/downloads/exclude" );
-        Assert.assertNotNull( artifact );
+  @Test
+  public void testInclusive()
+      throws Exception
+  {
 
-        line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( "Jar contained: " + line + ", expected: exclusive1", line, "exclusive1" );
+    Gav gav =
+        new Gav(this.getTestId() + ".inclusive", "inclusive", "1.0.0", null, "jar", 0, new Date().getTime(),
+            "Simple Test Artifact", false, null, false, null);
 
-    }
+    File artifact = this.downloadArtifactFromGroup("inclusive-single", gav, "target/downloads/include");
 
-    @Test
-    public void testInclusive()
-        throws Exception
-    {
+    String line = this.getFirstLineOfFile(artifact);
+    Assert.assertEquals("Jar contained: " + this.getFirstLineOfFile(artifact)
+        + ", expected: inclusive1", line, "inclusive1");
 
-        Gav gav =
-            new Gav( this.getTestId() + ".inclusive", "inclusive", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, null, false, null );
+    artifact = this.downloadArtifactFromGroup("inclusive-group", gav, "target/downloads/include");
 
-        File artifact = this.downloadArtifactFromGroup( "inclusive-single", gav, "target/downloads/include" );
+    line = this.getFirstLineOfFile(artifact);
+    Assert.assertEquals("Jar contained: " + this.getFirstLineOfFile(artifact)
+        + ", expected: inclusive2", line, "inclusive2");
 
-        String line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: inclusive1", line, "inclusive1" );
+    artifact = this.downloadArtifactFromGroup("other-group", gav, "target/downloads/include");
 
-        artifact = this.downloadArtifactFromGroup( "inclusive-group", gav, "target/downloads/include" );
+    line = this.getFirstLineOfFile(artifact);
+    Assert.assertEquals("Jar contained: " + this.getFirstLineOfFile(artifact)
+        + ", expected: inclusive1", line, "inclusive1");
 
-        line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: inclusive2", line, "inclusive2" );
+  }
 
-        artifact = this.downloadArtifactFromGroup( "other-group", gav, "target/downloads/include" );
+  @Test
+  public void testBlocking()
+      throws Exception
+  {
 
-        line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: inclusive1", line, "inclusive1" );
+    Gav gav =
+        new Gav(this.getTestId() + ".blocking", "blocking", "1.0.0", null, "jar", 0, new Date().getTime(),
+            "Simple Test Artifact", false, null, false, null);
+
+    try {
+
+      this.downloadArtifactFromGroup("blocking-group", gav, "target/downloads/blocking");
+      Assert.fail("This file should not have been found.");
 
     }
-
-    @Test
-    public void testBlocking()
-        throws Exception
-    {
-
-        Gav gav =
-            new Gav( this.getTestId() + ".blocking", "blocking", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, null, false, null );
-
-        try
-        {
-
-            this.downloadArtifactFromGroup( "blocking-group", gav, "target/downloads/blocking" );
-            Assert.fail( "This file should not have been found." );
-
-        }
-        catch ( IOException e )
-        {
-        }
-        File artifact = this.downloadArtifactFromGroup( "other-group", gav, "target/downloads/blocking" );
-
-        String line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: blocking1", line, "blocking1" );
-
+    catch (IOException e) {
     }
+    File artifact = this.downloadArtifactFromGroup("other-group", gav, "target/downloads/blocking");
 
-    private String getFirstLineOfFile( File file )
-        throws IOException
-    {
-        BufferedReader bReader = new BufferedReader( new FileReader( file ) );
-        String line = bReader.readLine().trim(); // only need one line
-        bReader.close();
+    String line = this.getFirstLineOfFile(artifact);
+    Assert.assertEquals("Jar contained: " + this.getFirstLineOfFile(artifact)
+        + ", expected: blocking1", line, "blocking1");
 
-        return line;
+  }
 
-    }
+  private String getFirstLineOfFile(File file)
+      throws IOException
+  {
+    BufferedReader bReader = new BufferedReader(new FileReader(file));
+    String line = bReader.readLine().trim(); // only need one line
+    bReader.close();
+
+    return line;
+
+  }
 
 }

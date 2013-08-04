@@ -10,30 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 /**
  * Exception used to wrap-up the non-exceptions (errors like OOM) occured during runtime of tasks into an Exception.
- * 
+ *
  * @author cstamas
  */
 public class TaskExecutionException
     extends Exception
 {
-    private static final long serialVersionUID = 1364178345795897438L;
+  private static final long serialVersionUID = 1364178345795897438L;
 
-    public TaskExecutionException( String message )
-    {
-        super( message );
-    }
+  public TaskExecutionException(String message) {
+    super(message);
+  }
 
-    public TaskExecutionException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+  public TaskExecutionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public TaskExecutionException( Throwable cause )
-    {
-        super( cause );
-    }
+  public TaskExecutionException(Throwable cause) {
+    super(cause);
+  }
 }

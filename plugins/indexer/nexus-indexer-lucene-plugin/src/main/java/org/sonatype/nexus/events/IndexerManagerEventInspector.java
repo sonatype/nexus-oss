@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.events;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
@@ -26,77 +25,71 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * Event inspector that maintains indexes.
- * 
+ *
  * @author cstamas
  */
-@Component( role = EventInspector.class, hint = "LuceneIndexerManagerEventInspector" )
+@Component(role = EventInspector.class, hint = "LuceneIndexerManagerEventInspector")
 public class IndexerManagerEventInspector
     extends AbstractEventInspector
     implements AsynchronousEventInspector
 {
-    private final boolean enabled =
-        SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.events.IndexerManagerEventInspector.enabled", true );
+  private final boolean enabled =
+      SystemPropertiesHelper.getBoolean("org.sonatype.nexus.events.IndexerManagerEventInspector.enabled", true);
 
-    private final boolean async =
-        SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.events.IndexerManagerEventInspector.async", true );
+  private final boolean async =
+      SystemPropertiesHelper.getBoolean("org.sonatype.nexus.events.IndexerManagerEventInspector.async", true);
 
-    @Requirement
-    private IndexerManager indexerManager;
+  @Requirement
+  private IndexerManager indexerManager;
 
-    protected IndexerManager getIndexerManager()
-    {
-        return indexerManager;
+  protected IndexerManager getIndexerManager() {
+    return indexerManager;
+  }
+
+  @Override
+  public boolean accepts(final Event<?> evt) {
+    // listen for STORE, CACHE, DELETE only
+    final boolean accepts = enabled
+        && (evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache ||
+        evt instanceof RepositoryItemEventDelete);
+    if (!async && accepts) {
+      inspectForIndexerManager(evt);
     }
+    return accepts;
+  }
 
-    @Override
-    public boolean accepts( final Event<?> evt )
-    {
-        // listen for STORE, CACHE, DELETE only
-        final boolean accepts = enabled
-            && ( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache || evt instanceof RepositoryItemEventDelete );
-        if ( !async && accepts )
-        {
-            inspectForIndexerManager( evt );
+  @Override
+  public void inspect(final Event<?> evt) {
+    if (async) {
+      inspectForIndexerManager(evt);
+    }
+  }
+
+  private void inspectForIndexerManager(final Event<?> evt) {
+    RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
+
+    Repository repository = ievt.getRepository();
+
+    // should we sync at all
+    if (repository != null && repository.isIndexable()) {
+      try {
+        if (ievt instanceof RepositoryItemEventCache || ievt instanceof RepositoryItemEventStore) {
+          getIndexerManager().addItemToIndex(repository, ievt.getItem());
         }
-        return accepts;
-    }
-
-    @Override
-    public void inspect( final Event<?> evt )
-    {
-        if ( async )
-        {
-            inspectForIndexerManager( evt );
+        else if (ievt instanceof RepositoryItemEventDelete) {
+          getIndexerManager().removeItemFromIndex(repository, ievt.getItem());
         }
+      }
+      catch (Exception e) // TODO be more specific
+      {
+        getLogger().error("Could not maintain index for repository {}!", repository.getId(), e);
+      }
     }
-
-    private void inspectForIndexerManager( final Event<?> evt )
-    {
-        RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
-        Repository repository = ievt.getRepository();
-
-        // should we sync at all
-        if ( repository != null && repository.isIndexable() )
-        {
-            try
-            {
-                if ( ievt instanceof RepositoryItemEventCache || ievt instanceof RepositoryItemEventStore )
-                {
-                    getIndexerManager().addItemToIndex( repository, ievt.getItem() );
-                }
-                else if ( ievt instanceof RepositoryItemEventDelete )
-                {
-                    getIndexerManager().removeItemFromIndex( repository, ievt.getItem() );
-                }
-            }
-            catch ( Exception e ) // TODO be more specific
-            {
-                getLogger().error( "Could not maintain index for repository {}!", repository.getId(), e );
-            }
-        }
-    }
+  }
 
 }

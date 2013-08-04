@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 /**
@@ -19,23 +20,23 @@ public interface Condition
     extends Evaluable
 {
 
-    /**
-     * Binds (eventual) resources used by condition. Before binding, condition should not be used.
-     * <p/>
-     * Calling this method multiple times should not fail, eventually should log a warning.
-     *
-     * @return itself, for fluent api usage
-     */
-    Condition bind();
+  /**
+   * Binds (eventual) resources used by condition. Before binding, condition should not be used.
+   * <p/>
+   * Calling this method multiple times should not fail, eventually should log a warning.
+   *
+   * @return itself, for fluent api usage
+   */
+  Condition bind();
 
-    /**
-     * Releases (eventual) resources used by condition. After releasing, condition should not be used until not binding
-     * it again.
-     * <p/>
-     * Calling this method multiple times should not fail, eventually should log a warning.
-     *
-     * @return itself, for fluent api usage
-     */
-    Condition release();
+  /**
+   * Releases (eventual) resources used by condition. After releasing, condition should not be used until not binding
+   * it again.
+   * <p/>
+   * Calling this method multiple times should not fail, eventually should log a warning.
+   *
+   * @return itself, for fluent api usage
+   */
+  Condition release();
 
 }

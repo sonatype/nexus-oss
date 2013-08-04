@@ -10,25 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rest;
+
+import java.util.List;
+
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
-import java.util.List;
 
 public class SimpleDocumentationNexusResourceBundleTest
     extends TestSupport
 {
-    @Test
-    public void testDoc()
-        throws Exception
-    {
-        NexusResourceBundle docBundle = new SimpleDocumentationResourceBundle();
+  @Test
+  public void testDoc()
+      throws Exception
+  {
+    NexusResourceBundle docBundle = new SimpleDocumentationResourceBundle();
 
-        List<StaticResource> resources = docBundle.getContributedResouces();
-        Assert.assertNotNull( resources );
-        Assert.assertEquals( 22, resources.size() );
-    }
+    List<StaticResource> resources = docBundle.getContributedResouces();
+    Assert.assertNotNull(resources);
+    Assert.assertEquals(22, resources.size());
+  }
 }

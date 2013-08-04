@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling.events;
 
 import org.sonatype.nexus.scheduling.NexusTask;
@@ -17,15 +18,14 @@ import org.sonatype.nexus.scheduling.NexusTask;
 /**
  * Event fired when a task is cancelled (more precisely, not WHEN is cancelled, but when task detected that is being
  * canceled and gives up the work).
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public class NexusTaskEventStoppedCanceled<T>
     extends NexusTaskEventStopped<T>
 {
-    public NexusTaskEventStoppedCanceled( final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent )
-    {
-        super( task, startedEvent );
-    }
+  public NexusTaskEventStoppedCanceled(final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent) {
+    super(task, startedEvent);
+  }
 }

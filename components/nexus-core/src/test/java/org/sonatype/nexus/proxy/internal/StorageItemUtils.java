@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.internal;
 
 import java.io.PrintWriter;
@@ -21,36 +22,31 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public class StorageItemUtils
 {
 
-    public static void printStorageItemList( List<StorageItem> items )
-    {
-        PrintWriter pw = new PrintWriter( System.out );
-        pw.println( " *** List of StorageItems:" );
-        for ( StorageItem item : items )
-        {
-            printStorageItem( pw, item );
-        }
-        pw.println( " *** List of StorageItems end" );
-        pw.flush();
+  public static void printStorageItemList(List<StorageItem> items) {
+    PrintWriter pw = new PrintWriter(System.out);
+    pw.println(" *** List of StorageItems:");
+    for (StorageItem item : items) {
+      printStorageItem(pw, item);
     }
+    pw.println(" *** List of StorageItems end");
+    pw.flush();
+  }
 
-    public static void printStorageItem( StorageItem item )
-    {
-        printStorageItem( new PrintWriter( System.out ), item );
-    }
+  public static void printStorageItem(StorageItem item) {
+    printStorageItem(new PrintWriter(System.out), item);
+  }
 
-    public static void printStorageItem( PrintWriter pw, StorageItem item )
-    {
-        pw.println( item.getClass().getName() );
-        Map<String, String> dataMap = item.getRepositoryItemAttributes().asMap();
-        for ( String key : dataMap.keySet() )
-        {
-            pw.print( key );
-            pw.print( " = " );
-            pw.print( dataMap.get( key ) );
-            pw.println();
-        }
-        pw.println();
-        pw.flush();
+  public static void printStorageItem(PrintWriter pw, StorageItem item) {
+    pw.println(item.getClass().getName());
+    Map<String, String> dataMap = item.getRepositoryItemAttributes().asMap();
+    for (String key : dataMap.keySet()) {
+      pw.print(key);
+      pw.print(" = ");
+      pw.print(dataMap.get(key));
+      pw.println();
     }
+    pw.println();
+    pw.flush();
+  }
 
 }

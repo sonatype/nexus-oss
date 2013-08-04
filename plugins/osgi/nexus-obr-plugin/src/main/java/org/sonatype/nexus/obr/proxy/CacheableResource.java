@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.proxy;
 
 import java.io.IOException;
@@ -30,99 +31,86 @@ import org.osgi.service.obr.Resource;
 public class CacheableResource
     implements Resource
 {
-    /**
-     * The {@link Resource} property used to cache the remote URL.
-     */
-    public static final String REMOTE_URL = "remote-url";
+  /**
+   * The {@link Resource} property used to cache the remote URL.
+   */
+  public static final String REMOTE_URL = "remote-url";
 
-    /**
-     * The repository directory used to cache remote OSGi bundles.
-     */
-    public static final String BUNDLES_PATH = "/bundles/";
+  /**
+   * The repository directory used to cache remote OSGi bundles.
+   */
+  public static final String BUNDLES_PATH = "/bundles/";
 
-    Resource resource;
+  Resource resource;
 
-    Map<?, ?> properties;
+  Map<?, ?> properties;
 
-    URL url;
+  URL url;
 
-    /**
-     * Wrap the given {@link Resource} and redirect the URL to allow caching.
-     * 
-     * @param r the backing resource
-     */
-    public CacheableResource( final Resource r )
-    {
-        // defaults
-        resource = r;
-        properties = r.getProperties();
-        url = r.getURL();
+  /**
+   * Wrap the given {@link Resource} and redirect the URL to allow caching.
+   *
+   * @param r the backing resource
+   */
+  public CacheableResource(final Resource r) {
+    // defaults
+    resource = r;
+    properties = r.getProperties();
+    url = r.getURL();
 
-        try
-        {
-            // store the original URL as a resource property
-            final Map<Object, Object> p = new HashMap<Object, Object>();
-            p.putAll( r.getProperties() );
-            p.put( REMOTE_URL, r.getURL().toExternalForm() );
-            properties = p;
+    try {
+      // store the original URL as a resource property
+      final Map<Object, Object> p = new HashMap<Object, Object>();
+      p.putAll(r.getProperties());
+      p.put(REMOTE_URL, r.getURL().toExternalForm());
+      properties = p;
 
-            // construct a new URL using the bundle's identity, making sure we encode spaces
-            final String id = URLEncoder.encode( r.getSymbolicName() + '-' + r.getVersion(), "UTF-8" );
-            url = new URL( "file:" + BUNDLES_PATH + id + ".jar" );
-        }
-        catch ( final IOException e )
-        {
-            // shouldn't happen, but if it does the defaults will be used
-        }
+      // construct a new URL using the bundle's identity, making sure we encode spaces
+      final String id = URLEncoder.encode(r.getSymbolicName() + '-' + r.getVersion(), "UTF-8");
+      url = new URL("file:" + BUNDLES_PATH + id + ".jar");
     }
-
-    public String getId()
-    {
-        return resource.getId();
+    catch (final IOException e) {
+      // shouldn't happen, but if it does the defaults will be used
     }
+  }
 
-    public String getPresentationName()
-    {
-        return resource.getPresentationName();
-    }
+  public String getId() {
+    return resource.getId();
+  }
 
-    public String getSymbolicName()
-    {
-        return resource.getSymbolicName();
-    }
+  public String getPresentationName() {
+    return resource.getPresentationName();
+  }
 
-    public Version getVersion()
-    {
-        return resource.getVersion();
-    }
+  public String getSymbolicName() {
+    return resource.getSymbolicName();
+  }
 
-    public URL getURL()
-    {
-        return url;
-    }
+  public Version getVersion() {
+    return resource.getVersion();
+  }
 
-    public String[] getCategories()
-    {
-        return resource.getCategories();
-    }
+  public URL getURL() {
+    return url;
+  }
 
-    public Repository getRepository()
-    {
-        return resource.getRepository();
-    }
+  public String[] getCategories() {
+    return resource.getCategories();
+  }
 
-    public Map<?, ?> getProperties()
-    {
-        return properties;
-    }
+  public Repository getRepository() {
+    return resource.getRepository();
+  }
 
-    public Capability[] getCapabilities()
-    {
-        return resource.getCapabilities();
-    }
+  public Map<?, ?> getProperties() {
+    return properties;
+  }
 
-    public Requirement[] getRequirements()
-    {
-        return resource.getRequirements();
-    }
+  public Capability[] getCapabilities() {
+    return resource.getCapabilities();
+  }
+
+  public Requirement[] getRequirements() {
+    return resource.getRequirements();
+  }
 }

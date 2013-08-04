@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -21,12 +22,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public abstract class AbstractMavenGroupRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator
 {
-    protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
-        CRepositoryCoreConfiguration coreConfiguration )
-        throws ConfigurationException
-    {
-        super.doApplyConfiguration( repository, configuration, coreConfiguration );
-        
-        // potentially check things here in the future
-    }
+  protected void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
+                                      CRepositoryCoreConfiguration coreConfiguration)
+      throws ConfigurationException
+  {
+    super.doApplyConfiguration(repository, configuration, coreConfiguration);
+
+    // potentially check things here in the future
+  }
 }

@@ -10,7 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.cache;
+
+import java.util.List;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -21,48 +24,50 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link EhCachePathCache}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EhCachePathCacheTest {
+public class EhCachePathCacheTest
+{
 
-    @Captor
-    ArgumentCaptor<Element> elementCaptor;
+  @Captor
+  ArgumentCaptor<Element> elementCaptor;
 
-    @Mock
-    Ehcache ehcache;
+  @Mock
+  Ehcache ehcache;
 
-    /**
-     * Related to NEXUS-5166, since ehcache 2.5
-     */
-    @Test
-    public void doPutOnlySetsTimeToLiveOnElementsWhenExpirationGreaterThanNegOne() {
+  /**
+   * Related to NEXUS-5166, since ehcache 2.5
+   */
+  @Test
+  public void doPutOnlySetsTimeToLiveOnElementsWhenExpirationGreaterThanNegOne() {
 
-        EhCachePathCache cache = spy(new EhCachePathCache("fake", ehcache));
-        when(cache.getEHCache()).thenReturn(ehcache);
+    EhCachePathCache cache = spy(new EhCachePathCache("fake", ehcache));
+    when(cache.getEHCache()).thenReturn(ehcache);
 
-        cache.put("path1", new Object(), -2);
-        cache.put("path2", new Object(), -1);
-        cache.put("path3", new Object(), 0);
-        cache.put("path4", new Object(), 1);
-        cache.put("path5", new Object(), 10000);
+    cache.put("path1", new Object(), -2);
+    cache.put("path2", new Object(), -1);
+    cache.put("path3", new Object(), 0);
+    cache.put("path4", new Object(), 1);
+    cache.put("path5", new Object(), 10000);
 
-        verify(cache, times(5)).getEHCache();
-        verify(ehcache, times(5)).put(elementCaptor.capture());
+    verify(cache, times(5)).getEHCache();
+    verify(ehcache, times(5)).put(elementCaptor.capture());
 
-        List<Element> elements = elementCaptor.getAllValues();
-        assertThat(elements.get(0).getTimeToLive(), equalTo(0));
-        assertThat(elements.get(1).getTimeToLive(), equalTo(0));
-        assertThat(elements.get(2).getTimeToLive(), equalTo(0));
-        assertThat(elements.get(3).getTimeToLive(), equalTo(1));
-        assertThat(elements.get(4).getTimeToLive(), equalTo(10000));
+    List<Element> elements = elementCaptor.getAllValues();
+    assertThat(elements.get(0).getTimeToLive(), equalTo(0));
+    assertThat(elements.get(1).getTimeToLive(), equalTo(0));
+    assertThat(elements.get(2).getTimeToLive(), equalTo(0));
+    assertThat(elements.get(3).getTimeToLive(), equalTo(1));
+    assertThat(elements.get(4).getTimeToLive(), equalTo(10000));
 
-    }
+  }
 }

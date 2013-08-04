@@ -10,38 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.tools;
 
 import org.sonatype.security.model.Configuration;
 
 /**
  * An abstract class that removes the boiler plate code of reading in the dynamic security configuration.
- * 
+ *
  * @author Brian Demers
  */
 public abstract class AbstractDynamicSecurityResource
     implements DynamicSecurityResource
 {
 
-    protected volatile boolean dirty = true;
+  protected volatile boolean dirty = true;
 
-    public boolean isDirty()
-    {
-        return dirty;
-    }
+  public boolean isDirty() {
+    return dirty;
+  }
 
-    protected void setDirty( boolean dirty )
-    {
-        this.dirty = dirty;
-    }
+  protected void setDirty(boolean dirty) {
+    this.dirty = dirty;
+  }
 
-    protected abstract Configuration doGetConfiguration();
+  protected abstract Configuration doGetConfiguration();
 
-    public Configuration getConfiguration()
-    {
-        Configuration config = doGetConfiguration();
-        // unset the dirty flag
-        this.setDirty( false );
-        return config;
-    }
+  public Configuration getConfiguration() {
+    Configuration config = doGetConfiguration();
+    // unset the dirty flag
+    this.setDirty(false);
+    return config;
+  }
 }

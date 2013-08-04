@@ -10,23 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao;
 
 public class NoSuchLdapUserException
     extends Exception
 {
 
-    private final String username;
+  private final String username;
 
-    public NoSuchLdapUserException( String username )
-    {
-        super( "No such user: " + username );
-        this.username = username;
-    }
+  public NoSuchLdapUserException(String username) {
+    super("No such user: " + username);
+    this.username = username;
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public String getUsername() {
+    return username;
+  }
 
 }

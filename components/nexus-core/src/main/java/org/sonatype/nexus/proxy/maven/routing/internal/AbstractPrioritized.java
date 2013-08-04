@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -17,23 +18,21 @@ import org.sonatype.nexus.proxy.maven.routing.discovery.Prioritized;
 
 /**
  * Abstract class for {@link Prioritized} implementations.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractPrioritized
     extends AbstractLoggingComponent
     implements Prioritized
 {
-    private final int priority;
+  private final int priority;
 
-    protected AbstractPrioritized( final int priority )
-    {
-        this.priority = priority;
-    }
+  protected AbstractPrioritized(final int priority) {
+    this.priority = priority;
+  }
 
-    @Override
-    public int getPriority()
-    {
-        return priority;
-    }
+  @Override
+  public int getPriority() {
+    return priority;
+  }
 }

@@ -10,22 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.sisu.jetty.mangler;
 
 import org.eclipse.jetty.server.Server;
 
 /**
  * Disables the shutdown hook. Usable in tests.
- * 
+ *
  * @author cstamas
  */
 public class DisableShutdownHookMangler
     implements ServerMangler<Server>
 {
-    public Server mangle( final Server server )
-    {
-        server.setStopAtShutdown( false );
+  public Server mangle(final Server server) {
+    server.setStopAtShutdown(false);
 
-        return server;
-    }
+    return server;
+  }
 }

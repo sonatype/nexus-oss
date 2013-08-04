@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mindexer.client;
 
 import org.sonatype.nexus.client.internal.util.Check;
@@ -17,40 +18,36 @@ import org.sonatype.nexus.client.internal.util.Check;
 public class SearchResponseRepository
 {
 
-    private final String id;
+  private final String id;
 
-    private final String name;
+  private final String name;
 
-    private final String contentClass;
+  private final String contentClass;
 
-    private final String baseUrl;
+  private final String baseUrl;
 
-    public SearchResponseRepository( final String id, final String name, final String contentClass,
-                                     final String baseUrl )
-    {
-        this.id = Check.notBlank( id, "id" );
-        this.name = name;
-        this.contentClass = Check.notBlank( contentClass, "contentClass" );
-        this.baseUrl = baseUrl;
-    }
+  public SearchResponseRepository(final String id, final String name, final String contentClass,
+                                  final String baseUrl)
+  {
+    this.id = Check.notBlank(id, "id");
+    this.name = name;
+    this.contentClass = Check.notBlank(contentClass, "contentClass");
+    this.baseUrl = baseUrl;
+  }
 
-    public String getId()
-    {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getContentClass()
-    {
-        return contentClass;
-    }
+  public String getContentClass() {
+    return contentClass;
+  }
 
-    public String getBaseUrl()
-    {
-        return baseUrl;
-    }
+  public String getBaseUrl() {
+    return baseUrl;
+  }
 }

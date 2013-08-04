@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.sisu.jetty.thread;
 
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -28,32 +29,27 @@ import org.eclipse.jetty.util.log.Logger;
  * Note: OOM are not always same. This will work if OOM is not due to leak, but to some memory consumption peak (ie.
  * code that quickly allocates huge amounts of memory, but in next moment it is released too, same pattern as in
  * NXCM-4391 for P2 proxy repository).
- * 
+ *
  * @author cstamas
  * @since 1.3
  */
 public class JettyWatchdog
     implements Runnable
 {
-    private static final Logger LOG = Log.getLogger( JettyWatchdog.class );
+  private static final Logger LOG = Log.getLogger(JettyWatchdog.class);
 
-    public void run()
-    {
-        try
-        {
-            while ( true )
-            {
-                Thread.sleep( TimeUnit.SECONDS.toMillis( 10 ) );
+  public void run() {
+    try {
+      while (true) {
+        Thread.sleep(TimeUnit.SECONDS.toMillis(10));
 
-                if ( RunnableWrapper.unexpectedThrowable )
-                {
-                    LOG.warn( "Jetty pooled thread death detected! System might be running low on memory!" );
-                }
-            }
+        if (RunnableWrapper.unexpectedThrowable) {
+          LOG.warn("Jetty pooled thread death detected! System might be running low on memory!");
         }
-        catch ( InterruptedException e )
-        {
-            // nothing, will quit silently
-        }
+      }
     }
+    catch (InterruptedException e) {
+      // nothing, will quit silently
+    }
+  }
 }

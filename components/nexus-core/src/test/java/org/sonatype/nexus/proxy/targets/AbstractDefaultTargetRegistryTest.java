@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.targets;
 
 import java.util.ArrayList;
@@ -31,58 +32,56 @@ public abstract class AbstractDefaultTargetRegistryTest
     extends NexusAppTestSupport
 {
 
-    protected ApplicationConfiguration applicationConfiguration;
+  protected ApplicationConfiguration applicationConfiguration;
 
-    protected TargetRegistry targetRegistry;
+  protected TargetRegistry targetRegistry;
 
-    protected ContentClass maven1;
+  protected ContentClass maven1;
 
-    protected ContentClass maven2;
+  protected ContentClass maven2;
 
-    public AbstractDefaultTargetRegistryTest()
-    {
-        super();
+  public AbstractDefaultTargetRegistryTest() {
+    super();
+  }
+
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
+
+    applicationConfiguration = lookup(ApplicationConfiguration.class);
+
+    maven1 = new Maven1ContentClass();
+
+    maven2 = new Maven2ContentClass();
+
+    targetRegistry = lookup(TargetRegistry.class);
+
+    // shave off defaults
+    final Collection<Target> targets = new ArrayList<Target>(targetRegistry.getRepositoryTargets());
+    for (Target t : targets) {
+      targetRegistry.removeRepositoryTarget(t.getId());
     }
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+    // adding two targets
+    Target t1 =
+        new Target("maven2-public", "Maven2 (public)", maven2,
+            Arrays.asList(new String[]{"/org/apache/maven/((?!sources\\.).)*"}));
 
-        applicationConfiguration = lookup( ApplicationConfiguration.class );
+    targetRegistry.addRepositoryTarget(t1);
 
-        maven1 = new Maven1ContentClass();
+    Target t2 =
+        new Target("maven2-with-sources", "Maven2 sources", maven2,
+            Arrays.asList(new String[]{"/org/apache/maven/.*"}));
 
-        maven2 = new Maven2ContentClass();
+    targetRegistry.addRepositoryTarget(t2);
 
-        targetRegistry = lookup( TargetRegistry.class );
+    Target t3 =
+        new Target("maven1", "Maven1", maven1, Arrays.asList(new String[]{"/org\\.apache\\.maven.*"}));
 
-        // shave off defaults
-        final Collection<Target> targets = new ArrayList<Target>( targetRegistry.getRepositoryTargets() );
-        for ( Target t : targets )
-        {
-            targetRegistry.removeRepositoryTarget( t.getId() );
-        }
+    targetRegistry.addRepositoryTarget(t3);
 
-        // adding two targets
-        Target t1 =
-            new Target( "maven2-public", "Maven2 (public)", maven2,
-                        Arrays.asList( new String[]{ "/org/apache/maven/((?!sources\\.).)*" } ) );
-
-        targetRegistry.addRepositoryTarget( t1 );
-
-        Target t2 =
-            new Target( "maven2-with-sources", "Maven2 sources", maven2,
-                        Arrays.asList( new String[]{ "/org/apache/maven/.*" } ) );
-
-        targetRegistry.addRepositoryTarget( t2 );
-
-        Target t3 =
-            new Target( "maven1", "Maven1", maven1, Arrays.asList( new String[]{ "/org\\.apache\\.maven.*" } ) );
-
-        targetRegistry.addRepositoryTarget( t3 );
-
-        applicationConfiguration.saveConfiguration();
-    }
+    applicationConfiguration.saveConfiguration();
+  }
 
 }

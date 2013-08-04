@@ -10,24 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.guice;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.sameInstance;
+package org.sonatype.security.guice;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.nexus5727.FixedDefaultSessionManager;
-import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.guice.bean.binders.ParameterKeys;
 import org.sonatype.guice.bean.binders.SpaceModule;
 import org.sonatype.guice.bean.binders.WireModule;
@@ -41,6 +29,19 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.nexus5727.FixedDefaultSessionManager;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.sameInstance;
 
 /**
  * Verifies functionality of SecurityModule.
@@ -48,72 +49,65 @@ import com.google.inject.Module;
 public class SecurityModuleTest
     extends TestSupport
 {
-    private Injector injector;
+  private Injector injector;
 
-    @Before
-    public void setUp()
-    {
-        injector = Guice.createInjector( getWireModule() );
+  @Before
+  public void setUp() {
+    injector = Guice.createInjector(getWireModule());
+  }
+
+  @Test
+  public void testInjectionIsSetupCorrectly() {
+    SecuritySystem securitySystem = injector.getInstance(SecuritySystem.class);
+    // See DefaultSecuritySystem, that applies cache
+    // TODO: this should be done with Guice binding?
+    securitySystem.start();
+
+    SecurityManager securityManager = injector.getInstance(SecurityManager.class);
+
+    RealmSecurityManager realmSecurityManager = injector.getInstance(RealmSecurityManager.class);
+
+    assertThat(securitySystem.getSecurityManager(), sameInstance(securityManager));
+    assertThat(securitySystem.getSecurityManager(), sameInstance(realmSecurityManager));
+
+    assertThat(securityManager, instanceOf(DefaultSecurityManager.class));
+    DefaultSecurityManager defaultSecurityManager = (DefaultSecurityManager) securityManager;
+
+    assertThat(defaultSecurityManager.getSessionManager(), instanceOf(FixedDefaultSessionManager.class));
+    FixedDefaultSessionManager sessionManager =
+        (FixedDefaultSessionManager) defaultSecurityManager.getSessionManager();
+    assertThat(sessionManager.getSessionDAO(), instanceOf(EnterpriseCacheSessionDAO.class));
+    assertThat(
+        ((EhCacheManager) ((EnterpriseCacheSessionDAO) sessionManager.getSessionDAO()).getCacheManager())
+            .getCacheManager(),
+        sameInstance(injector.getInstance(CacheManagerComponent.class).getCacheManager()));
+  }
+
+  @After
+  public void stopCache() {
+    if (injector != null) {
+      injector.getInstance(CacheManagerComponent.class).shutdown();
     }
+  }
 
-    @Test
-    public void testInjectionIsSetupCorrectly()
+  private Module getWireModule() {
+    return new WireModule(new SecurityModule(), getSpaceModule(), getPropertiesModule());
+  }
+
+  private Module getSpaceModule() {
+    return new SpaceModule(new URLClassSpace(getClass().getClassLoader()), BeanScanning.INDEX);
+  }
+
+  protected AbstractModule getPropertiesModule() {
+    return new AbstractModule()
     {
-        SecuritySystem securitySystem = injector.getInstance( SecuritySystem.class );
-        // See DefaultSecuritySystem, that applies cache
-        // TODO: this should be done with Guice binding?
-        securitySystem.start();
-
-        SecurityManager securityManager = injector.getInstance( SecurityManager.class );
-
-        RealmSecurityManager realmSecurityManager = injector.getInstance( RealmSecurityManager.class );
-
-        assertThat( securitySystem.getSecurityManager(), sameInstance( securityManager ) );
-        assertThat( securitySystem.getSecurityManager(), sameInstance( realmSecurityManager ) );
-
-        assertThat( securityManager, instanceOf( DefaultSecurityManager.class ) );
-        DefaultSecurityManager defaultSecurityManager = (DefaultSecurityManager) securityManager;
-
-        assertThat( defaultSecurityManager.getSessionManager(), instanceOf( FixedDefaultSessionManager.class ) );
-        FixedDefaultSessionManager sessionManager =
-            (FixedDefaultSessionManager) defaultSecurityManager.getSessionManager();
-        assertThat( sessionManager.getSessionDAO(), instanceOf( EnterpriseCacheSessionDAO.class ) );
-        assertThat(
-            ( (EhCacheManager) ( (EnterpriseCacheSessionDAO) sessionManager.getSessionDAO() ).getCacheManager() ).getCacheManager(),
-            sameInstance( injector.getInstance( CacheManagerComponent.class ).getCacheManager() ) );
-    }
-
-    @After
-    public void stopCache()
-    {
-        if ( injector != null )
-        {
-            injector.getInstance( CacheManagerComponent.class ).shutdown();
-        }
-    }
-
-    private Module getWireModule()
-    {
-        return new WireModule( new SecurityModule(), getSpaceModule(), getPropertiesModule() );
-    }
-
-    private Module getSpaceModule()
-    {
-        return new SpaceModule( new URLClassSpace( getClass().getClassLoader() ), BeanScanning.INDEX );
-    }
-
-    protected AbstractModule getPropertiesModule()
-    {
-        return new AbstractModule()
-        {
-            @Override
-            protected void configure()
-            {
-                Map<String, Object> properties = new HashMap<String, Object>();
-                properties.put( "security-xml-file", util.resolvePath("target/foo/security.xml") );
-                properties.put( "application-conf", util.resolvePath("target/plexus-home/conf") );
-                binder().bind( ParameterKeys.PROPERTIES ).toInstance( properties );
-            }
-        };
-    }
+      @Override
+      protected void configure() {
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("security-xml-file", util.resolvePath("target/foo/security.xml"));
+        properties.put("application-conf", util.resolvePath("target/plexus-home/conf"));
+        binder().bind(ParameterKeys.PROPERTIES).toInstance(properties);
+      }
+    };
+  }
 }

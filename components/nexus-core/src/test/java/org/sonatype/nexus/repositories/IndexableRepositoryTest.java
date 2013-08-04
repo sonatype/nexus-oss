@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repositories;
 
-import org.junit.Test;
-import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -22,98 +22,99 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 
+import org.junit.Test;
+
 public class IndexableRepositoryTest
     extends NexusAppTestSupport
 {
 
-    private Nexus nexus;
+  private Nexus nexus;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        this.nexus = this.lookup( Nexus.class );
-    }
+    this.nexus = this.lookup(Nexus.class);
+  }
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        this.nexus = null;
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    this.nexus = null;
 
-        super.tearDown();
-    }
+    super.tearDown();
+  }
 
-    @Override
-    protected boolean loadConfigurationAtSetUp()
-    {
-        return false;
-    }
+  @Override
+  protected boolean loadConfigurationAtSetUp() {
+    return false;
+  }
 
-    @Test
-    public void testCreateIndexableM1()
-        throws Exception
-    {
-        String repoId = "indexableM1";
+  @Test
+  public void testCreateIndexableM1()
+      throws Exception
+  {
+    String repoId = "indexableM1";
 
-        RepositoryTemplate repoTemplate =
-            (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates( Maven1HostedRepositoryTemplate.class,
-                RepositoryPolicy.RELEASE ).pick();
+    RepositoryTemplate repoTemplate =
+        (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(Maven1HostedRepositoryTemplate.class,
+            RepositoryPolicy.RELEASE).pick();
 
-        repoTemplate.getConfigurableRepository().setId( repoId );
-        repoTemplate.getConfigurableRepository().setName( repoId + "-name" );
-        // Assert.assertEquals( "group-name", group.getName() );
-        repoTemplate.getConfigurableRepository().setExposed( true );
-        repoTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+    repoTemplate.getConfigurableRepository().setId(repoId);
+    repoTemplate.getConfigurableRepository().setName(repoId + "-name");
+    // Assert.assertEquals( "group-name", group.getName() );
+    repoTemplate.getConfigurableRepository().setExposed(true);
+    repoTemplate.getConfigurableRepository().setLocalStatus(LocalStatus.IN_SERVICE);
 
-        repoTemplate.getConfigurableRepository().setIndexable( true );
+    repoTemplate.getConfigurableRepository().setIndexable(true);
 
-        // will not fail, just create a warning and silently override it
-        Repository repository = repoTemplate.create();
+    // will not fail, just create a warning and silently override it
+    Repository repository = repoTemplate.create();
 
-        assertFalse( "The repository should be non-indexable!", repository.isIndexable() );
-    }
+    assertFalse("The repository should be non-indexable!", repository.isIndexable());
+  }
 
-    @Test
-    public void testCreateIndexableM2()
-        throws Exception
-    {
-        String repoId = "indexableM2";
+  @Test
+  public void testCreateIndexableM2()
+      throws Exception
+  {
+    String repoId = "indexableM2";
 
-        RepositoryTemplate repoTemplate =
-            (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates( Maven2HostedRepositoryTemplate.class )
-                .getTemplates( RepositoryPolicy.RELEASE ).pick();
+    RepositoryTemplate repoTemplate =
+        (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(Maven2HostedRepositoryTemplate.class)
+            .getTemplates(RepositoryPolicy.RELEASE).pick();
 
-        repoTemplate.getConfigurableRepository().setId( repoId );
-        repoTemplate.getConfigurableRepository().setName( repoId + "-name" );
-        // Assert.assertEquals( "group-name", group.getName() );
-        repoTemplate.getConfigurableRepository().setExposed( true );
-        repoTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
-        repoTemplate.getConfigurableRepository().setIndexable( true );
+    repoTemplate.getConfigurableRepository().setId(repoId);
+    repoTemplate.getConfigurableRepository().setName(repoId + "-name");
+    // Assert.assertEquals( "group-name", group.getName() );
+    repoTemplate.getConfigurableRepository().setExposed(true);
+    repoTemplate.getConfigurableRepository().setLocalStatus(LocalStatus.IN_SERVICE);
+    repoTemplate.getConfigurableRepository().setIndexable(true);
 
-        repoTemplate.create();
-    }
+    repoTemplate.create();
+  }
 
-    @Test
-    public void testCreateNonIndexableM2()
-        throws Exception
-    {
-        String repoId = "nonIndexableM2";
+  @Test
+  public void testCreateNonIndexableM2()
+      throws Exception
+  {
+    String repoId = "nonIndexableM2";
 
-        RepositoryTemplate repoTemplate =
-            (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates( Maven2HostedRepositoryTemplate.class )
-                .getTemplates( RepositoryPolicy.RELEASE ).pick();
+    RepositoryTemplate repoTemplate =
+        (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(Maven2HostedRepositoryTemplate.class)
+            .getTemplates(RepositoryPolicy.RELEASE).pick();
 
-        repoTemplate.getConfigurableRepository().setId( repoId );
-        repoTemplate.getConfigurableRepository().setName( repoId + "-name" );
-        // Assert.assertEquals( "group-name", group.getName() );
-        repoTemplate.getConfigurableRepository().setExposed( true );
-        repoTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
-        repoTemplate.getConfigurableRepository().setIndexable( false );
+    repoTemplate.getConfigurableRepository().setId(repoId);
+    repoTemplate.getConfigurableRepository().setName(repoId + "-name");
+    // Assert.assertEquals( "group-name", group.getName() );
+    repoTemplate.getConfigurableRepository().setExposed(true);
+    repoTemplate.getConfigurableRepository().setLocalStatus(LocalStatus.IN_SERVICE);
+    repoTemplate.getConfigurableRepository().setIndexable(false);
 
-        repoTemplate.create();
-    }
+    repoTemplate.create();
+  }
 
 }

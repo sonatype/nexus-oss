@@ -10,20 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
-import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link InversionCondition} UTs.
@@ -34,65 +35,61 @@ public class InversionConditionTest
     extends EventBusTestSupport
 {
 
-    @Mock
-    private Condition condition;
+  @Mock
+  private Condition condition;
 
-    private InversionCondition underTest;
+  private InversionCondition underTest;
 
-    @Before
-    public final void setUpInversionCondition()
-        throws Exception
-    {
-        underTest = new InversionCondition( eventBus, condition );
-        underTest.bind();
+  @Before
+  public final void setUpInversionCondition()
+      throws Exception
+  {
+    underTest = new InversionCondition(eventBus, condition);
+    underTest.bind();
 
-        verify( eventBus ).register( underTest );
-    }
+    verify(eventBus).register(underTest);
+  }
 
-    /**
-     * Condition is satisfied initially (because mock returns false).
-     */
-    @Test
-    public void not01()
-    {
-        assertThat( underTest.isSatisfied(), is( true ) );
-    }
+  /**
+   * Condition is satisfied initially (because mock returns false).
+   */
+  @Test
+  public void not01() {
+    assertThat(underTest.isSatisfied(), is(true));
+  }
 
-    /**
-     * Condition is not satisfied when negated is satisfied.
-     */
-    @Test
-    public void not02()
-    {
-        when( condition.isSatisfied() ).thenReturn( true );
-        underTest.handle( new ConditionEvent.Satisfied( condition ) );
-        assertThat( underTest.isSatisfied(), is( false ) );
+  /**
+   * Condition is not satisfied when negated is satisfied.
+   */
+  @Test
+  public void not02() {
+    when(condition.isSatisfied()).thenReturn(true);
+    underTest.handle(new ConditionEvent.Satisfied(condition));
+    assertThat(underTest.isSatisfied(), is(false));
 
-        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
-    }
+    verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));
+  }
 
-    /**
-     * Condition is satisfied when negated is not satisfied.
-     */
-    @Test
-    public void not03()
-    {
-        when( condition.isSatisfied() ).thenReturn( false );
-        underTest.handle( new ConditionEvent.Unsatisfied( condition ) );
-        assertThat( underTest.isSatisfied(), is( true ) );
+  /**
+   * Condition is satisfied when negated is not satisfied.
+   */
+  @Test
+  public void not03() {
+    when(condition.isSatisfied()).thenReturn(false);
+    underTest.handle(new ConditionEvent.Unsatisfied(condition));
+    assertThat(underTest.isSatisfied(), is(true));
 
-        verifyEventBusEvents( satisfied( underTest ) );
-    }
+    verifyEventBusEvents(satisfied(underTest));
+  }
 
-    /**
-     * Event bus handler is removed when releasing.
-     */
-    @Test
-    public void releaseRemovesItselfAsHandler()
-    {
-        underTest.release();
+  /**
+   * Event bus handler is removed when releasing.
+   */
+  @Test
+  public void releaseRemovesItselfAsHandler() {
+    underTest.release();
 
-        verify( eventBus ).unregister( underTest );
-    }
+    verify(eventBus).unregister(underTest);
+  }
 
 }

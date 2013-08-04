@@ -10,36 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.p2.nxcm0792;
 
-import org.junit.Test;
-import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
+
+import org.junit.Test;
 
 public class NXCM0792UpdateSiteWithTransitiveDependenciesProxyIT
     extends AbstractNexusProxyP2IT
 {
 
-    public NXCM0792UpdateSiteWithTransitiveDependenciesProxyIT()
-    {
-        super( "nxcm0792" );
-    }
+  public NXCM0792UpdateSiteWithTransitiveDependenciesProxyIT() {
+    super("nxcm0792");
+  }
 
-    @Test
-    public void test()
-        throws Exception
-    {
-        TaskScheduleUtil.run( "1" );
-        TaskScheduleUtil.waitForAllTasksToStop();
+  @Test
+  public void test()
+      throws Exception
+  {
+    TaskScheduleUtil.run("1");
+    TaskScheduleUtil.waitForAllTasksToStop();
 
-        installAndVerifyP2Feature(
-            "com.sonatype.nexus.p2.its.feature3.feature.group",
-            new String[]{ "com.sonatype.nexus.p2.its.feature3_1.0.0" },
-            new String[]{
-                "com.sonatype.nexus.p2.its.bundle_1.0.0.jar",
-                "com.sonatype.nexus.p2.its.bundle3_1.0.0.jar"
-            }
-        );
-    }
+    installAndVerifyP2Feature(
+        "com.sonatype.nexus.p2.its.feature3.feature.group",
+        new String[]{"com.sonatype.nexus.p2.its.feature3_1.0.0"},
+        new String[]{
+            "com.sonatype.nexus.p2.its.bundle_1.0.0.jar",
+            "com.sonatype.nexus.p2.its.bundle3_1.0.0.jar"
+        }
+    );
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -17,38 +18,36 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The event fired when repository's local status is changed.
- * 
+ *
  * @author cstamas
  */
 public class RepositoryEventLocalStatusChanged
     extends RepositoryEvent
 {
-    private final LocalStatus oldLocalStatus;
+  private final LocalStatus oldLocalStatus;
 
-    private final LocalStatus newLocalStatus;
+  private final LocalStatus newLocalStatus;
 
-    /**
-     * Instantiates a new repository event evict unused items.
-     * 
-     * @param repository the repository
-     */
-    public RepositoryEventLocalStatusChanged( final Repository repository, final LocalStatus oldLocalStatus,
-        final LocalStatus newLocalStatus )
-    {
-        super( repository );
+  /**
+   * Instantiates a new repository event evict unused items.
+   *
+   * @param repository the repository
+   */
+  public RepositoryEventLocalStatusChanged(final Repository repository, final LocalStatus oldLocalStatus,
+                                           final LocalStatus newLocalStatus)
+  {
+    super(repository);
 
-        this.oldLocalStatus = oldLocalStatus;
+    this.oldLocalStatus = oldLocalStatus;
 
-        this.newLocalStatus = newLocalStatus;
-    }
+    this.newLocalStatus = newLocalStatus;
+  }
 
-    public LocalStatus getOldLocalStatus()
-    {
-        return oldLocalStatus;
-    }
+  public LocalStatus getOldLocalStatus() {
+    return oldLocalStatus;
+  }
 
-    public LocalStatus getNewLocalStatus()
-    {
-        return newLocalStatus;
-    }
+  public LocalStatus getNewLocalStatus() {
+    return newLocalStatus;
+  }
 }

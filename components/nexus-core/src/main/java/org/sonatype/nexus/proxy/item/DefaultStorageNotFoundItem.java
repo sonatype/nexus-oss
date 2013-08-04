@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -17,7 +18,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The Class DefaultStorageNotFoundItem abstracting the "not found" case, used in caches mainly.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
@@ -25,8 +26,7 @@ public class DefaultStorageNotFoundItem
     extends AbstractStorageItem
     implements StorageNotFoundItem
 {
-    public DefaultStorageNotFoundItem( final Repository repository, final ResourceStoreRequest request )
-    {
-        super( repository, request, false, false );
-    }
+  public DefaultStorageNotFoundItem(final Repository repository, final ResourceStoreRequest request) {
+    super(repository, request, false, false);
+  }
 }

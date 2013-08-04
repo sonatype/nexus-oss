@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.tools;
 
 import javax.inject.Singleton;
@@ -25,62 +26,56 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeP
 public class UnitTestDynamicSecurityResource
     extends AbstractDynamicSecurityResource
 {
-    private boolean configCalledAfterSetDirty = false;
+  private boolean configCalledAfterSetDirty = false;
 
-    private static int INSTANCE_COUNT = 1;
+  private static int INSTANCE_COUNT = 1;
 
-    private String privId = "priv-" + INSTANCE_COUNT++;
+  private String privId = "priv-" + INSTANCE_COUNT++;
 
-    public String getId()
-    {
-        return privId;
+  public String getId() {
+    return privId;
+  }
+
+  protected Configuration doGetConfiguration() {
+    configCalledAfterSetDirty = true;
+
+    setConfigCalledAfterSetDirty(true);
+    Configuration config = new Configuration();
+
+    CPrivilege priv = new CPrivilege();
+    priv.setId(privId);
+    priv.setName(privId);
+    priv.setReadOnly(true);
+    priv.setType(ApplicationPrivilegeDescriptor.TYPE);
+    CProperty method = new CProperty();
+    method.setKey(ApplicationPrivilegeMethodPropertyDescriptor.ID);
+    method.setValue("read");
+    priv.addProperty(method);
+
+    CProperty permission = new CProperty();
+    permission.setKey(ApplicationPrivilegePermissionPropertyDescriptor.ID);
+    permission.setValue("foo:bar:" + privId);
+    priv.addProperty(permission);
+
+    config.addPrivilege(priv);
+
+    return config;
+  }
+
+  public void setConfigCalledAfterSetDirty(boolean configCalledAfterSetDirty) {
+    this.configCalledAfterSetDirty = configCalledAfterSetDirty;
+  }
+
+  public boolean isConfigCalledAfterSetDirty() {
+    return configCalledAfterSetDirty;
+  }
+
+  @Override
+  protected void setDirty(boolean dirty) {
+    if (dirty) {
+      this.configCalledAfterSetDirty = false;
     }
-
-    protected Configuration doGetConfiguration()
-    {
-        configCalledAfterSetDirty = true;
-
-        setConfigCalledAfterSetDirty( true );
-        Configuration config = new Configuration();
-
-        CPrivilege priv = new CPrivilege();
-        priv.setId( privId );
-        priv.setName( privId );
-        priv.setReadOnly( true );
-        priv.setType( ApplicationPrivilegeDescriptor.TYPE );
-        CProperty method = new CProperty();
-        method.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
-        method.setValue( "read" );
-        priv.addProperty( method );
-
-        CProperty permission = new CProperty();
-        permission.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
-        permission.setValue( "foo:bar:" + privId );
-        priv.addProperty( permission );
-
-        config.addPrivilege( priv );
-
-        return config;
-    }
-
-    public void setConfigCalledAfterSetDirty( boolean configCalledAfterSetDirty )
-    {
-        this.configCalledAfterSetDirty = configCalledAfterSetDirty;
-    }
-
-    public boolean isConfigCalledAfterSetDirty()
-    {
-        return configCalledAfterSetDirty;
-    }
-
-    @Override
-    protected void setDirty( boolean dirty )
-    {
-        if ( dirty )
-        {
-            this.configCalledAfterSetDirty = false;
-        }
-        super.setDirty( dirty );
-    }
+    super.setDirty(dirty);
+  }
 
 }

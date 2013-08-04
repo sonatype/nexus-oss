@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.Collection;
@@ -27,58 +28,52 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * <p>
  * A common base for Proximity "web site" repository. It simply serves up static stuff, and detects "index.html" within
  * the collections.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractWebSiteRepository
     extends AbstractRepository
     implements WebSiteRepository
 {
-    @Override
-    protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration( boolean forModification )
-    {
-        return (AbstractWebSiteRepositoryConfiguration) super.getExternalConfiguration( forModification );
-    }
+  @Override
+  protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration(boolean forModification) {
+    return (AbstractWebSiteRepositoryConfiguration) super.getExternalConfiguration(forModification);
+  }
 
-    public List<String> getWelcomeFiles()
-    {
-        return getExternalConfiguration( false ).getWelcomeFiles();
-    }
+  public List<String> getWelcomeFiles() {
+    return getExternalConfiguration(false).getWelcomeFiles();
+  }
 
-    public void setWelcomeFiles( List<String> vals )
-    {
-        getExternalConfiguration( true ).setWelcomeFiles( vals );
-    }
+  public void setWelcomeFiles(List<String> vals) {
+    getExternalConfiguration(true).setWelcomeFiles(vals);
+  }
 
-    @Override
-    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
-    {
-        StorageItem result = super.doRetrieveItem( request );
+  @Override
+  protected StorageItem doRetrieveItem(ResourceStoreRequest request)
+      throws IllegalOperationException,
+             ItemNotFoundException,
+             StorageException
+  {
+    StorageItem result = super.doRetrieveItem(request);
 
-        List<String> wf = getWelcomeFiles();
+    List<String> wf = getWelcomeFiles();
 
-        boolean useWelcomeFiles = !request.getRequestContext().containsKey( WebSiteRepository.USE_WELCOME_FILES_KEY )
-            || Boolean.TRUE.equals( request.getRequestContext().get( WebSiteRepository.USE_WELCOME_FILES_KEY ) );
+    boolean useWelcomeFiles = !request.getRequestContext().containsKey(WebSiteRepository.USE_WELCOME_FILES_KEY)
+        || Boolean.TRUE.equals(request.getRequestContext().get(WebSiteRepository.USE_WELCOME_FILES_KEY));
 
-        if ( useWelcomeFiles && result instanceof StorageCollectionItem && wf.size() > 0 )
-        {
-            // it is a collection, check for one of the "welcome" files
-            Collection<StorageItem> collItems = list( false, (StorageCollectionItem) result );
+    if (useWelcomeFiles && result instanceof StorageCollectionItem && wf.size() > 0) {
+      // it is a collection, check for one of the "welcome" files
+      Collection<StorageItem> collItems = list(false, (StorageCollectionItem) result);
 
-            for ( StorageItem item : collItems )
-            {
-                if ( item instanceof StorageFileItem && wf.contains( item.getName() ) )
-                {
-                    // it is a file, it's name is in welcomeFiles list, so return it instead parent collection
-                    return item;
-                }
-            }
+      for (StorageItem item : collItems) {
+        if (item instanceof StorageFileItem && wf.contains(item.getName())) {
+          // it is a file, it's name is in welcomeFiles list, so return it instead parent collection
+          return item;
         }
-
-        return result;
+      }
     }
+
+    return result;
+  }
 
 }

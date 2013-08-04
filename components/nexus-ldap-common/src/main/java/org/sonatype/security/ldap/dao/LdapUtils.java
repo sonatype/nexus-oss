@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao;
 
 import java.util.Enumeration;
@@ -24,117 +25,98 @@ import javax.naming.directory.Attributes;
 public final class LdapUtils
 {
 
-    private LdapUtils()
-    {
-    }
+  private LdapUtils() {
+  }
 
-    public static String getLabeledUriValue( Attributes attributes, String attrName, String label,
-                                             String attributeDescription )
-        throws LdapDAOException
-    {
-        Attribute attribute = attributes.get( attrName );
-        if ( attribute != null )
-        {
-            try
-            {
-                NamingEnumeration<?> attrs = attribute.getAll();
-                try
-                {
-                    while ( attrs.hasMoreElements() )
-                    {
-                        Object value = attrs.nextElement();
+  public static String getLabeledUriValue(Attributes attributes, String attrName, String label,
+                                          String attributeDescription)
+      throws LdapDAOException
+  {
+    Attribute attribute = attributes.get(attrName);
+    if (attribute != null) {
+      try {
+        NamingEnumeration<?> attrs = attribute.getAll();
+        try {
+          while (attrs.hasMoreElements()) {
+            Object value = attrs.nextElement();
 
-                        String val = String.valueOf( value );
+            String val = String.valueOf(value);
 
-                        if ( val.endsWith( " " + label ) )
-                        {
-                            return val.substring( 0, val.length() - ( label.length() + 1 ) );
-                        }
-                    }
-                }
-                finally
-                {
-                    attrs.close();
-                }
+            if (val.endsWith(" " + label)) {
+              return val.substring(0, val.length() - (label.length() + 1));
             }
-            catch ( NamingException e )
-            {
-                throw new LdapDAOException( "Failed to retrieve " + attributeDescription + " (attribute: \'" + attrName
-                    + "\').", e );
-            }
+          }
         }
-        return null;
-    }
-
-    public static String getAttributeValue( Attributes attributes, String attrName, String attributeDescription )
-        throws LdapDAOException
-    {
-        Attribute attribute = attributes.get( attrName );
-        if ( attribute != null )
-        {
-            try
-            {
-                Object value = attribute.get();
-
-                return String.valueOf( value );
-            }
-            catch ( NamingException e )
-            {
-                throw new LdapDAOException( "Failed to retrieve " + attributeDescription + " (attribute: \'"
-                    + attrName + "\').", e );
-            }
+        finally {
+          attrs.close();
         }
-
-        return null;
+      }
+      catch (NamingException e) {
+        throw new LdapDAOException("Failed to retrieve " + attributeDescription + " (attribute: \'" + attrName
+            + "\').", e);
+      }
     }
-    
-    public static Set<String> getAttributeValues( Attributes attributes, String attrName, String attributeDescription )
-    throws LdapDAOException
-    {
-        Set<String> results = new HashSet<String>();
-        Attribute attribute = attributes.get( attrName );
-        if ( attribute != null )
-        {
-            try
-            {   
-                for ( Enumeration<?> values = attribute.getAll(); values.hasMoreElements(); )
-                {
-                    results.add( String.valueOf( values.nextElement() ) );
-                }
-            }
-            catch ( NamingException e )
-            {
-                throw new LdapDAOException( "Failed to retrieve " + attributeDescription + " (attribute: \'"
-                    + attrName + "\').", e );
-            }
+    return null;
+  }
+
+  public static String getAttributeValue(Attributes attributes, String attrName, String attributeDescription)
+      throws LdapDAOException
+  {
+    Attribute attribute = attributes.get(attrName);
+    if (attribute != null) {
+      try {
+        Object value = attribute.get();
+
+        return String.valueOf(value);
+      }
+      catch (NamingException e) {
+        throw new LdapDAOException("Failed to retrieve " + attributeDescription + " (attribute: \'"
+            + attrName + "\').", e);
+      }
+    }
+
+    return null;
+  }
+
+  public static Set<String> getAttributeValues(Attributes attributes, String attrName, String attributeDescription)
+      throws LdapDAOException
+  {
+    Set<String> results = new HashSet<String>();
+    Attribute attribute = attributes.get(attrName);
+    if (attribute != null) {
+      try {
+        for (Enumeration<?> values = attribute.getAll(); values.hasMoreElements(); ) {
+          results.add(String.valueOf(values.nextElement()));
         }
-    
-        return results;
+      }
+      catch (NamingException e) {
+        throw new LdapDAOException("Failed to retrieve " + attributeDescription + " (attribute: \'"
+            + attrName + "\').", e);
+      }
     }
 
-    public static String getAttributeValueFromByteArray( Attributes attributes, String attrName,
-        String attributeDescription )
-        throws LdapDAOException
-    {
-        if( attrName != null)
-        {
-            Attribute attribute = attributes.get( attrName );
-            if ( attribute != null )
-            {
-                try
-                {
-                    byte[] value = (byte[]) attribute.get();
-    
-                    return new String( value );
-                }
-                catch ( NamingException e )
-                {
-                    throw new LdapDAOException( "Failed to retrieve " + attributeDescription + " (attribute: \'"
-                        + attrName + "\').", e );
-                }
-            }
+    return results;
+  }
+
+  public static String getAttributeValueFromByteArray(Attributes attributes, String attrName,
+                                                      String attributeDescription)
+      throws LdapDAOException
+  {
+    if (attrName != null) {
+      Attribute attribute = attributes.get(attrName);
+      if (attribute != null) {
+        try {
+          byte[] value = (byte[]) attribute.get();
+
+          return new String(value);
         }
-
-        return null;
+        catch (NamingException e) {
+          throw new LdapDAOException("Failed to retrieve " + attributeDescription + " (attribute: \'"
+              + attrName + "\').", e);
+        }
+      }
     }
+
+    return null;
+  }
 }

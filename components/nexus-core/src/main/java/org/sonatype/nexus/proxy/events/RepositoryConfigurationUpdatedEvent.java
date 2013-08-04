@@ -10,81 +10,71 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Fired when a repository configuration changed and is applied (not rollbacked).
- * 
+ *
  * @author cstamas
  */
 public class RepositoryConfigurationUpdatedEvent
     extends RepositoryEvent
 {
-    private boolean localUrlChanged = false;
+  private boolean localUrlChanged = false;
 
-    private boolean remoteUrlChanged = false;
+  private boolean remoteUrlChanged = false;
 
-    private boolean downloadRemoteIndexEnabled = false;
+  private boolean downloadRemoteIndexEnabled = false;
 
-    private boolean madeSearchable = false;
+  private boolean madeSearchable = false;
 
-    private boolean localStatusChanged = false;
+  private boolean localStatusChanged = false;
 
-    public RepositoryConfigurationUpdatedEvent( Repository repository )
-    {
-        super( repository );
-    }
+  public RepositoryConfigurationUpdatedEvent(Repository repository) {
+    super(repository);
+  }
 
-    public boolean isLocalUrlChanged()
-    {
-        return localUrlChanged;
-    }
+  public boolean isLocalUrlChanged() {
+    return localUrlChanged;
+  }
 
-    public boolean isRemoteUrlChanged()
-    {
-        return remoteUrlChanged;
-    }
+  public boolean isRemoteUrlChanged() {
+    return remoteUrlChanged;
+  }
 
-    public boolean isDownloadRemoteIndexEnabled()
-    {
-        return downloadRemoteIndexEnabled;
-    }
+  public boolean isDownloadRemoteIndexEnabled() {
+    return downloadRemoteIndexEnabled;
+  }
 
-    public boolean isLocalStatusChanged()
-    {
-        return localStatusChanged;
-    }
+  public boolean isLocalStatusChanged() {
+    return localStatusChanged;
+  }
 
-    public void setLocalUrlChanged( boolean localUrlChanged )
-    {
-        this.localUrlChanged = localUrlChanged;
-    }
+  public void setLocalUrlChanged(boolean localUrlChanged) {
+    this.localUrlChanged = localUrlChanged;
+  }
 
-    public void setRemoteUrlChanged( boolean remoteUrlChanged )
-    {
-        this.remoteUrlChanged = remoteUrlChanged;
-    }
+  public void setRemoteUrlChanged(boolean remoteUrlChanged) {
+    this.remoteUrlChanged = remoteUrlChanged;
+  }
 
-    public void setDownloadRemoteIndexEnabled( boolean downloadRemoteIndexEnabled )
-    {
-        this.downloadRemoteIndexEnabled = downloadRemoteIndexEnabled;
-    }
+  public void setDownloadRemoteIndexEnabled(boolean downloadRemoteIndexEnabled) {
+    this.downloadRemoteIndexEnabled = downloadRemoteIndexEnabled;
+  }
 
-    public boolean isMadeSearchable()
-    {
-        return madeSearchable;
-    }
+  public boolean isMadeSearchable() {
+    return madeSearchable;
+  }
 
-    public void setMadeSearchable( boolean madeSearchable )
-    {
-        this.madeSearchable = madeSearchable;
-    }
+  public void setMadeSearchable(boolean madeSearchable) {
+    this.madeSearchable = madeSearchable;
+  }
 
-    public void setLocalStatusChanged( boolean localStatusChanged )
-    {
-        this.localStatusChanged = localStatusChanged;
-    }
+  public void setLocalStatusChanged(boolean localStatusChanged) {
+    this.localStatusChanged = localStatusChanged;
+  }
 
 }

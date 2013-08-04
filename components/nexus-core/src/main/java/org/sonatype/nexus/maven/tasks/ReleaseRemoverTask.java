@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.maven.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.maven.tasks;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,49 +19,47 @@ import javax.inject.Named;
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @since 2.5
  */
-@Named( ReleaseRemovalTaskDescriptor.ID )
+@Named(ReleaseRemovalTaskDescriptor.ID)
 public class ReleaseRemoverTask
     extends AbstractNexusRepositoriesTask<ReleaseRemovalResult>
 {
 
-    private final ReleaseRemover releaseRemover;
+  private final ReleaseRemover releaseRemover;
 
-    @Inject
-    public ReleaseRemoverTask( final ReleaseRemover releaseRemover )
-    {
-        this.releaseRemover = checkNotNull( releaseRemover );
-    }
+  @Inject
+  public ReleaseRemoverTask(final ReleaseRemover releaseRemover) {
+    this.releaseRemover = checkNotNull(releaseRemover);
+  }
 
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return ReleaseRemovalTaskDescriptor.REPOSITORY_FIELD_ID;
-    }
+  @Override
+  protected String getRepositoryFieldId() {
+    return ReleaseRemovalTaskDescriptor.REPOSITORY_FIELD_ID;
+  }
 
-    @Override
-    protected ReleaseRemovalResult doRun()
-        throws Exception
-    {
-        int numberOfVersionsToKeep = Integer.parseInt(
-            getParameter( ReleaseRemovalTaskDescriptor.NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID ) );
-        String targetId = getParameter( ReleaseRemovalTaskDescriptor.REPOSITORY_TARGET_FIELD_ID );
-        return releaseRemover.removeReleases(
-            new ReleaseRemovalRequest( getRepositoryId(), numberOfVersionsToKeep, targetId ) );
-    }
+  @Override
+  protected ReleaseRemovalResult doRun()
+      throws Exception
+  {
+    int numberOfVersionsToKeep = Integer.parseInt(
+        getParameter(ReleaseRemovalTaskDescriptor.NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID));
+    String targetId = getParameter(ReleaseRemovalTaskDescriptor.REPOSITORY_TARGET_FIELD_ID);
+    return releaseRemover.removeReleases(
+        new ReleaseRemovalRequest(getRepositoryId(), numberOfVersionsToKeep, targetId));
+  }
 
-    @Override
-    protected String getAction()
-    {
-        return getClass().getSimpleName();
-    }
+  @Override
+  protected String getAction() {
+    return getClass().getSimpleName();
+  }
 
-    @Override
-    protected String getMessage()
-    {
-        return "Removing old releases from repository " + getRepositoryName();
-    }
+  @Override
+  protected String getMessage() {
+    return "Removing old releases from repository " + getRepositoryName();
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.appevents;
 
 import javax.inject.Inject;
@@ -22,11 +23,10 @@ public abstract class AbstractApplicationEventListener
     implements EventListener
 {
 
-    @Inject
-    @Deprecated
-    public AbstractApplicationEventListener( ApplicationEventMulticaster applicationEventMulticaster )
-    {
-        applicationEventMulticaster.addEventListener( this );
-    }
+  @Inject
+  @Deprecated
+  public AbstractApplicationEventListener(ApplicationEventMulticaster applicationEventMulticaster) {
+    applicationEventMulticaster.addEventListener(this);
+  }
 
 }

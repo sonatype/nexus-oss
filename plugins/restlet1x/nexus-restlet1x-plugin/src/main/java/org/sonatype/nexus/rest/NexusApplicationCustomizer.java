@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import javax.inject.Singleton;
@@ -21,5 +22,5 @@ import org.sonatype.plugin.ExtensionPoint;
 @Singleton
 public interface NexusApplicationCustomizer
 {
-    void customize( NexusApplication nexusApplication, RetargetableRestlet root );
+  void customize(NexusApplication nexusApplication, RetargetableRestlet root);
 }

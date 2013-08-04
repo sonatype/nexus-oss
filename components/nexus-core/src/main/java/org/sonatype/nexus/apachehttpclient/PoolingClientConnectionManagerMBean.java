@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.apachehttpclient;
 
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
@@ -22,24 +23,24 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 public interface PoolingClientConnectionManagerMBean
 {
 
-    int getMaxTotal();
+  int getMaxTotal();
 
-    int getDefaultMaxPerRoute();
+  int getDefaultMaxPerRoute();
 
-    int getLeased();
+  int getLeased();
 
-    int getPending();
+  int getPending();
 
-    int getAvailable();
+  int getAvailable();
 
-    int getMax();
+  int getMax();
 
-    void closeIdleConnections( long idleTimeoutInMillis );
+  void closeIdleConnections(long idleTimeoutInMillis);
 
-    void closeExpiredConnections();
+  void closeExpiredConnections();
 
-    void setMaxTotal( int max );
+  void setMaxTotal(int max);
 
-    void setDefaultMaxPerRoute( int max );
+  void setDefaultMaxPerRoute(int max);
 
 }

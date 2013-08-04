@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
@@ -21,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -29,56 +29,52 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
+import org.codehaus.plexus.util.IOUtil;
+
 /**
  * This is a "local" strategy, uses Nexus content to get a Java properties file and get filtered keys from there.
- * 
+ *
  * @author cstamas
  */
 @Singleton
-@Named( "content-get-properties" )
-@Typed( DiscoveryStrategy.class )
+@Named("content-get-properties")
+@Typed(DiscoveryStrategy.class)
 public class ContentGetPropertiesDiscoveryStrategy
     extends ContentGetDiscoveryStrategy
 {
-    @Inject
-    public ContentGetPropertiesDiscoveryStrategy( final RepositoryRegistry repositoryRegistry )
-    {
-        super( repositoryRegistry );
-    }
+  @Inject
+  public ContentGetPropertiesDiscoveryStrategy(final RepositoryRegistry repositoryRegistry) {
+    super(repositoryRegistry);
+  }
 
-    public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
-    {
-        final DiscoveryResponse dr = new DiscoveryResponse( request );
-        // handle
-        final StorageFileItem response = handleRequest( request );
+  public DiscoveryResponse discoverLatestVersion(DiscoveryRequest request)
+      throws NoSuchRepositoryException, IOException
+  {
+    final DiscoveryResponse dr = new DiscoveryResponse(request);
+    // handle
+    final StorageFileItem response = handleRequest(request);
 
-        if ( response != null )
-        {
-            final Properties properties = new Properties();
-            final InputStream content = response.getInputStream();
-            try
-            {
-                properties.load( content );
-            }
-            finally
-            {
-                IOUtil.close( content );
-            }
+    if (response != null) {
+      final Properties properties = new Properties();
+      final InputStream content = response.getInputStream();
+      try {
+        properties.load(content);
+      }
+      finally {
+        IOUtil.close(content);
+      }
 
-            final String keyPrefix = request.getKey() + ".";
-            // repack it into response
-            for ( Object key : properties.keySet() )
-            {
-                final String keyString = key.toString();
-                if ( keyString.startsWith( keyPrefix ) )
-                {
-                    dr.getResponse().put( key.toString().substring( keyPrefix.length() ), properties.get( key ) );
-                    dr.setSuccessful( true );
-                }
-            }
+      final String keyPrefix = request.getKey() + ".";
+      // repack it into response
+      for (Object key : properties.keySet()) {
+        final String keyString = key.toString();
+        if (keyString.startsWith(keyPrefix)) {
+          dr.getResponse().put(key.toString().substring(keyPrefix.length()), properties.get(key));
+          dr.setSuccessful(true);
         }
-
-        return dr;
+      }
     }
+
+    return dr;
+  }
 }

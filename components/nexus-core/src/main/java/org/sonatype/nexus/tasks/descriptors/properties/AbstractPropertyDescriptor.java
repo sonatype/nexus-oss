@@ -10,39 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors.properties;
 
 @Deprecated
 public abstract class AbstractPropertyDescriptor
     implements ScheduledTaskPropertyDescriptor
 {
-    private String helpText;
+  private String helpText;
 
-    private boolean required;
+  private boolean required;
 
-    public String getHelpText()
-    {
-        return helpText;
-    }
+  public String getHelpText() {
+    return helpText;
+  }
 
-    public boolean isRequired()
-    {
-        return required;
-    }
+  public boolean isRequired() {
+    return required;
+  }
 
-    public void setHelpText( String helpText )
-    {
-        this.helpText = helpText;
-    }
+  public void setHelpText(String helpText) {
+    this.helpText = helpText;
+  }
 
-    public void setRequired( boolean required )
-    {
-        this.required = required;
-    }
+  public void setRequired(boolean required) {
+    this.required = required;
+  }
 
-    public String getRegexValidation()
-    {
-        return null;
-    }
+  public String getRegexValidation() {
+    return null;
+  }
 
 }
