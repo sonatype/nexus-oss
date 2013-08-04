@@ -10,60 +10,56 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.mime;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.mime;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * A simple handy implementation of MimeRulesSource that uses an ordered map of regexp Patterns to match path again, and
+ * A simple handy implementation of MimeRulesSource that uses an ordered map of regexp Patterns to match path again,
+ * and
  * in case of match the mapping value is returned. The order how Regexp/type is registered is important, since first
- * matched "wins". Meaning, you'd need to register the most specific ones first, and then the "usua" ones (if needed, or
+ * matched "wins". Meaning, you'd need to register the most specific ones first, and then the "usua" ones (if needed,
+ * or
  * just leave them to "global MIME type handling" if enough).
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public class RegexpMimeRulesSource
     implements MimeRulesSource
 {
-    private final LinkedHashMap<Pattern, String> rules;
+  private final LinkedHashMap<Pattern, String> rules;
 
-    public RegexpMimeRulesSource()
-    {
-        this.rules = new LinkedHashMap<Pattern, String>();
+  public RegexpMimeRulesSource() {
+    this.rules = new LinkedHashMap<Pattern, String>();
+  }
+
+  public void addRule(final String regexpString, final String mimeType) {
+    addRule(Pattern.compile(regexpString), mimeType);
+  }
+
+  public void addRule(final Pattern pattern, final String mimeType) {
+    rules.put(checkNotNull(pattern), checkNotNull(mimeType));
+  }
+
+  public void clear() {
+    rules.clear();
+  }
+
+  @Override
+  public String getRuleForPath(final String path) {
+    for (Map.Entry<Pattern, String> entry : rules.entrySet()) {
+      if (entry.getKey().matcher(path).matches()) {
+        return entry.getValue();
+      }
     }
 
-    public void addRule( final String regexpString, final String mimeType )
-    {
-        addRule( Pattern.compile( regexpString ), mimeType );
-    }
-
-    public void addRule( final Pattern pattern, final String mimeType )
-    {
-        rules.put( checkNotNull( pattern ), checkNotNull( mimeType ) );
-    }
-
-    public void clear()
-    {
-        rules.clear();
-    }
-
-    @Override
-    public String getRuleForPath( final String path )
-    {
-        for ( Map.Entry<Pattern, String> entry : rules.entrySet() )
-        {
-            if ( entry.getKey().matcher( path ).matches() )
-            {
-                return entry.getValue();
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.events;
 
 import javax.management.StandardMBean;
@@ -18,7 +19,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * The default implementation of MBean management interface for {@link DebugEventInspector} management.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
@@ -26,24 +27,21 @@ public class DefaultDebugEventInspectorMBean
     extends StandardMBean
     implements DebugEventInspectorMBean
 {
-    private final DebugEventInspector debugEventInspector;
+  private final DebugEventInspector debugEventInspector;
 
-    public DefaultDebugEventInspectorMBean( final DebugEventInspector debugEventInspector )
-    {
-        super( DebugEventInspectorMBean.class, false );
-        this.debugEventInspector =
-            Preconditions.checkNotNull( debugEventInspector, "Managed DebugEventInspector cannot be null!" );
-    }
+  public DefaultDebugEventInspectorMBean(final DebugEventInspector debugEventInspector) {
+    super(DebugEventInspectorMBean.class, false);
+    this.debugEventInspector =
+        Preconditions.checkNotNull(debugEventInspector, "Managed DebugEventInspector cannot be null!");
+  }
 
-    @Override
-    public boolean isEnabled()
-    {
-        return debugEventInspector.isEnabled();
-    }
+  @Override
+  public boolean isEnabled() {
+    return debugEventInspector.isEnabled();
+  }
 
-    @Override
-    public void setEnabled( boolean val )
-    {
-        debugEventInspector.setEnabled( val );
-    }
+  @Override
+  public void setEnabled(boolean val) {
+    debugEventInspector.setEnabled(val);
+  }
 }

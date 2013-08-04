@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2bridge.internal;
 
 import javax.inject.Inject;
@@ -23,24 +24,21 @@ public class HttpProxyProvider
     implements Provider<HttpProxy>
 {
 
-    private final P2Runtime p2Runtime;
+  private final P2Runtime p2Runtime;
 
-    private HttpProxy service;
+  private HttpProxy service;
 
-    @Inject
-    public HttpProxyProvider( final P2Runtime p2Runtime )
-    {
-        this.p2Runtime = p2Runtime;
+  @Inject
+  public HttpProxyProvider(final P2Runtime p2Runtime) {
+    this.p2Runtime = p2Runtime;
+  }
+
+  @Override
+  public HttpProxy get() {
+    if (service == null) {
+      service = p2Runtime.get().getService(HttpProxy.class);
     }
-
-    @Override
-    public HttpProxy get()
-    {
-        if ( service == null )
-        {
-            service = p2Runtime.get().getService( HttpProxy.class );
-        }
-        return service;
-    }
+    return service;
+  }
 
 }

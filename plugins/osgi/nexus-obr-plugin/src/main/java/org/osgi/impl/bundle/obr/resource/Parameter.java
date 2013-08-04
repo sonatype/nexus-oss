@@ -10,35 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.osgi.impl.bundle.obr.resource;
 
-class Parameter {
-	final static int	ATTRIBUTE	= 1;
-	final static int	DIRECTIVE	= 2;
-	final static int	SINGLE		= 0;
+class Parameter
+{
+  final static int ATTRIBUTE = 1;
 
-	int					type;
-	String				key;
-	String				value;
+  final static int DIRECTIVE = 2;
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(key);
-		switch (type) {
-			case ATTRIBUTE :
-				sb.append("=");
-				break;
-			case DIRECTIVE :
-				sb.append(":=");
-				break;
-			case SINGLE :
-				return sb.toString();
-		}
-		sb.append(value);
-		return sb.toString();
-	}
+  final static int SINGLE = 0;
 
-	boolean is(String s, int type) {
-		return this.type == type && key.equalsIgnoreCase(s);
-	}
+  int type;
+
+  String key;
+
+  String value;
+
+  public String toString() {
+    StringBuffer sb = new StringBuffer();
+    sb.append(key);
+    switch (type) {
+      case ATTRIBUTE:
+        sb.append("=");
+        break;
+      case DIRECTIVE:
+        sb.append(":=");
+        break;
+      case SINGLE:
+        return sb.toString();
+    }
+    sb.append(value);
+    return sb.toString();
+  }
+
+  boolean is(String s, int type) {
+    return this.type == type && key.equalsIgnoreCase(s);
+  }
 }

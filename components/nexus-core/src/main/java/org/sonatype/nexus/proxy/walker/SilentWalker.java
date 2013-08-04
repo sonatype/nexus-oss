@@ -10,17 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.walker.WalkerContext;
 
 /**
  * SilentWalker only exists to enforce that classes like WastebasketWalker won't throw exceptions
- * 
+ *
  * @author Marvin Froeder
  */
 public interface SilentWalker
 {
-    void processItem( WalkerContext ctx, StorageItem item );
+  void processItem(WalkerContext ctx, StorageItem item);
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -23,45 +24,38 @@ public class DefaultRemoteHttpProxySettings
     implements RemoteHttpProxySettings
 {
 
-    private String hostname;
+  private String hostname;
 
-    private int port;
+  private int port;
 
-    private RemoteAuthenticationSettings proxyAuthentication;
+  private RemoteAuthenticationSettings proxyAuthentication;
 
-    public boolean isEnabled()
-    {
-        return StringUtils.isNotBlank( getHostname() ) && getPort() != 0;
-    }
+  public boolean isEnabled() {
+    return StringUtils.isNotBlank(getHostname()) && getPort() != 0;
+  }
 
-    public String getHostname()
-    {
-        return hostname;
-    }
+  public String getHostname() {
+    return hostname;
+  }
 
-    public void setHostname( String hostname )
-    {
-        this.hostname = hostname;
-    }
+  public void setHostname(String hostname) {
+    this.hostname = hostname;
+  }
 
-    public int getPort()
-    {
-        return port;
-    }
+  public int getPort() {
+    return port;
+  }
 
-    public void setPort( int port )
-    {
-        this.port = port;
-    }
+  public void setPort(int port) {
+    this.port = port;
+  }
 
-    public RemoteAuthenticationSettings getProxyAuthentication()
-    {
-        return proxyAuthentication;
-    }
+  public RemoteAuthenticationSettings getProxyAuthentication() {
+    return proxyAuthentication;
+  }
 
-    public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )
-    {
-        this.proxyAuthentication = proxyAuthentication;
-    }
+  public void setProxyAuthentication(RemoteAuthenticationSettings proxyAuthentication) {
+    this.proxyAuthentication = proxyAuthentication;
+  }
 
 }

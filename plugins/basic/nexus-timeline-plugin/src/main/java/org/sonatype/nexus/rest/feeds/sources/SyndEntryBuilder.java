@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -19,7 +20,7 @@ import com.sun.syndication.feed.synd.SyndEntry;
  */
 public interface SyndEntryBuilder<T>
 {
-    boolean shouldBuildEntry( T source );
+  boolean shouldBuildEntry(T source);
 
-    SyndEntry buildEntry( T source );
+  SyndEntry buildEntry(T source);
 }

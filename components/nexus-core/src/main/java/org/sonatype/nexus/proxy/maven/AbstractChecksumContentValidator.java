@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.util.List;
@@ -25,104 +26,98 @@ public abstract class AbstractChecksumContentValidator
     extends AbstractLoggingComponent
 {
 
-    public AbstractChecksumContentValidator()
-    {
-        super();
+  public AbstractChecksumContentValidator() {
+    super();
+  }
+
+  public boolean isRemoteItemContentValid(final ProxyRepository proxy, final ResourceStoreRequest req,
+                                          final String baseUrl,
+                                          final AbstractStorageItem item,
+                                          final List<RepositoryItemValidationEvent> events)
+      throws LocalStorageException
+  {
+    ChecksumPolicy checksumPolicy = getChecksumPolicy(proxy, item);
+    if (checksumPolicy == null || !checksumPolicy.shouldCheckChecksum()) {
+      return true;
     }
 
-    public boolean isRemoteItemContentValid(final  ProxyRepository proxy, final ResourceStoreRequest req, final String baseUrl,
-                                             final AbstractStorageItem item, final List<RepositoryItemValidationEvent> events )
-        throws LocalStorageException
-    {
-        ChecksumPolicy checksumPolicy = getChecksumPolicy( proxy, item );
-        if ( checksumPolicy == null || !checksumPolicy.shouldCheckChecksum() )
-        {
-            return true;
-        }
-
-        final ChecksumPolicy requestChecksumPolicy =
-            (ChecksumPolicy) req.getRequestContext().get( ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY );
-        if ( requestChecksumPolicy != null )
-        {
-            // found, it overrides the repository-set checksum policy then
-            checksumPolicy = requestChecksumPolicy;
-        }
-
-        RemoteHashResponse remoteHash = retrieveRemoteHash( item, proxy, baseUrl );
-
-        // let compiler make sure I did not forget to populate validation results
-        String msg;
-        boolean contentValid;
-
-        if ( remoteHash == null && ChecksumPolicy.STRICT.equals( checksumPolicy ) )
-        {
-            msg =
-                "The artifact " + item.getPath() + " has no remote checksum in repository " + item.getRepositoryId()
-                    + "! The checksumPolicy of repository forbids downloading of it.";
-
-            contentValid = false;
-        }
-        else if ( remoteHash == null )
-        {
-            msg =
-                "Warning, the artifact " + item.getPath() + " has no remote checksum in repository "
-                    + item.getRepositoryId() + "!";
-
-            contentValid = true; // policy is STRICT_IF_EXIST or WARN
-        }
-        else if ( remoteHash.getRemoteHash().equals( retrieveLocalHash( item, remoteHash.getInspector() ) ) )
-        {
-            // remote hash exists and matches item content
-            return true;
-        }
-        else if ( ChecksumPolicy.WARN.equals( checksumPolicy ) )
-        {
-            msg =
-                "Warning, the artifact " + item.getPath() + " and it's remote checksums does not match in repository "
-                    + item.getRepositoryId() + "!";
-
-            contentValid = true;
-        }
-        else
-        // STRICT or STRICT_IF_EXISTS
-        {
-            msg =
-                "The artifact " + item.getPath() + " and it's remote checksums does not match in repository "
-                    + item.getRepositoryId() + "! The checksumPolicy of repository forbids downloading of it.";
-
-            contentValid = false;
-        }
-
-        if ( !contentValid )
-        {
-            getLogger().debug( "Validation failed due: " + msg );
-        }
-
-        events.add( newChechsumFailureEvent( proxy, item, msg ) );
-
-        cleanup( proxy, remoteHash, contentValid );
-
-        return contentValid;
+    final ChecksumPolicy requestChecksumPolicy =
+        (ChecksumPolicy) req.getRequestContext().get(ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY);
+    if (requestChecksumPolicy != null) {
+      // found, it overrides the repository-set checksum policy then
+      checksumPolicy = requestChecksumPolicy;
     }
 
-    protected String retrieveLocalHash( AbstractStorageItem item, String inspector )
+    RemoteHashResponse remoteHash = retrieveRemoteHash(item, proxy, baseUrl);
+
+    // let compiler make sure I did not forget to populate validation results
+    String msg;
+    boolean contentValid;
+
+    if (remoteHash == null && ChecksumPolicy.STRICT.equals(checksumPolicy)) {
+      msg =
+          "The artifact " + item.getPath() + " has no remote checksum in repository " + item.getRepositoryId()
+              + "! The checksumPolicy of repository forbids downloading of it.";
+
+      contentValid = false;
+    }
+    else if (remoteHash == null) {
+      msg =
+          "Warning, the artifact " + item.getPath() + " has no remote checksum in repository "
+              + item.getRepositoryId() + "!";
+
+      contentValid = true; // policy is STRICT_IF_EXIST or WARN
+    }
+    else if (remoteHash.getRemoteHash().equals(retrieveLocalHash(item, remoteHash.getInspector()))) {
+      // remote hash exists and matches item content
+      return true;
+    }
+    else if (ChecksumPolicy.WARN.equals(checksumPolicy)) {
+      msg =
+          "Warning, the artifact " + item.getPath() + " and it's remote checksums does not match in repository "
+              + item.getRepositoryId() + "!";
+
+      contentValid = true;
+    }
+    else
+    // STRICT or STRICT_IF_EXISTS
     {
-        return item.getRepositoryItemAttributes().get( inspector );
+      msg =
+          "The artifact " + item.getPath() + " and it's remote checksums does not match in repository "
+              + item.getRepositoryId() + "! The checksumPolicy of repository forbids downloading of it.";
+
+      contentValid = false;
     }
 
-    protected abstract void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
-        throws LocalStorageException;
-
-    protected abstract RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy,
-                                                              String baseUrl )
-        throws LocalStorageException;
-
-    protected abstract ChecksumPolicy getChecksumPolicy( ProxyRepository proxy, AbstractStorageItem item )
-        throws LocalStorageException;
-
-    private RepositoryItemValidationEvent newChechsumFailureEvent( final ProxyRepository proxy, final AbstractStorageItem item, final String msg )
-    {
-        return new MavenChecksumContentValidationEventFailed( proxy, item, msg );
+    if (!contentValid) {
+      getLogger().debug("Validation failed due: " + msg);
     }
+
+    events.add(newChechsumFailureEvent(proxy, item, msg));
+
+    cleanup(proxy, remoteHash, contentValid);
+
+    return contentValid;
+  }
+
+  protected String retrieveLocalHash(AbstractStorageItem item, String inspector) {
+    return item.getRepositoryItemAttributes().get(inspector);
+  }
+
+  protected abstract void cleanup(ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid)
+      throws LocalStorageException;
+
+  protected abstract RemoteHashResponse retrieveRemoteHash(AbstractStorageItem item, ProxyRepository proxy,
+                                                           String baseUrl)
+      throws LocalStorageException;
+
+  protected abstract ChecksumPolicy getChecksumPolicy(ProxyRepository proxy, AbstractStorageItem item)
+      throws LocalStorageException;
+
+  private RepositoryItemValidationEvent newChechsumFailureEvent(final ProxyRepository proxy,
+                                                                final AbstractStorageItem item, final String msg)
+  {
+    return new MavenChecksumContentValidationEventFailed(proxy, item, msg);
+  }
 
 }

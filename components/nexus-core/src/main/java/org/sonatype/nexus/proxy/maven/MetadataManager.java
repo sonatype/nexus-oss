@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
@@ -18,40 +19,28 @@ import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 public interface MetadataManager
 {
-    /**
-     * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
-     * 
-     * @param req
-     */
-    void deployArtifact( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
+   */
+  void deployArtifact(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
-     * 
-     * @param req
-     */
-    void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException;
+  /**
+   * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
+   */
+  void undeployArtifact(ArtifactStoreRequest request)
+      throws IOException;
 
-    /**
-     * Resolves the artifact, honoring LATEST and RELEASE as version. In case of snapshots, it will try to resolve the
-     * timestamped version too, if needed.
-     * 
-     * @return
-     * @throws IOException
-     * @throws IllegalArtifactCoordinateException
-     */
-    Gav resolveArtifact( ArtifactStoreRequest gavRequest )
-        throws IOException;
+  /**
+   * Resolves the artifact, honoring LATEST and RELEASE as version. In case of snapshots, it will try to resolve the
+   * timestamped version too, if needed.
+   */
+  Gav resolveArtifact(ArtifactStoreRequest gavRequest)
+      throws IOException;
 
-    /**
-     * Resolves the snapshot base version to a timestamped version if possible. Only when a repo is snapshot.
-     * 
-     * @return
-     * @throws IOException
-     * @throws IllegalArtifactCoordinateException
-     */
-    Gav resolveSnapshot( ArtifactStoreRequest gavRequest, Gav gav )
-        throws IOException;
+  /**
+   * Resolves the snapshot base version to a timestamped version if possible. Only when a repo is snapshot.
+   */
+  Gav resolveSnapshot(ArtifactStoreRequest gavRequest, Gav gav)
+      throws IOException;
 }

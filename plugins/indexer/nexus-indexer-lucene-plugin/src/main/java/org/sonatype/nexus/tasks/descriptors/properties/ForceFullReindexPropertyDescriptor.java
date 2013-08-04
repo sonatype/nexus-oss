@@ -10,36 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors.properties;
 
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- *
  * @author Marvin Froeder
- *
  */
-@Component( role = ScheduledTaskPropertyDescriptor.class, hint = ForceFullReindexPropertyDescriptor.ID, instantiationStrategy = "per-lookup" )
+@Component(role = ScheduledTaskPropertyDescriptor.class, hint = ForceFullReindexPropertyDescriptor.ID,
+    instantiationStrategy = "per-lookup")
 public class ForceFullReindexPropertyDescriptor
     extends AbstractBooleanPropertyDescriptor
 {
 
-    public static final String ID = "forceFullReindex";
+  public static final String ID = "forceFullReindex";
 
-    public ForceFullReindexPropertyDescriptor()
-    {
-        setHelpText( "If selected will generate a new full index, otherwise just generate the incremental index." );
-        setRequired( false );
-    }
+  public ForceFullReindexPropertyDescriptor() {
+    setHelpText("If selected will generate a new full index, otherwise just generate the incremental index.");
+    setRequired(false);
+  }
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    public String getName()
-    {
-        return "Do full reindex";
-    }
+  public String getName() {
+    return "Do full reindex";
+  }
 
 }

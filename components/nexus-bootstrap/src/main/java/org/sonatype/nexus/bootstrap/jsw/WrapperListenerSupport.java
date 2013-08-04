@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.jsw;
+
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tanukisoftware.wrapper.WrapperListener;
-
-import java.util.Arrays;
 
 /**
  * Support for {@link WrapperListener} implementations.
@@ -26,49 +27,49 @@ import java.util.Arrays;
 public abstract class WrapperListenerSupport
     implements WrapperListener
 {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+  protected final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public Integer start(final String[] args) {
-        log.info("Starting with arguments: {}", Arrays.asList(args));
+  @Override
+  public Integer start(final String[] args) {
+    log.info("Starting with arguments: {}", Arrays.asList(args));
 
-        try {
-            return doStart(args);
-        }
-        catch (Exception e) {
-            log.error("Failed to start", e);
-            return 1; // exit
-        }
+    try {
+      return doStart(args);
     }
-
-    protected abstract Integer doStart(final String[] args) throws Exception;
-
-    @Override
-    public int stop(final int code) {
-        log.info("Stopping with code: {}", code);
-
-        try {
-            return doStop(code);
-        }
-        catch (Exception e) {
-            log.error("Failed to stop cleanly", e);
-            return 1; // exit
-        }
+    catch (Exception e) {
+      log.error("Failed to start", e);
+      return 1; // exit
     }
+  }
 
-    protected abstract int doStop(final int code) throws Exception;
+  protected abstract Integer doStart(final String[] args) throws Exception;
 
-    @Override
-    public void controlEvent(final int code) {
-        log.info("Received control event: {}", code);
+  @Override
+  public int stop(final int code) {
+    log.info("Stopping with code: {}", code);
 
-        try {
-            doControlEvent(code);
-        }
-        catch (Exception e) {
-            log.error("Failed to handle control event[{}]", code, e);
-        }
+    try {
+      return doStop(code);
     }
+    catch (Exception e) {
+      log.error("Failed to stop cleanly", e);
+      return 1; // exit
+    }
+  }
 
-    protected abstract void doControlEvent(final int code) throws Exception;
+  protected abstract int doStop(final int code) throws Exception;
+
+  @Override
+  public void controlEvent(final int code) {
+    log.info("Received control event: {}", code);
+
+    try {
+      doControlEvent(code);
+    }
+    catch (Exception e) {
+      log.error("Failed to handle control event[{}]", code, e);
+    }
+  }
+
+  protected abstract void doControlEvent(final int code) throws Exception;
 }

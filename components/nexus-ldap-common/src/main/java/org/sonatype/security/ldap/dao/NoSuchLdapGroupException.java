@@ -10,32 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao;
 
 public class NoSuchLdapGroupException
     extends Exception
 {
 
-    private final String groupId;
+  private final String groupId;
 
-    private final String logicalGroupId;
+  private final String logicalGroupId;
 
-    public NoSuchLdapGroupException( String groupId, String logicalGroupId )
-    {
-        super( "No such group: " + groupId + " (logical name: " + logicalGroupId + ")" );
+  public NoSuchLdapGroupException(String groupId, String logicalGroupId) {
+    super("No such group: " + groupId + " (logical name: " + logicalGroupId + ")");
 
-        this.groupId = groupId;
-        this.logicalGroupId = logicalGroupId;
-    }
+    this.groupId = groupId;
+    this.logicalGroupId = logicalGroupId;
+  }
 
-    public String getGroupId()
-    {
-        return groupId;
-    }
+  public String getGroupId() {
+    return groupId;
+  }
 
-    public String getLogicalGroupId()
-    {
-        return logicalGroupId;
-    }
+  public String getLogicalGroupId() {
+    return logicalGroupId;
+  }
 
 }

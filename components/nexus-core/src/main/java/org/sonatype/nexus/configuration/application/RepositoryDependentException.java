@@ -10,47 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.configuration.application;
 
-import static java.lang.String.format;
-import static org.sonatype.nexus.proxy.utils.RepositoryStringUtils.getHumanizedNameString;
+package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.repository.Repository;
+
+import static java.lang.String.format;
+import static org.sonatype.nexus.proxy.utils.RepositoryStringUtils.getHumanizedNameString;
 
 public class RepositoryDependentException
     extends ConfigurationException
 {
 
-    private static final long serialVersionUID = -2037859093869479166L;
+  private static final long serialVersionUID = -2037859093869479166L;
 
-    private final Repository dependant;
+  private final Repository dependant;
 
-    private final Repository repository;
+  private final Repository repository;
 
-    public RepositoryDependentException( Repository repository, Repository dependant )
-    {
-        super( format( "Repository %s cannot be deleted due to dependency: repository %s.",
-            getHumanizedNameString( repository ), getHumanizedNameString( dependant ) ) );
-        this.repository = repository;
-        this.dependant = dependant;
-    }
+  public RepositoryDependentException(Repository repository, Repository dependant) {
+    super(format("Repository %s cannot be deleted due to dependency: repository %s.",
+        getHumanizedNameString(repository), getHumanizedNameString(dependant)));
+    this.repository = repository;
+    this.dependant = dependant;
+  }
 
-    public Repository getDependant()
-    {
-        return dependant;
-    }
+  public Repository getDependant() {
+    return dependant;
+  }
 
-    public Repository getRepository()
-    {
-        return repository;
-    }
+  public Repository getRepository() {
+    return repository;
+  }
 
-    public String getUIMessage()
-    {
-        return format(
-            "Repository '%s' cannot be deleted due to dependencies on repository '%s'.\nDependencies must be removed in order to complete this operation.",
-            getHumanizedNameString( repository ), getHumanizedNameString( dependant ) );
-    }
+  public String getUIMessage() {
+    return format(
+        "Repository '%s' cannot be deleted due to dependencies on repository '%s'.\nDependencies must be removed in order to complete this operation.",
+        getHumanizedNameString(repository), getHumanizedNameString(dependant));
+  }
 
 }

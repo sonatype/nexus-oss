@@ -10,12 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.artifact.nexus477;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Date;
+
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
@@ -24,9 +29,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
 
 /**
  * Test the privilege for CRUD operations.
@@ -34,112 +36,113 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 public class Nexus477ArtifactsCrudIT
     extends AbstractPrivilegeTest
 {
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
-    
-    @Before
-    public void deployArtifact()
-        throws Exception
-    {
-        Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
-                     null, false, null );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        // Grab File used to deploy
-        File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
+  @Before
+  public void deployArtifact()
+      throws Exception
+  {
+    Gav gav =
+        new Gav(this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
+            null, false, null);
 
-        // URLConnection.set
+    // Grab File used to deploy
+    File fileToDeploy = this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
 
-        // use the test-user
-        // this.giveUserPrivilege( "test-user", "T3" ); // the Wagon does a PUT not a POST, so this is correct
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-        this.resetTestUserPrivs();
+    // URLConnection.set
 
-        int status = getDeployUtils().deployUsingGavWithRest( this.getTestRepositoryId(), gav, fileToDeploy );
-        Assert.assertEquals( "Status", status, 201 );
-    }
+    // use the test-user
+    // this.giveUserPrivilege( "test-user", "T3" ); // the Wagon does a PUT not a POST, so this is correct
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
+    this.resetTestUserPrivs();
 
-    // @Test
-    // public void testPost()
-    // {
-    // // the Wagon deploys using the PUT method
-    // }
+    int status = getDeployUtils().deployUsingGavWithRest(this.getTestRepositoryId(), gav, fileToDeploy);
+    Assert.assertEquals("Status", status, 201);
+  }
 
-    // @Test
-    // public void testPut()
-    // {
-    // // This is covered in Nexus429WagonDeployPrivilegeTest.
-    // }
+  // @Test
+  // public void testPost()
+  // {
+  // // the Wagon deploys using the PUT method
+  // }
 
-    @Test
-    public void deleteTest()
-        throws Exception
-    {
-        Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, 
-                     null, false, null );
+  // @Test
+  // public void testPut()
+  // {
+  // // This is covered in Nexus429WagonDeployPrivilegeTest.
+  // }
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+  @Test
+  public void deleteTest()
+      throws Exception
+  {
+    Gav gav =
+        new Gav(this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
+            null, false, null);
 
-        String serviceURI =
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
+
+    String serviceURI =
         // "service/local/repositories/" + this.getTestRepositoryId() + "/content/" + this.getTestId() + "/";
-            "content/repositories/" + this.getTestRepositoryId() + "/" + this.getTestId();
+        "content/repositories/" + this.getTestRepositoryId() + "/" + this.getTestId();
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        Assert.assertEquals( "Artifact should not have been deleted", response.getStatus().getCode(), 403 );
+    Response response = RequestFacade.sendMessage(serviceURI, Method.DELETE);
+    Assert.assertEquals("Artifact should not have been deleted", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        this.giveUserPrivilege( "test-user", "T7" );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
+    this.giveUserPrivilege("test-user", "T7");
 
-        // delete implies read
-        // we need to check read first...
-        response =
-            RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/"
-                                           + this.getRelitiveArtifactPath( gav ), Method.GET );
-        Assert.assertEquals( "Could not get artifact", response.getStatus().getCode(), 200 );
+    // delete implies read
+    // we need to check read first...
+    response =
+        RequestFacade.sendMessage("content/repositories/" + this.getTestRepositoryId() + "/"
+            + this.getRelitiveArtifactPath(gav), Method.GET);
+    Assert.assertEquals("Could not get artifact", response.getStatus().getCode(), 200);
 
-        response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        Assert.assertEquals( "Artifact should have been deleted", response.getStatus().getCode(), 204 );
+    response = RequestFacade.sendMessage(serviceURI, Method.DELETE);
+    Assert.assertEquals("Artifact should have been deleted", response.getStatus().getCode(), 204);
 
-    }
+  }
 
-    @Test
-    public void readTest()
-        throws IOException, URISyntaxException, Exception
-    {
-        this.overwriteUserRole( "test-user", "read-test-role", "1" );
+  @Test
+  public void readTest()
+      throws IOException, URISyntaxException, Exception
+  {
+    this.overwriteUserRole("test-user", "read-test-role", "1");
 
-        Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, 
-                     null, false, null );
+    Gav gav =
+        new Gav(this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
+            null, false, null);
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        String serviceURI =
-            "content/repositories/" + this.getTestRepositoryId() + "/" + this.getRelitiveArtifactPath( gav );
+    String serviceURI =
+        "content/repositories/" + this.getTestRepositoryId() + "/" + this.getRelitiveArtifactPath(gav);
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.GET );
-        Assert.assertEquals( "Artifact should not have been read", response.getStatus().getCode(), 403 );
+    Response response = RequestFacade.sendMessage(serviceURI, Method.GET);
+    Assert.assertEquals("Artifact should not have been read", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        this.giveUserPrivilege( "test-user", "T1" );
-        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
+    this.giveUserPrivilege("test-user", "T1");
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    TestContainer.getInstance().getTestContext().setUsername("test-user");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        response = RequestFacade.sendMessage( serviceURI, Method.GET );
-        Assert.assertEquals( "Artifact should have been read\nresponse:\n" + response.getEntity().getText(), response.getStatus().getCode(),
-                             200 );
+    response = RequestFacade.sendMessage(serviceURI, Method.GET);
+    Assert.assertEquals("Artifact should have been read\nresponse:\n" + response.getEntity().getText(),
+        response.getStatus().getCode(),
+        200);
 
-        response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        Assert.assertEquals( "Artifact should have been deleted", response.getStatus().getCode(), 403 );
+    response = RequestFacade.sendMessage(serviceURI, Method.DELETE);
+    Assert.assertEquals("Artifact should have been deleted", response.getStatus().getCode(), 403);
 
-    }
+  }
 
 }

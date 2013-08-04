@@ -10,70 +10,71 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.model;
 
-import org.junit.Test;
 import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 
+import org.junit.Test;
+
 public class TestLuceneRestMarshalUnmarchal
     extends TestMarshalUnmarchal
 {
-    @Override
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  public void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        getJsonXStream().processAnnotations( SearchResponse.class );
-        getXmlXStream().processAnnotations( SearchResponse.class );
+    getJsonXStream().processAnnotations(SearchResponse.class);
+    getXmlXStream().processAnnotations(SearchResponse.class);
 
-        getJsonXStream().registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
-            "artifact" ) );
+    getJsonXStream().registerLocalConverter(SearchResponse.class, "data", new AliasingListConverter(NexusArtifact.class,
+        "artifact"));
 
-        getXmlXStream().registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
-            "artifact" ) );
-    }
+    getXmlXStream().registerLocalConverter(SearchResponse.class, "data", new AliasingListConverter(NexusArtifact.class,
+        "artifact"));
+  }
 
-    @Test
-    public void testSearchResponse()
-    {
-        SearchResponse response = new SearchResponse();
-        response.setCount( 10 );
-        response.setFrom( 50 );
-        response.setTotalCount( 8 );
-        response.setTooManyResults( true );
+  @Test
+  public void testSearchResponse() {
+    SearchResponse response = new SearchResponse();
+    response.setCount(10);
+    response.setFrom(50);
+    response.setTotalCount(8);
+    response.setTooManyResults(true);
 
-        NexusArtifact artifact1 = new NexusArtifact();
-        artifact1.setArtifactId( "artifactId1" );
-        artifact1.setClassifier( "classifier1" );
-        artifact1.setContextId( "contextId1" );
-        artifact1.setGroupId( "groupId1" );
-        artifact1.setPackaging( "packaging1" );
-        artifact1.setRepoId( "repoId1" );
-        artifact1.setResourceURI( "resourceURI1" );
-        artifact1.setVersion( "version1" );
-        artifact1.setArtifactLink( "artifactLink" );
-        artifact1.setExtension( "extension" );
-        artifact1.setPomLink( "pomLink" );
-        response.addData( artifact1 );
+    NexusArtifact artifact1 = new NexusArtifact();
+    artifact1.setArtifactId("artifactId1");
+    artifact1.setClassifier("classifier1");
+    artifact1.setContextId("contextId1");
+    artifact1.setGroupId("groupId1");
+    artifact1.setPackaging("packaging1");
+    artifact1.setRepoId("repoId1");
+    artifact1.setResourceURI("resourceURI1");
+    artifact1.setVersion("version1");
+    artifact1.setArtifactLink("artifactLink");
+    artifact1.setExtension("extension");
+    artifact1.setPomLink("pomLink");
+    response.addData(artifact1);
 
-        NexusArtifact artifact2 = new NexusArtifact();
-        artifact2.setArtifactId( "artifactId1" );
-        artifact2.setClassifier( "classifier1" );
-        artifact2.setContextId( "contextId1" );
-        artifact2.setGroupId( "groupId1" );
-        artifact2.setPackaging( "packaging1" );
-        artifact2.setRepoId( "repoId1" );
-        artifact2.setResourceURI( "resourceURI1" );
-        artifact2.setVersion( "version1" );
-        artifact2.setArtifactLink( "artifactLink2" );
-        artifact2.setExtension( "extension2" );
-        artifact2.setPomLink( "pomLink2" );
-        response.addData( artifact2 );
+    NexusArtifact artifact2 = new NexusArtifact();
+    artifact2.setArtifactId("artifactId1");
+    artifact2.setClassifier("classifier1");
+    artifact2.setContextId("contextId1");
+    artifact2.setGroupId("groupId1");
+    artifact2.setPackaging("packaging1");
+    artifact2.setRepoId("repoId1");
+    artifact2.setResourceURI("resourceURI1");
+    artifact2.setVersion("version1");
+    artifact2.setArtifactLink("artifactLink2");
+    artifact2.setExtension("extension2");
+    artifact2.setPomLink("pomLink2");
+    response.addData(artifact2);
 
-        this.marshalUnmarchalThenCompare( response );
-        this.validateXmlHasNoPackageNames( response );
-    }
+    this.marshalUnmarchalThenCompare(response);
+    this.validateXmlHasNoPackageNames(response);
+  }
 }

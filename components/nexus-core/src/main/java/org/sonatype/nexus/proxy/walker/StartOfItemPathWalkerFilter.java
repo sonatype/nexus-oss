@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -24,51 +25,49 @@ public class StartOfItemPathWalkerFilter
     implements WalkerFilter
 {
 
-    /**
-     * The path that item path should start with.
-     */
-    private final String path;
+  /**
+   * The path that item path should start with.
+   */
+  private final String path;
 
-    /**
-     * Constructor.
-     *
-     * @param path the path that item path should start with
-     */
-    public StartOfItemPathWalkerFilter( final String path )
-    {
-        assert path != null : "Path must be specified (cannot be null)";
+  /**
+   * Constructor.
+   *
+   * @param path the path that item path should start with
+   */
+  public StartOfItemPathWalkerFilter(final String path) {
+    assert path != null : "Path must be specified (cannot be null)";
 
-        this.path = path;
-    }
+    this.path = path;
+  }
 
-    /**
-     * Return "true" if the item path starts with specified path.
-     *
-     * {@inheritDoc}
-     */
-    public boolean shouldProcess( final WalkerContext ctx,
-                                  final StorageItem item )
-    {
-        return item.getPath().matches( path );
-    }
+  /**
+   * Return "true" if the item path starts with specified path.
+   *
+   * {@inheritDoc}
+   */
+  public boolean shouldProcess(final WalkerContext ctx,
+                               final StorageItem item)
+  {
+    return item.getPath().matches(path);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean shouldProcessRecursively( final WalkerContext ctx,
-                                             final StorageCollectionItem coll )
-    {
-        return coll.getPath().matches( path );
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public boolean shouldProcessRecursively(final WalkerContext ctx,
+                                          final StorageCollectionItem coll)
+  {
+    return coll.getPath().matches(path);
+  }
 
-    /**
-     * Builder method.
-     *
-     * @return new ItemNameWalkerFilter
-     */
-    public static StartOfItemPathWalkerFilter pathStartsWith( final String path )
-    {
-        return new StartOfItemPathWalkerFilter( path );
-    }
+  /**
+   * Builder method.
+   *
+   * @return new ItemNameWalkerFilter
+   */
+  public static StartOfItemPathWalkerFilter pathStartsWith(final String path) {
+    return new StartOfItemPathWalkerFilter(path);
+  }
 
 }

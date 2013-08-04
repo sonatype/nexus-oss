@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.maven;
 
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
@@ -27,42 +28,37 @@ public class JerseyMavenHostedRepository
     implements MavenHostedRepository
 {
 
-    static final String PROVIDER = "maven2";
+  static final String PROVIDER = "maven2";
 
-    public JerseyMavenHostedRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyMavenHostedRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyMavenHostedRepository( final JerseyNexusClient nexusClient, final RepositoryResource resource )
-    {
-        super( nexusClient, resource );
-    }
+  public JerseyMavenHostedRepository(final JerseyNexusClient nexusClient, final RepositoryResource resource) {
+    super(nexusClient, resource);
+  }
 
-    @Override
-    protected RepositoryResource createSettings()
-    {
-        final RepositoryResource settings = super.createSettings();
+  @Override
+  protected RepositoryResource createSettings() {
+    final RepositoryResource settings = super.createSettings();
 
-        settings.setProvider( PROVIDER );
-        settings.setIndexable( true );
-        settings.setRepoPolicy( "RELEASE" );
+    settings.setProvider(PROVIDER);
+    settings.setIndexable(true);
+    settings.setRepoPolicy("RELEASE");
 
-        return settings;
-    }
+    return settings;
+  }
 
-    @Override
-    public MavenHostedRepository includeInSearchResults()
-    {
-        settings().setIndexable( true );
-        return this;
-    }
+  @Override
+  public MavenHostedRepository includeInSearchResults() {
+    settings().setIndexable(true);
+    return this;
+  }
 
-    @Override
-    public MavenHostedRepository excludeFromSearchResults()
-    {
-        settings().setIndexable( false );
-        return this;
-    }
+  @Override
+  public MavenHostedRepository excludeFromSearchResults() {
+    settings().setIndexable(false);
+    return this;
+  }
 
 }

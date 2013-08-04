@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds;
 
 import java.util.HashSet;
@@ -28,23 +29,20 @@ import com.google.common.base.Predicate;
 public class RepositoryIdTimelineFilter
     implements Predicate<Entry>
 {
-    private final Set<String> repositoryIds;
+  private final Set<String> repositoryIds;
 
-    public RepositoryIdTimelineFilter( String repositoryId )
-    {
-        this.repositoryIds = new HashSet<String>();
+  public RepositoryIdTimelineFilter(String repositoryId) {
+    this.repositoryIds = new HashSet<String>();
 
-        this.repositoryIds.add( repositoryId );
-    }
+    this.repositoryIds.add(repositoryId);
+  }
 
-    public RepositoryIdTimelineFilter( Set<String> repositoryIds )
-    {
-        this.repositoryIds = repositoryIds;
-    }
+  public RepositoryIdTimelineFilter(Set<String> repositoryIds) {
+    this.repositoryIds = repositoryIds;
+  }
 
-    public boolean apply( final Entry hit )
-    {
-        return ( hit.getData().containsKey( DefaultFeedRecorder.REPOSITORY ) && repositoryIds.contains( hit.getData().get(
-            DefaultFeedRecorder.REPOSITORY ) ) );
-    }
+  public boolean apply(final Entry hit) {
+    return (hit.getData().containsKey(DefaultFeedRecorder.REPOSITORY) && repositoryIds.contains(hit.getData().get(
+        DefaultFeedRecorder.REPOSITORY)));
+  }
 }

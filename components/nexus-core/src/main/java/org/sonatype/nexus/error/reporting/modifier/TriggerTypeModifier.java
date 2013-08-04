@@ -10,37 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.error.reporting.modifier;
 
-import static org.sonatype.sisu.pr.Modifier.Priority.MODIFIER;
+package org.sonatype.nexus.error.reporting.modifier;
 
 import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.sisu.pr.Modifier;
+
+import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
+
+import static org.sonatype.sisu.pr.Modifier.Priority.MODIFIER;
 
 /**
  * Prepends MPR or APR to the issue summary based on {@link ErrorReportRequest#isManual()}
  */
 @Named
 public class TriggerTypeModifier
-implements Modifier
+    implements Modifier
 {
 
-    @Override
-    public IssueSubmissionRequest modify( IssueSubmissionRequest request )
-    {
-        String prefix = ((ErrorReportRequest) request.getContext()).isManual() ? "MPR" : "APR";
-        request.setSummary( prefix + ": " + request.getSummary());
-        return request;
-    }
+  @Override
+  public IssueSubmissionRequest modify(IssueSubmissionRequest request) {
+    String prefix = ((ErrorReportRequest) request.getContext()).isManual() ? "MPR" : "APR";
+    request.setSummary(prefix + ": " + request.getSummary());
+    return request;
+  }
 
-    @Override
-    public int getPriority()
-    {
-        return MODIFIER.priority();
-    }
+  @Override
+  public int getPriority() {
+    return MODIFIER.priority();
+  }
 
 }

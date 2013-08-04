@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mime.detectors;
 
 import eu.medsea.mimeutil.detector.OpendesktopMimeDetector;
@@ -17,19 +18,18 @@ import eu.medsea.mimeutil.detector.OpendesktopMimeDetector;
 /**
  * Nexus specific {@link OpendesktopMimeDetector}. It detects file override and will use the override or the default
  * accordingly.
- * 
+ *
  * @author cstamas
  * @since 2.7.0
  */
 public class NexusOpendesktopMimeDetector
     extends OpendesktopMimeDetector
 {
-    public static final String DEFAULT_MIME_CACHE_PATH = "/usr/share/mime/mime.cache";
+  public static final String DEFAULT_MIME_CACHE_PATH = "/usr/share/mime/mime.cache";
 
-    public static String mimeCachePath;
+  public static String mimeCachePath;
 
-    public NexusOpendesktopMimeDetector()
-    {
-        super( mimeCachePath );
-    }
+  public NexusOpendesktopMimeDetector() {
+    super(mimeCachePath);
+  }
 }

@@ -10,7 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -19,19 +33,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Support for tests using event bus.
@@ -42,69 +43,63 @@ public class EventBusTestSupport
     extends TestSupport
 {
 
-    @Mock
-    protected EventBus eventBus;
+  @Mock
+  protected EventBus eventBus;
 
-    protected List<Object> eventBusEvents;
+  protected List<Object> eventBusEvents;
 
-    @Before
-    public final void setUpEventBus()
-        throws Exception
+  @Before
+  public final void setUpEventBus()
+      throws Exception
+  {
+    eventBusEvents = new ArrayList<Object>();
+
+    doAnswer(new Answer<Object>()
     {
-        eventBusEvents = new ArrayList<Object>();
 
-        doAnswer( new Answer<Object>()
+      @Override
+      public Object answer(final InvocationOnMock invocation)
+          throws Throwable
+      {
+        eventBusEvents.add(invocation.getArguments()[0]);
+        return null;
+      }
+
+    }).when(eventBus).post(any());
+  }
+
+  protected void verifyEventBusEvents(final Matcher... matchers) {
+    assertThat(eventBusEvents, contains(matchers));
+  }
+
+  protected void verifyNoEventBusEvents() {
+    assertThat(eventBusEvents, empty());
+  }
+
+  protected static Matcher<Object> satisfied(final Condition condition) {
+    return allOf(
+        instanceOf(ConditionEvent.Satisfied.class),
+        new ArgumentMatcher<Object>()
         {
+          @Override
+          public boolean matches(final Object argument) {
+            return ((ConditionEvent.Satisfied) argument).getCondition() == condition;
+          }
+        }
+    );
+  }
 
-            @Override
-            public Object answer( final InvocationOnMock invocation )
-                throws Throwable
-            {
-                eventBusEvents.add( invocation.getArguments()[0] );
-                return null;
-            }
-
-        } ).when( eventBus ).post( any() );
-    }
-
-    protected void verifyEventBusEvents( final Matcher... matchers )
-    {
-        assertThat( eventBusEvents, contains( matchers ) );
-    }
-
-    protected void verifyNoEventBusEvents()
-    {
-        assertThat( eventBusEvents, empty() );
-    }
-
-    protected static Matcher<Object> satisfied( final Condition condition )
-    {
-        return allOf(
-            instanceOf( ConditionEvent.Satisfied.class ),
-            new ArgumentMatcher<Object>()
-            {
-                @Override
-                public boolean matches( final Object argument )
-                {
-                    return ( (ConditionEvent.Satisfied) argument ).getCondition() == condition;
-                }
-            }
-        );
-    }
-
-    protected static Matcher<Object> unsatisfied( final Condition condition )
-    {
-        return allOf(
-            instanceOf( ConditionEvent.Unsatisfied.class ),
-            new ArgumentMatcher<Object>()
-            {
-                @Override
-                public boolean matches( final Object argument )
-                {
-                    return ( (ConditionEvent.Unsatisfied) argument ).getCondition() == condition;
-                }
-            }
-        );
-    }
+  protected static Matcher<Object> unsatisfied(final Condition condition) {
+    return allOf(
+        instanceOf(ConditionEvent.Unsatisfied.class),
+        new ArgumentMatcher<Object>()
+        {
+          @Override
+          public boolean matches(final Object argument) {
+            return ((ConditionEvent.Unsatisfied) argument).getCondition() == condition;
+          }
+        }
+    );
+  }
 
 }

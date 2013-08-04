@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -39,9 +38,11 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Default {@link LocalContentDiscoverer} implementation.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
@@ -51,105 +52,90 @@ public class LocalContentDiscovererImpl
     extends AbstractLoggingComponent
     implements LocalContentDiscoverer
 {
-    private static final String ID = "local";
+  private static final String ID = "local";
 
-    private final Config config;
+  private final Config config;
 
-    private final Walker walker;
+  private final Walker walker;
 
-    /**
-     * Constructor.
-     * 
-     * @param config
-     * @param walker
-     */
-    @Inject
-    public LocalContentDiscovererImpl( final Config config, final Walker walker )
-    {
-        this.config = checkNotNull( config );
-        this.walker = checkNotNull( walker );
+  /**
+   * Constructor.
+   */
+  @Inject
+  public LocalContentDiscovererImpl(final Config config, final Walker walker) {
+    this.config = checkNotNull(config);
+    this.walker = checkNotNull(walker);
+  }
+
+  @Override
+  public DiscoveryResult<MavenRepository> discoverLocalContent(final MavenRepository mavenRepository)
+      throws IOException
+  {
+    final DiscoveryResult<MavenRepository> discoveryResult =
+        new DiscoveryResult<MavenRepository>(mavenRepository);
+    final WalkerContext context =
+        new DefaultWalkerContext(mavenRepository, new ResourceStoreRequest("/"), new DefaultStoreWalkerFilter(),
+            true);
+    final PrefixCollectorProcessor prefixCollectorProcessor = new PrefixCollectorProcessor();
+    context.getProcessors().add(prefixCollectorProcessor);
+
+    try {
+      walker.walk(context);
+      final ParentOMatic parentOMatic = prefixCollectorProcessor.getParentOMatic();
+      if (parentOMatic.getRoot().isLeaf()) {
+        // tree is basically empty, so make the list too
+        discoveryResult.recordSuccess(ID, "Repository crawled successfully (is empty)",
+            new ArrayListPrefixSource(Collections.<String>emptyList()));
+      }
+      else {
+        discoveryResult.recordSuccess(ID, "Repository crawled successfully", new ArrayListPrefixSource(
+            getAllLeafPaths(parentOMatic, config.getLocalScrapeDepth())));
+      }
+    }
+    catch (WalkerException e) {
+      if (e.getWalkerContext().getStopCause() != null) {
+        discoveryResult.recordError(ID, e.getWalkerContext().getStopCause());
+      }
+      else {
+        discoveryResult.recordError(ID, e);
+      }
+    }
+    return discoveryResult;
+  }
+
+  // ==
+
+  protected List<String> getAllLeafPaths(final ParentOMatic parentOMatic, final int maxDepth) {
+    // cut the tree
+    if (maxDepth != Integer.MAX_VALUE) {
+      parentOMatic.cutNodesDeeperThan(maxDepth);
+    }
+    // get leafs
+    return parentOMatic.getAllLeafPaths();
+  }
+
+  protected static class PrefixCollectorProcessor
+      extends AbstractWalkerProcessor
+  {
+    private final ParentOMatic parentOMatic;
+
+    public PrefixCollectorProcessor() {
+      this.parentOMatic = new ParentOMatic();
+    }
+
+    public ParentOMatic getParentOMatic() {
+      return parentOMatic;
     }
 
     @Override
-    public DiscoveryResult<MavenRepository> discoverLocalContent( final MavenRepository mavenRepository )
-        throws IOException
+    public void processItem(final WalkerContext context, final StorageItem item)
+        throws Exception
     {
-        final DiscoveryResult<MavenRepository> discoveryResult =
-            new DiscoveryResult<MavenRepository>( mavenRepository );
-        final WalkerContext context =
-            new DefaultWalkerContext( mavenRepository, new ResourceStoreRequest( "/" ), new DefaultStoreWalkerFilter(),
-                true );
-        final PrefixCollectorProcessor prefixCollectorProcessor = new PrefixCollectorProcessor();
-        context.getProcessors().add( prefixCollectorProcessor );
-
-        try
-        {
-            walker.walk( context );
-            final ParentOMatic parentOMatic = prefixCollectorProcessor.getParentOMatic();
-            if ( parentOMatic.getRoot().isLeaf() )
-            {
-                // tree is basically empty, so make the list too
-                discoveryResult.recordSuccess( ID, "Repository crawled successfully (is empty)",
-                    new ArrayListPrefixSource( Collections.<String> emptyList() ) );
-            }
-            else
-            {
-                discoveryResult.recordSuccess( ID, "Repository crawled successfully", new ArrayListPrefixSource(
-                    getAllLeafPaths( parentOMatic, config.getLocalScrapeDepth() ) ) );
-            }
-        }
-        catch ( WalkerException e )
-        {
-            if ( e.getWalkerContext().getStopCause() != null )
-            {
-                discoveryResult.recordError( ID, e.getWalkerContext().getStopCause() );
-            }
-            else
-            {
-                discoveryResult.recordError( ID, e );
-            }
-        }
-        return discoveryResult;
+      // cancelation
+      CancelableUtil.checkInterruption();
+      if (item instanceof StorageFileItem) {
+        parentOMatic.addPath(item.getPath());
+      }
     }
-
-    // ==
-
-    protected List<String> getAllLeafPaths( final ParentOMatic parentOMatic, final int maxDepth )
-    {
-        // cut the tree
-        if ( maxDepth != Integer.MAX_VALUE )
-        {
-            parentOMatic.cutNodesDeeperThan( maxDepth );
-        }
-        // get leafs
-        return parentOMatic.getAllLeafPaths();
-    }
-
-    protected static class PrefixCollectorProcessor
-        extends AbstractWalkerProcessor
-    {
-        private final ParentOMatic parentOMatic;
-
-        public PrefixCollectorProcessor()
-        {
-            this.parentOMatic = new ParentOMatic();
-        }
-
-        public ParentOMatic getParentOMatic()
-        {
-            return parentOMatic;
-        }
-
-        @Override
-        public void processItem( final WalkerContext context, final StorageItem item )
-            throws Exception
-        {
-            // cancelation
-            CancelableUtil.checkInterruption();
-            if ( item instanceof StorageFileItem )
-            {
-                parentOMatic.addPath( item.getPath() );
-            }
-        }
-    }
+  }
 }

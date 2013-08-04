@@ -10,50 +10,52 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.group.nexus261;
 
-import static org.junit.Assert.assertTrue;
+package org.sonatype.nexus.testsuite.group.nexus261;
 
 import java.io.File;
 import java.util.Date;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
+
+import static org.junit.Assert.assertTrue;
 
 /**
- * Tests to make sure an artifact deployed in multiple repositories will respect the group order. 
+ * Tests to make sure an artifact deployed in multiple repositories will respect the group order.
  */
 public class Nexus261NexusGroupDownloadIT
     extends AbstractNexusIntegrationTest
 {
-	
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
 
-    @Test
-    public void downloadArtifact()
-        throws Exception
-    {
-        Gav gav =
-            new Gav( this.getTestId(), "release-jar", "1", null, "jar", 0, new Date().getTime(),
-                     "Release Jar", false, null, false, null );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        File artifact = downloadArtifactFromGroup( "nexus-test", gav, "./target/downloaded-jars" );
+  @Test
+  public void downloadArtifact()
+      throws Exception
+  {
+    Gav gav =
+        new Gav(this.getTestId(), "release-jar", "1", null, "jar", 0, new Date().getTime(),
+            "Release Jar", false, null, false, null);
 
-        assertTrue( artifact.exists() );
+    File artifact = downloadArtifactFromGroup("nexus-test", gav, "./target/downloaded-jars");
 
-        File originalFile =
-            this.getTestResourceAsFile( "projects/" + gav.getArtifactId() + "/" + gav.getArtifactId() + "."
-                + gav.getExtension() );
+    assertTrue(artifact.exists());
 
-        Assert.assertTrue( FileTestingUtils.compareFileSHA1s( originalFile, artifact ) );
+    File originalFile =
+        this.getTestResourceAsFile("projects/" + gav.getArtifactId() + "/" + gav.getArtifactId() + "."
+            + gav.getExtension());
 
-    }
+    Assert.assertTrue(FileTestingUtils.compareFileSHA1s(originalFile, artifact));
+
+  }
 }

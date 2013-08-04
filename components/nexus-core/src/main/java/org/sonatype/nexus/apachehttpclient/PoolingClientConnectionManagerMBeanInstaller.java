@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.apachehttpclient;
 
 import java.lang.management.ManagementFactory;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
@@ -34,64 +36,52 @@ import org.slf4j.LoggerFactory;
 public class PoolingClientConnectionManagerMBeanInstaller
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( PoolingClientConnectionManagerMBeanInstaller.class );
+  private static final Logger LOGGER = LoggerFactory.getLogger(PoolingClientConnectionManagerMBeanInstaller.class);
 
-    private static final String JMX_DOMAIN = "org.sonatype.nexus.httpclient";
+  private static final String JMX_DOMAIN = "org.sonatype.nexus.httpclient";
 
-    private ObjectName jmxName;
+  private ObjectName jmxName;
 
-    /**
-     * Registers the connection manager to JMX.
-     *
-     * @param connectionManager
-     */
-    public synchronized void register( final PoolingClientConnectionManager connectionManager )
-    {
-        if ( jmxName == null )
-        {
-            try
-            {
-                jmxName =
-                    ObjectName.getInstance( JMX_DOMAIN, "name", PoolingClientConnectionManager.class.getSimpleName() );
+  /**
+   * Registers the connection manager to JMX.
+   */
+  public synchronized void register(final PoolingClientConnectionManager connectionManager) {
+    if (jmxName == null) {
+      try {
+        jmxName =
+            ObjectName.getInstance(JMX_DOMAIN, "name", PoolingClientConnectionManager.class.getSimpleName());
 
-                final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-                server.registerMBean( new PoolingClientConnectionManagerMBeanImpl( connectionManager ), jmxName );
-            }
-            catch ( final Exception e )
-            {
-                LOGGER.warn( "Failed to register mbean {} due to {}:{}",
-                     jmxName, e.getClass(), e.getMessage() );
-                jmxName = null;
-            }
-        }
-        else
-        {
-            LOGGER.warn( "Already registered mbean {}", jmxName );
-        }
+        final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        server.registerMBean(new PoolingClientConnectionManagerMBeanImpl(connectionManager), jmxName);
+      }
+      catch (final Exception e) {
+        LOGGER.warn("Failed to register mbean {} due to {}:{}",
+            jmxName, e.getClass(), e.getMessage());
+        jmxName = null;
+      }
     }
-
-    /**
-     * Unregisters the connection manager from JMX.
-     */
-    public synchronized void unregister()
-    {
-        if ( jmxName != null )
-        {
-            try
-            {
-                final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-                server.unregisterMBean( jmxName );
-            }
-            catch ( final Exception e )
-            {
-                LOGGER.warn( "Failed to unregister mbean {} due to {}:{}",
-                    jmxName, e.getClass(), e.getMessage() );
-            }
-            finally
-            {
-                jmxName = null;
-            }
-        }
+    else {
+      LOGGER.warn("Already registered mbean {}", jmxName);
     }
+  }
+
+  /**
+   * Unregisters the connection manager from JMX.
+   */
+  public synchronized void unregister() {
+    if (jmxName != null) {
+      try {
+        final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        server.unregisterMBean(jmxName);
+      }
+      catch (final Exception e) {
+        LOGGER.warn("Failed to unregister mbean {} due to {}:{}",
+            jmxName, e.getClass(), e.getMessage());
+      }
+      finally {
+        jmxName = null;
+      }
+    }
+  }
 
 }

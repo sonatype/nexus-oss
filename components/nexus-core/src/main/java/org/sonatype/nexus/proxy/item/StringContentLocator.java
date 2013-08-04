@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 import java.io.UnsupportedEncodingException;
@@ -18,43 +19,37 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * A simple content locator that emits a string actually.
- * 
+ *
  * @author cstamas
  */
 public class StringContentLocator
     extends ByteArrayContentLocator
 {
-    private static final String ENCODING = "UTF-8";
+  private static final String ENCODING = "UTF-8";
 
-    private final String content;
+  private final String content;
 
-    public StringContentLocator( String content )
-    {
-        this( content, null );
+  public StringContentLocator(String content) {
+    this(content, null);
+  }
+
+  public StringContentLocator(String content, String mimeType) {
+    super(toByteArray(content), StringUtils.isBlank(mimeType) ? "text/plain" : mimeType);
+
+    this.content = content;
+  }
+
+  public String getString() {
+    return content;
+  }
+
+  public static byte[] toByteArray(String string) {
+    try {
+      return string.getBytes(ENCODING);
     }
-
-    public StringContentLocator( String content, String mimeType )
-    {
-        super( toByteArray( content ), StringUtils.isBlank( mimeType ) ? "text/plain" : mimeType );
-
-        this.content = content;
+    catch (UnsupportedEncodingException e) {
+      // heh? will not happen
+      return new byte[0];
     }
-
-    public String getString()
-    {
-        return content;
-    }
-
-    public static byte[] toByteArray( String string )
-    {
-        try
-        {
-            return string.getBytes( ENCODING );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            // heh? will not happen
-            return new byte[0];
-        }
-    }
+  }
 }

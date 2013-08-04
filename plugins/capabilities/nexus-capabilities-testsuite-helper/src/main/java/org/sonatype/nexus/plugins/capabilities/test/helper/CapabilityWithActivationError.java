@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import javax.inject.Named;
@@ -19,17 +20,17 @@ import org.sonatype.nexus.plugins.capabilities.Capability;
 /**
  * @since 2.4
  */
-@Named( CapabilityWithActivationErrorDescriptor.TYPE_ID )
+@Named(CapabilityWithActivationErrorDescriptor.TYPE_ID)
 public class CapabilityWithActivationError
     extends TestCapability
     implements Capability
 {
 
-    @Override
-    public void onActivate()
-        throws Exception
-    {
-        throw new Exception( "This capability always fails on activate" );
-    }
+  @Override
+  public void onActivate()
+      throws Exception
+  {
+    throw new Exception("This capability always fails on activate");
+  }
 
 }

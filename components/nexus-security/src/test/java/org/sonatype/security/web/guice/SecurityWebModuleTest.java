@@ -10,13 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.web.guice;
 
-import static org.easymock.EasyMock.createMock;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.sameInstance;
+package org.sonatype.security.web.guice;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +20,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletContext;
 
+import org.sonatype.guice.bean.binders.ParameterKeys;
+import org.sonatype.guice.bean.binders.SpaceModule;
+import org.sonatype.guice.bean.binders.WireModule;
+import org.sonatype.guice.bean.reflect.URLClassSpace;
+import org.sonatype.inject.BeanScanning;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.web.ProtectedPathManager;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -42,138 +50,120 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.guice.bean.binders.ParameterKeys;
-import org.sonatype.guice.bean.binders.SpaceModule;
-import org.sonatype.guice.bean.binders.WireModule;
-import org.sonatype.guice.bean.reflect.URLClassSpace;
-import org.sonatype.inject.BeanScanning;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.web.ProtectedPathManager;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import static org.easymock.EasyMock.createMock;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.sameInstance;
 
 /**
  * Verifies functionality of SecurityWebModule.
- * 
+ *
  * @since 2.7
  */
 public class SecurityWebModuleTest
 {
-    private Injector injector;
+  private Injector injector;
 
-    @Before
-    public void setUp()
-    {
-        injector = Guice.createInjector( getWireModule() );
+  @Before
+  public void setUp() {
+    injector = Guice.createInjector(getWireModule());
+  }
+
+  @Test
+  public void testInjectionIsSetupCorrectly() {
+    SecuritySystem securitySystem = injector.getInstance(SecuritySystem.class);
+
+    SecurityManager securityManager = injector.getInstance(SecurityManager.class);
+
+    RealmSecurityManager realmSecurityManager =
+        (RealmSecurityManager) injector.getInstance(WebSecurityManager.class);
+
+    assertThat(securitySystem.getSecurityManager(), sameInstance(securityManager));
+    assertThat(securitySystem.getSecurityManager(), sameInstance(realmSecurityManager));
+
+    assertThat(securityManager, instanceOf(DefaultWebSecurityManager.class));
+    DefaultSecurityManager defaultSecurityManager = (DefaultSecurityManager) securityManager;
+
+    assertThat(defaultSecurityManager.getSessionManager(), instanceOf(DefaultWebSessionManager.class));
+    DefaultSessionManager sessionManager = (DefaultSessionManager) defaultSecurityManager.getSessionManager();
+    assertThat(sessionManager.getSessionDAO(), instanceOf(EnterpriseCacheSessionDAO.class));
+
+    SecurityWebFilter shiroFilter = injector.getInstance(SecurityWebFilter.class);
+    assertThat(shiroFilter.getFilterChainResolver(), instanceOf(PathMatchingFilterChainResolver.class));
+
+    PathMatchingFilterChainResolver filterChainResolver =
+        (PathMatchingFilterChainResolver) shiroFilter.getFilterChainResolver();
+    assertThat(filterChainResolver.getFilterChainManager(), instanceOf(DefaultFilterChainManager.class));
+    assertThat(filterChainResolver, sameInstance(injector.getInstance(FilterChainResolver.class)));
+
+    // now add a protected path
+    ProtectedPathManager protectedPathManager = injector.getInstance(ProtectedPathManager.class);
+    protectedPathManager.addProtectedResource("/service/**", "foobar,perms[sample:priv-name]");
+
+    NamedFilterList filterList = filterChainResolver.getFilterChainManager().getChain("/service/**");
+    assertThat(filterList.get(0), instanceOf(SimpleAccessControlFilter.class));
+    assertThat(filterList.get(1), instanceOf(HttpMethodPermissionFilter.class));
+
+    // test that injection of filters works
+    assertThat(((SimpleAccessControlFilter) filterList.get(0)).getSecurityXMLFilePath(),
+        equalTo("target/foo/security.xml"));
+  }
+
+  @After
+  public void stopCache() {
+    if (injector != null) {
+      injector.getInstance(CacheManagerComponent.class).shutdown();
     }
+  }
 
-    @Test
-    public void testInjectionIsSetupCorrectly()
+  private Module getWireModule() {
+    return new WireModule(getShiroModule(), getSpaceModule(), getPropertiesModule());
+  }
+
+  private Module getShiroModule() {
+    return new SecurityWebModule(createMock(ServletContext.class), true)
     {
-        SecuritySystem securitySystem = injector.getInstance( SecuritySystem.class );
+      @Override
+      protected void configureShiroWeb() {
+        super.configureShiroWeb();
 
-        SecurityManager securityManager = injector.getInstance( SecurityManager.class );
+        SimpleAccessControlFilter foobar = new SimpleAccessControlFilter();
+        foobar.setApplicationName("Foobar Application");
 
-        RealmSecurityManager realmSecurityManager =
-            (RealmSecurityManager) injector.getInstance( WebSecurityManager.class );
+        bindNamedFilter("foobar", foobar);
+        bindNamedFilter("perms", new HttpMethodPermissionFilter());
+      }
+    };
+  }
 
-        assertThat( securitySystem.getSecurityManager(), sameInstance( securityManager ) );
-        assertThat( securitySystem.getSecurityManager(), sameInstance( realmSecurityManager ) );
+  private Module getSpaceModule() {
+    return new SpaceModule(new URLClassSpace(getClass().getClassLoader()), BeanScanning.INDEX);
+  }
 
-        assertThat( securityManager, instanceOf( DefaultWebSecurityManager.class ) );
-        DefaultSecurityManager defaultSecurityManager = (DefaultSecurityManager) securityManager;
-
-        assertThat( defaultSecurityManager.getSessionManager(), instanceOf( DefaultWebSessionManager.class ) );
-        DefaultSessionManager sessionManager = (DefaultSessionManager) defaultSecurityManager.getSessionManager();
-        assertThat( sessionManager.getSessionDAO(), instanceOf( EnterpriseCacheSessionDAO.class ) );
-
-        SecurityWebFilter shiroFilter = injector.getInstance( SecurityWebFilter.class );
-        assertThat( shiroFilter.getFilterChainResolver(), instanceOf( PathMatchingFilterChainResolver.class ) );
-
-        PathMatchingFilterChainResolver filterChainResolver =
-            (PathMatchingFilterChainResolver) shiroFilter.getFilterChainResolver();
-        assertThat( filterChainResolver.getFilterChainManager(), instanceOf( DefaultFilterChainManager.class ) );
-        assertThat( filterChainResolver, sameInstance( injector.getInstance( FilterChainResolver.class ) ) );
-
-        // now add a protected path
-        ProtectedPathManager protectedPathManager = injector.getInstance( ProtectedPathManager.class );
-        protectedPathManager.addProtectedResource( "/service/**", "foobar,perms[sample:priv-name]" );
-
-        NamedFilterList filterList = filterChainResolver.getFilterChainManager().getChain( "/service/**" );
-        assertThat( filterList.get( 0 ), instanceOf( SimpleAccessControlFilter.class ) );
-        assertThat( filterList.get( 1 ), instanceOf( HttpMethodPermissionFilter.class ) );
-
-        // test that injection of filters works
-        assertThat( ( (SimpleAccessControlFilter) filterList.get( 0 ) ).getSecurityXMLFilePath(),
-                    equalTo( "target/foo/security.xml" ) );
-    }
-
-    @After
-    public void stopCache()
+  protected AbstractModule getPropertiesModule() {
+    return new AbstractModule()
     {
-        if ( injector != null )
-        {
-            injector.getInstance( CacheManagerComponent.class ).shutdown();
-        }
+      @Override
+      protected void configure() {
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("security-xml-file", "target/foo/security.xml");
+        properties.put("application-conf", "target/plexus-home/conf");
+        binder().bind(ParameterKeys.PROPERTIES).toInstance(properties);
+      }
+    };
+  }
+
+  static class SimpleAccessControlFilter
+      extends BasicHttpAuthenticationFilter
+  {
+    @Inject
+    @Named("${security-xml-file}")
+    private String securityXMLFilePath;
+
+    public String getSecurityXMLFilePath() {
+      return securityXMLFilePath;
     }
-
-    private Module getWireModule()
-    {
-        return new WireModule( getShiroModule(), getSpaceModule(), getPropertiesModule() );
-    }
-
-    private Module getShiroModule()
-    {
-        return new SecurityWebModule( createMock( ServletContext.class ), true )
-        {
-            @Override
-            protected void configureShiroWeb()
-            {
-                super.configureShiroWeb();
-
-                SimpleAccessControlFilter foobar = new SimpleAccessControlFilter();
-                foobar.setApplicationName( "Foobar Application" );
-
-                bindNamedFilter( "foobar", foobar );
-                bindNamedFilter( "perms", new HttpMethodPermissionFilter() );
-            }
-        };
-    }
-
-    private Module getSpaceModule()
-    {
-        return new SpaceModule( new URLClassSpace( getClass().getClassLoader() ), BeanScanning.INDEX );
-    }
-
-    protected AbstractModule getPropertiesModule()
-    {
-        return new AbstractModule()
-        {
-            @Override
-            protected void configure()
-            {
-                Map<String, Object> properties = new HashMap<String, Object>();
-                properties.put( "security-xml-file", "target/foo/security.xml" );
-                properties.put( "application-conf", "target/plexus-home/conf" );
-                binder().bind( ParameterKeys.PROPERTIES ).toInstance( properties );
-            }
-        };
-    }
-
-    static class SimpleAccessControlFilter
-        extends BasicHttpAuthenticationFilter
-    {
-        @Inject
-        @Named( "${security-xml-file}" )
-        private String securityXMLFilePath;
-
-        public String getSecurityXMLFilePath()
-        {
-            return securityXMLFilePath;
-        }
-    }
+  }
 }

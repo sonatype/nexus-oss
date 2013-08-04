@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.email;
 
 import org.sonatype.micromailer.Address;
@@ -21,77 +22,70 @@ import org.sonatype.nexus.configuration.Configurable;
 /**
  * Simple service interface to expose the properly configured MicroMailer and also some helper methods for creating and
  * sending emails. This component will also keep EMailer configuration in sync with Nexus.
- * 
+ *
  * @author cstamas
  */
 public interface NexusEmailer
     extends Configurable
 {
-    /**
-     * Gets the preconfigured EMailer instance for prepared for using it.
-     * 
-     * @return
-     */
-    EMailer getEMailer();
+  /**
+   * Gets the preconfigured EMailer instance for prepared for using it.
+   */
+  EMailer getEMailer();
 
-    /**
-     * Returns the system-wide default mail type used as default mailType for outgoing mails.
-     * 
-     * @return
-     */
-    String getDefaultMailTypeId();
+  /**
+   * Returns the system-wide default mail type used as default mailType for outgoing mails.
+   */
+  String getDefaultMailTypeId();
 
-    /**
-     * Returns a prepopulated MailRequest. The request only needs to set the To, CC, Bcc (or override any of the
-     * defaulted values) and send it.
-     * 
-     * @param subject the string used for subject. May be Velocity template, but the API consumer should take care to
-     *            populate the request context then.
-     * @param body the string used for body. May be Velocity template, but the API consumer should take care to populate
-     *            the request context then.
-     * @return
-     */
-    MailRequest getDefaultMailRequest( String subject, String body );
+  /**
+   * Returns a prepopulated MailRequest. The request only needs to set the To, CC, Bcc (or override any of the
+   * defaulted values) and send it.
+   *
+   * @param subject the string used for subject. May be Velocity template, but the API consumer should take care to
+   *                populate the request context then.
+   * @param body    the string used for body. May be Velocity template, but the API consumer should take care to
+   *                populate
+   *                the request context then.
+   */
+  MailRequest getDefaultMailRequest(String subject, String body);
 
-    /**
-     * A shortcut method.
-     * 
-     * @param request
-     * @return
-     */
-    MailRequestStatus sendMail( MailRequest request );
+  /**
+   * A shortcut method.
+   */
+  MailRequestStatus sendMail(MailRequest request);
 
-    // ==
+  // ==
 
-    String getSMTPHostname();
+  String getSMTPHostname();
 
-    void setSMTPHostname( String host );
+  void setSMTPHostname(String host);
 
-    int getSMTPPort();
+  int getSMTPPort();
 
-    void setSMTPPort( int port );
+  void setSMTPPort(int port);
 
-    boolean isSMTPSslEnabled();
+  boolean isSMTPSslEnabled();
 
-    void setSMTPSslEnabled( boolean val );
+  void setSMTPSslEnabled(boolean val);
 
-    boolean isSMTPTlsEnabled();
+  boolean isSMTPTlsEnabled();
 
-    void setSMTPTlsEnabled( boolean val );
+  void setSMTPTlsEnabled(boolean val);
 
-    String getSMTPUsername();
+  String getSMTPUsername();
 
-    void setSMTPUsername( String username );
+  void setSMTPUsername(String username);
 
-    String getSMTPPassword();
+  String getSMTPPassword();
 
-    void setSMTPPassword( String password );
+  void setSMTPPassword(String password);
 
-    Address getSMTPSystemEmailAddress();
+  Address getSMTPSystemEmailAddress();
 
-    void setSMTPSystemEmailAddress( Address adr );
+  void setSMTPSystemEmailAddress(Address adr);
 
-    boolean isSMTPDebug();
+  boolean isSMTPDebug();
 
-    void setSMTPDebug( boolean val );
+  void setSMTPDebug(boolean val);
 }

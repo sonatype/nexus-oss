@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
 
 import java.util.ArrayList;
@@ -19,30 +20,28 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 
 /**
- * An event fired on configuration prepare save, when configurable components should prepare configs for save. This is a
+ * An event fired on configuration prepare save, when configurable components should prepare configs for save. This is
+ * a
  * VetoableEvent, so, save may be vetoed.
- * 
+ *
  * @author cstamas
  */
 public class ConfigurationPrepareForSaveEvent
     extends AbstractVetoableEvent<ApplicationConfiguration>
 {
-    private final Collection<Configurable> changes;
+  private final Collection<Configurable> changes;
 
-    public ConfigurationPrepareForSaveEvent( ApplicationConfiguration configuration )
-    {
-        super( configuration );
+  public ConfigurationPrepareForSaveEvent(ApplicationConfiguration configuration) {
+    super(configuration);
 
-        this.changes = new ArrayList<Configurable>();
-    }
+    this.changes = new ArrayList<Configurable>();
+  }
 
-    public ApplicationConfiguration getConfiguration()
-    {
-        return getEventSender();
-    }
+  public ApplicationConfiguration getConfiguration() {
+    return getEventSender();
+  }
 
-    public Collection<Configurable> getChanges()
-    {
-        return changes;
-    }
+  public Collection<Configurable> getChanges() {
+    return changes;
+  }
 }

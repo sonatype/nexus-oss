@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -30,55 +31,51 @@ import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
  *
  * @since 2.5
  */
-public abstract class AbstractFileDeletingWalkerProcessor extends AbstractWalkerProcessor
+public abstract class AbstractFileDeletingWalkerProcessor
+    extends AbstractWalkerProcessor
 {
 
-    /**
-     * Inspect the given collection and delete it from the repository if it no longer has any files.
-     */
-    protected void removeDirectoryIfEmpty( MavenRepository repository, StorageCollectionItem coll )
-        throws StorageException, IllegalOperationException, UnsupportedStorageOperationException
-    {
-        try
-        {
-            if ( repository.list( false, coll ).size() > 0 )
-            {
-                return;
-            }
-            // directory is empty, never move to trash
-            repository.deleteItem( false, createResourceStoreRequest( coll, DeleteOperation.DELETE_PERMANENTLY ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // silent, this happens if whole GAV is removed and the dir is removed too
-        }
+  /**
+   * Inspect the given collection and delete it from the repository if it no longer has any files.
+   */
+  protected void removeDirectoryIfEmpty(MavenRepository repository, StorageCollectionItem coll)
+      throws StorageException, IllegalOperationException, UnsupportedStorageOperationException
+  {
+    try {
+      if (repository.list(false, coll).size() > 0) {
+        return;
+      }
+      // directory is empty, never move to trash
+      repository.deleteItem(false, createResourceStoreRequest(coll, DeleteOperation.DELETE_PERMANENTLY));
+    }
+    catch (ItemNotFoundException e) {
+      // silent, this happens if whole GAV is removed and the dir is removed too
+    }
+  }
+
+  /**
+   * Create a request to delete an item.
+   */
+  protected ResourceStoreRequest createResourceStoreRequest(final StorageItem item, final WalkerContext ctx) {
+    ResourceStoreRequest request = new ResourceStoreRequest(item);
+
+    if (ctx.getContext().containsKey(DeleteOperation.DELETE_OPERATION_CTX_KEY)) {
+      request.getRequestContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY,
+          ctx.getContext().get(DeleteOperation.DELETE_OPERATION_CTX_KEY));
     }
 
-    /**
-     * Create a request to delete an item.
-     */
-    protected ResourceStoreRequest createResourceStoreRequest( final StorageItem item, final WalkerContext ctx )
-    {
-        ResourceStoreRequest request = new ResourceStoreRequest( item );
+    return request;
+  }
 
-        if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
-        {
-            request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY,
-                                             ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY ) );
-        }
-
-        return request;
-    }
-
-    /**
-     * Create a request to delete an item with the specified DeleteOperation.
-     */
-    protected ResourceStoreRequest createResourceStoreRequest( final StorageCollectionItem item,
-                                                             final DeleteOperation operation )
-    {
-        ResourceStoreRequest request = new ResourceStoreRequest( item );
-        request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
-        return request;
-    }
+  /**
+   * Create a request to delete an item with the specified DeleteOperation.
+   */
+  protected ResourceStoreRequest createResourceStoreRequest(final StorageCollectionItem item,
+                                                            final DeleteOperation operation)
+  {
+    ResourceStoreRequest request = new ResourceStoreRequest(item);
+    request.getRequestContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY, operation);
+    return request;
+  }
 
 }

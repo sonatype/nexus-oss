@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.p2.client.internal;
 
-import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.JerseyGroupRepository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.repository.p2.client.P2CompositeGroupRepository;
@@ -26,27 +26,25 @@ public class JerseyP2CompositeGroupRepository
     implements P2CompositeGroupRepository
 {
 
-    static final String PROVIDER = "p2-composite";
+  static final String PROVIDER = "p2-composite";
 
-    public JerseyP2CompositeGroupRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyP2CompositeGroupRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyP2CompositeGroupRepository( final JerseyNexusClient nexusClient,
-                                             final RepositoryGroupResource resource )
-    {
-        super( nexusClient, resource );
-    }
+  public JerseyP2CompositeGroupRepository(final JerseyNexusClient nexusClient,
+                                          final RepositoryGroupResource resource)
+  {
+    super(nexusClient, resource);
+  }
 
-    @Override
-    protected RepositoryGroupResource createSettings()
-    {
-        final RepositoryGroupResource settings = super.createSettings();
+  @Override
+  protected RepositoryGroupResource createSettings() {
+    final RepositoryGroupResource settings = super.createSettings();
 
-        settings.setProvider( JerseyP2CompositeGroupRepository.PROVIDER );
+    settings.setProvider(JerseyP2CompositeGroupRepository.PROVIDER);
 
-        return settings;
-    }
+    return settings;
+  }
 
 }

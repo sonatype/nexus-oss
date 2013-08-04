@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.tools;
 
 /**
@@ -18,14 +19,14 @@ package org.sonatype.security.realms.tools;
  * to the ConfigurationManager to complete. These actions provide a way for users to use the ConfigurationManager
  * in a thread-safe manner. Must be used in conjunction with an implementation of ConfigurationManager that supports
  * the runRead and runWrite methods
- * 
+ *
  * @author Steve Carlucci
  * @since 3.1
  */
 public interface ConfigurationManagerAction
 {
-    /**
-     * Run the action
-     */
-    void run() throws Exception;
+  /**
+   * Run the action
+   */
+  void run() throws Exception;
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.IOException;
@@ -23,21 +24,21 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 public interface NexusWritablePluginRepository
     extends NexusPluginRepository
 {
-    /**
-     * Downloads and installs the given Nexus plugin into the writable repository.
-     * 
-     * @param bundle The plugin resource bundle
-     * @return {@code true} if the plugin installed successfully; otherwise {@code false}
-     */
-    boolean installPluginBundle( URL bundle )
-        throws IOException;
+  /**
+   * Downloads and installs the given Nexus plugin into the writable repository.
+   *
+   * @param bundle The plugin resource bundle
+   * @return {@code true} if the plugin installed successfully; otherwise {@code false}
+   */
+  boolean installPluginBundle(URL bundle)
+      throws IOException;
 
-    /**
-     * Deletes the given Nexus plugin from the writable repository.
-     * 
-     * @param gav The plugin coordinates
-     * @return {@code true} if the plugin was successfully deleted; otherwise {@code false}
-     */
-    boolean deletePluginBundle( GAVCoordinate gav )
-        throws IOException;
+  /**
+   * Deletes the given Nexus plugin from the writable repository.
+   *
+   * @param gav The plugin coordinates
+   * @return {@code true} if the plugin was successfully deleted; otherwise {@code false}
+   */
+  boolean deletePluginBundle(GAVCoordinate gav)
+      throws IOException;
 }

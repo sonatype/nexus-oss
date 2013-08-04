@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage;
 
 /**
@@ -20,17 +21,18 @@ public class UnsupportedStorageOperationException
     extends Exception
 {
 
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = -335469508640167504L;
+  /**
+   * The Constant serialVersionUID.
+   */
+  private static final long serialVersionUID = -335469508640167504L;
 
-    /**
-     * Instantiates a new unsupported storage operation exception.
-     * 
-     * @param message the message
-     */
-    public UnsupportedStorageOperationException( String message )
-    {
-        super( message );
-    }
+  /**
+   * Instantiates a new unsupported storage operation exception.
+   *
+   * @param message the message
+   */
+  public UnsupportedStorageOperationException(String message) {
+    super(message);
+  }
 
 }

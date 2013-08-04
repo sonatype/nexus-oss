@@ -10,36 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.log.internal;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.plexus.appevents.Event;
 
-@Component( role = EventInspector.class, hint = "LogbackReconfigureEventInspector" )
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
+@Component(role = EventInspector.class, hint = "LogbackReconfigureEventInspector")
 public class LogbackReconfigureEventInspector
     extends AbstractEventInspector
 {
 
-    @Requirement
-    private LogManager logManager;
+  @Requirement
+  private LogManager logManager;
 
-    public boolean accepts( Event<?> evt )
-    {
-        return evt instanceof NexusInitializedEvent;
+  public boolean accepts(Event<?> evt) {
+    return evt instanceof NexusInitializedEvent;
+  }
+
+  public void inspect(Event<?> evt) {
+    if (!accepts(evt)) {
+      return;
     }
 
-    public void inspect( Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
-
-        logManager.configure();
-    }
+    logManager.configure();
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -18,14 +19,13 @@ import org.sonatype.nexus.proxy.repository.Repository;
 /**
  * The base event fired on item deletions. See {@link RepositoryItemEventDeleteRoot} and
  * {@link RepositoryItemEventDeleteRecursively} for actual events being fired.
- * 
+ *
  * @author cstamas
  */
 public abstract class RepositoryItemEventDelete
     extends RepositoryItemEvent
 {
-    public RepositoryItemEventDelete( final Repository repository, final StorageItem item )
-    {
-        super( repository, item );
-    }
+  public RepositoryItemEventDelete(final Repository repository, final StorageItem item) {
+    super(repository, item);
+  }
 }

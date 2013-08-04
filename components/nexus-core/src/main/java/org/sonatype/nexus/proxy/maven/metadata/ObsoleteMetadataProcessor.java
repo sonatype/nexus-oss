@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.IOException;
@@ -18,38 +19,35 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 
 /**
  * Used to remove metadata files
- * 
+ *
  * @author juven
  */
 public class ObsoleteMetadataProcessor
     extends AbstractMetadataProcessor
 {
 
-    public ObsoleteMetadataProcessor( AbstractMetadataHelper metadataHelper )
-    {
-        super( metadataHelper );
-    }
+  public ObsoleteMetadataProcessor(AbstractMetadataHelper metadataHelper) {
+    super(metadataHelper);
+  }
 
-    /**
-     * always return false, so the metadata will be removed
-     */
-    @Override
-    protected boolean isMetadataCorrect( Metadata oldMd, String path )
-        throws IOException
-    {
-        return false;
-    }
+  /**
+   * always return false, so the metadata will be removed
+   */
+  @Override
+  protected boolean isMetadataCorrect(Metadata oldMd, String path)
+      throws IOException
+  {
+    return false;
+  }
 
-    @Override
-    public void postProcessMetadata( String path )
-    {
-        // do nothing
-    }
+  @Override
+  public void postProcessMetadata(String path) {
+    // do nothing
+  }
 
-    @Override
-    protected boolean shouldProcessMetadata( String path )
-    {
-        return true;
-    }
+  @Override
+  protected boolean shouldProcessMetadata(String path) {
+    return true;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.model.source;
 
 import java.io.IOException;
@@ -22,17 +23,17 @@ import org.sonatype.security.model.Configuration;
  * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also
  * stores one instance of Configuration object maintained thru life of the application. This component is also able to
  * persist security config.
- * 
+ *
  * @author cstamas
  */
 public interface SecurityModelConfigurationSource
     extends ConfigurationSource<Configuration>
 {
 
-    InputStream getConfigurationAsStream()
-        throws IOException;
+  InputStream getConfigurationAsStream()
+      throws IOException;
 
-    void backupConfiguration()
-        throws IOException;
+  void backupConfiguration()
+      throws IOException;
 
 }

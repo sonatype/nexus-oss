@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest;
 
 import org.restlet.Context;
@@ -20,30 +21,26 @@ import org.restlet.data.Status;
 
 /**
  * A simple restlet that is returned as root, while allowing to recreate roots in applications per application request.
- * 
+ *
  * @author cstamas
  */
 public class RetargetableRestlet
     extends Filter
 {
-    public RetargetableRestlet( Context context )
-    {
-        super( context );
+  public RetargetableRestlet(Context context) {
+    super(context);
+  }
+
+  @Override
+  protected int doHandle(Request request, Response response) {
+    if (getNext() != null) {
+      return super.doHandle(request, response);
+    }
+    else {
+      response.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+
+      return CONTINUE;
     }
 
-    @Override
-    protected int doHandle( Request request, Response response )
-    {
-        if ( getNext() != null )
-        {
-            return super.doHandle( request, response );
-        }
-        else
-        {
-            response.setStatus( Status.CLIENT_ERROR_NOT_FOUND );
-
-            return CONTINUE;
-        }
-
-    }
+  }
 }

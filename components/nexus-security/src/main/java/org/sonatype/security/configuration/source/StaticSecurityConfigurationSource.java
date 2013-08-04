@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.configuration.source;
 
 import java.io.IOException;
@@ -25,61 +26,58 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 /**
  * A special "static" configuration source, that always return a factory provided defaults for Security configuration.
  * It is unmodifiable, since it actually reads the bundled config file from the module's JAR.
- * 
+ *
  * @author cstamas
  */
 @Singleton
-@Typed( SecurityConfigurationSource.class )
-@Named( "static" )
+@Typed(SecurityConfigurationSource.class)
+@Named("static")
 public class StaticSecurityConfigurationSource
     extends AbstractSecurityConfigurationSource
 {
 
-    private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security-configuration.xml";
+  private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security-configuration.xml";
 
-    /**
-     * Gets the configuration using getResourceAsStream from "/META-INF/security/security-configuration.xml".
-     */
-    public InputStream getConfigurationAsStream()
-        throws IOException
-    {
-        return getClass().getResourceAsStream( STATIC_SECURITY_RESOURCE );
+  /**
+   * Gets the configuration using getResourceAsStream from "/META-INF/security/security-configuration.xml".
+   */
+  public InputStream getConfigurationAsStream()
+      throws IOException
+  {
+    return getClass().getResourceAsStream(STATIC_SECURITY_RESOURCE);
+  }
+
+  public SecurityConfiguration loadConfiguration()
+      throws ConfigurationException, IOException
+  {
+    if (getClass().getResource(STATIC_SECURITY_RESOURCE) != null) {
+      loadConfiguration(getConfigurationAsStream());
+    }
+    else {
+      this.getLogger().warn("Default static security configuration not found in classpath: "
+          + STATIC_SECURITY_RESOURCE);
     }
 
-    public SecurityConfiguration loadConfiguration()
-        throws ConfigurationException, IOException
-    {
-        if ( getClass().getResource( STATIC_SECURITY_RESOURCE ) != null )
-        {
-            loadConfiguration( getConfigurationAsStream() );
-        }
-        else
-        {
-            this.getLogger().warn( "Default static security configuration not found in classpath: "
-                                       + STATIC_SECURITY_RESOURCE );
-        }
+    SecurityConfiguration configuration = getConfiguration();
 
-        SecurityConfiguration configuration = getConfiguration();
+    return configuration;
+  }
 
-        return configuration;
-    }
+  /**
+   * This method will always throw UnsupportedOperationException, since SecurityDefaultsConfigurationSource is read
+   * only.
+   */
+  public void storeConfiguration()
+      throws IOException
+  {
+    throw new UnsupportedOperationException("The SecurityDefaultsConfigurationSource is static source!");
+  }
 
-    /**
-     * This method will always throw UnsupportedOperationException, since SecurityDefaultsConfigurationSource is read
-     * only.
-     */
-    public void storeConfiguration()
-        throws IOException
-    {
-        throw new UnsupportedOperationException( "The SecurityDefaultsConfigurationSource is static source!" );
-    }
-
-    /**
-     * Static configuration has no default source, hence it cannot be defalted. Always returns false.
-     */
-    public boolean isConfigurationDefaulted()
-    {
-        return false;
-    }
+  /**
+   * Static configuration has no default source, hence it cannot be defalted. Always returns false.
+   */
+  public boolean isConfigurationDefaulted() {
+    return false;
+  }
 
 }

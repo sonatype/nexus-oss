@@ -10,14 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
-import org.apache.http.client.methods.AbortableHttpRequest;
 import org.sonatype.nexus.util.WrappingInputStream;
+
+import org.apache.http.client.methods.AbortableHttpRequest;
 
 /**
  * Best-effort interruptable InputStream wrapper. The wrapper checks for Thread.isInterrupred before delegating to the
@@ -27,86 +29,82 @@ import org.sonatype.nexus.util.WrappingInputStream;
 class InterruptableInputStream
     extends WrappingInputStream
 {
-    private AbortableHttpRequest request;
+  private AbortableHttpRequest request;
 
-    public InterruptableInputStream( final AbortableHttpRequest request, final InputStream stream )
-    {
-        super(stream);
-        this.request = request;
-    }
+  public InterruptableInputStream(final AbortableHttpRequest request, final InputStream stream) {
+    super(stream);
+    this.request = request;
+  }
 
-    public InterruptableInputStream( final InputStream stream )
-    {
-        this( null, stream );
-    }
+  public InterruptableInputStream(final InputStream stream) {
+    this(null, stream);
+  }
 
-    private void abortIfInterrupted()
-        throws IOException
-    {
-        if ( Thread.interrupted() )
-        {
-            if ( request != null )
-            {
-                request.abort();
-            }
-            throw new InterruptedIOException();
-        }
+  private void abortIfInterrupted()
+      throws IOException
+  {
+    if (Thread.interrupted()) {
+      if (request != null) {
+        request.abort();
+      }
+      throw new InterruptedIOException();
     }
+  }
 
-    @Override
-    public int read()
-        throws IOException
-    {
-        abortIfInterrupted();
-        return super.read();
-    }
+  @Override
+  public int read()
+      throws IOException
+  {
+    abortIfInterrupted();
+    return super.read();
+  }
 
-    @Override
-    public int read( byte[] b )
-        throws IOException
-    {
-        abortIfInterrupted();
-        return super.read( b );
-    }
+  @Override
+  public int read(byte[] b)
+      throws IOException
+  {
+    abortIfInterrupted();
+    return super.read(b);
+  }
 
-    @Override
-    public int read( byte b[], int off, int len )
-        throws IOException
-    {
-        abortIfInterrupted();
-        return super.read( b, off, len );
-    }
+  @Override
+  public int read(byte b[], int off, int len)
+      throws IOException
+  {
+    abortIfInterrupted();
+    return super.read(b, off, len);
+  }
 
-    @Override
-    public long skip( long n )
-        throws IOException
-    {
-        abortIfInterrupted();
-        return super.skip( n );
-    }
+  @Override
+  public long skip(long n)
+      throws IOException
+  {
+    abortIfInterrupted();
+    return super.skip(n);
+  }
 
-    @Override
-    public int available()
-        throws IOException
-    {
-        abortIfInterrupted();
-        return super.available();
-    }
+  @Override
+  public int available()
+      throws IOException
+  {
+    abortIfInterrupted();
+    return super.available();
+  }
 
-    @Override
-    public void close()
-        throws IOException
-    {
-        // do not throw InterruptedIOException here!
-        // this will not close the stream and likely mask original exception!
-        super.close();
-    }
+  @Override
+  public void close()
+      throws IOException
+  {
+    // do not throw InterruptedIOException here!
+    // this will not close the stream and likely mask original exception!
+    super.close();
+  }
 
-    @Override
-    public synchronized void reset()
-        throws IOException
-    {
-        abortIfInterrupted();
-        super.reset();
-    }
+  @Override
+  public synchronized void reset()
+      throws IOException
+  {
+    abortIfInterrupted();
+    super.reset();
+  }
 }

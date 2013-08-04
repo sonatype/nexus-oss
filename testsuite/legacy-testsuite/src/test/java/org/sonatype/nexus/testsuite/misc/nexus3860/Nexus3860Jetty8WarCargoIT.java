@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.misc.nexus3860;
 
 import java.io.File;
@@ -17,15 +18,13 @@ import java.io.File;
 public class Nexus3860Jetty8WarCargoIT
     extends AbstractCargoIT
 {
-    @Override
-    public File getContainerLocation()
-    {
-        return util.resolveFile( "target/containers/jetty-distribution-8.1.1.v20120215" );
-    }
+  @Override
+  public File getContainerLocation() {
+    return util.resolveFile("target/containers/jetty-distribution-8.1.1.v20120215");
+  }
 
-    @Override
-    public String getContainer()
-    {
-        return "jetty8x";
-    }
+  @Override
+  public String getContainer() {
+    return "jetty8x";
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -19,20 +20,17 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 public class DefaultStoreWalkerFilter
     implements WalkerFilter
 {
-    public boolean shouldProcess( WalkerContext context, StorageItem item )
-    {
-        return !isHidden( context, item );
-    }
+  public boolean shouldProcess(WalkerContext context, StorageItem item) {
+    return !isHidden(context, item);
+  }
 
-    public boolean shouldProcessRecursively( WalkerContext context, StorageCollectionItem coll )
-    {
-        return !isHidden( context, coll );
-    }
+  public boolean shouldProcessRecursively(WalkerContext context, StorageCollectionItem coll) {
+    return !isHidden(context, coll);
+  }
 
-    // ==
+  // ==
 
-    protected boolean isHidden( WalkerContext context, StorageItem item )
-    {
-        return item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class );
-    }
+  protected boolean isHidden(WalkerContext context, StorageItem item) {
+    return item.getRepositoryItemUid().getBooleanAttributeValue(IsHiddenAttribute.class);
+  }
 }

@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.discovery;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.discovery;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,260 +20,232 @@ import java.util.List;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Carries the results of a discovery.
- * 
+ *
  * @author cstamas
  * @since 2.4
- * @param <R>
  */
 public class DiscoveryResult<R extends MavenRepository>
 {
+  /**
+   * The outcome of discovery of a single strategy.
+   */
+  public static interface Outcome
+  {
     /**
-     * The outcome of discovery of a single strategy.
+     * Returns the ID of the {@link RemoteStrategy} that this outcome belongs to.
+     *
+     * @return the strategy ID, never {@code null}.
      */
-    public static interface Outcome
-    {
-        /**
-         * Returns the ID of the {@link RemoteStrategy} that this outcome belongs to.
-         * 
-         * @return the strategy ID, never {@code null}.
-         */
-        String getStrategyId();
-
-        /**
-         * Returns {@code true} if this outcome is a successful one.
-         * 
-         * @return {@code true} if this outcome is a successful one.
-         */
-        boolean isSuccessful();
-
-        /**
-         * Message of the outcome, meant for {@link RemoteStrategy} to pass some strategy specific information.
-         * 
-         * @return the message of the outcome.
-         */
-        String getMessage();
-
-        /**
-         * Throwable associated with outcome, if any, of {@code null}.
-         * 
-         * @return throwable
-         */
-        Throwable getThrowable();
-    }
-
-    private static class OutcomeImpl
-        implements Outcome
-    {
-        private final String strategyId;
-
-        private final boolean successful;
-
-        private final String message;
-
-        private final Throwable throwable;
-
-        private OutcomeImpl( final String strategyId, final boolean successful, final String message,
-                             final Throwable throwable )
-        {
-            this.strategyId = checkNotNull( strategyId );
-            this.successful = successful;
-            this.message = checkNotNull( message );
-            this.throwable = throwable;
-        }
-
-        /**
-         * Returns the ID of the {@link RemoteStrategy} that this outcome belongs to.
-         * 
-         * @return the strategy ID, never {@code null}.
-         */
-        public String getStrategyId()
-        {
-            return strategyId;
-        }
-
-        /**
-         * Returns {@code true} if this outcome is a successful one.
-         * 
-         * @return {@code true} if this outcome is a successful one.
-         */
-        public boolean isSuccessful()
-        {
-            return successful;
-        }
-
-        /**
-         * Message of the outcome, meant for {@link RemoteStrategy} to pass some strategy specific information.
-         * 
-         * @return the message of the outcome.
-         */
-        public String getMessage()
-        {
-            return message;
-        }
-
-        /**
-         * Throwable belonging to outcome.
-         * 
-         * @return the Throwable if any.
-         */
-        public Throwable getThrowable()
-        {
-            return throwable;
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Outcome[strategyId=" + strategyId + ", successful=" + successful + ", message=" + message + "]";
-        }
-    }
-
-    private final R mavenRepository;
-
-    private final List<Outcome> outcomes;
-
-    private PrefixSource prefixSource;
+    String getStrategyId();
 
     /**
-     * Constructor.
-     * 
-     * @param mavenRepository the repository having been discovered.
+     * Returns {@code true} if this outcome is a successful one.
+     *
+     * @return {@code true} if this outcome is a successful one.
      */
-    public DiscoveryResult( final R mavenRepository )
+    boolean isSuccessful();
+
+    /**
+     * Message of the outcome, meant for {@link RemoteStrategy} to pass some strategy specific information.
+     *
+     * @return the message of the outcome.
+     */
+    String getMessage();
+
+    /**
+     * Throwable associated with outcome, if any, of {@code null}.
+     *
+     * @return throwable
+     */
+    Throwable getThrowable();
+  }
+
+  private static class OutcomeImpl
+      implements Outcome
+  {
+    private final String strategyId;
+
+    private final boolean successful;
+
+    private final String message;
+
+    private final Throwable throwable;
+
+    private OutcomeImpl(final String strategyId, final boolean successful, final String message,
+                        final Throwable throwable)
     {
-        this.mavenRepository = checkNotNull( mavenRepository );
-        this.outcomes = new ArrayList<Outcome>();
-        this.prefixSource = null;
+      this.strategyId = checkNotNull(strategyId);
+      this.successful = successful;
+      this.message = checkNotNull(message);
+      this.throwable = throwable;
     }
 
     /**
-     * Returns the repository being discovered.
-     * 
-     * @return the discovered repository.
+     * Returns the ID of the {@link RemoteStrategy} that this outcome belongs to.
+     *
+     * @return the strategy ID, never {@code null}.
      */
-    public R getMavenRepository()
-    {
-        return mavenRepository;
+    public String getStrategyId() {
+      return strategyId;
     }
 
     /**
-     * Returns {@code true} if discovery was successful.
-     * 
-     * @return {@code true} if discovery was successful.
+     * Returns {@code true} if this outcome is a successful one.
+     *
+     * @return {@code true} if this outcome is a successful one.
      */
-    public boolean isSuccessful()
-    {
-        return getLastSuccessOutcome() != null;
+    public boolean isSuccessful() {
+      return successful;
     }
 
     /**
-     * Returns the succeeded strategy instance.
-     * 
-     * @return strategy that succeeded.
+     * Message of the outcome, meant for {@link RemoteStrategy} to pass some strategy specific information.
+     *
+     * @return the message of the outcome.
      */
-    public Outcome getLastResult()
-    {
-        return getLastOutcome();
+    public String getMessage() {
+      return message;
     }
 
     /**
-     * Returns all the outcomes.
-     * 
-     * @return strategy that succeeded.
+     * Throwable belonging to outcome.
+     *
+     * @return the Throwable if any.
      */
-    public List<Outcome> getAllResults()
-    {
-        return Collections.unmodifiableList( outcomes );
+    public Throwable getThrowable() {
+      return throwable;
     }
 
-    /**
-     * Returns the {@link PrefixSource} that was provided by successful strategy.
-     * 
-     * @return entry source built by successful strategy.
-     */
-    public PrefixSource getPrefixSource()
-    {
-        return prefixSource;
+    @Override
+    public String toString() {
+      return "Outcome[strategyId=" + strategyId + ", successful=" + successful + ", message=" + message + "]";
     }
+  }
 
-    /**
-     * Records a success on behalf of a strategy, if this has not yet recorded a success, in which case this method will
-     * do nothing.
-     * 
-     * @param usedStrategyId
-     * @param message
-     * @param prefixSource
-     */
-    public void recordSuccess( final String usedStrategyId, final String message, final PrefixSource prefixSource )
-    {
-        if ( !isSuccessful() )
-        {
-            checkNotNull( usedStrategyId );
-            checkNotNull( message );
-            checkNotNull( prefixSource );
-            final OutcomeImpl success = new OutcomeImpl( usedStrategyId, true, message, null );
-            this.outcomes.add( success );
-            this.prefixSource = prefixSource;
-        }
+  private final R mavenRepository;
+
+  private final List<Outcome> outcomes;
+
+  private PrefixSource prefixSource;
+
+  /**
+   * Constructor.
+   *
+   * @param mavenRepository the repository having been discovered.
+   */
+  public DiscoveryResult(final R mavenRepository) {
+    this.mavenRepository = checkNotNull(mavenRepository);
+    this.outcomes = new ArrayList<Outcome>();
+    this.prefixSource = null;
+  }
+
+  /**
+   * Returns the repository being discovered.
+   *
+   * @return the discovered repository.
+   */
+  public R getMavenRepository() {
+    return mavenRepository;
+  }
+
+  /**
+   * Returns {@code true} if discovery was successful.
+   *
+   * @return {@code true} if discovery was successful.
+   */
+  public boolean isSuccessful() {
+    return getLastSuccessOutcome() != null;
+  }
+
+  /**
+   * Returns the succeeded strategy instance.
+   *
+   * @return strategy that succeeded.
+   */
+  public Outcome getLastResult() {
+    return getLastOutcome();
+  }
+
+  /**
+   * Returns all the outcomes.
+   *
+   * @return strategy that succeeded.
+   */
+  public List<Outcome> getAllResults() {
+    return Collections.unmodifiableList(outcomes);
+  }
+
+  /**
+   * Returns the {@link PrefixSource} that was provided by successful strategy.
+   *
+   * @return entry source built by successful strategy.
+   */
+  public PrefixSource getPrefixSource() {
+    return prefixSource;
+  }
+
+  /**
+   * Records a success on behalf of a strategy, if this has not yet recorded a success, in which case this method
+   * will
+   * do nothing.
+   */
+  public void recordSuccess(final String usedStrategyId, final String message, final PrefixSource prefixSource) {
+    if (!isSuccessful()) {
+      checkNotNull(usedStrategyId);
+      checkNotNull(message);
+      checkNotNull(prefixSource);
+      final OutcomeImpl success = new OutcomeImpl(usedStrategyId, true, message, null);
+      this.outcomes.add(success);
+      this.prefixSource = prefixSource;
     }
+  }
 
-    /**
-     * Records a failure on behalf of a strategy, if this has not yet recorded a success, in which case this method will
-     * do nothing. A failure simply means "this strategy failed to get remote prefix list".
-     * 
-     * @param usedStrategyId
-     * @param message
-     */
-    public void recordFailure( final String usedStrategyId, final String message )
-    {
-        if ( !isSuccessful() )
-        {
-            checkNotNull( usedStrategyId );
-            checkNotNull( message );
-            final OutcomeImpl failure = new OutcomeImpl( usedStrategyId, false, message, null );
-            this.outcomes.add( failure );
-        }
+  /**
+   * Records a failure on behalf of a strategy, if this has not yet recorded a success, in which case this method
+   * will
+   * do nothing. A failure simply means "this strategy failed to get remote prefix list".
+   */
+  public void recordFailure(final String usedStrategyId, final String message) {
+    if (!isSuccessful()) {
+      checkNotNull(usedStrategyId);
+      checkNotNull(message);
+      final OutcomeImpl failure = new OutcomeImpl(usedStrategyId, false, message, null);
+      this.outcomes.add(failure);
     }
+  }
 
-    /**
-     * Records an error on behalf of a strategy, if this has not yet recorded a success, in which case this method will
-     * do nothing.
-     * 
-     * @param usedStrategyId
-     * @param errorCause
-     */
-    public void recordError( final String usedStrategyId, final Throwable errorCause )
-    {
-        if ( !isSuccessful() )
-        {
-            checkNotNull( usedStrategyId );
-            checkNotNull( errorCause );
-            final OutcomeImpl failure = new OutcomeImpl( usedStrategyId, false, errorCause.getMessage(), errorCause );
-            this.outcomes.add( failure );
-        }
+  /**
+   * Records an error on behalf of a strategy, if this has not yet recorded a success, in which case this method will
+   * do nothing.
+   */
+  public void recordError(final String usedStrategyId, final Throwable errorCause) {
+    if (!isSuccessful()) {
+      checkNotNull(usedStrategyId);
+      checkNotNull(errorCause);
+      final OutcomeImpl failure = new OutcomeImpl(usedStrategyId, false, errorCause.getMessage(), errorCause);
+      this.outcomes.add(failure);
     }
+  }
 
-    // ==
+  // ==
 
-    protected Outcome getLastOutcome()
-    {
-        if ( outcomes.size() > 0 )
-        {
-            final Outcome outcome = outcomes.get( outcomes.size() - 1 );
-            return outcome;
-        }
-        return null;
+  protected Outcome getLastOutcome() {
+    if (outcomes.size() > 0) {
+      final Outcome outcome = outcomes.get(outcomes.size() - 1);
+      return outcome;
     }
+    return null;
+  }
 
-    protected Outcome getLastSuccessOutcome()
-    {
-        final Outcome outcome = getLastOutcome();
-        if ( outcome != null && outcome.isSuccessful() )
-        {
-            return outcome;
-        }
-        return null;
+  protected Outcome getLastSuccessOutcome() {
+    final Outcome outcome = getLastOutcome();
+    if (outcome != null && outcome.isSuccessful()) {
+      return outcome;
     }
+    return null;
+  }
 }

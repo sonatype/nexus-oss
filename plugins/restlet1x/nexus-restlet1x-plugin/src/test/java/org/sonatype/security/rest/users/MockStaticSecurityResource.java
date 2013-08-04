@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.rest.users;
 
 import javax.enterprise.inject.Typed;
@@ -20,14 +21,13 @@ import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 @Singleton
-@Typed( StaticSecurityResource.class )
-@Named( "MockStaticSecurityResource" )
+@Typed(StaticSecurityResource.class)
+@Named("MockStaticSecurityResource")
 public class MockStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    protected String getResourcePath()
-    {
-        return "/META-INF/security/static-security-mock.xml";
-    }
+  protected String getResourcePath() {
+    return "/META-INF/security/static-security-mock.xml";
+  }
 }

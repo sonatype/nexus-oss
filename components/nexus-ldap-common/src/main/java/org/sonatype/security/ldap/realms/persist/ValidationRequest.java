@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.persist;
 
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
@@ -17,30 +18,27 @@ import org.sonatype.security.ldap.realms.persist.model.Configuration;
 
 /**
  * A request for validation, holding the configuration.
- * 
+ *
  * @author cstamas
  */
 public class ValidationRequest
 {
-    /**
-     * The configuration to validate.
-     */
-    private Configuration configuration;
+  /**
+   * The configuration to validate.
+   */
+  private Configuration configuration;
 
-    public ValidationRequest( Configuration configuration )
-    {
-        super();
+  public ValidationRequest(Configuration configuration) {
+    super();
 
-        this.configuration = configuration;
-    }
+    this.configuration = configuration;
+  }
 
-    public Configuration getConfiguration()
-    {
-        return configuration;
-    }
+  public Configuration getConfiguration() {
+    return configuration;
+  }
 
-    public void setConfiguration( Configuration configuration )
-    {
-        this.configuration = configuration;
-    }
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
+  }
 }

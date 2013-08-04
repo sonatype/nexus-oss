@@ -10,57 +10,50 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.templates;
 
 public abstract class AbstractTemplate
     implements Template
 {
-    private final TemplateProvider provider;
+  private final TemplateProvider provider;
 
-    private final String id;
+  private final String id;
 
-    private final String description;
+  private final String description;
 
-    public AbstractTemplate( TemplateProvider provider, String id, String description )
-    {
-        this.provider = provider;
+  public AbstractTemplate(TemplateProvider provider, String id, String description) {
+    this.provider = provider;
 
-        this.id = id;
+    this.id = id;
 
-        this.description = description;
+    this.description = description;
+  }
+
+  public TemplateProvider getTemplateProvider() {
+    return provider;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public boolean targetFits(Object clazz) {
+    return targetIsClassAndFitsClass(clazz, getClass());
+  }
+
+  // ==
+
+  protected boolean targetIsClassAndFitsClass(Object filter, Class<?> clazz) {
+    if (filter instanceof Class<?>) {
+      return ((Class<?>) filter).isAssignableFrom(clazz);
     }
-
-    public TemplateProvider getTemplateProvider()
-    {
-        return provider;
+    else {
+      return false;
     }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public boolean targetFits( Object clazz )
-    {
-        return targetIsClassAndFitsClass( clazz, getClass() );
-    }
-
-    // ==
-
-    protected boolean targetIsClassAndFitsClass( Object filter, Class<?> clazz )
-    {
-        if ( filter instanceof Class<?> )
-        {
-            return ( (Class<?>) filter ).isAssignableFrom( clazz );
-        }
-        else
-        {
-            return false;
-        }
-    }
+  }
 }

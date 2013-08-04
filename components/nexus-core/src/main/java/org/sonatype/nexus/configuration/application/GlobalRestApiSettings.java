@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.nexus.configuration.Configurable;
@@ -17,19 +18,19 @@ import org.sonatype.nexus.configuration.Configurable;
 public interface GlobalRestApiSettings
     extends Configurable
 {
-    void disable();
+  void disable();
 
-    boolean isEnabled();
+  boolean isEnabled();
 
-    void setForceBaseUrl( boolean forceBaseUrl );
+  void setForceBaseUrl(boolean forceBaseUrl);
 
-    boolean isForceBaseUrl();
+  boolean isForceBaseUrl();
 
-    void setBaseUrl( String baseUrl );
+  void setBaseUrl(String baseUrl);
 
-    String getBaseUrl();
+  String getBaseUrl();
 
-    void setUITimeout( int uiTimeout );
+  void setUITimeout(int uiTimeout);
 
-    int getUITimeout();
+  int getUITimeout();
 }

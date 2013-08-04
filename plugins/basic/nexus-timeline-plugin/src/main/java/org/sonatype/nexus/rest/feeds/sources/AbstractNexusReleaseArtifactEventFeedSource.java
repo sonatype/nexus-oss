@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Collection;
@@ -17,42 +18,38 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import org.codehaus.plexus.component.annotations.Requirement;
+
 public abstract class AbstractNexusReleaseArtifactEventFeedSource
     extends AbstractNexusItemEventFeedSource
 {
-    @Requirement( hint = "artifact" )
-    private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
+  @Requirement(hint = "artifact")
+  private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
 
-    @Override
-    public SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder( NexusArtifactEvent event )
-    {
-        return entryBuilder;
-    }
+  @Override
+  public SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder(NexusArtifactEvent event) {
+    return entryBuilder;
+  }
 
-    protected Set<String> getRepoIdsFromParams( Map<String, String> params )
-    {
-        Set<String> result = new HashSet<String>();
+  protected Set<String> getRepoIdsFromParams(Map<String, String> params) {
+    Set<String> result = new HashSet<String>();
 
-        Collection<Repository> repos = getRepositoryRegistry().getRepositories();
+    Collection<Repository> repos = getRepositoryRegistry().getRepositories();
 
-        for ( Repository repo : repos )
-        {
-            // huh? release as policy exists for MavenRepository only?
-            if ( repo.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
-            {
-                if ( RepositoryPolicy.RELEASE.equals( repo.adaptToFacet( MavenRepository.class ).getRepositoryPolicy() ) )
-                {
-                    result.add( repo.getId() );
-                }
-            }
+    for (Repository repo : repos) {
+      // huh? release as policy exists for MavenRepository only?
+      if (repo.getRepositoryKind().isFacetAvailable(MavenRepository.class)) {
+        if (RepositoryPolicy.RELEASE.equals(repo.adaptToFacet(MavenRepository.class).getRepositoryPolicy())) {
+          result.add(repo.getId());
         }
-
-        return result;
+      }
     }
+
+    return result;
+  }
 }

@@ -10,22 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.upgrade.cipher;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-@Component( role = PlexusCipher.class, hint = "test" )
+@Component(role = PlexusCipher.class, hint = "test")
 public class TestPlexusCipher
     extends DefaultPlexusCipher
 {
 
-    public String getAlgorithm()
-    {
-        return super.algorithm;
-    }
+  public String getAlgorithm() {
+    return super.algorithm;
+  }
 
-    public int getIterationCount()
-    {
-        return super.iterationCount;
-    }
+  public int getIterationCount() {
+    return super.iterationCount;
+  }
 }

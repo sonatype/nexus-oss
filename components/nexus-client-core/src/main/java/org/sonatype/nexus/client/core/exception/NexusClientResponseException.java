@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.exception;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -17,48 +18,45 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @since 2.3
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class NexusClientResponseException
     extends NexusClientException
 {
 
-    private final int responseCode;
+  private final int responseCode;
 
-    private final String reasonPhrase;
+  private final String reasonPhrase;
 
-    private final String responseBody;
+  private final String responseBody;
 
-    public NexusClientResponseException( final int responseCode,
-                                         final String reasonPhrase,
-                                         final String responseBody )
-    {
-        this( null, responseCode, reasonPhrase, responseBody );
-    }
+  public NexusClientResponseException(final int responseCode,
+                                      final String reasonPhrase,
+                                      final String responseBody)
+  {
+    this(null, responseCode, reasonPhrase, responseBody);
+  }
 
-    public NexusClientResponseException( final String message,
-                                         final int responseCode,
-                                         final String reasonPhrase,
-                                         final String responseBody )
-    {
-        super( message == null ? String.format( "%s - %s", responseCode, reasonPhrase ) : message );
-        this.responseCode = responseCode;
-        this.reasonPhrase = checkNotNull( reasonPhrase );
-        this.responseBody = checkNotNull( responseBody );
-    }
+  public NexusClientResponseException(final String message,
+                                      final int responseCode,
+                                      final String reasonPhrase,
+                                      final String responseBody)
+  {
+    super(message == null ? String.format("%s - %s", responseCode, reasonPhrase) : message);
+    this.responseCode = responseCode;
+    this.reasonPhrase = checkNotNull(reasonPhrase);
+    this.responseBody = checkNotNull(responseBody);
+  }
 
-    public int getResponseCode()
-    {
-        return responseCode;
-    }
+  public int getResponseCode() {
+    return responseCode;
+  }
 
-    public String getReasonPhrase()
-    {
-        return reasonPhrase;
-    }
+  public String getReasonPhrase() {
+    return reasonPhrase;
+  }
 
-    public String getResponseBody()
-    {
-        return responseBody;
-    }
+  public String getResponseBody() {
+    return responseBody;
+  }
 
 }

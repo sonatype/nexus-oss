@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rrb;
 
 import javax.inject.Named;
@@ -23,16 +24,14 @@ public class RRBDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
 
-    @Override
-    public String getPluginId()
-    {
-        return "nexus-rrb-plugin";
-    }
+  @Override
+  public String getPluginId() {
+    return "nexus-rrb-plugin";
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "RRB Plugin API";
-    }
+  @Override
+  public String getDescription() {
+    return "RRB Plugin API";
+  }
 
 }

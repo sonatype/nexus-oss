@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 import java.util.HashMap;
@@ -21,43 +22,38 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSchedulerTask<T>
     implements SchedulerTask<T>
 {
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+  protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<String, String> parameters;
+  private Map<String, String> parameters;
 
-    public void addParameter( String key, String value )
-    {
-        getParameters().put( key, value );
+  public void addParameter(String key, String value) {
+    getParameters().put(key, value);
+  }
+
+  public String getParameter(String key) {
+    return getParameters().get(key);
+  }
+
+  public synchronized Map<String, String> getParameters() {
+    if (parameters == null) {
+      parameters = new HashMap<String, String>();
     }
 
-    public String getParameter( String key )
-    {
-        return getParameters().get( key );
-    }
+    return parameters;
+  }
 
-    public synchronized Map<String, String> getParameters()
-    {
-        if ( parameters == null )
-        {
-            parameters = new HashMap<String, String>();
-        }
+  public abstract T call()
+      throws Exception;
 
-        return parameters;
-    }
+  // ==
 
-    public abstract T call()
-        throws Exception;
+  protected Logger getLogger() {
+    return logger;
+  }
 
-    // ==
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
-    protected void checkInterruption()
-        throws TaskInterruptedException
-    {
-        TaskUtil.checkInterruption();
-    }
+  protected void checkInterruption()
+      throws TaskInterruptedException
+  {
+    TaskUtil.checkInterruption();
+  }
 }

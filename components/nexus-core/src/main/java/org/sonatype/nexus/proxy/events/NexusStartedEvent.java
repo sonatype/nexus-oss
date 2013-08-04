@@ -10,18 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 /**
  * The event that is occured when nexus has started (fired as last step of boot process, everything is in place).
- * 
+ *
  * @author cstamas
  */
 public class NexusStartedEvent
     extends NexusStateChangeEvent
 {
-    public NexusStartedEvent( Object sender )
-    {
-        super( sender );
-    }
+  public NexusStartedEvent(Object sender) {
+    super(sender);
+  }
 }

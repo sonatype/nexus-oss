@@ -10,109 +10,110 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application.source;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.Test;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.source.FileConfigurationSource;
 import org.sonatype.nexus.util.FileUtils;
+
+import org.junit.Test;
 
 public class FileConfigurationSourceTest
     extends AbstractApplicationConfigurationSourceTest
 
 {
-    @Override
-    protected ApplicationConfigurationSource getConfigurationSource()
-        throws Exception
-    {
-        return lookup( ApplicationConfigurationSource.class, "file" );
+  @Override
+  protected ApplicationConfigurationSource getConfigurationSource()
+      throws Exception
+  {
+    return lookup(ApplicationConfigurationSource.class, "file");
+  }
+
+  @Override
+  protected InputStream getOriginatingConfigurationInputStream()
+      throws IOException
+  {
+    return getClass().getResourceAsStream("/META-INF/nexus/default-oss-nexus.xml");
+  }
+
+  @Test
+  public void testStoreConfiguration()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
+
+    configurationSource.loadConfiguration();
+
+    try {
+      configurationSource.storeConfiguration();
     }
-
-    @Override
-    protected InputStream getOriginatingConfigurationInputStream()
-        throws IOException
-    {
-        return getClass().getResourceAsStream( "/META-INF/nexus/default-oss-nexus.xml" );
+    catch (UnsupportedOperationException e) {
+      fail();
     }
+  }
 
-    @Test
-    public void testStoreConfiguration()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  @Test
+  public void testIsConfigurationUpgraded()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        configurationSource.loadConfiguration();
+    configurationSource.loadConfiguration();
 
-        try
-        {
-            configurationSource.storeConfiguration();
-        }
-        catch ( UnsupportedOperationException e )
-        {
-            fail();
-        }
-    }
+    assertEquals(false, configurationSource.isConfigurationUpgraded());
+  }
 
-    @Test
-    public void testIsConfigurationUpgraded()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  @Test
+  public void testIsConfigurationDefaulted()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        configurationSource.loadConfiguration();
+    configurationSource.loadConfiguration();
 
-        assertEquals( false, configurationSource.isConfigurationUpgraded() );
-    }
+    assertEquals(true, configurationSource.isConfigurationDefaulted());
+  }
 
-    @Test
-    public void testIsConfigurationDefaulted()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  @Test
+  public void testIsConfigurationDefaultedShouldNot()
+      throws Exception
+  {
+    copyDefaultConfigToPlace();
 
-        configurationSource.loadConfiguration();
+    configurationSource = getConfigurationSource();
 
-        assertEquals( true, configurationSource.isConfigurationDefaulted() );
-    }
+    configurationSource.loadConfiguration();
 
-    @Test
-    public void testIsConfigurationDefaultedShouldNot()
-        throws Exception
-    {
-        copyDefaultConfigToPlace();
+    assertEquals(false, configurationSource.isConfigurationDefaulted());
+  }
 
-        configurationSource = getConfigurationSource();
+  @Test
+  public void testGetDefaultsSource()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        configurationSource.loadConfiguration();
+    assertFalse(configurationSource.getDefaultsSource() == null);
+  }
 
-        assertEquals( false, configurationSource.isConfigurationDefaulted() );
-    }
+  @Test
+  public void testNEXUS2212LoadValidConfig()
+      throws Exception
+  {
 
-    @Test
-    public void testGetDefaultsSource()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+    // copy the config into place
+    File nexusConfigFile = FileUtils
+        .getFileFromUrl(ClassLoader.getSystemClassLoader().getResource("nexus-NEXUS-2212.xml").toString());
+    org.codehaus.plexus.util.FileUtils.copyFile(nexusConfigFile, new File(getWorkHomeDir(), "conf/nexus.xml"));
 
-        assertFalse( configurationSource.getDefaultsSource() == null );
-    }
+    configurationSource = (FileConfigurationSource) getConfigurationSource();
+    configurationSource.loadConfiguration();
+    assertTrue(configurationSource.getValidationResponse().isValid());
 
-    @Test
-    public void testNEXUS2212LoadValidConfig()
-        throws Exception
-    {
-
-        // copy the config into place
-        File nexusConfigFile = FileUtils.getFileFromUrl( ClassLoader.getSystemClassLoader().getResource( "nexus-NEXUS-2212.xml" ).toString() );
-        org.codehaus.plexus.util.FileUtils.copyFile( nexusConfigFile, new File( getWorkHomeDir(), "conf/nexus.xml") );
-
-        configurationSource = (FileConfigurationSource) getConfigurationSource();
-        configurationSource.loadConfiguration();
-        assertTrue( configurationSource.getValidationResponse().isValid()) ;
-
-    }
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.router;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -17,95 +18,81 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Request route holds the information how will be an incoming request processed.
- * 
+ *
  * @author cstamas
  */
 public class RequestRoute
 {
-    private Repository targetedRepository;
+  private Repository targetedRepository;
 
-    private String repositoryPath;
+  private String repositoryPath;
 
-    private String strippedPrefix;
+  private String strippedPrefix;
 
-    private String originalRequestPath;
+  private String originalRequestPath;
 
-    private int requestDepth;
+  private int requestDepth;
 
-    private ResourceStoreRequest resourceStoreRequest;
+  private ResourceStoreRequest resourceStoreRequest;
 
-    public boolean isRepositoryHit()
-    {
-        return targetedRepository != null;
-    }
+  public boolean isRepositoryHit() {
+    return targetedRepository != null;
+  }
 
-    public Repository getTargetedRepository()
-    {
-        return targetedRepository;
-    }
+  public Repository getTargetedRepository() {
+    return targetedRepository;
+  }
 
-    public void setTargetedRepository( Repository targetedRepository )
-    {
-        this.targetedRepository = targetedRepository;
-    }
+  public void setTargetedRepository(Repository targetedRepository) {
+    this.targetedRepository = targetedRepository;
+  }
 
-    public String getRepositoryPath()
-    {
-        return repositoryPath;
-    }
+  public String getRepositoryPath() {
+    return repositoryPath;
+  }
 
-    public void setRepositoryPath( String repositoryPath )
-    {
-        this.repositoryPath = repositoryPath;
-    }
+  public void setRepositoryPath(String repositoryPath) {
+    this.repositoryPath = repositoryPath;
+  }
 
-    public String getStrippedPrefix()
-    {
-        return strippedPrefix;
-    }
+  public String getStrippedPrefix() {
+    return strippedPrefix;
+  }
 
-    public void setStrippedPrefix( String strippedPrefix )
-    {
-        this.strippedPrefix = strippedPrefix;
-    }
+  public void setStrippedPrefix(String strippedPrefix) {
+    this.strippedPrefix = strippedPrefix;
+  }
 
-    public String getOriginalRequestPath()
-    {
-        return originalRequestPath;
-    }
+  public String getOriginalRequestPath() {
+    return originalRequestPath;
+  }
 
-    public void setOriginalRequestPath( String originalRequestPath )
-    {
-        this.originalRequestPath = originalRequestPath;
-    }
+  public void setOriginalRequestPath(String originalRequestPath) {
+    this.originalRequestPath = originalRequestPath;
+  }
 
-    public int getRequestDepth()
-    {
-        return requestDepth;
-    }
+  public int getRequestDepth() {
+    return requestDepth;
+  }
 
-    public void setRequestDepth( int depth )
-    {
-        this.requestDepth = depth;
-    }
+  public void setRequestDepth(int depth) {
+    this.requestDepth = depth;
+  }
 
-    public ResourceStoreRequest getResourceStoreRequest()
-    {
-        return resourceStoreRequest;
-    }
+  public ResourceStoreRequest getResourceStoreRequest() {
+    return resourceStoreRequest;
+  }
 
-    public void setResourceStoreRequest( ResourceStoreRequest resourceStoreRequest )
-    {
-        this.resourceStoreRequest = resourceStoreRequest;
-    }
+  public void setResourceStoreRequest(ResourceStoreRequest resourceStoreRequest) {
+    this.resourceStoreRequest = resourceStoreRequest;
+  }
 
-    // ==
+  // ==
 
-    @Override
-    public String toString()
-    {
-        return "RequestRoute [targetedRepository=" + targetedRepository + ", repositoryPath=" + repositoryPath
-            + ", strippedPrefix=" + strippedPrefix + ", originalRequestPath=" + originalRequestPath + ", requestDepth="
-            + requestDepth + ", resourceStoreRequest=" + resourceStoreRequest + "]";
-    }
+  @Override
+  public String toString() {
+    return "RequestRoute [targetedRepository=" + targetedRepository + ", repositoryPath=" + repositoryPath
+        + ", strippedPrefix=" + strippedPrefix + ", originalRequestPath=" + originalRequestPath + ", requestDepth="
+        + requestDepth + ", resourceStoreRequest=" + resourceStoreRequest + "]";
+  }
 }

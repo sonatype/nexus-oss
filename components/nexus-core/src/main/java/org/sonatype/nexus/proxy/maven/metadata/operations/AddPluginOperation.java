@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import java.util.ArrayList;
@@ -25,82 +26,71 @@ import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.is
 
 /**
  * adds new plugin to metadata
- * 
+ *
  * @author Oleg Gusakov
  * @version $Id: AddPluginOperation.java 762963 2009-04-07 21:01:07Z ogusakov $
  */
 public class AddPluginOperation
     implements MetadataOperation
 {
-    private Plugin plugin;
+  private Plugin plugin;
 
-    private static PluginComparator pluginComparator;
+  private static PluginComparator pluginComparator;
 
-    {
-        pluginComparator = new PluginComparator();
+  {
+    pluginComparator = new PluginComparator();
+  }
+
+  /**
+   * @throws MetadataException
+   */
+  public AddPluginOperation(PluginOperand data)
+      throws MetadataException
+  {
+    if (data == null) {
+      throw new MetadataException("Operand is not correct: cannot accept null!");
     }
 
-    /**
-     * @throws MetadataException
-     */
-    public AddPluginOperation( PluginOperand data )
-        throws MetadataException
-    {
-        if ( data == null )
-        {
-            throw new MetadataException( "Operand is not correct: cannot accept null!" );
-        }
+    this.plugin = data.getOperand();
+  }
 
-        this.plugin = data.getOperand();
+  public void setOperand(AbstractOperand data)
+      throws MetadataException
+  {
+    if (data == null || !(data instanceof PluginOperand)) {
+      throw new MetadataException("Operand is not correct: expected PluginOperand, but got "
+          + (data == null ? "null" : data.getClass().getName()));
     }
 
-    public void setOperand( AbstractOperand data )
-        throws MetadataException
-    {
-        if ( data == null || !( data instanceof PluginOperand ) )
-        {
-            throw new MetadataException( "Operand is not correct: expected PluginOperand, but got "
-                + ( data == null ? "null" : data.getClass().getName() ) );
-        }
+    plugin = ((PluginOperand) data).getOperand();
+  }
 
-        plugin = ( (PluginOperand) data ).getOperand();
+  /**
+   * add plugin to the in-memory metadata instance
+   */
+  public boolean perform(Metadata metadata)
+      throws MetadataException
+  {
+    if (metadata == null) {
+      return false;
     }
 
-    /**
-     * add plugin to the in-memory metadata instance
-     * 
-     * @param metadata
-     * @param version
-     * @return
-     * @throws MetadataException
-     */
-    public boolean perform( Metadata metadata )
-        throws MetadataException
-    {
-        if ( metadata == null )
-        {
-            return false;
+    List<Plugin> plugins = metadata.getPlugins();
+
+    for (Plugin p : plugins) {
+      if (p.getArtifactId().equals(plugin.getArtifactId())) {
+        if (isPluginPrefixAndArtifactIdEquals(p, plugin)) {
+          p.setName(plugin.getName());
+          // plugin already enlisted
+          return false;
         }
+      }
+    }
 
-        List<Plugin> plugins = metadata.getPlugins();
-
-        for ( Plugin p : plugins )
-        {
-            if ( p.getArtifactId().equals( plugin.getArtifactId() ) )
-            {
-                if ( isPluginPrefixAndArtifactIdEquals( p, plugin ) )
-                {
-                    p.setName( plugin.getName() );
-                    // plugin already enlisted
-                    return false;
-                }
-            }
-        }
-
-        // not found, add it
-        plugins.add( plugin );
-        Collections.sort( plugins, pluginComparator );
-        return true;
+    // not found, add it
+    plugins.add(plugin);
+    Collections.sort(plugins, pluginComparator);
+    return true;
 /*
         // We have a large hack happening here
         // Originally, the code was:
@@ -144,35 +134,31 @@ public class AddPluginOperation
             return false;
         }
         */
+  }
+
+  class PluginComparator
+      implements Comparator<Plugin>
+  {
+    public int compare(Plugin p1, Plugin p2) {
+      if (p1 == null || p2 == null) {
+        throw new IllegalArgumentException();
+      }
+
+      if (p1.getArtifactId() == null || p2.getArtifactId() == null) {
+        throw new IllegalArgumentException();
+      }
+
+      return p1.getArtifactId().compareTo(p2.getArtifactId());
     }
+  }
 
-    class PluginComparator
-        implements Comparator<Plugin>
-    {
-        public int compare( Plugin p1, Plugin p2 )
-        {
-            if ( p1 == null || p2 == null )
-            {
-                throw new IllegalArgumentException();
-            }
+  // == A HACK
 
-            if ( p1.getArtifactId() == null || p2.getArtifactId() == null )
-            {
-                throw new IllegalArgumentException();
-            }
-
-            return p1.getArtifactId().compareTo( p2.getArtifactId() );
-        }
+  public static class ArrayList2
+      extends ArrayList<Plugin>
+  {
+    public ArrayList2(Collection<? extends Plugin> c) {
+      super(c);
     }
-
-    // == A HACK
-
-    public static class ArrayList2
-        extends ArrayList<Plugin>
-    {
-        public ArrayList2( Collection<? extends Plugin> c )
-        {
-            super( c );
-        }
-    }
+  }
 }

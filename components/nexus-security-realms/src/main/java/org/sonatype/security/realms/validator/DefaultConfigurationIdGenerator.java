@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.validator;
 
 import java.util.Random;
@@ -19,16 +20,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton
-@Typed( ConfigurationIdGenerator.class )
-@Named( "default" )
+@Typed(ConfigurationIdGenerator.class)
+@Named("default")
 public class DefaultConfigurationIdGenerator
     implements ConfigurationIdGenerator
 {
-    private Random rand = new Random( System.currentTimeMillis() );
+  private Random rand = new Random(System.currentTimeMillis());
 
-    public String generateId()
-    {
-        return Long.toHexString( System.nanoTime() + rand.nextInt( 2008 ) );
-    }
+  public String generateId() {
+    return Long.toHexString(System.nanoTime() + rand.nextInt(2008));
+  }
 
 }

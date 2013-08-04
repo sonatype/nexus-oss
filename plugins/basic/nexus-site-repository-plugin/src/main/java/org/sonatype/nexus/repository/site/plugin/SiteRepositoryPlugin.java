@@ -10,18 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.site.plugin;
 
-import static com.google.common.base.Preconditions.checkState;
+package org.sonatype.nexus.repository.site.plugin;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.plugin.metadata.GAVCoordinate;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Site Reporsitory Plugin.
@@ -31,59 +33,56 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 public class SiteRepositoryPlugin
 {
 
-    /**
-     * Expected groupId for plugin artifact.
-     */
-    public static final String GROUP_ID = "org.sonatype.nexus.plugins";
+  /**
+   * Expected groupId for plugin artifact.
+   */
+  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
-    /**
-     * Expected artifactId for plugin artifact.
-     */
-    public static final String ARTIFACT_ID = "nexus-site-repository-plugin";
+  /**
+   * Expected artifactId for plugin artifact.
+   */
+  public static final String ARTIFACT_ID = "nexus-site-repository-plugin";
 
-    private final GAVCoordinate coordinates;
+  private final GAVCoordinate coordinates;
 
-    @Inject
-    public SiteRepositoryPlugin()
-        throws Exception
-    {
-        this.coordinates = loadCoordinates();
-    }
+  @Inject
+  public SiteRepositoryPlugin()
+      throws Exception
+  {
+    this.coordinates = loadCoordinates();
+  }
 
-    private GAVCoordinate loadCoordinates()
-        throws IOException
-    {
-        URL url = getClass().getResource(
-            String.format( "/META-INF/maven/%s/%s/pom.properties", GROUP_ID, ARTIFACT_ID ) ); //NON-NLS
-        checkState( url != null, "Missing pom.properties" ); //NON-NLS
+  private GAVCoordinate loadCoordinates()
+      throws IOException
+  {
+    URL url = getClass().getResource(
+        String.format("/META-INF/maven/%s/%s/pom.properties", GROUP_ID, ARTIFACT_ID)); //NON-NLS
+    checkState(url != null, "Missing pom.properties"); //NON-NLS
 
-        Properties props = new Properties();
-        props.load( url.openStream() );
-        GAVCoordinate gav = new GAVCoordinate(
-            props.getProperty( "groupId", "unknown" ),
-            props.getProperty( "artifactId", "unknown" ),
-            props.getProperty( "version", "unknown" )
-        );
+    Properties props = new Properties();
+    props.load(url.openStream());
+    GAVCoordinate gav = new GAVCoordinate(
+        props.getProperty("groupId", "unknown"),
+        props.getProperty("artifactId", "unknown"),
+        props.getProperty("version", "unknown")
+    );
 
-        checkState( GROUP_ID.equals( gav.getGroupId() ), "Plugin groupId mismatch" ); //NON-NLS
-        checkState( ARTIFACT_ID.equals( gav.getArtifactId() ), "Plugin artifactId mismatch" ); //NON-NLS
+    checkState(GROUP_ID.equals(gav.getGroupId()), "Plugin groupId mismatch"); //NON-NLS
+    checkState(ARTIFACT_ID.equals(gav.getArtifactId()), "Plugin artifactId mismatch"); //NON-NLS
 
-        return gav;
-    }
+    return gav;
+  }
 
-    public GAVCoordinate getCoordinates()
-    {
-        return coordinates;
-    }
+  public GAVCoordinate getCoordinates() {
+    return coordinates;
+  }
 
-    public String getId()
-    {
-        return getCoordinates().getArtifactId();
-    }
+  public String getId() {
+    return getCoordinates().getArtifactId();
+  }
 
-    public String getVersion()
-    {
-        return getCoordinates().getVersion();
-    }
+  public String getVersion() {
+    return getCoordinates().getVersion();
+  }
 
 }

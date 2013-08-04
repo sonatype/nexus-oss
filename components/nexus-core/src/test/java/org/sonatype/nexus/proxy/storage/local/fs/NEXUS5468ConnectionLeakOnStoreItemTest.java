@@ -10,14 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
 import java.io.InputStream;
 
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
@@ -28,84 +26,84 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+
 /**
  * Testing NEXUS-5468 http connection leak triggered by LocalStorageException
- * 
+ *
  * @author cstamas
  */
 public class NEXUS5468ConnectionLeakOnStoreItemTest
     extends TestSupport
 {
-    @Mock
-    private Wastebasket wastebasket;
+  @Mock
+  private Wastebasket wastebasket;
 
-    @Mock
-    private LinkPersister linkPersister;
+  @Mock
+  private LinkPersister linkPersister;
 
-    @Mock
-    private MimeSupport mimeSupport;
+  @Mock
+  private MimeSupport mimeSupport;
 
-    @Mock
-    private FSPeer fsPeer;
+  @Mock
+  private FSPeer fsPeer;
 
-    @Test
-    public void closeIsCalledOnPreparedContentLocatorIfAllWentOkay()
-        throws Exception
-    {
-        final InputStream preparedStream = Mockito.mock( InputStream.class );
-        try
-        {
-            final DefaultFSLocalRepositoryStorage testSubject =
-                new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, fsPeer );
+  @Test
+  public void closeIsCalledOnPreparedContentLocatorIfAllWentOkay()
+      throws Exception
+  {
+    final InputStream preparedStream = Mockito.mock(InputStream.class);
+    try {
+      final DefaultFSLocalRepositoryStorage testSubject =
+          new DefaultFSLocalRepositoryStorage(wastebasket, linkPersister, mimeSupport, fsPeer);
 
-            final Repository repository = Mockito.mock( Repository.class );
-            Mockito.when( repository.getId() ).thenReturn( "test" );
-            Mockito.when( repository.getAttributesHandler() ).thenReturn( Mockito.mock( AttributesHandler.class ) );
-            // we return some URL, but does not matter which, this is only to avoid NPE
-            // so execution path is "normal success" of storeItem in this case
-            Mockito.when( repository.getLocalUrl() ).thenReturn( new File( "target" ).toURI().toURL().toString() );
+      final Repository repository = Mockito.mock(Repository.class);
+      Mockito.when(repository.getId()).thenReturn("test");
+      Mockito.when(repository.getAttributesHandler()).thenReturn(Mockito.mock(AttributesHandler.class));
+      // we return some URL, but does not matter which, this is only to avoid NPE
+      // so execution path is "normal success" of storeItem in this case
+      Mockito.when(repository.getLocalUrl()).thenReturn(new File("target").toURI().toURL().toString());
 
-            final PreparedContentLocator pcl = new PreparedContentLocator( preparedStream, "text/plain" );
+      final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain");
 
-            final DefaultStorageFileItem file =
-                new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/some/file.txt" ), true, true, pcl );
+      final DefaultStorageFileItem file =
+          new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/file.txt"), true, true, pcl);
 
-            testSubject.storeItem( repository, file );
-        }
-        finally
-        {
-            Mockito.verify( preparedStream, Mockito.times( 1 ) ).close();
-        }
+      testSubject.storeItem(repository, file);
     }
-
-    @Test( expected = RuntimeException.class )
-    public void closeIsCalledOnPreparedContentLocatorIfUnexpectedExceptionIsMet()
-        throws Exception
-    {
-        final InputStream preparedStream = Mockito.mock( InputStream.class );
-        try
-        {
-            final DefaultFSLocalRepositoryStorage testSubject =
-                new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, fsPeer );
-
-            final Repository repository = Mockito.mock( Repository.class );
-            Mockito.when( repository.getId() ).thenReturn( "test" );
-            Mockito.when( repository.getAttributesHandler() ).thenReturn( Mockito.mock( AttributesHandler.class ) );
-            // we intentionally throw some unexpected exception here
-            // so execution path here will be interrupted
-            Mockito.when( repository.getLocalUrl() ).thenThrow( new RuntimeException( "Something unexpected!" ) );
-
-            final PreparedContentLocator pcl = new PreparedContentLocator( preparedStream, "text/plain" );
-
-            final DefaultStorageFileItem file =
-                new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/some/file.txt" ), true, true, pcl );
-
-            testSubject.storeItem( repository, file );
-        }
-        finally
-        {
-            Mockito.verify( preparedStream, Mockito.times( 1 ) ).close();
-        }
+    finally {
+      Mockito.verify(preparedStream, Mockito.times(1)).close();
     }
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void closeIsCalledOnPreparedContentLocatorIfUnexpectedExceptionIsMet()
+      throws Exception
+  {
+    final InputStream preparedStream = Mockito.mock(InputStream.class);
+    try {
+      final DefaultFSLocalRepositoryStorage testSubject =
+          new DefaultFSLocalRepositoryStorage(wastebasket, linkPersister, mimeSupport, fsPeer);
+
+      final Repository repository = Mockito.mock(Repository.class);
+      Mockito.when(repository.getId()).thenReturn("test");
+      Mockito.when(repository.getAttributesHandler()).thenReturn(Mockito.mock(AttributesHandler.class));
+      // we intentionally throw some unexpected exception here
+      // so execution path here will be interrupted
+      Mockito.when(repository.getLocalUrl()).thenThrow(new RuntimeException("Something unexpected!"));
+
+      final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain");
+
+      final DefaultStorageFileItem file =
+          new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/file.txt"), true, true, pcl);
+
+      testSubject.storeItem(repository, file);
+    }
+    finally {
+      Mockito.verify(preparedStream, Mockito.times(1)).close();
+    }
+  }
 
 }

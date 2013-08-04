@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.Validator;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Logical AND between {@link Validator}s.
@@ -30,63 +32,52 @@ public class ConjunctionValidator
     implements Validator
 {
 
-    private final Validator[] validators;
+  private final Validator[] validators;
 
-    @Inject
-    public ConjunctionValidator( final Validator... validators )
-    {
-        this.validators = checkNotNull( validators );
-        checkArgument( validators.length > 0, "There must be at least one validator" );
-        for ( final Validator validator : validators )
-        {
-            checkNotNull( validator );
-        }
+  @Inject
+  public ConjunctionValidator(final Validator... validators) {
+    this.validators = checkNotNull(validators);
+    checkArgument(validators.length > 0, "There must be at least one validator");
+    for (final Validator validator : validators) {
+      checkNotNull(validator);
     }
+  }
 
-    @Override
-    public ValidationResult validate( final Map<String, String> properties )
-    {
-        for ( final Validator validator : validators )
-        {
-            final ValidationResult validationResult = validator.validate( properties );
-            if ( !validationResult.isValid() )
-            {
-                return validationResult;
-            }
-        }
-        return ValidationResult.VALID;
+  @Override
+  public ValidationResult validate(final Map<String, String> properties) {
+    for (final Validator validator : validators) {
+      final ValidationResult validationResult = validator.validate(properties);
+      if (!validationResult.isValid()) {
+        return validationResult;
+      }
     }
+    return ValidationResult.VALID;
+  }
 
-    @Override
-    public String explainValid()
-    {
-        final StringBuilder sb = new StringBuilder();
-        sb.append( "All of following are valid: " );
-        for ( final Validator validator : validators )
-        {
-            if ( sb.length() > 0 )
-            {
-                sb.append( " AND " );
-            }
-            sb.append( validator.explainValid() );
-        }
-        return sb.toString();
+  @Override
+  public String explainValid() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("All of following are valid: ");
+    for (final Validator validator : validators) {
+      if (sb.length() > 0) {
+        sb.append(" AND ");
+      }
+      sb.append(validator.explainValid());
     }
+    return sb.toString();
+  }
 
-    @Override
-    public String explainInvalid()
-    {
-        final StringBuilder sb = new StringBuilder();
-        sb.append( "One of following is invalid: " );
-        for ( final Validator validator : validators )
-        {
-            if ( sb.length() > 0 )
-            {
-                sb.append( " OR " );
-            }
-            sb.append( validator.explainValid() );
-        }
-        return sb.toString();
+  @Override
+  public String explainInvalid() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("One of following is invalid: ");
+    for (final Validator validator : validators) {
+      if (sb.length() > 0) {
+        sb.append(" OR ");
+      }
+      sb.append(validator.explainValid());
     }
+    return sb.toString();
+  }
 
 }

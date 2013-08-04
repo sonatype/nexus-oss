@@ -10,43 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.proxy;
 
-import org.junit.After;
-import org.junit.Before;
 import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
+
+import org.junit.After;
+import org.junit.Before;
 
 public abstract class AbstractNexusWebProxyIntegrationTest
     extends AbstractNexusProxyIntegrationTest
 {
 
-    protected static final int webProxyPort;
+  protected static final int webProxyPort;
 
-    protected ProxyServer server;
+  protected ProxyServer server;
 
-    static
-    {
-        webProxyPort = TestProperties.getInteger( "webproxy.server.port" );
+  static {
+    webProxyPort = TestProperties.getInteger("webproxy.server.port");
+  }
+
+  @Before
+  public void startWebProxy()
+      throws Exception
+  {
+    server = lookup(ProxyServer.class);
+    server.start();
+  }
+
+  @After
+  public void stopWebProxy()
+      throws Exception
+  {
+    if (server != null) {
+      server.stop();
     }
-
-    @Before
-    public void startWebProxy()
-        throws Exception
-    {
-        server = lookup( ProxyServer.class );
-        server.start();
-    }
-
-    @After
-    public void stopWebProxy()
-        throws Exception
-    {
-        if ( server != null )
-        {
-            server.stop();
-        }
-    }
+  }
 
 }

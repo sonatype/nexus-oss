@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -19,24 +20,23 @@ public class RouterTest
     extends M2ResourceStoreTest
 {
 
-    @Override
-    protected String getItemPath()
-    {
-        return "/activemq/activemq-core/1.2/activemq-core-1.2.jar";
-    }
+  @Override
+  protected String getItemPath() {
+    return "/activemq/activemq-core/1.2/activemq-core-1.2.jar";
+  }
 
-    @Override
-    protected ResourceStore getResourceStore()
-        throws NoSuchResourceStoreException,
-            Exception
-    {
-        Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
+  @Override
+  protected ResourceStore getResourceStore()
+      throws NoSuchResourceStoreException,
+             Exception
+  {
+    Repository repo1 = getRepositoryRegistry().getRepository("repo1");
 
-        repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
-        
-        getApplicationConfiguration().saveConfiguration();
-        
-        return repo1;
-    }
+    repo1.setWritePolicy(RepositoryWritePolicy.ALLOW_WRITE);
+
+    getApplicationConfiguration().saveConfiguration();
+
+    return repo1;
+  }
 
 }

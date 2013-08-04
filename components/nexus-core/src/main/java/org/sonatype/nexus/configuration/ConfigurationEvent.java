@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -17,19 +18,17 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * The abstract event that is occured when configuration related change had occured.
- * 
+ *
  * @author cstamas
  */
 public abstract class ConfigurationEvent
     extends AbstractEvent<ApplicationConfiguration>
 {
-    public ConfigurationEvent( ApplicationConfiguration configuration )
-    {
-        super( configuration );
-    }
+  public ConfigurationEvent(ApplicationConfiguration configuration) {
+    super(configuration);
+  }
 
-    public ApplicationConfiguration getApplicationConfiguration()
-    {
-        return getEventSender();
-    }
+  public ApplicationConfiguration getApplicationConfiguration() {
+    return getEventSender();
+  }
 }

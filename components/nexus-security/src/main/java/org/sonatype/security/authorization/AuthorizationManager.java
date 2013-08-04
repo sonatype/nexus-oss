@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.authorization;
 
 import java.util.Set;
@@ -18,121 +19,83 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 
 /**
  * A DAO for Roles and Privileges comming from a given source.
- * 
+ *
  * @author Brian Demers
  */
 public interface AuthorizationManager
 {
-    /**
-     * The Id if this AuthorizationManager;
-     * 
-     * @return
-     */
-    public String getSource();
+  /**
+   * The Id if this AuthorizationManager;
+   */
+  public String getSource();
 
-    /**
-     * If this AuthorizationManager is writable.
-     * 
-     * @return
-     */
-    boolean supportsWrite();
+  /**
+   * If this AuthorizationManager is writable.
+   */
+  boolean supportsWrite();
 
-    // **************
-    // ROLE CRUDS
-    // **************
-    /**
-     * Returns the all Roles from this AuthorizationManager. NOTE: this call could be slow when coming from an external
-     * source (i.e. a database) TODO: Consider removing this method.
-     * 
-     * @return
-     */
-    public Set<Role> listRoles();
+  // **************
+  // ROLE CRUDS
+  // **************
 
-    /**
-     * Returns a Role base on an Id.
-     * 
-     * @param roleId
-     * @return
-     * @throws NoSuchRoleException
-     */
-    public Role getRole( String roleId )
-        throws NoSuchRoleException;
+  /**
+   * Returns the all Roles from this AuthorizationManager. NOTE: this call could be slow when coming from an external
+   * source (i.e. a database) TODO: Consider removing this method.
+   */
+  public Set<Role> listRoles();
 
-    /**
-     * Adds a role to this AuthorizationManager.
-     * 
-     * @param role
-     * @return
-     * @throws InvalidConfigurationException
-     */
-    public Role addRole( Role role )
-        throws InvalidConfigurationException;
+  /**
+   * Returns a Role base on an Id.
+   */
+  public Role getRole(String roleId)
+      throws NoSuchRoleException;
 
-    /**
-     * Updates a role in this AuthorizationManager.
-     * 
-     * @param role
-     * @return
-     * @throws NoSuchRoleException
-     * @throws InvalidConfigurationException
-     */
-    public Role updateRole( Role role )
-        throws NoSuchRoleException, InvalidConfigurationException;
+  /**
+   * Adds a role to this AuthorizationManager.
+   */
+  public Role addRole(Role role)
+      throws InvalidConfigurationException;
 
-    /**
-     * Removes a role in this AuthorizationManager.
-     * 
-     * @param roleId
-     * @throws NoSuchRoleException
-     */
-    public void deleteRole( String roleId )
-        throws NoSuchRoleException;
+  /**
+   * Updates a role in this AuthorizationManager.
+   */
+  public Role updateRole(Role role)
+      throws NoSuchRoleException, InvalidConfigurationException;
 
-    // Privilege CRUDS
-    /**
-     * Returns the all Privileges from this AuthorizationManager.
-     * 
-     * @return
-     */
-    public Set<Privilege> listPrivileges();
+  /**
+   * Removes a role in this AuthorizationManager.
+   */
+  public void deleteRole(String roleId)
+      throws NoSuchRoleException;
 
-    /**
-     * Returns a Privilege base on an Id.
-     * 
-     * @param privilegeId
-     * @return
-     * @throws NoSuchPrivilegeException
-     */
-    public Privilege getPrivilege( String privilegeId )
-        throws NoSuchPrivilegeException;
+  // Privilege CRUDS
 
-    /**
-     * Adds a Privilege to this AuthorizationManager.
-     * 
-     * @param privilege
-     * @return
-     * @throws InvalidConfigurationException
-     */
-    public Privilege addPrivilege( Privilege privilege )
-        throws InvalidConfigurationException;
+  /**
+   * Returns the all Privileges from this AuthorizationManager.
+   */
+  public Set<Privilege> listPrivileges();
 
-    /**
-     * Updates a Privilege in this AuthorizationManager.
-     * 
-     * @param privilege
-     * @return
-     * @throws NoSuchPrivilegeException
-     * @throws InvalidConfigurationException
-     */
-    public Privilege updatePrivilege( Privilege privilege )
-        throws NoSuchPrivilegeException, InvalidConfigurationException;
+  /**
+   * Returns a Privilege base on an Id.
+   */
+  public Privilege getPrivilege(String privilegeId)
+      throws NoSuchPrivilegeException;
 
-    /**
-     * Removes a Privilege in this AuthorizationManager.
-     * 
-     * @param privilegeId
-     * @throws NoSuchPrivilegeException
-     */
-    public void deletePrivilege( String privilegeId )
-        throws NoSuchPrivilegeException;
+  /**
+   * Adds a Privilege to this AuthorizationManager.
+   */
+  public Privilege addPrivilege(Privilege privilege)
+      throws InvalidConfigurationException;
+
+  /**
+   * Updates a Privilege in this AuthorizationManager.
+   */
+  public Privilege updatePrivilege(Privilege privilege)
+      throws NoSuchPrivilegeException, InvalidConfigurationException;
+
+  /**
+   * Removes a Privilege in this AuthorizationManager.
+   */
+  public void deletePrivilege(String privilegeId)
+      throws NoSuchPrivilegeException;
 }

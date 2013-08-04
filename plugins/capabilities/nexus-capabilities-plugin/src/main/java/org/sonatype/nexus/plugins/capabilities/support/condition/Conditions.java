@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.support.condition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities.support.condition;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Central access point for built in {@link org.sonatype.nexus.plugins.capabilities.Condition}s.
@@ -28,64 +29,60 @@ import javax.inject.Singleton;
 public class Conditions
 {
 
-    private LogicalConditions logicalConditions;
+  private LogicalConditions logicalConditions;
 
-    private CapabilityConditions capabilityConditions;
+  private CapabilityConditions capabilityConditions;
 
-    private final RepositoryConditions repositoryConditions;
+  private final RepositoryConditions repositoryConditions;
 
-    private final NexusConditions nexusConditions;
+  private final NexusConditions nexusConditions;
 
-    @Inject
-    public Conditions( final LogicalConditions logicalConditions,
-                       final CapabilityConditions capabilityConditions,
-                       final RepositoryConditions repositoryConditions,
-                       final NexusConditions nexusConditions )
-    {
-        this.logicalConditions = checkNotNull( logicalConditions );
-        this.capabilityConditions = checkNotNull( capabilityConditions );
-        this.repositoryConditions = checkNotNull( repositoryConditions );
-        this.nexusConditions = checkNotNull( nexusConditions );
-    }
+  @Inject
+  public Conditions(final LogicalConditions logicalConditions,
+                    final CapabilityConditions capabilityConditions,
+                    final RepositoryConditions repositoryConditions,
+                    final NexusConditions nexusConditions)
+  {
+    this.logicalConditions = checkNotNull(logicalConditions);
+    this.capabilityConditions = checkNotNull(capabilityConditions);
+    this.repositoryConditions = checkNotNull(repositoryConditions);
+    this.nexusConditions = checkNotNull(nexusConditions);
+  }
 
-    /**
-     * Access to logical conditions.
-     *
-     * @return logical conditions factory
-     */
-    public LogicalConditions logical()
-    {
-        return logicalConditions;
-    }
+  /**
+   * Access to logical conditions.
+   *
+   * @return logical conditions factory
+   */
+  public LogicalConditions logical() {
+    return logicalConditions;
+  }
 
-    /**
-     * Access to capability related conditions.
-     *
-     * @return capability related conditions factory
-     */
-    public CapabilityConditions capabilities()
-    {
-        return capabilityConditions;
-    }
+  /**
+   * Access to capability related conditions.
+   *
+   * @return capability related conditions factory
+   */
+  public CapabilityConditions capabilities() {
+    return capabilityConditions;
+  }
 
-    /**
-     * Access to repository specific conditions.
-     *
-     * @return repository specific conditions factory
-     */
-    public RepositoryConditions repository()
-    {
-        return repositoryConditions;
-    }
+  /**
+   * Access to repository specific conditions.
+   *
+   * @return repository specific conditions factory
+   */
+  public RepositoryConditions repository() {
+    return repositoryConditions;
+  }
 
-    /**
-     * Access to nexus specific conditions.
-     *
-     * @return nexus specific conditions factory
-     */
-    public NexusConditions nexus()
-    {
-        return nexusConditions;
-    }
+  /**
+   * Access to nexus specific conditions.
+   *
+   * @return nexus specific conditions factory
+   */
+  public NexusConditions nexus() {
+    return nexusConditions;
+  }
 
 }

@@ -10,15 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelSource;
-import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.plugins.mavenbridge.internal.FileItemModelSource;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -29,76 +27,78 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
+
 import junit.framework.Assert;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelSource;
+import org.junit.Test;
 
 public class MavenBridgeTest
     extends AbstractMavenRepoContentTests
 {
 
-    protected NexusMavenBridge mavenBridge;
+  protected NexusMavenBridge mavenBridge;
 
-    private Server server;
+  private Server server;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        mavenBridge = lookup( NexusMavenBridge.class );
+    mavenBridge = lookup(NexusMavenBridge.class);
 
-        repositoryRegistry = lookup( RepositoryRegistry.class );
+    repositoryRegistry = lookup(RepositoryRegistry.class);
 
-        shutDownSecurity();
+    shutDownSecurity();
 
-        server = Server.withPort( 0 ).serve( "/*" ).withBehaviours( Behaviours.get(
-            new File( getBasedir(), "src/test/resources/test-repo" ) ) ).start();
+    server = Server.withPort(0).serve("/*").withBehaviours(Behaviours.get(
+        new File(getBasedir(), "src/test/resources/test-repo"))).start();
 
-        for ( MavenProxyRepository repo : repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) )
-        {
-            repo.setRemoteUrl( server.getUrl().toExternalForm() );
-            repo.commitChanges();
-        }
+    for (MavenProxyRepository repo : repositoryRegistry.getRepositoriesWithFacet(MavenProxyRepository.class)) {
+      repo.setRemoteUrl(server.getUrl().toExternalForm());
+      repo.commitChanges();
     }
+  }
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    super.tearDown();
 
-        if ( server != null )
-        {
-            server.stop();
-        }
+    if (server != null) {
+      server.stop();
     }
+  }
 
-    @Test
-    public void testSimple()
-        throws Exception
-    {
-        Assert.assertNotNull( mavenBridge );
+  @Test
+  public void testSimple()
+      throws Exception
+  {
+    Assert.assertNotNull(mavenBridge);
 
-        MavenRepository publicRepo = repositoryRegistry.getRepositoryWithFacet( "public", MavenGroupRepository.class );
+    MavenRepository publicRepo = repositoryRegistry.getRepositoryWithFacet("public", MavenGroupRepository.class);
 
-        ResourceStoreRequest req =
-            new ResourceStoreRequest( "/org/apache/maven/apache-maven/3.0-beta-1/apache-maven-3.0-beta-1.pom" );
+    ResourceStoreRequest req =
+        new ResourceStoreRequest("/org/apache/maven/apache-maven/3.0-beta-1/apache-maven-3.0-beta-1.pom");
 
-        StorageFileItem pomItem = (StorageFileItem) publicRepo.retrieveItem( req );
+    StorageFileItem pomItem = (StorageFileItem) publicRepo.retrieveItem(req);
 
-        ModelSource pomSource = new FileItemModelSource( pomItem );
+    ModelSource pomSource = new FileItemModelSource(pomItem);
 
-        List<MavenRepository> participants =
-            Arrays.asList( pomItem.getRepositoryItemUid().getRepository().adaptToFacet( MavenRepository.class ) );
+    List<MavenRepository> participants =
+        Arrays.asList(pomItem.getRepositoryItemUid().getRepository().adaptToFacet(MavenRepository.class));
 
-        Model model = mavenBridge.buildModel( pomSource, participants );
+    Model model = mavenBridge.buildModel(pomSource, participants);
 
-        // very simple check: if interpolated/effective, license node is present, but if you look
-        // at pom above that has no license node. Hence, if present, it means parent found and successfully calculated
-        // effective
-        Assert.assertTrue( model.getLicenses().size() > 0 );
+    // very simple check: if interpolated/effective, license node is present, but if you look
+    // at pom above that has no license node. Hence, if present, it means parent found and successfully calculated
+    // effective
+    Assert.assertTrue(model.getLicenses().size() > 0);
 
-        // for debug
-        //MavenXpp3Writer w = new MavenXpp3Writer();
-        //w.write( System.out, model );
-    }
+    // for debug
+    //MavenXpp3Writer w = new MavenXpp3Writer();
+    //w.write( System.out, model );
+  }
 }

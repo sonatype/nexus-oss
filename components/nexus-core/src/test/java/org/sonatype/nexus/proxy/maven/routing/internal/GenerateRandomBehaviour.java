@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkArgument;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.util.Map;
 import java.util.Random;
@@ -23,54 +22,53 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.tests.http.server.api.Behaviour;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * {@link Behaviour} that generates random count of bytes as response.
- * 
+ *
  * @author cstamas
  */
 public class GenerateRandomBehaviour
     implements Behaviour
 {
-    private final Random random = new Random();
+  private final Random random = new Random();
 
-    private static final byte[] bytes = new byte[1024];
+  private static final byte[] bytes = new byte[1024];
 
-    private final int length;
+  private final int length;
 
-    /**
-     * Constructor.
-     * 
-     * @param length the length of the response in bytes.
-     */
-    public GenerateRandomBehaviour( final int length )
-    {
-        checkArgument( length > 0, "Length must be greater than zero!" );
-        this.length = length;
+  /**
+   * Constructor.
+   *
+   * @param length the length of the response in bytes.
+   */
+  public GenerateRandomBehaviour(final int length) {
+    checkArgument(length > 0, "Length must be greater than zero!");
+    this.length = length;
+  }
+
+  @Override
+  public boolean execute(final HttpServletRequest request, final HttpServletResponse response,
+                         final Map<Object, Object> ctx)
+      throws Exception
+  {
+    if ("GET".equals(request.getMethod())) {
+      response.setContentType("application/octet-stream");
+      response.setContentLength(length);
+
+      ServletOutputStream out = response.getOutputStream();
+      for (int i = length; i > 0; ) {
+        random.nextBytes(bytes);
+        int n = Math.min(i, bytes.length);
+        i -= n;
+        out.write(bytes, 0, n);
+      }
+      out.close();
+      return false;
     }
 
-    @Override
-    public boolean execute( final HttpServletRequest request, final HttpServletResponse response,
-                            final Map<Object, Object> ctx )
-        throws Exception
-    {
-        if ( "GET".equals( request.getMethod() ) )
-        {
-            response.setContentType( "application/octet-stream" );
-            response.setContentLength( length );
-
-            ServletOutputStream out = response.getOutputStream();
-            for ( int i = length; i > 0; )
-            {
-                random.nextBytes( bytes );
-                int n = Math.min( i, bytes.length );
-                i -= n;
-                out.write( bytes, 0, n );
-            }
-            out.close();
-            return false;
-        }
-
-        return true;
-    }
+    return true;
+  }
 
 }

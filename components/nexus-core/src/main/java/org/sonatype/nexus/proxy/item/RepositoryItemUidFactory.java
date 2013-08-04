@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -17,32 +18,21 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 public interface RepositoryItemUidFactory
 {
-    /**
-     * Creates an UID based on a Repository reference and a path.
-     * 
-     * @param repository
-     * @param path
-     * @return
-     */
-    RepositoryItemUid createUid( Repository repository, String path );
+  /**
+   * Creates an UID based on a Repository reference and a path.
+   */
+  RepositoryItemUid createUid(Repository repository, String path);
 
-    /**
-     * Parses an "uid string representation" and creates an UID for it. Uid String representation is of form '<repoId> +
-     * ':' + <path>'.
-     * 
-     * @param uidStr
-     * @return
-     * @throws IllegalArgumentException
-     * @throws NoSuchRepositoryException
-     */
-    public RepositoryItemUid createUid( String uidStr )
-        throws IllegalArgumentException, NoSuchRepositoryException;
+  /**
+   * Parses an "uid string representation" and creates an UID for it. Uid String representation is of form '<repoId>
+   * +
+   * ':' + <path>'.
+   */
+  public RepositoryItemUid createUid(String uidStr)
+      throws IllegalArgumentException, NoSuchRepositoryException;
 
-    /**
-     * Creates a shared UIDLock based on a uid reference.
-     * 
-     * @param uid
-     * @return
-     */
-    RepositoryItemUidLock createUidLock( RepositoryItemUid uid );
+  /**
+   * Creates a shared UIDLock based on a uid reference.
+   */
+  RepositoryItemUidLock createUidLock(RepositoryItemUid uid);
 }

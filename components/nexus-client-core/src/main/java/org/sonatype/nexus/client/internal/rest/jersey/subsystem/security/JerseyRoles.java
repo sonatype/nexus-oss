@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.security;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
+
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
@@ -24,6 +26,7 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceResponse;
+
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
@@ -40,89 +43,73 @@ public class JerseyRoles
     implements Roles
 {
 
-    public JerseyRoles( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
+  public JerseyRoles(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
+
+  @Override
+  public JerseyRole create(final String id) {
+    return new JerseyRole(getNexusClient(), id);
+  }
+
+  @Override
+  public Role get(final String id) {
+    try {
+      return convert(
+          getNexusClient()
+              .serviceResource(path(id))
+              .get(RoleResourceResponse.class)
+              .getData()
+      );
+    }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
+
+  @Override
+  public Collection<Role> get() {
+    final RoleListResourceResponse roles;
+    try {
+      roles = getNexusClient()
+          .serviceResource("roles")
+          .get(RoleListResourceResponse.class);
+    }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
     }
 
-    @Override
-    public JerseyRole create( final String id )
+    return Collections2.transform(roles.getData(), new Function<RoleResource, Role>()
     {
-        return new JerseyRole( getNexusClient(), id );
-    }
+      @Override
+      public Role apply(@Nullable final RoleResource input) {
+        return convert(input);
+      }
+    });
+  }
 
-    @Override
-    public Role get( final String id )
-    {
-        try
-        {
-            return convert(
-                getNexusClient()
-                    .serviceResource( path( id ) )
-                    .get( RoleResourceResponse.class )
-                    .getData()
-            );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  private JerseyRole convert(@Nullable final RoleResource resource) {
+    if (resource == null) {
+      return null;
     }
+    final JerseyRole role = new JerseyRole(getNexusClient(), resource.getId(), resource);
+    role.overwriteWith(resource);
+    return role;
+  }
 
-    @Override
-    public Collection<Role> get()
-    {
-        final RoleListResourceResponse roles;
-        try
-        {
-            roles = getNexusClient()
-                .serviceResource( "roles" )
-                .get( RoleListResourceResponse.class );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-
-        return Collections2.transform( roles.getData(), new Function<RoleResource, Role>()
-        {
-            @Override
-            public Role apply( @Nullable final RoleResource input )
-            {
-                return convert( input );
-            }
-        } );
+  static String path(final String id) {
+    try {
+      return "roles/" + URLEncoder.encode(id, "UTF-8");
     }
-
-    private JerseyRole convert( @Nullable final RoleResource resource )
-    {
-        if ( resource == null )
-        {
-            return null;
-        }
-        final JerseyRole role = new JerseyRole( getNexusClient(), resource.getId(), resource );
-        role.overwriteWith( resource );
-        return role;
+    catch (UnsupportedEncodingException e) {
+      throw Throwables.propagate(e);
     }
-
-    static String path( final String id )
-    {
-        try
-        {
-            return "roles/" + URLEncoder.encode( id, "UTF-8" );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
+  }
 
 }

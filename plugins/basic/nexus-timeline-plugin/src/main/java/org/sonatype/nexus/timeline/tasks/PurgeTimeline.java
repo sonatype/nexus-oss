@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.timeline.tasks;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,54 +19,51 @@ import javax.inject.Named;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.timeline.NexusTimeline;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Purge timeline.
  */
-@Named( PurgeTimelineTaskDescriptor.ID )
+@Named(PurgeTimelineTaskDescriptor.ID)
 public class PurgeTimeline
     extends AbstractNexusTask<Object>
 {
-    /**
-     * System event action: timeline purge
-     */
-    public static final String ACTION = "TL_PURGE";
+  /**
+   * System event action: timeline purge
+   */
+  public static final String ACTION = "TL_PURGE";
 
-    private final NexusTimeline timeline;
+  private final NexusTimeline timeline;
 
-    @Inject
-    public PurgeTimeline( final NexusTimeline timeline )
-    {
-        this.timeline = checkNotNull( timeline );
-    }
+  @Inject
+  public PurgeTimeline(final NexusTimeline timeline) {
+    this.timeline = checkNotNull(timeline);
+  }
 
-    public int getPurgeOlderThan()
-    {
-        return Integer.parseInt( getParameters().get( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID ) );
-    }
+  public int getPurgeOlderThan() {
+    return Integer.parseInt(getParameters().get(PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID));
+  }
 
-    public void setPurgeOlderThan( int purgeOlderThan )
-    {
-        getParameters().put( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID, Integer.toString( purgeOlderThan ) );
-    }
+  public void setPurgeOlderThan(int purgeOlderThan) {
+    getParameters().put(PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID, Integer.toString(purgeOlderThan));
+  }
 
-    @Override
-    protected Object doRun()
-        throws Exception
-    {
-        timeline.purgeOlderThan( getPurgeOlderThan() );
-        return null;
-    }
+  @Override
+  protected Object doRun()
+      throws Exception
+  {
+    timeline.purgeOlderThan(getPurgeOlderThan());
+    return null;
+  }
 
-    @Override
-    protected String getAction()
-    {
-        return ACTION;
-    }
+  @Override
+  protected String getAction() {
+    return ACTION;
+  }
 
-    @Override
-    protected String getMessage()
-    {
-        return "Purging Timeline records.";
-    }
+  @Override
+  protected String getMessage() {
+    return "Purging Timeline records.";
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.schedules;
 
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -23,32 +24,26 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class ScheduledServicePropertyResourceConverter
     extends AbstractReflectionConverter
 {
-    public ScheduledServicePropertyResourceConverter( Mapper mapper, ReflectionProvider reflectionProvider )
-    {
-        super( mapper, reflectionProvider );
-    }
+  public ScheduledServicePropertyResourceConverter(Mapper mapper, ReflectionProvider reflectionProvider) {
+    super(mapper, reflectionProvider);
+  }
 
-    public boolean canConvert( Class type )
-    {
-        return ScheduledServicePropertyResource.class.equals( type );
+  public boolean canConvert(Class type) {
+    return ScheduledServicePropertyResource.class.equals(type);
+  }
+
+  public Object doUnmarshal(Object source, HierarchicalStreamReader reader, UnmarshallingContext context) {
+    ScheduledServicePropertyResource resource = (ScheduledServicePropertyResource) source;
+    while (reader.hasMoreChildren()) {
+      reader.moveDown();
+      if ("key".equals(reader.getNodeName())) {
+        resource.setKey((String) context.convertAnother(source, String.class));
+      }
+      else if ("value".equals(reader.getNodeName())) {
+        resource.setValue((String) context.convertAnother(source, String.class));
+      }
+      reader.moveUp();
     }
-    
-    public Object doUnmarshal( Object source, HierarchicalStreamReader reader, UnmarshallingContext context )
-    {
-        ScheduledServicePropertyResource resource = (ScheduledServicePropertyResource) source;
-        while ( reader.hasMoreChildren() )
-        {
-            reader.moveDown();
-            if ( "key".equals( reader.getNodeName() ) )
-            {
-                resource.setKey( (String) context.convertAnother( source, String.class ) );
-            }
-            else if ( "value".equals( reader.getNodeName() ) )
-            {
-                resource.setValue( (String) context.convertAnother( source, String.class ) );
-            }
-            reader.moveUp();
-        }
-        return resource;
-    }
+    return resource;
+  }
 }

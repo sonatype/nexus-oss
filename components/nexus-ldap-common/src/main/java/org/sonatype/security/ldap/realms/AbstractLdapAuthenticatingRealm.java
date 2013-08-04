@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.ldap.realms;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.security.ldap.realms;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +19,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 
-import org.apache.shiro.authc.AuthenticationException;
+import org.sonatype.security.ldap.dao.LdapDAOException;
+import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
+
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -35,99 +36,87 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.security.ldap.dao.LdapDAOException;
-import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
-import com.google.common.base.Preconditions;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 //@Component( role = AbstractLdapAuthenticatingRealm.class, hint = "ConfigurableLdapRealm" )
 public abstract class AbstractLdapAuthenticatingRealm
     extends AbstractLdapRealm
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Requirement
-    private LdapManager ldapManager;
+  @Requirement
+  private LdapManager ldapManager;
 
-    @Inject
-    public void setLdapManager( final LdapManager ldapManager )
-    {
-        this.ldapManager = checkNotNull( ldapManager );
+  @Inject
+  public void setLdapManager(final LdapManager ldapManager) {
+    this.ldapManager = checkNotNull(ldapManager);
+  }
+
+  @Override
+  protected AuthenticationInfo queryForAuthenticationInfo(AuthenticationToken token,
+                                                          LdapContextFactory ldapContextFactory)
+      throws NamingException
+  {
+    UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+    String username = upToken.getUsername();
+    String pass = String.valueOf(upToken.getPassword());
+
+    try {
+      this.ldapManager.authenticateUser(username, pass);
+      return this.buildAuthenticationInfo(username, null);
     }
-
-    @Override
-    protected AuthenticationInfo queryForAuthenticationInfo( AuthenticationToken token,
-        LdapContextFactory ldapContextFactory )
-        throws NamingException
-    {
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-        String username = upToken.getUsername();
-        String pass = String.valueOf( upToken.getPassword() );
-
-        try
-        {
-            this.ldapManager.authenticateUser( username, pass );
-            return this.buildAuthenticationInfo( username, null );
-        }
-        catch ( org.sonatype.security.authentication.AuthenticationException e )
-        {
-            if ( this.logger.isDebugEnabled() )
-            {
-                this.logger.debug( "User: " + username + " could not be authenticated ", e );
-            }
-            throw new org.apache.shiro.authc.AuthenticationException( e.getMessage() );
-        }
+    catch (org.sonatype.security.authentication.AuthenticationException e) {
+      if (this.logger.isDebugEnabled()) {
+        this.logger.debug("User: " + username + " could not be authenticated ", e);
+      }
+      throw new org.apache.shiro.authc.AuthenticationException(e.getMessage());
     }
+  }
 
-    @Override
-    protected AuthorizationInfo queryForAuthorizationInfo( PrincipalCollection principals,
-        LdapContextFactory ldapContextFactory )
-        throws NamingException
-    {
-        // only authorize users from this realm
-        if( principals.getRealmNames().contains( this.getName() ))
-        {
-        
-            Set<String> roles = new HashSet<String>();
-            String username = principals.getPrimaryPrincipal().toString();
-            try
-            {
-                roles = this.ldapManager.getUserRoles(username  );
-            }
-            catch ( LdapDAOException e )
-            {
-                this.logger.error( e.getMessage(), e );
-                throw new NamingException(e.getMessage());
-            }
-            catch ( NoLdapUserRolesFoundException e )
-            {
-                this.logger.debug( "User: " + username + " does not have any ldap roles.", e );
-            }
-            
-            return new SimpleAuthorizationInfo( roles );
-        }
-        return null;
-        
+  @Override
+  protected AuthorizationInfo queryForAuthorizationInfo(PrincipalCollection principals,
+                                                        LdapContextFactory ldapContextFactory)
+      throws NamingException
+  {
+    // only authorize users from this realm
+    if (principals.getRealmNames().contains(this.getName())) {
+
+      Set<String> roles = new HashSet<String>();
+      String username = principals.getPrimaryPrincipal().toString();
+      try {
+        roles = this.ldapManager.getUserRoles(username);
+      }
+      catch (LdapDAOException e) {
+        this.logger.error(e.getMessage(), e);
+        throw new NamingException(e.getMessage());
+      }
+      catch (NoLdapUserRolesFoundException e) {
+        this.logger.debug("User: " + username + " does not have any ldap roles.", e);
+      }
+
+      return new SimpleAuthorizationInfo(roles);
     }
+    return null;
 
-    protected AuthenticationInfo buildAuthenticationInfo( String username, char[] password )
-    {
-        return new SimpleAuthenticationInfo( username, password, getName() );
-    }
+  }
+
+  protected AuthenticationInfo buildAuthenticationInfo(String username, char[] password) {
+    return new SimpleAuthenticationInfo(username, password, getName());
+  }
 
 
-    @Override
-    public String getName()
-    {
-        return "LdapAuthenticatingRealm";
-    }
+  @Override
+  public String getName() {
+    return "LdapAuthenticatingRealm";
+  }
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.shiro.realm.AuthenticatingRealm#getCredentialsMatcher()
-     */
-    @Override
-    public CredentialsMatcher getCredentialsMatcher()
-    {
-        return new AllowAllCredentialsMatcher();
-    }
+  /*
+   * (non-Javadoc)
+   * @see org.apache.shiro.realm.AuthenticatingRealm#getCredentialsMatcher()
+   */
+  @Override
+  public CredentialsMatcher getCredentialsMatcher() {
+    return new AllowAllCredentialsMatcher();
+  }
 }

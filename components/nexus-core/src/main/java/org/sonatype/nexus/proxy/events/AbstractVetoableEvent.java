@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import java.util.ArrayList;
@@ -22,36 +23,30 @@ public class AbstractVetoableEvent<T>
     extends AbstractEvent<T>
     implements Vetoable
 {
-    private final ArrayList<Veto> vetos = new ArrayList<Veto>();
+  private final ArrayList<Veto> vetos = new ArrayList<Veto>();
 
-    public AbstractVetoableEvent( T component )
-    {
-        super( component );
-    }
+  public AbstractVetoableEvent(T component) {
+    super(component);
+  }
 
-    public List<Veto> getVetos()
-    {
-        return Collections.unmodifiableList( vetos );
-    }
+  public List<Veto> getVetos() {
+    return Collections.unmodifiableList(vetos);
+  }
 
-    public boolean isVetoed()
-    {
-        return !vetos.isEmpty();
-    }
+  public boolean isVetoed() {
+    return !vetos.isEmpty();
+  }
 
-    public void putVeto( Veto veto )
-    {
-        vetos.add( veto );
-    }
+  public void putVeto(Veto veto) {
+    vetos.add(veto);
+  }
 
-    public void putVeto( Object vetoer, Throwable reason )
-    {
-        vetos.add( new Veto( vetoer, reason ) );
-    }
+  public void putVeto(Object vetoer, Throwable reason) {
+    vetos.add(new Veto(vetoer, reason));
+  }
 
-    public boolean removeVeto( Veto veto )
-    {
-        return vetos.remove( veto );
-    }
+  public boolean removeVeto(Veto veto) {
+    return vetos.remove(veto);
+  }
 
 }

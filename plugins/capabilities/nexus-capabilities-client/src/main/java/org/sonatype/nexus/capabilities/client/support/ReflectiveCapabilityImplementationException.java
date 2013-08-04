@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.capabilities.client.support;
 
-import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 
 /**
@@ -20,14 +20,13 @@ import org.sonatype.nexus.client.core.exception.NexusClientException;
  *
  * @since 2.2
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class ReflectiveCapabilityImplementationException
     extends NexusClientException
 {
 
-    public ReflectiveCapabilityImplementationException( final String message )
-    {
-        super( message );
-    }
+  public ReflectiveCapabilityImplementationException(final String message) {
+    super(message);
+  }
 
 }

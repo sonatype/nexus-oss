@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
@@ -24,50 +24,52 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import org.junit.Test;
+
 public class LinkTest
     extends AbstractProxyTestEnvironment
 {
-    private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
+  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
 
-    @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
-        throws Exception
-    {
-        ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
-        return jettyTestsuiteEnvironmentBuilder;
-    }
+  @Override
+  protected EnvironmentBuilder getEnvironmentBuilder()
+      throws Exception
+  {
+    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
+    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
+    return jettyTestsuiteEnvironmentBuilder;
+  }
 
-    @Test
-    public void testRepoLinks()
-        throws Exception
-    {
-        String contentString = "SOME_CONTENT";
+  @Test
+  public void testRepoLinks()
+      throws Exception
+  {
+    String contentString = "SOME_CONTENT";
 
-        Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
+    Repository repo1 = getRepositoryRegistry().getRepository("repo1");
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            repo1,
-            "/a.txt",
-            true,
-            true,
-            new StringContentLocator( contentString ) );
-        file.getAttributes().put( "attr1", "ATTR1" );
-        repo1.storeItem( false, file );
+    DefaultStorageFileItem file = new DefaultStorageFileItem(
+        repo1,
+        "/a.txt",
+        true,
+        true,
+        new StringContentLocator(contentString));
+    file.getAttributes().put("attr1", "ATTR1");
+    repo1.storeItem(false, file);
 
-        DefaultStorageLinkItem link = new DefaultStorageLinkItem( repo1, "/b.txt", true, true, file
-            .getRepositoryItemUid() );
-        repo1.getLocalStorage().storeItem( repo1, link );
+    DefaultStorageLinkItem link = new DefaultStorageLinkItem(repo1, "/b.txt", true, true, file
+        .getRepositoryItemUid());
+    repo1.getLocalStorage().storeItem(repo1, link);
 
-        StorageItem item = repo1.retrieveItem( new ResourceStoreRequest( "/b.txt", true ) );
-        assertEquals( DefaultStorageLinkItem.class, item.getClass() );
+    StorageItem item = repo1.retrieveItem(new ResourceStoreRequest("/b.txt", true));
+    assertEquals(DefaultStorageLinkItem.class, item.getClass());
 
-        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( false, new ResourceStoreRequest(
-            ( (StorageLinkItem) item ).getTarget().getPath(),
-            false ) );
+    StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem(false, new ResourceStoreRequest(
+        ((StorageLinkItem) item).getTarget().getPath(),
+        false));
 
-        assertStorageFileItem( item1 );
-        assertTrue( contentEquals( item1.getInputStream(), new ByteArrayInputStream( contentString.getBytes() ) ) );
-    }
+    assertStorageFileItem(item1);
+    assertTrue(contentEquals(item1.getInputStream(), new ByteArrayInputStream(contentString.getBytes())));
+  }
 
 }

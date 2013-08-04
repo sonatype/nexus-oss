@@ -10,26 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting.bundle;
 
 import com.thoughtworks.xstream.XStream;
 
 public class AbstractXmlAssembler
 {
-    /**
-     * XStream is used for a deep clone (TODO: not sure if this is a great idea)
-     */
-    private static XStream xstream = new XStream();
-    
-    protected static final String PASSWORD_MASK = "*****";
-    
-    protected Object cloneViaXml( Object configuration )
-    {
-        if ( configuration == null )
-        {
-            return null;
-        }
-        
-        return xstream.fromXML( xstream.toXML( configuration ) );
+  /**
+   * XStream is used for a deep clone (TODO: not sure if this is a great idea)
+   */
+  private static XStream xstream = new XStream();
+
+  protected static final String PASSWORD_MASK = "*****";
+
+  protected Object cloneViaXml(Object configuration) {
+    if (configuration == null) {
+      return null;
     }
+
+    return xstream.fromXML(xstream.toXML(configuration));
+  }
 }

@@ -10,21 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.attributes;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+package org.sonatype.nexus.proxy.attributes;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -41,245 +33,251 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+
 /**
  * AttributeStorage implementation driven by XStream.
- * 
+ *
  * @author cstamas
  */
 public class DefaultAttributeStorageIT
     extends AbstractNexusTestEnvironment
 {
 
-    protected AttributeStorage attributeStorage;
+  protected AttributeStorage attributeStorage;
 
-    protected RepositoryItemUidFactory repositoryItemUidFactory;
+  protected RepositoryItemUidFactory repositoryItemUidFactory;
 
-    protected Repository repository;
+  protected Repository repository;
 
-    protected File localStorageDirectory;
+  protected File localStorageDirectory;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        attributeStorage = lookup( AttributeStorage.class, "fs" );
+    attributeStorage = lookup(AttributeStorage.class, "fs");
 
-        repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
+    repositoryItemUidFactory = lookup(RepositoryItemUidFactory.class);
 
-        repository = lookup( Repository.class, "maven2" );
+    repository = lookup(Repository.class, "maven2");
 
-        CRepository repoConf = new DefaultCRepository();
+    CRepository repoConf = new DefaultCRepository();
 
-        repoConf.setProviderRole( Repository.class.getName() );
-        repoConf.setProviderHint( "maven2" );
-        repoConf.setId( "dummy" );
+    repoConf.setProviderRole(Repository.class.getName());
+    repoConf.setProviderHint("maven2");
+    repoConf.setId("dummy");
 
-        repoConf.setLocalStorage( new CLocalStorage() );
-        repoConf.getLocalStorage().setProvider( "file" );
-        localStorageDirectory = new File( getBasedir(), "target/test-reposes/repo1" );
-        repoConf.getLocalStorage().setUrl( localStorageDirectory.toURI().toURL().toString() );
+    repoConf.setLocalStorage(new CLocalStorage());
+    repoConf.getLocalStorage().setProvider("file");
+    localStorageDirectory = new File(getBasedir(), "target/test-reposes/repo1");
+    repoConf.getLocalStorage().setUrl(localStorageDirectory.toURI().toURL().toString());
 
-        Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
-        repoConf.setExternalConfiguration( exRepo );
-        M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
-        exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
+    Xpp3Dom exRepo = new Xpp3Dom("externalConfiguration");
+    repoConf.setExternalConfiguration(exRepo);
+    M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration(exRepo);
+    exRepoConf.setRepositoryPolicy(RepositoryPolicy.RELEASE);
+    exRepoConf.setChecksumPolicy(ChecksumPolicy.STRICT_IF_EXISTS);
 
-        if ( attributeStorage instanceof DefaultFSAttributeStorage )
-        {
-            FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributeStorage ).getWorkingDirectory() );
-        }
-        else if ( attributeStorage instanceof DefaultLSAttributeStorage )
-        {
-            FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
-        }
-
-        repository.configure( repoConf );
+    if (attributeStorage instanceof DefaultFSAttributeStorage) {
+      FileUtils.deleteDirectory(((DefaultFSAttributeStorage) attributeStorage).getWorkingDirectory());
+    }
+    else if (attributeStorage instanceof DefaultLSAttributeStorage) {
+      FileUtils.deleteDirectory(new File(localStorageDirectory, ".nexus/attributes"));
     }
 
-    @Test
-    public void testSimplePutGet()
-        throws Exception
-    {
-        DefaultStorageFileItem file =
-            new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/a.txt" ), true, true,
-                new StringContentLocator( "CONTENT" ) );
+    repository.configure(repoConf);
+  }
 
-        file.getAttributes().put( "kuku", "kuku" );
+  @Test
+  public void testSimplePutGet()
+      throws Exception
+  {
+    DefaultStorageFileItem file =
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true,
+            new StringContentLocator("CONTENT"));
 
-        attributeStorage.putAttributes( file.getRepositoryItemUid(), file.getRepositoryItemAttributes() );
+    file.getAttributes().put("kuku", "kuku");
 
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
-        Attributes file1 = attributeStorage.getAttributes( uid );
+    attributeStorage.putAttributes(file.getRepositoryItemUid(), file.getRepositoryItemAttributes());
 
-        assertTrue( file1.containsKey( "kuku" ) );
-        assertTrue( "kuku".equals( file1.get( "kuku" ) ) );
+    RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(repository, "/a.txt");
+    Attributes file1 = attributeStorage.getAttributes(uid);
+
+    assertTrue(file1.containsKey("kuku"));
+    assertTrue("kuku".equals(file1.get("kuku")));
+  }
+
+  @Test
+  public void testSimplePutGetNEXUS3911()
+      throws Exception
+  {
+    DefaultStorageFileItem file =
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true,
+            new StringContentLocator("CONTENT"));
+
+    file.getAttributes().put("kuku", "kuku");
+
+    attributeStorage.putAttributes(file.getRepositoryItemUid(), file.getRepositoryItemAttributes());
+
+    RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(repository, "/a.txt");
+    Attributes file1 = attributeStorage.getAttributes(uid);
+
+    assertTrue(file1.containsKey("kuku"));
+    assertTrue("kuku".equals(file1.get("kuku")));
+
+    // this above is same as in testSimplePutGet(), but now we will replace the attribute file
+
+    // reverted back to "old" attributes
+    File attributeFile =
+        new File(((DefaultFSAttributeStorage) attributeStorage).getWorkingDirectory(), repository.getId()
+            + "/a.txt");
+    // File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
+
+    FileUtils.fileWrite(attributeFile.getAbsolutePath(), "<file");
+
+    // try to read it, we should not get NPE
+    try {
+      file1 = attributeStorage.getAttributes(uid);
+    }
+    catch (NullPointerException e) {
+      fail("We should not get NPE!");
     }
 
-    @Test
-    public void testSimplePutGetNEXUS3911()
-        throws Exception
-    {
-        DefaultStorageFileItem file =
-            new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/a.txt" ), true, true,
-                new StringContentLocator( "CONTENT" ) );
+    assertNull("file1 is corrupt, hence it should be null!", file1);
+  }
 
-        file.getAttributes().put( "kuku", "kuku" );
+  @Test
+  public void testSimplePutDelete()
+      throws Exception
+  {
+    DefaultStorageFileItem file =
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/b.txt"), true, true,
+            new StringContentLocator("CONTENT"));
 
-        attributeStorage.putAttributes( file.getRepositoryItemUid(), file.getRepositoryItemAttributes() );
+    file.getAttributes().put("kuku", "kuku");
 
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
-        Attributes file1 = attributeStorage.getAttributes( uid );
+    attributeStorage.putAttributes(file.getRepositoryItemUid(), file.getRepositoryItemAttributes());
 
-        assertTrue( file1.containsKey( "kuku" ) );
-        assertTrue( "kuku".equals( file1.get( "kuku" ) ) );
+    RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(repository, "/b.txt");
 
-        // this above is same as in testSimplePutGet(), but now we will replace the attribute file
+    assertNotNull(attributeStorage.getAttributes(uid));
 
-        // reverted back to "old" attributes
-        File attributeFile =
-            new File( ( (DefaultFSAttributeStorage) attributeStorage ).getWorkingDirectory(), repository.getId()
-                + "/a.txt" );
-        // File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
+    assertTrue(attributeStorage.deleteAttributes(uid));
 
-        FileUtils.fileWrite( attributeFile.getAbsolutePath(), "<file" );
+    assertNull(attributeStorage.getAttributes(uid));
+  }
 
-        // try to read it, we should not get NPE
-        try
-        {
-            file1 = attributeStorage.getAttributes( uid );
-        }
-        catch ( NullPointerException e )
-        {
-            fail( "We should not get NPE!" );
-        }
+  @Test
+  public void testZeroLenghtFSAttributeStorage()
+      throws Exception
+  {
+    // NEXUS-4871
+    ApplicationConfiguration appCfg = lookup(ApplicationConfiguration.class);
+    File workDir = appCfg.getWorkingDirectory("proxy/attributes-ng");
+    workDir.mkdirs();
 
-        assertNull( "file1 is corrupt, hence it should be null!", file1 );
-    }
+    RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(repository, "a/b/c.txt");
 
-    @Test
-    public void testSimplePutDelete()
-        throws Exception
-    {
-        DefaultStorageFileItem file =
-            new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/b.txt" ), true, true,
-                new StringContentLocator( "CONTENT" ) );
+    File attFile = new File(workDir, repository.getId() + "/" + uid.getPath());
+    attFile.getParentFile().mkdirs();
 
-        file.getAttributes().put( "kuku", "kuku" );
+    // make a zero length file
+    attFile.createNewFile();
+    assertThat(attFile, FileMatchers.sized(0L));
 
-        attributeStorage.putAttributes( file.getRepositoryItemUid(), file.getRepositoryItemAttributes() );
+    final DefaultFSAttributeStorage fsStorage = new DefaultFSAttributeStorage(appCfg);
 
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
+    // check getAttributes is gonna delete it
+    Attributes att = fsStorage.getAttributes(uid);
+    assertThat(att, nullValue());
+    assertThat(attFile, not(FileMatchers.exists()));
 
-        assertNotNull( attributeStorage.getAttributes( uid ) );
+    DefaultStorageFileItem file =
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest(uid.getPath()), true, true,
+            new StringContentLocator("CONTENT"));
 
-        assertTrue( attributeStorage.deleteAttributes( uid ) );
+    long creationTime = createFile(attFile);
+    assertThat(attFile, FileMatchers.sized(0L));
 
-        assertNull( attributeStorage.getAttributes( uid ) );
-    }
+    att = file.getRepositoryItemAttributes();
+    fsStorage.putAttributes(uid, att);
 
-    @Test
-    public void testZeroLenghtFSAttributeStorage()
-        throws Exception
-    {
-        // NEXUS-4871
-        ApplicationConfiguration appCfg = lookup( ApplicationConfiguration.class );
-        File workDir = appCfg.getWorkingDirectory( "proxy/attributes-ng" );
-        workDir.mkdirs();
+    // put shall create the file
+    assertThat(attFile, FileMatchers.exists());
+    // must be newer then the zero length file
+    assertThat(attFile.lastModified(), greaterThan(creationTime));
 
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "a/b/c.txt" );
+    Attributes retAtt = fsStorage.getAttributes(uid);
+    assertThat(retAtt, notNullValue());
+  }
 
-        File attFile = new File( workDir, repository.getId() + "/" + uid.getPath() );
-        attFile.getParentFile().mkdirs();
+  @Test
+  public void testZeroLenghtLSAttributeStorage()
+      throws Exception
+  {
+    // NEXUS-4871
+    RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(repository, "a/b/c.txt");
 
-        // make a zero length file
-        attFile.createNewFile();
-        assertThat( attFile, FileMatchers.sized( 0L ) );
+    File attFile = new File(localStorageDirectory, ".nexus/attributes/" + uid.getPath());
+    attFile.getParentFile().mkdirs();
 
-        final DefaultFSAttributeStorage fsStorage = new DefaultFSAttributeStorage( appCfg );
+    // cleanup
+    attFile.delete();
+    new File(localStorageDirectory, ".nexus/trash/.nexus/attributes/" + uid.getPath()).delete();
 
-        // check getAttributes is gonna delete it
-        Attributes att = fsStorage.getAttributes( uid );
-        assertThat( att, nullValue() );
-        assertThat( attFile, not( FileMatchers.exists() ) );
+    // make a zero length file
+    attFile.createNewFile();
+    assertThat(attFile, FileMatchers.sized(0L));
 
-        DefaultStorageFileItem file =
-            new DefaultStorageFileItem( repository, new ResourceStoreRequest( uid.getPath() ), true, true,
-                new StringContentLocator( "CONTENT" ) );
+    final DefaultLSAttributeStorage lsStorage = new DefaultLSAttributeStorage();
 
-        long creationTime = createFile( attFile );
-        assertThat( attFile, FileMatchers.sized( 0L ) );
+    // check getAttributes is gonna delete it
+    Attributes att = lsStorage.getAttributes(uid);
+    assertThat(att, nullValue());
+    assertThat(attFile, not(FileMatchers.exists()));
 
-        att = file.getRepositoryItemAttributes();
-        fsStorage.putAttributes( uid, att );
+    DefaultStorageFileItem file =
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest(uid.getPath()), true, true,
+            new StringContentLocator("CONTENT"));
 
-        // put shall create the file
-        assertThat( attFile, FileMatchers.exists() );
-        // must be newer then the zero length file
-        assertThat( attFile.lastModified(), greaterThan( creationTime ) );
+    // make a zero length file
+    long creationTime = createFile(attFile);
+    assertThat(attFile, FileMatchers.sized(0L));
 
-        Attributes retAtt = fsStorage.getAttributes( uid );
-        assertThat( retAtt, notNullValue() );
-    }
+    att = file.getRepositoryItemAttributes();
+    lsStorage.putAttributes(uid, att);
 
-    @Test
-    public void testZeroLenghtLSAttributeStorage()
-        throws Exception
-    {
-        // NEXUS-4871
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "a/b/c.txt" );
+    // put shall create the file
+    assertThat(attFile, FileMatchers.exists());
+    // must be newer then the zero length file
+    assertThat(attFile.lastModified(), greaterThan(creationTime));
 
-        File attFile = new File( localStorageDirectory, ".nexus/attributes/" + uid.getPath() );
-        attFile.getParentFile().mkdirs();
+    Attributes retAtt = lsStorage.getAttributes(uid);
+    assertThat(retAtt, notNullValue());
+  }
 
-        // cleanup
-        attFile.delete();
-        new File( localStorageDirectory, ".nexus/trash/.nexus/attributes/" + uid.getPath() ).delete();
+  protected long createFile(File attFile)
+      throws IOException, InterruptedException
+  {
+    attFile.createNewFile();
+    long creationTime = new Date().getTime();
 
-        // make a zero length file
-        attFile.createNewFile();
-        assertThat( attFile, FileMatchers.sized( 0L ) );
+    // https://github.com/sonatype/nexus/pull/308#r460989
+    // This may fail depending on the filesystem timestamp resolution (ext3 uses 1s IIRC)
+    Thread.sleep(1500);
 
-        final DefaultLSAttributeStorage lsStorage = new DefaultLSAttributeStorage();
-
-        // check getAttributes is gonna delete it
-        Attributes att = lsStorage.getAttributes( uid );
-        assertThat( att, nullValue() );
-        assertThat( attFile, not( FileMatchers.exists() ) );
-
-        DefaultStorageFileItem file =
-            new DefaultStorageFileItem( repository, new ResourceStoreRequest( uid.getPath() ), true, true,
-                new StringContentLocator( "CONTENT" ) );
-
-        // make a zero length file
-        long creationTime = createFile( attFile );
-        assertThat( attFile, FileMatchers.sized( 0L ) );
-
-        att = file.getRepositoryItemAttributes();
-        lsStorage.putAttributes( uid, att );
-
-        // put shall create the file
-        assertThat( attFile, FileMatchers.exists() );
-        // must be newer then the zero length file
-        assertThat( attFile.lastModified(), greaterThan( creationTime ) );
-
-        Attributes retAtt = lsStorage.getAttributes( uid );
-        assertThat( retAtt, notNullValue() );
-    }
-
-    protected long createFile( File attFile )
-        throws IOException, InterruptedException
-    {
-        attFile.createNewFile();
-        long creationTime = new Date().getTime();
-
-        // https://github.com/sonatype/nexus/pull/308#r460989
-        // This may fail depending on the filesystem timestamp resolution (ext3 uses 1s IIRC)
-        Thread.sleep( 1500 );
-
-        return creationTime;
-    }
+    return creationTime;
+  }
 
 }

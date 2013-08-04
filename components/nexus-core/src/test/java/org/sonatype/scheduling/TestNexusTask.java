@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 import java.util.List;
@@ -23,68 +24,59 @@ public class TestNexusTask
     implements NexusTask<Object>
 {
 
-    private int runCount = 0;
+  private int runCount = 0;
 
-    public int getRunCount()
-    {
-        return runCount;
-    }
+  public int getRunCount() {
+    return runCount;
+  }
 
-    @Override
-    public Object call()
-        throws Exception
-    {
-        runCount++;
+  @Override
+  public Object call()
+      throws Exception
+  {
+    runCount++;
 
-        return null;
-    }
+    return null;
+  }
 
-    @Override
-    public String getId()
-    {
-        return TestNexusTask.class.getName();
-    }
+  @Override
+  public String getId() {
+    return TestNexusTask.class.getName();
+  }
 
-    @Override
-    public String getName()
-    {
-        return TestNexusTask.class.getName();
-    }
+  @Override
+  public String getName() {
+    return TestNexusTask.class.getName();
+  }
 
-    @Override
-    public boolean isExposed()
-    {
-        return true;
-    }
+  @Override
+  public boolean isExposed() {
+    return true;
+  }
 
-    @Override
-    public boolean shouldSendAlertEmail()
-    {
-        return false;
-    }
+  @Override
+  public boolean shouldSendAlertEmail() {
+    return false;
+  }
 
-    @Override
-    public String getAlertEmail()
-    {
-        return null;
-    }
+  @Override
+  public String getAlertEmail() {
+    return null;
+  }
 
-    @Override
-    public TaskActivityDescriptor getTaskActivityDescriptor()
-    {
-        return null;
-    }
+  @Override
+  public TaskActivityDescriptor getTaskActivityDescriptor() {
+    return null;
+  }
 
-    @Override
-    public boolean allowConcurrentSubmission( final Map<String, List<ScheduledTask<?>>> currentActiveTasks )
-    {
-        return false;
-    }
+  @Override
+  public boolean allowConcurrentSubmission(final Map<String, List<ScheduledTask<?>>> currentActiveTasks) {
+    return false;
+  }
 
-    @Override
-    public boolean allowConcurrentExecution( final Map<String, List<ScheduledTask<?>>> currentActiveTasks )
-    {
-        return false;
-    }
+  @Override
+  public boolean allowConcurrentExecution(final Map<String, List<ScheduledTask<?>>> currentActiveTasks) {
+    return false;
+  }
 
 }

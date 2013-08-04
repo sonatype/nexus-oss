@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.validator;
 
 import java.util.Set;
@@ -24,16 +25,16 @@ import org.sonatype.security.model.Configuration;
 
 public interface SecurityConfigurationValidator
 {
-    ValidationResponse validateModel( ValidationRequest<Configuration> request );
+  ValidationResponse validateModel(ValidationRequest<Configuration> request);
 
-    ValidationResponse validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege, boolean update );
+  ValidationResponse validatePrivilege(SecurityValidationContext ctx, CPrivilege privilege, boolean update);
 
-    ValidationResponse validateRoleContainment( SecurityValidationContext ctx );
+  ValidationResponse validateRoleContainment(SecurityValidationContext ctx);
 
-    ValidationResponse validateRole( SecurityValidationContext ctx, CRole role, boolean update );
+  ValidationResponse validateRole(SecurityValidationContext ctx, CRole role, boolean update);
 
-    ValidationResponse validateUser( SecurityValidationContext ctx, CUser user, Set<String> roles, boolean update );
+  ValidationResponse validateUser(SecurityValidationContext ctx, CUser user, Set<String> roles, boolean update);
 
-    ValidationResponse validateUserRoleMapping( SecurityValidationContext ctx, CUserRoleMapping userRoleMapping,
-                                                boolean update );
+  ValidationResponse validateUserRoleMapping(SecurityValidationContext ctx, CUserRoleMapping userRoleMapping,
+                                             boolean update);
 }

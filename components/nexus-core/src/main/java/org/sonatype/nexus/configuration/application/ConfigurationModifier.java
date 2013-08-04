@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -17,6 +18,6 @@ import org.sonatype.nexus.configuration.model.Configuration;
 public interface ConfigurationModifier
 {
 
-    boolean apply( Configuration configuration );
+  boolean apply(Configuration configuration);
 
 }

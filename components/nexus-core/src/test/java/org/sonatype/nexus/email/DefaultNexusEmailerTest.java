@@ -10,29 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.email;
 
-import org.junit.Test;
 import org.sonatype.nexus.NexusAppTestSupport;
+
+import org.junit.Test;
 
 public class DefaultNexusEmailerTest
     extends NexusAppTestSupport
 {
-    private NexusEmailer emailer;
+  private NexusEmailer emailer;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        emailer = lookup( NexusEmailer.class );
-    }
+    emailer = lookup(NexusEmailer.class);
+  }
 
-    @Test
-    public void testConfigChanged()
-        throws Exception
-    {
+  @Test
+  public void testConfigChanged()
+      throws Exception
+  {
 /*        CSmtpConfiguration newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname(  "1.2.3.4" );
 
@@ -90,5 +92,5 @@ public class DefaultNexusEmailerTest
         assertTrue( emailer.configChanged( newSmtp ) );
 
         assertFalse( emailer.configChanged( newSmtp ) );*/
-    }
+  }
 }

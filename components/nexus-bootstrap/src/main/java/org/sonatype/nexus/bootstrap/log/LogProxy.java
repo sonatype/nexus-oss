@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.log;
 
 /**
@@ -20,42 +21,34 @@ package org.sonatype.nexus.bootstrap.log;
 public class LogProxy
 {
 
-    public void debug( final String message, Object... args )
-    {
-        // does nothing
-    }
+  public void debug(final String message, Object... args) {
+    // does nothing
+  }
 
-    public void info( final String message, final Object... args )
-    {
-        // does nothing
-    }
+  public void info(final String message, final Object... args) {
+    // does nothing
+  }
 
-    public void error( final String message, Object... args )
-    {
-        // does nothing
-    }
+  public void error(final String message, Object... args) {
+    // does nothing
+  }
 
-    public void error( final String message, Throwable e )
-    {
-        // does nothing
-    }
+  public void error(final String message, Throwable e) {
+    // does nothing
+  }
 
-    public void warn( final String message, Object... args )
-    {
-        // does nothing
-    }
+  public void warn(final String message, Object... args) {
+    // does nothing
+  }
 
-    public static LogProxy getLogger( final Class clazz )
-    {
-        try
-        {
-            LogProxy.class.getClassLoader().loadClass( "org.slf4j.Logger" );
-            return new Slf4jLogProxy( clazz );
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return new SystemOutLogProxy( clazz );
-        }
+  public static LogProxy getLogger(final Class clazz) {
+    try {
+      LogProxy.class.getClassLoader().loadClass("org.slf4j.Logger");
+      return new Slf4jLogProxy(clazz);
     }
+    catch (ClassNotFoundException e) {
+      return new SystemOutLogProxy(clazz);
+    }
+  }
 
 }

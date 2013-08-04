@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Arrays;
@@ -18,54 +19,49 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.Entry;
 
 import com.google.common.base.Predicate;
+import org.codehaus.plexus.component.annotations.Component;
 
-@Component( role = FeedSource.class, hint = "recentlyCachedReleaseArtifacts" )
+@Component(role = FeedSource.class, hint = "recentlyCachedReleaseArtifacts")
 public class RecentCachedReleaseArtifactFeedSource
     extends AbstractNexusReleaseArtifactEventFeedSource
 {
 
-    public static final String CHANNEL_KEY = "recentlyCachedReleaseArtifacts";
+  public static final String CHANNEL_KEY = "recentlyCachedReleaseArtifacts";
 
-    @Override
-    public List<NexusArtifactEvent> getEventList( Integer from, Integer count, Map<String, String> params )
-    {
-        final Set<String> repositoryIds = getRepoIdsFromParams( params );
+  @Override
+  public List<NexusArtifactEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
+    final Set<String> repositoryIds = getRepoIdsFromParams(params);
 
-        final Predicate<Entry> filter =
-            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
-                : new RepositoryIdTimelineFilter( repositoryIds );
+    final Predicate<Entry> filter =
+        (repositoryIds == null || repositoryIds.isEmpty()) ? null
+            : new RepositoryIdTimelineFilter(repositoryIds);
 
-        return getFeedRecorder().getNexusArtifectEvents(
-            new HashSet<String>( Arrays.asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), from, count,
-            filter );
-    }
+    return getFeedRecorder().getNexusArtifectEvents(
+        new HashSet<String>(Arrays.asList(new String[]{NexusArtifactEvent.ACTION_CACHED})), from, count,
+        filter);
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "New cached release artifacts in all Nexus repositories (cached).";
-    }
+  @Override
+  public String getDescription() {
+    return "New cached release artifacts in all Nexus repositories (cached).";
+  }
 
-    @Override
-    public String getTitle()
-    {
-        return "New cached release artifacts";
-    }
+  @Override
+  public String getTitle() {
+    return "New cached release artifacts";
+  }
 
-    public String getFeedKey()
-    {
-        return CHANNEL_KEY;
-    }
+  public String getFeedKey() {
+    return CHANNEL_KEY;
+  }
 
-    public String getFeedName()
-    {
-        return getDescription();
-    }
+  public String getFeedName() {
+    return getDescription();
+  }
 
 }

@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.support.condition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities.support.condition;
 
 import javax.inject.Provider;
 
@@ -20,6 +19,8 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link Condition} implementation support.
@@ -31,123 +32,104 @@ public abstract class ConditionSupport
     implements Condition
 {
 
-    private final Provider<EventBus> eventBusProvider;
+  private final Provider<EventBus> eventBusProvider;
 
-    private boolean satisfied;
+  private boolean satisfied;
 
-    private boolean active;
+  private boolean active;
 
-    protected ConditionSupport( final EventBus eventBus )
+  protected ConditionSupport(final EventBus eventBus) {
+    this(eventBus, false);
+  }
+
+  protected ConditionSupport(final EventBus eventBus, final boolean satisfied) {
+    this(new Provider<EventBus>()
     {
-        this( eventBus, false );
+      @Override
+      public EventBus get() {
+        return eventBus;
+      }
+    }, satisfied);
+  }
+
+  protected ConditionSupport(final Provider<EventBus> eventBusProvider) {
+    this(eventBusProvider, false);
+  }
+
+  protected ConditionSupport(final Provider<EventBus> eventBusProvider, final boolean satisfied) {
+    this.eventBusProvider = checkNotNull(eventBusProvider);
+    this.satisfied = satisfied;
+    active = false;
+  }
+
+  public EventBus getEventBus() {
+    return eventBusProvider.get();
+  }
+
+  @Override
+  public boolean isSatisfied() {
+    return satisfied;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  @Override
+  public final Condition bind() {
+    if (!active) {
+      active = true;
+      doBind();
     }
+    return this;
+  }
 
-    protected ConditionSupport( final EventBus eventBus, final boolean satisfied )
-    {
-        this( new Provider<EventBus>()
-        {
-            @Override
-            public EventBus get()
-            {
-                return eventBus;
-            }
-        }, satisfied );
+  @Override
+  public final Condition release() {
+    if (active) {
+      doRelease();
+      active = false;
     }
+    return this;
+  }
 
-    protected ConditionSupport( final Provider<EventBus> eventBusProvider )
-    {
-        this( eventBusProvider, false );
-    }
+  @Override
+  public String explainSatisfied() {
+    return this + " is satisfied";
+  }
 
-    protected ConditionSupport( final Provider<EventBus> eventBusProvider, final boolean satisfied )
-    {
-        this.eventBusProvider = checkNotNull( eventBusProvider );
-        this.satisfied = satisfied;
-        active = false;
-    }
+  @Override
+  public String explainUnsatisfied() {
+    return this + " is not satisfied";
+  }
 
-    public EventBus getEventBus()
-    {
-        return eventBusProvider.get();
-    }
+  /**
+   * Template method to be implemented by subclasses for doing specific binding.
+   */
+  protected abstract void doBind();
 
-    @Override
-    public boolean isSatisfied()
-    {
-        return satisfied;
-    }
+  /**
+   * Template method to be implemented by subclasses for doing specific releasing.
+   */
+  protected abstract void doRelease();
 
-    public boolean isActive()
-    {
-        return active;
-    }
-
-    @Override
-    public final Condition bind()
-    {
-        if ( !active )
-        {
-            active = true;
-            doBind();
+  /**
+   * Sets the satisfied status and if active, notify about this condition being satisfied/unsatisfied.
+   *
+   * @param satisfied true, if condition is satisfied
+   */
+  protected void setSatisfied(final boolean satisfied) {
+    if (this.satisfied != satisfied) {
+      this.satisfied = satisfied;
+      if (active) {
+        if (this.satisfied) {
+          getEventBus().post(new ConditionEvent.Satisfied(this));
         }
-        return this;
-    }
-
-    @Override
-    public final Condition release()
-    {
-        if ( active )
-        {
-            doRelease();
-            active = false;
+        else {
+          getEventBus().post(new ConditionEvent.Unsatisfied(this));
         }
-        return this;
+      }
     }
-
-    @Override
-    public String explainSatisfied()
-    {
-        return this + " is satisfied";
-    }
-
-    @Override
-    public String explainUnsatisfied()
-    {
-        return this + " is not satisfied";
-    }
-
-    /**
-     * Template method to be implemented by subclasses for doing specific binding.
-     */
-    protected abstract void doBind();
-
-    /**
-     * Template method to be implemented by subclasses for doing specific releasing.
-     */
-    protected abstract void doRelease();
-
-    /**
-     * Sets the satisfied status and if active, notify about this condition being satisfied/unsatisfied.
-     *
-     * @param satisfied true, if condition is satisfied
-     */
-    protected void setSatisfied( final boolean satisfied )
-    {
-        if ( this.satisfied != satisfied )
-        {
-            this.satisfied = satisfied;
-            if ( active )
-            {
-                if ( this.satisfied )
-                {
-                    getEventBus().post( new ConditionEvent.Satisfied( this ) );
-                }
-                else
-                {
-                    getEventBus().post( new ConditionEvent.Unsatisfied( this ) );
-                }
-            }
-        }
-    }
+  }
 
 }

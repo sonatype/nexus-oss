@@ -10,10 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline;
 
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 
@@ -27,16 +29,14 @@ public class PredicateTimelineFilter
     implements TimelineFilter
 {
 
-    private final Predicate<Entry> predicate;
+  private final Predicate<Entry> predicate;
 
-    public PredicateTimelineFilter( final Predicate<Entry> predicate )
-    {
-        this.predicate = Preconditions.checkNotNull( predicate );
-    }
+  public PredicateTimelineFilter(final Predicate<Entry> predicate) {
+    this.predicate = Preconditions.checkNotNull(predicate);
+  }
 
-    @Override
-    public boolean accept( final TimelineRecord timelineRecord )
-    {
-        return predicate.apply( new TimelineRecordWrapper( timelineRecord ) );
-    }
+  @Override
+  public boolean accept(final TimelineRecord timelineRecord) {
+    return predicate.apply(new TimelineRecordWrapper(timelineRecord));
+  }
 }

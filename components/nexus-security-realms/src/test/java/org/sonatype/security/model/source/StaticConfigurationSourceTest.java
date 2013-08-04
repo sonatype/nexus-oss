@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.model.source;
 
 import java.io.IOException;
@@ -19,66 +20,64 @@ public class StaticConfigurationSourceTest
     extends AbstractSecurityConfigurationSourceTest
 {
 
-    @Override
-    protected SecurityModelConfigurationSource getConfigurationSource()
-        throws Exception
-    {
-        return (SecurityModelConfigurationSource) lookup( SecurityModelConfigurationSource.class, "static" );
+  @Override
+  protected SecurityModelConfigurationSource getConfigurationSource()
+      throws Exception
+  {
+    return (SecurityModelConfigurationSource) lookup(SecurityModelConfigurationSource.class, "static");
+  }
+
+  @Override
+  protected InputStream getOriginatingConfigurationInputStream()
+      throws IOException
+  {
+    return getClass().getResourceAsStream("/META-INF/security/security.xml");
+  }
+
+  public void testStoreConfiguration()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
+
+    configurationSource.loadConfiguration();
+
+    try {
+      configurationSource.storeConfiguration();
+
+      fail();
     }
-
-    @Override
-    protected InputStream getOriginatingConfigurationInputStream()
-        throws IOException
-    {
-        return getClass().getResourceAsStream( "/META-INF/security/security.xml" );
+    catch (UnsupportedOperationException e) {
+      // good
     }
+  }
 
-    public void testStoreConfiguration()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  public void testIsConfigurationUpgraded()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        configurationSource.loadConfiguration();
+    configurationSource.loadConfiguration();
 
-        try
-        {
-            configurationSource.storeConfiguration();
+    assertEquals(false, configurationSource.isConfigurationUpgraded());
+  }
 
-            fail();
-        }
-        catch ( UnsupportedOperationException e )
-        {
-            // good
-        }
-    }
+  public void testIsConfigurationDefaulted()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-    public void testIsConfigurationUpgraded()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+    configurationSource.loadConfiguration();
 
-        configurationSource.loadConfiguration();
+    assertEquals(false, configurationSource.isConfigurationDefaulted());
+  }
 
-        assertEquals( false, configurationSource.isConfigurationUpgraded() );
-    }
-
-    public void testIsConfigurationDefaulted()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
-
-        configurationSource.loadConfiguration();
-
-        assertEquals( false, configurationSource.isConfigurationDefaulted() );
-    }
-
-    // NOT EXPOSED
-    // public void testGetDefaultsSource()
-    // throws Exception
-    // {
-    // configurationSource = getConfigurationSource();
-    //
-    // assertEquals( null, configurationSource.getDefaultsSource() );
-    // }
+  // NOT EXPOSED
+  // public void testGetDefaultsSource()
+  // throws Exception
+  // {
+  // configurationSource = getConfigurationSource();
+  //
+  // assertEquals( null, configurationSource.getDefaultsSource() );
+  // }
 
 }

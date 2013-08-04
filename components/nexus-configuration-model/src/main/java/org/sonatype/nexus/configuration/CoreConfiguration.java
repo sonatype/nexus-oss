@@ -10,20 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
 
 /**
  * Top level interface for wrapping up "core configurations", those used by core components.
- * 
+ *
  * @author cstamas
  */
 public interface CoreConfiguration
     extends RevertableConfiguration
 {
-    /**
-     * Returns the external configuration, if any. Null otherwise.
-     * 
-     * @return
-     */
-    ExternalConfiguration<?> getExternalConfiguration();
+  /**
+   * Returns the external configuration, if any. Null otherwise.
+   */
+  ExternalConfiguration<?> getExternalConfiguration();
 }

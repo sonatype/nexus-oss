@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authc;
 
 import javax.inject.Inject;
@@ -17,6 +18,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.sonatype.nexus.auth.ClientInfo;
+import org.sonatype.nexus.auth.NexusAuthenticationEvent;
+import org.sonatype.nexus.rest.RemoteIPFinder;
+import org.sonatype.nexus.security.Constants;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -33,424 +41,362 @@ import org.apache.shiro.web.util.WebUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.auth.ClientInfo;
-import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.rest.RemoteIPFinder;
-import org.sonatype.nexus.security.Constants;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
 {
-    public static final String AUTH_SCHEME_KEY = "auth.scheme";
+  public static final String AUTH_SCHEME_KEY = "auth.scheme";
 
-    public static final String AUTH_REALM_KEY = "auth.realm";
+  public static final String AUTH_REALM_KEY = "auth.realm";
 
-    public static final String FAKE_AUTH_SCHEME = "NxBASIC";
+  public static final String FAKE_AUTH_SCHEME = "NxBASIC";
 
-    public static final String ANONYMOUS_LOGIN = "nexus.anonymous";
+  public static final String ANONYMOUS_LOGIN = "nexus.anonymous";
 
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private boolean fakeAuthScheme;
+  private boolean fakeAuthScheme;
 
-    @Inject
-    protected PlexusContainer plexusContainer;
+  @Inject
+  protected PlexusContainer plexusContainer;
 
-    @Inject
-    private SecuritySystem securitySystem;
+  @Inject
+  private SecuritySystem securitySystem;
 
-    @Inject
-    private EventBus eventBus;
+  @Inject
+  private EventBus eventBus;
 
-    @Deprecated
-    protected PlexusContainer getPlexusContainer()
-    {
-        return plexusContainer;
+  @Deprecated
+  protected PlexusContainer getPlexusContainer() {
+    return plexusContainer;
+  }
+
+  protected SecuritySystem getSecuritySystem() {
+    return securitySystem;
+  }
+
+  protected Logger getLogger() {
+    return logger;
+  }
+
+  // TODO: this should be boolean, but see
+  // http://issues.jsecurity.org/browse/JSEC-119
+  public String isFakeAuthScheme() {
+    return Boolean.toString(fakeAuthScheme);
+  }
+
+  // TODO: this should be boolean, but see
+  // http://issues.jsecurity.org/browse/JSEC-119
+  public void setFakeAuthScheme(String fakeAuthSchemeStr) {
+    this.fakeAuthScheme = Boolean.parseBoolean(fakeAuthSchemeStr);
+
+    if (fakeAuthScheme) {
+      setAuthcScheme(FAKE_AUTH_SCHEME);
+      setAuthzScheme(FAKE_AUTH_SCHEME);
+    }
+    else {
+      setAuthcScheme(HttpServletRequest.BASIC_AUTH);
+      setAuthzScheme(HttpServletRequest.BASIC_AUTH);
+    }
+  }
+
+  @Override
+  protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
+      throws Exception
+  {
+    // this will be true if cookie is sent with request and it is valid
+    Subject subject = getSubject(request, response);
+
+    // NEXUS-607: fix for cookies, when sent from client. They will expire once
+    // and we are not sending them anymore.
+    boolean loggedIn = subject.isAuthenticated();
+
+    if (loggedIn) {
+      return true;
     }
 
-    protected SecuritySystem getSecuritySystem()
-    {
-        return securitySystem;
+    if (isLoginAttempt(request, response)) {
+      // NEXUS-5049: Check is this an attempt with "anonymous" user?
+      // We do not allow logins with anonymous user if anon access is disabled
+      final AuthenticationToken token = createToken(request, response);
+      final String anonymousUsername = getSecuritySystem().getAnonymousUsername();
+      final String loginUsername = token.getPrincipal().toString();
+      if (!getSecuritySystem().isAnonymousAccessEnabled()
+          && StringUtils.equals(anonymousUsername, loginUsername)) {
+        getLogger().info(
+            "Login attempt with username \"" + anonymousUsername
+                + "\" (used for Anonymous Access) while Anonymous Access is disabled.");
+        loggedIn = false;
+      }
+      else {
+        try {
+          loggedIn = executeLogin(request, response);
+        }
+        // if no username or password is supplied, an IllegalStateException (runtime)
+        // is thrown, so if anything fails in executeLogin just assume failed login
+        catch (Exception e) {
+          getLogger().error("Unable to login", e);
+          loggedIn = false;
+        }
+      }
+    }
+    else {
+      // let the user "fall thru" until we get some permission problem
+      if (getSecuritySystem().isAnonymousAccessEnabled()) {
+        loggedIn = executeAnonymousLogin(request, response);
+      }
     }
 
-    protected Logger getLogger()
-    {
-        return logger;
+    if (!loggedIn) {
+      sendChallenge(request, response);
+    }
+    else {
+      request.setAttribute(AUTH_SCHEME_KEY, getAuthcScheme());
+
+      request.setAttribute(AUTH_REALM_KEY, getApplicationName());
     }
 
-    // TODO: this should be boolean, but see
-    // http://issues.jsecurity.org/browse/JSEC-119
-    public String isFakeAuthScheme()
-    {
-        return Boolean.toString( fakeAuthScheme );
+    return loggedIn;
+  }
+
+  @Override
+  protected boolean isLoginAttempt(String authzHeader) {
+    // handle BASIC in the same way as our faked one
+    String authzHeaderScheme = getAuthzScheme().toLowerCase();
+
+    if (authzHeader.toLowerCase().startsWith(HttpServletRequest.BASIC_AUTH.toLowerCase())) {
+      return true;
+    }
+    else {
+      return super.isLoginAttempt(authzHeaderScheme);
+    }
+  }
+
+  @Override
+  protected boolean isRememberMe(ServletRequest request) {
+    if (request.getAttribute(ANONYMOUS_LOGIN) == null) {
+      // it is not an anonymous login
+      // return true;
+      // NEXUS-607: fix for cookies, when sent from client. They will expire once
+      // and we are not sending them anymore.
+      return false;
+    }
+    else {
+      // it is anon login. no rembemberMe
+      return false;
+    }
+  }
+
+  /**
+   * TODO: consider moving this to a new filter, and chain them together
+   */
+  protected boolean executeAnonymousLogin(ServletRequest request, ServletResponse response) {
+    getLogger().debug("Attempting to authenticate Subject as Anonymous request...");
+
+    boolean anonymousLoginSuccessful = false;
+
+    Subject subject = getSubject(request, response);
+
+    // disable the session creation for the anon user.
+    request.setAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
+
+    UsernamePasswordToken usernamePasswordToken =
+        new UsernamePasswordToken(getSecuritySystem().getAnonymousUsername(),
+            getSecuritySystem().getAnonymousPassword());
+
+    try {
+      request.setAttribute(ANONYMOUS_LOGIN, Boolean.TRUE);
+
+      subject.login(usernamePasswordToken);
+      anonymousLoginSuccessful = true;
+    }
+    catch (UnknownSessionException e) {
+      Session anonSession = subject.getSession(false);
+
+      this.getLogger().debug(
+          "Unknown session exception while logging in anonymous user: '{}' with principal '{}'",
+          new Object[]{anonSession, usernamePasswordToken.getUsername(), e});
+
+      if (anonSession != null) {
+        // clear the session
+        this.getLogger().debug("Logging out the current anonymous user, to clear the session.");
+        try {
+          subject.logout();
+        }
+        catch (UnknownSessionException expectedException) {
+          this.logger.trace(
+              "Forced a logout with an Unknown Session so the current subject would get cleaned up.", e);
+        }
+
+        // login again
+        this.getLogger().debug("Attempting to login as anonymous for the second time.");
+        subject.login(usernamePasswordToken);
+
+        anonymousLoginSuccessful = true;
+      }
+    }
+    catch (AuthenticationException ae) {
+      getLogger().info(
+          "Unable to authenticate user [anonymous] from IP Address "
+              + RemoteIPFinder.findIP((HttpServletRequest) request));
+
+      getLogger().debug("Unable to log in subject as anonymous", ae);
     }
 
-    // TODO: this should be boolean, but see
-    // http://issues.jsecurity.org/browse/JSEC-119
-    public void setFakeAuthScheme( String fakeAuthSchemeStr )
-    {
-        this.fakeAuthScheme = Boolean.parseBoolean( fakeAuthSchemeStr );
+    if (anonymousLoginSuccessful) {
+      getLogger().debug("Successfully logged in as anonymous");
 
-        if ( fakeAuthScheme )
-        {
-            setAuthcScheme( FAKE_AUTH_SCHEME );
-            setAuthzScheme( FAKE_AUTH_SCHEME );
-        }
-        else
-        {
-            setAuthcScheme( HttpServletRequest.BASIC_AUTH );
-            setAuthzScheme( HttpServletRequest.BASIC_AUTH );
-        }
+      postAuthcEvent(request, getSecuritySystem().getAnonymousUsername(), getUserAgent(request), true);
+
+      return true;
     }
 
-    @Override
-    protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
-        throws Exception
-    {
-        // this will be true if cookie is sent with request and it is valid
-        Subject subject = getSubject( request, response );
+    // always default to false. If we've made it to this point in the code, that
+    // means the authentication attempt either never occured, or wasn't successful:
+    return false;
+  }
 
-        // NEXUS-607: fix for cookies, when sent from client. They will expire once
-        // and we are not sending them anymore.
-        boolean loggedIn = subject.isAuthenticated();
+  private void postAuthcEvent(ServletRequest request, String username, String userAgent, boolean success) {
+    if (eventBus != null) {
+      eventBus.post(
+          new NexusAuthenticationEvent(
+              this,
+              new ClientInfo(username, RemoteIPFinder.findIP((HttpServletRequest) request), userAgent),
+              success
+          )
+      );
+    }
+  }
 
-        if ( loggedIn )
-        {
-            return true;
-        }
+  @Override
+  protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
+                                   ServletResponse response)
+  {
+    // TODO: consider moving this to a new filter, and chain them together
+    postAuthcEvent(request, token.getPrincipal().toString(), getUserAgent(request), true);
 
-        if ( isLoginAttempt( request, response ) )
-        {
-            // NEXUS-5049: Check is this an attempt with "anonymous" user?
-            // We do not allow logins with anonymous user if anon access is disabled
-            final AuthenticationToken token = createToken( request, response );
-            final String anonymousUsername = getSecuritySystem().getAnonymousUsername();
-            final String loginUsername = token.getPrincipal().toString();
-            if ( !getSecuritySystem().isAnonymousAccessEnabled()
-                && StringUtils.equals( anonymousUsername, loginUsername ) )
-            {
-                getLogger().info(
-                    "Login attempt with username \"" + anonymousUsername
-                        + "\" (used for Anonymous Access) while Anonymous Access is disabled." );
-                loggedIn = false;
-            }
-            else
-            {
-                try
-                {
-                    loggedIn = executeLogin( request, response );
-                }
-                // if no username or password is supplied, an IllegalStateException (runtime)
-                // is thrown, so if anything fails in executeLogin just assume failed login
-                catch ( Exception e )
-                {
-                    getLogger().error( "Unable to login", e );
-                    loggedIn = false;
-                }
-            }
-        }
-        else
-        {
-            // let the user "fall thru" until we get some permission problem
-            if ( getSecuritySystem().isAnonymousAccessEnabled() )
-            {
-                loggedIn = executeAnonymousLogin( request, response );
-            }
-        }
+    return true;
+  }
 
-        if ( !loggedIn )
-        {
-            sendChallenge( request, response );
-        }
-        else
-        {
-            request.setAttribute( AUTH_SCHEME_KEY, getAuthcScheme() );
+  @Override
+  protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException ae, ServletRequest request,
+                                   ServletResponse response)
+  {
+    postAuthcEvent(request, token.getPrincipal().toString(), getUserAgent(request), false);
 
-            request.setAttribute( AUTH_REALM_KEY, getApplicationName() );
-        }
+    HttpServletResponse httpResponse = WebUtils.toHttp(response);
 
-        return loggedIn;
+    if (ExpiredCredentialsException.class.isAssignableFrom(ae.getClass())) {
+      httpResponse.addHeader("X-Nexus-Reason", "expired");
     }
 
-    @Override
-    protected boolean isLoginAttempt( String authzHeader )
-    {
-        // handle BASIC in the same way as our faked one
-        String authzHeaderScheme = getAuthzScheme().toLowerCase();
+    return false;
+  }
 
-        if ( authzHeader.toLowerCase().startsWith( HttpServletRequest.BASIC_AUTH.toLowerCase() ) )
-        {
-            return true;
+  @Override
+  public void postHandle(ServletRequest request, ServletResponse response)
+      throws Exception
+  {
+    if (request.getAttribute(Constants.REQUEST_IS_AUTHZ_REJECTED) != null) {
+      if (request.getAttribute(ANONYMOUS_LOGIN) != null) {
+        sendChallenge(request, response);
+      }
+      else {
+
+        if (getLogger().isDebugEnabled()) {
+          final Subject subject = getSubject(request, response);
+
+          String username;
+
+          if (subject != null && subject.isAuthenticated() && subject.getPrincipal() != null) {
+            username = subject.getPrincipal().toString();
+          }
+          else {
+            username = getSecuritySystem().getAnonymousUsername();
+          }
+
+          getLogger().debug(
+              "Request processing is rejected because user \"" + username + "\" lacks permissions.");
         }
-        else
-        {
-            return super.isLoginAttempt( authzHeaderScheme );
-        }
+
+        sendForbidden(request, response);
+      }
+    }
+  }
+
+  /**
+   * set http 403 forbidden header for the response
+   */
+  protected void sendForbidden(ServletRequest request, ServletResponse response) {
+    HttpServletResponse httpResponse = WebUtils.toHttp(response);
+
+    httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+  }
+
+  // Will retrieve authz header. if missing from header, will try
+  // to retrieve from request params instead
+  @Override
+  protected String getAuthzHeader(ServletRequest request) {
+    String authzHeader = super.getAuthzHeader(request);
+
+    // If in header use it
+    if (!StringUtils.isEmpty(authzHeader)) {
+      getLogger().debug("Using authorization header from request");
+      return authzHeader;
+    }
+    // otherwise check request params for it
+    else {
+      authzHeader = request.getParameter("authorization");
+
+      if (!StringUtils.isEmpty(authzHeader)) {
+        getLogger().debug("Using authorization from request parameter");
+      }
+      else {
+        getLogger().debug("No authorization found (header or request parameter)");
+      }
+
+      return authzHeader;
+    }
+  }
+
+  // work around to accept password with ':' character
+  @Override
+  protected String[] getPrincipalsAndCredentials(String scheme, String encoded) {
+    // no credentials, no auth
+    if (StringUtils.isEmpty(encoded)) {
+      return null;
     }
 
-    @Override
-    protected boolean isRememberMe( ServletRequest request )
-    {
-        if ( request.getAttribute( ANONYMOUS_LOGIN ) == null )
-        {
-            // it is not an anonymous login
-            // return true;
-            // NEXUS-607: fix for cookies, when sent from client. They will expire once
-            // and we are not sending them anymore.
-            return false;
-        }
-        else
-        {
-            // it is anon login. no rembemberMe
-            return false;
-        }
+    String decoded = Base64.decodeToString(encoded);
+
+    // no credentials, no auth
+    if (StringUtils.isEmpty(encoded)) {
+      return null;
     }
 
-    /**
-     * TODO: consider moving this to a new filter, and chain them together
-     */
-    protected boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
-    {
-        getLogger().debug( "Attempting to authenticate Subject as Anonymous request..." );
+    String[] parts = decoded.split(":");
 
-        boolean anonymousLoginSuccessful = false;
-
-        Subject subject = getSubject( request, response );
-
-        // disable the session creation for the anon user.
-        request.setAttribute( DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE );
-
-        UsernamePasswordToken usernamePasswordToken =
-            new UsernamePasswordToken( getSecuritySystem().getAnonymousUsername(),
-                getSecuritySystem().getAnonymousPassword() );
-
-        try
-        {
-            request.setAttribute( ANONYMOUS_LOGIN, Boolean.TRUE );
-
-            subject.login( usernamePasswordToken );
-            anonymousLoginSuccessful = true;
-        }
-        catch ( UnknownSessionException e )
-        {
-            Session anonSession = subject.getSession( false );
-
-            this.getLogger().debug(
-                "Unknown session exception while logging in anonymous user: '{}' with principal '{}'",
-                new Object[] { anonSession, usernamePasswordToken.getUsername(), e } );
-
-            if ( anonSession != null )
-            {
-                // clear the session
-                this.getLogger().debug( "Logging out the current anonymous user, to clear the session." );
-                try
-                {
-                    subject.logout();
-                }
-                catch ( UnknownSessionException expectedException )
-                {
-                    this.logger.trace(
-                        "Forced a logout with an Unknown Session so the current subject would get cleaned up.", e );
-                }
-
-                // login again
-                this.getLogger().debug( "Attempting to login as anonymous for the second time." );
-                subject.login( usernamePasswordToken );
-
-                anonymousLoginSuccessful = true;
-            }
-        }
-        catch ( AuthenticationException ae )
-        {
-            getLogger().info(
-                "Unable to authenticate user [anonymous] from IP Address "
-                    + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
-
-            getLogger().debug( "Unable to log in subject as anonymous", ae );
-        }
-
-        if ( anonymousLoginSuccessful )
-        {
-            getLogger().debug( "Successfully logged in as anonymous" );
-
-            postAuthcEvent( request, getSecuritySystem().getAnonymousUsername(), getUserAgent( request ), true );
-
-            return true;
-        }
-
-        // always default to false. If we've made it to this point in the code, that
-        // means the authentication attempt either never occured, or wasn't successful:
-        return false;
+    // invalid credentials, no auth
+    if (parts == null || parts.length < 2) {
+      return null;
     }
 
-    private void postAuthcEvent( ServletRequest request, String username, String userAgent, boolean success )
-    {
-        if ( eventBus != null )
-        {
-            eventBus.post(
-                new NexusAuthenticationEvent(
-                    this,
-                    new ClientInfo( username, RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent ),
-                    success
-                )
-            );
-        }
+    return new String[]{parts[0], decoded.substring(parts[0].length() + 1)};
+  }
+
+  // ==
+
+  protected Object getAttribute(String key) {
+    return getFilterConfig().getServletContext().getAttribute(key);
+  }
+
+  private String getUserAgent(final ServletRequest request) {
+    if (request instanceof HttpServletRequest) {
+      final String userAgent = ((HttpServletRequest) request).getHeader("User-Agent");
+
+      return userAgent;
     }
 
-    @Override
-    protected boolean onLoginSuccess( AuthenticationToken token, Subject subject, ServletRequest request,
-                                      ServletResponse response )
-    {
-        // TODO: consider moving this to a new filter, and chain them together
-        postAuthcEvent( request, token.getPrincipal().toString(), getUserAgent( request ), true );
-
-        return true;
-    }
-
-    @Override
-    protected boolean onLoginFailure( AuthenticationToken token, AuthenticationException ae, ServletRequest request,
-                                      ServletResponse response )
-    {
-        postAuthcEvent( request, token.getPrincipal().toString(), getUserAgent( request ), false );
-
-        HttpServletResponse httpResponse = WebUtils.toHttp( response );
-
-        if ( ExpiredCredentialsException.class.isAssignableFrom( ae.getClass() ) )
-        {
-            httpResponse.addHeader( "X-Nexus-Reason", "expired" );
-        }
-
-        return false;
-    }
-
-    @Override
-    public void postHandle( ServletRequest request, ServletResponse response )
-        throws Exception
-    {
-        if ( request.getAttribute( Constants.REQUEST_IS_AUTHZ_REJECTED ) != null )
-        {
-            if ( request.getAttribute( ANONYMOUS_LOGIN ) != null )
-            {
-                sendChallenge( request, response );
-            }
-            else
-            {
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    final Subject subject = getSubject( request, response );
-
-                    String username;
-
-                    if ( subject != null && subject.isAuthenticated() && subject.getPrincipal() != null )
-                    {
-                        username = subject.getPrincipal().toString();
-                    }
-                    else
-                    {
-                        username = getSecuritySystem().getAnonymousUsername();
-                    }
-
-                    getLogger().debug(
-                        "Request processing is rejected because user \"" + username + "\" lacks permissions." );
-                }
-
-                sendForbidden( request, response );
-            }
-        }
-    }
-
-    /**
-     * set http 403 forbidden header for the response
-     * 
-     * @param request
-     * @param response
-     */
-    protected void sendForbidden( ServletRequest request, ServletResponse response )
-    {
-        HttpServletResponse httpResponse = WebUtils.toHttp( response );
-
-        httpResponse.setStatus( HttpServletResponse.SC_FORBIDDEN );
-    }
-
-    // Will retrieve authz header. if missing from header, will try
-    // to retrieve from request params instead
-    @Override
-    protected String getAuthzHeader( ServletRequest request )
-    {
-        String authzHeader = super.getAuthzHeader( request );
-
-        // If in header use it
-        if ( !StringUtils.isEmpty( authzHeader ) )
-        {
-            getLogger().debug( "Using authorization header from request" );
-            return authzHeader;
-        }
-        // otherwise check request params for it
-        else
-        {
-            authzHeader = request.getParameter( "authorization" );
-
-            if ( !StringUtils.isEmpty( authzHeader ) )
-            {
-                getLogger().debug( "Using authorization from request parameter" );
-            }
-            else
-            {
-                getLogger().debug( "No authorization found (header or request parameter)" );
-            }
-
-            return authzHeader;
-        }
-    }
-
-    // work around to accept password with ':' character
-    @Override
-    protected String[] getPrincipalsAndCredentials( String scheme, String encoded )
-    {
-        // no credentials, no auth
-        if ( StringUtils.isEmpty( encoded ) )
-        {
-            return null;
-        }
-
-        String decoded = Base64.decodeToString( encoded );
-
-        // no credentials, no auth
-        if ( StringUtils.isEmpty( encoded ) )
-        {
-            return null;
-        }
-
-        String[] parts = decoded.split( ":" );
-
-        // invalid credentials, no auth
-        if ( parts == null || parts.length < 2 )
-        {
-            return null;
-        }
-
-        return new String[] { parts[0], decoded.substring( parts[0].length() + 1 ) };
-    }
-
-    // ==
-
-    protected Object getAttribute( String key )
-    {
-        return getFilterConfig().getServletContext().getAttribute( key );
-    }
-
-    private String getUserAgent( final ServletRequest request )
-    {
-        if ( request instanceof HttpServletRequest )
-        {
-            final String userAgent = ( (HttpServletRequest) request ).getHeader( "User-Agent" );
-
-            return userAgent;
-        }
-
-        return null;
-    }
+    return null;
+  }
 }

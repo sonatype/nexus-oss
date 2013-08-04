@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.identify;
 
 import java.io.IOException;
@@ -19,6 +20,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+
+import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
+import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.apache.maven.index.MAVEN;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -30,88 +37,78 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
-import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Resource that is able to fetch the identified Nexus Artifact. The used hash algorithm and hash key are coming from
  * request attributes, and are posibly mapped from URL. Recognized algorithms: "sha1" and "md5".
- * 
+ *
  * @author cstamas
  */
-@Component( role = PlexusResource.class, hint = "IdentifyHashPlexusResource" )
-@Path( IdentifyHashPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "IdentifyHashPlexusResource")
+@Path(IdentifyHashPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class IdentifyHashPlexusResource
     extends AbstractIndexerNexusPlexusResource
 {
-    public static final String ALGORITHM_KEY = "algorithm";
+  public static final String ALGORITHM_KEY = "algorithm";
 
-    public static final String HASH_KEY = "hash";
+  public static final String HASH_KEY = "hash";
 
-    public static final String RESOURCE_URI = "/identify/{" + ALGORITHM_KEY + "}/{" + HASH_KEY + "}";
+  public static final String RESOURCE_URI = "/identify/{" + ALGORITHM_KEY + "}/{" + HASH_KEY + "}";
 
-    @Requirement
-    private IndexerManager indexerManager;
+  @Requirement
+  private IndexerManager indexerManager;
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( "/identify/*/*", "authcBasic,perms[nexus:identify]" );
-    }
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor("/identify/*/*", "authcBasic,perms[nexus:identify]");
+  }
 
-    /**
-     * Retrieve artifact details using a hash value.
-     * 
-     * @param algorithm The hash algorithm (i.e. md5 or sha1).
-     * @param hash The hash string to compare.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( pathParams = { @PathParam( IdentifyHashPlexusResource.ALGORITHM_KEY ),
-        @PathParam( IdentifyHashPlexusResource.HASH_KEY ) }, output = NexusArtifact.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        String alg = request.getAttributes().get( ALGORITHM_KEY ).toString();
+  /**
+   * Retrieve artifact details using a hash value.
+   *
+   * @param algorithm The hash algorithm (i.e. md5 or sha1).
+   * @param hash      The hash string to compare.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(pathParams = {
+      @PathParam(IdentifyHashPlexusResource.ALGORITHM_KEY),
+      @PathParam(IdentifyHashPlexusResource.HASH_KEY)
+  }, output = NexusArtifact.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    String alg = request.getAttributes().get(ALGORITHM_KEY).toString();
 
-        String checksum = request.getAttributes().get( HASH_KEY ).toString();
+    String checksum = request.getAttributes().get(HASH_KEY).toString();
 
-        NexusArtifact na = null;
+    NexusArtifact na = null;
 
-        try
-        {
-            if ( "sha1".equalsIgnoreCase( alg ) )
-            {
-                Collection<NexusArtifact> nas =
-                    ai2NaColl( request, indexerManager.identifyArtifact( MAVEN.SHA1, checksum ) );
+    try {
+      if ("sha1".equalsIgnoreCase(alg)) {
+        Collection<NexusArtifact> nas =
+            ai2NaColl(request, indexerManager.identifyArtifact(MAVEN.SHA1, checksum));
 
-                if ( nas != null && nas.size() > 0 )
-                {
-                    na = nas.iterator().next();
-                }
-            }
+        if (nas != null && nas.size() > 0) {
+          na = nas.iterator().next();
         }
-        catch ( IOException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "IOException during configuration retrieval!", e );
-        }
-
-        return na;
+      }
     }
+    catch (IOException e) {
+      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "IOException during configuration retrieval!", e);
+    }
+
+    return na;
+  }
 }

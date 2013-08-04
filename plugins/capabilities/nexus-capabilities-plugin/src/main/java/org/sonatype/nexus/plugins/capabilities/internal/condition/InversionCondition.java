@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.CompositeConditionSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * A condition that applies a logical NOT on another condition.
@@ -26,36 +27,32 @@ public class InversionCondition
     implements Condition
 {
 
-    private final Condition condition;
+  private final Condition condition;
 
-    public InversionCondition( final EventBus eventBus,
-                               final Condition condition )
-    {
-        super( eventBus, condition );
-        this.condition = condition;
-    }
+  public InversionCondition(final EventBus eventBus,
+                            final Condition condition)
+  {
+    super(eventBus, condition);
+    this.condition = condition;
+  }
 
-    @Override
-    protected boolean reevaluate( final Condition... conditions )
-    {
-        return !conditions[0].isSatisfied();
-    }
+  @Override
+  protected boolean reevaluate(final Condition... conditions) {
+    return !conditions[0].isSatisfied();
+  }
 
-    @Override
-    public String toString()
-    {
-        return "NOT " + condition;
-    }
+  @Override
+  public String toString() {
+    return "NOT " + condition;
+  }
 
-    @Override
-    public String explainSatisfied()
-    {
-        return condition.explainUnsatisfied();
-    }
+  @Override
+  public String explainSatisfied() {
+    return condition.explainUnsatisfied();
+  }
 
-    @Override
-    public String explainUnsatisfied()
-    {
-        return condition.explainSatisfied();
-    }
+  @Override
+  public String explainUnsatisfied() {
+    return condition.explainSatisfied();
+  }
 }

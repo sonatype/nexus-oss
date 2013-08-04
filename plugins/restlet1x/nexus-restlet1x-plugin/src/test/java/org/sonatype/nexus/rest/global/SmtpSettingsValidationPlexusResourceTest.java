@@ -10,77 +10,77 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.global;
+
+import org.sonatype.nexus.rest.model.SmtpSettingsResource;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import com.thoughtworks.xstream.XStream;
+import org.junit.Test;
+import org.restlet.resource.ResourceException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.rest.global.SmtpSettingsValidationPlexusResource.validateEmail;
 
-import com.thoughtworks.xstream.XStream;
-import org.junit.Test;
-import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.rest.model.SmtpSettings;
-import org.sonatype.nexus.rest.model.SmtpSettingsResource;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
 public class SmtpSettingsValidationPlexusResourceTest
     extends TestSupport
 {
 
-    @Test( expected = ResourceException.class )
-    public void nullEmailShouldNotBeAccepted()
-        throws ResourceException
-    {
-        validateEmail( null );
-    }
+  @Test(expected = ResourceException.class)
+  public void nullEmailShouldNotBeAccepted()
+      throws ResourceException
+  {
+    validateEmail(null);
+  }
 
-    @Test( expected = ResourceException.class )
-    public void emptyEmailShouldNotBeAccepted()
-        throws ResourceException
-    {
-        validateEmail( " " );
-    }
+  @Test(expected = ResourceException.class)
+  public void emptyEmailShouldNotBeAccepted()
+      throws ResourceException
+  {
+    validateEmail(" ");
+  }
 
-    @Test
-    public void tldWithUpperCase()
-        throws ResourceException
-    {
-        validateEmail( "me@foo.COM" );
-    }
+  @Test
+  public void tldWithUpperCase()
+      throws ResourceException
+  {
+    validateEmail("me@foo.COM");
+  }
 
-    @Test
-    public void tldWithLowerCase()
-        throws ResourceException
-    {
-        validateEmail( "me@foo.com" );
-    }
+  @Test
+  public void tldWithLowerCase()
+      throws ResourceException
+  {
+    validateEmail("me@foo.com");
+  }
 
-    @Test
-    public void tldWithMixCase()
-        throws ResourceException
-    {
-        validateEmail( "me@foo.CoM" );
-    }
+  @Test
+  public void tldWithMixCase()
+      throws ResourceException
+  {
+    validateEmail("me@foo.CoM");
+  }
 
-    @Test
-    public void unescapeHTMLInSMTPPassword()
-    {
-        final SmtpSettingsValidationPlexusResource testSubject =
-            new SmtpSettingsValidationPlexusResource();
+  @Test
+  public void unescapeHTMLInSMTPPassword() {
+    final SmtpSettingsValidationPlexusResource testSubject =
+        new SmtpSettingsValidationPlexusResource();
 
-        // settings object as it would come in via REST, with escaped HTML
-        SmtpSettingsResource settings = new SmtpSettingsResource();
-        settings.setPassword( "asdf&amp;qwer" );
-        settings.setUsername( "asdf&amp;qwer" );
+    // settings object as it would come in via REST, with escaped HTML
+    SmtpSettingsResource settings = new SmtpSettingsResource();
+    settings.setPassword("asdf&amp;qwer");
+    settings.setUsername("asdf&amp;qwer");
 
-        // make sure the configuration resource configures xstream to unescape
-        final XStream xStream = new XStream();
-        testSubject.configureXStream( xStream );
+    // make sure the configuration resource configures xstream to unescape
+    final XStream xStream = new XStream();
+    testSubject.configureXStream(xStream);
 
-        final String xml = xStream.toXML( settings );
-        settings = (SmtpSettingsResource) xStream.fromXML( xml );
+    final String xml = xStream.toXML(settings);
+    settings = (SmtpSettingsResource) xStream.fromXML(xml);
 
-        assertThat( settings.getUsername(), is( "asdf&qwer" ) );
-        assertThat( settings.getPassword(), is( "asdf&qwer" ) );
-    }
+    assertThat(settings.getUsername(), is("asdf&qwer"));
+    assertThat(settings.getPassword(), is("asdf&qwer"));
+  }
 }

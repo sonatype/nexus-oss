@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Arrays;
@@ -17,49 +18,45 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemEvent;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * The system changes feed.
- * 
+ *
  * @author cstamas
  */
-@Component( role = FeedSource.class, hint = "systemRepositoryStatusChanges" )
+@Component(role = FeedSource.class, hint = "systemRepositoryStatusChanges")
 public class SystemRepositoryStatusChangesFeedSource
     extends AbstractSystemFeedSource
 {
-    public static final String CHANNEL_KEY = "systemRepositoryStatusChanges";
+  public static final String CHANNEL_KEY = "systemRepositoryStatusChanges";
 
-    public List<SystemEvent> getEventList( Integer from, Integer count, Map<String, String> params )
-    {
-        return getFeedRecorder().getSystemEvents(
-            new HashSet<String>( Arrays.asList( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
-                FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION ) ),
-            from, count, null );
-    }
+  public List<SystemEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
+    return getFeedRecorder().getSystemEvents(
+        new HashSet<String>(Arrays.asList(FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
+            FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION)),
+        from, count, null);
+  }
 
-    public String getFeedKey()
-    {
-        return CHANNEL_KEY;
-    }
+  public String getFeedKey() {
+    return CHANNEL_KEY;
+  }
 
-    public String getFeedName()
-    {
-        return getDescription();
-    }
+  public String getFeedName() {
+    return getDescription();
+  }
 
-    @Override
-    public String getDescription()
-    {
-        return "Repository Status Changes in Nexus (user interventions and automatic).";
-    }
+  @Override
+  public String getDescription() {
+    return "Repository Status Changes in Nexus (user interventions and automatic).";
+  }
 
-    @Override
-    public String getTitle()
-    {
-        return "Repository Status Changes";
-    }
+  @Override
+  public String getTitle() {
+    return "Repository Status Changes";
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.attributes;
 
 import java.util.Map;
@@ -17,256 +18,186 @@ import java.util.Map;
 /**
  * Attributes are simply a String key-value pairs with some type-safe getters and setters for keys known and used in
  * core.
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public interface Attributes
 {
-    /**
-     * Returns true if this instance has a value for given key set.
-     * 
-     * @param key
-     * @return
-     */
-    boolean containsKey( final String key );
+  /**
+   * Returns true if this instance has a value for given key set.
+   */
+  boolean containsKey(final String key);
 
-    /**
-     * Gets the value for given key.
-     * 
-     * @param key
-     * @return
-     */
-    String get( final String key );
+  /**
+   * Gets the value for given key.
+   */
+  String get(final String key);
 
-    /**
-     * Puts the value for given key, returning any previous values bound. Note: Attributes does not allow {@code null}
-     * for key neither values!
-     * 
-     * @param key
-     * @param value
-     * @return
-     */
-    String put( final String key, final String value );
+  /**
+   * Puts the value for given key, returning any previous values bound. Note: Attributes does not allow {@code null}
+   * for key neither values!
+   */
+  String put(final String key, final String value);
 
-    /**
-     * Removes the value with given key from this instance.
-     * 
-     * @param key
-     * @return
-     */
-    String remove( final String key );
+  /**
+   * Removes the value with given key from this instance.
+   */
+  String remove(final String key);
 
-    /**
-     * Puts all the entries of the given map into this instance.
-     * 
-     * @param map
-     */
-    void putAll( Map<? extends String, ? extends String> map );
+  /**
+   * Puts all the entries of the given map into this instance.
+   */
+  void putAll(Map<? extends String, ? extends String> map);
 
-    // ===
+  // ===
 
-    /**
-     * Performs an "overlay" with given attributes: only those values are changed that are not set by some setter method
-     * or by {@link #put(String, String)} or by {@link #putAll(Map)}. Core internal use only!
-     * 
-     * @param repositoryItemAttributes
-     */
-    void overlayAttributes( final Attributes repositoryItemAttributes );
+  /**
+   * Performs an "overlay" with given attributes: only those values are changed that are not set by some setter
+   * method
+   * or by {@link #put(String, String)} or by {@link #putAll(Map)}. Core internal use only!
+   */
+  void overlayAttributes(final Attributes repositoryItemAttributes);
 
-    /**
-     * Returns the generation of Attributes. Core internal use only!
-     * 
-     * @return
-     */
-    int getGeneration();
+  /**
+   * Returns the generation of Attributes. Core internal use only!
+   */
+  int getGeneration();
 
-    /**
-     * Sets the generation of Attributes. Core internal use only!
-     * 
-     * @param value
-     */
-    void setGeneration( final int value );
+  /**
+   * Sets the generation of Attributes. Core internal use only!
+   */
+  void setGeneration(final int value);
 
-    /**
-     * Setps the generation of this instance. Core internal use only!
-     */
-    void incrementGeneration();
+  /**
+   * Setps the generation of this instance. Core internal use only!
+   */
+  void incrementGeneration();
 
-    /**
-     * Returns the path attribute.
-     * 
-     * @return
-     */
-    String getPath();
+  /**
+   * Returns the path attribute.
+   */
+  String getPath();
 
-    /**
-     * Sets the path attribute.
-     * 
-     * @param value
-     */
-    void setPath( final String value );
+  /**
+   * Sets the path attribute.
+   */
+  void setPath(final String value);
 
-    /**
-     * Returns the readable attribute.
-     * 
-     * @return
-     */
-    boolean isReadable();
+  /**
+   * Returns the readable attribute.
+   */
+  boolean isReadable();
 
-    /**
-     * Sets the readable attribute.
-     * 
-     * @param value
-     */
-    void setReadable( final boolean value );
+  /**
+   * Sets the readable attribute.
+   */
+  void setReadable(final boolean value);
 
-    /**
-     * Returns the writable attribute.
-     * 
-     * @return
-     */
-    boolean isWritable();
+  /**
+   * Returns the writable attribute.
+   */
+  boolean isWritable();
 
-    /**
-     * Sets the writable attribute.
-     * 
-     * @param value
-     */
-    void setWritable( final boolean value );
+  /**
+   * Sets the writable attribute.
+   */
+  void setWritable(final boolean value);
 
-    /**
-     * Returns the repositoryId attribute.
-     * 
-     * @return
-     */
-    String getRepositoryId();
+  /**
+   * Returns the repositoryId attribute.
+   */
+  String getRepositoryId();
 
-    /**
-     * Sets the repositoryId attribute.
-     * 
-     * @param value
-     */
-    void setRepositoryId( final String value );
+  /**
+   * Sets the repositoryId attribute.
+   */
+  void setRepositoryId(final String value);
 
-    /**
-     * Returns the created attribute.
-     * 
-     * @return
-     */
-    long getCreated();
+  /**
+   * Returns the created attribute.
+   */
+  long getCreated();
 
-    /**
-     * Sets the created attribute.
-     * 
-     * @param value
-     */
-    void setCreated( final long value );
+  /**
+   * Sets the created attribute.
+   */
+  void setCreated(final long value);
 
-    /**
-     * Returns the modified attribute.
-     * 
-     * @return
-     */
-    long getModified();
+  /**
+   * Returns the modified attribute.
+   */
+  long getModified();
 
-    /**
-     * Sets the modified attribute.
-     * 
-     * @param value
-     */
-    void setModified( final long value );
+  /**
+   * Sets the modified attribute.
+   */
+  void setModified(final long value);
 
-    /**
-     * Returns the storedLocally attribute.
-     * 
-     * @return
-     */
-    long getStoredLocally();
+  /**
+   * Returns the storedLocally attribute.
+   */
+  long getStoredLocally();
 
-    /**
-     * Sets the storedLocally attribute.
-     * 
-     * @param value
-     */
-    void setStoredLocally( final long value );
+  /**
+   * Sets the storedLocally attribute.
+   */
+  void setStoredLocally(final long value);
 
-    /**
-     * Returns the checkedRemotely attribute.
-     * 
-     * @return
-     */
-    long getCheckedRemotely();
+  /**
+   * Returns the checkedRemotely attribute.
+   */
+  long getCheckedRemotely();
 
-    /**
-     * Sets the checkedRemotely attribute.
-     * 
-     * @param value
-     */
-    void setCheckedRemotely( final long value );
+  /**
+   * Sets the checkedRemotely attribute.
+   */
+  void setCheckedRemotely(final long value);
 
-    /**
-     * Returns the lastRequest attribute.
-     * 
-     * @return
-     */
-    long getLastRequested();
+  /**
+   * Returns the lastRequest attribute.
+   */
+  long getLastRequested();
 
-    /**
-     * Sets the lastRequested attribute.
-     * 
-     * @param value
-     */
-    void setLastRequested( final long value );
+  /**
+   * Sets the lastRequested attribute.
+   */
+  void setLastRequested(final long value);
 
-    /**
-     * Returns the expired attribute.
-     * 
-     * @return
-     */
-    boolean isExpired();
+  /**
+   * Returns the expired attribute.
+   */
+  boolean isExpired();
 
-    /**
-     * Sets the expired attribute.
-     * 
-     * @param value
-     */
-    void setExpired( final boolean value );
+  /**
+   * Sets the expired attribute.
+   */
+  void setExpired(final boolean value);
 
-    /**
-     * Returns the remoteUrl attribute.
-     * 
-     * @return
-     */
-    String getRemoteUrl();
+  /**
+   * Returns the remoteUrl attribute.
+   */
+  String getRemoteUrl();
 
-    /**
-     * Sets the remoteUrl attribute.
-     * 
-     * @param value
-     */
-    void setRemoteUrl( final String value );
+  /**
+   * Sets the remoteUrl attribute.
+   */
+  void setRemoteUrl(final String value);
 
-    /**
-     * Returns the length attribute.
-     * 
-     * @return
-     */
-    long getLength();
+  /**
+   * Returns the length attribute.
+   */
+  long getLength();
 
-    /**
-     * Sets the length attribute.
-     * 
-     * @param value
-     */
-    void setLength( final long value );
+  /**
+   * Sets the length attribute.
+   */
+  void setLength(final long value);
 
-    // ==
+  // ==
 
-    /**
-     * Returns an unmodifiable "snapshot" of this instance as {@code Map<String, String>}.
-     * 
-     * @return
-     */
-    Map<String, String> asMap();
+  /**
+   * Returns an unmodifiable "snapshot" of this instance as {@code Map<String, String>}.
+   */
+  Map<String, String> asMap();
 }

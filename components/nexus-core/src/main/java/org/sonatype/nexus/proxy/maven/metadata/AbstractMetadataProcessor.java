@@ -10,137 +10,127 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 
 /**
  * @author juven
  */
 public abstract class AbstractMetadataProcessor
 {
-    protected static final String METADATA_SUFFIX = "/maven-metadata.xml";
+  protected static final String METADATA_SUFFIX = "/maven-metadata.xml";
 
-    protected AbstractMetadataHelper metadataHelper;
+  protected AbstractMetadataHelper metadataHelper;
 
-    public AbstractMetadataProcessor( AbstractMetadataHelper metadataHelper )
-    {
-        this.metadataHelper = metadataHelper;
+  public AbstractMetadataProcessor(AbstractMetadataHelper metadataHelper) {
+    this.metadataHelper = metadataHelper;
+  }
+
+  /**
+   * @return true if got processed, else false
+   */
+  public boolean process(String path)
+      throws IOException
+  {
+    if (!shouldProcessMetadata(path)) {
+      return false;
     }
 
-    /**
-     * @param path
-     * @return true if got processed, else false
-     * @throws Exception
-     */
-    public boolean process( String path )
-        throws IOException
-    {
-        if ( !shouldProcessMetadata( path ) )
-        {
-            return false;
-        }
+    Metadata oldMetadata = null;
 
-        Metadata oldMetadata = null;
+    if (isMetadataExisted(path)) {
+      oldMetadata = readMetadata(path);
 
-        if ( isMetadataExisted( path ) )
-        {
-            oldMetadata = readMetadata( path );
-
-            if ( oldMetadata != null && isMetadataCorrect( oldMetadata, path ) )
-            {
-                postProcessMetadata( path );
-
-                return true;
-            }
-            else
-            {
-                removedMetadata( path );
-            }
-        }
-
-        processMetadata( path, oldMetadata );
-
-        postProcessMetadata( path );
-
-        buildMetadataChecksum( path );
+      if (oldMetadata != null && isMetadataCorrect(oldMetadata, path)) {
+        postProcessMetadata(path);
 
         return true;
-
+      }
+      else {
+        removedMetadata(path);
+      }
     }
 
-    protected boolean isMetadataExisted( String path )
-        throws IOException
-    {
-        return metadataHelper.exists( path + METADATA_SUFFIX );
+    processMetadata(path, oldMetadata);
+
+    postProcessMetadata(path);
+
+    buildMetadataChecksum(path);
+
+    return true;
+
+  }
+
+  protected boolean isMetadataExisted(String path)
+      throws IOException
+  {
+    return metadataHelper.exists(path + METADATA_SUFFIX);
+  }
+
+  protected Metadata readMetadata(String path)
+      throws IOException
+  {
+    InputStream mdStream = metadataHelper.retrieveContent(path + METADATA_SUFFIX);
+
+    try {
+      Metadata md = MetadataBuilder.read(mdStream);
+
+      return md;
     }
+    catch (IOException e) {
+      if (metadataHelper.logger.isDebugEnabled()) {
+        metadataHelper.logger.info("Failed to parse metadata from '" + path + "'", e);
+      }
+      else {
+        metadataHelper.logger.info("Failed to parse metadata from '" + path + "'");
+      }
 
-    protected Metadata readMetadata( String path )
-        throws IOException
-    {
-        InputStream mdStream = metadataHelper.retrieveContent( path + METADATA_SUFFIX );
-
-        try
-        {
-            Metadata md = MetadataBuilder.read( mdStream );
-
-            return md;
-        }
-        catch ( IOException e )
-        {
-            if ( metadataHelper.logger.isDebugEnabled() )
-            {
-                metadataHelper.logger.info( "Failed to parse metadata from '" + path + "'", e );
-            }
-            else
-            {
-                metadataHelper.logger.info( "Failed to parse metadata from '" + path + "'" );
-            }
-
-            return null;
-        }
-        finally
-        {
-            IOUtil.close( mdStream );
-        }
+      return null;
     }
-
-    protected void removedMetadata( String path )
-        throws IOException
-    {
-        metadataHelper.remove( path + METADATA_SUFFIX );
+    finally {
+      IOUtil.close(mdStream);
     }
+  }
 
-    protected void buildMetadataChecksum( String path )
-        throws IOException
-    {
-        metadataHelper.rebuildChecksum( path + METADATA_SUFFIX );
-    }
+  protected void removedMetadata(String path)
+      throws IOException
+  {
+    metadataHelper.remove(path + METADATA_SUFFIX);
+  }
 
-    protected abstract boolean isMetadataCorrect( Metadata metadata, String path )
-        throws IOException;
+  protected void buildMetadataChecksum(String path)
+      throws IOException
+  {
+    metadataHelper.rebuildChecksum(path + METADATA_SUFFIX);
+  }
 
-    protected abstract boolean shouldProcessMetadata( String path );
+  protected abstract boolean isMetadataCorrect(Metadata metadata, String path)
+      throws IOException;
 
-    protected void processMetadata( final String path )
-        throws IOException
-    {
-        // do nothing
-    }
+  protected abstract boolean shouldProcessMetadata(String path);
 
-    /**
-     * @since 2.6
-     */
-    protected void processMetadata( final String path, final Metadata oldMetadata )
-        throws IOException
-    {
-        processMetadata( path );
-    }
+  protected void processMetadata(final String path)
+      throws IOException
+  {
+    // do nothing
+  }
 
-    protected abstract void postProcessMetadata( String path );
+  /**
+   * @since 2.6
+   */
+  protected void processMetadata(final String path, final Metadata oldMetadata)
+      throws IOException
+  {
+    processMetadata(path);
+  }
+
+  protected abstract void postProcessMetadata(String path);
 }

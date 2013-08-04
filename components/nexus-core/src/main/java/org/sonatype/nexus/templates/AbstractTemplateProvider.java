@@ -10,46 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.templates;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.templates;
 
 import javax.inject.Inject;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+
+import org.codehaus.plexus.util.StringUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractTemplateProvider<T extends Template>
     implements TemplateProvider
 {
 
-    private ApplicationConfiguration applicationConfiguration;
+  private ApplicationConfiguration applicationConfiguration;
 
-    @Inject
-    public void setApplicationConfiguration( final ApplicationConfiguration applicationConfiguration )
-    {
-        this.applicationConfiguration = checkNotNull( applicationConfiguration );
+  @Inject
+  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+  }
+
+  public ApplicationConfiguration getApplicationConfiguration() {
+    return applicationConfiguration;
+  }
+
+  public Template getTemplateById(String id)
+      throws NoSuchTemplateIdException
+  {
+    TemplateSet templates = getTemplates();
+
+    for (Template template : templates) {
+      if (StringUtils.equals(id, template.getId())) {
+        return template;
+      }
     }
 
-    public ApplicationConfiguration getApplicationConfiguration()
-    {
-        return applicationConfiguration;
-    }
-
-    public Template getTemplateById( String id )
-        throws NoSuchTemplateIdException
-    {
-        TemplateSet templates = getTemplates();
-
-        for ( Template template : templates )
-        {
-            if ( StringUtils.equals( id, template.getId() ) )
-            {
-                return template;
-            }
-        }
-
-        throw new NoSuchTemplateIdException( "Template for Id='" + id + "' not found!" );
-    }
+    throw new NoSuchTemplateIdException("Template for Id='" + id + "' not found!");
+  }
 
 }

@@ -10,22 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.rest.jersey;
 
 import org.sonatype.nexus.client.core.exception.NexusClientException;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 
 /**
  * @since 2.3
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class NexusClientHandlerException
     extends NexusClientException
 {
 
-    public NexusClientHandlerException( final ClientHandlerException cause )
-    {
-        super( cause );
-    }
+  public NexusClientHandlerException(final ClientHandlerException cause) {
+    super(cause);
+  }
 
 }

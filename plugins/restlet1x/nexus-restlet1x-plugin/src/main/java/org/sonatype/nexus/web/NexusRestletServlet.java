@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.web;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -24,15 +23,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.plexus.rest.PlexusServerServlet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.sonatype.plexus.rest.PlexusServerServlet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An {@link PlexusServerServlet} that has an hardcoded name of "nexus" as required by plexus init param lookup. Guice
  * servlet extension does not allow servlet name setup while binding.
- * 
+ *
  * @author adreghiciu
  */
 @Singleton
@@ -40,100 +42,88 @@ class NexusRestletServlet
     extends PlexusServerServlet
 {
 
-    private static final long serialVersionUID = -840934203229475592L;
+  private static final long serialVersionUID = -840934203229475592L;
 
-    private static final Logger log = LoggerFactory.getLogger( NexusRestletServlet.class );
+  private static final Logger log = LoggerFactory.getLogger(NexusRestletServlet.class);
 
-    /**
-     * Original servlet context delegate.
-     */
-    private DelegatingServletConfig servletConfig;
+  /**
+   * Original servlet context delegate.
+   */
+  private DelegatingServletConfig servletConfig;
 
-    NexusRestletServlet()
-    {
-        servletConfig = new DelegatingServletConfig();
+  NexusRestletServlet() {
+    servletConfig = new DelegatingServletConfig();
+  }
+
+  @Override
+  public void init()
+      throws ServletException
+  {
+    final ClassLoader original = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+    try {
+      super.init();
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(original);
+    }
+  }
+
+  @Override
+  public void service(final HttpServletRequest request, final HttpServletResponse response)
+      throws ServletException,
+             IOException
+  {
+    checkNotNull(request);
+    checkNotNull(response);
+
+    // Log the request URI+URL muck
+    String uri = request.getRequestURI();
+    if (request.getQueryString() != null) {
+      uri = String.format("%s?%s", uri, request.getQueryString());
     }
 
-    @Override
-    public void init()
-        throws ServletException
-    {
-        final ClassLoader original = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-        try
-        {
-            super.init();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( original );
-        }
+    if (log.isDebugEnabled()) {
+      log.debug("Processing: {} {} ({})", request.getMethod(), uri, request.getRequestURL());
     }
 
-    @Override
-    public void service( final HttpServletRequest request, final HttpServletResponse response )
-        throws ServletException,
-        IOException
-    {
-        checkNotNull( request );
-        checkNotNull( response );
+    MDC.put(getClass().getName(), uri);
+    try {
+      super.service(request, response);
+    }
+    finally {
+      MDC.remove(getClass().getName());
+    }
+  }
 
-        // Log the request URI+URL muck
-        String uri = request.getRequestURI();
-        if ( request.getQueryString() != null )
-        {
-            uri = String.format( "%s?%s", uri, request.getQueryString() );
-        }
+  @Override
+  public ServletConfig getServletConfig() {
+    return servletConfig;
+  }
 
-        if ( log.isDebugEnabled() )
-        {
-            log.debug( "Processing: {} {} ({})", request.getMethod(), uri, request.getRequestURL() );
-        }
+  /**
+   * An {@link ServletConfig} delegate that has an hardcoded servlet name.
+   */
+  private class DelegatingServletConfig
+      implements ServletConfig
+  {
 
-        MDC.put( getClass().getName(), uri );
-        try
-        {
-            super.service( request, response );
-        }
-        finally
-        {
-            MDC.remove( getClass().getName() );
-        }
+    public String getServletName() {
+      return "nexus";
     }
 
-    @Override
-    public ServletConfig getServletConfig()
-    {
-        return servletConfig;
+    public ServletContext getServletContext() {
+      return NexusRestletServlet.super.getServletConfig().getServletContext();
     }
 
-    /**
-     * An {@link ServletConfig} delegate that has an hardcoded servlet name.
-     */
-    private class DelegatingServletConfig
-        implements ServletConfig
-    {
-
-        public String getServletName()
-        {
-            return "nexus";
-        }
-
-        public ServletContext getServletContext()
-        {
-            return NexusRestletServlet.super.getServletConfig().getServletContext();
-        }
-
-        public String getInitParameter( String name )
-        {
-            return NexusRestletServlet.super.getServletConfig().getInitParameter( name );
-        }
-
-        @SuppressWarnings( "rawtypes" )
-        public Enumeration getInitParameterNames()
-        {
-            return NexusRestletServlet.super.getServletConfig().getInitParameterNames();
-        }
+    public String getInitParameter(String name) {
+      return NexusRestletServlet.super.getServletConfig().getInitParameter(name);
     }
+
+    @SuppressWarnings("rawtypes")
+    public Enumeration getInitParameterNames() {
+      return NexusRestletServlet.super.getServletConfig().getInitParameterNames();
+    }
+  }
 
 }

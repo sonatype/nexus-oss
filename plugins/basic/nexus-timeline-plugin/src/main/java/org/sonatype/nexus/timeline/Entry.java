@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline;
 
 import java.util.Map;
@@ -23,11 +24,11 @@ import java.util.Map;
 public interface Entry
 {
 
-    long getTimestamp();
+  long getTimestamp();
 
-    String getType();
+  String getType();
 
-    String getSubType();
+  String getSubType();
 
-    Map<String, String> getData();
+  Map<String, String> getData();
 }

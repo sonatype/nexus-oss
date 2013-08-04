@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capabilities.client.exceptions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.capabilities.client.exceptions;
 
 import java.util.Collection;
 
@@ -20,39 +19,39 @@ import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.Filter;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Exception thrown when looking for a unique capability based on a filter and the filter matches more then one.
  *
  * @since 2.2
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class MultipleCapabilitiesFoundException
     extends NexusClientException
 {
 
-    private final Filter filter;
+  private final Filter filter;
 
-    private final Collection<Capability> capabilities;
+  private final Collection<Capability> capabilities;
 
-    public MultipleCapabilitiesFoundException( final Filter filter,
-                                               final Collection<Capability> capabilities )
-    {
-        super( String.format(
-            "Found multiple capabilities matching filter '%s': %s",
-            checkNotNull( filter ), checkNotNull( capabilities )
-        ) );
-        this.filter = filter;
-        this.capabilities = capabilities;
-    }
+  public MultipleCapabilitiesFoundException(final Filter filter,
+                                            final Collection<Capability> capabilities)
+  {
+    super(String.format(
+        "Found multiple capabilities matching filter '%s': %s",
+        checkNotNull(filter), checkNotNull(capabilities)
+    ));
+    this.filter = filter;
+    this.capabilities = capabilities;
+  }
 
-    public Filter getFilter()
-    {
-        return filter;
-    }
+  public Filter getFilter() {
+    return filter;
+  }
 
-    public Collection<Capability> getCapabilities()
-    {
-        return capabilities;
-    }
+  public Collection<Capability> getCapabilities() {
+    return capabilities;
+  }
 
 }

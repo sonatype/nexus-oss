@@ -10,16 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfiguration;
+
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public abstract class LayoutConverterShadowRepositoryConfiguration
     extends AbstractShadowRepositoryConfiguration
 {
-    public LayoutConverterShadowRepositoryConfiguration( Xpp3Dom configuration )
-    {
-        super( configuration );
-    }
+  public LayoutConverterShadowRepositoryConfiguration(Xpp3Dom configuration) {
+    super(configuration);
+  }
 }

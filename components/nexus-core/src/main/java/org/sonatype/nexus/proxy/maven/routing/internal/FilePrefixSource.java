@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,319 +39,283 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 import com.google.common.base.Throwables;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * {@link WritablePrefixSource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
+ * {@link WritablePrefixSource} implementation that is backed by a {@link StorageFileItem} in a {@link
+ * MavenRepository}.
  * Also serves as "the main" prefix list source. This is the only implementation of the {@link WritablePrefixSource}.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class FilePrefixSource
     implements WritablePrefixSource
 {
-    private final MavenRepository mavenRepository;
+  private final MavenRepository mavenRepository;
 
-    private final String path;
+  private final String path;
 
-    private final TextFilePrefixSourceMarshaller prefixSourceMarshaller;
+  private final TextFilePrefixSourceMarshaller prefixSourceMarshaller;
 
-    private final RepositoryItemUid repositoryItemUid;
+  private final RepositoryItemUid repositoryItemUid;
 
-    /**
-     * Constructor.
-     * 
-     * @param mavenRepository
-     * @param path
-     * @param prefixFileMaxEntryCount
-     */
-    protected FilePrefixSource( final MavenRepository mavenRepository, final String path, final Config config )
-    {
-        this.mavenRepository = checkNotNull( mavenRepository );
-        this.path = checkNotNull( path );
-        this.prefixSourceMarshaller = new TextFilePrefixSourceMarshaller( config );
-        this.repositoryItemUid = mavenRepository.createUid( path );
+  /**
+   * Constructor.
+   */
+  protected FilePrefixSource(final MavenRepository mavenRepository, final String path, final Config config) {
+    this.mavenRepository = checkNotNull(mavenRepository);
+    this.path = checkNotNull(path);
+    this.prefixSourceMarshaller = new TextFilePrefixSourceMarshaller(config);
+    this.repositoryItemUid = mavenRepository.createUid(path);
+  }
+
+  /**
+   * Returns the repository path that is used to store {@link StorageFileItem} backing this entry source instance.
+   *
+   * @return the path of the backing file.
+   */
+  public String getFilePath() {
+    return path;
+  }
+
+  /**
+   * Returns the {@link MavenRepository} instance that is used to store {@link StorageFileItem} backing this entry
+   * source instance.
+   *
+   * @return the repository of the backing file.
+   */
+  public MavenRepository getMavenRepository() {
+    return mavenRepository;
+  }
+
+  /**
+   * Returns the UID that points to the (existent or nonexistent) file that is (or will be) used to back this
+   * {@link PrefixSource}.
+   *
+   * @return the {@link RepositoryItemUid} of this file item backed {@link PrefixSource}.
+   */
+  public RepositoryItemUid getRepositoryItemUid() {
+    return repositoryItemUid;
+  }
+
+  protected TextFilePrefixSourceMarshaller getPrefixSourceMarshaller() {
+    return prefixSourceMarshaller;
+  }
+
+  @Override
+  public boolean exists() {
+    try {
+      return doReadProtected(new Callable<Boolean>()
+      {
+        @Override
+        public Boolean call()
+            throws IOException
+        {
+          return getFileItem() != null;
+        }
+      });
     }
-
-    /**
-     * Returns the repository path that is used to store {@link StorageFileItem} backing this entry source instance.
-     * 
-     * @return the path of the backing file.
-     */
-    public String getFilePath()
-    {
-        return path;
+    catch (IOException e) {
+      // bam
     }
+    return false;
+  }
 
-    /**
-     * Returns the {@link MavenRepository} instance that is used to store {@link StorageFileItem} backing this entry
-     * source instance.
-     * 
-     * @return the repository of the backing file.
-     */
-    public MavenRepository getMavenRepository()
-    {
-        return mavenRepository;
+  @Override
+  public boolean supported() {
+    try {
+      return doReadProtected(new Callable<Boolean>()
+      {
+        @Override
+        public Boolean call()
+            throws IOException
+        {
+          StorageFileItem file = getFileItem();
+          if (file != null) {
+            return getPrefixSourceMarshaller().read(file).supported();
+          }
+          return false;
+        }
+      });
     }
-
-    /**
-     * Returns the UID that points to the (existent or nonexistent) file that is (or will be) used to back this
-     * {@link PrefixSource}.
-     * 
-     * @return the {@link RepositoryItemUid} of this file item backed {@link PrefixSource}.
-     */
-    public RepositoryItemUid getRepositoryItemUid()
-    {
-        return repositoryItemUid;
+    catch (IOException e) {
+      // bam
     }
+    return false;
+  }
 
-    protected TextFilePrefixSourceMarshaller getPrefixSourceMarshaller()
-    {
-        return prefixSourceMarshaller;
+  @Override
+  public long getLostModifiedTimestamp() {
+    try {
+      return doReadProtected(new Callable<Long>()
+      {
+        @Override
+        public Long call()
+            throws Exception
+        {
+          final StorageFileItem file = getFileItem();
+          if (file != null) {
+            return file.getModified();
+          }
+          else {
+            return -1L;
+          }
+        }
+      });
     }
-
-    @Override
-    public boolean exists()
-    {
-        try
-        {
-            return doReadProtected( new Callable<Boolean>()
-            {
-                @Override
-                public Boolean call()
-                    throws IOException
-                {
-                    return getFileItem() != null;
-                }
-            } );
-        }
-        catch ( IOException e )
-        {
-            // bam
-        }
-        return false;
+    catch (IOException e) {
+      // bum
     }
+    return -1L;
+  }
 
-    @Override
-    public boolean supported()
+  @Override
+  public List<String> readEntries()
+      throws IOException
+  {
+    return doReadProtected(new Callable<List<String>>()
     {
-        try
-        {
-            return doReadProtected( new Callable<Boolean>()
-            {
-                @Override
-                public Boolean call()
-                    throws IOException
-                {
-                    StorageFileItem file = getFileItem();
-                    if ( file != null )
-                    {
-                        return getPrefixSourceMarshaller().read( file ).supported();
-                    }
-                    return false;
-                }
-            } );
+      @Override
+      public List<String> call()
+          throws Exception
+      {
+        final StorageFileItem file = getFileItem();
+        if (file == null) {
+          return null;
         }
-        catch ( IOException e )
-        {
-            // bam
-        }
-        return false;
-    }
+        return getPrefixSourceMarshaller().read(file).entries();
+      }
+    });
+  }
 
-    @Override
-    public long getLostModifiedTimestamp()
-    {
-        try
-        {
-            return doReadProtected( new Callable<Long>()
-            {
-                @Override
-                public Long call()
-                    throws Exception
-                {
-                    final StorageFileItem file = getFileItem();
-                    if ( file != null )
-                    {
-                        return file.getModified();
-                    }
-                    else
-                    {
-                        return -1L;
-                    }
-                }
-            } );
-        }
-        catch ( IOException e )
-        {
-            // bum
-        }
-        return -1L;
-    }
+  @Override
+  public void writeEntries(final PrefixSource prefixSource)
+      throws IOException
+  {
+    checkNotNull(prefixSource);
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    getPrefixSourceMarshaller().write(prefixSource.readEntries(), bos);
+    putFileItem(new PreparedContentLocator(new ByteArrayInputStream(bos.toByteArray()), "text/plain"));
+  }
 
-    @Override
-    public List<String> readEntries()
-        throws IOException
-    {
-        return doReadProtected( new Callable<List<String>>()
-        {
-            @Override
-            public List<String> call()
-                throws Exception
-            {
-                final StorageFileItem file = getFileItem();
-                if ( file == null )
-                {
-                    return null;
-                }
-                return getPrefixSourceMarshaller().read( file ).entries();
-            }
-        } );
-    }
+  @Override
+  public void delete()
+      throws IOException
+  {
+    deleteFileItem();
+  }
 
-    @Override
-    public void writeEntries( final PrefixSource prefixSource )
-        throws IOException
-    {
-        checkNotNull( prefixSource );
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        getPrefixSourceMarshaller().write( prefixSource.readEntries(), bos );
-        putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
-    }
+  // ==
 
-    @Override
-    public void delete()
-        throws IOException
-    {
-        deleteFileItem();
+  protected <R> R doReadProtected(final Callable<R> callable)
+      throws IOException
+  {
+    final RepositoryItemUidLock lock = getRepositoryItemUid().getLock();
+    lock.lock(Action.read);
+    try {
+      try {
+        return callable.call();
+      }
+      catch (IOException e) {
+        throw e;
+      }
+      catch (Exception e) {
+        Throwables.propagate(e);
+      }
     }
-
-    // ==
-
-    protected <R> R doReadProtected( final Callable<R> callable )
-        throws IOException
-    {
-        final RepositoryItemUidLock lock = getRepositoryItemUid().getLock();
-        lock.lock( Action.read );
-        try
-        {
-            try
-            {
-                return callable.call();
-            }
-            catch ( IOException e )
-            {
-                throw e;
-            }
-            catch ( Exception e )
-            {
-                Throwables.propagate( e );
-            }
-        }
-        finally
-        {
-            lock.unlock();
-        }
-        return null; // to make compiler happy. but is unreachable
+    finally {
+      lock.unlock();
     }
+    return null; // to make compiler happy. but is unreachable
+  }
 
-    protected StorageFileItem getFileItem()
-        throws IOException
-    {
-        try
-        {
-            final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
-            request.setRequestLocalOnly( true );
-            request.setRequestGroupLocalOnly( true );
-            request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
-            @SuppressWarnings( "deprecation" )
-            final StorageItem item = getMavenRepository().retrieveItem( true, request );
-            if ( item instanceof StorageFileItem )
-            {
-                return (StorageFileItem) item;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
-            return null;
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // not present
-            return null;
-        }
+  protected StorageFileItem getFileItem()
+      throws IOException
+  {
+    try {
+      final ResourceStoreRequest request = new ResourceStoreRequest(getFilePath());
+      request.setRequestLocalOnly(true);
+      request.setRequestGroupLocalOnly(true);
+      request.getRequestContext().put(Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE);
+      @SuppressWarnings("deprecation")
+      final StorageItem item = getMavenRepository().retrieveItem(true, request);
+      if (item instanceof StorageFileItem) {
+        return (StorageFileItem) item;
+      }
+      else {
+        return null;
+      }
     }
+    catch (IllegalOperationException e) {
+      // eh?
+      return null;
+    }
+    catch (ItemNotFoundException e) {
+      // not present
+      return null;
+    }
+  }
 
-    protected void putFileItem( final ContentLocator content )
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
-        final DefaultStorageFileItem file =
-            new DefaultStorageFileItem( getMavenRepository(), request, true, true, content );
-        try
-        {
-            // NXCM-5188: Remark to not get tempted to change these to storeItemWithChecksums() method:
-            // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
-            // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
-            // is published in Nexus, there is no need anymore to save checksums to disk, as they will
-            // be served up just fine. This is true for all items in Nexus storage, not just prefix
-            // file related ones!
-            getMavenRepository().storeItem( true, file );
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // eh?
-        }
+  protected void putFileItem(final ContentLocator content)
+      throws IOException
+  {
+    final ResourceStoreRequest request = new ResourceStoreRequest(getFilePath());
+    request.setRequestLocalOnly(true);
+    request.setRequestGroupLocalOnly(true);
+    request.getRequestContext().put(Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE);
+    final DefaultStorageFileItem file =
+        new DefaultStorageFileItem(getMavenRepository(), request, true, true, content);
+    try {
+      // NXCM-5188: Remark to not get tempted to change these to storeItemWithChecksums() method:
+      // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
+      // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
+      // is published in Nexus, there is no need anymore to save checksums to disk, as they will
+      // be served up just fine. This is true for all items in Nexus storage, not just prefix
+      // file related ones!
+      getMavenRepository().storeItem(true, file);
     }
+    catch (UnsupportedStorageOperationException e) {
+      // eh?
+    }
+    catch (IllegalOperationException e) {
+      // eh?
+    }
+  }
 
-    @SuppressWarnings( "deprecation" )
-    protected void deleteFileItem()
-        throws IOException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
-        request.setRequestLocalOnly( true );
-        request.setRequestGroupLocalOnly( true );
-        request.getRequestContext().put( Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
-        try
-        {
-            // NXCM-5188: Remark to not get tempted to change these to deleteItemWithChecksums() method:
-            // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
-            // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
-            // is published in Nexus, there is no need anymore to save checksums to disk, as they will
-            // be served up just fine. This is true for all items in Nexus storage, not just prefix
-            // file related ones!
-            getMavenRepository().deleteItem( true, request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            // eh?
-        }
-        catch ( IllegalOperationException e )
-        {
-            // ignore
-        }
+  @SuppressWarnings("deprecation")
+  protected void deleteFileItem()
+      throws IOException
+  {
+    final ResourceStoreRequest request = new ResourceStoreRequest(getFilePath());
+    request.setRequestLocalOnly(true);
+    request.setRequestGroupLocalOnly(true);
+    request.getRequestContext().put(Manager.ROUTING_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE);
+    try {
+      // NXCM-5188: Remark to not get tempted to change these to deleteItemWithChecksums() method:
+      // Since NEXUS-5418 was fixed (in 2.4), Nexus serves up ALL request for existing items that
+      // has extra trailing ".sha1" or ".md5" from item attributes. This means, that when prefix file
+      // is published in Nexus, there is no need anymore to save checksums to disk, as they will
+      // be served up just fine. This is true for all items in Nexus storage, not just prefix
+      // file related ones!
+      getMavenRepository().deleteItem(true, request);
     }
+    catch (ItemNotFoundException e) {
+      // ignore
+    }
+    catch (UnsupportedStorageOperationException e) {
+      // eh?
+    }
+    catch (IllegalOperationException e) {
+      // ignore
+    }
+  }
 
-    public void writeUnsupported()
-        throws IOException
-    {
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        getPrefixSourceMarshaller().writeUnsupported( bos );
-        putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
-    }
+  public void writeUnsupported()
+      throws IOException
+  {
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    getPrefixSourceMarshaller().writeUnsupported(bos);
+    putFileItem(new PreparedContentLocator(new ByteArrayInputStream(bos.toByteArray()), "text/plain"));
+  }
 }

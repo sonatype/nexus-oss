@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import java.util.Collections;
@@ -34,136 +35,119 @@ import org.sonatype.plugins.model.PluginMetadata;
 final class DefaultPluginRepositoryManager
     implements PluginRepositoryManager
 {
-    // ----------------------------------------------------------------------
-    // Constants
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Constants
+  // ----------------------------------------------------------------------
 
-    private static final Comparator<NexusPluginRepository> REPOSITORY_COMPARATOR =
-        new NexusPluginRepositoryComparator();
+  private static final Comparator<NexusPluginRepository> REPOSITORY_COMPARATOR =
+      new NexusPluginRepositoryComparator();
 
-    // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Implementation fields
+  // ----------------------------------------------------------------------
 
-    @Inject
-    private Map<String, NexusPluginRepository> repositoryMap;
+  @Inject
+  private Map<String, NexusPluginRepository> repositoryMap;
 
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------------------
 
-    public String getId()
+  public String getId() {
+    return null;
+  }
+
+  public int getPriority() {
+    return -1;
+  }
+
+  public NexusPluginRepository getNexusPluginRepository(final String id) {
+    return repositoryMap.get(id);
+  }
+
+  public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins() {
+    final Map<GAVCoordinate, PluginMetadata> installedPlugins = new HashMap<GAVCoordinate, PluginMetadata>();
+    for (final NexusPluginRepository r : getRepositories(true)) {
+      installedPlugins.putAll(r.findAvailablePlugins());
+    }
+    return installedPlugins;
+  }
+
+  public PluginRepositoryArtifact resolveArtifact(final GAVCoordinate gav)
+      throws NoSuchPluginRepositoryArtifactException
+  {
+    for (final NexusPluginRepository r : getRepositories(false)) {
+      try {
+        return r.resolveArtifact(gav);
+      }
+      catch (final NoSuchPluginRepositoryArtifactException e) // NOPMD
+      {
+        // continue
+      }
+    }
+    throw new NoSuchPluginRepositoryArtifactException(null, gav);
+  }
+
+  public PluginRepositoryArtifact resolveDependencyArtifact(final PluginRepositoryArtifact plugin,
+                                                            final GAVCoordinate gav)
+      throws NoSuchPluginRepositoryArtifactException
+  {
+    try {
+      return plugin.getNexusPluginRepository().resolveDependencyArtifact(plugin, gav);
+    }
+    catch (final NoSuchPluginRepositoryArtifactException e) // NOPMD
     {
-        return null;
+      // continue
+    }
+    for (final NexusPluginRepository r : getRepositories(false)) {
+      try {
+        if (r != plugin.getNexusPluginRepository()) {
+          return r.resolveDependencyArtifact(plugin, gav);
+        }
+      }
+      catch (final NoSuchPluginRepositoryArtifactException e) // NOPMD
+      {
+        // continue
+      }
+    }
+    throw new NoSuchPluginRepositoryArtifactException(null, gav);
+  }
+
+  public PluginMetadata getPluginMetadata(final GAVCoordinate gav)
+      throws NoSuchPluginRepositoryArtifactException
+  {
+    for (final NexusPluginRepository r : getRepositories(false)) {
+      try {
+        return r.getPluginMetadata(gav);
+      }
+      catch (final NoSuchPluginRepositoryArtifactException e) // NOPMD
+      {
+        // continue
+      }
+    }
+    throw new NoSuchPluginRepositoryArtifactException(null, gav);
+  }
+
+  // ----------------------------------------------------------------------
+  // Implementation methods
+  // ----------------------------------------------------------------------
+
+  private NexusPluginRepository[] getRepositories(final boolean reverse) {
+    final Set<NexusPluginRepository> sortedRepositories;
+    if (reverse) {
+      sortedRepositories = new TreeSet<NexusPluginRepository>(Collections.reverseOrder(REPOSITORY_COMPARATOR));
+    }
+    else {
+      sortedRepositories = new TreeSet<NexusPluginRepository>(REPOSITORY_COMPARATOR);
     }
 
-    public int getPriority()
-    {
-        return -1;
+    for (final NexusPluginRepository repo : repositoryMap.values()) {
+      if (repo != this) // avoid recursion since this is also a NexusPluginRepository
+      {
+        sortedRepositories.add(repo);
+      }
     }
 
-    public NexusPluginRepository getNexusPluginRepository( final String id )
-    {
-        return repositoryMap.get( id );
-    }
-
-    public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins()
-    {
-        final Map<GAVCoordinate, PluginMetadata> installedPlugins = new HashMap<GAVCoordinate, PluginMetadata>();
-        for ( final NexusPluginRepository r : getRepositories( true ) )
-        {
-            installedPlugins.putAll( r.findAvailablePlugins() );
-        }
-        return installedPlugins;
-    }
-
-    public PluginRepositoryArtifact resolveArtifact( final GAVCoordinate gav )
-        throws NoSuchPluginRepositoryArtifactException
-    {
-        for ( final NexusPluginRepository r : getRepositories( false ) )
-        {
-            try
-            {
-                return r.resolveArtifact( gav );
-            }
-            catch ( final NoSuchPluginRepositoryArtifactException e ) // NOPMD
-            {
-                // continue
-            }
-        }
-        throw new NoSuchPluginRepositoryArtifactException( null, gav );
-    }
-
-    public PluginRepositoryArtifact resolveDependencyArtifact( final PluginRepositoryArtifact plugin,
-                                                               final GAVCoordinate gav )
-        throws NoSuchPluginRepositoryArtifactException
-    {
-        try
-        {
-            return plugin.getNexusPluginRepository().resolveDependencyArtifact( plugin, gav );
-        }
-        catch ( final NoSuchPluginRepositoryArtifactException e ) // NOPMD
-        {
-            // continue
-        }
-        for ( final NexusPluginRepository r : getRepositories( false ) )
-        {
-            try
-            {
-                if ( r != plugin.getNexusPluginRepository() )
-                {
-                    return r.resolveDependencyArtifact( plugin, gav );
-                }
-            }
-            catch ( final NoSuchPluginRepositoryArtifactException e ) // NOPMD
-            {
-                // continue
-            }
-        }
-        throw new NoSuchPluginRepositoryArtifactException( null, gav );
-    }
-
-    public PluginMetadata getPluginMetadata( final GAVCoordinate gav )
-        throws NoSuchPluginRepositoryArtifactException
-    {
-        for ( final NexusPluginRepository r : getRepositories( false ) )
-        {
-            try
-            {
-                return r.getPluginMetadata( gav );
-            }
-            catch ( final NoSuchPluginRepositoryArtifactException e ) // NOPMD
-            {
-                // continue
-            }
-        }
-        throw new NoSuchPluginRepositoryArtifactException( null, gav );
-    }
-
-    // ----------------------------------------------------------------------
-    // Implementation methods
-    // ----------------------------------------------------------------------
-
-    private NexusPluginRepository[] getRepositories( final boolean reverse )
-    {
-        final Set<NexusPluginRepository> sortedRepositories;
-        if ( reverse )
-        {
-            sortedRepositories = new TreeSet<NexusPluginRepository>( Collections.reverseOrder( REPOSITORY_COMPARATOR ) );
-        }
-        else
-        {
-            sortedRepositories = new TreeSet<NexusPluginRepository>( REPOSITORY_COMPARATOR );
-        }
-
-        for ( final NexusPluginRepository repo : repositoryMap.values() )
-        {
-            if ( repo != this ) // avoid recursion since this is also a NexusPluginRepository
-            {
-                sortedRepositories.add( repo );
-            }
-        }
-
-        return sortedRepositories.toArray( new NexusPluginRepository[sortedRepositories.size()] );
-    }
+    return sortedRepositories.toArray(new NexusPluginRepository[sortedRepositories.size()]);
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rrb;
 
 import java.net.URLDecoder;
@@ -20,6 +21,19 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
+import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
+import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
+
+import com.thoughtworks.xstream.XStream;
 import org.apache.http.client.HttpClient;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
@@ -33,132 +47,110 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.ResourceStore;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
-import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * A REST resource for retrieving directories from a remote repository.
  */
-@Path( RemoteBrowserResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
-@Consumes( { "application/xml", "application/json" } )
-@Component( role = PlexusResource.class, hint = "org.sonatype.nexus.plugins.rrb.RemoteBrowserResource" )
+@Path(RemoteBrowserResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
+@Consumes({"application/xml", "application/json"})
+@Component(role = PlexusResource.class, hint = "org.sonatype.nexus.plugins.rrb.RemoteBrowserResource")
 public class RemoteBrowserResource
     extends AbstractResourceStoreContentPlexusResource
     implements PlexusResource
 {
-    public static final String RESOURCE_URI = "/repositories/{" +
-        AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser";
+  public static final String RESOURCE_URI = "/repositories/{" +
+      AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser";
 
-    @Requirement
-    private QueryStringBuilder queryStringBuilder;
+  @Requirement
+  private QueryStringBuilder queryStringBuilder;
 
-    @Requirement
-    private Hc4Provider httpClientProvider;
+  @Requirement
+  private Hc4Provider httpClientProvider;
 
-    private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
+  private final Logger logger = LoggerFactory.getLogger(RemoteBrowserResource.class);
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        // if you allow PUT or POST you would need to return your object.
-        return null;
+  @Override
+  public Object getPayloadInstance() {
+    // if you allow PUT or POST you would need to return your object.
+    return null;
+  }
+
+  @Override
+  public void configureXStream(XStream xstream) {
+    super.configureXStream(xstream);
+    xstream.alias("rrbresponse", MavenRepositoryReaderResponse.class);
+    xstream.alias("node", RepositoryDirectory.class);
+  }
+
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    // Allow anonymous access for now
+    // return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
+    return new PathProtectionDescriptor("/repositories/*/remotebrowser/**", "authcBasic,perms[nexus:browseremote]");
+  }
+
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
+
+  /**
+   * Returns the directory nodes retrieved by remote browsing of proxy repository.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(output = MavenRepositoryReaderResponse.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    String id = request.getAttributes().get(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY).toString();
+    ResourceStoreRequest storageItem = getResourceStoreRequest(request);
+    String remotePath = null;
+
+    try {
+      remotePath = URLDecoder.decode(storageItem.getRequestPath().substring(1), "UTF-8");
+    }
+    catch (Exception e) {
+      // old way
+      remotePath = storageItem.getRequestPath().substring(1);
     }
 
-    @Override
-    public void configureXStream( XStream xstream )
-    {
-        super.configureXStream( xstream );
-        xstream.alias( "rrbresponse", MavenRepositoryReaderResponse.class );
-        xstream.alias( "node", RepositoryDirectory.class );
+    try {
+      ProxyRepository proxyRepository = getUnprotectedRepositoryRegistry()
+          .getRepositoryWithFacet(id, ProxyRepository.class);
+      HttpClient client = httpClientProvider.createHttpClient(proxyRepository.getRemoteStorageContext());
+
+      MavenRepositoryReader mr = new MavenRepositoryReader(client, queryStringBuilder);
+      MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
+      // FIXME: Sort this out, NEXUS-4058 was closed about a year go (orig: we really should not do the encoding here, but this is work around until NEXUS-4058 is fixed).
+      String localUrl = createRemoteResourceReference(request, id, "").toString(false, false);
+      List<RepositoryDirectory> result = mr.extract(remotePath, localUrl, proxyRepository, id);
+      data.setData(result);
+      logger.debug("return value is {}", data);
+
+      return data;
     }
-
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        // Allow anonymous access for now
-        // return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
-        return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "authcBasic,perms[nexus:browseremote]" );
+    catch (NoSuchRepositoryException e) {
+      this.logger.warn("Could not find repository: " + id, e);
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find repository: " + id, e);
     }
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  protected Reference createRemoteResourceReference(Request request, String repoId, String remoteUrl) {
+    Reference repoRootRef = createRepositoryReference(request, repoId);
 
-    /**
-     * Returns the directory nodes retrieved by remote browsing of proxy repository.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( output = MavenRepositoryReaderResponse.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        String id = request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString();
-        ResourceStoreRequest storageItem = getResourceStoreRequest( request );
-        String remotePath = null;
+    return createReference(repoRootRef, "remotebrowser/" + remoteUrl);
+  }
 
-        try
-        {
-            remotePath = URLDecoder.decode( storageItem.getRequestPath().substring( 1 ), "UTF-8" );
-        }
-        catch ( Exception e )
-        {
-            // old way
-            remotePath = storageItem.getRequestPath().substring( 1 );
-        }
-
-        try
-        {
-            ProxyRepository proxyRepository = getUnprotectedRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
-            HttpClient client = httpClientProvider.createHttpClient(proxyRepository.getRemoteStorageContext());
-
-            MavenRepositoryReader mr = new MavenRepositoryReader( client, queryStringBuilder );
-            MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
-            // FIXME: Sort this out, NEXUS-4058 was closed about a year go (orig: we really should not do the encoding here, but this is work around until NEXUS-4058 is fixed).
-            String localUrl = createRemoteResourceReference( request, id, "" ).toString(false, false);
-            List<RepositoryDirectory> result = mr.extract(remotePath, localUrl, proxyRepository, id);
-            data.setData( result );
-            logger.debug( "return value is {}", data );
-
-            return data;
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            this.logger.warn( "Could not find repository: " + id, e );
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not find repository: " + id, e );
-        }
-    }
-
-    protected Reference createRemoteResourceReference( Request request, String repoId, String remoteUrl )
-    {
-        Reference repoRootRef = createRepositoryReference( request, repoId );
-
-        return createReference( repoRootRef, "remotebrowser/" + remoteUrl );
-    }
-
-    /**
-     * DUMMY IMPLEMENTATION, just to satisfy superclass (but why is this class expanding it at all?)
-     */
-    @Override
-    protected ResourceStore getResourceStore( final Request request )
-        throws NoSuchResourceStoreException, ResourceException
-    {
-        return getUnprotectedRepositoryRegistry().getRepository(
-            request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString() );
-    }
+  /**
+   * DUMMY IMPLEMENTATION, just to satisfy superclass (but why is this class expanding it at all?)
+   */
+  @Override
+  protected ResourceStore getResourceStore(final Request request)
+      throws NoSuchResourceStoreException, ResourceException
+  {
+    return getUnprotectedRepositoryRegistry().getRepository(
+        request.getAttributes().get(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY).toString());
+  }
 }

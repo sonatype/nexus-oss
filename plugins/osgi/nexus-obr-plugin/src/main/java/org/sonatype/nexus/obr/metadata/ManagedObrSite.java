@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.metadata;
 
 import java.io.IOException;
@@ -30,72 +31,65 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 public class ManagedObrSite
     extends AbstractObrSite
 {
-    private final StorageFileItem item;
+  private final StorageFileItem item;
 
-    private final URL url;
+  private final URL url;
 
-    /**
-     * Creates a managed OBR site based on the given metadata item inside Nexus.
-     * 
-     * @param item the metadata item
-     * @throws StorageException
-     */
-    public ManagedObrSite( final StorageFileItem item )
-        throws StorageException
-    {
-        this.item = item;
+  /**
+   * Creates a managed OBR site based on the given metadata item inside Nexus.
+   *
+   * @param item the metadata item
+   */
+  public ManagedObrSite(final StorageFileItem item)
+      throws StorageException
+  {
+    this.item = item;
 
-        url = getAbsoluteUrlFromBase( item );
+    url = getAbsoluteUrlFromBase(item);
+  }
+
+  /**
+   * Finds the absolute URL for the managed OBR site.
+   *
+   * @return the absolute URL
+   */
+  private static URL getAbsoluteUrlFromBase(final StorageFileItem item)
+      throws StorageException
+  {
+    final RepositoryItemUid uid = item.getRepositoryItemUid();
+
+    final Repository repository = uid.getRepository();
+    final ResourceStoreRequest request = new ResourceStoreRequest(uid.getPath());
+
+    if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+      final ProxyRepository proxyRepository = repository.adaptToFacet(ProxyRepository.class);
+      final RemoteRepositoryStorage storage = proxyRepository.getRemoteStorage();
+      if (storage != null) {
+        return storage.getAbsoluteUrlFromBase(proxyRepository, request);
+      }
+      // locally hosted proxy repository, so drop through...
     }
 
-    /**
-     * Finds the absolute URL for the managed OBR site.
-     * 
-     * @return the absolute URL
-     * @throws StorageException
-     */
-    private static URL getAbsoluteUrlFromBase( final StorageFileItem item )
-        throws StorageException
-    {
-        final RepositoryItemUid uid = item.getRepositoryItemUid();
+    return repository.getLocalStorage().getAbsoluteUrlFromBase(repository, request);
+  }
 
-        final Repository repository = uid.getRepository();
-        final ResourceStoreRequest request = new ResourceStoreRequest( uid.getPath() );
+  public URL getMetadataUrl() {
+    return url;
+  }
 
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            final ProxyRepository proxyRepository = repository.adaptToFacet( ProxyRepository.class );
-            final RemoteRepositoryStorage storage = proxyRepository.getRemoteStorage();
-            if ( storage != null )
-            {
-                return storage.getAbsoluteUrlFromBase( proxyRepository, request );
-            }
-            // locally hosted proxy repository, so drop through...
-        }
+  public String getMetadataPath() {
+    return item.getRepositoryItemUid().getPath();
+  }
 
-        return repository.getLocalStorage().getAbsoluteUrlFromBase( repository, request );
-    }
+  @Override
+  protected InputStream openRawStream()
+      throws IOException
+  {
+    return item.getInputStream();
+  }
 
-    public URL getMetadataUrl()
-    {
-        return url;
-    }
-
-    public String getMetadataPath()
-    {
-        return item.getRepositoryItemUid().getPath();
-    }
-
-    @Override
-    protected InputStream openRawStream()
-        throws IOException
-    {
-        return item.getInputStream();
-    }
-
-    @Override
-    protected String getContentType()
-    {
-        return item.getMimeType();
-    }
+  @Override
+  protected String getContentType() {
+    return item.getMimeType();
+  }
 }

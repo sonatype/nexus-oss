@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 
 import java.util.Map;
@@ -22,18 +23,18 @@ import org.sonatype.tests.http.server.api.Behaviour;
 /**
  * Behavior that "mimics" S3 response by placing junk S3 headers. Works when only their presence is checked, like in
  * case of S3 scraper.
- * 
+ *
  * @author cstamas
  */
 public class S3ResponseHeadersBehaviour
     implements Behaviour
 {
-    @Override
-    public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
-        throws Exception
-    {
-        response.addHeader( "Server", "AmazonS3" );
-        response.addHeader( "x-amz-request-id", "1234567890" );
-        return true;
-    }
+  @Override
+  public boolean execute(HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx)
+      throws Exception
+  {
+    response.addHeader("Server", "AmazonS3");
+    response.addHeader("x-amz-request-id", "1234567890");
+    return true;
+  }
 }

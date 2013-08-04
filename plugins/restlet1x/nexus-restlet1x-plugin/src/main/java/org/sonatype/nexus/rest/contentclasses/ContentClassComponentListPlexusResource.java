@@ -10,11 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.contentclasses;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
+import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
@@ -24,68 +33,56 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
-import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "ContentClassComponentListPlexusResource" )
-@Path( ContentClassComponentListPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "ContentClassComponentListPlexusResource")
+@Path(ContentClassComponentListPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class ContentClassComponentListPlexusResource
     extends AbstractNexusPlexusResource
 {
-    public static final String RESOURCE_URI = "/components/repo_content_classes";
-    
-    @Requirement
-    private RepositoryTypeRegistry repoTypeRegistry;
+  public static final String RESOURCE_URI = "/components/repo_content_classes";
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
+  @Requirement
+  private RepositoryTypeRegistry repoTypeRegistry;
+
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
+
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:componentscontentclasses]");
+  }
+
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
+
+  /**
+   * Retrieve the list of content classes availabe in nexus.  Plugins can contribute to this list.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(output = RepositoryContentClassListResourceResponse.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    RepositoryContentClassListResourceResponse contentClasses = new RepositoryContentClassListResourceResponse();
+
+    for (ContentClass contentClass : repoTypeRegistry.getContentClasses().values()) {
+      RepositoryContentClassListResource resource = new RepositoryContentClassListResource();
+      resource.setContentClass(contentClass.getId());
+      resource.setName(contentClass.getName());
+      resource.setGroupable(contentClass.isGroupable());
+
+      for (String compClass : repoTypeRegistry.getCompatibleContentClasses(contentClass)) {
+        resource.addCompatibleType(compClass);
+      }
+
+      contentClasses.addData(resource);
     }
 
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:componentscontentclasses]" );
-    }
-    
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
-    
-    /**
-     * Retrieve the list of content classes availabe in nexus.  Plugins can contribute to this list.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( output = RepositoryContentClassListResourceResponse.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {   
-        RepositoryContentClassListResourceResponse contentClasses = new RepositoryContentClassListResourceResponse();
-        
-        for ( ContentClass contentClass : repoTypeRegistry.getContentClasses().values() )
-        {
-            RepositoryContentClassListResource resource = new RepositoryContentClassListResource();
-            resource.setContentClass( contentClass.getId() );
-            resource.setName( contentClass.getName() );
-            resource.setGroupable( contentClass.isGroupable() );
-            
-            for ( String compClass : repoTypeRegistry.getCompatibleContentClasses( contentClass ) )
-            {
-                resource.addCompatibleType( compClass );
-            }
-            
-            contentClasses.addData( resource );
-        }
-        
-        return contentClasses;
-    }
+    return contentClasses;
+  }
 }

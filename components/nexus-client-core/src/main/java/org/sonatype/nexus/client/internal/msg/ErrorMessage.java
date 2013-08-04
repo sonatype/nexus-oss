@@ -32,81 +32,73 @@ public class ErrorMessage
     implements java.io.Serializable
 {
 
-    //--------------------------/
-    //- Class/Member Variables -/
-    //--------------------------/
+  //--------------------------/
+  //- Class/Member Variables -/
+  //--------------------------/
 
-    /**
-     * Field id.
-     */
-    private String id;
+  /**
+   * Field id.
+   */
+  private String id;
 
-    /**
-     * Field msg.
-     */
-    private String msg;
+  /**
+   * Field msg.
+   */
+  private String msg;
 
-    //-----------/
-    //- Methods -/
-    //-----------/
+  //-----------/
+  //- Methods -/
+  //-----------/
 
-    /**
-     * Get the id field.
-     *
-     * @return String
-     */
-    public String getId()
-    {
-        return this.id;
-    } //-- String getId() 
+  /**
+   * Get the id field.
+   *
+   * @return String
+   */
+  public String getId() {
+    return this.id;
+  } //-- String getId()
 
-    /**
-     * Get the msg field.
-     *
-     * @return String
-     */
-    public String getMsg()
-    {
-        return this.msg;
-    } //-- String getMsg() 
+  /**
+   * Get the msg field.
+   *
+   * @return String
+   */
+  public String getMsg() {
+    return this.msg;
+  } //-- String getMsg()
 
-    /**
-     * Set the id field.
-     *
-     * @param id
-     */
-    public void setId( String id )
-    {
-        this.id = id;
-    } //-- void setId(String) 
+  /**
+   * Set the id field.
+   */
+  public void setId(String id) {
+    this.id = id;
+  } //-- void setId(String)
 
-    /**
-     * Set the msg field.
-     *
-     * @param msg
-     */
-    public void setMsg( String msg )
-    {
-        this.msg = msg;
-    } //-- void setMsg(String) 
+  /**
+   * Set the msg field.
+   */
+  public void setMsg(String msg) {
+    this.msg = msg;
+  } //-- void setMsg(String)
 
-//    private String modelEncoding = "UTF-8";
-//
-//    /**
-//     * Set an encoding used for reading/writing the model.
-//     *
-//     * @param modelEncoding the encoding used when reading/writing the model.
-//     */
-//    public void setModelEncoding( String modelEncoding )
-//    {
-//        this.modelEncoding = modelEncoding;
-//    }
-//
-//    /**
-//     * @return the current encoding used when reading/writing this model.
-//     */
-//    public String getModelEncoding()
-//    {
-//        return modelEncoding;
-//    }
+  //    private String modelEncoding = "UTF-8";
+  //
+  //    /**
+  //     * Set an encoding used for reading/writing the model.
+  //     *
+  //     * @param modelEncoding the encoding used when reading/writing the model.
+  //     */
+  //    public void setModelEncoding( String modelEncoding )
+  //    {
+  //        this.modelEncoding = modelEncoding;
+  //    }
+  //
+  //    /**
+  //     * @return the current encoding used when reading/writing this model.
+  //     */
+  //    public String getModelEncoding()
+  //    {
+  //        return modelEncoding;
+  //    }
 }

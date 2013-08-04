@@ -10,49 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.persist;
 
 import java.io.File;
 
 public class LdapConfigrationValidatorTestBean
 {
-    
-    private File configFile;
-    
-    private int numberOfErrors;
-    
-    private int numberOfWarnings;
 
-    public File getConfigFile()
-    {
-        return configFile;
-    }
+  private File configFile;
 
-    public void setConfigFile( File configFile )
-    {
-        this.configFile = configFile;
-    }
+  private int numberOfErrors;
 
-    public int getNumberOfErrors()
-    {
-        return numberOfErrors;
-    }
+  private int numberOfWarnings;
 
-    public void setNumberOfErrors( int numberOfErrors )
-    {
-        this.numberOfErrors = numberOfErrors;
-    }
+  public File getConfigFile() {
+    return configFile;
+  }
 
-    public int getNumberOfWarnings()
-    {
-        return numberOfWarnings;
-    }
+  public void setConfigFile(File configFile) {
+    this.configFile = configFile;
+  }
 
-    public void setNumberOfWarnings( int numberOfWarnings )
-    {
-        this.numberOfWarnings = numberOfWarnings;
-    }
-    
-    
-    
+  public int getNumberOfErrors() {
+    return numberOfErrors;
+  }
+
+  public void setNumberOfErrors(int numberOfErrors) {
+    this.numberOfErrors = numberOfErrors;
+  }
+
+  public int getNumberOfWarnings() {
+    return numberOfWarnings;
+  }
+
+  public void setNumberOfWarnings(int numberOfWarnings) {
+    this.numberOfWarnings = numberOfWarnings;
+  }
+
+
 }

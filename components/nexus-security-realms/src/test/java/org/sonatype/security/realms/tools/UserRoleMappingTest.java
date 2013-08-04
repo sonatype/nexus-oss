@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.tools;
 
 import java.io.File;
@@ -17,117 +18,116 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
-import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
+
+import junit.framework.Assert;
+import org.codehaus.plexus.util.FileUtils;
 
 public class UserRoleMappingTest
     extends AbstractSecurityTestCase
 {
 
-    public ConfigurationManager getConfigManager()
-        throws Exception
-    {
-        return (ConfigurationManager) this.lookup( DefaultConfigurationManager.class );
-    }
+  public ConfigurationManager getConfigManager()
+      throws Exception
+  {
+    return (ConfigurationManager) this.lookup(DefaultConfigurationManager.class);
+  }
 
-    public void testGetUser()
-        throws Exception
-    {
-        ConfigurationManager config = this.getConfigManager();
+  public void testGetUser()
+      throws Exception
+  {
+    ConfigurationManager config = this.getConfigManager();
 
-        CUser user = config.readUser( "test-user" );
-        Assert.assertEquals( user.getId(), "test-user" );
-        Assert.assertEquals( user.getEmail(), "changeme1@yourcompany.com" );
-        Assert.assertEquals( user.getFirstName(), "Test" );
-        Assert.assertEquals( user.getLastName(), "User" );
-        Assert.assertEquals( user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0" );
-        Assert.assertEquals( user.getStatus(), "active" );
+    CUser user = config.readUser("test-user");
+    Assert.assertEquals(user.getId(), "test-user");
+    Assert.assertEquals(user.getEmail(), "changeme1@yourcompany.com");
+    Assert.assertEquals(user.getFirstName(), "Test");
+    Assert.assertEquals(user.getLastName(), "User");
+    Assert.assertEquals(user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0");
+    Assert.assertEquals(user.getStatus(), "active");
 
-        CUserRoleMapping mapping = config.readUserRoleMapping( "test-user", "default" );
+    CUserRoleMapping mapping = config.readUserRoleMapping("test-user", "default");
 
-        Assert.assertTrue( mapping.getRoles().contains( "role1" ) );
-        Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
-        Assert.assertEquals( 2, mapping.getRoles().size() );
-    }
+    Assert.assertTrue(mapping.getRoles().contains("role1"));
+    Assert.assertTrue(mapping.getRoles().contains("role2"));
+    Assert.assertEquals(2, mapping.getRoles().size());
+  }
 
-    public void testGetUserWithEmptyRole()
-        throws Exception
-    {
-        ConfigurationManager config = this.getConfigManager();
+  public void testGetUserWithEmptyRole()
+      throws Exception
+  {
+    ConfigurationManager config = this.getConfigManager();
 
-        CUser user = config.readUser( "test-user-with-empty-role" );
-        Assert.assertEquals( user.getId(), "test-user-with-empty-role" );
-        Assert.assertEquals( user.getEmail(), "empty-role@yourcompany.com" );
-        Assert.assertEquals( user.getFirstName(), "Test" );
-        Assert.assertEquals( user.getLastName(), "User With Empty Role" );
-        Assert.assertEquals( user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0" );
-        Assert.assertEquals( user.getStatus(), "active" );
+    CUser user = config.readUser("test-user-with-empty-role");
+    Assert.assertEquals(user.getId(), "test-user-with-empty-role");
+    Assert.assertEquals(user.getEmail(), "empty-role@yourcompany.com");
+    Assert.assertEquals(user.getFirstName(), "Test");
+    Assert.assertEquals(user.getLastName(), "User With Empty Role");
+    Assert.assertEquals(user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0");
+    Assert.assertEquals(user.getStatus(), "active");
 
-        CUserRoleMapping mapping = config.readUserRoleMapping( "test-user-with-empty-role", "default" );
+    CUserRoleMapping mapping = config.readUserRoleMapping("test-user-with-empty-role", "default");
 
-        Assert.assertTrue( mapping.getRoles().contains( "empty-role" ) );
-        Assert.assertTrue( mapping.getRoles().contains( "role1" ) );
-        Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
-        Assert.assertEquals( 3, mapping.getRoles().size() );
+    Assert.assertTrue(mapping.getRoles().contains("empty-role"));
+    Assert.assertTrue(mapping.getRoles().contains("role1"));
+    Assert.assertTrue(mapping.getRoles().contains("role2"));
+    Assert.assertEquals(3, mapping.getRoles().size());
 
-        // try to update empty role
-        config.updateUserRoleMapping( mapping );
-        config.save();
-        config.clearCache();
+    // try to update empty role
+    config.updateUserRoleMapping(mapping);
+    config.save();
+    config.clearCache();
 
-        // make sure we still have the role mappings
-        mapping = config.readUserRoleMapping( "test-user-with-empty-role", "default" );
+    // make sure we still have the role mappings
+    mapping = config.readUserRoleMapping("test-user-with-empty-role", "default");
 
-        Assert.assertTrue( mapping.getRoles().contains( "empty-role" ) );
-        Assert.assertTrue( mapping.getRoles().contains( "role1" ) );
-        Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
-        Assert.assertEquals( 3, mapping.getRoles().size() );
-    }
+    Assert.assertTrue(mapping.getRoles().contains("empty-role"));
+    Assert.assertTrue(mapping.getRoles().contains("role1"));
+    Assert.assertTrue(mapping.getRoles().contains("role2"));
+    Assert.assertEquals(3, mapping.getRoles().size());
+  }
 
-    public void testUpdateUsersRoles()
-        throws Exception
-    {
-        ConfigurationManager config = this.getConfigManager();
+  public void testUpdateUsersRoles()
+      throws Exception
+  {
+    ConfigurationManager config = this.getConfigManager();
 
-        // make sure we have exactly 4 user role mappings
-        Assert.assertEquals( 5, config.listUserRoleMappings().size() );
+    // make sure we have exactly 4 user role mappings
+    Assert.assertEquals(5, config.listUserRoleMappings().size());
 
-        // get the test-user and add a role
-        CUser user = config.readUser( "test-user" );
+    // get the test-user and add a role
+    CUser user = config.readUser("test-user");
 
-        CUserRoleMapping roleMapping = config.readUserRoleMapping( "test-user", "default" );
-        List<String> roles = roleMapping.getRoles();
-        roles.add( "role3" );
+    CUserRoleMapping roleMapping = config.readUserRoleMapping("test-user", "default");
+    List<String> roles = roleMapping.getRoles();
+    roles.add("role3");
 
-        // update the user
-        config.updateUser( user, new HashSet<String>( roles ) );
+    // update the user
+    config.updateUser(user, new HashSet<String>(roles));
 
-        // make sure we have exactly 4 user role mappings
-        Assert.assertEquals( 5, config.listUserRoleMappings().size() );
-    }
+    // make sure we have exactly 4 user role mappings
+    Assert.assertEquals(5, config.listUserRoleMappings().size());
+  }
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        // copy the file to a different location because we are going to change it
-        FileUtils.copyFile( new File( "target/test-classes/org/sonatype/security/locators/security.xml" ),
-                            new File( "target/test-classes/org/sonatype/security/locators/security-test.xml" ) );
-    }
+    // copy the file to a different location because we are going to change it
+    FileUtils.copyFile(new File("target/test-classes/org/sonatype/security/locators/security.xml"),
+        new File("target/test-classes/org/sonatype/security/locators/security-test.xml"));
+  }
 
-    @Override
-    public void configure( Properties properties )
-    {
-        super.configure( properties );
-        
-        //Overriding default value set in parent
-        properties.put( "security-xml-file", "target/test-classes/org/sonatype/security/locators/security-test.xml" );
-    }
+  @Override
+  public void configure(Properties properties) {
+    super.configure(properties);
+
+    //Overriding default value set in parent
+    properties.put("security-xml-file", "target/test-classes/org/sonatype/security/locators/security-test.xml");
+  }
 
 }

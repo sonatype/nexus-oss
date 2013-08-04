@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.json;
 
 import java.util.List;
@@ -17,11 +18,11 @@ import java.util.Map;
 
 public class CombinedValued
 {
-    public String stringValue;
+  public String stringValue;
 
-    public int[] ints;
+  public int[] ints;
 
-    public List objectsList;
+  public List objectsList;
 
-    public Map objectMap;
+  public Map objectMap;
 }

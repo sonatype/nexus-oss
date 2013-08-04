@@ -10,63 +10,58 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.tools;
+
+import org.sonatype.security.model.Configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.security.model.Configuration;
 
 public abstract class AbstractConfigurationManager
     implements ConfigurationManager
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
+  protected Logger getLogger() {
+    return logger;
+  }
 
-    //
+  //
 
-    private volatile EnhancedConfiguration configurationCache = null;
+  private volatile EnhancedConfiguration configurationCache = null;
 
-    public void clearCache()
-    {
-        configurationCache = null;
-    }
+  public void clearCache() {
+    configurationCache = null;
+  }
 
-    protected EnhancedConfiguration getConfiguration()
-    {
-        // Assign configuration to local variable first, as calls to clearCache can null it out at any time
-        EnhancedConfiguration configuration = this.configurationCache;
-        if ( configuration == null || shouldRebuildConifuguration() )
-        {
-            synchronized ( this )
-            {
-                // double-checked locking of volatile is apparently OK with java5+
-                // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
-                configuration = this.configurationCache;
-                if ( configuration == null || shouldRebuildConifuguration() )
-                {
-                    configuration = new EnhancedConfiguration( doGetConfiguration() );
-                    this.configurationCache = configuration;
-                }
-            }
+  protected EnhancedConfiguration getConfiguration() {
+    // Assign configuration to local variable first, as calls to clearCache can null it out at any time
+    EnhancedConfiguration configuration = this.configurationCache;
+    if (configuration == null || shouldRebuildConifuguration()) {
+      synchronized (this) {
+        // double-checked locking of volatile is apparently OK with java5+
+        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
+        configuration = this.configurationCache;
+        if (configuration == null || shouldRebuildConifuguration()) {
+          configuration = new EnhancedConfiguration(doGetConfiguration());
+          this.configurationCache = configuration;
         }
-        return configuration;
+      }
     }
+    return configuration;
+  }
 
-    /**
-     * Returns <code>true</code> if configuration needs to be rebuilt (by calling {@link #doGetConfiguration()}).
-     */
-    protected boolean shouldRebuildConifuguration()
-    {
-        return false;
-    }
+  /**
+   * Returns <code>true</code> if configuration needs to be rebuilt (by calling {@link #doGetConfiguration()}).
+   */
+  protected boolean shouldRebuildConifuguration() {
+    return false;
+  }
 
-    /**
-     * Builds and returns fresh new Configuration instance. Implementation is expected to reset
-     * {@link #shouldRebuildConifuguration()} flag back to <code>false</code>.
-     */
-    protected abstract Configuration doGetConfiguration();
+  /**
+   * Builds and returns fresh new Configuration instance. Implementation is expected to reset
+   * {@link #shouldRebuildConifuguration()} flag back to <code>false</code>.
+   */
+  protected abstract Configuration doGetConfiguration();
 }

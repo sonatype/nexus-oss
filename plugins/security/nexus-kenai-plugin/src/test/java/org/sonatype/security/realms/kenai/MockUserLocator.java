@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.kenai;
 
 import java.util.HashSet;
@@ -26,74 +27,63 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 @Singleton
-@Typed( UserManager.class )
-@Named( "test" )
+@Typed(UserManager.class)
+@Named("test")
 public class MockUserLocator
     extends AbstractReadOnlyUserManager
 {
-    private Set<String> userIds = new HashSet<String>();
+  private Set<String> userIds = new HashSet<String>();
 
-    public MockUserLocator()
-    {
-        userIds.add( "bob" );
-        userIds.add( "jcoder" );
+  public MockUserLocator() {
+    userIds.add("bob");
+    userIds.add("jcoder");
+  }
+
+  public String getSource() {
+    return "test";
+  }
+
+  public User getUser(String userId) {
+    if (this.userIds.contains(userId)) {
+      return this.toUser(userId);
+    }
+    return null;
+  }
+
+  public boolean isPrimary() {
+    return false;
+  }
+
+  public Set<String> listUserIds() {
+    return userIds;
+  }
+
+  public Set<User> listUsers() {
+    Set<User> users = new HashSet<User>();
+
+    for (String userId : this.userIds) {
+      users.add(this.toUser(userId));
     }
 
-    public String getSource()
-    {
-        return "test";
-    }
+    return users;
+  }
 
-    public User getUser( String userId )
-    {
-        if ( this.userIds.contains( userId ) )
-        {
-            return this.toUser( userId );
-        }
-        return null;
-    }
+  public Set<User> searchUsers(UserSearchCriteria criteria) {
+    return this.filterListInMemeory(this.listUsers(), criteria);
+  }
 
-    public boolean isPrimary()
-    {
-        return false;
-    }
+  private User toUser(String userId) {
+    DefaultUser user = new DefaultUser();
 
-    public Set<String> listUserIds()
-    {
-        return userIds;
-    }
+    user.setUserId(userId);
+    user.setName(userId);
+    user.setEmailAddress(userId + "@foo.com");
+    user.setSource(this.getSource());
 
-    public Set<User> listUsers()
-    {
-        Set<User> users = new HashSet<User>();
+    return user;
+  }
 
-        for ( String userId : this.userIds )
-        {
-            users.add( this.toUser( userId ) );
-        }
-
-        return users;
-    }
-
-    public Set<User> searchUsers( UserSearchCriteria criteria )
-    {
-        return this.filterListInMemeory( this.listUsers(), criteria );
-    }
-
-    private User toUser( String userId )
-    {
-        DefaultUser user = new DefaultUser();
-
-        user.setUserId( userId );
-        user.setName( userId );
-        user.setEmailAddress( userId + "@foo.com" );
-        user.setSource( this.getSource() );
-
-        return user;
-    }
-
-    public String getAuthenticationRealmName()
-    {
-        return null;
-    }
+  public String getAuthenticationRealmName() {
+    return null;
+  }
 }

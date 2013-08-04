@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest;
 
 import org.sonatype.nexus.client.core.Condition;
@@ -29,46 +30,42 @@ public abstract class AbstractNexusClientFactory<NC extends NexusClient>
     implements NexusClientFactory
 {
 
-    private final Condition connectionCondition;
+  private final Condition connectionCondition;
 
-    private final SubsystemFactory<?, NC>[] subsystemFactories;
+  private final SubsystemFactory<?, NC>[] subsystemFactories;
 
-    protected AbstractNexusClientFactory( final Condition connectionCondition,
-                                          SubsystemFactory<?, NC>[] subsystemFactories )
-    {
-        this.connectionCondition = Check.notNull( connectionCondition, "Connection condition" );
-        this.subsystemFactories = Check.notNull( subsystemFactories, "Subsystem factories" );
-    }
+  protected AbstractNexusClientFactory(final Condition connectionCondition,
+                                       SubsystemFactory<?, NC>[] subsystemFactories)
+  {
+    this.connectionCondition = Check.notNull(connectionCondition, "Connection condition");
+    this.subsystemFactories = Check.notNull(subsystemFactories, "Subsystem factories");
+  }
 
-    protected AbstractNexusClientFactory( final SubsystemFactory<?, NC>[] subsystemFactories )
-    {
-        this( NexusStatusConditions.anyModern(), subsystemFactories );
-    }
+  protected AbstractNexusClientFactory(final SubsystemFactory<?, NC>[] subsystemFactories) {
+    this(NexusStatusConditions.anyModern(), subsystemFactories);
+  }
 
-    @Override
-    public final NexusClient createFor( final BaseUrl baseUrl )
-    {
-        return createFor( baseUrl, null );
-    }
+  @Override
+  public final NexusClient createFor(final BaseUrl baseUrl) {
+    return createFor(baseUrl, null);
+  }
 
-    @Override
-    public final NexusClient createFor( final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo )
-    {
-        final ConnectionInfo connectionInfo = new ConnectionInfo( baseUrl, authenticationInfo, null );
-        return createFor( connectionInfo );
-    }
+  @Override
+  public final NexusClient createFor(final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo) {
+    final ConnectionInfo connectionInfo = new ConnectionInfo(baseUrl, authenticationInfo, null);
+    return createFor(connectionInfo);
+  }
 
-    @Override
-    public final NexusClient createFor( final ConnectionInfo connectionInfo )
-    {
-        final AbstractNexusClient nexusClient =
-            doCreateFor( connectionCondition, subsystemFactories, connectionInfo );
-        return nexusClient;
-    }
+  @Override
+  public final NexusClient createFor(final ConnectionInfo connectionInfo) {
+    final AbstractNexusClient nexusClient =
+        doCreateFor(connectionCondition, subsystemFactories, connectionInfo);
+    return nexusClient;
+  }
 
-    // ==
+  // ==
 
-    protected abstract AbstractNexusClient doCreateFor( final Condition connectionCondition,
-                                                        final SubsystemFactory<?, NC>[] subsystemFactories,
-                                                        final ConnectionInfo connectionInfo );
+  protected abstract AbstractNexusClient doCreateFor(final Condition connectionCondition,
+                                                     final SubsystemFactory<?, NC>[] subsystemFactories,
+                                                     final ConnectionInfo connectionInfo);
 }

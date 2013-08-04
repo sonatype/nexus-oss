@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.notification.events;
 
 import org.sonatype.nexus.notification.NotificationRequest;
@@ -17,16 +18,13 @@ import org.sonatype.plexus.appevents.Event;
 
 /**
  * Routes that calculates the proper notification targets to be notified in case of some event.
- * 
+ *
  * @author cstamas
  */
 public interface NotificationEventRouter
 {
-    /**
-     * Returns the set of targets to be notified for the event.
-     * 
-     * @param evt
-     * @return
-     */
-    NotificationRequest getRequestForEvent( Event<?> evt );
+  /**
+   * Returns the set of targets to be notified for the event.
+   */
+  NotificationRequest getRequestForEvent(Event<?> evt);
 }

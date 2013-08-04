@@ -10,23 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.remote.http;
 
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
- * Classes implementing this interface are injected into the {@link QueryStringBuilder} and asked for a custom string to
- * append to the query string. The string will be prepended with either ``&'' or ``?'' as necessary. 
- * 
+ * Classes implementing this interface are injected into the {@link QueryStringBuilder} and asked for a custom string
+ * to
+ * append to the query string. The string will be prepended with either ``&'' or ``?'' as necessary.
+ *
  * @since 2.2
  */
 public interface QueryStringContributor
 {
-    /**
-     * @param ctx The remote storage settings.
-     * @param repository The proxy repository
-     * @return The string to append to query string
-     */
-    public String getQueryString( RemoteStorageContext ctx, ProxyRepository repository );
+  /**
+   * @param ctx        The remote storage settings.
+   * @param repository The proxy repository
+   * @return The string to append to query string
+   */
+  public String getQueryString(RemoteStorageContext ctx, ProxyRepository repository);
 }

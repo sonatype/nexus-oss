@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.configuration.source;
 
 import java.io.IOException;
@@ -21,67 +22,56 @@ import org.sonatype.configuration.validation.ValidationResponse;
 
 /**
  * The Interface ConfigurationSource.
- * 
+ *
  * @author cstamas
  */
 public interface ConfigurationSource<E extends Configuration>
 {
-    /**
-     * Returns the validation response, if any. It is created on the loading of the user configuration.
-     * 
-     * @return the response or null if not applicable or config was still not loaded.
-     */
-    ValidationResponse getValidationResponse();
+  /**
+   * Returns the validation response, if any. It is created on the loading of the user configuration.
+   *
+   * @return the response or null if not applicable or config was still not loaded.
+   */
+  ValidationResponse getValidationResponse();
 
-    /**
-     * Persists the current configuration.
-     * 
-     * @throws IOException
-     */
-    void storeConfiguration()
-        throws IOException;
+  /**
+   * Persists the current configuration.
+   */
+  void storeConfiguration()
+      throws IOException;
 
-    /**
-     * Gets the current configuration.
-     * 
-     * @return the configuration, null if not loaded
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    E getConfiguration();
+  /**
+   * Gets the current configuration.
+   *
+   * @return the configuration, null if not loaded
+   */
+  E getConfiguration();
 
-    void setConfiguration( E configuration );
+  void setConfiguration(E configuration);
 
-    /**
-     * Forces reloading the user configuration.
-     * 
-     * @return the configuration
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    E loadConfiguration()
-        throws ConfigurationException, IOException;
+  /**
+   * Forces reloading the user configuration.
+   *
+   * @return the configuration
+   */
+  E loadConfiguration()
+      throws ConfigurationException, IOException;
 
-    /**
-     * Returns the actual content of configuration as stream.
-     * 
-     * @return
-     * @throws IOException
-     */
-    InputStream getConfigurationAsStream()
-        throws IOException;
+  /**
+   * Returns the actual content of configuration as stream.
+   */
+  InputStream getConfigurationAsStream()
+      throws IOException;
 
-    /**
-     * Returns whether the configuration was upgraded.
-     * 
-     * @return true if the user configuration was upgraded, false otherwise
-     */
-    boolean isConfigurationUpgraded();
+  /**
+   * Returns whether the configuration was upgraded.
+   *
+   * @return true if the user configuration was upgraded, false otherwise
+   */
+  boolean isConfigurationUpgraded();
 
-    /**
-     * Returns true if the configuration was got from defaults.
-     * 
-     * @return
-     */
-    boolean isConfigurationDefaulted();
+  /**
+   * Returns true if the configuration was got from defaults.
+   */
+  boolean isConfigurationDefaulted();
 }

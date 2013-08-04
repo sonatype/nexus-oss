@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.repository.ProxyMode;
@@ -18,15 +19,15 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 /**
  * The event fired when a repository's proxy mode is set. This event is fired on <b>every</b> setting of ProxyMode on a
  * ProxyRepository, unlike the RepositoryEventProxyModeChanged event.
- * 
+ *
  * @author cstamas
  */
 public class RepositoryEventProxyModeSet
     extends RepositoryEventProxyMode
 {
-    public RepositoryEventProxyModeSet( final ProxyRepository repository, final ProxyMode oldProxyMode,
-                                        final ProxyMode newProxyMode, final Throwable cause )
-    {
-        super( repository, oldProxyMode, newProxyMode, cause );
-    }
+  public RepositoryEventProxyModeSet(final ProxyRepository repository, final ProxyMode oldProxyMode,
+                                     final ProxyMode newProxyMode, final Throwable cause)
+  {
+    super(repository, oldProxyMode, newProxyMode, cause);
+  }
 }

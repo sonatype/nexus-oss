@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.representation;
 
 import java.io.IOException;
@@ -22,42 +23,39 @@ import org.restlet.resource.OutputRepresentation;
 
 /**
  * A simple Restlet.org representation based on InputStream.
- * 
+ *
  * @author cstamas
  */
 public class InputStreamRepresentation
     extends OutputRepresentation
 {
-    private InputStream is;
+  private InputStream is;
 
-    public InputStreamRepresentation( MediaType mediaType, InputStream is )
-    {
-        super( mediaType );
+  public InputStreamRepresentation(MediaType mediaType, InputStream is) {
+    super(mediaType);
 
-        setTransient( true );
+    setTransient(true);
 
-        this.is = is;
+    this.is = is;
+  }
+
+  @Override
+  public InputStream getStream()
+      throws IOException
+  {
+    return is;
+  }
+
+  @Override
+  public void write(OutputStream outputStream)
+      throws IOException
+  {
+    try {
+      IOUtil.copy(is, outputStream);
     }
-
-    @Override
-    public InputStream getStream()
-        throws IOException
-    {
-        return is;
+    finally {
+      is.close();
     }
-
-    @Override
-    public void write( OutputStream outputStream )
-        throws IOException
-    {
-        try
-        {
-            IOUtil.copy( is, outputStream );
-        }
-        finally
-        {
-            is.close();
-        }
-    }
+  }
 
 }

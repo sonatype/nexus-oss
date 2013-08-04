@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.tasks;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,65 +20,59 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * OptimizeIndex task.
  */
-@Named( OptimizeIndexTaskDescriptor.ID )
+@Named(OptimizeIndexTaskDescriptor.ID)
 public class OptimizeIndexTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    /**
-     * System event action: optimize index
-     */
-    public static final String ACTION = "OPTIMIZE_INDEX";
+  /**
+   * System event action: optimize index
+   */
+  public static final String ACTION = "OPTIMIZE_INDEX";
 
-    private final IndexerManager indexManager;
+  private final IndexerManager indexManager;
 
-    @Inject
-    public OptimizeIndexTask( final IndexerManager indexManager )
-    {
-        this.indexManager = checkNotNull( indexManager );
+  @Inject
+  public OptimizeIndexTask(final IndexerManager indexManager) {
+    this.indexManager = checkNotNull(indexManager);
+  }
+
+  @Override
+  protected String getRepositoryFieldId() {
+    return OptimizeIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+  }
+
+  @Override
+  public Object doRun()
+      throws Exception
+  {
+    if (getRepositoryId() != null) {
+      indexManager.optimizeRepositoryIndex(getRepositoryId());
+    }
+    else {
+      indexManager.optimizeAllRepositoriesIndex();
     }
 
-    @Override
-    protected String getRepositoryFieldId()
-    {
-        return OptimizeIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-    }
+    return null;
+  }
 
-    @Override
-    public Object doRun()
-        throws Exception
-    {
-        if ( getRepositoryId() != null )
-        {
-            indexManager.optimizeRepositoryIndex( getRepositoryId() );
-        }
-        else
-        {
-            indexManager.optimizeAllRepositoriesIndex();
-        }
+  @Override
+  protected String getAction() {
+    return ACTION;
+  }
 
-        return null;
+  @Override
+  protected String getMessage() {
+    if (getRepositoryId() != null) {
+      return "Optimizing repository " + getRepositoryName() + " index.";
     }
-
-    @Override
-    protected String getAction()
-    {
-        return ACTION;
+    else {
+      return "Optimizing all maven repositories indexes";
     }
-
-    @Override
-    protected String getMessage()
-    {
-        if ( getRepositoryId() != null )
-        {
-            return "Optimizing repository " + getRepositoryName() + " index.";
-        }
-        else
-        {
-            return "Optimizing all maven repositories indexes";
-        }
-    }
+  }
 
 }

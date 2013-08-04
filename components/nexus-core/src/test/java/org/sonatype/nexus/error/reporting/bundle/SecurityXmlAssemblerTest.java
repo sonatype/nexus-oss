@@ -10,18 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.error.reporting.bundle;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+package org.sonatype.nexus.error.reporting.bundle;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.sisu.pr.bundle.Bundle;
+import org.sonatype.sisu.pr.bundle.StorageManager;
+import org.sonatype.sisu.pr.bundle.internal.TmpFileStorageManager;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
@@ -31,106 +32,100 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.ConfigurationHelper;
-import org.sonatype.security.model.CUser;
-import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.source.SecurityModelConfigurationSource;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-import org.sonatype.sisu.pr.bundle.Bundle;
-import org.sonatype.sisu.pr.bundle.StorageManager;
-import org.sonatype.sisu.pr.bundle.internal.TmpFileStorageManager;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link SecurityXmlAssembler}.
  * Asserting basic operation and masking of passwords and email.
- * 
+ *
  * @since 2.1
  */
 public class SecurityXmlAssemblerTest
     extends TestSupport
 {
 
-    @Mock
-    private IssueSubmissionRequest request;
+  @Mock
+  private IssueSubmissionRequest request;
 
-    @Mock
-    private Configuration model;
+  @Mock
+  private Configuration model;
 
-    @Mock
-    private SecurityModelConfigurationSource source;
-    
-    @Mock
-    private CUser user;
+  @Mock
+  private SecurityModelConfigurationSource source;
 
-    private StorageManager storage;
+  @Mock
+  private CUser user;
 
-    private SecurityXmlAssembler underTest;
+  private StorageManager storage;
 
-    @Before
-    public void init()
+  private SecurityXmlAssembler underTest;
+
+  @Before
+  public void init() {
+    when(source.getConfiguration()).thenReturn(model);
+
+    when(model.getUsers()).thenReturn(Lists.newArrayList(user));
+
+    storage = new TmpFileStorageManager(util.createTempDir(getClass().getSimpleName()));
+
+    underTest = new SecurityXmlAssembler(source, storage)
     {
-        when( source.getConfiguration() ).thenReturn( model );
-        
-        when( model.getUsers() ).thenReturn( Lists.newArrayList( user ) );
+      @Override
+      protected Object cloneViaXml(final Object configuration) {
+        return configuration;
+      }
+    };
+  }
 
-        storage = new TmpFileStorageManager( util.createTempDir( getClass().getSimpleName() ) );
+  @After
+  public void cleanup() {
+    storage.release();
+  }
 
-        underTest = new SecurityXmlAssembler( source, storage ) {
-            @Override
-            protected Object cloneViaXml( final Object configuration )
-            {
-                return configuration;
-            }
-        };
+  @Test
+  public void testParticipation() {
+    assertThat(underTest.isParticipating(request), is(true));
+    when(source.getConfiguration()).thenReturn(null);
+    assertThat(underTest.isParticipating(request), is(false));
+  }
+
+  @Test
+  public void testAssemblyNoModel()
+      throws IssueSubmissionException, IOException
+  {
+    when(source.getConfiguration()).thenReturn(null);
+    final Bundle bundle = underTest.assemble(request);
+
+    assertThat(bundle.getName(), is("security.xml"));
+    assertThat(bundle.getContentLength(), lessThan(30L));
+  }
+
+  @Test
+  public void testAssembly()
+      throws IssueSubmissionException, IOException
+  {
+    final Bundle bundle = underTest.assemble(request);
+    assertThat(bundle.getName(), is("security.xml"));
+
+    assertThat(bundle.getContentLength(), greaterThan(30L));
+
+    final InputStreamReader reader = new InputStreamReader(bundle.getInputStream());
+    try {
+      // basically empty configuration, xml header, 'security' tag and an empty user
+      assertThat(CharStreams.toString(reader), containsString("<security>"));
+    }
+    finally {
+      reader.close();
     }
 
-    @After
-    public void cleanup()
-    {
-        storage.release();
-    }
-
-    @Test
-    public void testParticipation()
-    {
-        assertThat( underTest.isParticipating( request ), is( true ) );
-        when( source.getConfiguration() ).thenReturn( null );
-        assertThat( underTest.isParticipating( request ), is( false ) );
-    }
-    
-    @Test
-    public void testAssemblyNoModel()
-        throws IssueSubmissionException, IOException
-    {
-        when( source.getConfiguration() ).thenReturn( null );
-        final Bundle bundle = underTest.assemble( request );
-
-        assertThat( bundle.getName(), is( "security.xml" ) );
-        assertThat( bundle.getContentLength(), lessThan( 30L ) );
-    }
-
-    @Test
-    public void testAssembly()
-        throws IssueSubmissionException, IOException
-    {
-        final Bundle bundle = underTest.assemble( request );
-        assertThat( bundle.getName(), is( "security.xml" ) );
-
-        assertThat( bundle.getContentLength(), greaterThan( 30L ) );
-
-        final InputStreamReader reader = new InputStreamReader( bundle.getInputStream() );
-        try
-        {
-            // basically empty configuration, xml header, 'security' tag and an empty user
-            assertThat( CharStreams.toString( reader ), containsString( "<security>" ) );
-        }
-        finally
-        {
-            reader.close();
-        }
-        
-        verify( user ).setPassword( underTest.PASSWORD_MASK );
-        verify( user ).setEmail( underTest.PASSWORD_MASK );
-    }
+    verify(user).setPassword(underTest.PASSWORD_MASK);
+    verify(user).setEmail(underTest.PASSWORD_MASK);
+  }
 }

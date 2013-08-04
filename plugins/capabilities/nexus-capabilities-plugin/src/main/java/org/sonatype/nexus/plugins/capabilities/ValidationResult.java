@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 import java.util.Set;
@@ -24,42 +25,42 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidati
 public interface ValidationResult
 {
 
-    /**
-     * A validation result for the case when there are no validation failures.
-     */
-    static final ValidationResult VALID = new DefaultValidationResult();
+  /**
+   * A validation result for the case when there are no validation failures.
+   */
+  static final ValidationResult VALID = new DefaultValidationResult();
+
+  /**
+   * Whether or not the validation was successful.
+   *
+   * @return true if there were no violations
+   */
+  boolean isValid();
+
+  Set<Violation> violations();
+
+  /**
+   * Describes a violation.
+   *
+   * @since 2.0
+   */
+  interface Violation
+  {
 
     /**
-     * Whether or not the validation was successful.
+     * The key of property that is invalid or "*" when the violation applies to capability as a whole.
      *
-     * @return true if there were no violations
+     * @return key or "*"
      */
-    boolean isValid();
-
-    Set<Violation> violations();
+    String key();
 
     /**
-     * Describes a violation.
+     * A description of violation.
      *
-     * @since 2.0
+     * @return violation description
      */
-    interface Violation
-    {
+    String message();
 
-        /**
-         * The key of property that is invalid or "*" when the violation applies to capability as a whole.
-         *
-         * @return key or "*"
-         */
-        String key();
-
-        /**
-         * A description of violation.
-         *
-         * @return violation description
-         */
-        String message();
-
-    }
+  }
 
 }

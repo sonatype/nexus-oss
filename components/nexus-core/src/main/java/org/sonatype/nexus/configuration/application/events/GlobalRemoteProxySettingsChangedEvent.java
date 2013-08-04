@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application.events;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
@@ -17,7 +18,8 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * Event fired when global remote Proxy settings are changed (within configuration change). The settings carried in
- * this event will reflect the NEW values, but if you have the {@link org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings} component, you can
+ * this event will reflect the NEW values, but if you have the {@link org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings}
+ * component, you can
  * query it too <em>after</em> you received this event .
  *
  * @since 2.6
@@ -26,10 +28,10 @@ public class GlobalRemoteProxySettingsChangedEvent
     extends AbstractEvent<GlobalRemoteProxySettings>
 {
 
-    public GlobalRemoteProxySettingsChangedEvent(
-        final GlobalRemoteProxySettings remoteProxySettingsConfiguration )
-    {
-        super( remoteProxySettingsConfiguration );
-    }
+  public GlobalRemoteProxySettingsChangedEvent(
+      final GlobalRemoteProxySettings remoteProxySettingsConfiguration)
+  {
+    super(remoteProxySettingsConfiguration);
+  }
 
 }

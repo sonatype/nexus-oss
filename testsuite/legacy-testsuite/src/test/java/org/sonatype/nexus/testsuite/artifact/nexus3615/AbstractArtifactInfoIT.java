@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.artifact.nexus3615;
 
 import java.io.File;
@@ -24,41 +25,37 @@ public abstract class AbstractArtifactInfoIT
     extends AbstractNexusIntegrationTest
 {
 
-    public AbstractArtifactInfoIT()
-    {
-        super();
+  public AbstractArtifactInfoIT() {
+    super();
+  }
+
+  public AbstractArtifactInfoIT(String testRepositoryId) {
+    super(testRepositoryId);
+  }
+
+  @Override
+  protected void deployArtifacts()
+      throws Exception
+  {
+    super.deployArtifacts();
+
+    File pom = getTestFile("artifact.pom");
+    File jar = getTestFile("artifact.jar");
+    getDeployUtils().deployUsingPomWithRest(REPO_TEST_HARNESS_REPO, jar, pom, null, null);
+    getDeployUtils().deployUsingPomWithRest(REPO_TEST_HARNESS_REPO2, jar, pom, null, null);
+    getDeployUtils().deployUsingPomWithRest(REPO_TEST_HARNESS_RELEASE_REPO, jar, pom, null, null);
+
+    TaskScheduleUtil.waitForAllTasksToStop();
+    getEventInspectorsUtil().waitForCalmPeriod();
+  }
+
+  protected Iterable<String> getRepositoryId(List<RepositoryUrlResource> repositories) {
+    List<String> repoIds = new ArrayList<String>();
+    for (RepositoryUrlResource repositoryUrlResource : repositories) {
+      repoIds.add(repositoryUrlResource.getRepositoryId());
     }
 
-    public AbstractArtifactInfoIT( String testRepositoryId )
-    {
-        super( testRepositoryId );
-    }
-
-    @Override
-    protected void deployArtifacts()
-        throws Exception
-    {
-        super.deployArtifacts();
-    
-        File pom = getTestFile( "artifact.pom" );
-        File jar = getTestFile( "artifact.jar" );
-        getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO, jar, pom, null, null );
-        getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO2, jar, pom, null, null );
-        getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, jar, pom, null, null );
-        
-        TaskScheduleUtil.waitForAllTasksToStop();
-        getEventInspectorsUtil().waitForCalmPeriod();
-    }
-
-    protected Iterable<String> getRepositoryId( List<RepositoryUrlResource> repositories )
-    {
-        List<String> repoIds = new ArrayList<String>();
-        for ( RepositoryUrlResource repositoryUrlResource : repositories )
-        {
-            repoIds.add( repositoryUrlResource.getRepositoryId() );
-        }
-    
-        return repoIds;
-    }
+    return repoIds;
+  }
 
 }

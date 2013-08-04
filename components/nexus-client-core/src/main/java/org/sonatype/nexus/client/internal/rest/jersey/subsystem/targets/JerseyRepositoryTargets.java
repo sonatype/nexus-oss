@@ -10,13 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.targets;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
 import java.util.Collection;
+
 import javax.annotation.Nullable;
+
+import org.sonatype.nexus.client.core.spi.SubsystemSupport;
+import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTarget;
+import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTargets;
+import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -24,20 +34,6 @@ import com.google.common.collect.Collections2;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.commons.beanutils.BeanUtils;
-import org.sonatype.nexus.client.core.spi.SubsystemSupport;
-import org.sonatype.nexus.client.core.subsystem.security.Privilege;
-import org.sonatype.nexus.client.core.subsystem.security.Privileges;
-import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTarget;
-import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTargets;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.security.JerseyPrivilege;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
-import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryTargetResource;
-import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
-import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
-import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 
 /**
  * Jersey based {@link org.sonatype.nexus.client.core.subsystem.targets.RepositoryTargets} implementation.
@@ -49,115 +45,94 @@ public class JerseyRepositoryTargets
     implements RepositoryTargets
 {
 
-    public JerseyRepositoryTargets( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
+  public JerseyRepositoryTargets(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
+
+  @Override
+  public JerseyRepositoryTarget create(final String id) {
+    return new JerseyRepositoryTarget(getNexusClient(), id);
+  }
+
+  @Override
+  public RepositoryTarget get(final String id) {
+    try {
+      return convert(
+          getNexusClient()
+              .serviceResource(path(id))
+              .get(RepositoryTargetResourceResponse.class)
+              .getData()
+      );
+    }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
+
+  @Override
+  public Collection<RepositoryTarget> get() {
+    final RepositoryTargetListResourceResponse privileges;
+    try {
+      privileges = getNexusClient()
+          .serviceResource("repo_targets")
+          .get(RepositoryTargetListResourceResponse.class);
+    }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
     }
 
-    @Override
-    public JerseyRepositoryTarget create( final String id )
+    return Collections2.transform(privileges.getData(), new Function<RepositoryTargetListResource, RepositoryTarget>()
     {
-        return new JerseyRepositoryTarget( getNexusClient(), id );
+      @Override
+      public RepositoryTarget apply(@Nullable final RepositoryTargetListResource input) {
+        return convert(input);
+      }
+    });
+  }
+
+  private JerseyRepositoryTarget convert(@Nullable RepositoryTargetListResource resource) {
+    if (resource == null) {
+      return null;
     }
 
-    @Override
-    public RepositoryTarget get( final String id )
-    {
-        try
-        {
-            return convert(
-                getNexusClient()
-                    .serviceResource( path( id ) )
-                    .get( RepositoryTargetResourceResponse.class )
-                    .getData()
-            );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+    return convert(otherDTO(resource));
+  }
+
+  private JerseyRepositoryTarget convert(@Nullable final RepositoryTargetResource resource) {
+    if (resource == null) {
+      return null;
     }
 
-    @Override
-    public Collection<RepositoryTarget> get()
-    {
-        final RepositoryTargetListResourceResponse privileges;
-        try
-        {
-            privileges = getNexusClient()
-                .serviceResource( "repo_targets" )
-                .get( RepositoryTargetListResourceResponse.class );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+    final JerseyRepositoryTarget privilege = new JerseyRepositoryTarget(getNexusClient(), resource.getId(), resource);
+    privilege.overwriteWith(resource);
+    return privilege;
+  }
 
-        return Collections2.transform( privileges.getData(), new Function<RepositoryTargetListResource, RepositoryTarget>()
-        {
-            @Override
-            public RepositoryTarget apply( @Nullable final RepositoryTargetListResource input )
-            {
-                return convert( input );
-            }
-        } );
+  private RepositoryTargetResource otherDTO(final RepositoryTargetListResource resource) {
+    final RepositoryTargetResource targetResource = new RepositoryTargetResource();
+
+    try {
+      BeanUtils.copyProperties(targetResource, resource);
     }
-
-    private JerseyRepositoryTarget convert( @Nullable RepositoryTargetListResource resource )
-    {
-        if ( resource == null )
-        {
-            return null;
-        }
-
-        return convert( otherDTO( resource ) );
+    catch (Exception e) {
+      Throwables.propagate(e);
     }
+    return targetResource;
+  }
 
-    private JerseyRepositoryTarget convert( @Nullable final RepositoryTargetResource resource )
-    {
-        if ( resource == null )
-        {
-            return null;
-        }
-
-        final JerseyRepositoryTarget privilege = new JerseyRepositoryTarget( getNexusClient(), resource.getId(), resource );
-        privilege.overwriteWith( resource );
-        return privilege;
+  static String path(final String id) {
+    try {
+      return "repo_targets/" + URLEncoder.encode(id, "UTF-8");
     }
-
-    private RepositoryTargetResource otherDTO( final RepositoryTargetListResource resource )
-    {
-        final RepositoryTargetResource targetResource = new RepositoryTargetResource();
-
-        try
-        {
-            BeanUtils.copyProperties( targetResource, resource );
-        }
-        catch ( Exception e )
-        {
-            Throwables.propagate( e );
-        }
-        return targetResource;
+    catch (UnsupportedEncodingException e) {
+      throw Throwables.propagate(e);
     }
-
-    static String path( final String id )
-    {
-        try
-        {
-            return "repo_targets/" + URLEncoder.encode( id, "UTF-8" );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
+  }
 
 }

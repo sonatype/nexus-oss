@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
-import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -24,102 +24,89 @@ import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 
+import org.slf4j.Logger;
+
 /**
  * @author Juven Xu
  */
 public class RecreateMavenMetadataWalkerProcessor
     extends AbstractWalkerProcessor
 {
-    private boolean isHostedRepo;
+  private boolean isHostedRepo;
 
-    private MavenRepository repository;
+  private MavenRepository repository;
 
-    private AbstractMetadataHelper mdHelper;
+  private AbstractMetadataHelper mdHelper;
 
-    private final Logger logger;
+  private final Logger logger;
 
-    private DeleteOperation deleteOperation;
+  private DeleteOperation deleteOperation;
 
-    public RecreateMavenMetadataWalkerProcessor( Logger logger )
-    {
-        this.logger = logger;
+  public RecreateMavenMetadataWalkerProcessor(Logger logger) {
+    this.logger = logger;
+  }
+
+  public RecreateMavenMetadataWalkerProcessor(Logger logger, DeleteOperation operation) {
+    this.logger = logger;
+    this.deleteOperation = operation;
+  }
+
+  @Override
+  public void beforeWalk(WalkerContext context)
+      throws Exception
+  {
+    isHostedRepo = false;
+
+    repository =
+        context.getRepository() instanceof MavenRepository ? (MavenRepository) context.getRepository() : null;
+
+    if (repository != null) {
+      mdHelper = new DefaultMetadataHelper(logger, repository, deleteOperation);
+
+      isHostedRepo = repository.getRepositoryKind().isFacetAvailable(HostedRepository.class);
     }
 
-    public RecreateMavenMetadataWalkerProcessor( Logger logger, DeleteOperation operation )
-    {
-        this.logger = logger;
-        this.deleteOperation = operation;
+    setActive(isHostedRepo);
+  }
+
+  @Override
+  public void onCollectionEnter(WalkerContext context, StorageCollectionItem coll) {
+    try {
+      mdHelper.onDirEnter(coll.getPath());
     }
-
-    @Override
-    public void beforeWalk( WalkerContext context )
-        throws Exception
-    {
-        isHostedRepo = false;
-
-        repository =
-            context.getRepository() instanceof MavenRepository ? (MavenRepository) context.getRepository() : null;
-
-        if ( repository != null )
-        {
-            mdHelper = new DefaultMetadataHelper( logger, repository, deleteOperation );
-
-            isHostedRepo = repository.getRepositoryKind().isFacetAvailable( HostedRepository.class );
-        }
-
-        setActive( isHostedRepo );
+    catch (Exception e) {
+      logger.warn("Error occurred while entering collection '" + coll.getPath() + "'.", e);
     }
+  }
 
-    @Override
-    public void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
-    {
-        try
-        {
-            mdHelper.onDirEnter( coll.getPath() );
-        }
-        catch ( Exception e )
-        {
-            logger.warn( "Error occurred while entering collection '" + coll.getPath() + "'.", e );
-        }
+  @Override
+  public void processItem(WalkerContext context, StorageItem item) {
+    if (item instanceof StorageFileItem) {
+      try {
+        mdHelper.processFile(item.getPath());
+      }
+      catch (Exception e) {
+        logger.warn("Error occurred while processing item '" + item.getPath() + "'.", e);
+      }
     }
+  }
 
-    @Override
-    public void processItem( WalkerContext context, StorageItem item )
-    {
-        if ( item instanceof StorageFileItem )
-        {
-            try
-            {
-                mdHelper.processFile( item.getPath() );
-            }
-            catch ( Exception e )
-            {
-                logger.warn( "Error occurred while processing item '" + item.getPath() + "'.", e );
-            }
+  @Override
+  public void onCollectionExit(WalkerContext context, StorageCollectionItem coll) {
+    try {
+      mdHelper.onDirExit(coll.getPath());
+
+      if (coll.list().size() == 0) {
+        ResourceStoreRequest request = new ResourceStoreRequest(coll);
+        if (deleteOperation != null) {
+          request.getRequestContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY, this.deleteOperation);
         }
+
+        repository.deleteItem(false, request);
+      }
     }
-
-    @Override
-    public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
-    {
-        try
-        {
-            mdHelper.onDirExit( coll.getPath() );
-
-            if ( coll.list().size() == 0 )
-            {
-                ResourceStoreRequest request = new ResourceStoreRequest( coll );
-                if ( deleteOperation != null )
-                {
-                    request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, this.deleteOperation );
-                }
-
-                repository.deleteItem( false, request );
-            }
-        }
-        catch ( Exception e )
-        {
-            logger.warn( "Error occurred while existing collection '" + coll.getPath() + "'.", e );
-        }
+    catch (Exception e) {
+      logger.warn("Error occurred while existing collection '" + coll.getPath() + "'.", e);
     }
+  }
 }

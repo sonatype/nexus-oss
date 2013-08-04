@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import java.util.Collection;
@@ -18,21 +19,17 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Event fired when addition of a batch of items is to be announced.
- * 
+ *
  * @author cstamas
  * @since 2.3
  */
 public class RepositoryItemBatchEventAdded
     extends RepositoryItemBatchEvent
 {
-    /**
-     * Constructor.
-     * 
-     * @param repository
-     * @param itemPaths
-     */
-    public RepositoryItemBatchEventAdded( final Repository repository, final Collection<String> itemPaths )
-    {
-        super( repository, itemPaths );
-    }
+  /**
+   * Constructor.
+   */
+  public RepositoryItemBatchEventAdded(final Repository repository, final Collection<String> itemPaths) {
+    super(repository, itemPaths);
+  }
 }

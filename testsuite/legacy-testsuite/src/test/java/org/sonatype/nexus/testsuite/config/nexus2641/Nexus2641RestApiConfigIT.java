@@ -10,58 +10,60 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.config.nexus2641;
 
-import static org.junit.Assert.assertEquals;
-
-import org.codehaus.plexus.util.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
+import org.codehaus.plexus.util.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class Nexus2641RestApiConfigIT
     extends AbstractNexusIntegrationTest
 {
-    @Test
-    public void checkRestApiConfig()
-        throws Exception
-    {
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+  @Test
+  public void checkRestApiConfig()
+      throws Exception
+  {
+    GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
 
-        // *NEXUS-3840
-        assertEquals( settings.getGlobalRestApiSettings().getUiTimeout(), 60 );
-        // *
+    // *NEXUS-3840
+    assertEquals(settings.getGlobalRestApiSettings().getUiTimeout(), 60);
+    // *
 
-        Assert.assertNotNull( settings.getGlobalRestApiSettings() );
+    Assert.assertNotNull(settings.getGlobalRestApiSettings());
 
-        // enable it, not that even the baseUrl is not set, it will be filled with a defaut one
-        RestApiSettings restApiSettings = new RestApiSettings();
-        settings.setGlobalRestApiSettings( restApiSettings );
-        SettingsMessageUtil.save( settings );
-        settings = SettingsMessageUtil.getCurrentSettings();
+    // enable it, not that even the baseUrl is not set, it will be filled with a defaut one
+    RestApiSettings restApiSettings = new RestApiSettings();
+    settings.setGlobalRestApiSettings(restApiSettings);
+    SettingsMessageUtil.save(settings);
+    settings = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertNotNull( settings.getGlobalRestApiSettings() );
-        Assert.assertTrue( StringUtils.isNotEmpty( settings.getGlobalRestApiSettings().getBaseUrl() ) );
-        Assert.assertEquals( settings.getGlobalRestApiSettings().isForceBaseUrl(), false );
+    Assert.assertNotNull(settings.getGlobalRestApiSettings());
+    Assert.assertTrue(StringUtils.isNotEmpty(settings.getGlobalRestApiSettings().getBaseUrl()));
+    Assert.assertEquals(settings.getGlobalRestApiSettings().isForceBaseUrl(), false);
 
-        // now edit it
-        restApiSettings.setBaseUrl( "http://myhost/nexus" );
-        restApiSettings.setForceBaseUrl( true );
-        settings.setGlobalRestApiSettings( restApiSettings );
-        SettingsMessageUtil.save( settings );
-        settings = SettingsMessageUtil.getCurrentSettings();
+    // now edit it
+    restApiSettings.setBaseUrl("http://myhost/nexus");
+    restApiSettings.setForceBaseUrl(true);
+    settings.setGlobalRestApiSettings(restApiSettings);
+    SettingsMessageUtil.save(settings);
+    settings = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertNotNull( settings.getGlobalRestApiSettings() );
-        Assert.assertEquals( settings.getGlobalRestApiSettings().getBaseUrl(), "http://myhost/nexus" );
-        Assert.assertEquals( settings.getGlobalRestApiSettings().isForceBaseUrl(), true );
+    Assert.assertNotNull(settings.getGlobalRestApiSettings());
+    Assert.assertEquals(settings.getGlobalRestApiSettings().getBaseUrl(), "http://myhost/nexus");
+    Assert.assertEquals(settings.getGlobalRestApiSettings().isForceBaseUrl(), true);
 
-        //now unset it
-        settings.setGlobalRestApiSettings( null );
-        SettingsMessageUtil.save( settings );
-        
-        Assert.assertNull( settings.getGlobalRestApiSettings() );
-    }
+    //now unset it
+    settings.setGlobalRestApiSettings(null);
+    SettingsMessageUtil.save(settings);
+
+    Assert.assertNull(settings.getGlobalRestApiSettings());
+  }
 }

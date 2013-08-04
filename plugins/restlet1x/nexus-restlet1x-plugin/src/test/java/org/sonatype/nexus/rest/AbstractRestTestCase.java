@@ -10,32 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
-
 import org.junit.Before;
 
 public abstract class AbstractRestTestCase
 {
-    protected XStream xstream;
+  protected XStream xstream;
 
-    @Before
-    public void setUp()
-        throws Exception
-    {
-        // create and configure XStream for JSON
-        xstream = new XStream( new JsonOrgHierarchicalStreamDriver() );
+  @Before
+  public void setUp()
+      throws Exception
+  {
+    // create and configure XStream for JSON
+    xstream = new XStream(new JsonOrgHierarchicalStreamDriver());
 
-        configureXStream( xstream );
-    }
+    configureXStream(xstream);
+  }
 
-    protected void configureXStream( XStream xstream )
-    {
-        NexusApplication napp = new NexusApplication();
+  protected void configureXStream(XStream xstream) {
+    NexusApplication napp = new NexusApplication();
 
-        napp.doConfigureXstream( xstream );
-    }
+    napp.doConfigureXstream(xstream);
+  }
 }

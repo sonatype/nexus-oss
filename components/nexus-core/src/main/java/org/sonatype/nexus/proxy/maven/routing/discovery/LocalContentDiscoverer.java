@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.discovery;
 
 import java.io.IOException;
@@ -18,19 +19,19 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
  * Component used to perform local content discovery.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public interface LocalContentDiscoverer
 {
-    /**
-     * Performs the discovery and returns the results.
-     * 
-     * @param mavenRepository to discover local content.
-     * @return the result of discovery,
-     * @throws IOException in case of IO problem.
-     */
-    DiscoveryResult<MavenRepository> discoverLocalContent( MavenRepository mavenRepository )
-        throws IOException;
+  /**
+   * Performs the discovery and returns the results.
+   *
+   * @param mavenRepository to discover local content.
+   * @return the result of discovery,
+   * @throws IOException in case of IO problem.
+   */
+  DiscoveryResult<MavenRepository> discoverLocalContent(MavenRepository mavenRepository)
+      throws IOException;
 }

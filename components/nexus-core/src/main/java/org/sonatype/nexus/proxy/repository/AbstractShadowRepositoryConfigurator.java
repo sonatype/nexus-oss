@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -24,54 +25,51 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 public abstract class AbstractShadowRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
-    @Override
-    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
-                                      CRepositoryCoreConfiguration coreConfig )
-        throws ConfigurationException
-    {
-        // Shadows are read only
-        repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY );
-        
-        super.doApplyConfiguration( repository, configuration, coreConfig );
+  @Override
+  public void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
+                                   CRepositoryCoreConfiguration coreConfig)
+      throws ConfigurationException
+  {
+    // Shadows are read only
+    repository.setWritePolicy(RepositoryWritePolicy.READ_ONLY);
 
-        ShadowRepository shadowRepository = repository.adaptToFacet( ShadowRepository.class );
+    super.doApplyConfiguration(repository, configuration, coreConfig);
 
-        AbstractShadowRepositoryConfiguration extConf =
-            (AbstractShadowRepositoryConfiguration) coreConfig.getExternalConfiguration().getConfiguration( false );
+    ShadowRepository shadowRepository = repository.adaptToFacet(ShadowRepository.class);
 
-        try
-        {
-            // undone change made in https://github.com/sonatype/nexus/commit/64fb67dc16ef2e18300d3df3eb4f87d419b584cc
-            // original change was for NEXUS-4715
-            // undone due to NEXUS-4901
-            // ultimate fix will come with NEXUS-4909 
-            // that will get rid among other thing, tricks like this one below
-            // https://github.com/sonatype/nexus/blob/master/nexus/nexus-app/src/main/java/org/sonatype/nexus/configuration/application/DefaultNexusConfiguration.java#L557
-            shadowRepository.setMasterRepositoryId( extConf.getMasterRepositoryId() );
-        }
-        catch ( IncompatibleMasterRepositoryException e )
-        {
-            ValidationMessage message =
-                new ValidationMessage( "shadowOf", e.getMessage(),
-                                       "The source nexus repository is of an invalid Format." );
+    AbstractShadowRepositoryConfiguration extConf =
+        (AbstractShadowRepositoryConfiguration) coreConfig.getExternalConfiguration().getConfiguration(false);
 
-            ValidationResponse response = new ApplicationValidationResponse();
-
-            response.addValidationError( message );
-
-            throw new InvalidConfigurationException( response );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            ValidationMessage message =
-                new ValidationMessage( "shadowOf", e.getMessage(), "The source nexus repository is not existing." );
-
-            ValidationResponse response = new ApplicationValidationResponse();
-
-            response.addValidationError( message );
-
-            throw new InvalidConfigurationException( response );
-        }
+    try {
+      // undone change made in https://github.com/sonatype/nexus/commit/64fb67dc16ef2e18300d3df3eb4f87d419b584cc
+      // original change was for NEXUS-4715
+      // undone due to NEXUS-4901
+      // ultimate fix will come with NEXUS-4909
+      // that will get rid among other thing, tricks like this one below
+      // https://github.com/sonatype/nexus/blob/master/nexus/nexus-app/src/main/java/org/sonatype/nexus/configuration/application/DefaultNexusConfiguration.java#L557
+      shadowRepository.setMasterRepositoryId(extConf.getMasterRepositoryId());
     }
+    catch (IncompatibleMasterRepositoryException e) {
+      ValidationMessage message =
+          new ValidationMessage("shadowOf", e.getMessage(),
+              "The source nexus repository is of an invalid Format.");
+
+      ValidationResponse response = new ApplicationValidationResponse();
+
+      response.addValidationError(message);
+
+      throw new InvalidConfigurationException(response);
+    }
+    catch (NoSuchRepositoryException e) {
+      ValidationMessage message =
+          new ValidationMessage("shadowOf", e.getMessage(), "The source nexus repository is not existing.");
+
+      ValidationResponse response = new ApplicationValidationResponse();
+
+      response.addValidationError(message);
+
+      throw new InvalidConfigurationException(response);
+    }
+  }
 
 }

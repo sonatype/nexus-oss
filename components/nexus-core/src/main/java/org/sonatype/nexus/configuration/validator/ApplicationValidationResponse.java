@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.validator;
 
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -17,10 +18,9 @@ import org.sonatype.configuration.validation.ValidationResponse;
 public class ApplicationValidationResponse
     extends ValidationResponse
 {
-    public ApplicationValidationResponse()
-    {
-        super();
-        
-        setContext( new ApplicationValidationContext() );
-    }
+  public ApplicationValidationResponse() {
+    super();
+
+    setContext(new ApplicationValidationContext());
+  }
 }

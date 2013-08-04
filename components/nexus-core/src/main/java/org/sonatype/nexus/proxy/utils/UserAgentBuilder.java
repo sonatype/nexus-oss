@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.utils;
 
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -17,35 +18,27 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
  * Component building proper UserAgent string describing this instance of Nexus.
- * 
+ *
  * @author cstamas
  */
 public interface UserAgentBuilder
 {
-    /**
-     * Builds a "generic" user agent to be used across various components in Nexus, but NOT RemoteRepositoryStorage
-     * implementations.
-     * 
-     * @return
-     */
-    String formatGenericUserAgentString();
+  /**
+   * Builds a "generic" user agent to be used across various components in Nexus, but NOT RemoteRepositoryStorage
+   * implementations.
+   */
+  String formatGenericUserAgentString();
 
-    /**
-     * Builds a user agent string to be used with RemoteRepositoryStorages.
-     * 
-     * @param repository
-     * @param ctx
-     * @return
-     */
-    String formatRemoteRepositoryStorageUserAgentString( final ProxyRepository repository,
-                                                         final RemoteStorageContext ctx );
+  /**
+   * Builds a user agent string to be used with RemoteRepositoryStorages.
+   */
+  String formatRemoteRepositoryStorageUserAgentString(final ProxyRepository repository,
+                                                      final RemoteStorageContext ctx);
 
-    /**
-     * Builds a user agent string to be used for the specified remote storage context.
-     * 
-     * @param ctx
-     * @return
-     * @since 2.0
-     */
-    String formatUserAgentString( final RemoteStorageContext ctx );
+  /**
+   * Builds a user agent string to be used for the specified remote storage context.
+   *
+   * @since 2.0
+   */
+  String formatUserAgentString(final RemoteStorageContext ctx);
 }

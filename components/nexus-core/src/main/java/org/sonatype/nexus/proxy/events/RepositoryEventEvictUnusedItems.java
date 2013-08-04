@@ -10,20 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The event fired on EvictUnusedItems.
- * 
+ *
  * @author cstamas
  */
 public class RepositoryEventEvictUnusedItems
     extends RepositoryMaintenanceEvent
 {
-    public RepositoryEventEvictUnusedItems( final Repository repository )
-    {
-        super( repository );
-    }
+  public RepositoryEventEvictUnusedItems(final Repository repository) {
+    super(repository);
+  }
 }

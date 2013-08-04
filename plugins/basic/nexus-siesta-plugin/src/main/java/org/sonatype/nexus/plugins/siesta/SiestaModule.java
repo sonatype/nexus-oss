@@ -10,14 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.siesta;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.servlet.ServletModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.web.MdcUserContextFilter;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.nexus.web.MdcUserContextFilter;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 import org.sonatype.sisu.siesta.common.Resource;
 import org.sonatype.sisu.siesta.jackson.SiestaJacksonModule;
@@ -27,8 +27,10 @@ import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryReporterImpl;
 import org.sonatype.sisu.siesta.server.internal.SiestaServlet;
 import org.sonatype.sisu.siesta.server.internal.jersey.SiestaJerseyModule;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import com.google.inject.AbstractModule;
+import com.google.inject.servlet.ServletModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Siesta plugin module.
@@ -39,63 +41,62 @@ import javax.inject.Singleton;
 public class SiestaModule
     extends AbstractModule
 {
-    private static final Logger log = LoggerFactory.getLogger(SiestaModule.class);
+  private static final Logger log = LoggerFactory.getLogger(SiestaModule.class);
 
-    public static final String SERVICE_NAME = "siesta";
+  public static final String SERVICE_NAME = "siesta";
 
-    public static final String MOUNT_POINT = "/service/" + SERVICE_NAME;
+  public static final String MOUNT_POINT = "/service/" + SERVICE_NAME;
 
-    @Override
-    protected void configure() {
-        // FIXME: Sort this out... nexus-restlet1x-plugin should not have anything to do with this plugin
+  @Override
+  protected void configure() {
+    // FIXME: Sort this out... nexus-restlet1x-plugin should not have anything to do with this plugin
 
-        // We need to import some components from nexus-restlet1x-plugin for SecurityWebFilter, but its use is
-        // hidden behind guice-servlet muck. We therefore bind it explicitly here so it will get seen by Sisu.
-        // It would have been preferable to use "requireBinding(SecurityWebFilter.class)" to import the
-        // SecurityWebFilter instance from nexus-restlet1x-plugin, but guice-servlet only wants to see filters
-        // bound directly as singletons in this Injector (odd limitation). An alternative would have been to
-        // requireBinding's for SecuritySystem and FilterChainResolver, which are the filter's dependencies.
+    // We need to import some components from nexus-restlet1x-plugin for SecurityWebFilter, but its use is
+    // hidden behind guice-servlet muck. We therefore bind it explicitly here so it will get seen by Sisu.
+    // It would have been preferable to use "requireBinding(SecurityWebFilter.class)" to import the
+    // SecurityWebFilter instance from nexus-restlet1x-plugin, but guice-servlet only wants to see filters
+    // bound directly as singletons in this Injector (odd limitation). An alternative would have been to
+    // requireBinding's for SecuritySystem and FilterChainResolver, which are the filter's dependencies.
 
-        bind(SecurityWebFilter.class);
+    bind(SecurityWebFilter.class);
 
-        install(new org.sonatype.sisu.siesta.server.internal.SiestaModule());
-        install(new SiestaJerseyModule());
-        install(new SiestaJacksonModule());
+    install(new org.sonatype.sisu.siesta.server.internal.SiestaModule());
+    install(new SiestaJerseyModule());
+    install(new SiestaJacksonModule());
 
-        // Dynamically discover JAX-RS components
-        bind(javax.ws.rs.core.Application.class).to(ComponentDiscoveryApplication.class).in(Singleton.class);
+    // Dynamically discover JAX-RS components
+    bind(javax.ws.rs.core.Application.class).to(ComponentDiscoveryApplication.class).in(Singleton.class);
 
-        // Customize the report to include the MOUNT_POINT
-        bind(ComponentDiscoveryReporter.class).toInstance(new ComponentDiscoveryReporterImpl(log)
-        {
-            @Override
-            protected String pathOf(final Class<Resource> type) {
-                String path = super.pathOf(type);
-                if (!path.startsWith("/")) {
-                    path = "/" + path;
-                }
-                return MOUNT_POINT + path;
-            }
-        });
+    // Customize the report to include the MOUNT_POINT
+    bind(ComponentDiscoveryReporter.class).toInstance(new ComponentDiscoveryReporterImpl(log)
+    {
+      @Override
+      protected String pathOf(final Class<Resource> type) {
+        String path = super.pathOf(type);
+        if (!path.startsWith("/")) {
+          path = "/" + path;
+        }
+        return MOUNT_POINT + path;
+      }
+    });
 
-        install(new ServletModule()
-        {
-            @Override
-            protected void configureServlets() {
-                serve(MOUNT_POINT + "/*").with(SiestaServlet.class);
-                filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
-                filter(MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
-            }
-        });
+    install(new ServletModule()
+    {
+      @Override
+      protected void configureServlets() {
+        serve(MOUNT_POINT + "/*").with(SiestaServlet.class);
+        filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+        filter(MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
+      }
+    });
 
-        install( new FilterChainModule()
-        {
-            @Override
-            protected void configure()
-            {
-                addFilterChain( MOUNT_POINT + "/**", "noSessionCreation,authcBasic" );
-            }
+    install(new FilterChainModule()
+    {
+      @Override
+      protected void configure() {
+        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
+      }
 
-        } );
-    }
+    });
+  }
 }

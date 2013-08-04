@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
-import static com.google.common.base.Preconditions.checkState;
+package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,13 +21,16 @@ import java.util.Date;
 
 import javax.ws.rs.core.Response;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.Utilities;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import org.codehaus.plexus.util.IOUtil;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @since 2.1
@@ -38,100 +40,85 @@ public class JerseyUtilities
     implements Utilities
 {
 
-    public JerseyUtilities( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
+  public JerseyUtilities(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
+
+  @Override
+  public Date getLastModified(final String uri) {
+    try {
+      final ClientResponse response = getNexusClient()
+          .uri(uri)
+          .head();
+
+      return response.getLastModified();
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
+
+  /**
+   * @since 2.6
+   */
+  @Override
+  public Utilities download(final String path, final File target)
+      throws IOException
+  {
+    if (!target.exists()) {
+      final File targetDir = target.getParentFile();
+      checkState((targetDir.exists() || targetDir.mkdirs()) && targetDir.isDirectory(),
+          "Directory '%s' does not exist and could not be created", targetDir.getAbsolutePath());
+    }
+    else {
+      checkState(target.isFile() && target.canWrite(), "File '%s' is not a file or could not be written",
+          target.getAbsolutePath());
     }
 
-    @Override
-    public Date getLastModified( final String uri )
-    {
-        try
-        {
-            final ClientResponse response = getNexusClient()
-                .uri( uri )
-                .head();
-
-            return response.getLastModified();
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+    FileOutputStream fos = null;
+    try {
+      fos = new FileOutputStream(target);
+      return download(path, fos);
     }
-
-    /**
-     * @since 2.6
-     */
-    @Override
-    public Utilities download( final String path, final File target )
-        throws IOException
-    {
-        if ( !target.exists() )
-        {
-            final File targetDir = target.getParentFile();
-            checkState( ( targetDir.exists() || targetDir.mkdirs() ) && targetDir.isDirectory(),
-                        "Directory '%s' does not exist and could not be created", targetDir.getAbsolutePath() );
-        }
-        else
-        {
-            checkState( target.isFile() && target.canWrite(), "File '%s' is not a file or could not be written",
-                        target.getAbsolutePath() );
-        }
-
-        FileOutputStream fos = null;
-        try
-        {
-            fos = new FileOutputStream( target );
-            return download( path, fos );
-        }
-        finally
-        {
-            IOUtil.close( fos );
-        }
+    finally {
+      IOUtil.close(fos);
     }
+  }
 
-    /**
-     * @since 2.6
-     */
-    @Override
-    public Utilities download( final String path, final OutputStream target )
-        throws IOException
-    {
-        try
+  /**
+   * @since 2.6
+   */
+  @Override
+  public Utilities download(final String path, final OutputStream target)
+      throws IOException
+  {
+    try {
+      final ClientResponse response = getNexusClient().uri(path).get(ClientResponse.class);
+
+      if (!ClientResponse.Status.OK.equals(response.getClientResponseStatus())) {
+        throw getNexusClient().convert(new ContextAwareUniformInterfaceException(response)
         {
-            final ClientResponse response = getNexusClient().uri( path ).get( ClientResponse.class );
-
-            if ( !ClientResponse.Status.OK.equals( response.getClientResponseStatus() ) )
-            {
-                throw getNexusClient().convert( new ContextAwareUniformInterfaceException( response )
-                {
-                    @Override
-                    public String getMessage( final int status )
-                    {
-                        if ( status == Response.Status.NOT_FOUND.getStatusCode() )
-                        {
-                            return String.format( "Inexistent path: %s", path );
-                        }
-                        return null;
-                    }
-                } );
+          @Override
+          public String getMessage(final int status) {
+            if (status == Response.Status.NOT_FOUND.getStatusCode()) {
+              return String.format("Inexistent path: %s", path);
             }
+            return null;
+          }
+        });
+      }
 
-            try
-            {
-                IOUtil.copy( response.getEntityInputStream(), target );
-            }
-            finally
-            {
-                response.close();
-            }
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        return this;
+      try {
+        IOUtil.copy(response.getEntityInputStream(), target);
+      }
+      finally {
+        response.close();
+      }
     }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+    return this;
+  }
 
 }

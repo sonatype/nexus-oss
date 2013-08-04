@@ -10,37 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-@Component( role = RepositoryFolderCleaner.class, hint = "core-storage" )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = RepositoryFolderCleaner.class, hint = "core-storage")
 public class CoreRepositoryFolderCleaner
     extends AbstractRepositoryFolderCleaner
 {
-    public void cleanRepositoryFolders( final Repository repository, boolean deleteForever )
-        throws IOException
-    {
-        File defaultStorageFolder =
-            new File( new File( getApplicationConfiguration().getWorkingDirectory(), "storage" ), repository.getId() );
+  public void cleanRepositoryFolders(final Repository repository, boolean deleteForever)
+      throws IOException
+  {
+    File defaultStorageFolder =
+        new File(new File(getApplicationConfiguration().getWorkingDirectory(), "storage"), repository.getId());
 
-        String defaultStorageURI = defaultStorageFolder.toURI().toURL().toString();
-        defaultStorageURI = defaultStorageURI.endsWith( "/" ) ? defaultStorageURI : defaultStorageURI + "/";
+    String defaultStorageURI = defaultStorageFolder.toURI().toURL().toString();
+    defaultStorageURI = defaultStorageURI.endsWith("/") ? defaultStorageURI : defaultStorageURI + "/";
 
-        String localURI = repository.getLocalUrl();
+    String localURI = repository.getLocalUrl();
 
-        localURI = localURI.endsWith( "/" ) ? localURI : localURI + "/";
+    localURI = localURI.endsWith("/") ? localURI : localURI + "/";
 
-        boolean defaultLocation = defaultStorageURI.equals( localURI );
+    boolean defaultLocation = defaultStorageURI.equals(localURI);
 
-        // we do this _only_ if storage is not user-customized
-        if ( defaultLocation )
-        {
-            delete( defaultStorageFolder, deleteForever );
-        }
+    // we do this _only_ if storage is not user-customized
+    if (defaultLocation) {
+      delete(defaultStorageFolder, deleteForever);
     }
+  }
 }

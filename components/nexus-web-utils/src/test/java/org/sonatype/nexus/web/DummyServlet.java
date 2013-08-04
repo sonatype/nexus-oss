@@ -10,10 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web;
 
 import javax.servlet.http.HttpServlet;
 
-public class DummyServlet extends HttpServlet {
+public class DummyServlet
+    extends HttpServlet
+{
 
 }

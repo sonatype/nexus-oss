@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.component;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -21,15 +22,13 @@ public class SimpleComponentPlexusResource
     extends AbstractComponentListPlexusResource
 {
 
-    @Override
-    public String getResourceUri()
-    {
-        return "/components/{" + ROLE_ID + "}";
-    }
+  @Override
+  public String getResourceUri() {
+    return "/components/{" + ROLE_ID + "}";
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return null;
-    }
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return null;
+  }
 }

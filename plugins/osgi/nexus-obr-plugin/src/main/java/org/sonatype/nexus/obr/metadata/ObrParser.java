@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.metadata;
 
 import java.io.Closeable;
@@ -25,26 +26,25 @@ import org.osgi.service.obr.Resource;
 public interface ObrParser
     extends XmlPullParser, Closeable
 {
-    /**
-     * Returns the URL of the OBR metadata, may be local (file:) or remote.
-     * 
-     * @return the metadata URL
-     */
-    URL getMetadataUrl();
+  /**
+   * Returns the URL of the OBR metadata, may be local (file:) or remote.
+   *
+   * @return the metadata URL
+   */
+  URL getMetadataUrl();
 
-    /**
-     * Returns the maximum allowed depth of nested OBR referrals.
-     * 
-     * @return the maximum depth
-     */
-    int getMaxDepth();
+  /**
+   * Returns the maximum allowed depth of nested OBR referrals.
+   *
+   * @return the maximum depth
+   */
+  int getMaxDepth();
 
-    /**
-     * Parses an OBR resource from the underlying OBR metadata stream.
-     * 
-     * @return the parsed resource
-     * @throws IOException
-     */
-    Resource parseResource()
-        throws IOException;
+  /**
+   * Parses an OBR resource from the underlying OBR metadata stream.
+   *
+   * @return the parsed resource
+   */
+  Resource parseResource()
+      throws IOException;
 }

@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 /**
  * Before you continue using this class, stop and read carefully it's description. This "smart" lock is NOT an improved
  * implementation of Java's ReentrantReadWriteLock in any way. It does NOT implement the unsupported atomic
  * lock-upgrade. All this class allows is following pattern:
- * 
+ *
  * <pre>
  *   ...
  *   lock.lockShared();
@@ -33,30 +34,28 @@ package org.sonatype.nexus.proxy.item;
  *     lock.unlock();
  *   }
  * </pre>
- * 
+ *
  * @author cstamas
  */
 interface LockResource
 {
-    /**
-     * Acquires a shared lock. Blocks until successful.
-     */
-    void lockShared();
+  /**
+   * Acquires a shared lock. Blocks until successful.
+   */
+  void lockShared();
 
-    /**
-     * Acquires an exclusive lock. Blocks until successful.
-     */
-    void lockExclusively();
+  /**
+   * Acquires an exclusive lock. Blocks until successful.
+   */
+  void lockExclusively();
 
-    /**
-     * Unlocks the last acquired lock.
-     */
-    void unlock();
+  /**
+   * Unlocks the last acquired lock.
+   */
+  void unlock();
 
-    /**
-     * Returns true if the caller thread owns locks of any kinds on this lock.
-     * 
-     * @return
-     */
-    boolean hasLocksHeld();
+  /**
+   * Returns true if the caller thread owns locks of any kinds on this lock.
+   */
+  boolean hasLocksHeld();
 }

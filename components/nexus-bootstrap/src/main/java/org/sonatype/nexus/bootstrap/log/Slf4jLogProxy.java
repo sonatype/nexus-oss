@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.log;
 
 import org.slf4j.Logger;
@@ -24,46 +25,39 @@ public class Slf4jLogProxy
     extends LogProxy
 {
 
-    private Logger log = LoggerFactory.getLogger( this.getClass() );
+  private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public Slf4jLogProxy( final Logger log )
-    {
-        this.log = log;
-    }
+  public Slf4jLogProxy(final Logger log) {
+    this.log = log;
+  }
 
-    public Slf4jLogProxy( final Class clazz )
-    {
-        this( LoggerFactory.getLogger( clazz ) );
-    }
+  public Slf4jLogProxy(final Class clazz) {
+    this(LoggerFactory.getLogger(clazz));
+  }
 
-    @Override
-    public void debug( final String message, Object... args )
-    {
-        log.debug( message, args );
-    }
+  @Override
+  public void debug(final String message, Object... args) {
+    log.debug(message, args);
+  }
 
-    @Override
-    public void info( final String message, final Object... args )
-    {
-        log.info( message, args );
-    }
+  @Override
+  public void info(final String message, final Object... args) {
+    log.info(message, args);
+  }
 
-    @Override
-    public void error( final String message, Object... args )
-    {
-        log.error( message, args );
-    }
+  @Override
+  public void error(final String message, Object... args) {
+    log.error(message, args);
+  }
 
-    @Override
-    public void error( final String message, Throwable e )
-    {
-        log.error( message, e );
-    }
+  @Override
+  public void error(final String message, Throwable e) {
+    log.error(message, e);
+  }
 
-    @Override
-    public void warn( final String message, Object... args )
-    {
-        log.warn( message, args );
-    }
+  @Override
+  public void warn(final String message, Object... args) {
+    log.warn(message, args);
+  }
 
 }

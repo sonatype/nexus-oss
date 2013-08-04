@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.sisu.jetty.mangler;
 
 import org.eclipse.jetty.server.Handler;
@@ -21,56 +22,49 @@ import org.eclipse.jetty.webapp.WebAppContext;
 /**
  * Mangler that sets UnavailableOnStartupException on all WebAppContexts to true (or to defined value). It does so by
  * "crawling" all the defined contexts in Jetty instance. Note: use of this handler is limited only before Jetty is
- * started (for obvious reasons)! It returns the count of affected WebAppContext encountered during it's work being done
+ * started (for obvious reasons)! It returns the count of affected WebAppContext encountered during it's work being
+ * done
  * (in other words, returns the count of the setter invocations it did).
- * 
+ *
  * @author cstamas
  * @since 1.2
  */
 public class UnavailableOnStartupExceptionContextMangler
     implements ServerMangler<Integer>
 {
-    private final boolean throwUnavailableOnStartupException;
+  private final boolean throwUnavailableOnStartupException;
 
-    public UnavailableOnStartupExceptionContextMangler()
-    {
-        this( true );
-    }
+  public UnavailableOnStartupExceptionContextMangler() {
+    this(true);
+  }
 
-    public UnavailableOnStartupExceptionContextMangler( final boolean throwUnavailableOnStartupException )
-    {
-        this.throwUnavailableOnStartupException = throwUnavailableOnStartupException;
-    }
+  public UnavailableOnStartupExceptionContextMangler(final boolean throwUnavailableOnStartupException) {
+    this.throwUnavailableOnStartupException = throwUnavailableOnStartupException;
+  }
 
-    public Integer mangle( Server server )
-    {
-        return setUnavailableOnStartupException( server.getHandlers() );
-    }
+  public Integer mangle(Server server) {
+    return setUnavailableOnStartupException(server.getHandlers());
+  }
 
-    // ==
+  // ==
 
-    protected int setUnavailableOnStartupException( final Handler[] handlers )
-    {
-        int setCount = 0;
-        for ( int i = 0; i < handlers.length; i++ )
-        {
-            if ( handlers[i] instanceof ContextHandler )
-            {
-                final ContextHandler ctx = (ContextHandler) handlers[i];
+  protected int setUnavailableOnStartupException(final Handler[] handlers) {
+    int setCount = 0;
+    for (int i = 0; i < handlers.length; i++) {
+      if (handlers[i] instanceof ContextHandler) {
+        final ContextHandler ctx = (ContextHandler) handlers[i];
 
-                if ( ctx instanceof WebAppContext )
-                {
-                    final WebAppContext wctx = (WebAppContext) ctx;
-                    wctx.setThrowUnavailableOnStartupException( throwUnavailableOnStartupException );
-                    setCount++;
-                }
-            }
-            else if ( handlers[i] instanceof HandlerCollection )
-            {
-                final Handler[] handlerList = ( (HandlerCollection) handlers[i] ).getHandlers();
-                setCount = setCount + setUnavailableOnStartupException( handlerList );
-            }
+        if (ctx instanceof WebAppContext) {
+          final WebAppContext wctx = (WebAppContext) ctx;
+          wctx.setThrowUnavailableOnStartupException(throwUnavailableOnStartupException);
+          setCount++;
         }
-        return setCount;
+      }
+      else if (handlers[i] instanceof HandlerCollection) {
+        final Handler[] handlerList = ((HandlerCollection) handlers[i]).getHandlers();
+        setCount = setCount + setUnavailableOnStartupException(handlerList);
+      }
     }
+    return setCount;
+  }
 }

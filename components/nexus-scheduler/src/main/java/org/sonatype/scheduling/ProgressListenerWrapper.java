@@ -10,95 +10,78 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 public class ProgressListenerWrapper
     implements ProgressListener
 {
-    private final ProgressListener wrapped;
+  private final ProgressListener wrapped;
 
-    public ProgressListenerWrapper( final ProgressListener wrapped )
-    {
-        this.wrapped = wrapped;
+  public ProgressListenerWrapper(final ProgressListener wrapped) {
+    this.wrapped = wrapped;
+  }
+
+  public void beginTask(final String name) {
+    TaskUtil.checkInterruption();
+
+    if (wrapped != null) {
+      wrapped.beginTask(name);
     }
+  }
 
-    public void beginTask( final String name )
-    {
-        TaskUtil.checkInterruption();
+  public void beginTask(final String name, final int toDo) {
+    TaskUtil.checkInterruption();
 
-        if ( wrapped != null )
-        {
-            wrapped.beginTask( name );
-        }
+    if (wrapped != null) {
+      wrapped.beginTask(name, toDo);
     }
+  }
 
-    public void beginTask( final String name, final int toDo )
-    {
-        TaskUtil.checkInterruption();
+  public void working(final int workDone) {
+    TaskUtil.checkInterruption();
 
-        if ( wrapped != null )
-        {
-            wrapped.beginTask( name, toDo );
-        }
+    if (wrapped != null) {
+      wrapped.working(workDone);
     }
+  }
 
-    public void working( final int workDone )
-    {
-        TaskUtil.checkInterruption();
+  public void working(final String message) {
+    TaskUtil.checkInterruption();
 
-        if ( wrapped != null )
-        {
-            wrapped.working( workDone );
-        }
+    if (wrapped != null) {
+      wrapped.working(message);
     }
+  }
 
-    public void working( final String message )
-    {
-        TaskUtil.checkInterruption();
+  public void working(final String message, final int work) {
+    TaskUtil.checkInterruption();
 
-        if ( wrapped != null )
-        {
-            wrapped.working( message );
-        }
+    if (wrapped != null) {
+      wrapped.working(message, work);
     }
+  }
 
-    public void working( final String message, final int work )
-    {
-        TaskUtil.checkInterruption();
+  public void endTask(final String message) {
+    TaskUtil.checkInterruption();
 
-        if ( wrapped != null )
-        {
-            wrapped.working( message, work );
-        }
+    if (wrapped != null) {
+      wrapped.endTask(message);
     }
+  }
 
-    public void endTask( final String message )
-    {
-        TaskUtil.checkInterruption();
-
-        if ( wrapped != null )
-        {
-            wrapped.endTask( message );
-        }
+  public boolean isCanceled() {
+    if (wrapped != null) {
+      return wrapped.isCanceled();
     }
-
-    public boolean isCanceled()
-    {
-        if ( wrapped != null )
-        {
-            return wrapped.isCanceled();
-        }
-        else
-        {
-            return false;
-        }
+    else {
+      return false;
     }
+  }
 
-    public void cancel()
-    {
-        if ( wrapped != null )
-        {
-            wrapped.cancel();
-        }
+  public void cancel() {
+    if (wrapped != null) {
+      wrapped.cancel();
     }
+  }
 }

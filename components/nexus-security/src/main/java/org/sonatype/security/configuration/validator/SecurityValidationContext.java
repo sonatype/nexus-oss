@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.configuration.validator;
 
 import org.sonatype.configuration.validation.ValidationContext;
@@ -19,16 +20,14 @@ public class SecurityValidationContext
     implements ValidationContext
 {
 
-    private SecurityConfiguration securityConfiguration;
+  private SecurityConfiguration securityConfiguration;
 
-    public SecurityConfiguration getSecurityConfiguration()
-    {
-        return securityConfiguration;
-    }
+  public SecurityConfiguration getSecurityConfiguration() {
+    return securityConfiguration;
+  }
 
-    public void setSecurityConfiguration( SecurityConfiguration securityConfiguration )
-    {
-        this.securityConfiguration = securityConfiguration;
-    }
+  public void setSecurityConfiguration(SecurityConfiguration securityConfiguration) {
+    this.securityConfiguration = securityConfiguration;
+  }
 
 }

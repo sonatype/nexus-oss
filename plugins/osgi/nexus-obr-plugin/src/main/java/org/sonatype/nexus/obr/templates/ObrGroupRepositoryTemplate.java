@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.templates;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -24,53 +24,53 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
 public class ObrGroupRepositoryTemplate
     extends AbstractRepositoryTemplate
 {
-    public ObrGroupRepositoryTemplate( final ObrRepositoryTemplateProvider provider, final String id,
-                                       final String description )
-    {
-        super( provider, id, description, new ObrContentClass(), ObrGroupRepository.class );
-    }
+  public ObrGroupRepositoryTemplate(final ObrRepositoryTemplateProvider provider, final String id,
+                                    final String description)
+  {
+    super(provider, id, description, new ObrContentClass(), ObrGroupRepository.class);
+  }
 
-    public ObrGroupRepositoryConfiguration getExternalConfiguration( final boolean forWrite )
-    {
-        return (ObrGroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration( forWrite );
-    }
+  public ObrGroupRepositoryConfiguration getExternalConfiguration(final boolean forWrite) {
+    return (ObrGroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
+        .getConfiguration(forWrite);
+  }
 
-    @Override
-    protected CRepositoryCoreConfiguration initCoreConfiguration()
-    {
-        final CRepository repo = new DefaultCRepository();
+  @Override
+  protected CRepositoryCoreConfiguration initCoreConfiguration() {
+    final CRepository repo = new DefaultCRepository();
 
-        repo.setId( "" );
-        repo.setName( "" );
+    repo.setId("");
+    repo.setName("");
 
-        repo.setProviderRole( GroupRepository.class.getName() );
-        repo.setProviderHint( ObrGroupRepository.ROLE_HINT );
+    repo.setProviderRole(GroupRepository.class.getName());
+    repo.setProviderHint(ObrGroupRepository.ROLE_HINT);
 
-        final Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
-        repo.setExternalConfiguration( ex );
+    final Xpp3Dom ex = new Xpp3Dom(DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME);
+    repo.setExternalConfiguration(ex);
 
-        final ObrGroupRepositoryConfiguration exConf = new ObrGroupRepositoryConfiguration( ex );
+    final ObrGroupRepositoryConfiguration exConf = new ObrGroupRepositoryConfiguration(ex);
 
-        repo.externalConfigurationImple = exConf;
+    repo.externalConfigurationImple = exConf;
 
-        repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
+    repo.setWritePolicy(RepositoryWritePolicy.READ_ONLY.name());
 
-        final CRepositoryCoreConfiguration result =
-            new CRepositoryCoreConfiguration(
-                                              getTemplateProvider().getApplicationConfiguration(),
-                                              repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<ObrGroupRepositoryConfiguration>()
-                                              {
-                                                  public ObrGroupRepositoryConfiguration createExternalConfigurationHolder( final CRepository config )
-                                                  {
-                                                      return new ObrGroupRepositoryConfiguration(
-                                                                                                  (Xpp3Dom) config.getExternalConfiguration() );
-                                                  }
-                                              } );
+    final CRepositoryCoreConfiguration result =
+        new CRepositoryCoreConfiguration(
+            getTemplateProvider().getApplicationConfiguration(),
+            repo,
+            new CRepositoryExternalConfigurationHolderFactory<ObrGroupRepositoryConfiguration>()
+            {
+              public ObrGroupRepositoryConfiguration createExternalConfigurationHolder(final CRepository config) {
+                return new ObrGroupRepositoryConfiguration(
+                    (Xpp3Dom) config.getExternalConfiguration());
+              }
+            });
 
-        return result;
-    }
+    return result;
+  }
 }

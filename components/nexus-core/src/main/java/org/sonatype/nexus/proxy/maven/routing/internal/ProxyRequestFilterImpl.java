@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,9 +24,9 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
+import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
-import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFilePublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFileUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -35,9 +34,11 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Default implementation of the {@link ProxyRequestFilter}.
- * 
+ *
  * @author cstamas
  */
 @Named
@@ -46,120 +47,97 @@ public class ProxyRequestFilterImpl
     extends AbstractLoggingComponent
     implements ProxyRequestFilter
 {
-    private final ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
-    private final Manager manager;
+  private final Manager manager;
 
-    /**
-     * Constructor.
-     * 
-     * @param eventBus
-     * @param applicationStatusSource
-     * @param manager
-     */
-    @Inject
-    public ProxyRequestFilterImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
-                                   final Manager manager )
-    {
-        checkNotNull( eventBus );
-        this.applicationStatusSource = checkNotNull( applicationStatusSource );
-        this.manager = checkNotNull( manager );
-        eventBus.register( this );
+  /**
+   * Constructor.
+   */
+  @Inject
+  public ProxyRequestFilterImpl(final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
+                                final Manager manager)
+  {
+    checkNotNull(eventBus);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.manager = checkNotNull(manager);
+    eventBus.register(this);
+  }
+
+  @Override
+  public boolean allowed(final MavenProxyRepository mavenProxyRepository,
+                         final ResourceStoreRequest resourceStoreRequest)
+  {
+    final PathMatcher pathMatcher = getPathMatcherFor(mavenProxyRepository);
+    if (pathMatcher != null) {
+      final boolean allowed = pathMatcher.matches(resourceStoreRequest.getRequestPath());
+      if (!allowed) {
+        // flag the request as rejected
+        resourceStoreRequest.getRequestContext().put(Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY, Boolean.TRUE);
+      }
+      return allowed;
     }
-
-    @Override
-    public boolean allowed( final MavenProxyRepository mavenProxyRepository,
-                            final ResourceStoreRequest resourceStoreRequest )
-    {
-        final PathMatcher pathMatcher = getPathMatcherFor( mavenProxyRepository );
-        if ( pathMatcher != null )
-        {
-            final boolean allowed = pathMatcher.matches( resourceStoreRequest.getRequestPath() );
-            if ( !allowed )
-            {
-                // flag the request as rejected
-                resourceStoreRequest.getRequestContext().put( Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY, Boolean.TRUE );
-            }
-            return allowed;
-        }
-        else
-        {
-            // no pathMatcher for a proxy, it does not publishes it
-            return true;
-        }
+    else {
+      // no pathMatcher for a proxy, it does not publishes it
+      return true;
     }
+  }
 
-    // ==
+  // ==
 
-    private final ConcurrentHashMap<String, PathMatcher> pathMatchers = new ConcurrentHashMap<String, PathMatcher>();
+  private final ConcurrentHashMap<String, PathMatcher> pathMatchers = new ConcurrentHashMap<String, PathMatcher>();
 
-    protected PathMatcher getPathMatcherFor( final MavenProxyRepository mavenProxyRepository )
-    {
-        return pathMatchers.get( mavenProxyRepository.getId() );
+  protected PathMatcher getPathMatcherFor(final MavenProxyRepository mavenProxyRepository) {
+    return pathMatchers.get(mavenProxyRepository.getId());
+  }
+
+  protected boolean dropPathMatcherFor(final MavenProxyRepository mavenProxyRepository) {
+    return pathMatchers.remove(mavenProxyRepository.getId()) != null;
+  }
+
+  protected void buildPathMatcherFor(final MavenProxyRepository mavenProxyRepository) {
+    try {
+      final PrefixSource prefixSource = manager.getPrefixSourceFor(mavenProxyRepository);
+      if (prefixSource.supported()) {
+        final PathMatcher pathMatcher = new PathMatcher(prefixSource.readEntries(), Integer.MAX_VALUE);
+        pathMatchers.put(mavenProxyRepository.getId(), pathMatcher);
+      }
+      else {
+        dropPathMatcherFor(mavenProxyRepository);
+      }
     }
-
-    protected boolean dropPathMatcherFor( final MavenProxyRepository mavenProxyRepository )
-    {
-        return pathMatchers.remove( mavenProxyRepository.getId() ) != null;
+    catch (IOException e) {
+      getLogger().warn("Could not build PathMatcher for {}!", mavenProxyRepository, e);
+      dropPathMatcherFor(mavenProxyRepository);
     }
+  }
 
-    protected void buildPathMatcherFor( final MavenProxyRepository mavenProxyRepository )
-    {
-        try
-        {
-            final PrefixSource prefixSource = manager.getPrefixSourceFor( mavenProxyRepository );
-            if ( prefixSource.supported() )
-            {
-                final PathMatcher pathMatcher = new PathMatcher( prefixSource.readEntries(), Integer.MAX_VALUE );
-                pathMatchers.put( mavenProxyRepository.getId(), pathMatcher );
-            }
-            else
-            {
-                dropPathMatcherFor( mavenProxyRepository );
-            }
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn( "Could not build PathMatcher for {}!", mavenProxyRepository, e );
-            dropPathMatcherFor( mavenProxyRepository );
-        }
+  // == Events
+
+  protected boolean isRepositoryHandled(final Repository repository) {
+    return applicationStatusSource.getSystemStatus().isNexusStarted() && repository != null
+        && repository.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class);
+  }
+
+  /**
+   * Handler for {@link PrefixFilePublishedRepositoryEvent} event.
+   */
+  @Subscribe
+  public void onPrefixFilePublishedRepositoryEvent(final PrefixFilePublishedRepositoryEvent evt) {
+    final MavenProxyRepository mavenProxyRepository = evt.getRepository().adaptToFacet(MavenProxyRepository.class);
+    if (isRepositoryHandled(mavenProxyRepository)) {
+      buildPathMatcherFor(mavenProxyRepository);
     }
+  }
 
-    // == Events
-
-    protected boolean isRepositoryHandled( final Repository repository )
-    {
-        return applicationStatusSource.getSystemStatus().isNexusStarted() && repository != null
-            && repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class );
+  /**
+   * Handler for {@link PrefixFileUnpublishedRepositoryEvent} event.
+   */
+  @Subscribe
+  public void onPrefixFileUnpublishedRepositoryEvent(final PrefixFileUnpublishedRepositoryEvent evt) {
+    final MavenProxyRepository mavenProxyRepository = evt.getRepository().adaptToFacet(MavenProxyRepository.class);
+    if (isRepositoryHandled(mavenProxyRepository)) {
+      dropPathMatcherFor(mavenProxyRepository);
     }
-
-    /**
-     * Handler for {@link PrefixFilePublishedRepositoryEvent} event.
-     * 
-     * @param evt
-     */
-    @Subscribe
-    public void onPrefixFilePublishedRepositoryEvent( final PrefixFilePublishedRepositoryEvent evt )
-    {
-        final MavenProxyRepository mavenProxyRepository = evt.getRepository().adaptToFacet( MavenProxyRepository.class );
-        if ( isRepositoryHandled( mavenProxyRepository ) )
-        {
-            buildPathMatcherFor( mavenProxyRepository );
-        }
-    }
-
-    /**
-     * Handler for {@link PrefixFileUnpublishedRepositoryEvent} event.
-     * 
-     * @param evt
-     */
-    @Subscribe
-    public void onPrefixFileUnpublishedRepositoryEvent( final PrefixFileUnpublishedRepositoryEvent evt )
-    {
-        final MavenProxyRepository mavenProxyRepository = evt.getRepository().adaptToFacet( MavenProxyRepository.class );
-        if ( isRepositoryHandled( mavenProxyRepository ) )
-        {
-            dropPathMatcherFor( mavenProxyRepository );
-        }
-    }
+  }
 }

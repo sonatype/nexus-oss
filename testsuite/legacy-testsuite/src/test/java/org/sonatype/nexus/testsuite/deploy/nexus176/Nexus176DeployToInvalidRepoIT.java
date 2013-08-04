@@ -10,11 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.deploy.nexus176;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
@@ -23,8 +27,6 @@ import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 
 
 /**
@@ -34,284 +36,263 @@ public class Nexus176DeployToInvalidRepoIT
     extends AbstractNexusIntegrationTest
 {
 
-    private static final String TEST_RELEASE_REPO = "invalid-release";
+  private static final String TEST_RELEASE_REPO = "invalid-release";
 
-    public Nexus176DeployToInvalidRepoIT()
-    {
-        super( TEST_RELEASE_REPO );
-    }
-    
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
+  public Nexus176DeployToInvalidRepoIT() {
+    super(TEST_RELEASE_REPO);
+  }
 
-    @Test
-    public void wagonDeployTest()
-        throws Exception
-    {
-       
-        Gav gav =
-            new Gav( this.getTestId(), "simpleArtifact", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, null, false, null );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        // file to deploy
-        File fileToDeploy =
-            this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-        
-     // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+  @Test
+  public void wagonDeployTest()
+      throws Exception
+  {
 
-        // the method we are calling
-        HttpPost filePost = new HttpPost( uploadURL );
-        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
+    Gav gav =
+        new Gav(this.getTestId(), "simpleArtifact", "1.0.0", null, "xml", 0,
+            new Date().getTime(), "Simple Test Artifact", false, null, false, null);
 
-        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+    // file to deploy
+    File fileToDeploy =
+        this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
 
-        if ( status != HttpStatus.SC_NOT_FOUND )
-        {
-            Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
-        }
-      
-        boolean fileWasUploaded = true;
-        try
-        {
-          // download it
-          downloadArtifact( gav, "./target/downloaded-jars" );
-        }
-        catch(FileNotFoundException e)
-        {
-            fileWasUploaded = false;
-        }
-        
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
+    // url to upload to
+    String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
+    // the method we are calling
+    HttpPost filePost = new HttpPost(uploadURL);
+    filePost.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, true);
+
+    int status = getDeployUtils().deployUsingGavWithRest(uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy);
+
+    if (status != HttpStatus.SC_NOT_FOUND) {
+      Assert.fail("Upload attempt should have returned a 400, it returned:  " + status);
     }
 
-
-    @Test
-    public void deploywithGavUsingRest()
-        throws Exception
-    {
-
-        Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
-
-        // file to deploy
-        File fileToDeploy =
-            this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
-
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
-        // the method we are calling
-        HttpPost filePost = new HttpPost( uploadURL );
-        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
-
-        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
-
-        if ( status != HttpStatus.SC_NOT_FOUND )
-        {
-            Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
-        }
-      
-        boolean fileWasUploaded = true;
-        try
-        {
-          // download it
-          downloadArtifact( gav, "./target/downloaded-jars" );
-        }
-        catch(FileNotFoundException e)
-        {
-            fileWasUploaded = false;
-        }
-        
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
-
+    boolean fileWasUploaded = true;
+    try {
+      // download it
+      downloadArtifact(gav, "./target/downloaded-jars");
     }
-    
-    
-
-    @Test
-    public void deploywithPomUsingRest()
-        throws Exception
-    {
-
-        Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
-
-        // file to deploy
-        File fileToDeploy =
-            this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-        
-        File pomFile =
-            this.getTestFile( "pom.xml" );
-
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
-
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-            
-        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
-        
-        if ( status != HttpStatus.SC_NOT_FOUND )
-        {
-            Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
-        }
-      
-        boolean fileWasUploaded = true;
-        try
-        {
-          // download it
-          downloadArtifact( gav, "./target/downloaded-jars" );
-        }
-        catch(FileNotFoundException e)
-        {
-            fileWasUploaded = false;
-        }
-        
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
-
-    }
-    
-    
-    
-    @Test
-    public void wagonSnapshotDeployTest()
-        throws Exception
-    {
-       
-        Gav gav =
-            new Gav( this.getTestId(), "simpleArtifact", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
-
-        // file to deploy
-        File fileToDeploy =
-            this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-        
-     // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
-        // the method we are calling
-        HttpPost filePost = new HttpPost( uploadURL );
-        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
-
-        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
-
-        if ( status != HttpStatus.SC_NOT_FOUND )
-        {
-            Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
-        }
-      
-        boolean fileWasUploaded = true;
-        try
-        {
-          // download it
-          downloadArtifact( gav, "./target/downloaded-jars" );
-        }
-        catch(FileNotFoundException e)
-        {
-            fileWasUploaded = false;
-        }
-        
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
-
+    catch (FileNotFoundException e) {
+      fileWasUploaded = false;
     }
 
+    Assert.assertFalse("The file was uploaded and it should not have been.", fileWasUploaded);
 
-    @Test
-    public void deploySnapshotWithGavUsingRest()
-        throws Exception
-    {
+  }
 
-        Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
 
-        // file to deploy
-        File fileToDeploy =
-            this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
+  @Test
+  public void deploywithGavUsingRest()
+      throws Exception
+  {
 
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
+    Gav gav =
+        new Gav(this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
+            new Date().getTime(), "Simple Test Artifact", false, null, false, null);
 
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+    // file to deploy
+    File fileToDeploy =
+        this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
 
-        // the method we are calling
-        HttpPost filePost = new HttpPost( uploadURL );
-        filePost.getParams().setBooleanParameter( CoreProtocolPNames.USE_EXPECT_CONTINUE, true );
+    // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
 
-        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+    // url to upload to
+    String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
-        if ( status != HttpStatus.SC_NOT_FOUND )
-        {
-            Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
-        }
-      
-        boolean fileWasUploaded = true;
-        try
-        {
-          // download it
-          downloadArtifact( gav, "./target/downloaded-jars" );
-        }
-        catch(FileNotFoundException e)
-        {
-            fileWasUploaded = false;
-        }
-        
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
+    // the method we are calling
+    HttpPost filePost = new HttpPost(uploadURL);
+    filePost.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, true);
 
+    int status = getDeployUtils().deployUsingGavWithRest(uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy);
+
+    if (status != HttpStatus.SC_NOT_FOUND) {
+      Assert.fail("Upload attempt should have returned a 400, it returned:  " + status);
     }
-    
-    
 
-    @Test
-    public void deploySnapshotWithPomUsingRest()
-        throws Exception
-    {
-
-        Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
-
-        // file to deploy
-        File fileToDeploy =
-            this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-        
-        File pomFile =
-            this.getTestFile( "pom.xml" );
-
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
-
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-            
-        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
-        
-        if ( status != HttpStatus.SC_NOT_FOUND )
-        {
-            Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
-        }
-      
-        boolean fileWasUploaded = true;
-        try
-        {
-          // download it
-          downloadArtifact( gav, "./target/downloaded-jars" );
-        }
-        catch(FileNotFoundException e)
-        {
-            fileWasUploaded = false;
-        }
-        
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
-
+    boolean fileWasUploaded = true;
+    try {
+      // download it
+      downloadArtifact(gav, "./target/downloaded-jars");
     }
-    
-  
-    
+    catch (FileNotFoundException e) {
+      fileWasUploaded = false;
+    }
+
+    Assert.assertFalse("The file was uploaded and it should not have been.", fileWasUploaded);
+
+  }
+
+
+  @Test
+  public void deploywithPomUsingRest()
+      throws Exception
+  {
+
+    Gav gav =
+        new Gav(this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
+            new Date().getTime(), "Simple Test Artifact", false, null, false, null);
+
+    // file to deploy
+    File fileToDeploy =
+        this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
+
+    File pomFile =
+        this.getTestFile("pom.xml");
+
+    // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
+
+    // url to upload to
+    String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+
+    int status = getDeployUtils()
+        .deployUsingPomWithRest(uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null);
+
+    if (status != HttpStatus.SC_NOT_FOUND) {
+      Assert.fail("Upload attempt should have returned a 400, it returned:  " + status);
+    }
+
+    boolean fileWasUploaded = true;
+    try {
+      // download it
+      downloadArtifact(gav, "./target/downloaded-jars");
+    }
+    catch (FileNotFoundException e) {
+      fileWasUploaded = false;
+    }
+
+    Assert.assertFalse("The file was uploaded and it should not have been.", fileWasUploaded);
+
+  }
+
+
+  @Test
+  public void wagonSnapshotDeployTest()
+      throws Exception
+  {
+
+    Gav gav =
+        new Gav(this.getTestId(), "simpleArtifact", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Date().getTime(), "Simple Test Artifact", false, null, false, null);
+
+    // file to deploy
+    File fileToDeploy =
+        this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
+
+    // url to upload to
+    String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+
+    // the method we are calling
+    HttpPost filePost = new HttpPost(uploadURL);
+    filePost.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, true);
+
+    int status = getDeployUtils().deployUsingGavWithRest(uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy);
+
+    if (status != HttpStatus.SC_NOT_FOUND) {
+      Assert.fail("Upload attempt should have returned a 400, it returned:  " + status);
+    }
+
+    boolean fileWasUploaded = true;
+    try {
+      // download it
+      downloadArtifact(gav, "./target/downloaded-jars");
+    }
+    catch (FileNotFoundException e) {
+      fileWasUploaded = false;
+    }
+
+    Assert.assertFalse("The file was uploaded and it should not have been.", fileWasUploaded);
+
+  }
+
+
+  @Test
+  public void deploySnapshotWithGavUsingRest()
+      throws Exception
+  {
+
+    Gav gav =
+        new Gav(this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Date().getTime(), "Simple Test Artifact", false, null, false, null);
+
+    // file to deploy
+    File fileToDeploy =
+        this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
+
+    // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
+
+    // url to upload to
+    String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+
+    // the method we are calling
+    HttpPost filePost = new HttpPost(uploadURL);
+    filePost.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, true);
+
+    int status = getDeployUtils().deployUsingGavWithRest(uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy);
+
+    if (status != HttpStatus.SC_NOT_FOUND) {
+      Assert.fail("Upload attempt should have returned a 400, it returned:  " + status);
+    }
+
+    boolean fileWasUploaded = true;
+    try {
+      // download it
+      downloadArtifact(gav, "./target/downloaded-jars");
+    }
+    catch (FileNotFoundException e) {
+      fileWasUploaded = false;
+    }
+
+    Assert.assertFalse("The file was uploaded and it should not have been.", fileWasUploaded);
+
+  }
+
+
+  @Test
+  public void deploySnapshotWithPomUsingRest()
+      throws Exception
+  {
+
+    Gav gav =
+        new Gav(this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Date().getTime(), "Simple Test Artifact", false, null, false, null);
+
+    // file to deploy
+    File fileToDeploy =
+        this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
+
+    File pomFile =
+        this.getTestFile("pom.xml");
+
+    // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
+
+    // url to upload to
+    String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+
+    int status = getDeployUtils()
+        .deployUsingPomWithRest(uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null);
+
+    if (status != HttpStatus.SC_NOT_FOUND) {
+      Assert.fail("Upload attempt should have returned a 400, it returned:  " + status);
+    }
+
+    boolean fileWasUploaded = true;
+    try {
+      // download it
+      downloadArtifact(gav, "./target/downloaded-jars");
+    }
+    catch (FileNotFoundException e) {
+      fileWasUploaded = false;
+    }
+
+    Assert.assertFalse("The file was uploaded and it should not have been.", fileWasUploaded);
+
+  }
+
+
 }

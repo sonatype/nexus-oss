@@ -10,39 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting;
 
 import javax.inject.Named;
 
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 
-@Named( "ExceptionTask" )
+@Named("ExceptionTask")
 public class ExceptionTask
     extends AbstractNexusTask<Object>
 {
-    private String msg;
+  private String msg;
 
-    @Override
-    protected Object doRun()
-        throws Exception
-    {
-        throw new RuntimeException( msg );
-    }
+  @Override
+  protected Object doRun()
+      throws Exception
+  {
+    throw new RuntimeException(msg);
+  }
 
-    @Override
-    protected String getAction()
-    {
-        return "Exception Task";
-    }
+  @Override
+  protected String getAction() {
+    return "Exception Task";
+  }
 
-    @Override
-    protected String getMessage()
-    {
-        return msg;
-    }
+  @Override
+  protected String getMessage() {
+    return msg;
+  }
 
-    public void setMessage( String msg )
-    {
-        this.msg = msg;
-    }
+  public void setMessage(String msg) {
+    this.msg = msg;
+  }
 }

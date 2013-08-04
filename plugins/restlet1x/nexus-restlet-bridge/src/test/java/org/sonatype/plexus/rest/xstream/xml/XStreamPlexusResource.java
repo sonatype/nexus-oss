@@ -10,19 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.xml;
 
+import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
+
+import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * A simple testing resource. Will "publish" itself on passed in token URI (/token) and will emit "token" for GETs and
@@ -30,55 +31,49 @@ import com.thoughtworks.xstream.XStream;
  *
  * @author cstamas
  */
-@Component( role = PlexusResource.class, hint = "XStreamPlexusResource" )
+@Component(role = PlexusResource.class, hint = "XStreamPlexusResource")
 public class XStreamPlexusResource
     extends AbstractPlexusResource
 {
 
-    public XStreamPlexusResource()
-    {
-        super();
+  public XStreamPlexusResource() {
+    super();
 
-        setModifiable( true );
+    setModifiable(true);
+  }
+
+  @Override
+  public Object getPayloadInstance() {
+    return new SimpleTestObject();
+  }
+
+  @Override
+  public void configureXStream(XStream xstream) {
+    super.configureXStream(xstream);
+
+    xstream.processAnnotations(SimpleTestObject.class);
+  }
+
+  @Override
+  public String getResourceUri() {
+    return "/XStreamPlexusResource";
+  }
+
+  @Override
+  public Object post(Context context, Request request, Response response, Object payload)
+      throws ResourceException
+  {
+    SimpleTestObject obj = (SimpleTestObject) payload;
+    if (obj.getData() == null) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST);
     }
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return new SimpleTestObject();
-    }
+    return null;
+  }
 
-    @Override
-    public void configureXStream( XStream xstream )
-    {
-        super.configureXStream( xstream );
-
-        xstream.processAnnotations( SimpleTestObject.class );
-    }
-
-    @Override
-    public String getResourceUri()
-    {
-        return "/XStreamPlexusResource";
-    }
-
-    @Override
-    public Object post( Context context, Request request, Response response, Object payload )
-        throws ResourceException
-    {
-        SimpleTestObject obj = (SimpleTestObject) payload;
-        if ( obj.getData() == null )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
-        }
-
-        return null;
-    }
-
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return null;
-    }
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return null;
+  }
 
 }

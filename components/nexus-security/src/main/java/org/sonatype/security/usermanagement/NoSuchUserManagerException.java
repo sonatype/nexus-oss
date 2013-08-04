@@ -10,36 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.usermanagement;
 
 /**
  * Thrown when UserManager could not be found.
- * 
+ *
  * @author Brian Demers
  */
 public class NoSuchUserManagerException
     extends Exception
 {
 
-    private static final long serialVersionUID = -2561129270233203244L;
+  private static final long serialVersionUID = -2561129270233203244L;
 
-    public NoSuchUserManagerException()
-    {
-    }
+  public NoSuchUserManagerException() {
+  }
 
-    public NoSuchUserManagerException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+  public NoSuchUserManagerException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public NoSuchUserManagerException( String message )
-    {
-        super( message );
-    }
+  public NoSuchUserManagerException(String message) {
+    super(message);
+  }
 
-    public NoSuchUserManagerException( Throwable cause )
-    {
-        super( cause );
-    }
+  public NoSuchUserManagerException(Throwable cause) {
+    super(cause);
+  }
 
 }

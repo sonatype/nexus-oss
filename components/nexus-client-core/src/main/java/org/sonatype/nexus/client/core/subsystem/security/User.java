@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.security;
 
 import java.util.List;
@@ -25,30 +26,30 @@ public interface User
     extends Entity<User>
 {
 
-    String firstName();
+  String firstName();
 
-    String lastName();
+  String lastName();
 
-    String email();
+  String email();
 
-    boolean isActive();
+  boolean isActive();
 
-    List<String> roles();
+  List<String> roles();
 
-    User withPassword( String value );
+  User withPassword(String value);
 
-    User withFirstName( String value );
+  User withFirstName(String value);
 
-    User withLastName( String value );
+  User withLastName(String value);
 
-    User withEmail( String value );
+  User withEmail(String value);
 
-    User enableAccess();
+  User enableAccess();
 
-    User disableAccess();
+  User disableAccess();
 
-    User withRole( String value );
+  User withRole(String value);
 
-    User removeRole( String value );
+  User removeRole(String value);
 
 }

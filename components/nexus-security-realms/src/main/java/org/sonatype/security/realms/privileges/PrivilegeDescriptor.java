@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.privileges;
 
 import java.util.List;
@@ -20,13 +21,13 @@ import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 public interface PrivilegeDescriptor
 {
-    String getType();
+  String getType();
 
-    String getName();
+  String getName();
 
-    List<PrivilegePropertyDescriptor> getPropertyDescriptors();
+  List<PrivilegePropertyDescriptor> getPropertyDescriptors();
 
-    String buildPermission( CPrivilege privilege );
+  String buildPermission(CPrivilege privilege);
 
-    ValidationResponse validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update );
+  ValidationResponse validatePrivilege(CPrivilege privilege, SecurityValidationContext ctx, boolean update);
 }

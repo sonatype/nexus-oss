@@ -10,11 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItem;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,10 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -46,271 +39,272 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * Testing issues NEXUS-5602 and NEXUS-5608
- * 
+ *
  * @author cstamas
  */
 public class PrefixFileUpdatePropagationGroupUpdatesTest
     extends AbstractRoutingProxyTest
 {
-    private static final String HOSTED1_REPO_ID = "hosted1";
+  private static final String HOSTED1_REPO_ID = "hosted1";
 
-    private static final String HOSTED2_REPO_ID = "hosted2";
+  private static final String HOSTED2_REPO_ID = "hosted2";
 
-    private static final String GROUP1_REPO_ID = "group1";
+  private static final String GROUP1_REPO_ID = "group1";
 
-    private static final String GROUP2_REPO_ID = "group2";
+  private static final String GROUP2_REPO_ID = "group2";
 
-    private final PrefixFileUpdateListener prefixFileUpdateListener;
+  private final PrefixFileUpdateListener prefixFileUpdateListener;
 
-    public PrefixFileUpdatePropagationGroupUpdatesTest()
-        throws Exception
-    {
-        this.prefixFileUpdateListener = new PrefixFileUpdateListener();
+  public PrefixFileUpdatePropagationGroupUpdatesTest()
+      throws Exception
+  {
+    this.prefixFileUpdateListener = new PrefixFileUpdateListener();
+  }
+
+  protected static class PrefixFileUpdateListener
+  {
+    private final List<String> publishedIds;
+
+    private final List<String> unpublishedIds;
+
+    public PrefixFileUpdateListener() {
+      this.publishedIds = new ArrayList<String>();
+      this.unpublishedIds = new ArrayList<String>();
+      reset();
     }
 
-    protected static class PrefixFileUpdateListener
+    @Subscribe
+    public void on(final PrefixFilePublishedRepositoryEvent evt) {
+      publishedIds.add(evt.getRepository().getId());
+    }
+
+    @Subscribe
+    public void on(final PrefixFileUnpublishedRepositoryEvent evt) {
+      unpublishedIds.add(evt.getRepository().getId());
+    }
+
+    public List<String> getPublished() {
+      return publishedIds;
+    }
+
+    public List<String> getUnpublished() {
+      return unpublishedIds;
+    }
+
+    public void reset() {
+      publishedIds.clear();
+      unpublishedIds.clear();
+    }
+  }
+
+  protected File getStorageRoot(final String repoId) {
+    return getApplicationConfiguration().getWorkingDirectory("proxy/store/" + repoId);
+  }
+
+  @Override
+  protected EnvironmentBuilder createEnvironmentBuilder()
+      throws Exception
+  {
+    // we need one hosted repo only, so build it
+    return new EnvironmentBuilder()
     {
-        private final List<String> publishedIds;
+      @Override
+      public void startService() {
+      }
 
-        private final List<String> unpublishedIds;
+      @Override
+      public void stopService() {
+      }
 
-        public PrefixFileUpdateListener()
+      @Override
+      public void buildEnvironment(AbstractProxyTestEnvironment env)
+          throws ConfigurationException, IOException, ComponentLookupException
+      {
+        final PlexusContainer container = env.getPlexusContainer();
+        final List<String> reposes = new ArrayList<String>();
         {
-            this.publishedIds = new ArrayList<String>();
-            this.unpublishedIds = new ArrayList<String>();
-            reset();
+          // adding one hosted
+          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          CRepository repoConf = new DefaultCRepository();
+          repoConf.setProviderRole(Repository.class.getName());
+          repoConf.setProviderHint("maven2");
+          repoConf.setId(HOSTED1_REPO_ID);
+          repoConf.setName(HOSTED1_REPO_ID);
+          repoConf.setLocalStorage(new CLocalStorage());
+          repoConf.getLocalStorage().setProvider("file");
+          repoConf.getLocalStorage().setUrl(
+              env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + HOSTED1_REPO_ID).toURI().toURL()
+                  .toString());
+          Xpp3Dom exRepo = new Xpp3Dom("externalConfiguration");
+          repoConf.setExternalConfiguration(exRepo);
+          M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration(exRepo);
+          exRepoConf.setRepositoryPolicy(RepositoryPolicy.RELEASE);
+          exRepoConf.setChecksumPolicy(ChecksumPolicy.STRICT_IF_EXISTS);
+          repo.configure(repoConf);
+          reposes.add(repo.getId());
+          env.getApplicationConfiguration().getConfigurationModel().addRepository(repoConf);
+          env.getRepositoryRegistry().addRepository(repo);
+        }
+        {
+          // adding one hosted
+          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          CRepository repoConf = new DefaultCRepository();
+          repoConf.setProviderRole(Repository.class.getName());
+          repoConf.setProviderHint("maven2");
+          repoConf.setId(HOSTED2_REPO_ID);
+          repoConf.setName(HOSTED2_REPO_ID);
+          repoConf.setLocalStorage(new CLocalStorage());
+          repoConf.getLocalStorage().setProvider("file");
+          repoConf.getLocalStorage().setUrl(
+              env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + HOSTED2_REPO_ID).toURI().toURL()
+                  .toString());
+          Xpp3Dom exRepo = new Xpp3Dom("externalConfiguration");
+          repoConf.setExternalConfiguration(exRepo);
+          M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration(exRepo);
+          exRepoConf.setRepositoryPolicy(RepositoryPolicy.RELEASE);
+          exRepoConf.setChecksumPolicy(ChecksumPolicy.STRICT_IF_EXISTS);
+          repo.configure(repoConf);
+          reposes.add(repo.getId());
+          env.getApplicationConfiguration().getConfigurationModel().addRepository(repoConf);
+          env.getRepositoryRegistry().addRepository(repo);
+        }
+        {
+          // add a group
+          final M2GroupRepository group =
+              (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+          CRepository repoGroupConf = new DefaultCRepository();
+          repoGroupConf.setProviderRole(GroupRepository.class.getName());
+          repoGroupConf.setProviderHint("maven2");
+          repoGroupConf.setId(GROUP1_REPO_ID);
+          repoGroupConf.setName(GROUP1_REPO_ID);
+          repoGroupConf.setLocalStorage(new CLocalStorage());
+          repoGroupConf.getLocalStorage().setProvider("file");
+          repoGroupConf.getLocalStorage().setUrl(
+              env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + GROUP1_REPO_ID).toURI().toURL()
+                  .toString());
+          Xpp3Dom exGroupRepo = new Xpp3Dom("externalConfiguration");
+          repoGroupConf.setExternalConfiguration(exGroupRepo);
+          M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration(exGroupRepo);
+          exGroupRepoConf.setMemberRepositoryIds(reposes);
+          exGroupRepoConf.setMergeMetadata(true);
+          group.configure(repoGroupConf);
+          env.getApplicationConfiguration().getConfigurationModel().addRepository(repoGroupConf);
+          env.getRepositoryRegistry().addRepository(group);
+        }
+        {
+          // add 2nd group
+          final M2GroupRepository group =
+              (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+          CRepository repoGroupConf = new DefaultCRepository();
+          repoGroupConf.setProviderRole(GroupRepository.class.getName());
+          repoGroupConf.setProviderHint("maven2");
+          repoGroupConf.setId(GROUP2_REPO_ID);
+          repoGroupConf.setName(GROUP2_REPO_ID);
+          repoGroupConf.setLocalStorage(new CLocalStorage());
+          repoGroupConf.getLocalStorage().setProvider("file");
+          repoGroupConf.getLocalStorage().setUrl(
+              env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + GROUP2_REPO_ID).toURI().toURL()
+                  .toString());
+          Xpp3Dom exGroupRepo = new Xpp3Dom("externalConfiguration");
+          repoGroupConf.setExternalConfiguration(exGroupRepo);
+          M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration(exGroupRepo);
+          exGroupRepoConf.setMemberRepositoryIds(Collections.singletonList(GROUP1_REPO_ID));
+          exGroupRepoConf.setMergeMetadata(true);
+          group.configure(repoGroupConf);
+          env.getApplicationConfiguration().getConfigurationModel().addRepository(repoGroupConf);
+          env.getRepositoryRegistry().addRepository(group);
         }
 
-        @Subscribe
-        public void on( final PrefixFilePublishedRepositoryEvent evt )
-        {
-            publishedIds.add( evt.getRepository().getId() );
-        }
+        // register it here BEFORE boot process starts but plx is already created
+        container.lookup(EventBus.class).register(prefixFileUpdateListener);
+      }
+    };
+  }
 
-        @Subscribe
-        public void on( final PrefixFileUnpublishedRepositoryEvent evt )
-        {
-            unpublishedIds.add( evt.getRepository().getId() );
-        }
+  @Override
+  protected boolean enableAutomaticRoutingFeature() {
+    return true;
+  }
 
-        public List<String> getPublished()
-        {
-            return publishedIds;
-        }
+  @Test
+  public void testUpdateCountOnBootWithoutWL() {
+    // boot already happened
+    // we have 2 hosted and both are members of the group
+    // as we have no WL (clean boot/kinda upgrade), all of them was 1st marked for noscrape,
+    // and then H1 and H2 got WL updated concurrently in bg job, and as side effect group WL got updated too
+    // This means, that group might be updated once or twice, depending on concurrency.
+    // So the list might contain (in any order):
+    // HOSTED1, HOSTED2, GROUP1, GROUP2
+    // or
+    // HOSTED1, HOSTED2, GROUP1, GROUP1, GROUP2, GROUP...
+    // (group1 one or two times updated).
+    assertThat(prefixFileUpdateListener.getPublished(), hasItem(HOSTED1_REPO_ID));
+    assertThat(prefixFileUpdateListener.getPublished(), hasItem(HOSTED2_REPO_ID));
+    assertThat(prefixFileUpdateListener.getPublished(), hasItem(GROUP1_REPO_ID));
+    assertThat(prefixFileUpdateListener.getPublished(), hasItem(GROUP2_REPO_ID));
+  }
 
-        public List<String> getUnpublished()
-        {
-            return unpublishedIds;
-        }
+  @Test
+  public void testUpdateCountOnGroupMemberChange()
+      throws Exception
+  {
+    // in case of group member changes, the "cascade" is sync, hence
+    // we have no ordering problem as we have with async updates of proxy/hosted
+    // reposes on boot
+    prefixFileUpdateListener.reset();
 
-        public void reset()
-        {
-            publishedIds.clear();
-            unpublishedIds.clear();
-        }
-    }
+    final MavenGroupRepository mgr =
+        getRepositoryRegistry().getRepositoryWithFacet(GROUP1_REPO_ID, MavenGroupRepository.class);
 
-    protected File getStorageRoot( final String repoId )
-    {
-        return getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repoId );
-    }
+    mgr.removeMemberRepositoryId(HOSTED1_REPO_ID);
+    getApplicationConfiguration().saveConfiguration();
+    waitForRoutingBackgroundUpdates();
 
-    @Override
-    protected EnvironmentBuilder createEnvironmentBuilder()
-        throws Exception
-    {
-        // we need one hosted repo only, so build it
-        return new EnvironmentBuilder()
-        {
-            @Override
-            public void startService()
-            {
-            }
+    assertThat(prefixFileUpdateListener.getPublished(), contains(GROUP1_REPO_ID, GROUP2_REPO_ID));
 
-            @Override
-            public void stopService()
-            {
-            }
+    mgr.addMemberRepositoryId(HOSTED1_REPO_ID);
+    getApplicationConfiguration().saveConfiguration();
+    waitForRoutingBackgroundUpdates();
 
-            @Override
-            public void buildEnvironment( AbstractProxyTestEnvironment env )
-                throws ConfigurationException, IOException, ComponentLookupException
-            {
-                final PlexusContainer container = env.getPlexusContainer();
-                final List<String> reposes = new ArrayList<String>();
-                {
-                    // adding one hosted
-                    final M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
-                    CRepository repoConf = new DefaultCRepository();
-                    repoConf.setProviderRole( Repository.class.getName() );
-                    repoConf.setProviderHint( "maven2" );
-                    repoConf.setId( HOSTED1_REPO_ID );
-                    repoConf.setName( HOSTED1_REPO_ID );
-                    repoConf.setLocalStorage( new CLocalStorage() );
-                    repoConf.getLocalStorage().setProvider( "file" );
-                    repoConf.getLocalStorage().setUrl(
-                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + HOSTED1_REPO_ID ).toURI().toURL().toString() );
-                    Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
-                    repoConf.setExternalConfiguration( exRepo );
-                    M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
-                    exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-                    exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-                    repo.configure( repoConf );
-                    reposes.add( repo.getId() );
-                    env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
-                    env.getRepositoryRegistry().addRepository( repo );
-                }
-                {
-                    // adding one hosted
-                    final M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
-                    CRepository repoConf = new DefaultCRepository();
-                    repoConf.setProviderRole( Repository.class.getName() );
-                    repoConf.setProviderHint( "maven2" );
-                    repoConf.setId( HOSTED2_REPO_ID );
-                    repoConf.setName( HOSTED2_REPO_ID );
-                    repoConf.setLocalStorage( new CLocalStorage() );
-                    repoConf.getLocalStorage().setProvider( "file" );
-                    repoConf.getLocalStorage().setUrl(
-                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + HOSTED2_REPO_ID ).toURI().toURL().toString() );
-                    Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
-                    repoConf.setExternalConfiguration( exRepo );
-                    M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
-                    exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-                    exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-                    repo.configure( repoConf );
-                    reposes.add( repo.getId() );
-                    env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
-                    env.getRepositoryRegistry().addRepository( repo );
-                }
-                {
-                    // add a group
-                    final M2GroupRepository group =
-                        (M2GroupRepository) container.lookup( GroupRepository.class, "maven2" );
-                    CRepository repoGroupConf = new DefaultCRepository();
-                    repoGroupConf.setProviderRole( GroupRepository.class.getName() );
-                    repoGroupConf.setProviderHint( "maven2" );
-                    repoGroupConf.setId( GROUP1_REPO_ID );
-                    repoGroupConf.setName( GROUP1_REPO_ID );
-                    repoGroupConf.setLocalStorage( new CLocalStorage() );
-                    repoGroupConf.getLocalStorage().setProvider( "file" );
-                    repoGroupConf.getLocalStorage().setUrl(
-                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + GROUP1_REPO_ID ).toURI().toURL().toString() );
-                    Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
-                    repoGroupConf.setExternalConfiguration( exGroupRepo );
-                    M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
-                    exGroupRepoConf.setMemberRepositoryIds( reposes );
-                    exGroupRepoConf.setMergeMetadata( true );
-                    group.configure( repoGroupConf );
-                    env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
-                    env.getRepositoryRegistry().addRepository( group );
-                }
-                {
-                    // add 2nd group
-                    final M2GroupRepository group =
-                        (M2GroupRepository) container.lookup( GroupRepository.class, "maven2" );
-                    CRepository repoGroupConf = new DefaultCRepository();
-                    repoGroupConf.setProviderRole( GroupRepository.class.getName() );
-                    repoGroupConf.setProviderHint( "maven2" );
-                    repoGroupConf.setId( GROUP2_REPO_ID );
-                    repoGroupConf.setName( GROUP2_REPO_ID );
-                    repoGroupConf.setLocalStorage( new CLocalStorage() );
-                    repoGroupConf.getLocalStorage().setProvider( "file" );
-                    repoGroupConf.getLocalStorage().setUrl(
-                        env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + GROUP2_REPO_ID ).toURI().toURL().toString() );
-                    Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
-                    repoGroupConf.setExternalConfiguration( exGroupRepo );
-                    M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
-                    exGroupRepoConf.setMemberRepositoryIds( Collections.singletonList( GROUP1_REPO_ID ) );
-                    exGroupRepoConf.setMergeMetadata( true );
-                    group.configure( repoGroupConf );
-                    env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
-                    env.getRepositoryRegistry().addRepository( group );
-                }
+    assertThat(prefixFileUpdateListener.getPublished(),
+        contains(GROUP1_REPO_ID, GROUP2_REPO_ID, GROUP1_REPO_ID, GROUP2_REPO_ID));
+  }
 
-                // register it here BEFORE boot process starts but plx is already created
-                container.lookup( EventBus.class ).register( prefixFileUpdateListener );
-            }
-        };
-    }
+  @Test
+  public void testUpdateCountOnGroupOfGroupMemberChange()
+      throws Exception
+  {
+    // in case of group member changes, the "cascade" is sync, hence
+    // we have no ordering problem as we have with async updates of proxy/hosted
+    // reposes on boot
+    prefixFileUpdateListener.reset();
 
-    @Override
-    protected boolean enableAutomaticRoutingFeature()
-    {
-        return true;
-    }
+    final MavenGroupRepository mgr =
+        getRepositoryRegistry().getRepositoryWithFacet(GROUP2_REPO_ID, MavenGroupRepository.class);
 
-    @Test
-    public void testUpdateCountOnBootWithoutWL()
-    {
-        // boot already happened
-        // we have 2 hosted and both are members of the group
-        // as we have no WL (clean boot/kinda upgrade), all of them was 1st marked for noscrape,
-        // and then H1 and H2 got WL updated concurrently in bg job, and as side effect group WL got updated too
-        // This means, that group might be updated once or twice, depending on concurrency.
-        // So the list might contain (in any order):
-        // HOSTED1, HOSTED2, GROUP1, GROUP2
-        // or
-        // HOSTED1, HOSTED2, GROUP1, GROUP1, GROUP2, GROUP...
-        // (group1 one or two times updated).
-        assertThat( prefixFileUpdateListener.getPublished(), hasItem( HOSTED1_REPO_ID ) );
-        assertThat( prefixFileUpdateListener.getPublished(), hasItem( HOSTED2_REPO_ID ) );
-        assertThat( prefixFileUpdateListener.getPublished(), hasItem( GROUP1_REPO_ID ) );
-        assertThat( prefixFileUpdateListener.getPublished(), hasItem( GROUP2_REPO_ID ) );
-    }
+    mgr.removeMemberRepositoryId(GROUP1_REPO_ID);
+    mgr.addMemberRepositoryId(HOSTED1_REPO_ID);
+    getApplicationConfiguration().saveConfiguration();
+    waitForRoutingBackgroundUpdates();
 
-    @Test
-    public void testUpdateCountOnGroupMemberChange()
-        throws Exception
-    {
-        // in case of group member changes, the "cascade" is sync, hence
-        // we have no ordering problem as we have with async updates of proxy/hosted
-        // reposes on boot
-        prefixFileUpdateListener.reset();
+    assertThat(prefixFileUpdateListener.getPublished(), contains(GROUP2_REPO_ID));
 
-        final MavenGroupRepository mgr =
-            getRepositoryRegistry().getRepositoryWithFacet( GROUP1_REPO_ID, MavenGroupRepository.class );
+    mgr.addMemberRepositoryId(HOSTED2_REPO_ID);
+    getApplicationConfiguration().saveConfiguration();
+    waitForRoutingBackgroundUpdates();
 
-        mgr.removeMemberRepositoryId( HOSTED1_REPO_ID );
-        getApplicationConfiguration().saveConfiguration();
-        waitForRoutingBackgroundUpdates();
-
-        assertThat( prefixFileUpdateListener.getPublished(), contains( GROUP1_REPO_ID, GROUP2_REPO_ID ) );
-
-        mgr.addMemberRepositoryId( HOSTED1_REPO_ID );
-        getApplicationConfiguration().saveConfiguration();
-        waitForRoutingBackgroundUpdates();
-
-        assertThat( prefixFileUpdateListener.getPublished(),
-            contains( GROUP1_REPO_ID, GROUP2_REPO_ID, GROUP1_REPO_ID, GROUP2_REPO_ID ) );
-    }
-
-    @Test
-    public void testUpdateCountOnGroupOfGroupMemberChange()
-        throws Exception
-    {
-        // in case of group member changes, the "cascade" is sync, hence
-        // we have no ordering problem as we have with async updates of proxy/hosted
-        // reposes on boot
-        prefixFileUpdateListener.reset();
-
-        final MavenGroupRepository mgr =
-            getRepositoryRegistry().getRepositoryWithFacet( GROUP2_REPO_ID, MavenGroupRepository.class );
-
-        mgr.removeMemberRepositoryId( GROUP1_REPO_ID );
-        mgr.addMemberRepositoryId( HOSTED1_REPO_ID );
-        getApplicationConfiguration().saveConfiguration();
-        waitForRoutingBackgroundUpdates();
-
-        assertThat( prefixFileUpdateListener.getPublished(), contains( GROUP2_REPO_ID ) );
-
-        mgr.addMemberRepositoryId( HOSTED2_REPO_ID );
-        getApplicationConfiguration().saveConfiguration();
-        waitForRoutingBackgroundUpdates();
-
-        assertThat( prefixFileUpdateListener.getPublished(),
-            contains( GROUP2_REPO_ID, GROUP2_REPO_ID ) );
-    }
+    assertThat(prefixFileUpdateListener.getPublished(),
+        contains(GROUP2_REPO_ID, GROUP2_REPO_ID));
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.local;
 
 import java.io.File;
@@ -39,188 +40,170 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 /**
  * Abstract Storage class. It have ID and defines logger. Predefines all write methods to be able to "decorate"
  * StorageItems with attributes if supported.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractLocalRepositoryStorage
     extends AbstractLoggingComponent
     implements LocalRepositoryStorage
 {
-    /**
-     * Key used to mark a repository context as "initialized". This flag and the generation together controls how the
-     * context is about to be updated. See NEXUS-5145.
-     */
-    private static final String CONTEXT_UPDATED_KEY = AbstractLocalRepositoryStorage.class.getName() + ".updated";
+  /**
+   * Key used to mark a repository context as "initialized". This flag and the generation together controls how the
+   * context is about to be updated. See NEXUS-5145.
+   */
+  private static final String CONTEXT_UPDATED_KEY = AbstractLocalRepositoryStorage.class.getName() + ".updated";
 
-    /**
-     * The wastebasket.
-     */
-    private final Wastebasket wastebasket;
+  /**
+   * The wastebasket.
+   */
+  private final Wastebasket wastebasket;
 
-    /**
-     * The default Link persister.
-     */
-    private final LinkPersister linkPersister;
+  /**
+   * The default Link persister.
+   */
+  private final LinkPersister linkPersister;
 
-    /**
-     * The MIME support.
-     */
-    private final MimeSupport mimeSupport;
+  /**
+   * The MIME support.
+   */
+  private final MimeSupport mimeSupport;
 
-    /**
-     * Since storages are shared, we are tracking the last changes from each of them.
-     */
-    private final Map<String, Integer> repositoryContexts;
+  /**
+   * Since storages are shared, we are tracking the last changes from each of them.
+   */
+  private final Map<String, Integer> repositoryContexts;
 
-    protected AbstractLocalRepositoryStorage( final Wastebasket wastebasket, final LinkPersister linkPersister,
-                                              final MimeSupport mimeSupport )
-    {
-        this.wastebasket = wastebasket;
-        this.linkPersister = linkPersister;
-        this.mimeSupport = mimeSupport;
-        this.repositoryContexts = new HashMap<String, Integer>();
-    }
+  protected AbstractLocalRepositoryStorage(final Wastebasket wastebasket, final LinkPersister linkPersister,
+                                           final MimeSupport mimeSupport)
+  {
+    this.wastebasket = wastebasket;
+    this.linkPersister = linkPersister;
+    this.mimeSupport = mimeSupport;
+    this.repositoryContexts = new HashMap<String, Integer>();
+  }
 
-    protected Wastebasket getWastebasket()
-    {
-        return wastebasket;
-    }
+  protected Wastebasket getWastebasket() {
+    return wastebasket;
+  }
 
-    protected LinkPersister getLinkPersister()
-    {
-        return linkPersister;
-    }
+  protected LinkPersister getLinkPersister() {
+    return linkPersister;
+  }
 
-    protected MimeSupport getMimeSupport()
-    {
-        return mimeSupport;
-    }
+  protected MimeSupport getMimeSupport() {
+    return mimeSupport;
+  }
 
-    // ==
+  // ==
 
-    /**
-     * Remote storage specific, when the remote connection settings are actually applied.
-     * 
-     * @param context
-     */
-    protected void updateContext( Repository repository, LocalStorageContext context )
-        throws LocalStorageException
-    {
-        // empty, override if needed
-    }
+  /**
+   * Remote storage specific, when the remote connection settings are actually applied.
+   */
+  protected void updateContext(Repository repository, LocalStorageContext context)
+      throws LocalStorageException
+  {
+    // empty, override if needed
+  }
 
-    protected synchronized LocalStorageContext getLocalStorageContext( Repository repository )
-        throws LocalStorageException
-    {
-        final LocalStorageContext ctx = repository.getLocalStorageContext();
-        if ( ctx != null )
-        {
-            // we have repo specific settings
-            // if repositoryContexts does not contain this context ID, or
-            // if localStorageContext does not contain CONTEXT_UPDATED_KEY, or
-            // if repositoryContext generation is less than localStorageContext generation
-            if ( !repositoryContexts.containsKey( repository.getId() ) || !ctx.hasContextObject( CONTEXT_UPDATED_KEY )
-                || ctx.getGeneration() > repositoryContexts.get( repository.getId() ) )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    if ( !repositoryContexts.containsKey( repository.getId() ) )
-                    {
-                        getLogger().debug( "Local context {} is about to be initialized", ctx );
-                    }
-                    else
-                    {
-                        getLogger().debug( "Local context {} has been changed. Previous generation {}",
-                            new Object[] { ctx, repositoryContexts.get( repository.getId() ) } );
-                    }
-                }
-
-                updateContext( repository, repository.getLocalStorageContext() );
-                ctx.putContextObject( CONTEXT_UPDATED_KEY, Boolean.TRUE );
-                repositoryContexts.put( repository.getId(),
-                    Integer.valueOf( repository.getLocalStorageContext().getGeneration() ) );
-            }
+  protected synchronized LocalStorageContext getLocalStorageContext(Repository repository)
+      throws LocalStorageException
+  {
+    final LocalStorageContext ctx = repository.getLocalStorageContext();
+    if (ctx != null) {
+      // we have repo specific settings
+      // if repositoryContexts does not contain this context ID, or
+      // if localStorageContext does not contain CONTEXT_UPDATED_KEY, or
+      // if repositoryContext generation is less than localStorageContext generation
+      if (!repositoryContexts.containsKey(repository.getId()) || !ctx.hasContextObject(CONTEXT_UPDATED_KEY)
+          || ctx.getGeneration() > repositoryContexts.get(repository.getId())) {
+        if (getLogger().isDebugEnabled()) {
+          if (!repositoryContexts.containsKey(repository.getId())) {
+            getLogger().debug("Local context {} is about to be initialized", ctx);
+          }
+          else {
+            getLogger().debug("Local context {} has been changed. Previous generation {}",
+                new Object[]{ctx, repositoryContexts.get(repository.getId())});
+          }
         }
-        return ctx;
+
+        updateContext(repository, repository.getLocalStorageContext());
+        ctx.putContextObject(CONTEXT_UPDATED_KEY, Boolean.TRUE);
+        repositoryContexts.put(repository.getId(),
+            Integer.valueOf(repository.getLocalStorageContext().getGeneration()));
+      }
     }
+    return ctx;
+  }
 
-    // ==
+  // ==
 
-    /**
-     * Gets the absolute url from base.
-     * 
-     * @param uid the uid
-     * @return the absolute url from base
-     */
-    @Deprecated
-    public URL getAbsoluteUrlFromBase( Repository repository, ResourceStoreRequest request )
-        throws LocalStorageException
-    {
-        StringBuilder urlStr = new StringBuilder( repository.getLocalUrl() );
+  /**
+   * Gets the absolute url from base.
+   *
+   * @param uid the uid
+   * @return the absolute url from base
+   */
+  @Deprecated
+  public URL getAbsoluteUrlFromBase(Repository repository, ResourceStoreRequest request)
+      throws LocalStorageException
+  {
+    StringBuilder urlStr = new StringBuilder(repository.getLocalUrl());
 
-        if ( request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-        {
-            urlStr.append( request.getRequestPath() );
-        }
-        else
-        {
-            urlStr.append( RepositoryItemUid.PATH_SEPARATOR ).append( request.getRequestPath() );
-        }
-        try
-        {
-            return new URL( urlStr.toString() );
-        }
-        catch ( MalformedURLException e )
-        {
-            try
-            {
-                return new File( urlStr.toString() ).toURI().toURL();
-            }
-            catch ( MalformedURLException e1 )
-            {
-                throw new LocalStorageException( "The local storage has a malformed URL as baseUrl!", e );
-            }
-        }
+    if (request.getRequestPath().startsWith(RepositoryItemUid.PATH_SEPARATOR)) {
+      urlStr.append(request.getRequestPath());
     }
-
-    public final void deleteItem( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
-    {
-        getWastebasket().delete( this, repository, request );
+    else {
+      urlStr.append(RepositoryItemUid.PATH_SEPARATOR).append(request.getRequestPath());
     }
-
-    // ==
-
-    public Iterator<StorageItem> iterateItems( Repository repository, ResourceStoreIteratorRequest request )
-        throws ItemNotFoundException, LocalStorageException
-    {
-        throw new UnsupportedOperationException( "Iteration not supported!" );
+    try {
+      return new URL(urlStr.toString());
     }
-
-    // ==
-
-    protected void prepareStorageFileItemForStore( final StorageFileItem item )
-        throws LocalStorageException
-    {
-        try
-        {
-            // replace content locator
-            ChecksummingContentLocator sha1cl =
-                new ChecksummingContentLocator( item.getContentLocator(), MessageDigest.getInstance( "SHA1" ),
-                    StorageFileItem.DIGEST_SHA1_KEY, item.getItemContext() );
-
-            // md5 is deprecated but still calculated
-            ChecksummingContentLocator md5cl =
-                new ChecksummingContentLocator( sha1cl, MessageDigest.getInstance( "MD5" ),
-                    StorageFileItem.DIGEST_MD5_KEY, item.getItemContext() );
-
-            item.setContentLocator( md5cl );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            throw new LocalStorageException(
-                "The JVM does not support SHA1 MessageDigest or MD5 MessageDigest, that is essential for Nexus. We cannot write to local storage! Please run Nexus on JVM that does provide these MessageDigests.",
-                e );
-        }
+    catch (MalformedURLException e) {
+      try {
+        return new File(urlStr.toString()).toURI().toURL();
+      }
+      catch (MalformedURLException e1) {
+        throw new LocalStorageException("The local storage has a malformed URL as baseUrl!", e);
+      }
     }
+  }
+
+  public final void deleteItem(Repository repository, ResourceStoreRequest request)
+      throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
+  {
+    getWastebasket().delete(this, repository, request);
+  }
+
+  // ==
+
+  public Iterator<StorageItem> iterateItems(Repository repository, ResourceStoreIteratorRequest request)
+      throws ItemNotFoundException, LocalStorageException
+  {
+    throw new UnsupportedOperationException("Iteration not supported!");
+  }
+
+  // ==
+
+  protected void prepareStorageFileItemForStore(final StorageFileItem item)
+      throws LocalStorageException
+  {
+    try {
+      // replace content locator
+      ChecksummingContentLocator sha1cl =
+          new ChecksummingContentLocator(item.getContentLocator(), MessageDigest.getInstance("SHA1"),
+              StorageFileItem.DIGEST_SHA1_KEY, item.getItemContext());
+
+      // md5 is deprecated but still calculated
+      ChecksummingContentLocator md5cl =
+          new ChecksummingContentLocator(sha1cl, MessageDigest.getInstance("MD5"),
+              StorageFileItem.DIGEST_MD5_KEY, item.getItemContext());
+
+      item.setContentLocator(md5cl);
+    }
+    catch (NoSuchAlgorithmException e) {
+      throw new LocalStorageException(
+          "The JVM does not support SHA1 MessageDigest or MD5 MessageDigest, that is essential for Nexus. We cannot write to local storage! Please run Nexus on JVM that does provide these MessageDigests.",
+          e);
+    }
+  }
 }

@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.kenai;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.security.realms.kenai;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +22,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.inject.Description;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
+
+import com.google.common.collect.Lists;
 import org.apache.http.Consts;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -50,142 +54,126 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.inject.Description;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
-import com.google.common.collect.Lists;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A Realm that connects to a java.net kenai API.
- * 
+ *
  * @author Brian Demers
  */
 @Singleton
-@Typed( Realm.class )
-@Named( KenaiRealm.ROLE )
-@Description( "Kenai Realm" )
+@Typed(Realm.class)
+@Named(KenaiRealm.ROLE)
+@Description("Kenai Realm")
 public class KenaiRealm
     extends AuthorizingRealm
 {
-    public static final String ROLE = "kenai";
+  public static final String ROLE = "kenai";
 
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final KenaiRealmConfiguration kenaiRealmConfiguration;
+  private final KenaiRealmConfiguration kenaiRealmConfiguration;
 
-    private final Hc4Provider hc4Provider;
+  private final Hc4Provider hc4Provider;
 
-    @Inject
-    public KenaiRealm( final KenaiRealmConfiguration kenaiRealmConfiguration,
-                       final Hc4Provider hc4Provider )
-    {
-        this.kenaiRealmConfiguration = checkNotNull( kenaiRealmConfiguration );
-        this.hc4Provider = checkNotNull( hc4Provider );
-        setName( ROLE );
+  @Inject
+  public KenaiRealm(final KenaiRealmConfiguration kenaiRealmConfiguration,
+                    final Hc4Provider hc4Provider)
+  {
+    this.kenaiRealmConfiguration = checkNotNull(kenaiRealmConfiguration);
+    this.hc4Provider = checkNotNull(hc4Provider);
+    setName(ROLE);
 
-        // TODO: write another test before enabling this
-        // this.setAuthenticationCachingEnabled( true );
+    // TODO: write another test before enabling this
+    // this.setAuthenticationCachingEnabled( true );
+  }
+
+  // ------------ AUTHENTICATION ------------
+
+  @Override
+  public boolean supports(final AuthenticationToken token) {
+    return (token instanceof UsernamePasswordToken);
+  }
+
+  @Override
+  protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
+      throws AuthenticationException
+  {
+    final UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+
+    // if the user can authenticate we are good to go
+    if (authenticateViaUrl(upToken)) {
+      return buildAuthenticationInfo(upToken);
     }
-
-    // ------------ AUTHENTICATION ------------
-
-    @Override
-    public boolean supports( final AuthenticationToken token )
-    {
-        return ( token instanceof UsernamePasswordToken );
+    else {
+      throw new AccountException("User \"" + upToken.getUsername()
+          + "\" cannot be authenticated via Kenai Realm.");
     }
+  }
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo( final AuthenticationToken token )
-        throws AuthenticationException
-    {
-        final UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+  private AuthenticationInfo buildAuthenticationInfo(final UsernamePasswordToken token) {
+    return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), getName());
+  }
 
-        // if the user can authenticate we are good to go
-        if ( authenticateViaUrl( upToken ) )
-        {
-            return buildAuthenticationInfo( upToken );
-        }
-        else
-        {
-            throw new AccountException( "User \"" + upToken.getUsername()
-                + "\" cannot be authenticated via Kenai Realm." );
-        }
+  private boolean authenticateViaUrl(final UsernamePasswordToken usernamePasswordToken) {
+    final HttpClient client = getHttpClient(null);
+
+    try {
+      final String url = kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/login/authenticate.json";
+      final List<NameValuePair> nameValuePairs = Lists.newArrayListWithCapacity(2);
+      nameValuePairs.add(new BasicNameValuePair("username", usernamePasswordToken.getUsername()));
+      nameValuePairs.add(new BasicNameValuePair("password", new String(usernamePasswordToken.getPassword())));
+      final HttpPost post = new HttpPost(url);
+      post.setEntity(new UrlEncodedFormEntity(nameValuePairs, Consts.UTF_8));
+      final HttpResponse response = client.execute(post);
+
+      try {
+        logger.debug("Kenai Realm user \"{}\" validated against URL={} as {}", usernamePasswordToken.getUsername(), url,
+            response.getStatusLine());
+        final boolean success =
+            response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299;
+        return success;
+      }
+      finally {
+        HttpClientUtils.closeQuietly(response);
+      }
     }
-
-    private AuthenticationInfo buildAuthenticationInfo( final UsernamePasswordToken token )
-    {
-        return new SimpleAuthenticationInfo( token.getPrincipal(), token.getCredentials(), getName() );
+    catch (IOException e) {
+      logger.info("Kenai Realm was unable to perform authentication", e);
+      return false;
     }
+  }
 
-    private boolean authenticateViaUrl( final UsernamePasswordToken usernamePasswordToken )
-    {
-        final HttpClient client = getHttpClient( null );
+  // ------------ AUTHORIZATION ------------
 
-        try
-        {
-            final String url = kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/login/authenticate.json";
-            final List<NameValuePair> nameValuePairs = Lists.newArrayListWithCapacity( 2 );
-            nameValuePairs.add( new BasicNameValuePair( "username", usernamePasswordToken.getUsername() ) );
-            nameValuePairs.add( new BasicNameValuePair( "password", new String( usernamePasswordToken.getPassword() ) ) );
-            final HttpPost post = new HttpPost( url );
-            post.setEntity( new UrlEncodedFormEntity( nameValuePairs, Consts.UTF_8 ) );
-            final HttpResponse response = client.execute( post );
-
-            try
-            {
-                logger.debug( "Kenai Realm user \"{}\" validated against URL={} as {}", usernamePasswordToken.getUsername(), url,
-                    response.getStatusLine() );
-                final boolean success =
-                    response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299;
-                return success;
-            }
-            finally
-            {
-                HttpClientUtils.closeQuietly( response );
-            }
-        }
-        catch ( IOException e )
-        {
-            logger.info( "Kenai Realm was unable to perform authentication", e );
-            return false;
-        }
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(final PrincipalCollection principals) {
+    // only if authenticated with this realm too
+    if (!principals.getRealmNames().contains(getName())) {
+      return null;
     }
+    // add the default role
+    final SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+    authorizationInfo.addRole(kenaiRealmConfiguration.getConfiguration().getDefaultRole());
+    return authorizationInfo;
+  }
 
-    // ------------ AUTHORIZATION ------------
+  // ==
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )
-    {
-        // only if authenticated with this realm too
-        if ( !principals.getRealmNames().contains( getName() ) )
-        {
-            return null;
-        }
-        // add the default role
-        final SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        authorizationInfo.addRole( kenaiRealmConfiguration.getConfiguration().getDefaultRole() );
-        return authorizationInfo;
+  private HttpClient getHttpClient(final UsernamePasswordToken usernamePasswordToken) {
+    // risky, but we must blindly assume it is
+    final DefaultHttpClient client = (DefaultHttpClient) hc4Provider.createHttpClient();
+    if (usernamePasswordToken != null) {
+      final List<String> authorisationPreference = new ArrayList<String>(2);
+      authorisationPreference.add(AuthPolicy.DIGEST);
+      authorisationPreference.add(AuthPolicy.BASIC);
+      final Credentials credentials =
+          new UsernamePasswordCredentials(usernamePasswordToken.getUsername(),
+              String.valueOf(usernamePasswordToken.getPassword()));
+      client.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
+      client.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, authorisationPreference);
     }
-
-    // ==
-
-    private HttpClient getHttpClient( final UsernamePasswordToken usernamePasswordToken )
-    {
-        // risky, but we must blindly assume it is
-        final DefaultHttpClient client = (DefaultHttpClient) hc4Provider.createHttpClient();
-        if ( usernamePasswordToken != null )
-        {
-            final List<String> authorisationPreference = new ArrayList<String>( 2 );
-            authorisationPreference.add( AuthPolicy.DIGEST );
-            authorisationPreference.add( AuthPolicy.BASIC );
-            final Credentials credentials =
-                new UsernamePasswordCredentials( usernamePasswordToken.getUsername(),
-                    String.valueOf( usernamePasswordToken.getPassword() ) );
-            client.getCredentialsProvider().setCredentials( AuthScope.ANY, credentials );
-            client.getParams().setParameter( AuthPNames.TARGET_AUTH_PREF, authorisationPreference );
-        }
-        return client;
-    }
+    return client;
+  }
 }

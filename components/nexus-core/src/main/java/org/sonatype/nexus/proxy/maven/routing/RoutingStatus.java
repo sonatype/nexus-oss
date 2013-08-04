@@ -10,51 +10,46 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Routing Status.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class RoutingStatus
 {
-    private final PublishingStatus publishingStatus;
+  private final PublishingStatus publishingStatus;
 
-    private final DiscoveryStatus discoveryStatus;
+  private final DiscoveryStatus discoveryStatus;
 
-    /**
-     * Constructor.
-     * 
-     * @param publishingStatus
-     * @param discoveryStatus
-     */
-    public RoutingStatus( final PublishingStatus publishingStatus, final DiscoveryStatus discoveryStatus )
-    {
-        this.publishingStatus = checkNotNull( publishingStatus );
-        this.discoveryStatus = checkNotNull( discoveryStatus );
-    }
+  /**
+   * Constructor.
+   */
+  public RoutingStatus(final PublishingStatus publishingStatus, final DiscoveryStatus discoveryStatus) {
+    this.publishingStatus = checkNotNull(publishingStatus);
+    this.discoveryStatus = checkNotNull(discoveryStatus);
+  }
 
-    /**
-     * Returns the publishing status.
-     * 
-     * @return the publishing status.
-     */
-    public PublishingStatus getPublishingStatus()
-    {
-        return publishingStatus;
-    }
+  /**
+   * Returns the publishing status.
+   *
+   * @return the publishing status.
+   */
+  public PublishingStatus getPublishingStatus() {
+    return publishingStatus;
+  }
 
-    /**
-     * Returns the discovery status.
-     * 
-     * @return the discovery status.
-     */
-    public DiscoveryStatus getDiscoveryStatus()
-    {
-        return discoveryStatus;
-    }
+  /**
+   * Returns the discovery status.
+   *
+   * @return the discovery status.
+   */
+  public DiscoveryStatus getDiscoveryStatus() {
+    return discoveryStatus;
+  }
 }

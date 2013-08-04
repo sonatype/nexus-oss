@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.remote;
 
 /**
@@ -21,35 +22,35 @@ package org.sonatype.nexus.proxy.storage.remote;
  */
 public interface RemoteProviderHintFactory
 {
-    /**
-     * Returns the default provider role hint for provided remote URL.
-     * 
-     * @return The default provider role hint as a string.
-     */
-    String getDefaultRoleHint( final String remoteUrl )
-        throws IllegalArgumentException;
+  /**
+   * Returns the default provider role hint for provided remote URL.
+   *
+   * @return The default provider role hint as a string.
+   */
+  String getDefaultRoleHint(final String remoteUrl)
+      throws IllegalArgumentException;
 
-    /**
-     * Returns the provider role hint to be used, based on passed in remote URL and hint.
-     * 
-     * @return The provider role hint to be used, based on passed in remote URL and hint. If forceful override is in
-     *         effect, it will return the forced, otherwise the passed in one (if it is valid, non-null, etc).
-     */
-    String getRoleHint( final String remoteUrl, final String hint )
-        throws IllegalArgumentException;
+  /**
+   * Returns the provider role hint to be used, based on passed in remote URL and hint.
+   *
+   * @return The provider role hint to be used, based on passed in remote URL and hint. If forceful override is in
+   *         effect, it will return the forced, otherwise the passed in one (if it is valid, non-null, etc).
+   */
+  String getRoleHint(final String remoteUrl, final String hint)
+      throws IllegalArgumentException;
 
-    /**
-     * Returns the default HTTP provider role hint.
-     * 
-     * @return The default HTTP provider role hint as a string.
-     */
-    String getDefaultHttpRoleHint();
+  /**
+   * Returns the default HTTP provider role hint.
+   *
+   * @return The default HTTP provider role hint as a string.
+   */
+  String getDefaultHttpRoleHint();
 
-    /**
-     * Returns the HTTP provider role hint to be used, based on passed in hint.
-     * 
-     * @return The HTTP provider role hint to be used, based on passed in hint. If forceful override is in effect, it
-     *         will return the forced, otherwise the passed in one (if it is valid, non-null, etc).
-     */
-    String getHttpRoleHint( final String hint );
+  /**
+   * Returns the HTTP provider role hint to be used, based on passed in hint.
+   *
+   * @return The HTTP provider role hint to be used, based on passed in hint. If forceful override is in effect, it
+   *         will return the forced, otherwise the passed in one (if it is valid, non-null, etc).
+   */
+  String getHttpRoleHint(final String hint);
 }

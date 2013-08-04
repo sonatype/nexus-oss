@@ -10,24 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 public class WalkerException
     extends RuntimeException
 {
-    private static final long serialVersionUID = 3471267154120984621L;
+  private static final long serialVersionUID = 3471267154120984621L;
 
-    private final WalkerContext walkerContext;
+  private final WalkerContext walkerContext;
 
-    public WalkerException( WalkerContext walkerContext, String message )
-    {
-        super( message, walkerContext.getStopCause() );
+  public WalkerException(WalkerContext walkerContext, String message) {
+    super(message, walkerContext.getStopCause());
 
-        this.walkerContext = walkerContext;
-    }
+    this.walkerContext = walkerContext;
+  }
 
-    public WalkerContext getWalkerContext()
-    {
-        return walkerContext;
-    }
+  public WalkerContext getWalkerContext() {
+    return walkerContext;
+  }
 }

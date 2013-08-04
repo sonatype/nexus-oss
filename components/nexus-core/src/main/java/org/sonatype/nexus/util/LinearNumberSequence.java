@@ -10,58 +10,54 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util;
 
 /**
  * A simple linear number sequence (linear equation).
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public class LinearNumberSequence
     implements NumberSequence
 {
-    private final long start;
+  private final long start;
 
-    private final long step;
+  private final long step;
 
-    private final long multiplier;
+  private final long multiplier;
 
-    private final long shift;
+  private final long shift;
 
-    private long current;
+  private long current;
 
-    public LinearNumberSequence( final long start, final long step, final long multiplier, final long shift )
-    {
-        this.start = start;
-        this.step = step;
-        this.multiplier = multiplier;
-        this.shift = shift;
-    }
+  public LinearNumberSequence(final long start, final long step, final long multiplier, final long shift) {
+    this.start = start;
+    this.step = step;
+    this.multiplier = multiplier;
+    this.shift = shift;
+  }
 
-    @Override
-    public long next()
-    {
-        current = current + step;
-        return peek();
-    }
+  @Override
+  public long next() {
+    current = current + step;
+    return peek();
+  }
 
-    @Override
-    public long prev()
-    {
-        current = current - step;
-        return peek();
-    }
+  @Override
+  public long prev() {
+    current = current - step;
+    return peek();
+  }
 
-    @Override
-    public long peek()
-    {
-        return ( current * multiplier ) + shift;
-    }
+  @Override
+  public long peek() {
+    return (current * multiplier) + shift;
+  }
 
-    @Override
-    public void reset()
-    {
-        this.current = start;
-    }
+  @Override
+  public void reset() {
+    this.current = start;
+  }
 }

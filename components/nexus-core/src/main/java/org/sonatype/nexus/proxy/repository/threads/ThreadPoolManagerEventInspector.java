@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository.threads;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -21,45 +20,43 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.plexus.appevents.Event;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * Maintains the ThreadPoolManager based on Nexus events.
- * 
+ *
  * @author cstamas
  */
-@Component( role = EventInspector.class, hint = "ThreadPoolManagerEventInspector" )
+@Component(role = EventInspector.class, hint = "ThreadPoolManagerEventInspector")
 public class ThreadPoolManagerEventInspector
     extends AbstractEventInspector
 {
-    @Requirement
-    private ThreadPoolManager poolManager;
+  @Requirement
+  private ThreadPoolManager poolManager;
 
-    @Override
-    public boolean accepts( Event<?> evt )
-    {
-        return evt != null && evt instanceof RepositoryRegistryRepositoryEvent;
-        // return evt != null && ( evt instanceof RepositoryRegistryRepositoryEvent || evt instanceof NexusStoppedEvent );
+  @Override
+  public boolean accepts(Event<?> evt) {
+    return evt != null && evt instanceof RepositoryRegistryRepositoryEvent;
+    // return evt != null && ( evt instanceof RepositoryRegistryRepositoryEvent || evt instanceof NexusStoppedEvent );
+  }
+
+  @Override
+  public void inspect(Event<?> evt) {
+    if (!accepts(evt)) {
+      return;
     }
 
-    @Override
-    public void inspect( Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
+    if (evt instanceof RepositoryRegistryEventAdd) {
+      poolManager.createPool(((RepositoryRegistryEventAdd) evt).getRepository());
 
-        if ( evt instanceof RepositoryRegistryEventAdd )
-        {
-            poolManager.createPool( ( (RepositoryRegistryEventAdd) evt ).getRepository() );
-
-        }
-        else if ( evt instanceof RepositoryRegistryEventRemove )
-        {
-            poolManager.removePool( ( (RepositoryRegistryEventRemove) evt ).getRepository() );
-        }
-        // else if ( evt instanceof NexusStoppedEvent )
-        // {
-        // poolManager.shutdown();
-        // }
     }
+    else if (evt instanceof RepositoryRegistryEventRemove) {
+      poolManager.removePool(((RepositoryRegistryEventRemove) evt).getRepository());
+    }
+    // else if ( evt instanceof NexusStoppedEvent )
+    // {
+    // poolManager.shutdown();
+    // }
+  }
 }

@@ -10,20 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.proxy.nexus3915;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+package org.sonatype.nexus.testsuite.proxy.nexus3915;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import org.apache.maven.index.artifact.Gav;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
@@ -32,80 +25,83 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
+import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.restlet.data.MediaType;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class Nexus3915ContentValidationFeedIT
     extends AbstractNexusProxyIntegrationTest
 {
 
-    private Gav gav;
+  private Gav gav;
 
-    @Before
-    public void createGAV()
-    {
-        gav = GavUtil.newGav( "nexus3915", "artifact", "1.0.0" );
+  @Before
+  public void createGAV() {
+    gav = GavUtil.newGav("nexus3915", "artifact", "1.0.0");
+  }
+
+  @Test
+  public void contentValidationFeed()
+      throws Exception
+  {
+
+    // make sure it is validating the content!
+    RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    RepositoryProxyResource repo = (RepositoryProxyResource) repoUtil.getRepository(REPO_RELEASE_PROXY_REPO1);
+    repo.setFileTypeValidation(true);
+    repoUtil.updateRepo(repo);
+
+    String msg = null;
+
+    try {
+      this.downloadArtifactFromRepository(REPO_RELEASE_PROXY_REPO1, gav, "target/downloads");
+      Assert.fail("Should fail to download artifact");
+    }
+    catch (FileNotFoundException e) {
+      // ok!
+      msg = e.getMessage();
     }
 
-    @Test
-    public void contentValidationFeed()
-        throws Exception
-    {
+    File file = new File(nexusWorkDir, "storage/release-proxy-repo-1/nexus2922/artifact/1.0.0/artifact-1.0.0.jar");
+    Assert.assertFalse(file.toString(), file.exists());
 
-        // make sure it is validating the content!
-        RepositoryMessageUtil repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
-        RepositoryProxyResource repo = (RepositoryProxyResource) repoUtil.getRepository( REPO_RELEASE_PROXY_REPO1 );
-        repo.setFileTypeValidation( true );
-        repoUtil.updateRepo( repo );
+    Assert.assertTrue(msg, msg.contains("404"));
 
-        String msg = null;
+    // brokenFiles feed is a asynchronous event, so need to wait async event to finish running
+    getEventInspectorsUtil().waitForCalmPeriod();
 
-        try
-        {
-            this.downloadArtifactFromRepository( REPO_RELEASE_PROXY_REPO1, gav, "target/downloads" );
-            Assert.fail( "Should fail to download artifact" );
-        }
-        catch ( FileNotFoundException e )
-        {
-            // ok!
-            msg = e.getMessage();
-        }
+    SyndFeed feed = FeedUtil.getFeed("brokenFiles");
 
-        File file = new File( nexusWorkDir, "storage/release-proxy-repo-1/nexus2922/artifact/1.0.0/artifact-1.0.0.jar" );
-        Assert.assertFalse( file.toString(), file.exists() );
+    @SuppressWarnings("unchecked")
+    List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( msg, msg.contains( "404" ) );
+    Assert.assertTrue("Expected more then 1 entries, but got " + entries.size() + " - "
+        + entries, entries.size() >= 1);
 
-        // brokenFiles feed is a asynchronous event, so need to wait async event to finish running
-        getEventInspectorsUtil().waitForCalmPeriod();
+    validateContent(entries);
 
-        SyndFeed feed = FeedUtil.getFeed( "brokenFiles" );
+  }
 
-        @SuppressWarnings( "unchecked" )
-        List<SyndEntry> entries = feed.getEntries();
+  private void validateContent(List<SyndEntry> entries) {
+    StringBuilder titles = new StringBuilder();
 
-        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - "
-            + entries, entries.size() >= 1 );
+    String contentName = gav.getArtifactId() + "-" + gav.getVersion() + "." + gav.getExtension();
 
-        validateContent( entries );
+    for (SyndEntry entry : entries) {
+      // check if the title contains the file name (pom or jar)
+      String title = entry.getDescription().getValue();
+      titles.append(title);
+      titles.append(',');
 
+      assertThat(title, containsString(contentName));
+      return;
     }
 
-    private void validateContent( List<SyndEntry> entries )
-    {
-        StringBuilder titles = new StringBuilder();
-
-        String contentName = gav.getArtifactId() + "-" + gav.getVersion() + "." + gav.getExtension();
-
-        for ( SyndEntry entry : entries )
-        {
-            // check if the title contains the file name (pom or jar)
-            String title = entry.getDescription().getValue();
-            titles.append( title );
-            titles.append( ',' );
-
-            assertThat( title, containsString( contentName ) );
-            return;
-        }
-
-        Assert.fail( titles.toString() );
-    }
+    Assert.fail(titles.toString());
+  }
 }

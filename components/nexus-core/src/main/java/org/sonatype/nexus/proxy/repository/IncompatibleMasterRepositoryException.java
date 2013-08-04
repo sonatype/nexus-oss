@@ -10,46 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.configuration.ConfigurationException;
 
 /**
  * Throws when an incompatible master is assigned to a shadow repository.
- * 
+ *
  * @author cstamas
  */
 public class IncompatibleMasterRepositoryException
     extends ConfigurationException
 {
-    private static final long serialVersionUID = -5676236705854300582L;
+  private static final long serialVersionUID = -5676236705854300582L;
 
-    private final ShadowRepository shadow;
+  private final ShadowRepository shadow;
 
-    private final String masterId;
+  private final String masterId;
 
-    public IncompatibleMasterRepositoryException( ShadowRepository shadow, String masterId )
-    {
-        this( "Master repository ID='" + masterId + "' is incompatible with shadow repository ID='" + shadow.getId()
-            + "' because of it's ContentClass", shadow, masterId );
-    }
+  public IncompatibleMasterRepositoryException(ShadowRepository shadow, String masterId) {
+    this("Master repository ID='" + masterId + "' is incompatible with shadow repository ID='" + shadow.getId()
+        + "' because of it's ContentClass", shadow, masterId);
+  }
 
-    public IncompatibleMasterRepositoryException( String message, ShadowRepository shadow, String masterId )
-    {
-        super( message );
+  public IncompatibleMasterRepositoryException(String message, ShadowRepository shadow, String masterId) {
+    super(message);
 
-        this.shadow = shadow;
+    this.shadow = shadow;
 
-        this.masterId = masterId;
-    }
+    this.masterId = masterId;
+  }
 
-    public ShadowRepository getShadow()
-    {
-        return shadow;
-    }
+  public ShadowRepository getShadow() {
+    return shadow;
+  }
 
-    public String getMasterId()
-    {
-        return masterId;
-    }
+  public String getMasterId() {
+    return masterId;
+  }
 }

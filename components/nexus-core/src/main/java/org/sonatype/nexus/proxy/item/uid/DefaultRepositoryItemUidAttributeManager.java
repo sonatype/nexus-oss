@@ -10,66 +10,62 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item.uid;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * This is just a quick implementation for currently only one existing attribute: is hidden. Later this should be
  * extended.
- * 
+ *
  * @author cstamas
  */
-@Component( role = RepositoryItemUidAttributeManager.class )
+@Component(role = RepositoryItemUidAttributeManager.class)
 public class DefaultRepositoryItemUidAttributeManager
     extends AbstractLoggingComponent
     implements RepositoryItemUidAttributeManager
 {
-    @Requirement( role = RepositoryItemUidAttributeSource.class )
-    private Map<String, RepositoryItemUidAttributeSource> attributeSources;
+  @Requirement(role = RepositoryItemUidAttributeSource.class)
+  private Map<String, RepositoryItemUidAttributeSource> attributeSources;
 
-    private final Map<Class<?>, Attribute<?>> attributes;
+  private final Map<Class<?>, Attribute<?>> attributes;
 
-    public DefaultRepositoryItemUidAttributeManager()
-    {
-        this.attributes = new ConcurrentHashMap<Class<?>, Attribute<?>>();
+  public DefaultRepositoryItemUidAttributeManager() {
+    this.attributes = new ConcurrentHashMap<Class<?>, Attribute<?>>();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Attribute<?>> T getAttribute(final Class<T> attributeKey, final RepositoryItemUid subject) {
+    return (T) attributes.get(attributeKey);
+  }
+
+  public synchronized void reset() {
+    attributes.clear();
+
+    final ArrayList<String> sources = new ArrayList<String>(attributeSources.size());
+
+    for (Map.Entry<String, RepositoryItemUidAttributeSource> attributeSourceEntry : attributeSources.entrySet()) {
+      sources.add(attributeSourceEntry.getKey());
+
+      Map<Class<?>, Attribute<?>> attrs = attributeSourceEntry.getValue().getAttributes();
+
+      if (attrs != null) {
+        attributes.putAll(attrs);
+      }
     }
 
-    @SuppressWarnings( "unchecked" )
-    public <T extends Attribute<?>> T getAttribute( final Class<T> attributeKey, final RepositoryItemUid subject )
-    {
-        return (T) attributes.get( attributeKey );
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Registered {} UID Attributes coming from following sources: {}",
+          new Object[]{attributes.size(), sources.toString()});
     }
-
-    public synchronized void reset()
-    {
-        attributes.clear();
-
-        final ArrayList<String> sources = new ArrayList<String>( attributeSources.size() );
-
-        for ( Map.Entry<String, RepositoryItemUidAttributeSource> attributeSourceEntry : attributeSources.entrySet() )
-        {
-            sources.add( attributeSourceEntry.getKey() );
-
-            Map<Class<?>, Attribute<?>> attrs = attributeSourceEntry.getValue().getAttributes();
-
-            if ( attrs != null )
-            {
-                attributes.putAll( attrs );
-            }
-        }
-
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Registered {} UID Attributes coming from following sources: {}",
-                new Object[] { attributes.size(), sources.toString() } );
-        }
-    }
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.maven2;
 
 import java.io.ByteArrayInputStream;
@@ -22,13 +23,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -61,405 +55,361 @@ import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
 import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.DigesterUtils;
 
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
 /**
  * The default M2Repository.
- * 
+ *
  * @author cstamas
  */
-@Component( role = Repository.class, hint = M2Repository.ID, instantiationStrategy = "per-lookup", description = "Maven2 Repository" )
+@Component(role = Repository.class, hint = M2Repository.ID, instantiationStrategy = "per-lookup",
+    description = "Maven2 Repository")
 public class M2Repository
     extends AbstractMavenRepository
 {
-    /** This "mimics" the @Named("maven2") */
-    public static final String ID = Maven2ContentClass.ID;
+  /**
+   * This "mimics" the @Named("maven2")
+   */
+  public static final String ID = Maven2ContentClass.ID;
 
-    /**
-     * The GAV Calculator.
-     */
-    @Requirement( hint = "maven2" )
-    private GavCalculator gavCalculator;
+  /**
+   * The GAV Calculator.
+   */
+  @Requirement(hint = "maven2")
+  private GavCalculator gavCalculator;
 
-    @Requirement( hint = Maven2ContentClass.ID )
-    private ContentClass contentClass;
+  @Requirement(hint = Maven2ContentClass.ID)
+  private ContentClass contentClass;
 
-    @Requirement
-    private M2RepositoryConfigurator m2RepositoryConfigurator;
-    
-    private final MavenRepositoryMetadataManager mavenRepositoryMetadataManager = new MavenRepositoryMetadataManager( this );
+  @Requirement
+  private M2RepositoryConfigurator m2RepositoryConfigurator;
 
-    @Override
-    public RepositoryMetadataManager getRepositoryMetadataManager()
+  private final MavenRepositoryMetadataManager mavenRepositoryMetadataManager = new MavenRepositoryMetadataManager(
+      this);
+
+  @Override
+  public RepositoryMetadataManager getRepositoryMetadataManager() {
+    return mavenRepositoryMetadataManager;
+  }
+
+  @Override
+  protected M2RepositoryConfiguration getExternalConfiguration(boolean forWrite) {
+    return (M2RepositoryConfiguration) super.getExternalConfiguration(forWrite);
+  }
+
+  @Override
+  protected CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory() {
+    return new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
     {
-        return mavenRepositoryMetadataManager;
+      public M2RepositoryConfiguration createExternalConfigurationHolder(CRepository config) {
+        return new M2RepositoryConfiguration((Xpp3Dom) config.getExternalConfiguration());
+      }
+    };
+  }
+
+  public ContentClass getRepositoryContentClass() {
+    return contentClass;
+  }
+
+  public GavCalculator getGavCalculator() {
+    return gavCalculator;
+  }
+
+  @Override
+  protected Configurator getConfigurator() {
+    return m2RepositoryConfigurator;
+  }
+
+  @Override
+  public boolean isMavenMetadataPath(String path) {
+    return M2ArtifactRecognizer.isMetadata(path);
+  }
+
+  @Override
+  public boolean isMavenArtifactChecksumPath(String path) {
+    return M2ArtifactRecognizer.isChecksum(path);
+  }
+
+  /**
+   * Should serve by policies.
+   *
+   * @param request the request
+   * @return true, if successful
+   */
+  @Override
+  public boolean shouldServeByPolicies(ResourceStoreRequest request) {
+    if (M2ArtifactRecognizer.isMetadata(request.getRequestPath())) {
+      if (M2ArtifactRecognizer.isSnapshot(request.getRequestPath())) {
+        return RepositoryPolicy.SNAPSHOT.equals(getRepositoryPolicy());
+      }
+      else {
+        // metadatas goes always
+        return true;
+      }
     }
 
-    @Override
-    protected M2RepositoryConfiguration getExternalConfiguration( boolean forWrite )
-    {
-        return (M2RepositoryConfiguration) super.getExternalConfiguration( forWrite );
+    // we are using Gav to test the path
+    final Gav gav = getGavCalculator().pathToGav(request.getRequestPath());
+
+    if (gav == null) {
+      return true;
+    }
+    else {
+      if (gav.isSnapshot()) {
+        // snapshots goes if enabled
+        return RepositoryPolicy.SNAPSHOT.equals(getRepositoryPolicy());
+      }
+      else {
+        return RepositoryPolicy.RELEASE.equals(getRepositoryPolicy());
+      }
+    }
+  }
+
+  @Override
+  public AbstractStorageItem doCacheItem(AbstractStorageItem item)
+      throws LocalStorageException
+  {
+    // if the item is file, is M2 repository metadata and this repo is release-only or snapshot-only
+    if (isCleanseRepositoryMetadata() && item instanceof StorageFileItem
+        && M2ArtifactRecognizer.isMetadata(item.getPath())) {
+      InputStream orig = null;
+      StorageFileItem mdFile = (StorageFileItem) item;
+      ByteArrayInputStream backup = null;
+      ByteArrayOutputStream backup1 = new ByteArrayOutputStream();
+      try {
+        // remote item is not reusable, and we usually cache remote stuff locally
+        try {
+          orig = mdFile.getInputStream();
+          IOUtil.copy(orig, backup1);
+        }
+        finally {
+          IOUtil.close(orig);
+        }
+        backup = new ByteArrayInputStream(backup1.toByteArray());
+
+        // Metadata is small, let's do it in memory
+        MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
+        InputStreamReader isr = new InputStreamReader(backup);
+        Metadata imd = metadataReader.read(isr);
+
+        // and fix it
+        imd = cleanseMetadataForRepository(RepositoryPolicy.SNAPSHOT.equals(getRepositoryPolicy()), imd);
+
+        // serialize and swap the new metadata
+        MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        OutputStreamWriter osw = new OutputStreamWriter(bos);
+        metadataWriter.write(osw, imd);
+        mdFile.setContentLocator(new ByteArrayContentLocator(bos.toByteArray(), mdFile.getMimeType()));
+      }
+      catch (Exception e) {
+        getLogger().error("Exception during repository metadata cleansing.", e);
+
+        if (backup != null) {
+          // get backup and continue operation
+          backup.reset();
+          mdFile.setContentLocator(new ByteArrayContentLocator(backup1.toByteArray(), mdFile.getMimeType()));
+        }
+      }
     }
 
-    @Override
-    protected CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory()
-    {
-        return new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
-        {
-            public M2RepositoryConfiguration createExternalConfigurationHolder( CRepository config )
-            {
-                return new M2RepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+    return super.doCacheItem(item);
+  }
+
+  @Override
+  protected boolean isOld(StorageItem item) {
+    if (M2ArtifactRecognizer.isMetadata(item.getPath())) {
+      return isOld(getMetadataMaxAge(), item);
+    }
+    if (M2ArtifactRecognizer.isSnapshot(item.getPath())) {
+      return isOld(getArtifactMaxAge(), item);
+    }
+
+    // we are using Gav to test the path
+    final Gav gav = getGavCalculator().pathToGav(item.getPath());
+
+    if (gav == null) {
+      // this is not an artifact, it is just any "file"
+      return super.isOld(item);
+    }
+    // it is a release
+    return isOld(getArtifactMaxAge(), item);
+  }
+
+  protected Metadata cleanseMetadataForRepository(boolean snapshot, Metadata metadata) {
+    // remove base versions not belonging here
+    List<String> versions = metadata.getVersioning().getVersions();
+    for (Iterator<String> iversion = versions.iterator(); iversion.hasNext(); ) {
+      // if we need snapshots and the version is not snapshot, or
+      // if we need releases and the version is snapshot
+      if ((snapshot && !Gav.isSnapshot(iversion.next()))
+          || (!snapshot && Gav.isSnapshot(iversion.next()))) {
+        iversion.remove();
+      }
+    }
+
+    metadata.getVersioning().setLatest(getLatestVersion(metadata.getVersioning().getVersions()));
+    if (snapshot) {
+      metadata.getVersioning().setRelease(null);
+    }
+    else {
+      metadata.getVersioning().setRelease(metadata.getVersioning().getLatest());
+    }
+    return metadata;
+  }
+
+  public String getLatestVersion(List<String> versions) {
+    Collections.sort(versions, new AlphanumComparator());
+
+    return versions.get(versions.size() - 1);
+  }
+
+  @Override
+  protected void enforceWritePolicy(ResourceStoreRequest request, Action action)
+      throws IllegalRequestException
+  {
+    // allow updating of metadata
+    // we also need to allow updating snapshots
+    if (!M2ArtifactRecognizer.isMetadata(request.getRequestPath())
+        && !M2ArtifactRecognizer.isSnapshot(request.getRequestPath())) {
+      super.enforceWritePolicy(request, action);
+    }
+  }
+
+  @Override
+  protected StorageItem doRetrieveItem(ResourceStoreRequest request)
+      throws IllegalOperationException, ItemNotFoundException, StorageException
+  {
+    // we do all this mockery (NEXUS-4218 and NEXUS-4243) ONLY when we are sure
+    // that we deal with REMOTE REQUEST INITIATED BY OLD 2.x MAVEN and nothing else.
+    // Before this fix, the code was executed whenever
+    // "!ModelVersionUtility.LATEST_MODEL_VERSION.equals( userSupportedVersion ) )" was true
+    // and it was true even for userSupportedVersion being null (ie. not user agent string supplied!)!!!
+    final boolean remoteCall = request.getRequestContext().containsKey(AccessManager.REQUEST_REMOTE_ADDRESS);
+    final String userAgent = (String) request.getRequestContext().get(AccessManager.REQUEST_AGENT);
+
+    if (remoteCall && null != userAgent) {
+      final Version userSupportedVersion = getClientSupportedVersion(userAgent);
+
+      // we still can make up our mind here, we do this only if we know: this request is about metadata,
+      // the client's metadata version is known and it is not the latest one
+      if (M2ArtifactRecognizer.isMetadata(request.getRequestPath()) && userSupportedVersion != null
+          && !ModelVersionUtility.LATEST_MODEL_VERSION.equals(userSupportedVersion)) {
+        // metadata checksum files are calculated and cached as side-effect
+        // of doRetrieveMetadata.
+        final StorageFileItem mdItem;
+        if (M2ArtifactRecognizer.isChecksum(request.getRequestPath())) {
+          String path = request.getRequestPath();
+          if (request.getRequestPath().endsWith(".md5")) {
+            path = path.substring(0, path.length() - 4);
+          }
+          else if (request.getRequestPath().endsWith(".sha1")) {
+            path = path.substring(0, path.length() - 5);
+          }
+          // we have to keep original reqest's flags: localOnly and remoteOnly are strange ones, so
+          // we do a hack here
+          // second, since we initiate a request for different path within a context of this request,
+          // we need to be careful about it
+          ResourceStoreRequest mdRequest =
+              new ResourceStoreRequest(path, request.isRequestLocalOnly(), request.isRequestRemoteOnly());
+          mdRequest.getRequestContext().setParentContext(request.getRequestContext());
+
+          mdItem = (StorageFileItem) super.retrieveItem(false, mdRequest);
+        }
+        else {
+          mdItem = (StorageFileItem) super.doRetrieveItem(request);
+        }
+
+        try {
+          Metadata metadata;
+          InputStream inputStream = null;
+          try {
+            inputStream = mdItem.getInputStream();
+            metadata = MetadataBuilder.read(inputStream);
+          }
+          finally {
+            IOUtil.close(inputStream); // Make sure we unlock mdItem ASAP
+          }
+
+          Version requiredVersion = getClientSupportedVersion(userAgent);
+          Version metadataVersion = ModelVersionUtility.getModelVersion(metadata);
+
+          if (requiredVersion == null || requiredVersion.equals(metadataVersion)) {
+            return super.doRetrieveItem(request);
+          }
+
+          ModelVersionUtility.setModelVersion(metadata, requiredVersion);
+
+          ByteArrayOutputStream mdOutput = new ByteArrayOutputStream();
+
+          MetadataBuilder.write(metadata, mdOutput);
+
+          final byte[] content;
+          if (M2ArtifactRecognizer.isChecksum(request.getRequestPath())) {
+            String digest;
+            if (request.getRequestPath().endsWith(".md5")) {
+              digest = DigesterUtils.getMd5Digest(mdOutput.toByteArray());
             }
-        };
-    }
-
-    public ContentClass getRepositoryContentClass()
-    {
-        return contentClass;
-    }
-
-    public GavCalculator getGavCalculator()
-    {
-        return gavCalculator;
-    }
-
-    @Override
-    protected Configurator getConfigurator()
-    {
-        return m2RepositoryConfigurator;
-    }
-
-    @Override
-    public boolean isMavenMetadataPath( String path )
-    {
-        return M2ArtifactRecognizer.isMetadata( path );
-    }
-
-    @Override
-    public boolean isMavenArtifactChecksumPath( String path )
-    {
-        return M2ArtifactRecognizer.isChecksum( path );
-    }
-
-    /**
-     * Should serve by policies.
-     * 
-     * @param request the request
-     * @return true, if successful
-     */
-    @Override
-    public boolean shouldServeByPolicies( ResourceStoreRequest request )
-    {
-        if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() ) )
-        {
-            if ( M2ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
-            {
-                return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
+            else {
+              digest = DigesterUtils.getSha1Digest(mdOutput.toByteArray());
             }
-            else
-            {
-                // metadatas goes always
-                return true;
-            }
-        }
+            content = (digest + '\n').getBytes("UTF-8");
+          }
+          else {
+            content = mdOutput.toByteArray();
+          }
 
-        // we are using Gav to test the path
-        final Gav gav = getGavCalculator().pathToGav( request.getRequestPath() );
+          String mimeType =
+              getMimeSupport().guessMimeTypeFromPath(getMimeRulesSource(), request.getRequestPath());
+          ContentLocator contentLocator = new ByteArrayContentLocator(content, mimeType);
 
-        if ( gav == null )
-        {
-            return true;
+          DefaultStorageFileItem result =
+              new DefaultStorageFileItem(this, request, true, false, contentLocator);
+          result.setLength(content.length);
+          result.setCreated(mdItem.getCreated());
+          result.setModified(System.currentTimeMillis());
+          return result;
         }
-        else
-        {
-            if ( gav.isSnapshot() )
-            {
-                // snapshots goes if enabled
-                return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
-            }
-            else
-            {
-                return RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() );
-            }
+        catch (IOException e) {
+          if (getLogger().isDebugEnabled()) {
+            getLogger().error("Error parsing metadata, serving as retrieved", e);
+          }
+          else {
+            getLogger().error("Error parsing metadata, serving as retrieved: " + e.getMessage());
+          }
+
+          return super.doRetrieveItem(request);
         }
+      }
     }
 
-    @Override
-    public AbstractStorageItem doCacheItem( AbstractStorageItem item )
-        throws LocalStorageException
-    {
-        // if the item is file, is M2 repository metadata and this repo is release-only or snapshot-only
-        if ( isCleanseRepositoryMetadata() && item instanceof StorageFileItem
-            && M2ArtifactRecognizer.isMetadata( item.getPath() ) )
-        {
-            InputStream orig = null;
-            StorageFileItem mdFile = (StorageFileItem) item;
-            ByteArrayInputStream backup = null;
-            ByteArrayOutputStream backup1 = new ByteArrayOutputStream();
-            try
-            {
-                // remote item is not reusable, and we usually cache remote stuff locally
-                try
-                {
-                    orig = mdFile.getInputStream();
-                    IOUtil.copy( orig, backup1 );
-                }
-                finally
-                {
-                    IOUtil.close( orig );
-                }
-                backup = new ByteArrayInputStream( backup1.toByteArray() );
+    return super.doRetrieveItem(request);
+  }
 
-                // Metadata is small, let's do it in memory
-                MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
-                InputStreamReader isr = new InputStreamReader( backup );
-                Metadata imd = metadataReader.read( isr );
-
-                // and fix it
-                imd = cleanseMetadataForRepository( RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() ), imd );
-
-                // serialize and swap the new metadata
-                MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer();
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                OutputStreamWriter osw = new OutputStreamWriter( bos );
-                metadataWriter.write( osw, imd );
-                mdFile.setContentLocator( new ByteArrayContentLocator( bos.toByteArray(), mdFile.getMimeType() ) );
-            }
-            catch ( Exception e )
-            {
-                getLogger().error( "Exception during repository metadata cleansing.", e );
-
-                if ( backup != null )
-                {
-                    // get backup and continue operation
-                    backup.reset();
-                    mdFile.setContentLocator( new ByteArrayContentLocator( backup1.toByteArray(), mdFile.getMimeType() ) );
-                }
-            }
-        }
-
-        return super.doCacheItem( item );
+  protected Version getClientSupportedVersion(String userAgent) {
+    if (userAgent == null) {
+      return null;
     }
 
-    @Override
-    protected boolean isOld( StorageItem item )
-    {
-        if ( M2ArtifactRecognizer.isMetadata( item.getPath() ) )
-        {
-            return isOld( getMetadataMaxAge(), item );
-        }
-        if ( M2ArtifactRecognizer.isSnapshot( item.getPath() ) )
-        {
-            return isOld( getArtifactMaxAge(), item );
-        }
-
-        // we are using Gav to test the path
-        final Gav gav = getGavCalculator().pathToGav( item.getPath() );
-
-        if ( gav == null )
-        {
-            // this is not an artifact, it is just any "file"
-            return super.isOld( item );
-        }
-        // it is a release
-        return isOld( getArtifactMaxAge(), item );
+    if (userAgent.startsWith("Apache Ivy")) {
+      return Version.V100;
     }
 
-    protected Metadata cleanseMetadataForRepository( boolean snapshot, Metadata metadata )
-    {
-        // remove base versions not belonging here
-        List<String> versions = metadata.getVersioning().getVersions();
-        for ( Iterator<String> iversion = versions.iterator(); iversion.hasNext(); )
-        {
-            // if we need snapshots and the version is not snapshot, or
-            // if we need releases and the version is snapshot
-            if ( ( snapshot && !Gav.isSnapshot( iversion.next() ) )
-                || ( !snapshot && Gav.isSnapshot( iversion.next() ) ) )
-            {
-                iversion.remove();
-            }
-        }
-
-        metadata.getVersioning().setLatest( getLatestVersion( metadata.getVersioning().getVersions() ) );
-        if ( snapshot )
-        {
-            metadata.getVersioning().setRelease( null );
-        }
-        else
-        {
-            metadata.getVersioning().setRelease( metadata.getVersioning().getLatest() );
-        }
-        return metadata;
+    if (userAgent.startsWith("Java")) {
+      return Version.V100;
     }
 
-    public String getLatestVersion( List<String> versions )
-    {
-        Collections.sort( versions, new AlphanumComparator() );
-
-        return versions.get( versions.size() - 1 );
+    if (userAgent.startsWith("Apache-Maven/2")) {
+      return Version.V100;
     }
 
-    @Override
-    protected void enforceWritePolicy( ResourceStoreRequest request, Action action )
-        throws IllegalRequestException
-    {
-        // allow updating of metadata
-        // we also need to allow updating snapshots
-        if ( !M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
-            && !M2ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
-        {
-            super.enforceWritePolicy( request, action );
-        }
-    }
-
-    @Override
-    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
-        throws IllegalOperationException, ItemNotFoundException, StorageException
-    {
-        // we do all this mockery (NEXUS-4218 and NEXUS-4243) ONLY when we are sure
-        // that we deal with REMOTE REQUEST INITIATED BY OLD 2.x MAVEN and nothing else. 
-        // Before this fix, the code was executed whenever
-        // "!ModelVersionUtility.LATEST_MODEL_VERSION.equals( userSupportedVersion ) )" was true
-        // and it was true even for userSupportedVersion being null (ie. not user agent string supplied!)!!!
-        final boolean remoteCall = request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS );
-        final String userAgent = (String) request.getRequestContext().get( AccessManager.REQUEST_AGENT );
-
-        if ( remoteCall && null != userAgent )
-        {
-            final Version userSupportedVersion = getClientSupportedVersion( userAgent );
-
-            // we still can make up our mind here, we do this only if we know: this request is about metadata,
-            // the client's metadata version is known and it is not the latest one
-            if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() ) && userSupportedVersion != null
-                && !ModelVersionUtility.LATEST_MODEL_VERSION.equals( userSupportedVersion ) )
-            {
-                // metadata checksum files are calculated and cached as side-effect
-                // of doRetrieveMetadata.
-                final StorageFileItem mdItem;
-                if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
-                {
-                    String path = request.getRequestPath();
-                    if ( request.getRequestPath().endsWith( ".md5" ) )
-                    {
-                        path = path.substring( 0, path.length() - 4 );
-                    }
-                    else if ( request.getRequestPath().endsWith( ".sha1" ) )
-                    {
-                        path = path.substring( 0, path.length() - 5 );
-                    }
-                    // we have to keep original reqest's flags: localOnly and remoteOnly are strange ones, so
-                    // we do a hack here
-                    // second, since we initiate a request for different path within a context of this request,
-                    // we need to be careful about it
-                    ResourceStoreRequest mdRequest =
-                        new ResourceStoreRequest( path, request.isRequestLocalOnly(), request.isRequestRemoteOnly() );
-                    mdRequest.getRequestContext().setParentContext( request.getRequestContext() );
-
-                    mdItem = (StorageFileItem) super.retrieveItem( false, mdRequest );
-                }
-                else
-                {
-                    mdItem = (StorageFileItem) super.doRetrieveItem( request );
-                }
-
-                try
-                {
-                    Metadata metadata;
-                    InputStream inputStream = null;
-                    try
-                    {
-                        inputStream = mdItem.getInputStream();
-                        metadata = MetadataBuilder.read( inputStream );
-                    }
-                    finally
-                    {
-                        IOUtil.close( inputStream ); // Make sure we unlock mdItem ASAP
-                    }
-
-                    Version requiredVersion = getClientSupportedVersion( userAgent );
-                    Version metadataVersion = ModelVersionUtility.getModelVersion( metadata );
-
-                    if ( requiredVersion == null || requiredVersion.equals( metadataVersion ) )
-                    {
-                        return super.doRetrieveItem( request );
-                    }
-
-                    ModelVersionUtility.setModelVersion( metadata, requiredVersion );
-
-                    ByteArrayOutputStream mdOutput = new ByteArrayOutputStream();
-
-                    MetadataBuilder.write( metadata, mdOutput );
-
-                    final byte[] content;
-                    if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
-                    {
-                        String digest;
-                        if ( request.getRequestPath().endsWith( ".md5" ) )
-                        {
-                            digest = DigesterUtils.getMd5Digest( mdOutput.toByteArray() );
-                        }
-                        else
-                        {
-                            digest = DigesterUtils.getSha1Digest( mdOutput.toByteArray() );
-                        }
-                        content = ( digest + '\n' ).getBytes( "UTF-8" );
-                    }
-                    else
-                    {
-                        content = mdOutput.toByteArray();
-                    }
-
-                    String mimeType =
-                        getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), request.getRequestPath() );
-                    ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
-
-                    DefaultStorageFileItem result =
-                        new DefaultStorageFileItem( this, request, true, false, contentLocator );
-                    result.setLength( content.length );
-                    result.setCreated( mdItem.getCreated() );
-                    result.setModified( System.currentTimeMillis() );
-                    return result;
-                }
-                catch ( IOException e )
-                {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().error( "Error parsing metadata, serving as retrieved", e );
-                    }
-                    else
-                    {
-                        getLogger().error( "Error parsing metadata, serving as retrieved: " + e.getMessage() );
-                    }
-
-                    return super.doRetrieveItem( request );
-                }
-            }
-        }
-
-        return super.doRetrieveItem( request );
-    }
-
-    protected Version getClientSupportedVersion( String userAgent )
-    {
-        if ( userAgent == null )
-        {
-            return null;
-        }
-
-        if ( userAgent.startsWith( "Apache Ivy" ) )
-        {
-            return Version.V100;
-        }
-
-        if ( userAgent.startsWith( "Java" ) )
-        {
-            return Version.V100;
-        }
-
-        if ( userAgent.startsWith( "Apache-Maven/2" ) )
-        {
-            return Version.V100;
-        }
-
-        return Version.V110;
-    }
+    return Version.V110;
+  }
 
 }

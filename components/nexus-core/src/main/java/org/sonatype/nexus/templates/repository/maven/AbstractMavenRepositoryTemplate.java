@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.templates.repository.maven;
 
 import java.io.IOException;
@@ -20,50 +21,45 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
-import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
 public abstract class AbstractMavenRepositoryTemplate
     extends AbstractRepositoryTemplate
 {
-    private RepositoryPolicy repositoryPolicy;
+  private RepositoryPolicy repositoryPolicy;
 
-    public AbstractMavenRepositoryTemplate( AbstractRepositoryTemplateProvider provider, String id, String description,
-                                            ContentClass contentClass, Class<?> mainFacet,
-                                            RepositoryPolicy repositoryPolicy )
-    {
-        super( provider, id, description, contentClass, mainFacet );
+  public AbstractMavenRepositoryTemplate(AbstractRepositoryTemplateProvider provider, String id, String description,
+                                         ContentClass contentClass, Class<?> mainFacet,
+                                         RepositoryPolicy repositoryPolicy)
+  {
+    super(provider, id, description, contentClass, mainFacet);
 
-        setRepositoryPolicy( repositoryPolicy );
+    setRepositoryPolicy(repositoryPolicy);
+  }
+
+  @Override
+  public boolean targetFits(Object clazz) {
+    return super.targetFits(clazz) || clazz.equals(getRepositoryPolicy());
+  }
+
+  public RepositoryPolicy getRepositoryPolicy() {
+    return repositoryPolicy;
+  }
+
+  public void setRepositoryPolicy(RepositoryPolicy repositoryPolicy) {
+    this.repositoryPolicy = repositoryPolicy;
+  }
+
+  @Override
+  public MavenRepository create()
+      throws ConfigurationException, IOException
+  {
+    MavenRepository mavenRepository = (MavenRepository) super.create();
+
+    // huh? see initConfig classes
+    if (getRepositoryPolicy() != null) {
+      mavenRepository.setRepositoryPolicy(getRepositoryPolicy());
     }
 
-    @Override
-    public boolean targetFits( Object clazz )
-    {
-        return super.targetFits( clazz ) || clazz.equals( getRepositoryPolicy() );
-    }
-
-    public RepositoryPolicy getRepositoryPolicy()
-    {
-        return repositoryPolicy;
-    }
-
-    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
-    {
-        this.repositoryPolicy = repositoryPolicy;
-    }
-
-    @Override
-    public MavenRepository create()
-        throws ConfigurationException, IOException
-    {
-        MavenRepository mavenRepository = (MavenRepository) super.create();
-
-        // huh? see initConfig classes
-        if ( getRepositoryPolicy() != null )
-        {
-            mavenRepository.setRepositoryPolicy( getRepositoryPolicy() );
-        }
-
-        return mavenRepository;
-    }
+    return mavenRepository;
+  }
 }

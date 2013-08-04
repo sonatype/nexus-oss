@@ -10,74 +10,74 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-
-import org.junit.Test;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+
 public class DownloadIndexesTaskTest
     extends NexusAppTestSupport
 {
-    protected NexusScheduler nexusScheduler;
+  protected NexusScheduler nexusScheduler;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        nexusScheduler = lookup( NexusScheduler.class );
-        MockedIndexerManager.mockInvoked = false;
+    nexusScheduler = lookup(NexusScheduler.class);
+    MockedIndexerManager.mockInvoked = false;
+  }
+
+  protected void tearDown()
+      throws Exception
+  {
+    super.tearDown();
+  }
+
+  @Test
+  public void testError()
+      throws Exception
+  {
+    MockedIndexerManager.returnError = true;
+
+    DownloadIndexesTask task = nexusScheduler.createTaskInstance(DownloadIndexesTask.class);
+    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
+    // block until it finishes
+    try {
+      handle.get();
+      fail("it should have throwed an exception");
+    }
+    catch (Exception e) {
+      assertThat(e.getMessage(), containsString("Mocked Index Error"));
     }
 
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
+    assertThat("Mock was not invoked", MockedIndexerManager.mockInvoked);
+    assertThat(handle.getTaskState(), equalTo(TaskState.BROKEN));
+  }
 
-    @Test
-    public void testError()
-        throws Exception
-    {
-        MockedIndexerManager.returnError = true;
+  @Test
+  public void testFine()
+      throws Exception
+  {
+    MockedIndexerManager.returnError = false;
 
-        DownloadIndexesTask task = nexusScheduler.createTaskInstance( DownloadIndexesTask.class );
-        ScheduledTask<Object> handle = nexusScheduler.submit( "task", task );
-        // block until it finishes
-        try
-        {
-            handle.get();
-            fail( "it should have throwed an exception" );
-        }
-        catch ( Exception e )
-        {
-            assertThat( e.getMessage(), containsString( "Mocked Index Error" ) );
-        }
+    DownloadIndexesTask task = nexusScheduler.createTaskInstance(DownloadIndexesTask.class);
+    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
+    // block until it finishes
+    handle.get();
 
-        assertThat( "Mock was not invoked", MockedIndexerManager.mockInvoked );
-        assertThat( handle.getTaskState(), equalTo( TaskState.BROKEN ) );
-    }
-
-    @Test
-    public void testFine()
-        throws Exception
-    {
-        MockedIndexerManager.returnError = false;
-
-        DownloadIndexesTask task = nexusScheduler.createTaskInstance( DownloadIndexesTask.class );
-        ScheduledTask<Object> handle = nexusScheduler.submit( "task", task );
-        // block until it finishes
-        handle.get();
-
-        assertThat( "Mock was not invoked", MockedIndexerManager.mockInvoked );
-        assertThat( handle.getTaskState(), equalTo( TaskState.FINISHED ) );
-    }
+    assertThat("Mock was not invoked", MockedIndexerManager.mockInvoked);
+    assertThat(handle.getTaskState(), equalTo(TaskState.FINISHED));
+  }
 
 }

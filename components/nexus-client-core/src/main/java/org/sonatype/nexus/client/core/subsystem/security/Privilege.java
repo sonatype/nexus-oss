@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.security;
 
 import java.util.Collection;
@@ -26,31 +27,31 @@ public interface Privilege
     extends Entity<Privilege>
 {
 
-    String name();
+  String name();
 
-    Privilege withName( String value );
+  Privilege withName(String value);
 
-    String description();
+  String description();
 
-    Privilege withDescription( String value );
+  Privilege withDescription(String value);
 
-    String type();
+  String type();
 
-    String repositoryId();
+  String repositoryId();
 
-    Privilege withRepositoryId( String repositoryId );
+  Privilege withRepositoryId(String repositoryId);
 
-    List<String> methods();
+  List<String> methods();
 
-    Privilege withMethods( String... methods );
+  Privilege withMethods(String... methods);
 
-    String targetId();
+  String targetId();
 
-    Privilege withTargetId( String targetId );
+  Privilege withTargetId(String targetId);
 
-    String repositoryGroupId();
+  String repositoryGroupId();
 
-    Privilege withRepositoryGroupId( String groupId);
+  Privilege withRepositoryGroupId(String groupId);
 
-    Collection<Privilege> create();
+  Collection<Privilege> create();
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.source;
 
 import org.sonatype.configuration.source.ConfigurationSource;
@@ -19,52 +20,49 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractConfigurationSource
     extends AbstractLoggingComponent
     implements ConfigurationSource<Configuration>
 {
-    /** Flag to mark update. */
-    private boolean configurationUpgraded;
+  /**
+   * Flag to mark update.
+   */
+  private boolean configurationUpgraded;
 
-    /** The validation response */
-    private ValidationResponse validationResponse;
+  /**
+   * The validation response
+   */
+  private ValidationResponse validationResponse;
 
-    public ValidationResponse getValidationResponse()
-    {
-        return validationResponse;
-    }
+  public ValidationResponse getValidationResponse() {
+    return validationResponse;
+  }
 
-    protected void setValidationResponse( ValidationResponse validationResponse )
-    {
-        this.validationResponse = validationResponse;
-    }
+  protected void setValidationResponse(ValidationResponse validationResponse) {
+    this.validationResponse = validationResponse;
+  }
 
-    /**
-     * Is configuration updated?
-     */
-    public boolean isConfigurationUpgraded()
-    {
-        return configurationUpgraded;
-    }
+  /**
+   * Is configuration updated?
+   */
+  public boolean isConfigurationUpgraded() {
+    return configurationUpgraded;
+  }
 
-    /**
-     * Setter for configuration pugraded.
-     * 
-     * @param configurationUpgraded
-     */
-    public void setConfigurationUpgraded( boolean configurationUpgraded )
-    {
-        this.configurationUpgraded = configurationUpgraded;
-    }
+  /**
+   * Setter for configuration pugraded.
+   */
+  public void setConfigurationUpgraded(boolean configurationUpgraded) {
+    this.configurationUpgraded = configurationUpgraded;
+  }
 
-    /**
-     * Returns the default source of ConfigurationSource. May be null.
-     */
-    public ConfigurationSource<Configuration> getDefaultsSource()
-    {
-        return null;
-    }
+  /**
+   * Returns the default source of ConfigurationSource. May be null.
+   */
+  public ConfigurationSource<Configuration> getDefaultsSource() {
+    return null;
+  }
 }

@@ -10,67 +10,59 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.discovery;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.discovery;
 
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The result of a strategy discovery.
- * 
+ *
  * @author cstamas
  */
 public class StrategyResult
 {
-    private final String message;
+  private final String message;
 
-    private final PrefixSource prefixSource;
+  private final PrefixSource prefixSource;
 
-    private final boolean routingEnabled;
+  private final boolean routingEnabled;
 
-    /**
-     * Constructor.
-     * 
-     * @param message
-     * @param prefixSource
-     */
-    public StrategyResult( final String message, final PrefixSource prefixSource, boolean routingEnabled )
-    {
-        this.message = checkNotNull( message );
-        this.prefixSource = checkNotNull( prefixSource );
-        this.routingEnabled = routingEnabled;
-    }
+  /**
+   * Constructor.
+   */
+  public StrategyResult(final String message, final PrefixSource prefixSource, boolean routingEnabled) {
+    this.message = checkNotNull(message);
+    this.prefixSource = checkNotNull(prefixSource);
+    this.routingEnabled = routingEnabled;
+  }
 
-    /**
-     * Returns strategy specific message (probably explaining how did it get the results).
-     * 
-     * @return the message.
-     */
-    public String getMessage()
-    {
-        return message;
-    }
+  /**
+   * Returns strategy specific message (probably explaining how did it get the results).
+   *
+   * @return the message.
+   */
+  public String getMessage() {
+    return message;
+  }
 
-    /**
-     * Returns the prefix source, as a result of discovery.
-     * 
-     * @return entry source discovered by strategy.
-     */
-    public PrefixSource getPrefixSource()
-    {
-        return prefixSource;
-    }
+  /**
+   * Returns the prefix source, as a result of discovery.
+   *
+   * @return entry source discovered by strategy.
+   */
+  public PrefixSource getPrefixSource() {
+    return prefixSource;
+  }
 
-    /**
-     * Returns <code>false</code> if remote explicitly requested automatic routing to be disabled. This normally
-     * indicates that remote is not able to provide reliable path prefix information. For example, remote itself is a
-     * proxy of a repository that does not provide prefix file and cannot be scraped. 
-     * 
-     * @return
-     */
-    public boolean isRoutingEnabled()
-    {
-        return routingEnabled;
-    }
+  /**
+   * Returns <code>false</code> if remote explicitly requested automatic routing to be disabled. This normally
+   * indicates that remote is not able to provide reliable path prefix information. For example, remote itself is a
+   * proxy of a repository that does not provide prefix file and cannot be scraped.
+   */
+  public boolean isRoutingEnabled() {
+    return routingEnabled;
+  }
 }

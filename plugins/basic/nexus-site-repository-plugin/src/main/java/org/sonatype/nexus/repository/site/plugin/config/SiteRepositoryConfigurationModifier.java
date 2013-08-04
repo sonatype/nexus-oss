@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.site.plugin.config;
 
 import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,45 +36,36 @@ public class SiteRepositoryConfigurationModifier
     implements ConfigurationModifier
 {
 
-    @Override
-    public boolean apply( org.sonatype.nexus.configuration.model.Configuration configuration )
-    {
-        boolean modified = false;
-        final List<CRepository> repositories = configuration.getRepositories();
-        if ( repositories != null && repositories.size() > 0 )
-        {
-            for ( final CRepository repository : repositories )
-            {
-                if ( "maven-site".equals( repository.getProviderHint() ) )
-                {
-                    repository.setProviderHint( SiteRepository.ID );
-                    modified = true;
-                }
-            }
+  @Override
+  public boolean apply(org.sonatype.nexus.configuration.model.Configuration configuration) {
+    boolean modified = false;
+    final List<CRepository> repositories = configuration.getRepositories();
+    if (repositories != null && repositories.size() > 0) {
+      for (final CRepository repository : repositories) {
+        if ("maven-site".equals(repository.getProviderHint())) {
+          repository.setProviderHint(SiteRepository.ID);
+          modified = true;
         }
-        final List<CRepositoryTarget> repositoryTargets = configuration.getRepositoryTargets();
-        if ( repositoryTargets != null && repositoryTargets.size() > 0 )
-        {
-            for ( final CRepositoryTarget repositoryTarget : repositoryTargets )
-            {
-                if ( "maven-site".equals( repositoryTarget.getId() ) )
-                {
-                    repositoryTarget.setId( SiteRepository.ID );
-                    modified = true;
-                }
-                if ( "maven-site".equals( repositoryTarget.getContentClass() ) )
-                {
-                    repositoryTarget.setContentClass( SiteRepository.ID );
-                    modified = true;
-                }
-                if ( repositoryTarget.getName()!=null && repositoryTarget.getName().contains( "maven-site" ) )
-                {
-                    repositoryTarget.setName( repositoryTarget.getName().replace( "maven-site", SiteRepository.ID ) );
-                    modified = true;
-                }
-            }
-        }
-        return modified;
+      }
     }
+    final List<CRepositoryTarget> repositoryTargets = configuration.getRepositoryTargets();
+    if (repositoryTargets != null && repositoryTargets.size() > 0) {
+      for (final CRepositoryTarget repositoryTarget : repositoryTargets) {
+        if ("maven-site".equals(repositoryTarget.getId())) {
+          repositoryTarget.setId(SiteRepository.ID);
+          modified = true;
+        }
+        if ("maven-site".equals(repositoryTarget.getContentClass())) {
+          repositoryTarget.setContentClass(SiteRepository.ID);
+          modified = true;
+        }
+        if (repositoryTarget.getName() != null && repositoryTarget.getName().contains("maven-site")) {
+          repositoryTarget.setName(repositoryTarget.getName().replace("maven-site", SiteRepository.ID));
+          modified = true;
+        }
+      }
+    }
+    return modified;
+  }
 
 }

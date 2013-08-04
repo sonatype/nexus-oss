@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
@@ -23,49 +24,45 @@ public abstract class AbstractIndexTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
+  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-    public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
+  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 
-    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
-        FormField.MANDATORY );
+  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
+      FormField.MANDATORY);
 
-    private final StringTextFormField resourceStorePathField = new StringTextFormField( RESOURCE_STORE_PATH_FIELD_ID,
-        "Repository path",
-        "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-        FormField.OPTIONAL );
+  private final StringTextFormField resourceStorePathField = new StringTextFormField(RESOURCE_STORE_PATH_FIELD_ID,
+      "Repository path",
+      "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+      FormField.OPTIONAL);
 
-    private String id;
+  private String id;
 
-    private String name;
+  private String name;
 
-    public AbstractIndexTaskDescriptor( String id, String name )
-    {
-        super();
+  public AbstractIndexTaskDescriptor(String id, String name) {
+    super();
 
-        this.id = id;
-        this.name = name;
-    }
+    this.id = id;
+    this.name = name;
+  }
 
-    public String getId()
-    {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public String getName()
-    {
-        return name + " Repositories Index";
-    }
+  public String getName() {
+    return name + " Repositories Index";
+  }
 
-    @Override
-    public List<FormField> formFields()
-    {
-        List<FormField> fields = new ArrayList<FormField>();
+  @Override
+  public List<FormField> formFields() {
+    List<FormField> fields = new ArrayList<FormField>();
 
-        fields.add( repoField );
-        fields.add( resourceStorePathField );
+    fields.add(repoField);
+    fields.add(resourceStorePathField);
 
-        return fields;
-    }
+    return fields;
+  }
 
 }

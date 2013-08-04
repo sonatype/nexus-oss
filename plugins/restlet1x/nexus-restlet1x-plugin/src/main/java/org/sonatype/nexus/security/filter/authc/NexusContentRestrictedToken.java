@@ -10,14 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authc;
+
+import javax.servlet.ServletRequest;
 
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.HostAuthenticationToken;
-import org.apache.shiro.authc.RememberMeAuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
-
-import javax.servlet.ServletRequest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,75 +27,67 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link AuthenticationToken} used when access to {code}/content{code} is restricted.
  *
  * @see NexusContentAuthenticationFilter
- *
  * @since 2.1
  */
 public class NexusContentRestrictedToken
     implements /*RememberMeAuthenticationToken,*/ HostAuthenticationToken
 {
-    private final Object principal;
+  private final Object principal;
 
-    private final char[] credentials;
+  private final char[] credentials;
 
-    //private final boolean rememberMe;
+  //private final boolean rememberMe;
 
-    private final String host;
+  private final String host;
 
-    private final ServletRequest request;
+  private final ServletRequest request;
 
-    public NexusContentRestrictedToken(final UsernamePasswordToken basis, final ServletRequest request)
-    {
-        checkNotNull( basis );
-        this.principal = basis.getPrincipal();
-        this.credentials = basis.getPassword();
-        //this.rememberMe = basis.isRememberMe();
-        this.host = basis.getHost();
-        this.request = checkNotNull( request );
-    }
+  public NexusContentRestrictedToken(final UsernamePasswordToken basis, final ServletRequest request) {
+    checkNotNull(basis);
+    this.principal = basis.getPrincipal();
+    this.credentials = basis.getPassword();
+    //this.rememberMe = basis.isRememberMe();
+    this.host = basis.getHost();
+    this.request = checkNotNull(request);
+  }
 
-    @Override
-    public Object getPrincipal()
-    {
-        return principal;
-    }
+  @Override
+  public Object getPrincipal() {
+    return principal;
+  }
 
-    public String getUsername()
-    {
-        return principal != null ? principal.toString() : null;
-    }
+  public String getUsername() {
+    return principal != null ? principal.toString() : null;
+  }
 
-    @Override
-    public Object getCredentials()
-    {
-        return credentials;
-    }
+  @Override
+  public Object getCredentials() {
+    return credentials;
+  }
 
-    //@Override
-    //public boolean isRememberMe()
-    //{
-    //    return rememberMe;
-    //}
+  //@Override
+  //public boolean isRememberMe()
+  //{
+  //    return rememberMe;
+  //}
 
-    @Override
-    public String getHost()
-    {
-        return host;
-    }
+  @Override
+  public String getHost() {
+    return host;
+  }
 
-    // NOTE: For now just expose the raw request, may want to limit what information/operations are exposed in the future
+  // NOTE: For now just expose the raw request, may want to limit what information/operations are exposed in the future
 
-    public ServletRequest getRequest()
-    {
-        return request;
-    }
+  public ServletRequest getRequest() {
+    return request;
+  }
 
-    @Override
-    public String toString()
-    {
-        return getClass().getSimpleName() + "{" +
-            "principal=" + principal +
-            //", rememberMe=" + rememberMe +
-            ", host='" + host + '\'' +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "principal=" + principal +
+        //", rememberMe=" + rememberMe +
+        ", host='" + host + '\'' +
+        '}';
+  }
 }

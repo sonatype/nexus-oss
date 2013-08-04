@@ -10,36 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 public class NtlmRemoteAuthenticationSettings
     extends UsernamePasswordRemoteAuthenticationSettings
 {
-    private final String ntlmDomain;
+  private final String ntlmDomain;
 
-    private final String ntlmHost;
+  private final String ntlmHost;
 
-    public NtlmRemoteAuthenticationSettings( String username, String password, String ntlmDomain )
-    {
-        this( username, password, ntlmDomain, null );
-    }
+  public NtlmRemoteAuthenticationSettings(String username, String password, String ntlmDomain) {
+    this(username, password, ntlmDomain, null);
+  }
 
-    public NtlmRemoteAuthenticationSettings( String username, String password, String ntlmDomain, String ntlmHost )
-    {
-        super( username, password );
+  public NtlmRemoteAuthenticationSettings(String username, String password, String ntlmDomain, String ntlmHost) {
+    super(username, password);
 
-        this.ntlmDomain = ntlmDomain;
+    this.ntlmDomain = ntlmDomain;
 
-        this.ntlmHost = ntlmHost;
-    }
+    this.ntlmHost = ntlmHost;
+  }
 
-    public String getNtlmDomain()
-    {
-        return ntlmDomain;
-    }
+  public String getNtlmDomain() {
+    return ntlmDomain;
+  }
 
-    public String getNtlmHost()
-    {
-        return ntlmHost;
-    }
+  public String getNtlmHost() {
+    return ntlmHost;
+  }
 }

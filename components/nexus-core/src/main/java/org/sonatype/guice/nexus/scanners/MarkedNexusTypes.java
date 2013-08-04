@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.guice.nexus.scanners;
 
 import java.lang.annotation.Annotation;
@@ -17,74 +18,65 @@ import java.lang.annotation.Annotation;
 enum MarkedNexusTypes
     implements NexusType
 {
-    // ----------------------------------------------------------------------
-    // Values
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Values
+  // ----------------------------------------------------------------------
 
-    UNKNOWN
-    {
+  UNKNOWN
+      {
         @Override
-        public boolean isComponent()
-        {
-            return false;
+        public boolean isComponent() {
+          return false;
         }
-    },
+      },
 
-    EXTENSION_POINT
-    {
+  EXTENSION_POINT
+      {
         @Override
-        public boolean isSingleton()
-        {
-            return false;
+        public boolean isSingleton() {
+          return false;
         }
 
         @Override
-        public NexusType asSingleton()
-        {
-            return EXTENSION_POINT_SINGLETON;
+        public NexusType asSingleton() {
+          return EXTENSION_POINT_SINGLETON;
         }
-    },
+      },
 
-    EXTENSION_POINT_SINGLETON,
+  EXTENSION_POINT_SINGLETON,
 
-    MANAGED
-    {
+  MANAGED
+      {
         @Override
-        public boolean isSingleton()
-        {
-            return false;
+        public boolean isSingleton() {
+          return false;
         }
 
         @Override
-        public NexusType asSingleton()
-        {
-            return MANAGED_SINGLETON;
+        public NexusType asSingleton() {
+          return MANAGED_SINGLETON;
         }
-    },
+      },
 
-    MANAGED_SINGLETON;
+  MANAGED_SINGLETON;
 
-    // ----------------------------------------------------------------------
-    // Common methods
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // Common methods
+  // ----------------------------------------------------------------------
 
-    public boolean isComponent()
-    {
-        return true;
-    }
+  public boolean isComponent() {
+    return true;
+  }
 
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  public boolean isSingleton() {
+    return true;
+  }
 
-    public NexusType asSingleton()
-    {
-        return this;
-    }
+  public NexusType asSingleton() {
+    return this;
+  }
 
-    public final Annotation details()
-    {
-        return null;
-    }
+  public final Annotation details() {
+    return null;
+  }
 }

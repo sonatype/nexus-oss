@@ -10,77 +10,79 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.model.upgrade;
 
 import java.io.File;
 import java.io.StringWriter;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.model.AbstractSecurityConfigTest;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+
 public class DefaultSecurityConfigurationUpgraderTest
     extends AbstractSecurityConfigTest
 {
-	protected final String UPGRADE_HOME = new String("/org/sonatype/security/model/upgrade");
-	
-    protected SecurityConfigurationUpgrader configurationUpgrader;
+  protected final String UPGRADE_HOME = new String("/org/sonatype/security/model/upgrade");
 
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
+  protected SecurityConfigurationUpgrader configurationUpgrader;
 
-        FileUtils.cleanDirectory( new File( getSecurityConfiguration() ).getParentFile() );
+  public void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        this.configurationUpgrader = (SecurityConfigurationUpgrader) lookup( SecurityConfigurationUpgrader.class );
-    }
+    FileUtils.cleanDirectory(new File(getSecurityConfiguration()).getParentFile());
 
-    protected void resultIsFine( String path, Configuration configuration )
-        throws Exception
-    {
-        SecurityConfigurationXpp3Writer w = new SecurityConfigurationXpp3Writer();
+    this.configurationUpgrader = (SecurityConfigurationUpgrader) lookup(SecurityConfigurationUpgrader.class);
+  }
 
-        StringWriter sw = new StringWriter();
+  protected void resultIsFine(String path, Configuration configuration)
+      throws Exception
+  {
+    SecurityConfigurationXpp3Writer w = new SecurityConfigurationXpp3Writer();
 
-        w.write( sw, configuration );
+    StringWriter sw = new StringWriter();
 
-        String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
-        shouldBe = shouldBe.replace( "\r\n", "\n" );
+    w.write(sw, configuration);
 
-        assertEquals( shouldBe, sw.toString() );
-    }
-    
-    protected void testUpgrade(String filename)
-    	throws Exception
-	{
-		copyFromClasspathToFile( UPGRADE_HOME + "/" + filename, getSecurityConfiguration() );
+    String shouldBe = IOUtil.toString(getClass().getResourceAsStream(path + ".result"));
+    shouldBe = shouldBe.replace("\r\n", "\n");
 
-        Configuration configuration =
-            configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
+    assertEquals(shouldBe, sw.toString());
+  }
 
-        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+  protected void testUpgrade(String filename)
+      throws Exception
+  {
+    copyFromClasspathToFile(UPGRADE_HOME + "/" + filename, getSecurityConfiguration());
 
-        resultIsFine( UPGRADE_HOME + "/" + filename, configuration );
-	}
+    Configuration configuration =
+        configurationUpgrader.loadOldConfiguration(new File(getSecurityConfiguration()));
 
-    public void testFrom100()
-        throws Exception
-    {
-    	testUpgrade("security-100.xml");
-    }
+    assertEquals(Configuration.MODEL_VERSION, configuration.getVersion());
 
-    public void testFrom100Part2()
-        throws Exception
-    {
-    	testUpgrade("security-100-2.xml");        
-    }    
+    resultIsFine(UPGRADE_HOME + "/" + filename, configuration);
+  }
 
-    public void testFrom202to203OrphanRoleMappings()
-        throws Exception
-    {
-    	testUpgrade("security-202.xml");        
-    }
+  public void testFrom100()
+      throws Exception
+  {
+    testUpgrade("security-100.xml");
+  }
+
+  public void testFrom100Part2()
+      throws Exception
+  {
+    testUpgrade("security-100-2.xml");
+  }
+
+  public void testFrom202to203OrphanRoleMappings()
+      throws Exception
+  {
+    testUpgrade("security-202.xml");
+  }
 }

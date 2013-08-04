@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.index;
 
 import java.io.File;
@@ -38,302 +39,273 @@ class LockingIndexingContext
     implements IndexingContext
 {
 
-    private final IndexingContext context;
+  private final IndexingContext context;
 
-    private final Lock lock;
+  private final Lock lock;
 
-    private boolean closed;
+  private boolean closed;
 
-    private static final IndexSearcher EMPTY_SEARCHER;
+  private static final IndexSearcher EMPTY_SEARCHER;
 
-    static
-    {
-        EMPTY_SEARCHER = new MemoryIndex().createSearcher();
+  static {
+    EMPTY_SEARCHER = new MemoryIndex().createSearcher();
+  }
+
+  public LockingIndexingContext(IndexingContext context, Lock lock) {
+    this.context = context;
+    this.lock = lock;
+  }
+
+  @Override
+  public String getId() {
+    return context.getId();
+  }
+
+  @Override
+  public String getRepositoryId() {
+    return context.getRepositoryId();
+  }
+
+  @Override
+  public File getRepository() {
+    return context.getRepository();
+  }
+
+  @Override
+  public String getRepositoryUrl() {
+    return context.getRepositoryUrl();
+  }
+
+  @Override
+  public String getIndexUpdateUrl() {
+    return context.getIndexUpdateUrl();
+  }
+
+  @Override
+  public boolean isSearchable() {
+    return context.isSearchable();
+  }
+
+  @Override
+  public void setSearchable(boolean searchable) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Date getTimestamp() {
+    return context.getTimestamp();
+  }
+
+  @Override
+  public void updateTimestamp()
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void updateTimestamp(boolean save)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void updateTimestamp(boolean save, Date date)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int getSize()
+      throws IOException
+  {
+    lock.lock();
+    try {
+      return !isClosed() ? context.getSize() : 0;
     }
-
-    public LockingIndexingContext( IndexingContext context, Lock lock )
-    {
-        this.context = context;
-        this.lock = lock;
+    finally {
+      lock.unlock();
     }
+  }
 
-    @Override
-    public String getId()
-    {
-        return context.getId();
-    }
+  @Override
+  public IndexSearcher acquireIndexSearcher()
+      throws IOException
+  {
+    lock.lock();
+    return !isClosed() ? context.acquireIndexSearcher() : EMPTY_SEARCHER;
+  }
 
-    @Override
-    public String getRepositoryId()
-    {
-        return context.getRepositoryId();
+  @Override
+  public void releaseIndexSearcher(IndexSearcher s)
+      throws IOException
+  {
+    try {
+      if (!isClosed()) {
+        context.releaseIndexSearcher(s);
+      }
     }
+    finally {
+      lock.unlock();
+    }
+  }
 
-    @Override
-    public File getRepository()
-    {
-        return context.getRepository();
+  private synchronized boolean isClosed() {
+    // It is theoretically possible to "reopen" closed indexing context by context.replace(Directory)
+    // To guarantee balance of acquireIndexSearcher/releaseIndexSearcher calls, closed context must stay close
+    if (!closed) {
+      closed = context.getIndexDirectory() == null;
     }
+    return closed;
+  }
 
-    @Override
-    public String getRepositoryUrl()
-    {
-        return context.getRepositoryUrl();
-    }
+  @Override
+  public IndexWriter getIndexWriter()
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public String getIndexUpdateUrl()
-    {
-        return context.getIndexUpdateUrl();
-    }
+  @Override
+  public List<IndexCreator> getIndexCreators() {
+    return context.getIndexCreators();
+  }
 
-    @Override
-    public boolean isSearchable()
-    {
-        return context.isSearchable();
-    }
+  @Override
+  public Analyzer getAnalyzer() {
+    return context.getAnalyzer();
+  }
 
-    @Override
-    public void setSearchable( boolean searchable )
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void commit()
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public Date getTimestamp()
-    {
-        return context.getTimestamp();
-    }
+  @Override
+  public void rollback()
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void updateTimestamp()
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void optimize()
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void updateTimestamp( boolean save )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void close(boolean deleteFiles)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void updateTimestamp( boolean save, Date date )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void purge()
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public int getSize()
-        throws IOException
-    {
-        lock.lock();
-        try
-        {
-            return !isClosed() ? context.getSize() : 0;
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
+  @Override
+  public void merge(Directory directory)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public IndexSearcher acquireIndexSearcher()
-        throws IOException
-    {
-        lock.lock();
-        return !isClosed() ? context.acquireIndexSearcher() : EMPTY_SEARCHER;
-    }
+  @Override
+  public void merge(Directory directory, DocumentFilter filter)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void releaseIndexSearcher( IndexSearcher s )
-        throws IOException
-    {
-        try
-        {
-            if ( !isClosed() )
-            {
-                context.releaseIndexSearcher( s );
-            }
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
+  @Override
+  public void replace(Directory directory)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    private synchronized boolean isClosed()
-    {
-        // It is theoretically possible to "reopen" closed indexing context by context.replace(Directory)
-        // To guarantee balance of acquireIndexSearcher/releaseIndexSearcher calls, closed context must stay close
-        if ( !closed )
-        {
-            closed = context.getIndexDirectory() == null;
-        }
-        return closed;
-    }
+  @Override
+  public Directory getIndexDirectory() {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public IndexWriter getIndexWriter()
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public File getIndexDirectoryFile() {
+    return context.getIndexDirectoryFile();
+  }
 
-    @Override
-    public List<IndexCreator> getIndexCreators()
-    {
-        return context.getIndexCreators();
-    }
+  @Override
+  public GavCalculator getGavCalculator() {
+    return context.getGavCalculator();
+  }
 
-    @Override
-    public Analyzer getAnalyzer()
-    {
-        return context.getAnalyzer();
-    }
+  @Override
+  public void setAllGroups(Collection<String> groups)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void commit()
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
+  @Override
+  public Set<String> getAllGroups()
+      throws IOException
+  {
+    lock.lock();
+    try {
+      return !isClosed() ? context.getAllGroups() : Collections.<String>emptySet();
     }
+    finally {
+      lock.unlock();
+    }
+  }
 
-    @Override
-    public void rollback()
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void setRootGroups(Collection<String> groups)
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void optimize()
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
+  @Override
+  public Set<String> getRootGroups()
+      throws IOException
+  {
+    lock.lock();
+    try {
+      return !isClosed() ? context.getRootGroups() : Collections.<String>emptySet();
     }
+    finally {
+      lock.unlock();
+    }
+  }
 
-    @Override
-    public void close( boolean deleteFiles )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void rebuildGroups()
+      throws IOException
+  {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void purge()
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public boolean isReceivingUpdates() {
+    return context.isReceivingUpdates();
+  }
 
-    @Override
-    public void merge( Directory directory )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
+  public IndexingContext getContext() {
+    IndexingContext result = context;
+    while (result instanceof LockingIndexingContext) {
+      result = ((LockingIndexingContext) result).getContext();
     }
-
-    @Override
-    public void merge( Directory directory, DocumentFilter filter )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void replace( Directory directory )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Directory getIndexDirectory()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public File getIndexDirectoryFile()
-    {
-        return context.getIndexDirectoryFile();
-    }
-
-    @Override
-    public GavCalculator getGavCalculator()
-    {
-        return context.getGavCalculator();
-    }
-
-    @Override
-    public void setAllGroups( Collection<String> groups )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Set<String> getAllGroups()
-        throws IOException
-    {
-        lock.lock();
-        try
-        {
-            return !isClosed() ? context.getAllGroups() : Collections.<String> emptySet();
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void setRootGroups( Collection<String> groups )
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Set<String> getRootGroups()
-        throws IOException
-    {
-        lock.lock();
-        try
-        {
-            return !isClosed()? context.getRootGroups(): Collections.<String>emptySet();
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void rebuildGroups()
-        throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isReceivingUpdates()
-    {
-        return context.isReceivingUpdates();
-    }
-
-    public IndexingContext getContext()
-    {
-        IndexingContext result = context;
-        while ( result instanceof LockingIndexingContext )
-        {
-            result = ( (LockingIndexingContext) result ).getContext();
-        }
-        return result;
-    }
+    return result;
+  }
 }

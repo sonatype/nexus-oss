@@ -10,15 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.log;
 
 /**
  * Logger levels supported.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
 public enum LoggerLevel
 {
-    TRACE, DEBUG, INFO, WARN;
+  TRACE, DEBUG, INFO, WARN;
 }

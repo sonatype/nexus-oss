@@ -10,19 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.templates.repositories;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -38,109 +32,108 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
+import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.Context;
+import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
+
 /**
  * @author tstevens
  */
-@Component( role = PlexusResource.class, hint = "RepositoryTemplateListPlexusResource" )
-@Path( RepositoryTemplateListPlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "RepositoryTemplateListPlexusResource")
+@Path(RepositoryTemplateListPlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
 public class RepositoryTemplateListPlexusResource
     extends AbstractNexusPlexusResource
 {
-    public static final String RESOURCE_URI = "/templates/repositories";
-    
-    @Override
-    public Object getPayloadInstance()
-    {
-        return new RepositoryResourceResponse();
+  public static final String RESOURCE_URI = "/templates/repositories";
+
+  @Override
+  public Object getPayloadInstance() {
+    return new RepositoryResourceResponse();
+  }
+
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
+
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:repotemplates]");
+  }
+
+  /**
+   * Retrieve a list of repository templates in nexus.  Some default configurations for common repository types.
+   */
+  @Override
+  @GET
+  @ResourceMethodSignature(output = RepositoryListResourceResponse.class)
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    RepositoryListResourceResponse result = new RepositoryListResourceResponse();
+
+    RepositoryListResource repoRes;
+
+    TemplateSet repoTemplates = getNexus().getRepositoryTemplates();
+
+    for (Template tmp : repoTemplates) {
+      RepositoryTemplate template = (RepositoryTemplate) tmp;
+
+      repoRes = new RepositoryListResource();
+
+      repoRes.setResourceURI(createChildReference(request, this, template.getId()).toString());
+
+      repoRes.setId(template.getId());
+
+      repoRes.setName(template.getDescription());
+
+      if (ProxyRepository.class.isAssignableFrom(template.getMainFacet())) {
+        repoRes.setRepoType("proxy");
+      }
+      else if (HostedRepository.class.isAssignableFrom(template.getMainFacet())) {
+        repoRes.setRepoType("hosted");
+      }
+      else if (ShadowRepository.class.isAssignableFrom(template.getMainFacet())) {
+        repoRes.setRepoType("virtual");
+      }
+      else if (GroupRepository.class.isAssignableFrom(template.getMainFacet())) {
+        repoRes.setRepoType("group");
+      }
+      else {
+        // huh?
+        repoRes.setRepoType(template.getMainFacet().getName());
+      }
+
+      // policy
+      // another hack
+      if (template.getCoreConfiguration().getExternalConfiguration()
+          .getConfiguration(false) instanceof AbstractMavenRepositoryConfiguration) {
+        repoRes.setRepoPolicy(((AbstractMavenRepositoryConfiguration) template.getCoreConfiguration()
+            .getExternalConfiguration().getConfiguration(false)).getRepositoryPolicy().toString());
+      }
+
+      // format
+      repoRes.setFormat(template.getContentClass().getId());
+
+      // userManaged
+      repoRes.setUserManaged(template.getConfigurableRepository().isUserManaged());
+
+      // exposed
+      repoRes.setExposed(template.getConfigurableRepository().isExposed());
+
+      // ==
+      // below are not used for templates (and does not make any sense)
+      // effectiveLocalStorageUrl
+      // remoteUri
+
+      result.addData(repoRes);
     }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
-
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repotemplates]" );
-    }
-
-    /**
-     * Retrieve a list of repository templates in nexus.  Some default configurations for common repository types.
-     */
-    @Override
-    @GET
-    @ResourceMethodSignature( output = RepositoryListResourceResponse.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        RepositoryListResourceResponse result = new RepositoryListResourceResponse();
-
-        RepositoryListResource repoRes;
-
-        TemplateSet repoTemplates = getNexus().getRepositoryTemplates();
-
-        for ( Template tmp : repoTemplates )
-        {
-            RepositoryTemplate template = (RepositoryTemplate) tmp;
-
-            repoRes = new RepositoryListResource();
-
-            repoRes.setResourceURI( createChildReference( request, this, template.getId() ).toString() );
-
-            repoRes.setId( template.getId() );
-
-            repoRes.setName( template.getDescription() );
-
-            if ( ProxyRepository.class.isAssignableFrom( template.getMainFacet() ) )
-            {
-                repoRes.setRepoType( "proxy" );
-            }
-            else if ( HostedRepository.class.isAssignableFrom( template.getMainFacet() ) )
-            {
-                repoRes.setRepoType( "hosted" );
-            }
-            else if ( ShadowRepository.class.isAssignableFrom( template.getMainFacet() ) )
-            {
-                repoRes.setRepoType( "virtual" );
-            }
-            else if ( GroupRepository.class.isAssignableFrom( template.getMainFacet() ) )
-            {
-                repoRes.setRepoType( "group" );
-            }
-            else
-            {
-                // huh?
-                repoRes.setRepoType( template.getMainFacet().getName() );
-            }
-
-            // policy
-            // another hack
-            if ( template.getCoreConfiguration().getExternalConfiguration().getConfiguration( false ) instanceof AbstractMavenRepositoryConfiguration )
-            {
-                repoRes.setRepoPolicy( ( (AbstractMavenRepositoryConfiguration) template.getCoreConfiguration()
-                    .getExternalConfiguration().getConfiguration( false ) ).getRepositoryPolicy().toString() );
-            }
-
-            // format
-            repoRes.setFormat( template.getContentClass().getId() );
-
-            // userManaged
-            repoRes.setUserManaged( template.getConfigurableRepository().isUserManaged() );
-
-            // exposed
-            repoRes.setExposed( template.getConfigurableRepository().isExposed() );
-
-            // ==
-            // below are not used for templates (and does not make any sense)
-            // effectiveLocalStorageUrl
-            // remoteUri
-
-            result.addData( repoRes );
-        }
-
-        return result;
-    }
+    return result;
+  }
 }

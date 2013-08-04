@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.jaxrs;
 
 import java.util.Date;
@@ -20,47 +21,46 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.plexus.rest.jsr311.JsrComponent;
 
-@Component( role = JsrComponent.class, hint = "test" )
-@Path( "/test" )
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+
+@Component(role = JsrComponent.class, hint = "test")
+@Path("/test")
 public class TestJaxRsResource
     extends AbstractLogEnabled
 {
-    @GET
-    @Produces( { "text/xml", "application/json" } )
-    public TestDto get( String param )
-    {
-        getLogger().info( "Got GET request with param '" + param + "'" );
+  @GET
+  @Produces({"text/xml", "application/json"})
+  public TestDto get(String param) {
+    getLogger().info("Got GET request with param '" + param + "'");
 
-        TestDto result = new TestDto();
+    TestDto result = new TestDto();
 
-        result.setAString( param );
+    result.setAString(param);
 
-        result.setADate( new Date() );
+    result.setADate(new Date());
 
-        result.getAStringList().add( param );
+    result.getAStringList().add(param);
 
-        result.getAStringList().add( param );
+    result.getAStringList().add(param);
 
-        TestDto child = new TestDto();
+    TestDto child = new TestDto();
 
-        child.setAString( "child" );
+    child.setAString("child");
 
-        result.getChildren().add( child );
+    result.getChildren().add(child);
 
-        return result;
-    }
+    return result;
+  }
 
-    @PUT
-    @Consumes( { "application/xml", "application/json" } )
-    @Produces( { "application/xml", "application/json" } )
-    public String put( TestDto t )
-    {
-        getLogger().info( "Got TestDTO " + t.getAString() );
+  @PUT
+  @Consumes({"application/xml", "application/json"})
+  @Produces({"application/xml", "application/json"})
+  public String put(TestDto t) {
+    getLogger().info("Got TestDTO " + t.getAString());
 
-        return "OK";
-    }
+    return "OK";
+  }
 }

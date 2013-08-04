@@ -10,7 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.jetty;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
@@ -22,9 +26,6 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Custom re-implementation of {@link com.yammer.metrics.jetty.InstrumentedSelectChannelConnector}
  * which sets up metrics collection on {@link #doStart()} instead of in CTOR.
@@ -34,78 +35,78 @@ import java.util.concurrent.TimeUnit;
 public final class InstrumentedSelectChannelConnector
     extends SelectChannelConnector
 {
-    private static final Logger log = LoggerFactory.getLogger(InstrumentedSelectChannelConnector.class);
+  private static final Logger log = LoggerFactory.getLogger(InstrumentedSelectChannelConnector.class);
 
-    private final MetricsRegistry registry;
+  private final MetricsRegistry registry;
 
-    private Timer duration;
+  private Timer duration;
 
-    private Meter accepts, connects, disconnects;
+  private Meter accepts, connects, disconnects;
 
-    private Counter connections;
+  private Counter connections;
 
-    public InstrumentedSelectChannelConnector() {
-        registry = Metrics.defaultRegistry();
-    }
+  public InstrumentedSelectChannelConnector() {
+    registry = Metrics.defaultRegistry();
+  }
 
-    @Override
-    protected void doStart() throws Exception {
-        String port = String.valueOf(getPort());
+  @Override
+  protected void doStart() throws Exception {
+    String port = String.valueOf(getPort());
 
-        this.duration = registry.newTimer(SelectChannelConnector.class,
-            "connection-duration",
-            port,
-            TimeUnit.MILLISECONDS,
-            TimeUnit.SECONDS);
+    this.duration = registry.newTimer(SelectChannelConnector.class,
+        "connection-duration",
+        port,
+        TimeUnit.MILLISECONDS,
+        TimeUnit.SECONDS);
 
-        this.accepts = registry.newMeter(SelectChannelConnector.class,
-            "accepts",
-            port,
-            "connections",
-            TimeUnit.SECONDS);
+    this.accepts = registry.newMeter(SelectChannelConnector.class,
+        "accepts",
+        port,
+        "connections",
+        TimeUnit.SECONDS);
 
-        this.connects = registry.newMeter(SelectChannelConnector.class,
-            "connects",
-            port,
-            "connections",
-            TimeUnit.SECONDS);
+    this.connects = registry.newMeter(SelectChannelConnector.class,
+        "connects",
+        port,
+        "connections",
+        TimeUnit.SECONDS);
 
-        this.disconnects = registry.newMeter(SelectChannelConnector.class,
-            "disconnects",
-            port,
-            "connections",
-            TimeUnit.SECONDS);
+    this.disconnects = registry.newMeter(SelectChannelConnector.class,
+        "disconnects",
+        port,
+        "connections",
+        TimeUnit.SECONDS);
 
-        this.connections = registry.newCounter(SelectChannelConnector.class,
-            "active-connections",
-            port);
+    this.connections = registry.newCounter(SelectChannelConnector.class,
+        "active-connections",
+        port);
 
-        log.info("Metrics enabled");
+    log.info("Metrics enabled");
 
-        super.doStart();
-    }
+    super.doStart();
+  }
 
-    // TODO: remove metrics on doStop()
+  // TODO: remove metrics on doStop()
 
-    @Override
-    public void accept(final int acceptorID) throws IOException {
-        super.accept(acceptorID);
-        accepts.mark();
-    }
+  @Override
+  public void accept(final int acceptorID) throws IOException {
+    super.accept(acceptorID);
+    accepts.mark();
+  }
 
-    @Override
-    protected void connectionOpened(final Connection connection) {
-        connections.inc();
-        super.connectionOpened(connection);
-        connects.mark();
-    }
+  @Override
+  protected void connectionOpened(final Connection connection) {
+    connections.inc();
+    super.connectionOpened(connection);
+    connects.mark();
+  }
 
-    @Override
-    protected void connectionClosed(final Connection connection) {
-        super.connectionClosed(connection);
-        disconnects.mark();
-        final long duration = System.currentTimeMillis() - connection.getTimeStamp();
-        this.duration.update(duration, TimeUnit.MILLISECONDS);
-        connections.dec();
-    }
+  @Override
+  protected void connectionClosed(final Connection connection) {
+    super.connectionClosed(connection);
+    disconnects.mark();
+    final long duration = System.currentTimeMillis() - connection.getTimeStamp();
+    this.duration.update(duration, TimeUnit.MILLISECONDS);
+    connections.dec();
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.configuration.upgrade;
 
 import org.sonatype.configuration.upgrade.ConfigurationUpgrader;
@@ -18,7 +19,7 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 /**
  * Defines a type for upgraders of security-configuration.xml.
  * This is only used if an old version is detected and needs to be upgraded
- * 
+ *
  * @author Steve Carlucci
  * @since 3.1
  */

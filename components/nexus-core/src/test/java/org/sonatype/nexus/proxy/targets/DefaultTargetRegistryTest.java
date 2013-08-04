@@ -10,7 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.targets;
+
+import org.sonatype.nexus.proxy.repository.Repository;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,67 +23,63 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Test;
-import org.sonatype.nexus.proxy.repository.Repository;
 /**
  * Simple DefaultTargetRegistry creation test
  */
 public class DefaultTargetRegistryTest
     extends AbstractDefaultTargetRegistryTest
 {
-    @Test
-    public void testSimpleM2()
-    {
-        // create a dummy
-        Repository repository = mock( Repository.class );
-        doReturn( "dummy" ).when( repository ).getId();
-        doReturn( maven2 ).when( repository ).getRepositoryContentClass();
+  @Test
+  public void testSimpleM2() {
+    // create a dummy
+    Repository repository = mock(Repository.class);
+    doReturn("dummy").when(repository).getId();
+    doReturn(maven2).when(repository).getRepositoryContentClass();
 
-        TargetSet ts =
-            targetRegistry.getTargetsForRepositoryPath( repository,
-                "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9.pom" );
+    TargetSet ts =
+        targetRegistry.getTargetsForRepositoryPath(repository,
+            "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9.pom");
 
-        assertThat( ts, notNullValue() );
-        assertThat( ts.getMatches().size(), equalTo( 2 ) );
-        assertThat( ts.getMatchedRepositoryIds().size(), equalTo( 1 ) );
-        assertThat( ts.getMatchedRepositoryIds().iterator().next(), equalTo( "dummy" ) );
+    assertThat(ts, notNullValue());
+    assertThat(ts.getMatches().size(), equalTo(2));
+    assertThat(ts.getMatchedRepositoryIds().size(), equalTo(1));
+    assertThat(ts.getMatchedRepositoryIds().iterator().next(), equalTo("dummy"));
 
-        TargetSet ts1 =
-            targetRegistry.getTargetsForRepositoryPath( repository,
-                "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar" );
+    TargetSet ts1 =
+        targetRegistry.getTargetsForRepositoryPath(repository,
+            "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar");
 
-        assertThat( ts1, notNullValue() );
-        assertThat( ts1.getMatches().size(), equalTo( 1 ) );
-        assertThat( ts1.getMatches().iterator().next().getTarget().getId(), equalTo( "maven2-with-sources" ) );
+    assertThat(ts1, notNullValue());
+    assertThat(ts1.getMatches().size(), equalTo(1));
+    assertThat(ts1.getMatches().iterator().next().getTarget().getId(), equalTo("maven2-with-sources"));
 
-        // adding them
-        ts.addTargetSet( ts1 );
+    // adding them
+    ts.addTargetSet(ts1);
 
-        assertThat( ts, notNullValue() );
-        assertThat( ts.getMatches().size(), equalTo( 2 ) );
-        assertThat( ts.getMatchedRepositoryIds().size(), equalTo( 1 ) );
-    }
+    assertThat(ts, notNullValue());
+    assertThat(ts.getMatches().size(), equalTo(2));
+    assertThat(ts.getMatchedRepositoryIds().size(), equalTo(1));
+  }
 
-    @Test
-    public void testSimpleM1()
-    {
-        // create a dummy
-        Repository repository = mock( Repository.class );
-        doReturn( "dummy" ).when( repository ).getId();
-        doReturn( maven1 ).when( repository ).getRepositoryContentClass();
+  @Test
+  public void testSimpleM1() {
+    // create a dummy
+    Repository repository = mock(Repository.class);
+    doReturn("dummy").when(repository).getId();
+    doReturn(maven1).when(repository).getRepositoryContentClass();
 
-        TargetSet ts =
-            targetRegistry.getTargetsForRepositoryPath( repository, "/org.apache.maven/jars/maven-model-v3-2.0.jar" );
+    TargetSet ts =
+        targetRegistry.getTargetsForRepositoryPath(repository, "/org.apache.maven/jars/maven-model-v3-2.0.jar");
 
-        assertThat( ts, notNullValue() );
-        assertThat( ts.getMatches().size(), equalTo( 1 ) );
+    assertThat(ts, notNullValue());
+    assertThat(ts.getMatches().size(), equalTo(1));
 
-        ts =
-            targetRegistry.getTargetsForRepositoryPath( repository,
-                "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar" );
+    ts =
+        targetRegistry.getTargetsForRepositoryPath(repository,
+            "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar");
 
-        assertThat( ts, notNullValue() );
-        assertThat( ts.getMatches().size(), equalTo( 0 ) );
-    }
+    assertThat(ts, notNullValue());
+    assertThat(ts.getMatches().size(), equalTo(0));
+  }
 
 }

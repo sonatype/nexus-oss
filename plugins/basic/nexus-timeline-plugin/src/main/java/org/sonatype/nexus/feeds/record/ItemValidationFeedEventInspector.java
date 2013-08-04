@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds.record;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -21,48 +21,45 @@ import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecks
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
 import org.sonatype.plexus.appevents.Event;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Event inspector that creates feeds about failed item validations.
- * 
+ *
  * @author cstamas
  */
-@Component( role = EventInspector.class, hint = "ItemValidationFeedEventInspector" )
+@Component(role = EventInspector.class, hint = "ItemValidationFeedEventInspector")
 public class ItemValidationFeedEventInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector
 {
-    public boolean accepts( final Event<?> evt )
-    {
-        if ( evt instanceof RepositoryItemValidationEventFailed )
-        {
-            return true;
-        }
-
-        return false;
+  public boolean accepts(final Event<?> evt) {
+    if (evt instanceof RepositoryItemValidationEventFailed) {
+      return true;
     }
 
-    public void inspect( final Event<?> evt )
-    {
-        final RepositoryItemValidationEventFailed ievt = (RepositoryItemValidationEventFailed) evt;
+    return false;
+  }
 
-        final NexusItemInfo ai = new NexusItemInfo();
-        ai.setRepositoryId( ievt.getItem().getRepositoryId() );
-        ai.setPath( ievt.getItem().getPath() );
-        ai.setRemoteUrl( ievt.getItem().getRemoteUrl() );
+  public void inspect(final Event<?> evt) {
+    final RepositoryItemValidationEventFailed ievt = (RepositoryItemValidationEventFailed) evt;
 
-        String action = NexusArtifactEvent.ACTION_BROKEN;
+    final NexusItemInfo ai = new NexusItemInfo();
+    ai.setRepositoryId(ievt.getItem().getRepositoryId());
+    ai.setPath(ievt.getItem().getPath());
+    ai.setRemoteUrl(ievt.getItem().getRemoteUrl());
 
-        if ( ievt instanceof RepositoryItemValidationEventFailedChecksum )
-        {
-            action = NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM;
-        }
-        else if ( ievt instanceof RepositoryItemValidationEventFailedFileType )
-        {
-            action = NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT;
-        }
+    String action = NexusArtifactEvent.ACTION_BROKEN;
 
-        final NexusArtifactEvent nae = new NexusArtifactEvent( ievt.getEventDate(), action, ievt.getMessage(), ai );
-
-        getFeedRecorder().addNexusArtifactEvent( nae );
+    if (ievt instanceof RepositoryItemValidationEventFailedChecksum) {
+      action = NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM;
     }
+    else if (ievt instanceof RepositoryItemValidationEventFailedFileType) {
+      action = NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT;
+    }
+
+    final NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, ievt.getMessage(), ai);
+
+    getFeedRecorder().addNexusArtifactEvent(nae);
+  }
 }

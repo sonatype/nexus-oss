@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.ldap.nxcm58;
 
 import org.junit.Before;
@@ -19,16 +20,14 @@ public class Nxcm58NexusCommonUseXmlIT
     extends Nxcm58NexusCommonUseJsonIT
 {
 
-    public Nxcm58NexusCommonUseXmlIT()
-    {
-        super();
-    }
+  public Nxcm58NexusCommonUseXmlIT() {
+    super();
+  }
 
-    @Before
-    public void init()
-    {
-        this.xstream = this.getXMLXStream();
-        this.mediaType = MediaType.APPLICATION_XML;
-    }
+  @Before
+  public void init() {
+    this.xstream = this.getXMLXStream();
+    this.mediaType = MediaType.APPLICATION_XML;
+  }
 
 }

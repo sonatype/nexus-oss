@@ -10,65 +10,65 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.model.source;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.model.AbstractSecurityConfigTest;
+
+import org.codehaus.plexus.util.IOUtil;
 
 public abstract class AbstractSecurityConfigurationSourceTest
     extends AbstractSecurityConfigTest
 {
 
-    protected SecurityModelConfigurationSource configurationSource;
+  protected SecurityModelConfigurationSource configurationSource;
 
-    protected abstract SecurityModelConfigurationSource getConfigurationSource()
-        throws Exception;
+  protected abstract SecurityModelConfigurationSource getConfigurationSource()
+      throws Exception;
 
-    protected abstract InputStream getOriginatingConfigurationInputStream()
-        throws IOException;
+  protected abstract InputStream getOriginatingConfigurationInputStream()
+      throws IOException;
 
-    public void testConfigStream()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
+  public void testConfigStream()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
 
-        // not using load here since File config would load it and store it
-        // thus changing it (but no content change!)
-        copyDefaultSecurityConfigToPlace();
+    // not using load here since File config would load it and store it
+    // thus changing it (but no content change!)
+    copyDefaultSecurityConfigToPlace();
 
-        InputStream configStream = null;
+    InputStream configStream = null;
 
-        InputStream origStream = null;
+    InputStream origStream = null;
 
-        try
-        {
-            configStream = configurationSource.getConfigurationAsStream();
+    try {
+      configStream = configurationSource.getConfigurationAsStream();
 
-            origStream = getOriginatingConfigurationInputStream();
+      origStream = getOriginatingConfigurationInputStream();
 
-            assertTrue( IOUtil.contentEquals( configStream, origStream ) );
-        }
-        finally
-        {
-            IOUtil.close( origStream );
-
-            IOUtil.close( configStream );
-        }
+      assertTrue(IOUtil.contentEquals(configStream, origStream));
     }
+    finally {
+      IOUtil.close(origStream);
 
-    public void testGetConfiguration()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
-
-        assertTrue( configurationSource.getConfiguration() == null );
-
-        configurationSource.loadConfiguration();
-
-        assertFalse( configurationSource.getConfiguration() == null );
+      IOUtil.close(configStream);
     }
+  }
+
+  public void testGetConfiguration()
+      throws Exception
+  {
+    configurationSource = getConfigurationSource();
+
+    assertTrue(configurationSource.getConfiguration() == null);
+
+    configurationSource.loadConfiguration();
+
+    assertFalse(configurationSource.getConfiguration() == null);
+  }
 
 }

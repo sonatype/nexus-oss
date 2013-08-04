@@ -10,50 +10,50 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class DefaultGlobalRemoteConnectionSettingsTest
     extends NexusAppTestSupport
 {
 
-    @SuppressWarnings( "unchecked" )
-    @Test
-    public void testEvents()
-        throws Exception
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testEvents()
+      throws Exception
+  {
+    NexusConfiguration cfg = lookup(NexusConfiguration.class);
+    cfg.loadConfiguration();
+
+    final Event<GlobalRemoteConnectionSettings>[] event = new Event[1];
+    lookup(EventBus.class).register(new Object()
     {
-        NexusConfiguration cfg = lookup( NexusConfiguration.class );
-        cfg.loadConfiguration();
+      @Subscribe
+      public void onEvent(GlobalRemoteConnectionSettingsChangedEvent evt) {
+        event[0] = evt;
+      }
+    });
 
-        final Event<GlobalRemoteConnectionSettings>[] event = new Event[1];
-        lookup( EventBus.class ).register( new Object()
-        {
-            @Subscribe
-            public void onEvent( GlobalRemoteConnectionSettingsChangedEvent evt )
-            {
-                event[0] = evt;
-            }
-        } );
+    GlobalRemoteConnectionSettings settings = lookup(GlobalRemoteConnectionSettings.class);
 
-        GlobalRemoteConnectionSettings settings = lookup( GlobalRemoteConnectionSettings.class );
+    settings.setConnectionTimeout(2);
+    settings.setRetrievalRetryCount(3);
 
-        settings.setConnectionTimeout( 2 );
-        settings.setRetrievalRetryCount( 3 );
+    cfg.saveConfiguration();
 
-        cfg.saveConfiguration();
+    Assert.assertNotNull(event[0].getEventSender());
+    Assert.assertEquals(settings, event[0].getEventSender());
+    Assert.assertEquals(2, event[0].getEventSender().getConnectionTimeout());
+    Assert.assertEquals(3, event[0].getEventSender().getRetrievalRetryCount());
 
-        Assert.assertNotNull( event[0].getEventSender() );
-        Assert.assertEquals( settings, event[0].getEventSender() );
-        Assert.assertEquals( 2, event[0].getEventSender().getConnectionTimeout() );
-        Assert.assertEquals( 3, event[0].getEventSender().getRetrievalRetryCount() );
-
-    }
+  }
 }

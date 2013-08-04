@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest;
 
 import java.io.StringWriter;
@@ -23,37 +24,34 @@ import org.restlet.data.Response;
 
 public class TestClient
 {
-    private Response response;
+  private Response response;
 
-    public String request( String uri )
-        throws Exception
-    {
-        Request request = new Request();
+  public String request(String uri)
+      throws Exception
+  {
+    Request request = new Request();
 
-        request.setResourceRef( uri );
+    request.setResourceRef(uri);
 
-        request.setMethod( Method.GET );
+    request.setMethod(Method.GET);
 
-        Client client = new Client( Protocol.HTTP );
+    Client client = new Client(Protocol.HTTP);
 
-        response = client.handle( request );
+    response = client.handle(request);
 
-        Writer writer = new StringWriter();
+    Writer writer = new StringWriter();
 
-        if ( response.getStatus().isSuccess() )
-        {
-            response.getEntity().write( writer );
+    if (response.getStatus().isSuccess()) {
+      response.getEntity().write(writer);
 
-            return writer.toString();
-        }
-        else
-        {
-            return null;
-        }
+      return writer.toString();
     }
-
-    public Response getLastResponse()
-    {
-        return response;
+    else {
+      return null;
     }
+  }
+
+  public Response getLastResponse() {
+    return response;
+  }
 }

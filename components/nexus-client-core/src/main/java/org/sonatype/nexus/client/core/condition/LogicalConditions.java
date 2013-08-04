@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.condition;
 
 import org.sonatype.nexus.client.core.Condition;
@@ -24,119 +25,102 @@ import org.sonatype.nexus.client.internal.util.Check;
 public abstract class LogicalConditions
 {
 
-    /**
-     * Creates a {@link org.sonatype.nexus.client.core.Condition} that requires that all members match. In other words, it
-     * applies logical "AND" operation to them.
-     *
-     * @param conditions
-     * @return {@code true} if all passed in conditions match.
-     */
-    public static Condition and( final Condition... conditions )
+  /**
+   * Creates a {@link org.sonatype.nexus.client.core.Condition} that requires that all members match. In other words,
+   * it
+   * applies logical "AND" operation to them.
+   *
+   * @return {@code true} if all passed in conditions match.
+   */
+  public static Condition and(final Condition... conditions) {
+    Check.argument(conditions.length > 1, "At least two operators expected!");
+    return new Condition()
     {
-        Check.argument( conditions.length > 1, "At least two operators expected!" );
-        return new Condition()
-        {
-            @Override
-            public boolean isSatisfiedBy( final NexusStatus status )
-            {
-                for ( Condition condition : conditions )
-                {
-                    if ( !condition.isSatisfiedBy( status ) )
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
+      @Override
+      public boolean isSatisfiedBy(final NexusStatus status) {
+        for (Condition condition : conditions) {
+          if (!condition.isSatisfiedBy(status)) {
+            return false;
+          }
+        }
+        return true;
+      }
 
-            private static final String KW = " AND ";
+      private static final String KW = " AND ";
 
-            @Override
-            public String explainNotSatisfied( final NexusStatus status )
-            {
-                final Condition lastCondition = conditions[conditions.length - 1];
-                final StringBuilder explanation = new StringBuilder( "(" );
-                for ( Condition condition : conditions )
-                {
-                    explanation.append( condition.explainNotSatisfied( status ) );
-                    if ( condition != lastCondition )
-                    {
-                        explanation.append( KW );
-                    }
-                }
-                return explanation.append( ")" ).toString();
-            }
-        };
-    }
+      @Override
+      public String explainNotSatisfied(final NexusStatus status) {
+        final Condition lastCondition = conditions[conditions.length - 1];
+        final StringBuilder explanation = new StringBuilder("(");
+        for (Condition condition : conditions) {
+          explanation.append(condition.explainNotSatisfied(status));
+          if (condition != lastCondition) {
+            explanation.append(KW);
+          }
+        }
+        return explanation.append(")").toString();
+      }
+    };
+  }
 
-    /**
-     * Creates a {@link org.sonatype.nexus.client.core.Condition} that requires that any members match. In other words, it
-     * applies logical "OR" operation to them.
-     *
-     * @param conditions
-     * @return {@code true} if any passed in matchers match.
-     */
-    public static Condition or( final Condition... conditions )
+  /**
+   * Creates a {@link org.sonatype.nexus.client.core.Condition} that requires that any members match. In other words,
+   * it
+   * applies logical "OR" operation to them.
+   *
+   * @return {@code true} if any passed in matchers match.
+   */
+  public static Condition or(final Condition... conditions) {
+    Check.argument(conditions.length > 1, "At least two operators expected!");
+    return new Condition()
     {
-        Check.argument( conditions.length > 1, "At least two operators expected!" );
-        return new Condition()
-        {
-            @Override
-            public boolean isSatisfiedBy( final NexusStatus status )
-            {
-                for ( Condition condition : conditions )
-                {
-                    if ( condition.isSatisfiedBy( status ) )
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
+      @Override
+      public boolean isSatisfiedBy(final NexusStatus status) {
+        for (Condition condition : conditions) {
+          if (condition.isSatisfiedBy(status)) {
+            return true;
+          }
+        }
+        return false;
+      }
 
-            private static final String KW = " OR ";
+      private static final String KW = " OR ";
 
-            @Override
-            public String explainNotSatisfied( final NexusStatus status )
-            {
-                final Condition lastCondition = conditions[conditions.length - 1];
-                final StringBuilder explanation = new StringBuilder( "(" );
-                for ( Condition condition : conditions )
-                {
-                    explanation.append( condition.explainNotSatisfied( status ) );
-                    if ( condition != lastCondition )
-                    {
-                        explanation.append( KW );
-                    }
-                }
-                return explanation.append( ")" ).toString();
-            }
-        };
-    }
+      @Override
+      public String explainNotSatisfied(final NexusStatus status) {
+        final Condition lastCondition = conditions[conditions.length - 1];
+        final StringBuilder explanation = new StringBuilder("(");
+        for (Condition condition : conditions) {
+          explanation.append(condition.explainNotSatisfied(status));
+          if (condition != lastCondition) {
+            explanation.append(KW);
+          }
+        }
+        return explanation.append(")").toString();
+      }
+    };
+  }
 
-    /**
-     * Creates a {@link org.sonatype.nexus.client.core.Condition} that return negation of the passed in matcher match. In
-     * other words, it applies logical "NOT" operation to it.
-     *
-     * @param condition
-     * @return {@code true} if all passed in matchers match.
-     */
-    public static Condition not( final Condition condition )
+  /**
+   * Creates a {@link org.sonatype.nexus.client.core.Condition} that return negation of the passed in matcher match.
+   * In
+   * other words, it applies logical "NOT" operation to it.
+   *
+   * @return {@code true} if all passed in matchers match.
+   */
+  public static Condition not(final Condition condition) {
+    Check.notNull(condition, Condition.class);
+    return new Condition()
     {
-        Check.notNull( condition, Condition.class );
-        return new Condition()
-        {
-            @Override
-            public boolean isSatisfiedBy( final NexusStatus status )
-            {
-                return !condition.isSatisfiedBy( status );
-            }
+      @Override
+      public boolean isSatisfiedBy(final NexusStatus status) {
+        return !condition.isSatisfiedBy(status);
+      }
 
-            @Override
-            public String explainNotSatisfied( NexusStatus status )
-            {
-                return "(NOT " + condition.explainNotSatisfied( status ) + ")";
-            }
-        };
-    }
+      @Override
+      public String explainNotSatisfied(NexusStatus status) {
+        return "(NOT " + condition.explainNotSatisfied(status) + ")";
+      }
+    };
+  }
 }

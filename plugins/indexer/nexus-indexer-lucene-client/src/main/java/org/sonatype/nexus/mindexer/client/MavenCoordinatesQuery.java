@@ -10,59 +10,50 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mindexer.client;
 
 public class MavenCoordinatesQuery
     extends Query
 {
 
-    public String getGroupId()
-    {
-        return getTerms().get( "g" );
-    }
+  public String getGroupId() {
+    return getTerms().get("g");
+  }
 
-    public void setGroupId( String g )
-    {
-        getTerms().put( "g", g );
-    }
+  public void setGroupId(String g) {
+    getTerms().put("g", g);
+  }
 
-    public String getArtifactId()
-    {
-        return getTerms().get( "a" );
-    }
+  public String getArtifactId() {
+    return getTerms().get("a");
+  }
 
-    public void setArtifactId( String a )
-    {
-        getTerms().put( "a", a );
-    }
+  public void setArtifactId(String a) {
+    getTerms().put("a", a);
+  }
 
-    public String getVersion()
-    {
-        return getTerms().get( "v" );
-    }
+  public String getVersion() {
+    return getTerms().get("v");
+  }
 
-    public void setVersion( String v )
-    {
-        getTerms().put( "v", v );
-    }
+  public void setVersion(String v) {
+    getTerms().put("v", v);
+  }
 
-    public String getClassifier()
-    {
-        return getTerms().get( "c" );
-    }
+  public String getClassifier() {
+    return getTerms().get("c");
+  }
 
-    public void setClassifier( String c )
-    {
-        getTerms().put( "c", c );
-    }
+  public void setClassifier(String c) {
+    getTerms().put("c", c);
+  }
 
-    public String getType()
-    {
-        return getTerms().get( "p" );
-    }
+  public String getType() {
+    return getTerms().get("p");
+  }
 
-    public void setType( String t )
-    {
-        getTerms().put( "p", t );
-    }
+  public void setType(String t) {
+    getTerms().put("p", t);
+  }
 }

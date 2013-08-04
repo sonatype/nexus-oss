@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.threads;
 
 import java.util.concurrent.ThreadFactory;
@@ -18,58 +19,52 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class NexusThreadFactory
     implements ThreadFactory
 {
-    private static final AtomicInteger poolNumber = new AtomicInteger( 1 );
+  private static final AtomicInteger poolNumber = new AtomicInteger(1);
 
-    private final AtomicInteger threadNumber = new AtomicInteger( 1 );
+  private final AtomicInteger threadNumber = new AtomicInteger(1);
 
-    private final String namePrefix;
+  private final String namePrefix;
 
-    private final ThreadGroup schedulerThreadGroup;
+  private final ThreadGroup schedulerThreadGroup;
 
-    private final boolean deamonThread;
+  private final boolean deamonThread;
 
-    private int threadPriority;
+  private int threadPriority;
 
-    public NexusThreadFactory( String poolId, String name )
-    {
-        this( poolId, name, Thread.NORM_PRIORITY );
-    }
+  public NexusThreadFactory(String poolId, String name) {
+    this(poolId, name, Thread.NORM_PRIORITY);
+  }
 
-    public NexusThreadFactory( final String poolId, final String threadGroupName, final int threadPriority )
-    {
-        this( poolId, threadGroupName, threadPriority, false );
-    }
+  public NexusThreadFactory(final String poolId, final String threadGroupName, final int threadPriority) {
+    this(poolId, threadGroupName, threadPriority, false);
+  }
 
-    public NexusThreadFactory( final String poolId, final String threadGroupName, final int threadPriority,
-                               final boolean daemonThread )
-    {
-        int poolNum = poolNumber.getAndIncrement();
-        this.schedulerThreadGroup = new ThreadGroup( threadGroupName + " #" + poolNum );
-        this.namePrefix = poolId + "-" + poolNum + "-thread-";
-        this.deamonThread = daemonThread;
-        this.threadPriority = threadPriority;
-    }
+  public NexusThreadFactory(final String poolId, final String threadGroupName, final int threadPriority,
+                            final boolean daemonThread)
+  {
+    int poolNum = poolNumber.getAndIncrement();
+    this.schedulerThreadGroup = new ThreadGroup(threadGroupName + " #" + poolNum);
+    this.namePrefix = poolId + "-" + poolNum + "-thread-";
+    this.deamonThread = daemonThread;
+    this.threadPriority = threadPriority;
+  }
 
-    public Thread newThread( final Runnable r )
-    {
-        final Thread result = new Thread( schedulerThreadGroup, r, namePrefix + threadNumber.getAndIncrement() );
-        result.setDaemon( this.deamonThread );
-        result.setPriority( this.threadPriority );
-        return result;
-    }
+  public Thread newThread(final Runnable r) {
+    final Thread result = new Thread(schedulerThreadGroup, r, namePrefix + threadNumber.getAndIncrement());
+    result.setDaemon(this.deamonThread);
+    result.setPriority(this.threadPriority);
+    return result;
+  }
 
-    public ThreadGroup getSchedulerThreadGroup()
-    {
-        return this.schedulerThreadGroup;
-    }
+  public ThreadGroup getSchedulerThreadGroup() {
+    return this.schedulerThreadGroup;
+  }
 
-    public int getThreadPriority()
-    {
-        return threadPriority;
-    }
+  public int getThreadPriority() {
+    return threadPriority;
+  }
 
-    public void setThreadPriority( int threadPriority )
-    {
-        this.threadPriority = threadPriority;
-    }
+  public void setThreadPriority(int threadPriority) {
+    this.threadPriority = threadPriority;
+  }
 }

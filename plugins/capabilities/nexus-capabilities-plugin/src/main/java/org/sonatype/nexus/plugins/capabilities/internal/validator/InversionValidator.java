@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Logical NOT ona a {@link Validator}.
@@ -30,35 +32,30 @@ public class InversionValidator
     implements Validator
 {
 
-    private final Validator validator;
+  private final Validator validator;
 
-    @Inject
-    public InversionValidator( final Validator validator )
-    {
-        this.validator = checkNotNull( validator );
-    }
+  @Inject
+  public InversionValidator(final Validator validator) {
+    this.validator = checkNotNull(validator);
+  }
 
-    @Override
-    public ValidationResult validate( final Map<String, String> properties )
-    {
-        final ValidationResult validationResult = validator.validate( properties );
-        if ( !validationResult.isValid() )
-        {
-            return ValidationResult.VALID;
-        }
-        return new DefaultValidationResult().add( explainInvalid() );
+  @Override
+  public ValidationResult validate(final Map<String, String> properties) {
+    final ValidationResult validationResult = validator.validate(properties);
+    if (!validationResult.isValid()) {
+      return ValidationResult.VALID;
     }
+    return new DefaultValidationResult().add(explainInvalid());
+  }
 
-    @Override
-    public String explainValid()
-    {
-        return validator.explainInvalid();
-    }
+  @Override
+  public String explainValid() {
+    return validator.explainInvalid();
+  }
 
-    @Override
-    public String explainInvalid()
-    {
-        return validator.explainValid();
-    }
+  @Override
+  public String explainInvalid() {
+    return validator.explainValid();
+  }
 
 }

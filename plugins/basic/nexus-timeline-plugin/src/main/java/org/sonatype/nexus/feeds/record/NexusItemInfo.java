@@ -10,44 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds.record;
 
 public class NexusItemInfo
 {
-    private String path;
+  private String path;
 
-    private String repositoryId;
+  private String repositoryId;
 
-    private String remoteUrl;
+  private String remoteUrl;
 
-    public String getPath()
-    {
-        return path;
-    }
+  public String getPath() {
+    return path;
+  }
 
-    public void setPath( String path )
-    {
-        this.path = path;
-    }
+  public void setPath(String path) {
+    this.path = path;
+  }
 
-    public String getRepositoryId()
-    {
-        return repositoryId;
-    }
+  public String getRepositoryId() {
+    return repositoryId;
+  }
 
-    public void setRepositoryId( String repositoryId )
-    {
-        this.repositoryId = repositoryId;
-    }
+  public void setRepositoryId(String repositoryId) {
+    this.repositoryId = repositoryId;
+  }
 
-    public String getRemoteUrl()
-    {
-        return remoteUrl;
-    }
+  public String getRemoteUrl() {
+    return remoteUrl;
+  }
 
-    public void setRemoteUrl( String remoteUrl )
-    {
-        this.remoteUrl = remoteUrl;
-    }
+  public void setRemoteUrl(String remoteUrl) {
+    this.remoteUrl = remoteUrl;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 
 import java.util.Map;
@@ -23,42 +24,38 @@ import org.sonatype.tests.http.server.jetty.behaviour.Content;
 import org.sonatype.tests.http.server.jetty.behaviour.ErrorBehaviour;
 
 /**
- * {@link Behaviour} that combines {@link ErrorBehaviour} and {@link Content} behaviours, by letting specifying response
+ * {@link Behaviour} that combines {@link ErrorBehaviour} and {@link Content} behaviours, by letting specifying
+ * response
  * error code and body, thus allowing to simulate error pages too. And it uses {@link FormatTemplate} for body, so body
  * template is evaluated per request.
  */
 public class DeliverTemplateBehaviour
     implements Behaviour
 {
-    private final int code;
+  private final int code;
 
-    private final String bodyContentType;
+  private final String bodyContentType;
 
-    private final FormatTemplate body;
+  private final FormatTemplate body;
 
-    /**
-     * Constructor.
-     * 
-     * @param code
-     * @param bodyContentType
-     * @param body
-     */
-    public DeliverTemplateBehaviour( final int code, final String bodyContentType, final FormatTemplate body )
-    {
-        this.code = code;
-        this.bodyContentType = bodyContentType;
-        this.body = body;
-    }
+  /**
+   * Constructor.
+   */
+  public DeliverTemplateBehaviour(final int code, final String bodyContentType, final FormatTemplate body) {
+    this.code = code;
+    this.bodyContentType = bodyContentType;
+    this.body = body;
+  }
 
-    @Override
-    public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
-        throws Exception
-    {
-        response.setStatus( code );
-        response.setContentType( bodyContentType );
-        final byte[] bodyPayload = body.evaluate().getBytes( "UTF-8" );
-        response.setContentLength( bodyPayload.length );
-        response.getOutputStream().write( bodyPayload );
-        return true;
-    }
+  @Override
+  public boolean execute(HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx)
+      throws Exception
+  {
+    response.setStatus(code);
+    response.setContentType(bodyContentType);
+    final byte[] bodyPayload = body.evaluate().getBytes("UTF-8");
+    response.setContentLength(bodyPayload.length);
+    response.getOutputStream().write(bodyPayload);
+    return true;
+  }
 }

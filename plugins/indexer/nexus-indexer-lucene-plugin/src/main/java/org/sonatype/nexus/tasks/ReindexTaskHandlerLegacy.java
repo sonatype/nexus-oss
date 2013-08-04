@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks;
+
+import org.sonatype.nexus.index.IndexerManager;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.index.IndexerManager;
 
 /**
  * Reindex task.
@@ -22,35 +24,35 @@ import org.sonatype.nexus.index.IndexerManager;
  * @author cstamas
  * @author Alin Dreghiciu
  */
-@Component( role = ReindexTaskHandler.class, hint = "legacy" )
+@Component(role = ReindexTaskHandler.class, hint = "legacy")
 public class ReindexTaskHandlerLegacy
     implements ReindexTaskHandler
 {
-    @Requirement
-    private IndexerManager indexerManager;
+  @Requirement
+  private IndexerManager indexerManager;
 
-    /**
-     * Delegates to indexer manager.
-     *
-     * {@inheritDoc}
-     */
-    public void reindexAllRepositories( final String path,
-                                        final boolean fullReindex )
-        throws Exception
-    {
-        indexerManager.reindexAllRepositories( path, fullReindex );
-    }
+  /**
+   * Delegates to indexer manager.
+   *
+   * {@inheritDoc}
+   */
+  public void reindexAllRepositories(final String path,
+                                     final boolean fullReindex)
+      throws Exception
+  {
+    indexerManager.reindexAllRepositories(path, fullReindex);
+  }
 
-    /**
-     * Delegates to indexer manager.
-     *
-     * {@inheritDoc}
-     */
-    public void reindexRepository( final String repositoryId,
-                                   final String path,
-                                   final boolean fullReindex )
-        throws Exception
-    {
-        indexerManager.reindexRepository( path, repositoryId, fullReindex );
-    }
+  /**
+   * Delegates to indexer manager.
+   *
+   * {@inheritDoc}
+   */
+  public void reindexRepository(final String repositoryId,
+                                final String path,
+                                final boolean fullReindex)
+      throws Exception
+  {
+    indexerManager.reindexRepository(path, repositoryId, fullReindex);
+  }
 }

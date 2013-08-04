@@ -10,44 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.model;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import com.thoughtworks.xstream.converters.basic.StringConverter;
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class HtmlUnescapeStringConverter
     extends StringConverter
 {
-    /**
-     * A flag denoting should we ignore flakey clients or not.
-     */
-    private final boolean nullResilient;
+  /**
+   * A flag denoting should we ignore flakey clients or not.
+   */
+  private final boolean nullResilient;
 
-    public HtmlUnescapeStringConverter()
-    {
-        this( false );
-    }
+  public HtmlUnescapeStringConverter() {
+    this(false);
+  }
 
-    public HtmlUnescapeStringConverter( boolean nullResilient )
-    {
-        this.nullResilient = nullResilient;
-    }
+  public HtmlUnescapeStringConverter(boolean nullResilient) {
+    this.nullResilient = nullResilient;
+  }
 
-    @Override
-    @SuppressWarnings( "rawtypes" )
-    public boolean canConvert( Class type )
-    {
-        if ( nullResilient && type == null )
-        {
-            return true;
-        }
-        return super.canConvert( type );
+  @Override
+  @SuppressWarnings("rawtypes")
+  public boolean canConvert(Class type) {
+    if (nullResilient && type == null) {
+      return true;
     }
+    return super.canConvert(type);
+  }
 
-    @Override
-    public Object fromString( String str )
-    {
-        return StringEscapeUtils.unescapeHtml( str );
-    }
+  @Override
+  public Object fromString(String str) {
+    return StringEscapeUtils.unescapeHtml(str);
+  }
 }

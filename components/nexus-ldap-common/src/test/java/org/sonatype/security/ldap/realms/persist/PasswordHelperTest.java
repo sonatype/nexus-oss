@@ -10,67 +10,66 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.persist;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
+
+import junit.framework.Assert;
+import org.junit.Test;
 
 public class PasswordHelperTest
     extends PlexusTestCaseSupport
 {
 
-    public PasswordHelper getPasswordHelper()
-        throws Exception
-    {
-        return (PasswordHelper) this.lookup( PasswordHelper.class );
+  public PasswordHelper getPasswordHelper()
+      throws Exception
+  {
+    return (PasswordHelper) this.lookup(PasswordHelper.class);
+  }
+
+  @Test
+  public void testValidPass()
+      throws Exception
+  {
+    PasswordHelper ph = this.getPasswordHelper();
+
+    String password = "PASSWORD";
+    String encodedPass = ph.encrypt(password);
+    Assert.assertEquals(password, ph.decrypt(encodedPass));
+  }
+
+  @Test
+  public void testNullEncrypt()
+      throws Exception
+  {
+    PasswordHelper ph = this.getPasswordHelper();
+    Assert.assertNull(ph.encrypt(null));
+  }
+
+  @Test
+  public void testNullDecrypt()
+      throws Exception
+  {
+    PasswordHelper ph = this.getPasswordHelper();
+    Assert.assertNull(ph.decrypt(null));
+  }
+
+  @Test
+  public void testDecryptNonEncyprtedPassword()
+      throws Exception
+  {
+    PasswordHelper ph = this.getPasswordHelper();
+
+    try {
+      ph.decrypt("clear-text-password");
+      Assert.fail("Expected: PlexusCipherException");
+    }
+    catch (PlexusCipherException e) {
+      // expected
     }
 
-    @Test
-    public void testValidPass()
-        throws Exception
-    {
-        PasswordHelper ph = this.getPasswordHelper();
-
-        String password = "PASSWORD";
-        String encodedPass = ph.encrypt( password );
-        Assert.assertEquals( password, ph.decrypt( encodedPass ) );
-    }
-
-    @Test
-    public void testNullEncrypt()
-        throws Exception
-    {
-        PasswordHelper ph = this.getPasswordHelper();
-        Assert.assertNull( ph.encrypt( null ) );
-    }
-
-    @Test
-    public void testNullDecrypt()
-        throws Exception
-    {
-        PasswordHelper ph = this.getPasswordHelper();
-        Assert.assertNull( ph.decrypt( null ) );
-    }
-
-    @Test
-    public void testDecryptNonEncyprtedPassword()
-        throws Exception
-    {
-        PasswordHelper ph = this.getPasswordHelper();
-
-        try
-        {
-            ph.decrypt( "clear-text-password" );
-            Assert.fail( "Expected: PlexusCipherException" );
-        }
-        catch ( PlexusCipherException e )
-        {
-            // expected
-        }
-
-    }
+  }
 
 }

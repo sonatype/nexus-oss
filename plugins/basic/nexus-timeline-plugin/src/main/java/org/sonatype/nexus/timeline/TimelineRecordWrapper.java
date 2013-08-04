@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline;
 
 import java.util.Map;
 
 import org.sonatype.timeline.TimelineRecord;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -27,34 +29,29 @@ public class TimelineRecordWrapper
     implements Entry
 {
 
-    private final TimelineRecord record;
+  private final TimelineRecord record;
 
-    public TimelineRecordWrapper( final TimelineRecord record )
-    {
-        this.record = Preconditions.checkNotNull( record );
-    }
+  public TimelineRecordWrapper(final TimelineRecord record) {
+    this.record = Preconditions.checkNotNull(record);
+  }
 
-    @Override
-    public long getTimestamp()
-    {
-        return record.getTimestamp();
-    }
+  @Override
+  public long getTimestamp() {
+    return record.getTimestamp();
+  }
 
-    @Override
-    public String getType()
-    {
-        return record.getType();
-    }
+  @Override
+  public String getType() {
+    return record.getType();
+  }
 
-    @Override
-    public String getSubType()
-    {
-        return record.getSubType();
-    }
+  @Override
+  public String getSubType() {
+    return record.getSubType();
+  }
 
-    @Override
-    public Map<String, String> getData()
-    {
-        return record.getData();
-    }
+  @Override
+  public Map<String, String> getData() {
+    return record.getData();
+  }
 }

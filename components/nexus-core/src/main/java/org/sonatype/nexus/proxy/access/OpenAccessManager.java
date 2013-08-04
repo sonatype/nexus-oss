@@ -10,27 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.access;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * A simple AccessManager implementation that allows everybody to access the Proximity core. This is the default imple,
  * does nothing.
- * 
+ *
  * @author t.cservenak
  */
-@Component( role = AccessManager.class, hint = "open" )
+@Component(role = AccessManager.class, hint = "open")
 public class OpenAccessManager
     implements AccessManager
 {
-    public void decide( Repository repository, ResourceStoreRequest request, Action action )
-        throws AccessDeniedException
-    {
-        // this access manager is open, everybody has access to everything since
-        // it never throws AccessDeniedEx
-    }
+  public void decide(Repository repository, ResourceStoreRequest request, Action action)
+      throws AccessDeniedException
+  {
+    // this access manager is open, everybody has access to everything since
+    // it never throws AccessDeniedEx
+  }
 }

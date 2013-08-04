@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.model;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -22,95 +23,82 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 public class CRemoteProxySettingsCoreConfiguration
     extends AbstractCoreConfiguration
 {
-    private boolean nullified;
+  private boolean nullified;
 
-    public CRemoteProxySettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
-    {
-        super( applicationConfiguration );
+  public CRemoteProxySettingsCoreConfiguration(ApplicationConfiguration applicationConfiguration) {
+    super(applicationConfiguration);
+  }
+
+  @Override
+  public CRemoteProxySettings getConfiguration(boolean forWrite) {
+    return (CRemoteProxySettings) super.getConfiguration(forWrite);
+  }
+
+  @Override
+  protected CRemoteProxySettings extractConfiguration(Configuration configuration) {
+    return configuration.getRemoteProxySettings();
+  }
+
+  public void initConfig() {
+    CRemoteProxySettings newProxy = new CRemoteProxySettings();
+
+    getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings(newProxy);
+
+    setOriginalConfiguration(newProxy);
+  }
+
+  public void nullifyConfig() {
+    setChangedConfiguration(null);
+
+    setOriginalConfiguration(null);
+
+    nullified = true;
+  }
+
+  @Override
+  public ValidationResponse doValidateChanges(Object changedConfiguration) {
+    return new ValidationResponse();
+  }
+
+  @Override
+  public boolean isDirty() {
+    return super.isDirty() || nullified;
+  }
+
+  @Override
+  public void commitChanges()
+      throws ConfigurationException
+  {
+    if (nullified) {
+      // nullified, nothing to validate and the super.commitChanges() will not work
+      getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings(null);
+    }
+    else {
+      super.commitChanges();
     }
 
-    @Override
-    public CRemoteProxySettings getConfiguration( boolean forWrite )
-    {
-        return (CRemoteProxySettings) super.getConfiguration( forWrite );
+    nullified = false;
+  }
+
+  @Override
+  public void rollbackChanges() {
+    super.rollbackChanges();
+
+    nullified = false;
+  }
+
+  @Override
+  protected void copyTransients(Object source, Object destination) {
+    super.copyTransients(source, destination);
+
+    // we need to manually set the http/https to null here, because of flawed overlay, where null objects do NOT
+    // overwrite non-null objects
+    if (((CRemoteProxySettings) source).getHttpProxySettings() == null) {
+      ((CRemoteProxySettings) destination).setHttpProxySettings(null);
     }
-
-    @Override
-    protected CRemoteProxySettings extractConfiguration( Configuration configuration )
-    {
-        return configuration.getRemoteProxySettings();
+    if (((CRemoteProxySettings) source).getHttpsProxySettings() == null) {
+      ((CRemoteProxySettings) destination).setHttpsProxySettings(null);
     }
-
-    public void initConfig()
-    {
-        CRemoteProxySettings newProxy = new CRemoteProxySettings();
-
-        getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings( newProxy );
-
-        setOriginalConfiguration( newProxy );
-    }
-
-    public void nullifyConfig()
-    {
-        setChangedConfiguration( null );
-
-        setOriginalConfiguration( null );
-
-        nullified = true;
-    }
-
-    @Override
-    public ValidationResponse doValidateChanges( Object changedConfiguration )
-    {
-        return new ValidationResponse();
-    }
-
-    @Override
-    public boolean isDirty()
-    {
-        return super.isDirty() || nullified;
-    }
-
-    @Override
-    public void commitChanges()
-        throws ConfigurationException
-    {
-        if ( nullified )
-        {
-            // nullified, nothing to validate and the super.commitChanges() will not work
-            getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings( null );
-        }
-        else
-        {
-            super.commitChanges();
-        }
-
-        nullified = false;
-    }
-
-    @Override
-    public void rollbackChanges()
-    {
-        super.rollbackChanges();
-
-        nullified = false;
-    }
-
-    @Override
-    protected void copyTransients( Object source, Object destination )
-    {
-        super.copyTransients( source, destination );
-
-        // we need to manually set the http/https to null here, because of flawed overlay, where null objects do NOT
-        // overwrite non-null objects
-        if ( ( (CRemoteProxySettings) source ).getHttpProxySettings() == null )
-        {
-            ( (CRemoteProxySettings) destination ).setHttpProxySettings( null );
-        }
-        if ( ( (CRemoteProxySettings) source ).getHttpsProxySettings() == null )
-        {
-            ( (CRemoteProxySettings) destination ).setHttpsProxySettings( null );
-        }
-    }
+  }
 
 }

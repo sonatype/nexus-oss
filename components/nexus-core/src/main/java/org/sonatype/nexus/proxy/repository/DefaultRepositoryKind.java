@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.Collection;
@@ -19,39 +20,33 @@ import java.util.Set;
 public class DefaultRepositoryKind
     implements RepositoryKind
 {
-    private final Class<?> mainFacet;
+  private final Class<?> mainFacet;
 
-    private final Set<Class<?>> facets;
+  private final Set<Class<?>> facets;
 
-    public DefaultRepositoryKind( Class<?> mainFacet, Collection<Class<?>> facets )
-    {
-        this.mainFacet = mainFacet;
+  public DefaultRepositoryKind(Class<?> mainFacet, Collection<Class<?>> facets) {
+    this.mainFacet = mainFacet;
 
-        this.facets = new HashSet<Class<?>>();
+    this.facets = new HashSet<Class<?>>();
 
-        this.facets.add( mainFacet );
+    this.facets.add(mainFacet);
 
-        if ( facets != null )
-        {
-            this.facets.addAll( facets );
-        }
+    if (facets != null) {
+      this.facets.addAll(facets);
+    }
+  }
+
+  public Class<?> getMainFacet() {
+    return mainFacet;
+  }
+
+  public boolean isFacetAvailable(Class<?> f) {
+    for (Class<?> facet : facets) {
+      if (f.isAssignableFrom(facet)) {
+        return true;
+      }
     }
 
-    public Class<?> getMainFacet()
-    {
-        return mainFacet;
-    }
-
-    public boolean isFacetAvailable( Class<?> f )
-    {
-        for ( Class<?> facet : facets )
-        {
-            if ( f.isAssignableFrom( facet ) )
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    return false;
+  }
 }

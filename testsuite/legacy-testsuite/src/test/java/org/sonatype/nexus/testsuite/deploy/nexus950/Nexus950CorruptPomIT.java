@@ -10,30 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.deploy.nexus950;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 public class Nexus950CorruptPomIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
-    public void uploadCorruptPomTest() throws IOException
-    {
-        
-        File jarFile = this.getTestFile( "bad-pom.jar" );
-        File badPomFile = this.getTestFile( "pom.xml" );
-        
-        HttpResponse resultMethod = getDeployUtils().deployUsingPomWithRestReturnResult( this.getTestRepositoryId(), jarFile, badPomFile, "", "jar" );
-        
-        Assert.assertEquals( "Expected a 400 error returned.", 400, resultMethod.getStatusLine().getStatusCode() );        
-    }
-    
+  @Test
+  public void uploadCorruptPomTest() throws IOException {
+
+    File jarFile = this.getTestFile("bad-pom.jar");
+    File badPomFile = this.getTestFile("pom.xml");
+
+    HttpResponse resultMethod = getDeployUtils()
+        .deployUsingPomWithRestReturnResult(this.getTestRepositoryId(), jarFile, badPomFile, "", "jar");
+
+    Assert.assertEquals("Expected a 400 error returned.", 400, resultMethod.getStatusLine().getStatusCode());
+  }
+
 }

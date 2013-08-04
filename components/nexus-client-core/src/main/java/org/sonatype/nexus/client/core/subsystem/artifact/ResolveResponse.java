@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.artifact;
 
 /**
@@ -20,154 +21,141 @@ package org.sonatype.nexus.client.core.subsystem.artifact;
 public class ResolveResponse
 {
 
-    /**
-     * True if item is present in local storage.
-     */
-    private final boolean presentLocally;
+  /**
+   * True if item is present in local storage.
+   */
+  private final boolean presentLocally;
 
-    /**
-     * The groupId of the requested artifact.
-     */
-    private final String groupId;
+  /**
+   * The groupId of the requested artifact.
+   */
+  private final String groupId;
 
-    /**
-     * The artifactId of the requested artifact.
-     */
-    private final String artifactId;
+  /**
+   * The artifactId of the requested artifact.
+   */
+  private final String artifactId;
 
-    /**
-     * The version of the requested artifact.
-     */
-    private final String version;
+  /**
+   * The version of the requested artifact.
+   */
+  private final String version;
 
-    /**
-     * The base version of the requested artifact.
-     */
-    private final String baseVersion;
+  /**
+   * The base version of the requested artifact.
+   */
+  private final String baseVersion;
 
-    /**
-     * The classifier of the requested artifact.
-     */
-    private final String classifier;
+  /**
+   * The classifier of the requested artifact.
+   */
+  private final String classifier;
 
-    /**
-     * The file extension of the requested artifact.
-     */
-    private final String extension;
+  /**
+   * The file extension of the requested artifact.
+   */
+  private final String extension;
 
-    /**
-     * Flag that states if requested artifact is a snapshot.
-     */
-    private final boolean snapshot;
+  /**
+   * Flag that states if requested artifact is a snapshot.
+   */
+  private final boolean snapshot;
 
-    /**
-     * The build number of the snapshot version of the requested artifact.
-     */
-    private final long snapshotBuildNumber;
+  /**
+   * The build number of the snapshot version of the requested artifact.
+   */
+  private final long snapshotBuildNumber;
 
-    /**
-     * The timestamp portion of the snapshot version of the requested artifact.
-     */
-    private final long snapshotTimeStamp;
+  /**
+   * The timestamp portion of the snapshot version of the requested artifact.
+   */
+  private final long snapshotTimeStamp;
 
-    /**
-     * The filename of the requested artifact.
-     */
-    private final String fileName;
+  /**
+   * The filename of the requested artifact.
+   */
+  private final String fileName;
 
-    /**
-     * The sha1 hash of the requested artifact.
-     */
-    private final String sha1;
+  /**
+   * The sha1 hash of the requested artifact.
+   */
+  private final String sha1;
 
-    /**
-     * The path in the repository of the requested artifact.
-     */
-    private final String repositoryPath;
+  /**
+   * The path in the repository of the requested artifact.
+   */
+  private final String repositoryPath;
 
-    public ResolveResponse( final boolean presentLocally, final String groupId, final String artifactId,
-                            final String version, final String baseVersion, final String classifier,
-                            final String extension, final boolean snapshot, final long snapshotBuildNumber,
-                            final long snapshotTimeStamp, final String fileName, final String sha1,
-                            final String repositoryPath )
-    {
-        this.presentLocally = presentLocally;
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
-        this.baseVersion = baseVersion;
-        this.classifier = classifier;
-        this.extension = extension;
-        this.snapshot = snapshot;
-        this.snapshotBuildNumber = snapshotBuildNumber;
-        this.snapshotTimeStamp = snapshotTimeStamp;
-        this.fileName = fileName;
-        this.sha1 = sha1;
-        this.repositoryPath = repositoryPath;
-    }
+  public ResolveResponse(final boolean presentLocally, final String groupId, final String artifactId,
+                         final String version, final String baseVersion, final String classifier,
+                         final String extension, final boolean snapshot, final long snapshotBuildNumber,
+                         final long snapshotTimeStamp, final String fileName, final String sha1,
+                         final String repositoryPath)
+  {
+    this.presentLocally = presentLocally;
+    this.groupId = groupId;
+    this.artifactId = artifactId;
+    this.version = version;
+    this.baseVersion = baseVersion;
+    this.classifier = classifier;
+    this.extension = extension;
+    this.snapshot = snapshot;
+    this.snapshotBuildNumber = snapshotBuildNumber;
+    this.snapshotTimeStamp = snapshotTimeStamp;
+    this.fileName = fileName;
+    this.sha1 = sha1;
+    this.repositoryPath = repositoryPath;
+  }
 
-    public boolean isPresentLocally()
-    {
-        return presentLocally;
-    }
+  public boolean isPresentLocally() {
+    return presentLocally;
+  }
 
-    public String getGroupId()
-    {
-        return groupId;
-    }
+  public String getGroupId() {
+    return groupId;
+  }
 
-    public String getArtifactId()
-    {
-        return artifactId;
-    }
+  public String getArtifactId() {
+    return artifactId;
+  }
 
-    public String getVersion()
-    {
-        return version;
-    }
+  public String getVersion() {
+    return version;
+  }
 
-    public String getBaseVersion()
-    {
-        return baseVersion;
-    }
+  public String getBaseVersion() {
+    return baseVersion;
+  }
 
-    public String getClassifier()
-    {
-        return classifier;
-    }
+  public String getClassifier() {
+    return classifier;
+  }
 
-    public String getExtension()
-    {
-        return extension;
-    }
+  public String getExtension() {
+    return extension;
+  }
 
-    public boolean isSnapshot()
-    {
-        return snapshot;
-    }
+  public boolean isSnapshot() {
+    return snapshot;
+  }
 
-    public long getSnapshotBuildNumber()
-    {
-        return snapshotBuildNumber;
-    }
+  public long getSnapshotBuildNumber() {
+    return snapshotBuildNumber;
+  }
 
-    public long getSnapshotTimeStamp()
-    {
-        return snapshotTimeStamp;
-    }
+  public long getSnapshotTimeStamp() {
+    return snapshotTimeStamp;
+  }
 
-    public String getFileName()
-    {
-        return fileName;
-    }
+  public String getFileName() {
+    return fileName;
+  }
 
-    public String getSha1()
-    {
-        return sha1;
-    }
+  public String getSha1() {
+    return sha1;
+  }
 
-    public String getRepositoryPath()
-    {
-        return repositoryPath;
-    }
+  public String getRepositoryPath() {
+    return repositoryPath;
+  }
 }
