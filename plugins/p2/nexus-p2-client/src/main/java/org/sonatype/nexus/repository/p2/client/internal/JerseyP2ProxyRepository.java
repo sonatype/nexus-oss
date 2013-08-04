@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.p2.client.internal;
 
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.JerseyProxyRepository;
@@ -25,28 +26,25 @@ public class JerseyP2ProxyRepository
     implements P2ProxyRepository
 {
 
-    static final String PROVIDER = "p2";
+  static final String PROVIDER = "p2";
 
-    public JerseyP2ProxyRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyP2ProxyRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyP2ProxyRepository( final JerseyNexusClient nexusClient, final RepositoryProxyResource resource )
-    {
-        super( nexusClient, resource );
-    }
+  public JerseyP2ProxyRepository(final JerseyNexusClient nexusClient, final RepositoryProxyResource resource) {
+    super(nexusClient, resource);
+  }
 
-    @Override
-    protected RepositoryProxyResource createSettings()
-    {
-        final RepositoryProxyResource settings = super.createSettings();
+  @Override
+  protected RepositoryProxyResource createSettings() {
+    final RepositoryProxyResource settings = super.createSettings();
 
-        settings.setProvider( JerseyP2ProxyRepository.PROVIDER );
-        settings.setRepoPolicy( "RELEASE" );
-        settings.setIndexable( false );
+    settings.setProvider(JerseyP2ProxyRepository.PROVIDER);
+    settings.setRepoPolicy("RELEASE");
+    settings.setIndexable(false);
 
-        return settings;
-    }
+    return settings;
+  }
 
 }

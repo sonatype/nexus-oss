@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -17,23 +18,23 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 public interface MavenProxyRepository
     extends MavenRepository, ProxyRepository
 {
-    boolean isCleanseRepositoryMetadata();
+  boolean isCleanseRepositoryMetadata();
 
-    void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata );
+  void setCleanseRepositoryMetadata(boolean cleanseRepositoryMetadata);
 
-    ChecksumPolicy getChecksumPolicy();
+  ChecksumPolicy getChecksumPolicy();
 
-    void setChecksumPolicy( ChecksumPolicy checksumPolicy );
+  void setChecksumPolicy(ChecksumPolicy checksumPolicy);
 
-    int getArtifactMaxAge();
+  int getArtifactMaxAge();
 
-    void setArtifactMaxAge( int maxAge );
+  void setArtifactMaxAge(int maxAge);
 
-    int getMetadataMaxAge();
+  int getMetadataMaxAge();
 
-    void setMetadataMaxAge( int metadataMaxAge );
+  void setMetadataMaxAge(int metadataMaxAge);
 
-    boolean isDownloadRemoteIndexes();
+  boolean isDownloadRemoteIndexes();
 
-    void setDownloadRemoteIndexes( boolean download );
+  void setDownloadRemoteIndexes(boolean download);
 }

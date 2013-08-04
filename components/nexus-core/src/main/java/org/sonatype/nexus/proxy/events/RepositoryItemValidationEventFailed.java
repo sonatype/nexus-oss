@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -17,24 +18,23 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Event fired when a StorageItem is validated and it failed validation (is invalid).
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public abstract class RepositoryItemValidationEventFailed
     extends RepositoryItemValidationEvent
 {
-    private final String message;
+  private final String message;
 
-    public RepositoryItemValidationEventFailed( final Repository repository, final StorageItem item,
-                                                final String message )
-    {
-        super( repository, item );
-        this.message = message;
-    }
+  public RepositoryItemValidationEventFailed(final Repository repository, final StorageItem item,
+                                             final String message)
+  {
+    super(repository, item);
+    this.message = message;
+  }
 
-    public String getMessage()
-    {
-        return message;
-    }
+  public String getMessage() {
+    return message;
+  }
 }

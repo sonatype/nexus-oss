@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
 import java.net.URL;
@@ -18,8 +19,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
@@ -31,212 +30,185 @@ import org.sonatype.nexus.configuration.model.CRemoteProxySettingsCoreConfigurat
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
+
 import com.google.common.base.Throwables;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @since 2.6
  */
-@Component( role = GlobalRemoteProxySettings.class )
+@Component(role = GlobalRemoteProxySettings.class)
 public class DefaultGlobalRemoteProxySettings
     extends AbstractConfigurable
     implements GlobalRemoteProxySettings
 {
 
-    @Requirement
-    private AuthenticationInfoConverter authenticationInfoConverter;
+  @Requirement
+  private AuthenticationInfoConverter authenticationInfoConverter;
 
-    @Override
-    protected ApplicationConfiguration getApplicationConfiguration()
-    {
-        return null;
+  @Override
+  protected ApplicationConfiguration getApplicationConfiguration() {
+    return null;
+  }
+
+  @Override
+  protected Configurator getConfigurator() {
+    return null;
+  }
+
+  @Override
+  protected CRemoteProxySettings getCurrentConfiguration(boolean forWrite) {
+    return ((CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
+  }
+
+  @Override
+  protected CoreConfiguration wrapConfiguration(Object configuration)
+      throws ConfigurationException
+  {
+    if (configuration instanceof ApplicationConfiguration) {
+      return new CRemoteProxySettingsCoreConfiguration((ApplicationConfiguration) configuration);
+    }
+    else {
+      throw new ConfigurationException("The passed configuration object is of class \""
+          + configuration.getClass().getName() + "\" and not the required \""
+          + ApplicationConfiguration.class.getName() + "\"!");
+    }
+  }
+
+  // ==
+
+  @Override
+  public RemoteHttpProxySettings getHttpProxySettings() {
+    if (isEnabled()) {
+      try {
+        return convertFromModel(getCurrentConfiguration(false).getHttpProxySettings());
+      }
+      catch (ConfigurationException e) {
+        throw Throwables.propagate(e);
+      }
     }
 
-    @Override
-    protected Configurator getConfigurator()
-    {
-        return null;
+    return null;
+  }
+
+  @Override
+  public void setHttpProxySettings(final RemoteHttpProxySettings settings) {
+    if (!isEnabled()) {
+      initConfig();
+    }
+    getCurrentConfiguration(true).setHttpProxySettings(convertToModel(settings));
+  }
+
+  @Override
+  public RemoteHttpProxySettings getHttpsProxySettings() {
+    if (isEnabled()) {
+      try {
+        return convertFromModel(getCurrentConfiguration(false).getHttpsProxySettings());
+      }
+      catch (ConfigurationException e) {
+        throw Throwables.propagate(e);
+      }
     }
 
-    @Override
-    protected CRemoteProxySettings getCurrentConfiguration( boolean forWrite )
-    {
-        return ( (CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+    return null;
+  }
+
+  @Override
+  public void setHttpsProxySettings(final RemoteHttpProxySettings settings) {
+    if (!isEnabled()) {
+      initConfig();
+    }
+    getCurrentConfiguration(true).setHttpsProxySettings(convertToModel(settings));
+  }
+
+  @Override
+  public Set<String> getNonProxyHosts() {
+    if (isEnabled()) {
+      return new HashSet<String>(getCurrentConfiguration(false).getNonProxyHosts());
     }
 
-    @Override
-    protected CoreConfiguration wrapConfiguration( Object configuration )
-        throws ConfigurationException
-    {
-        if ( configuration instanceof ApplicationConfiguration )
-        {
-            return new CRemoteProxySettingsCoreConfiguration( (ApplicationConfiguration) configuration );
-        }
-        else
-        {
-            throw new ConfigurationException( "The passed configuration object is of class \""
-                                                  + configuration.getClass().getName() + "\" and not the required \""
-                                                  + ApplicationConfiguration.class.getName() + "\"!" );
-        }
+    return Collections.emptySet();
+  }
+
+  @Override
+  public void setNonProxyHosts(Set<String> nonProxyHosts) {
+    if (!isEnabled()) {
+      initConfig();
     }
 
-    // ==
+    getCurrentConfiguration(true).setNonProxyHosts(new ArrayList<String>(
+        nonProxyHosts == null ? Collections.<String>emptySet() : nonProxyHosts
+    ));
+  }
 
-    @Override
-    public RemoteHttpProxySettings getHttpProxySettings()
-    {
-        if ( isEnabled() )
-        {
-            try
-            {
-                return convertFromModel( getCurrentConfiguration( false ).getHttpProxySettings() );
-            }
-            catch ( ConfigurationException e )
-            {
-                throw Throwables.propagate( e );
-            }
-        }
+  @Override
+  public RemoteHttpProxySettings getRemoteHttpProxySettingsFor(final URL url) {
+    return DefaultRemoteProxySettings.getRemoteHttpProxySettingsFor(url, this);
+  }
 
-        return null;
+  private RemoteHttpProxySettings convertFromModel(CRemoteHttpProxySettings model)
+      throws ConfigurationException
+  {
+    if (model == null) {
+      return null;
     }
 
-    @Override
-    public void setHttpProxySettings( final RemoteHttpProxySettings settings )
-    {
-        if ( !isEnabled() )
-        {
-            initConfig();
-        }
-        getCurrentConfiguration( true ).setHttpProxySettings( convertToModel( settings ) );
+    final RemoteHttpProxySettings settings = new DefaultRemoteHttpProxySettings();
+
+    settings.setHostname(model.getProxyHostname());
+    settings.setPort(model.getProxyPort());
+    settings.setProxyAuthentication(
+        authenticationInfoConverter.convertAndValidateFromModel(model.getAuthentication())
+    );
+
+    return settings;
+  }
+
+  public CRemoteHttpProxySettings convertToModel(RemoteHttpProxySettings settings) {
+    if (settings == null) {
+      return null;
     }
 
-    @Override
-    public RemoteHttpProxySettings getHttpsProxySettings()
-    {
-        if ( isEnabled() )
-        {
-            try
-            {
-                return convertFromModel( getCurrentConfiguration( false ).getHttpsProxySettings() );
-            }
-            catch ( ConfigurationException e )
-            {
-                throw Throwables.propagate( e );
-            }
-        }
+    final CRemoteHttpProxySettings model = new CRemoteHttpProxySettings();
 
-        return null;
+    model.setProxyHostname(settings.getHostname());
+    model.setProxyPort(settings.getPort());
+    model.setAuthentication(authenticationInfoConverter.convertToModel(settings.getProxyAuthentication()));
+
+    return model;
+  }
+
+  // ==
+
+  public void disable() {
+    ((CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration()).nullifyConfig();
+  }
+
+  public boolean isEnabled() {
+    return getCurrentConfiguration(false) != null;
+  }
+
+  protected void initConfig() {
+    ((CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration()).initConfig();
+  }
+
+  @Override
+  public boolean commitChanges()
+      throws ConfigurationException
+  {
+    boolean wasDirty = super.commitChanges();
+
+    if (wasDirty) {
+      eventBus().post(new GlobalRemoteProxySettingsChangedEvent(this));
     }
 
-    @Override
-    public void setHttpsProxySettings( final RemoteHttpProxySettings settings )
-    {
-        if ( !isEnabled() )
-        {
-            initConfig();
-        }
-        getCurrentConfiguration( true ).setHttpsProxySettings( convertToModel( settings ) );
-    }
+    return wasDirty;
+  }
 
-    @Override
-    public Set<String> getNonProxyHosts()
-    {
-        if ( isEnabled() )
-        {
-            return new HashSet<String>( getCurrentConfiguration( false ).getNonProxyHosts() );
-        }
-
-        return Collections.emptySet();
-    }
-
-    @Override
-    public void setNonProxyHosts( Set<String> nonProxyHosts )
-    {
-        if ( !isEnabled() )
-        {
-            initConfig();
-        }
-
-        getCurrentConfiguration( true ).setNonProxyHosts( new ArrayList<String>(
-            nonProxyHosts == null ? Collections.<String>emptySet() : nonProxyHosts
-        ) );
-    }
-
-    @Override
-    public RemoteHttpProxySettings getRemoteHttpProxySettingsFor( final URL url )
-    {
-        return DefaultRemoteProxySettings.getRemoteHttpProxySettingsFor( url, this );
-    }
-
-    private RemoteHttpProxySettings convertFromModel( CRemoteHttpProxySettings model )
-        throws ConfigurationException
-    {
-        if ( model == null )
-        {
-            return null;
-        }
-
-        final RemoteHttpProxySettings settings = new DefaultRemoteHttpProxySettings();
-
-        settings.setHostname( model.getProxyHostname() );
-        settings.setPort( model.getProxyPort() );
-        settings.setProxyAuthentication(
-            authenticationInfoConverter.convertAndValidateFromModel( model.getAuthentication() )
-        );
-
-        return settings;
-    }
-
-    public CRemoteHttpProxySettings convertToModel( RemoteHttpProxySettings settings )
-    {
-        if ( settings == null )
-        {
-            return null;
-        }
-
-        final CRemoteHttpProxySettings model = new CRemoteHttpProxySettings();
-
-        model.setProxyHostname( settings.getHostname() );
-        model.setProxyPort( settings.getPort() );
-        model.setAuthentication( authenticationInfoConverter.convertToModel( settings.getProxyAuthentication() ) );
-
-        return model;
-    }
-
-    // ==
-
-    public void disable()
-    {
-        ( (CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).nullifyConfig();
-    }
-
-    public boolean isEnabled()
-    {
-        return getCurrentConfiguration( false ) != null;
-    }
-
-    protected void initConfig()
-    {
-        ( (CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).initConfig();
-    }
-
-    @Override
-    public boolean commitChanges()
-        throws ConfigurationException
-    {
-        boolean wasDirty = super.commitChanges();
-
-        if ( wasDirty )
-        {
-            eventBus().post( new GlobalRemoteProxySettingsChangedEvent( this ) );
-        }
-
-        return wasDirty;
-    }
-
-    @Override
-    public String getName()
-    {
-        return "Global Remote Proxy Settings";
-    }
+  @Override
+  public String getName() {
+    return "Global Remote Proxy Settings";
+  }
 
 }

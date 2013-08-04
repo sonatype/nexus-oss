@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.sisu.jetty;
 
 import java.io.File;
@@ -22,31 +23,27 @@ import static org.junit.Assert.fail;
 public abstract class AbstractJettyConfigurationTest
     extends TestSupport
 {
-    protected String getJettyXmlPath( String jettyXmlName )
-    {
-        String result = null;
+  protected String getJettyXmlPath(String jettyXmlName) {
+    String result = null;
 
-        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-        URL res = cloader.getResource( "jetty-xmls/" + jettyXmlName );
-        if ( res == null )
-        {
-            System.out.println( "Can't find jetty-xml: " + jettyXmlName + " on classpath; trying filesystem." );
-            File f = new File( "src/test/resources/jetty-xmls/", jettyXmlName );
+    ClassLoader cloader = Thread.currentThread().getContextClassLoader();
+    URL res = cloader.getResource("jetty-xmls/" + jettyXmlName);
+    if (res == null) {
+      System.out.println("Can't find jetty-xml: " + jettyXmlName + " on classpath; trying filesystem.");
+      File f = new File("src/test/resources/jetty-xmls/", jettyXmlName);
 
-            if ( !f.isFile() )
-            {
-                fail("Cannot find Jetty configuration file: " + jettyXmlName
-                    + " (tried classpath and base-path src/test/resources/jetty-xmls)");
-            }
+      if (!f.isFile()) {
+        fail("Cannot find Jetty configuration file: " + jettyXmlName
+            + " (tried classpath and base-path src/test/resources/jetty-xmls)");
+      }
 
-            result = f.getAbsolutePath();
-        }
-        else
-        {
-            result = res.getPath();
-        }
-
-        System.out.println( "Jetty configuration path is: '" + result + "'" );
-        return result;
+      result = f.getAbsolutePath();
     }
+    else {
+      result = res.getPath();
+    }
+
+    System.out.println("Jetty configuration path is: '" + result + "'");
+    return result;
+  }
 }

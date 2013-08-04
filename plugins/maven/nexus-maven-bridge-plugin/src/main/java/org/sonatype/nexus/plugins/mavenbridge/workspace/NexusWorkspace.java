@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge.workspace;
 
 import java.util.Collections;
@@ -20,31 +21,27 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 public class NexusWorkspace
 {
-    private final String id;
+  private final String id;
 
-    private final List<MavenRepository> repositories;
+  private final List<MavenRepository> repositories;
 
-    public NexusWorkspace( String id, List<MavenRepository> repositories )
-    {
-        assert id != null && id.trim().length() > 0 : "Workspace ID cannotbe null or empty!";
-        assert repositories != null : "Repository cannot be null!";
+  public NexusWorkspace(String id, List<MavenRepository> repositories) {
+    assert id != null && id.trim().length() > 0 : "Workspace ID cannotbe null or empty!";
+    assert repositories != null : "Repository cannot be null!";
 
-        this.id = id;
-        this.repositories = repositories;
-    }
+    this.id = id;
+    this.repositories = repositories;
+  }
 
-    public String getId()
-    {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public List<MavenRepository> getRepositories()
-    {
-        return Collections.unmodifiableList( repositories );
-    }
+  public List<MavenRepository> getRepositories() {
+    return Collections.unmodifiableList(repositories);
+  }
 
-    public WorkspaceReader getWorkspaceReader()
-    {
-        return new NexusWorkspaceReader( this );
-    }
+  public WorkspaceReader getWorkspaceReader() {
+    return new NexusWorkspaceReader(this);
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
 
 /**
@@ -21,40 +22,35 @@ public class RepoTargetComboFormField
     extends AbstractFormField<String>
 {
 
-    public static final String DEFAULT_HELP_TEXT = "Select the repository target to apply ";
+  public static final String DEFAULT_HELP_TEXT = "Select the repository target to apply ";
 
-    public static final String DEFAULT_LABEL = "Repository Target";
+  public static final String DEFAULT_LABEL = "Repository Target";
 
-    public RepoTargetComboFormField( String id, String label, String helpText, boolean required,
-                                     String regexValidation )
-    {
-        super( id, label, helpText, required, regexValidation );
-    }
+  public RepoTargetComboFormField(String id, String label, String helpText, boolean required,
+                                  String regexValidation)
+  {
+    super(id, label, helpText, required, regexValidation);
+  }
 
-    public RepoTargetComboFormField( String id, String label, String helpText, boolean required )
-    {
-        super( id, label, helpText, required );
-    }
+  public RepoTargetComboFormField(String id, String label, String helpText, boolean required) {
+    super(id, label, helpText, required);
+  }
 
-    public RepoTargetComboFormField( String id, boolean required )
-    {
-        super( id, DEFAULT_LABEL, DEFAULT_HELP_TEXT, required );
-    }
+  public RepoTargetComboFormField(String id, boolean required) {
+    super(id, DEFAULT_LABEL, DEFAULT_HELP_TEXT, required);
+  }
 
-    public RepoTargetComboFormField( String id )
-    {
-        super( id, DEFAULT_LABEL, DEFAULT_HELP_TEXT, false );
-    }
+  public RepoTargetComboFormField(String id) {
+    super(id, DEFAULT_LABEL, DEFAULT_HELP_TEXT, false);
+  }
 
-    public String getType()
-    {
-        return "repo-target";
-    }
+  public String getType() {
+    return "repo-target";
+  }
 
-    public RepoTargetComboFormField withInitialValue( final String initialValue )
-    {
-        setInitialValue( initialValue );
-        return this;
-    }
+  public RepoTargetComboFormField withInitialValue(final String initialValue) {
+    setInitialValue(initialValue);
+    return this;
+  }
 
 }

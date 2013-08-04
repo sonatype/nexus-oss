@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.log;
 
 /**
@@ -19,68 +20,57 @@ public class DefaultLogConfiguration
     implements LogConfiguration
 {
 
-    private String rootLoggerLevel;
+  private String rootLoggerLevel;
 
-    private String rootLoggerAppenders;
+  private String rootLoggerAppenders;
 
-    private String fileAppenderPattern;
+  private String fileAppenderPattern;
 
-    private String fileAppenderLocation;
+  private String fileAppenderLocation;
 
-    public DefaultLogConfiguration()
-    {
-        this( null );
+  public DefaultLogConfiguration() {
+    this(null);
+  }
+
+  public DefaultLogConfiguration(LogConfiguration config) {
+    if (config != null) {
+      rootLoggerLevel = config.getRootLoggerLevel();
+      rootLoggerAppenders = config.getRootLoggerAppenders();
+      fileAppenderPattern = config.getFileAppenderPattern();
+      fileAppenderLocation = config.getFileAppenderLocation();
     }
+  }
 
-    public DefaultLogConfiguration( LogConfiguration config )
-    {
-        if ( config != null )
-        {
-            rootLoggerLevel = config.getRootLoggerLevel();
-            rootLoggerAppenders = config.getRootLoggerAppenders();
-            fileAppenderPattern = config.getFileAppenderPattern();
-            fileAppenderLocation = config.getFileAppenderLocation();
-        }
-    }
+  public String getRootLoggerLevel() {
+    return rootLoggerLevel;
+  }
 
-    public String getRootLoggerLevel()
-    {
-        return rootLoggerLevel;
-    }
+  public void setRootLoggerLevel(String rootLoggerLevel) {
+    this.rootLoggerLevel = rootLoggerLevel;
+  }
 
-    public void setRootLoggerLevel( String rootLoggerLevel )
-    {
-        this.rootLoggerLevel = rootLoggerLevel;
-    }
+  public String getRootLoggerAppenders() {
+    return rootLoggerAppenders;
+  }
 
-    public String getRootLoggerAppenders()
-    {
-        return rootLoggerAppenders;
-    }
+  public void setRootLoggerAppenders(String rootLoggerAppenders) {
+    this.rootLoggerAppenders = rootLoggerAppenders;
+  }
 
-    public void setRootLoggerAppenders( String rootLoggerAppenders )
-    {
-        this.rootLoggerAppenders = rootLoggerAppenders;
-    }
+  public String getFileAppenderPattern() {
+    return fileAppenderPattern;
+  }
 
-    public String getFileAppenderPattern()
-    {
-        return fileAppenderPattern;
-    }
+  public void setFileAppenderPattern(String fileAppenderPattern) {
+    this.fileAppenderPattern = fileAppenderPattern;
+  }
 
-    public void setFileAppenderPattern( String fileAppenderPattern )
-    {
-        this.fileAppenderPattern = fileAppenderPattern;
-    }
+  public String getFileAppenderLocation() {
+    return fileAppenderLocation;
+  }
 
-    public String getFileAppenderLocation()
-    {
-        return fileAppenderLocation;
-    }
-
-    public void setFileAppenderLocation( String fileAppenderLocation )
-    {
-        this.fileAppenderLocation = fileAppenderLocation;
-    }
+  public void setFileAppenderLocation(String fileAppenderLocation) {
+    this.fileAppenderLocation = fileAppenderLocation;
+  }
 
 }

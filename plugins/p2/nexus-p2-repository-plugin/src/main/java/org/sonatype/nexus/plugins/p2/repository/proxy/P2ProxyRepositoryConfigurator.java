@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.p2.repository.proxy;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.p2.repository.proxy;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,38 +27,39 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeItemContentValidator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Named
 @Singleton
 public class P2ProxyRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
 
-    private final ItemContentValidator checksumValidator;
+  private final ItemContentValidator checksumValidator;
 
-    private final ItemContentValidator fileTypeItemContentValidator;
+  private final ItemContentValidator fileTypeItemContentValidator;
 
-    @Inject
-    public P2ProxyRepositoryConfigurator(
-        final @Named( P2ChecksumContentValidator.ID ) ItemContentValidator checksumValidator,
-        final @Named( FileTypeItemContentValidator.ID ) ItemContentValidator fileTypeItemContentValidator )
-    {
-        this.checksumValidator = checkNotNull( checksumValidator );
-        this.fileTypeItemContentValidator = checkNotNull( fileTypeItemContentValidator );
+  @Inject
+  public P2ProxyRepositoryConfigurator(
+      final @Named(P2ChecksumContentValidator.ID) ItemContentValidator checksumValidator,
+      final @Named(FileTypeItemContentValidator.ID) ItemContentValidator fileTypeItemContentValidator)
+  {
+    this.checksumValidator = checkNotNull(checksumValidator);
+    this.fileTypeItemContentValidator = checkNotNull(fileTypeItemContentValidator);
+  }
+
+  @Override
+  public void doApplyConfiguration(final Repository repository, final ApplicationConfiguration configuration,
+                                   final CRepositoryCoreConfiguration coreConfiguration)
+      throws ConfigurationException
+  {
+    super.doApplyConfiguration(repository, configuration, coreConfiguration);
+
+    if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+      final ProxyRepository proxy = repository.adaptToFacet(ProxyRepository.class);
+
+      proxy.getItemContentValidators().put("checksum", checksumValidator);
+      proxy.getItemContentValidators().put("filetypevalidator", fileTypeItemContentValidator);
     }
-
-    @Override
-    public void doApplyConfiguration( final Repository repository, final ApplicationConfiguration configuration,
-                                      final CRepositoryCoreConfiguration coreConfiguration )
-        throws ConfigurationException
-    {
-        super.doApplyConfiguration( repository, configuration, coreConfiguration );
-
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            final ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
-
-            proxy.getItemContentValidators().put( "checksum", checksumValidator );
-            proxy.getItemContentValidators().put( "filetypevalidator", fileTypeItemContentValidator );
-        }
-    }
+  }
 }

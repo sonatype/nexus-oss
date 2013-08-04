@@ -10,15 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.support.condition;
+
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-
-import org.junit.Test;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * {@link Conditions} UTs.
@@ -29,23 +31,22 @@ public class ConditionsTest
     extends TestSupport
 {
 
-    /**
-     * Passed in factories are returned.
-     */
-    @Test
-    public void and01()
-    {
-        final LogicalConditions logicalConditions = mock( LogicalConditions.class );
-        final CapabilityConditions capabilityConditions = mock( CapabilityConditions.class );
-        final RepositoryConditions repositoryConditions = mock( RepositoryConditions.class );
-        final NexusConditions nexusConditions = mock( NexusConditions.class );
-        final Conditions underTest = new Conditions(
-            logicalConditions, capabilityConditions, repositoryConditions, nexusConditions
-        );
-        assertThat( underTest.logical(), is( equalTo( logicalConditions ) ) );
-        assertThat( underTest.capabilities(), is( equalTo( capabilityConditions ) ) );
-        assertThat( underTest.repository(), is( equalTo( repositoryConditions ) ) );
-        assertThat( underTest.nexus(), is( equalTo( nexusConditions ) ) );
-    }
+  /**
+   * Passed in factories are returned.
+   */
+  @Test
+  public void and01() {
+    final LogicalConditions logicalConditions = mock(LogicalConditions.class);
+    final CapabilityConditions capabilityConditions = mock(CapabilityConditions.class);
+    final RepositoryConditions repositoryConditions = mock(RepositoryConditions.class);
+    final NexusConditions nexusConditions = mock(NexusConditions.class);
+    final Conditions underTest = new Conditions(
+        logicalConditions, capabilityConditions, repositoryConditions, nexusConditions
+    );
+    assertThat(underTest.logical(), is(equalTo(logicalConditions)));
+    assertThat(underTest.capabilities(), is(equalTo(capabilityConditions)));
+    assertThat(underTest.repository(), is(equalTo(repositoryConditions)));
+    assertThat(underTest.nexus(), is(equalTo(nexusConditions)));
+  }
 
 }

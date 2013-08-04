@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.appevents;
 
 /**
@@ -20,28 +21,28 @@ package org.sonatype.plexus.appevents;
 @Deprecated
 public interface EventMulticaster
 {
-    /**
-     * Adds the proximity event listener.
-     * 
-     * @param listener the listener
-     */
-    @Deprecated
-    public void addEventListener( EventListener listener );
+  /**
+   * Adds the proximity event listener.
+   *
+   * @param listener the listener
+   */
+  @Deprecated
+  public void addEventListener(EventListener listener);
 
-    /**
-     * Removes the proximity event listener.
-     * 
-     * @param listener the listener
-     */
-    @Deprecated
-    public void removeEventListener( EventListener listener );
+  /**
+   * Removes the proximity event listener.
+   *
+   * @param listener the listener
+   */
+  @Deprecated
+  public void removeEventListener(EventListener listener);
 
-    /**
-     * Notify proximity event listeners.
-     * 
-     * @param evt the evt
-     */
-    @Deprecated
-    public void notifyEventListeners( Event<?> evt );
+  /**
+   * Notify proximity event listeners.
+   *
+   * @param evt the evt
+   */
+  @Deprecated
+  public void notifyEventListeners(Event<?> evt);
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -19,44 +20,39 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 public class ExpireCacheWalker
     extends AbstractFileWalkerProcessor
 {
-    private final Repository repository;
+  private final Repository repository;
 
-    private int alteredItemCount;
+  private int alteredItemCount;
 
-    public ExpireCacheWalker( Repository repository )
-    {
-        this.repository = repository;
-        this.alteredItemCount = 0;
+  public ExpireCacheWalker(Repository repository) {
+    this.repository = repository;
+    this.alteredItemCount = 0;
+  }
+
+  public Repository getRepository() {
+    return repository;
+  }
+
+  @Override
+  protected void processFileItem(WalkerContext context, StorageFileItem item)
+      throws Exception
+  {
+    if (!item.isExpired()) {
+      // expiring found files
+      item.setExpired(true);
+
+      // store it
+      getRepository().getAttributesHandler().storeAttributes(item);
+
+      alteredItemCount++;
     }
+  }
 
-    public Repository getRepository()
-    {
-        return repository;
-    }
+  public boolean isCacheAltered() {
+    return alteredItemCount > 0;
+  }
 
-    @Override
-    protected void processFileItem( WalkerContext context, StorageFileItem item )
-        throws Exception
-    {
-        if ( !item.isExpired() )
-        {
-            // expiring found files
-            item.setExpired( true );
-
-            // store it
-            getRepository().getAttributesHandler().storeAttributes( item );
-
-            alteredItemCount++;
-        }
-    }
-
-    public boolean isCacheAltered()
-    {
-        return alteredItemCount > 0;
-    }
-
-    public int getAlteredItemCount()
-    {
-        return alteredItemCount;
-    }
+  public int getAlteredItemCount() {
+    return alteredItemCount;
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.xstream.xml;
 
 import java.io.InputStream;
@@ -37,56 +38,46 @@ public class LookAheadXppDriver
     extends XppDriver
 {
 
-    private static boolean xppLibraryPresent;
+  private static boolean xppLibraryPresent;
 
-    public LookAheadXppDriver()
-    {
-        super( new XmlFriendlyReplacer() );
-    }
+  public LookAheadXppDriver() {
+    super(new XmlFriendlyReplacer());
+  }
 
-    public LookAheadXppDriver( XmlFriendlyReplacer replacer )
-    {
-        super( replacer );
-    }
+  public LookAheadXppDriver(XmlFriendlyReplacer replacer) {
+    super(replacer);
+  }
 
-    public HierarchicalStreamReader createReader( Reader xml )
-    {
-        loadLibrary();
-        return new LookAheadXppReader( xml, xmlFriendlyReplacer() );
-    }
+  public HierarchicalStreamReader createReader(Reader xml) {
+    loadLibrary();
+    return new LookAheadXppReader(xml, xmlFriendlyReplacer());
+  }
 
-    public HierarchicalStreamReader createReader( InputStream in )
-    {
-        return createReader( new InputStreamReader( in ) );
-    }
+  public HierarchicalStreamReader createReader(InputStream in) {
+    return createReader(new InputStreamReader(in));
+  }
 
-    private void loadLibrary()
-    {
-        if ( !xppLibraryPresent )
-        {
-            try
-            {
-                Class.forName( "org.xmlpull.mxp1.MXParser" );
-            }
-            catch ( ClassNotFoundException e )
-            {
-                throw new IllegalArgumentException(
-                    "XPP3 pull parser library not present. Specify another driver."
-                        + " For example: new XStream(new DomDriver())"
-                );
-            }
-            xppLibraryPresent = true;
-        }
+  private void loadLibrary() {
+    if (!xppLibraryPresent) {
+      try {
+        Class.forName("org.xmlpull.mxp1.MXParser");
+      }
+      catch (ClassNotFoundException e) {
+        throw new IllegalArgumentException(
+            "XPP3 pull parser library not present. Specify another driver."
+                + " For example: new XStream(new DomDriver())"
+        );
+      }
+      xppLibraryPresent = true;
     }
+  }
 
-    public HierarchicalStreamWriter createWriter( Writer out )
-    {
-        return new PrettyPrintWriter( out, xmlFriendlyReplacer() );
-    }
+  public HierarchicalStreamWriter createWriter(Writer out) {
+    return new PrettyPrintWriter(out, xmlFriendlyReplacer());
+  }
 
-    public HierarchicalStreamWriter createWriter( OutputStream out )
-    {
-        return createWriter( new OutputStreamWriter( out ) );
-    }
+  public HierarchicalStreamWriter createWriter(OutputStream out) {
+    return createWriter(new OutputStreamWriter(out));
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.guice.nexus.scanners;
 
 import java.lang.annotation.Annotation;
@@ -17,39 +18,33 @@ import java.lang.annotation.Annotation;
 final class DetailedNexusType
     implements NexusType
 {
-    private final boolean isSingleton;
+  private final boolean isSingleton;
 
-    private final Annotation details;
+  private final Annotation details;
 
-    DetailedNexusType( final Annotation details )
-    {
-        isSingleton = false;
-        this.details = details;
-    }
+  DetailedNexusType(final Annotation details) {
+    isSingleton = false;
+    this.details = details;
+  }
 
-    private DetailedNexusType( final boolean isSingleton, final Annotation details )
-    {
-        this.isSingleton = isSingleton;
-        this.details = details;
-    }
+  private DetailedNexusType(final boolean isSingleton, final Annotation details) {
+    this.isSingleton = isSingleton;
+    this.details = details;
+  }
 
-    public boolean isComponent()
-    {
-        return true;
-    }
+  public boolean isComponent() {
+    return true;
+  }
 
-    public boolean isSingleton()
-    {
-        return isSingleton;
-    }
+  public boolean isSingleton() {
+    return isSingleton;
+  }
 
-    public DetailedNexusType asSingleton()
-    {
-        return isSingleton ? this : new DetailedNexusType( true, details );
-    }
+  public DetailedNexusType asSingleton() {
+    return isSingleton ? this : new DetailedNexusType(true, details);
+  }
 
-    public Annotation details()
-    {
-        return details;
-    }
+  public Annotation details() {
+    return details;
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus;
 
 import java.io.IOException;
@@ -18,85 +19,79 @@ import java.io.InputStream;
 public class LimitedInputStream
     extends InputStream
 {
-    public static final long UNLIMITED = -1;
+  public static final long UNLIMITED = -1;
 
-    private final InputStream is;
+  private final InputStream is;
 
-    private final long from;
+  private final long from;
 
-    private final long count;
+  private final long count;
 
-    private long readAlready = 0;
+  private long readAlready = 0;
 
-    public LimitedInputStream( InputStream is, long from, long count )
-        throws IOException
-    {
-        super();
+  public LimitedInputStream(InputStream is, long from, long count)
+      throws IOException
+  {
+    super();
 
-        this.is = is;
+    this.is = is;
 
-        this.from = from;
+    this.from = from;
 
-        this.count = count;
+    this.count = count;
 
-        is.skip( from );
+    is.skip(from);
+  }
+
+  public InputStream getIs() {
+    return is;
+  }
+
+  public long getFrom() {
+    return from;
+  }
+
+  public long getCount() {
+    return count;
+  }
+
+  @Override
+  public int read()
+      throws IOException
+  {
+    if (readAlready > count) {
+      return -1;
     }
 
-    public InputStream getIs()
-    {
-        return is;
-    }
+    readAlready++;
 
-    public long getFrom()
-    {
-        return from;
-    }
+    return is.read();
+  }
 
-    public long getCount()
-    {
-        return count;
-    }
+  public int available()
+      throws IOException
+  {
+    return is.available();
+  }
 
-    @Override
-    public int read()
-        throws IOException
-    {
-        if ( readAlready > count )
-        {
-            return -1;
-        }
+  public void close()
+      throws IOException
+  {
+    is.close();
+  }
 
-        readAlready++;
+  public synchronized void mark(int readlimit) {
+    is.mark(readlimit);
+  }
 
-        return is.read();
-    }
+  public synchronized void reset()
+      throws IOException
+  {
+    is.reset();
+  }
 
-    public int available()
-        throws IOException
-    {
-        return is.available();
-    }
-
-    public void close()
-        throws IOException
-    {
-        is.close();
-    }
-
-    public synchronized void mark( int readlimit )
-    {
-        is.mark( readlimit );
-    }
-
-    public synchronized void reset()
-        throws IOException
-    {
-        is.reset();
-    }
-
-    public boolean markSupported()
-    {
-        return is.markSupported();
-    }
+  public boolean markSupported() {
+    return is.markSupported();
+  }
 
 }

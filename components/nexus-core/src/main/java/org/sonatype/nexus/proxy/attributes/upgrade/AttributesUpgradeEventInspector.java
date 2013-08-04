@@ -10,41 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.attributes.upgrade;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.plexus.appevents.Event;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * EventInspector that fires upgrade call to upgrader component, does it blindly.
- * 
+ *
  * @since 2.0
  */
-@Component( role = EventInspector.class, hint = "AttributesUpgradeEventInspector" )
+@Component(role = EventInspector.class, hint = "AttributesUpgradeEventInspector")
 public class AttributesUpgradeEventInspector
     extends AbstractEventInspector
     implements EventInspector, AsynchronousEventInspector
 {
-    @Requirement
-    private AttributeUpgrader attributeUpgrader;
+  @Requirement
+  private AttributeUpgrader attributeUpgrader;
 
-    @Override
-    public boolean accepts( Event<?> evt )
-    {
-        return evt instanceof NexusStartedEvent;
-    }
+  @Override
+  public boolean accepts(Event<?> evt) {
+    return evt instanceof NexusStartedEvent;
+  }
 
-    @Override
-    public void inspect( Event<?> evt )
-    {
-        if ( accepts( evt ) )
-        {
-            attributeUpgrader.upgradeAttributes();
-        }
+  @Override
+  public void inspect(Event<?> evt) {
+    if (accepts(evt)) {
+      attributeUpgrader.upgradeAttributes();
     }
+  }
 }

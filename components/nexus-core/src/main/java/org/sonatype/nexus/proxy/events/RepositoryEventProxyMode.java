@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.repository.ProxyMode;
@@ -17,47 +18,43 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 /**
  * The superclass event of ProxyReposiory ProxyMode related events.
- * 
+ *
  * @author cstamas
  */
 public abstract class RepositoryEventProxyMode
     extends RepositoryEvent
 {
-    private final ProxyMode oldProxyMode;
+  private final ProxyMode oldProxyMode;
 
-    private final ProxyMode newProxyMode;
+  private final ProxyMode newProxyMode;
 
-    private final Throwable cause;
+  private final Throwable cause;
 
-    public RepositoryEventProxyMode( final ProxyRepository repository, final ProxyMode oldProxyMode,
-                                     final ProxyMode newProxyMode, final Throwable cause )
-    {
-        super( repository );
+  public RepositoryEventProxyMode(final ProxyRepository repository, final ProxyMode oldProxyMode,
+                                  final ProxyMode newProxyMode, final Throwable cause)
+  {
+    super(repository);
 
-        this.oldProxyMode = oldProxyMode;
+    this.oldProxyMode = oldProxyMode;
 
-        this.newProxyMode = newProxyMode;
+    this.newProxyMode = newProxyMode;
 
-        this.cause = cause;
-    }
+    this.cause = cause;
+  }
 
-    public ProxyMode getOldProxyMode()
-    {
-        return oldProxyMode;
-    }
+  public ProxyMode getOldProxyMode() {
+    return oldProxyMode;
+  }
 
-    public ProxyMode getNewProxyMode()
-    {
-        return newProxyMode;
-    }
+  public ProxyMode getNewProxyMode() {
+    return newProxyMode;
+  }
 
-    public Throwable getCause()
-    {
-        return cause;
-    }
+  public Throwable getCause() {
+    return cause;
+  }
 
-    public ProxyRepository getRepository()
-    {
-        return (ProxyRepository) super.getRepository();
-    }
+  public ProxyRepository getRepository() {
+    return (ProxyRepository) super.getRepository();
+  }
 }

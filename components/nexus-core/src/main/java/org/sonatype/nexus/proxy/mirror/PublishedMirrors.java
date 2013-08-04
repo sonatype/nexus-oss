@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.mirror;
 
 import java.util.List;
@@ -19,12 +20,12 @@ import org.sonatype.nexus.proxy.repository.Mirror;
 /**
  * Published mirrors of a repository. Set of mirrors used by all repository types to publish downstream (using
  * metadata).
- * 
+ *
  * @author cstamas
  */
 public interface PublishedMirrors
 {
-    void setMirrors( List<Mirror> mirrors );
+  void setMirrors(List<Mirror> mirrors);
 
-    List<Mirror> getMirrors();
+  List<Mirror> getMirrors();
 }

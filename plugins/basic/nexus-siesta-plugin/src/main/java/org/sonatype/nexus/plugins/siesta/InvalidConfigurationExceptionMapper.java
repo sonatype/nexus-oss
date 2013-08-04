@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.siesta;
 
 import java.util.List;
+
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,6 +24,7 @@ import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.sisu.siesta.common.validation.ValidationErrorXO;
 import org.sonatype.sisu.siesta.server.ValidationErrorsExceptionMappersSupport;
+
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
@@ -36,31 +39,26 @@ public class InvalidConfigurationExceptionMapper
     extends ValidationErrorsExceptionMappersSupport<InvalidConfigurationException>
 {
 
-    @Override
-    protected List<ValidationErrorXO> getValidationErrors( final InvalidConfigurationException exception )
-    {
-        final ValidationResponse validationResponse = exception.getValidationResponse();
-        if ( validationResponse != null )
+  @Override
+  protected List<ValidationErrorXO> getValidationErrors(final InvalidConfigurationException exception) {
+    final ValidationResponse validationResponse = exception.getValidationResponse();
+    if (validationResponse != null) {
+      final List<ValidationMessage> validationErrors = validationResponse.getValidationErrors();
+      if (validationErrors != null && validationErrors.isEmpty()) {
+        Lists.transform(validationErrors, new Function<ValidationMessage, ValidationErrorXO>()
         {
-            final List<ValidationMessage> validationErrors = validationResponse.getValidationErrors();
-            if ( validationErrors != null && validationErrors.isEmpty() )
-            {
-                Lists.transform( validationErrors, new Function<ValidationMessage, ValidationErrorXO>()
-                {
-                    @Nullable
-                    @Override
-                    public ValidationErrorXO apply( @Nullable final ValidationMessage validationMessage )
-                    {
-                        if ( validationMessage != null )
-                        {
-                            return new ValidationErrorXO( validationMessage.getKey(), validationMessage.getMessage() );
-                        }
-                        return null;
-                    }
-                } );
+          @Nullable
+          @Override
+          public ValidationErrorXO apply(@Nullable final ValidationMessage validationMessage) {
+            if (validationMessage != null) {
+              return new ValidationErrorXO(validationMessage.getKey(), validationMessage.getMessage());
             }
-        }
-        return Lists.newArrayList( new ValidationErrorXO( exception.getMessage() ) );
+            return null;
+          }
+        });
+      }
     }
+    return Lists.newArrayList(new ValidationErrorXO(exception.getMessage()));
+  }
 
 }

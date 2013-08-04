@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.ui;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,13 +30,12 @@ public class TimelineUiContributor
     implements UiContributor
 {
 
-    public static final String ARTIFACT_ID = "nexus-timeline-plugin";
+  public static final String ARTIFACT_ID = "nexus-timeline-plugin";
 
-    public static final String GROUP_ID = "org.sonatype.nexus.plugins";
+  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
-    @Override
-    public UiContribution contribute( final boolean debug )
-    {
-        return new UiContributionBuilder( this, GROUP_ID, ARTIFACT_ID ).build( debug );
-    }
+  @Override
+  public UiContribution contribute(final boolean debug) {
+    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
+  }
 }

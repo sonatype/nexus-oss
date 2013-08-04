@@ -10,17 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.sisu.jetty.mangler;
 
 import org.eclipse.jetty.server.Server;
 
 /**
  * Provides means to "mangle" the Jetty instance.
- * 
+ *
  * @author cstamas
- * @param <T>
  */
 public interface ServerMangler<T>
 {
-    T mangle( final Server server );
+  T mangle(final Server server);
 }

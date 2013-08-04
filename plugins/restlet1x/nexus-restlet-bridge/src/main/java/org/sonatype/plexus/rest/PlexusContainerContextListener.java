@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest;
 
 
@@ -27,44 +28,39 @@ import org.codehaus.plexus.PlexusContainerException;
 public class PlexusContainerContextListener
     implements ServletContextListener
 {
-    private static final String KEY_PLEXUS = "plexus";
+  private static final String KEY_PLEXUS = "plexus";
 
-    PlexusContainerConfigurationUtils plexusContainerConfigurationUtils = new PlexusContainerConfigurationUtils();
+  PlexusContainerConfigurationUtils plexusContainerConfigurationUtils = new PlexusContainerConfigurationUtils();
 
-    PlexusContainerUtils plexusContainerUtils = new PlexusContainerUtils();
+  PlexusContainerUtils plexusContainerUtils = new PlexusContainerUtils();
 
-    public void contextInitialized( ServletContextEvent sce )
-    {
-        ServletContext context = sce.getServletContext();
+  public void contextInitialized(ServletContextEvent sce) {
+    ServletContext context = sce.getServletContext();
 
-        ContainerConfiguration plexusContainerConfiguration = this.buildContainerConfiguration( context );
+    ContainerConfiguration plexusContainerConfiguration = this.buildContainerConfiguration(context);
 
-        try
-        {
-            initizlizePlexusContainer( context, plexusContainerConfiguration );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new IllegalStateException( "Could start plexus container", e );
-        }
+    try {
+      initizlizePlexusContainer(context, plexusContainerConfiguration);
     }
-
-    public void contextDestroyed( ServletContextEvent sce )
-    {
-        plexusContainerUtils.stopContainer();
+    catch (PlexusContainerException e) {
+      throw new IllegalStateException("Could start plexus container", e);
     }
+  }
 
-    protected void initizlizePlexusContainer( ServletContext context, ContainerConfiguration configuration )
-        throws PlexusContainerException
-    {
-        PlexusContainer plexusContainer = plexusContainerUtils.startContainer( configuration );
+  public void contextDestroyed(ServletContextEvent sce) {
+    plexusContainerUtils.stopContainer();
+  }
 
-        context.setAttribute( KEY_PLEXUS, plexusContainer );
-    }
-    
-    protected ContainerConfiguration buildContainerConfiguration( ServletContext context )
-    {
-        return plexusContainerConfigurationUtils
-        .buildContainerConfiguration( context );
-    }
+  protected void initizlizePlexusContainer(ServletContext context, ContainerConfiguration configuration)
+      throws PlexusContainerException
+  {
+    PlexusContainer plexusContainer = plexusContainerUtils.startContainer(configuration);
+
+    context.setAttribute(KEY_PLEXUS, plexusContainer);
+  }
+
+  protected ContainerConfiguration buildContainerConfiguration(ServletContext context) {
+    return plexusContainerConfigurationUtils
+        .buildContainerConfiguration(context);
+  }
 }

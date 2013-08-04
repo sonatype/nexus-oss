@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.targets;
 
 import java.util.List;
@@ -25,17 +26,17 @@ public interface RepositoryTarget
     extends Entity<RepositoryTarget>
 {
 
-    String name();
+  String name();
 
-    String contentClass();
+  String contentClass();
 
-    List<String> patterns();
+  List<String> patterns();
 
-    RepositoryTarget withName( String name );
+  RepositoryTarget withName(String name);
 
-    RepositoryTarget withContentClass( String cls );
+  RepositoryTarget withContentClass(String cls);
 
-    RepositoryTarget withPatterns( String... patterns );
+  RepositoryTarget withPatterns(String... patterns);
 
-    RepositoryTarget addPattern( String pattern );
+  RepositoryTarget addPattern(String pattern);
 }

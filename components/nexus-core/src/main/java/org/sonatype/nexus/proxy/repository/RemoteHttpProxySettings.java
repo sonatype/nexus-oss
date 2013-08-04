@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 /**
@@ -20,39 +21,39 @@ package org.sonatype.nexus.proxy.repository;
 public interface RemoteHttpProxySettings
 {
 
-    /**
-     * @return true if proxy settings are enabled (hostname != null)
-     */
-    boolean isEnabled();
+  /**
+   * @return true if proxy settings are enabled (hostname != null)
+   */
+  boolean isEnabled();
 
-    /**
-     * @return proxy server host name (or IP)
-     */
-    String getHostname();
+  /**
+   * @return proxy server host name (or IP)
+   */
+  String getHostname();
 
-    /**
-     * @param hostname proxy server host name (or IP)
-     */
-    void setHostname( String hostname );
+  /**
+   * @param hostname proxy server host name (or IP)
+   */
+  void setHostname(String hostname);
 
-    /**
-     * @return proxy server port
-     */
-    int getPort();
+  /**
+   * @return proxy server port
+   */
+  int getPort();
 
-    /**
-     * @param port proxy server port
-     */
-    void setPort( int port );
+  /**
+   * @param port proxy server port
+   */
+  void setPort(int port);
 
-    /**
-     * @return proxy server credentials (if required, null otherwise)
-     */
-    RemoteAuthenticationSettings getProxyAuthentication();
+  /**
+   * @return proxy server credentials (if required, null otherwise)
+   */
+  RemoteAuthenticationSettings getProxyAuthentication();
 
-    /**
-     * @param proxyAuthentication proxy server credentials (if required, null otherwise)
-     */
-    void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication );
+  /**
+   * @param proxyAuthentication proxy server credentials (if required, null otherwise)
+   */
+  void setProxyAuthentication(RemoteAuthenticationSettings proxyAuthentication);
 
 }

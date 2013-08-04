@@ -10,25 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.notification;
 
 public interface NotificationManager
 {
-    boolean isEnabled();
+  boolean isEnabled();
 
-    void setEnabled( boolean val );
+  void setEnabled(boolean val);
 
-    // TODO: implement full CRUD when redoing
-    // void createNotificationTarget( NotificationTarget target );
+  // TODO: implement full CRUD when redoing
+  // void createNotificationTarget( NotificationTarget target );
 
-    NotificationTarget readNotificationTarget( String targetId );
+  NotificationTarget readNotificationTarget(String targetId);
 
-    void updateNotificationTarget( NotificationTarget target );
+  void updateNotificationTarget(NotificationTarget target);
 
-    // TODO: implement full CRUD when redoing
-    // void deleteNotificationTarget( String targetId );
+  // TODO: implement full CRUD when redoing
+  // void deleteNotificationTarget( String targetId );
 
-    // --
+  // --
 
-    void notifyTargets( NotificationRequest request );
+  void notifyTargets(NotificationRequest request);
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven;
 
 import java.text.SimpleDateFormat;
@@ -17,96 +18,97 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Nexus4423Maven3MetadataTest
     extends AbstractProxyTestEnvironment
 {
 
-    private Logger log = LoggerFactory.getLogger(Nexus4423Maven3MetadataTest.class);
+  private Logger log = LoggerFactory.getLogger(Nexus4423Maven3MetadataTest.class);
 
-    @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
-        throws Exception
-    {
-        ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        return new M2TestsuiteEnvironmentBuilder( ss );
+  @Override
+  protected EnvironmentBuilder getEnvironmentBuilder()
+      throws Exception
+  {
+    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
+    return new M2TestsuiteEnvironmentBuilder(ss);
+  }
+
+  @Test
+  public void testMaven3MetadataShouldSucceed()
+      throws Exception
+  {
+    final Gav gav =
+        new Gav("org.exoplatform.social", "exo.social.packaging.pkg", "1.2.1-SNAPSHOT", null, "pom", null, null,
+            null, false, null, false, null);
+
+    final MavenRepository mavenRepository =
+        getRepositoryRegistry().getRepositoryWithFacet("nexus4423-snapshot", MavenRepository.class);
+
+    ArtifactStoreRequest gavRequest = new ArtifactStoreRequest(mavenRepository, gav, false);
+
+    ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
+
+    Gav resolvedGav = helper.resolveArtifact(gavRequest);
+
+    if (resolvedGav == null) {
+      Assert.fail("We should be able to resolve the gav " + gav.toString());
     }
 
-    @Test
-    public void testMaven3MetadataShouldSucceed()
-        throws Exception
-    {
-        final Gav gav =
-            new Gav( "org.exoplatform.social", "exo.social.packaging.pkg", "1.2.1-SNAPSHOT", null, "pom", null, null,
-                null, false, null, false, null );
+    log.error("resolvedGav.getSnapshotTimeStamp()" + resolvedGav.getSnapshotTimeStamp());
+    Assert.assertEquals("The expected version does not match!", "1.2.1-20110719.134341-19",
+        resolvedGav.getVersion());
 
-        final MavenRepository mavenRepository =
-            getRepositoryRegistry().getRepositoryWithFacet( "nexus4423-snapshot", MavenRepository.class );
+    // ensure GMT 00:00 sine that is what is supposed to be in metadata files
+    SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.US);
+    df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
 
-        ArtifactStoreRequest gavRequest = new ArtifactStoreRequest( mavenRepository, gav, false );
+    Assert.assertEquals("The expected timestamp does not match!", "20110719.134341",
+        df.format(new Date(resolvedGav.getSnapshotTimeStamp())));
+    Assert.assertEquals("The expected buildNumber does not match!", Integer.valueOf(19),
+        resolvedGav.getSnapshotBuildNumber());
+  }
 
-        ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
+  @Test
+  public void testMaven3MetadataShouldFailWithoutNexus4423Fixed()
+      throws Exception
+  {
+    final Gav gav =
+        new Gav("org.exoplatform.social", "exo.social.packaging.pkg", "1.2.1-SNAPSHOT", "tomcat", "zip", null,
+            null, null, false, null, false, null);
 
-        Gav resolvedGav = helper.resolveArtifact( gavRequest );
+    final MavenRepository mavenRepository =
+        getRepositoryRegistry().getRepositoryWithFacet("nexus4423-snapshot", MavenRepository.class);
 
-        if ( resolvedGav == null )
-        {
-            Assert.fail( "We should be able to resolve the gav " + gav.toString() );
-        }
+    ArtifactStoreRequest gavRequest = new ArtifactStoreRequest(mavenRepository, gav, false);
 
-        log.error("resolvedGav.getSnapshotTimeStamp()" + resolvedGav.getSnapshotTimeStamp());
-        Assert.assertEquals( "The expected version does not match!", "1.2.1-20110719.134341-19",
-            resolvedGav.getVersion() );
+    ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
-        // ensure GMT 00:00 sine that is what is supposed to be in metadata files
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
+    Gav resolvedGav = helper.resolveArtifact(gavRequest);
 
-        Assert.assertEquals( "The expected timestamp does not match!", "20110719.134341", df.format( new Date( resolvedGav.getSnapshotTimeStamp() ) ) );
-        Assert.assertEquals( "The expected buildNumber does not match!", Integer.valueOf( 19 ),
-            resolvedGav.getSnapshotBuildNumber() );
+    if (resolvedGav == null) {
+      Assert.fail("We should be able to resolve the gav " + gav.toString());
     }
 
-    @Test
-    public void testMaven3MetadataShouldFailWithoutNexus4423Fixed()
-        throws Exception
-    {
-        final Gav gav =
-            new Gav( "org.exoplatform.social", "exo.social.packaging.pkg", "1.2.1-SNAPSHOT", "tomcat", "zip", null,
-                null, null, false, null, false, null );
+    Assert.assertEquals("The expected version does not match!", "1.2.1-20110719.092007-17",
+        resolvedGav.getVersion());
 
-        final MavenRepository mavenRepository =
-            getRepositoryRegistry().getRepositoryWithFacet( "nexus4423-snapshot", MavenRepository.class );
+    // ensure GMT 00:00 sine that is what is supposed to be in metadata files
+    SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.US);
+    df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
 
-        ArtifactStoreRequest gavRequest = new ArtifactStoreRequest( mavenRepository, gav, false );
-
-        ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
-
-        Gav resolvedGav = helper.resolveArtifact( gavRequest );
-
-        if ( resolvedGav == null )
-        {
-            Assert.fail( "We should be able to resolve the gav " + gav.toString() );
-        }
-
-        Assert.assertEquals( "The expected version does not match!", "1.2.1-20110719.092007-17",
-            resolvedGav.getVersion() );
-
-        // ensure GMT 00:00 sine that is what is supposed to be in metadata files
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
-
-        Assert.assertEquals( "The expected timestamp does not match!", "20110719.092007", df.format(new Date( resolvedGav.getSnapshotTimeStamp() ) ) );
-        Assert.assertEquals( "The expected buildNumber does not match!", Integer.valueOf( 17 ),
-            resolvedGav.getSnapshotBuildNumber() );
-    }
+    Assert.assertEquals("The expected timestamp does not match!", "20110719.092007",
+        df.format(new Date(resolvedGav.getSnapshotTimeStamp())));
+    Assert.assertEquals("The expected buildNumber does not match!", Integer.valueOf(17),
+        resolvedGav.getSnapshotBuildNumber());
+  }
 }

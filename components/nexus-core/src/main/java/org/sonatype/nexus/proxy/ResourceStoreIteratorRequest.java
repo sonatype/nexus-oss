@@ -10,32 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 public class ResourceStoreIteratorRequest
     extends ResourceStoreRequest
 {
-    public enum Traversal
-    {
-        IN_DEPTH, IN_WIDTH;
-    }
+  public enum Traversal
+  {
+    IN_DEPTH, IN_WIDTH;
+  }
 
-    private final Traversal traversal;
+  private final Traversal traversal;
 
-    public ResourceStoreIteratorRequest( Traversal traversal, String requestPath )
-    {
-        this( traversal, requestPath, true, false );
-    }
+  public ResourceStoreIteratorRequest(Traversal traversal, String requestPath) {
+    this(traversal, requestPath, true, false);
+  }
 
-    public ResourceStoreIteratorRequest( Traversal traversal, String requestPath, boolean localOnly, boolean remoteOnly )
-    {
-        super( requestPath, localOnly, remoteOnly );
+  public ResourceStoreIteratorRequest(Traversal traversal, String requestPath, boolean localOnly, boolean remoteOnly) {
+    super(requestPath, localOnly, remoteOnly);
 
-        this.traversal = traversal;
-    }
+    this.traversal = traversal;
+  }
 
-    public Traversal getTraversal()
-    {
-        return traversal;
-    }
+  public Traversal getTraversal() {
+    return traversal;
+  }
 }

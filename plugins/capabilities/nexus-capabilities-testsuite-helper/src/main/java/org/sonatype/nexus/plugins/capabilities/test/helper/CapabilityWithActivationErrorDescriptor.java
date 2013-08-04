@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.test.helper;
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -20,6 +19,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
+
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 /**
  * @since 2.4
@@ -31,13 +32,12 @@ public class CapabilityWithActivationErrorDescriptor
     implements CapabilityDescriptor
 {
 
-    static final String TYPE_ID = "[withActivationError]";
+  static final String TYPE_ID = "[withActivationError]";
 
-    static final CapabilityType TYPE = capabilityType( TYPE_ID );
+  static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-    protected CapabilityWithActivationErrorDescriptor()
-    {
-        super( TYPE, "With Activation Error", "?" );
-    }
+  protected CapabilityWithActivationErrorDescriptor() {
+    super(TYPE, "With Activation Error", "?");
+  }
 
 }

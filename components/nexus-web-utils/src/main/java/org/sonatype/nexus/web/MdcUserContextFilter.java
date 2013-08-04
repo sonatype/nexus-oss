@@ -10,9 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web;
 
-import org.sonatype.nexus.threads.MDCUtils;
+import java.io.IOException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,7 +23,8 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import java.io.IOException;
+
+import org.sonatype.nexus.threads.MDCUtils;
 
 // NOTE: This would be better integrated as part of the org.sonatype.security.web.guice.SecurityWebFilter ?
 
@@ -36,26 +38,26 @@ import java.io.IOException;
 public class MdcUserContextFilter
     implements Filter
 {
-    @Override
-    public void init(final FilterConfig config) throws ServletException {
-        // ignore
-    }
+  @Override
+  public void init(final FilterConfig config) throws ServletException {
+    // ignore
+  }
 
-    @Override
-    public void destroy() {
-        // ignore
-    }
+  @Override
+  public void destroy() {
+    // ignore
+  }
 
-    @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-        throws IOException, ServletException
-    {
-        MDCUtils.setMDCUserId();
-        try {
-            chain.doFilter(request, response);
-        }
-        finally {
-            MDCUtils.unsetMDCUserId();
-        }
+  @Override
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+      throws IOException, ServletException
+  {
+    MDCUtils.setMDCUserId();
+    try {
+      chain.doFilter(request, response);
     }
+    finally {
+      MDCUtils.unsetMDCUserId();
+    }
+  }
 }

@@ -10,14 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+
 import com.google.common.base.Preconditions;
 
 /**
- * Remote storage exception for cases when outbound request is unsuccessful, due to remote peer hang up on us unexpectedly.
- * Main use of this exception is to "translate" various EOF notification for various Remote Repository Storage implementations
+ * Remote storage exception for cases when outbound request is unsuccessful, due to remote peer hang up on us
+ * unexpectedly.
+ * Main use of this exception is to "translate" various EOF notification for various Remote Repository Storage
+ * implementations
  * into single exception handled by Nexus Core.
  *
  * @author cstamas
@@ -26,50 +30,36 @@ import com.google.common.base.Preconditions;
 public class RemoteStorageEOFException
     extends RemoteStorageException
 {
-    private final ProxyRepository repository;
+  private final ProxyRepository repository;
 
-    /**
-     * Constructor.
-     *
-     * @param repository
-     * @param message
-     */
-    public RemoteStorageEOFException( final ProxyRepository repository, final String message )
-    {
-        this( repository, message, null );
-    }
+  /**
+   * Constructor.
+   */
+  public RemoteStorageEOFException(final ProxyRepository repository, final String message) {
+    this(repository, message, null);
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param repository
-     * @param message
-     * @param cause
-     */
-    public RemoteStorageEOFException( final ProxyRepository repository, final String message, final Throwable cause )
-    {
-        super( message, cause );
-        this.repository = Preconditions.checkNotNull( repository );
-    }
+  /**
+   * Constructor.
+   */
+  public RemoteStorageEOFException(final ProxyRepository repository, final String message, final Throwable cause) {
+    super(message, cause);
+    this.repository = Preconditions.checkNotNull(repository);
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param repository
-     * @param cause
-     */
-    public RemoteStorageEOFException( final ProxyRepository repository, final Throwable cause )
-    {
-        this( repository, cause.getMessage(), cause );
-    }
+  /**
+   * Constructor.
+   */
+  public RemoteStorageEOFException(final ProxyRepository repository, final Throwable cause) {
+    this(repository, cause.getMessage(), cause);
+  }
 
-    /**
-     * Returns the involved proxy repository. Never returns {@code null}.
-     * 
-     * @return the involved proxy repository.
-     */
-    public ProxyRepository getRepository()
-    {
-        return repository;
-    }
+  /**
+   * Returns the involved proxy repository. Never returns {@code null}.
+   *
+   * @return the involved proxy repository.
+   */
+  public ProxyRepository getRepository() {
+    return repository;
+  }
 }

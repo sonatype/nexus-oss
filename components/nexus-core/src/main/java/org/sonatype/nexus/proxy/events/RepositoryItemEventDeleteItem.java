@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -18,17 +19,17 @@ import org.sonatype.nexus.proxy.repository.Repository;
 /**
  * The event fired on item deletion when a collection is about to be deleted. When a collection is deleted, a
  * "recursive dive" is done to notify listeners for recursive deletions about to happen as part of a deletion of a
- * collection item. All delete events are fired before actual deletion is made, hence, the items carried by these events
+ * collection item. All delete events are fired before actual deletion is made, hence, the items carried by these
+ * events
  * are still present and even it's content is reachable (if any).
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
 public class RepositoryItemEventDeleteItem
     extends RepositoryItemEventDelete
 {
-    public RepositoryItemEventDeleteItem( final Repository repository, final StorageItem item )
-    {
-        super( repository, item );
-    }
+  public RepositoryItemEventDeleteItem(final Repository repository, final StorageItem item) {
+    super(repository, item);
+  }
 }

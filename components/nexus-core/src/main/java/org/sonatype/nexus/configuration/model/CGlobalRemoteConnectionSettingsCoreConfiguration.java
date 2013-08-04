@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.model;
 
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -18,56 +19,48 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 public class CGlobalRemoteConnectionSettingsCoreConfiguration
     extends AbstractCoreConfiguration
 {
-    public CGlobalRemoteConnectionSettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
-    {
-        super( applicationConfiguration );
+  public CGlobalRemoteConnectionSettingsCoreConfiguration(ApplicationConfiguration applicationConfiguration) {
+    super(applicationConfiguration);
+  }
+
+  @Override
+  public CRemoteConnectionSettings getConfiguration(boolean forWrite) {
+    if (getOriginalConfiguration() == null) {
+      // create default
+      CRemoteConnectionSettings newConn = new CRemoteConnectionSettings();
+
+      newConn.setConnectionTimeout(20000);
+
+      newConn.setRetrievalRetryCount(3);
+
+      getApplicationConfiguration().getConfigurationModel().setGlobalConnectionSettings(newConn);
+
+      setOriginalConfiguration(newConn);
     }
 
-    @Override
-    public CRemoteConnectionSettings getConfiguration( boolean forWrite )
-    {
-        if ( getOriginalConfiguration() == null )
-        {
-            // create default
-            CRemoteConnectionSettings newConn = new CRemoteConnectionSettings();
+    return (CRemoteConnectionSettings) super.getConfiguration(forWrite);
+  }
 
-            newConn.setConnectionTimeout( 20000 );
+  @Override
+  protected CRemoteConnectionSettings extractConfiguration(Configuration configuration) {
+    return configuration.getGlobalConnectionSettings();
+  }
 
-            newConn.setRetrievalRetryCount( 3 );
+  @Override
+  public ValidationResponse doValidateChanges(Object changedConfiguration) {
+    return new ValidationResponse();
+  }
 
-            getApplicationConfiguration().getConfigurationModel().setGlobalConnectionSettings( newConn );
+  @Override
+  protected void copyTransients(final Object source, final Object destination) {
+    super.copyTransients(source, destination);
 
-            setOriginalConfiguration( newConn );
-        }
-
-        return (CRemoteConnectionSettings) super.getConfiguration( forWrite );
+    if (((CRemoteConnectionSettings) source).getQueryString() == null) {
+      ((CRemoteConnectionSettings) destination).setQueryString(null);
     }
-
-    @Override
-    protected CRemoteConnectionSettings extractConfiguration( Configuration configuration )
-    {
-        return configuration.getGlobalConnectionSettings();
+    if (((CRemoteConnectionSettings) source).getUserAgentCustomizationString() == null) {
+      ((CRemoteConnectionSettings) destination).setUserAgentCustomizationString(null);
     }
-
-    @Override
-    public ValidationResponse doValidateChanges( Object changedConfiguration )
-    {
-        return new ValidationResponse();
-    }
-
-    @Override
-    protected void copyTransients( final Object source, final Object destination )
-    {
-        super.copyTransients( source, destination );
-
-        if ( ( (CRemoteConnectionSettings) source ).getQueryString() == null )
-        {
-            ( (CRemoteConnectionSettings) destination ).setQueryString( null );
-        }
-        if ( ( (CRemoteConnectionSettings) source ).getUserAgentCustomizationString() == null )
-        {
-            ( (CRemoteConnectionSettings) destination ).setUserAgentCustomizationString( null );
-        }
-    }
+  }
 
 }

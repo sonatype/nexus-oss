@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -25,65 +26,59 @@ public class InstanceOfWalkerFilter
     implements WalkerFilter
 {
 
-    /**
-     * Allowed types (can be null or empty).
-     */
-    private final Class<? extends StorageItem>[] m_allowed;
+  /**
+   * Allowed types (can be null or empty).
+   */
+  private final Class<? extends StorageItem>[] m_allowed;
 
-    /**
-     * Constructor.
-     *
-     * @param allowedClasses allowed types (can be null or empty)
-     */
-    public InstanceOfWalkerFilter( final Class<? extends StorageItem>... allowedClasses )
-    {
-        m_allowed = allowedClasses;
+  /**
+   * Constructor.
+   *
+   * @param allowedClasses allowed types (can be null or empty)
+   */
+  public InstanceOfWalkerFilter(final Class<? extends StorageItem>... allowedClasses) {
+    m_allowed = allowedClasses;
+  }
+
+  /**
+   * Checks if item is instance of any of allowed classes.<br/>
+   * If no classes were provided returns true.
+   *
+   * {@inheritDoc}
+   */
+  public boolean shouldProcess(final WalkerContext context,
+                               final StorageItem item)
+  {
+    if (m_allowed == null || m_allowed.length == 0) {
+      return true;
     }
-
-    /**
-     * Checks if item is instance of any of allowed classes.<br/>
-     * If no classes were provided returns true.
-     *
-     * {@inheritDoc}
-     */
-    public boolean shouldProcess( final WalkerContext context,
-                                  final StorageItem item )
-    {
-        if ( m_allowed == null || m_allowed.length == 0 )
-        {
-            return true;
-        }
-        for ( Class<? extends StorageItem> clazz : m_allowed )
-        {
-            if ( clazz.isAssignableFrom( item.getClass() ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Always returns true.
-     *
-     * {@inheritDoc}
-     */
-    public boolean shouldProcessRecursively( final WalkerContext context,
-                                             final StorageCollectionItem coll )
-    {
+    for (Class<? extends StorageItem> clazz : m_allowed) {
+      if (clazz.isAssignableFrom(item.getClass())) {
         return true;
+      }
     }
+    return false;
+  }
 
-    /**
-     * Builder method.
-     *
-     * @param allowedClasses allowed types (can be null or empty)
-     *
-     * @return conjunction between filters
-     */
-    public static InstanceOfWalkerFilter anyInstanceOf( final Class<? extends StorageItem>... allowedClasses )
-    {
-        return new InstanceOfWalkerFilter( allowedClasses );
-    }
+  /**
+   * Always returns true.
+   *
+   * {@inheritDoc}
+   */
+  public boolean shouldProcessRecursively(final WalkerContext context,
+                                          final StorageCollectionItem coll)
+  {
+    return true;
+  }
+
+  /**
+   * Builder method.
+   *
+   * @param allowedClasses allowed types (can be null or empty)
+   * @return conjunction between filters
+   */
+  public static InstanceOfWalkerFilter anyInstanceOf(final Class<? extends StorageItem>... allowedClasses) {
+    return new InstanceOfWalkerFilter(allowedClasses);
+  }
 
 }

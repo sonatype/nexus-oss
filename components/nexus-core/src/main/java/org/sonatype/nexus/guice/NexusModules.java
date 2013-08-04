@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.guice;
 
 import com.google.inject.AbstractModule;
@@ -23,40 +24,40 @@ import org.apache.shiro.guice.aop.ShiroAopModule;
  */
 public class NexusModules
 {
-    /**
-     * Nexus common guice module.
-     */
-    public static class CommonModule
-        extends AbstractModule
-    {
-        @Override
-        protected void configure() {
-            install(new ShiroAopModule());
-            install(new InstrumentationModule());
-        }
+  /**
+   * Nexus common guice module.
+   */
+  public static class CommonModule
+      extends AbstractModule
+  {
+    @Override
+    protected void configure() {
+      install(new ShiroAopModule());
+      install(new InstrumentationModule());
     }
+  }
 
-    /**
-     * Nexus core guice module.
-     */
-    public static class CoreModule
-        extends AbstractModule
-    {
-        @Override
-        protected void configure() {
-            install(new CommonModule());
-        }
+  /**
+   * Nexus core guice module.
+   */
+  public static class CoreModule
+      extends AbstractModule
+  {
+    @Override
+    protected void configure() {
+      install(new CommonModule());
     }
+  }
 
-    /**
-     * Nexus plugin guice module.
-     */
-    public static class PluginModule
-        extends AbstractModule
-    {
-        @Override
-        protected void configure() {
-            install(new CommonModule());
-        }
+  /**
+   * Nexus plugin guice module.
+   */
+  public static class PluginModule
+      extends AbstractModule
+  {
+    @Override
+    protected void configure() {
+      install(new CommonModule());
     }
+  }
 }

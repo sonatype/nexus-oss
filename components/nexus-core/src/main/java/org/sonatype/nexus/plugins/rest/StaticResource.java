@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rest;
 
 import java.io.IOException;
@@ -17,22 +18,22 @@ import java.io.InputStream;
 
 /**
  * This is an abstraction for static resources that the NexusResourceBundle wants to "contribute" to Nexus Web App.
- * 
+ *
  * @author cstamas
  */
 public interface StaticResource
 {
-    String getPath();
+  String getPath();
 
-    String getContentType();
+  String getContentType();
 
-    long getSize();
+  long getSize();
 
-    /**
-     * @return the last time the resource was modified or null if the last modified time is unknown
-     */
-    Long getLastModified();
+  /**
+   * @return the last time the resource was modified or null if the last modified time is unknown
+   */
+  Long getLastModified();
 
-    InputStream getInputStream()
-        throws IOException;
+  InputStream getInputStream()
+      throws IOException;
 }

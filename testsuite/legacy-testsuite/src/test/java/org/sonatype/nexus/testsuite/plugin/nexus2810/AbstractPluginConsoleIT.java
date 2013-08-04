@@ -10,76 +10,66 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.plugin.nexus2810;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
+
+import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
 
 public abstract class AbstractPluginConsoleIT
     extends AbstractNexusIntegrationTest
 {
 
-    protected PluginConsoleMessageUtil pluginConsoleMsgUtil = new PluginConsoleMessageUtil();
+  protected PluginConsoleMessageUtil pluginConsoleMsgUtil = new PluginConsoleMessageUtil();
 
-    public AbstractPluginConsoleIT()
-    {
-        super();
+  public AbstractPluginConsoleIT() {
+    super();
+  }
+
+  public AbstractPluginConsoleIT(String testRepositoryId) {
+    super(testRepositoryId);
+  }
+
+  protected List<String> getPluginsNames(List<PluginInfoDTO> pluginInfos) {
+    if (pluginInfos == null) {
+      return null;
     }
 
-    public AbstractPluginConsoleIT( String testRepositoryId )
-    {
-        super( testRepositoryId );
+    List<String> names = new ArrayList<String>();
+    for (PluginInfoDTO pluginInfoDTO : pluginInfos) {
+      names.add(pluginInfoDTO.getName());
+    }
+    return names;
+  }
+
+  protected PluginInfoDTO getPluginInfoByName(List<PluginInfoDTO> pluginInfos, String name) {
+    for (PluginInfoDTO pluginInfo : pluginInfos) {
+      if (pluginInfo.getName().equals(name)) {
+        return pluginInfo;
+      }
     }
 
-    protected List<String> getPluginsNames( List<PluginInfoDTO> pluginInfos )
-    {
-        if ( pluginInfos == null )
-        {
-            return null;
-        }
-    
-        List<String> names = new ArrayList<String>();
-        for ( PluginInfoDTO pluginInfoDTO : pluginInfos )
-        {
-            names.add( pluginInfoDTO.getName() );
-        }
-        return names;
+    return null;
+  }
+
+  protected void assertPropertyValid(String name, String value, String... expectedValue) {
+    if (StringUtils.isEmpty(value)) {
+      Assert.fail("Property '" + name + "' is empty!");
     }
 
-    protected PluginInfoDTO getPluginInfoByName( List<PluginInfoDTO> pluginInfos, String name )
-    {
-        for ( PluginInfoDTO pluginInfo : pluginInfos )
-        {
-            if ( pluginInfo.getName().equals( name ) )
-            {
-                return pluginInfo;
-            }
-        }
-    
-        return null;
+    if ("N/A".equals(value)) {
+      Assert.fail("Property '" + name + "' is N/A!");
     }
 
-    protected void assertPropertyValid( String name, String value, String... expectedValue )
-    {
-        if ( StringUtils.isEmpty( value ) )
-        {
-            Assert.fail( "Property '" + name + "' is empty!" );
-        }
-    
-        if ( "N/A".equals( value ) )
-        {
-            Assert.fail( "Property '" + name + "' is N/A!" );
-        }
-    
-        if ( expectedValue != null && expectedValue.length > 0 )
-        {
-            Assert.assertEquals( value, expectedValue[0] );
-        }
+    if (expectedValue != null && expectedValue.length > 0) {
+      Assert.assertEquals(value, expectedValue[0]);
     }
+  }
 
 }

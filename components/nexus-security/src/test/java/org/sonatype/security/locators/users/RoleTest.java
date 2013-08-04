@@ -10,49 +10,48 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.locators.users;
 
-import junit.framework.Assert;
+package org.sonatype.security.locators.users;
 
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.authorization.Role;
+
+import junit.framework.Assert;
 
 public class RoleTest
     extends InjectedTestCase
 {
 
-    public void testCompareDifferentId()
-    {
-        Role roleA = new Role();
-        roleA.setName( "ID1" );
-        roleA.setRoleId( "ID1" );
-        roleA.setSource( "source" );
+  public void testCompareDifferentId() {
+    Role roleA = new Role();
+    roleA.setName("ID1");
+    roleA.setRoleId("ID1");
+    roleA.setSource("source");
 
-        Role roleB = new Role();
-        roleB.setName( "ID2" );
-        roleB.setRoleId( "ID2" );
-        roleB.setSource( "source" );
+    Role roleB = new Role();
+    roleB.setName("ID2");
+    roleB.setRoleId("ID2");
+    roleB.setSource("source");
 
-        Assert.assertEquals( -1, roleA.compareTo( roleB ) );
-        Assert.assertEquals( 1, roleB.compareTo( roleA ) );
+    Assert.assertEquals(-1, roleA.compareTo(roleB));
+    Assert.assertEquals(1, roleB.compareTo(roleA));
 
-    }
+  }
 
-    public void testCompareDifferentSource()
-    {
-        Role roleA = new Role();
-        roleA.setName( "ID1" );
-        roleA.setRoleId( "ID1" );
-        roleA.setSource( "source1" );
+  public void testCompareDifferentSource() {
+    Role roleA = new Role();
+    roleA.setName("ID1");
+    roleA.setRoleId("ID1");
+    roleA.setSource("source1");
 
-        Role roleB = new Role();
-        roleB.setName( "ID1" );
-        roleB.setRoleId( "ID1" );
-        roleB.setSource( "source2" );
+    Role roleB = new Role();
+    roleB.setName("ID1");
+    roleB.setRoleId("ID1");
+    roleB.setSource("source2");
 
-        Assert.assertEquals( -1, roleA.compareTo( roleB ) );
-        Assert.assertEquals( 1, roleB.compareTo( roleA ) );
+    Assert.assertEquals(-1, roleA.compareTo(roleB));
+    Assert.assertEquals(1, roleB.compareTo(roleA));
 
-    }
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.mock.authorization;
 
 import java.util.HashSet;
@@ -27,66 +28,62 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 
 @Singleton
-@Typed( AuthorizationManager.class )
-@Named( "sourceB" )
+@Typed(AuthorizationManager.class)
+@Named("sourceB")
 public class MockAuthorizationManagerB
     extends AbstractReadOnlyAuthorizationManager
 {
 
-    public String getSource()
-    {
-        return "sourceB";
-    }
+  public String getSource() {
+    return "sourceB";
+  }
 
-    public Set<String> listPermissions()
-    {
-        Set<String> permissions = new HashSet<String>();
+  public Set<String> listPermissions() {
+    Set<String> permissions = new HashSet<String>();
 
-        permissions.add( "from-role:read" );
-        permissions.add( "from-role:delete" );
+    permissions.add("from-role:read");
+    permissions.add("from-role:delete");
 
-        return permissions;
-    }
+    return permissions;
+  }
 
-    public Set<Role> listRoles()
-    {
-        Set<Role> roles = new HashSet<Role>();
+  public Set<Role> listRoles() {
+    Set<Role> roles = new HashSet<Role>();
 
-        Role role1 = new Role();
-        role1.setSource( this.getSource() );
-        role1.setName( "Role 1" );
-        role1.setRoleId( "test-role1" );
-        role1.addPrivilege( "from-role1:read" );
-        role1.addPrivilege( "from-role1:delete" );
+    Role role1 = new Role();
+    role1.setSource(this.getSource());
+    role1.setName("Role 1");
+    role1.setRoleId("test-role1");
+    role1.addPrivilege("from-role1:read");
+    role1.addPrivilege("from-role1:delete");
 
-        Role role2 = new Role();
-        role2.setSource( this.getSource() );
-        role2.setName( "Role 2" );
-        role2.setRoleId( "test-role2" );
-        role2.addPrivilege( "from-role2:read" );
-        role2.addPrivilege( "from-role2:delete" );
+    Role role2 = new Role();
+    role2.setSource(this.getSource());
+    role2.setName("Role 2");
+    role2.setRoleId("test-role2");
+    role2.addPrivilege("from-role2:read");
+    role2.addPrivilege("from-role2:delete");
 
-        roles.add( role1 );
-        roles.add( role2 );
+    roles.add(role1);
+    roles.add(role2);
 
-        return roles;
-    }
+    return roles;
+  }
 
-    public Privilege getPrivilege( String privilegeId )
-        throws NoSuchPrivilegeException
-    {
-        return null;
-    }
+  public Privilege getPrivilege(String privilegeId)
+      throws NoSuchPrivilegeException
+  {
+    return null;
+  }
 
-    public Role getRole( String roleId )
-        throws NoSuchRoleException
-    {
-        return null;
-    }
+  public Role getRole(String roleId)
+      throws NoSuchRoleException
+  {
+    return null;
+  }
 
-    public Set<Privilege> listPrivileges()
-    {
-        return null;
-    }
+  public Set<Privilege> listPrivileges() {
+    return null;
+  }
 
 }

@@ -10,72 +10,72 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus;
+
+import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authentication.AuthenticationException;
 
 public class LdapNexusIT
     extends NexusLdapTestSupport
 {
 
-    @Test
-    public void testAuthentication()
-        throws Exception
-    {
-        SecuritySystem security = lookup( SecuritySystem.class );
-        security.start();
+  @Test
+  public void testAuthentication()
+      throws Exception
+  {
+    SecuritySystem security = lookup(SecuritySystem.class);
+    security.start();
 
-        Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "cstamas", "cstamas123" ) ) );
+    Assert.assertNotNull(security.authenticate(new UsernamePasswordToken("cstamas", "cstamas123")));
+  }
+
+  @Test
+  public void testAuthenticationFailure()
+      throws Exception
+  {
+    SecuritySystem security = lookup(SecuritySystem.class);
+    security.start();
+
+    try {
+      Assert.assertNull(security.authenticate(new UsernamePasswordToken("cstamas", "INVALID")));
     }
-
-    @Test
-    public void testAuthenticationFailure()
-        throws Exception
-    {
-        SecuritySystem security = lookup( SecuritySystem.class );
-        security.start();
-
-        try
-        {
-            Assert.assertNull( security.authenticate( new UsernamePasswordToken( "cstamas", "INVALID" ) ) );
-        }
-        catch ( AuthenticationException e )
-        {
-            // expected
-        }
+    catch (AuthenticationException e) {
+      // expected
     }
+  }
 
-    @Test
-    public void testAuthorization()
-        throws Exception
-    {
-        SecuritySystem security = lookup( SecuritySystem.class );
-        security.start();
+  @Test
+  public void testAuthorization()
+      throws Exception
+  {
+    SecuritySystem security = lookup(SecuritySystem.class);
+    security.start();
 
-        SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
+    SimplePrincipalCollection principals = new SimplePrincipalCollection();
+    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
 
-        Assert.assertTrue( security.hasRole( principals, "developer" ) );
-        Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
-    }
+    Assert.assertTrue(security.hasRole(principals, "developer"));
+    Assert.assertFalse(security.hasRole(principals, "JUNK"));
+  }
 
-    @Test
-    public void testAuthorizationPriv()
-        throws Exception
-    {
-        SecuritySystem security = lookup( SecuritySystem.class );
-        security.start();
+  @Test
+  public void testAuthorizationPriv()
+      throws Exception
+  {
+    SecuritySystem security = lookup(SecuritySystem.class);
+    security.start();
 
-        SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
+    SimplePrincipalCollection principals = new SimplePrincipalCollection();
+    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
 
-        Assert.assertTrue( security.isPermitted( principals, "security:usersforgotpw:create" ) );
-        Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:delete" ) );
-    }
+    Assert.assertTrue(security.isPermitted(principals, "security:usersforgotpw:create"));
+    Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:delete"));
+  }
 }

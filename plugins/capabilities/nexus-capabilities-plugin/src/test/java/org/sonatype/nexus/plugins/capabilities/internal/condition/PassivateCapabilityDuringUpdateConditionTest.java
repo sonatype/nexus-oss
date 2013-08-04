@@ -10,25 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
+
 import com.google.common.collect.Maps;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 
 /**
  * {@link PassivateCapabilityDuringUpdateCondition} UTs.
@@ -39,104 +41,98 @@ public class PassivateCapabilityDuringUpdateConditionTest
     extends EventBusTestSupport
 {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
-    @Mock
-    private CapabilityReference reference;
+  @Mock
+  private CapabilityReference reference;
 
-    @Mock
-    private CapabilityRegistry capabilityRegistry;
+  @Mock
+  private CapabilityRegistry capabilityRegistry;
 
-    private PassivateCapabilityDuringUpdateCondition underTest;
+  private PassivateCapabilityDuringUpdateCondition underTest;
 
-    @Before
-    public final void setUpPassivateCapabilityDuringUpdateCondition()
-        throws Exception
-    {
-        final CapabilityIdentity id = capabilityIdentity( "test" );
+  @Before
+  public final void setUpPassivateCapabilityDuringUpdateCondition()
+      throws Exception
+  {
+    final CapabilityIdentity id = capabilityIdentity("test");
 
-        final CapabilityContext context = mock( CapabilityContext.class );
-        when( context.id() ).thenReturn( id );
+    final CapabilityContext context = mock(CapabilityContext.class);
+    when(context.id()).thenReturn(id);
 
-        when( reference.context() ).thenReturn( context );
+    when(reference.context()).thenReturn(context);
 
-        underTest = new PassivateCapabilityDuringUpdateCondition( eventBus );
-        underTest.setContext( context );
-        underTest.bind();
+    underTest = new PassivateCapabilityDuringUpdateCondition(eventBus);
+    underTest.setContext(context);
+    underTest.bind();
 
-        verify( eventBus ).register( underTest );
-    }
+    verify(eventBus).register(underTest);
+  }
 
-    /**
-     * Condition should become unsatisfied before update and satisfied after update.
-     */
-    @Test
-    public void passivateDuringUpdate()
-    {
-        underTest.handle( new CapabilityEvent.BeforeUpdate(
-            capabilityRegistry, reference, Maps.<String, String>newHashMap(), Maps.<String, String>newHashMap()
-        ) );
-        underTest.handle( new CapabilityEvent.AfterUpdate(
-            capabilityRegistry, reference, Maps.<String, String>newHashMap(), Maps.<String, String>newHashMap()
-        ) );
+  /**
+   * Condition should become unsatisfied before update and satisfied after update.
+   */
+  @Test
+  public void passivateDuringUpdate() {
+    underTest.handle(new CapabilityEvent.BeforeUpdate(
+        capabilityRegistry, reference, Maps.<String, String>newHashMap(), Maps.<String, String>newHashMap()
+    ));
+    underTest.handle(new CapabilityEvent.AfterUpdate(
+        capabilityRegistry, reference, Maps.<String, String>newHashMap(), Maps.<String, String>newHashMap()
+    ));
 
-        verifyEventBusEvents( unsatisfied( underTest ), satisfied( underTest ) );
-    }
+    verifyEventBusEvents(unsatisfied(underTest), satisfied(underTest));
+  }
 
-    /**
-     * Event bus handler is removed when releasing.
-     */
-    @Test
-    public void releaseRemovesItselfAsHandler()
-    {
-        underTest.release();
+  /**
+   * Event bus handler is removed when releasing.
+   */
+  @Test
+  public void releaseRemovesItselfAsHandler() {
+    underTest.release();
 
-        verify( eventBus ).unregister( underTest );
-    }
+    verify(eventBus).unregister(underTest);
+  }
 
-    /**
-     * Verify that binding fails if id was not set before.
-     */
-    @Test
-    public void bindWithoutIdBeingSet()
-    {
-        thrown.expect( IllegalStateException.class );
-        thrown.expectMessage( "Capability identity not specified" );
-        new PassivateCapabilityDuringUpdateCondition( eventBus ).bind();
-    }
+  /**
+   * Verify that binding fails if id was not set before.
+   */
+  @Test
+  public void bindWithoutIdBeingSet() {
+    thrown.expect(IllegalStateException.class);
+    thrown.expectMessage("Capability identity not specified");
+    new PassivateCapabilityDuringUpdateCondition(eventBus).bind();
+  }
 
-    /**
-     * Verify that binding succeeds after contextualization.
-     */
-    @Test
-    public void bindAfterContextualization()
-    {
-        new PassivateCapabilityDuringUpdateCondition( eventBus ).setContext( reference.context() ).bind();
-    }
+  /**
+   * Verify that binding succeeds after contextualization.
+   */
+  @Test
+  public void bindAfterContextualization() {
+    new PassivateCapabilityDuringUpdateCondition(eventBus).setContext(reference.context()).bind();
+  }
 
-    /**
-     * Verify that contextualization fails if already bounded.
-     */
-    @Test
-    public void contextualizationWhenAlreadyBounded()
-    {
-        thrown.expect( IllegalStateException.class );
-        thrown.expectMessage( "Cannot contextualize when already bounded" );
-        underTest.setContext( reference.context() );
-    }
+  /**
+   * Verify that contextualization fails if already bounded.
+   */
+  @Test
+  public void contextualizationWhenAlreadyBounded() {
+    thrown.expect(IllegalStateException.class);
+    thrown.expectMessage("Cannot contextualize when already bounded");
+    underTest.setContext(reference.context());
+  }
 
-    /**
-     * Verify that contextualization fails if already contextualized.
-     */
-    @Test
-    public void contextualizationWhenAlreadyContextualized()
-    {
-        thrown.expect( IllegalStateException.class );
-        thrown.expectMessage( "Already contextualized" );
-        new PassivateCapabilityDuringUpdateCondition( eventBus )
-            .setContext( reference.context() )
-            .setContext( reference.context() );
-    }
+  /**
+   * Verify that contextualization fails if already contextualized.
+   */
+  @Test
+  public void contextualizationWhenAlreadyContextualized() {
+    thrown.expect(IllegalStateException.class);
+    thrown.expectMessage("Already contextualized");
+    new PassivateCapabilityDuringUpdateCondition(eventBus)
+        .setContext(reference.context())
+        .setContext(reference.context());
+  }
 
 }

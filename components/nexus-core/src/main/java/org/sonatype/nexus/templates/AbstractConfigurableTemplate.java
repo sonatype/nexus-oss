@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.templates;
 
 import org.sonatype.nexus.configuration.CoreConfiguration;
@@ -18,29 +19,25 @@ public abstract class AbstractConfigurableTemplate
     extends AbstractTemplate
     implements ConfigurableTemplate
 {
-    private CoreConfiguration coreConfiguration;
+  private CoreConfiguration coreConfiguration;
 
-    public AbstractConfigurableTemplate( TemplateProvider provider, String id, String description )
-    {
-        super( provider, id, description );
+  public AbstractConfigurableTemplate(TemplateProvider provider, String id, String description) {
+    super(provider, id, description);
+  }
+
+  public CoreConfiguration getCoreConfiguration() {
+    if (coreConfiguration == null) {
+      coreConfiguration = initCoreConfiguration();
     }
 
-    public CoreConfiguration getCoreConfiguration()
-    {
-        if ( coreConfiguration == null )
-        {
-            coreConfiguration = initCoreConfiguration();
-        }
+    return coreConfiguration;
+  }
 
-        return coreConfiguration;
-    }
+  public void setCoreConfiguration(CoreConfiguration coreConfiguration) {
+    this.coreConfiguration = coreConfiguration;
+  }
 
-    public void setCoreConfiguration( CoreConfiguration coreConfiguration )
-    {
-        this.coreConfiguration = coreConfiguration;
-    }
+  // ==
 
-    // ==
-
-    protected abstract CoreConfiguration initCoreConfiguration();
+  protected abstract CoreConfiguration initCoreConfiguration();
 }

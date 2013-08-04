@@ -10,25 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package com.sonatype.nexus.build.error.reporting;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.error.report.ErrorReportComponent;
+
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Error report component used in nexus-core UTs only. Basically equivalent to OSS edition one,
  * even reporting the same (to not screw existing UTs), but the real thing is in nexus-oss-edition module.
  */
-@Component( role = ErrorReportComponent.class )
+@Component(role = ErrorReportComponent.class)
 public class BuildErrorReportComponent
     implements ErrorReportComponent
 {
 
-    private static final String COMPONENT = "Nexus";
+  private static final String COMPONENT = "Nexus";
 
-    public String getComponent()
-    {
-        return COMPONENT;
-    }
+  public String getComponent() {
+    return COMPONENT;
+  }
 
 }

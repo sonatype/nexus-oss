@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 import java.io.File;
@@ -22,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -33,195 +33,176 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 
+import org.codehaus.plexus.util.IOUtil;
+
 public class NexusUtils
 {
 
-    private static final String GENERATED_AT_ATTRIBUTE = "p2Repository.generated.timestamp";
+  private static final String GENERATED_AT_ATTRIBUTE = "p2Repository.generated.timestamp";
 
-    private static final String DOT = ".";
+  private static final String DOT = ".";
 
-    private NexusUtils()
-    {
+  private NexusUtils() {
+  }
+
+  static File retrieveFile(final Repository repository, final String path)
+      throws LocalStorageException
+  {
+    final ResourceStoreRequest request = new ResourceStoreRequest(path);
+    final File content =
+        ((DefaultFSLocalRepositoryStorage) repository.getLocalStorage()).getFileFromBase(repository, request);
+    return content;
+  }
+
+  static File safeRetrieveFile(final Repository repository, final String path) {
+    try {
+      return retrieveFile(repository, path);
+    }
+    catch (final LocalStorageException e) {
+      return null;
+    }
+  }
+
+  static StorageItem retrieveItem(final Repository repository, final String path)
+      throws Exception
+  {
+    final ResourceStoreRequest request = new ResourceStoreRequest(path);
+    final StorageItem item = repository.retrieveItem(request);
+    return item;
+  }
+
+  static StorageItem safeRetrieveItem(final Repository repository, final String path) {
+    try {
+      return retrieveItem(repository, path);
+    }
+    catch (final Exception e) {
+      return null;
+    }
+  }
+
+  public static void storeItem(final Repository repository, final ResourceStoreRequest request, final InputStream in,
+                               final String mimeType, final Map<String, String> userAttributes)
+      throws Exception
+  {
+    final DefaultStorageFileItem fItem =
+        new DefaultStorageFileItem(repository, request, true, true, new PreparedContentLocator(in, mimeType));
+
+    if (userAttributes != null) {
+      fItem.getAttributes().putAll(userAttributes);
     }
 
-    static File retrieveFile( final Repository repository, final String path )
-        throws LocalStorageException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        final File content =
-            ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase( repository, request );
-        return content;
+    repository.storeItem(false, fItem);
+  }
+
+  static void createLink(final Repository repository, final StorageItem item, final String path)
+      throws Exception
+  {
+    final ResourceStoreRequest req = new ResourceStoreRequest(path);
+
+    req.getRequestContext().putAll(item.getItemContext());
+
+    final DefaultStorageLinkItem link =
+        new DefaultStorageLinkItem(repository, req, true, true, item.getRepositoryItemUid());
+
+    repository.storeItem(false, link);
+  }
+
+  static File localStorageOfRepositoryAsFile(final Repository repository)
+      throws LocalStorageException
+  {
+    if (repository.getLocalUrl() != null
+        && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage) {
+      final File baseDir =
+          ((DefaultFSLocalRepositoryStorage) repository.getLocalStorage()).getBaseDir(repository,
+              new ResourceStoreRequest(
+                  RepositoryItemUid.PATH_ROOT));
+      return baseDir;
     }
 
-    static File safeRetrieveFile( final Repository repository, final String path )
-    {
-        try
-        {
-            return retrieveFile( repository, path );
-        }
-        catch ( final LocalStorageException e )
-        {
-            return null;
-        }
+    throw new LocalStorageException(String.format("Repository [%s] does not have an local storage",
+        repository.getId()));
+  }
+
+  static String getRelativePath(final File fromFile, final File toFile) {
+    final String[] fromSegments = getReversePathSegments(fromFile);
+    final String[] toSegments = getReversePathSegments(toFile);
+
+    String relativePath = "";
+    int i = fromSegments.length - 1;
+    int j = toSegments.length - 1;
+
+    // first eliminate common root
+    while ((i >= 0) && (j >= 0) && (fromSegments[i].equals(toSegments[j]))) {
+      i--;
+      j--;
     }
 
-    static StorageItem retrieveItem( final Repository repository, final String path )
-        throws Exception
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        final StorageItem item = repository.retrieveItem( request );
-        return item;
+    for (; i >= 0; i--) {
+      relativePath += ".." + File.separator;
     }
 
-    static StorageItem safeRetrieveItem( final Repository repository, final String path )
-    {
-        try
-        {
-            return retrieveItem( repository, path );
-        }
-        catch ( final Exception e )
-        {
-            return null;
-        }
+    for (; j >= 1; j--) {
+      relativePath += toSegments[j] + File.separator;
     }
 
-    public static void storeItem( final Repository repository, final ResourceStoreRequest request, final InputStream in,
-                           final String mimeType, final Map<String, String> userAttributes )
-        throws Exception
-    {
-        final DefaultStorageFileItem fItem =
-            new DefaultStorageFileItem( repository, request, true, true, new PreparedContentLocator( in, mimeType ) );
+    relativePath += toSegments[j];
 
-        if ( userAttributes != null )
-        {
-            fItem.getAttributes().putAll( userAttributes );
-        }
+    return relativePath;
+  }
 
-        repository.storeItem( false, fItem );
+  static boolean isHidden(final String path) {
+    if (path == null) {
+      return false;
     }
+    return path.startsWith(DOT) || path.startsWith("/" + DOT) || path.startsWith(File.separator + DOT);
+  }
 
-    static void createLink( final Repository repository, final StorageItem item, final String path )
-        throws Exception
-    {
-        final ResourceStoreRequest req = new ResourceStoreRequest( path );
+  public static File createTemporaryP2Repository()
+      throws IOException
+  {
+    File tempP2Repository;
+    tempP2Repository = File.createTempFile("nexus-p2-repository-plugin", "");
+    tempP2Repository.delete();
+    tempP2Repository.mkdirs();
+    return tempP2Repository;
+  }
 
-        req.getRequestContext().putAll( item.getItemContext() );
+  public static void storeItemFromFile(final String path,
+                                       final File file,
+                                       final Repository repository,
+                                       final String mimeType)
+      throws Exception
+  {
+    InputStream in = null;
+    try {
+      in = new FileInputStream(file);
+      final Map<String, String> attributes = new HashMap<String, String>();
+      attributes.put(GENERATED_AT_ATTRIBUTE, new Date().toString());
 
-        final DefaultStorageLinkItem link =
-            new DefaultStorageLinkItem( repository, req, true, true, item.getRepositoryItemUid() );
+      final ResourceStoreRequest request = new ResourceStoreRequest(path);
 
-        repository.storeItem( false, link );
+      storeItem(repository, request, in, mimeType, attributes);
     }
-
-    static File localStorageOfRepositoryAsFile( final Repository repository )
-        throws LocalStorageException
-    {
-        if ( repository.getLocalUrl() != null
-            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
-        {
-            final File baseDir =
-                ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getBaseDir( repository,
-                                                                                               new ResourceStoreRequest(
-                                                                                                   RepositoryItemUid.PATH_ROOT ) );
-            return baseDir;
-        }
-
-        throw new LocalStorageException( String.format( "Repository [%s] does not have an local storage",
-                                                        repository.getId() ) );
+    finally {
+      IOUtil.close(in);
     }
+  }
 
-    static String getRelativePath( final File fromFile, final File toFile )
-    {
-        final String[] fromSegments = getReversePathSegments( fromFile );
-        final String[] toSegments = getReversePathSegments( toFile );
+  private static String[] getReversePathSegments(final File file) {
+    final List<String> paths = new ArrayList<String>();
 
-        String relativePath = "";
-        int i = fromSegments.length - 1;
-        int j = toSegments.length - 1;
-
-        // first eliminate common root
-        while ( ( i >= 0 ) && ( j >= 0 ) && ( fromSegments[i].equals( toSegments[j] ) ) )
-        {
-            i--;
-            j--;
-        }
-
-        for (; i >= 0; i-- )
-        {
-            relativePath += ".." + File.separator;
-        }
-
-        for (; j >= 1; j-- )
-        {
-            relativePath += toSegments[j] + File.separator;
-        }
-
-        relativePath += toSegments[j];
-
-        return relativePath;
+    File segment;
+    try {
+      segment = file.getCanonicalFile();
+      while (segment != null) {
+        paths.add(segment.getName());
+        segment = segment.getParentFile();
+      }
     }
-
-    static boolean isHidden( final String path )
-    {
-        if ( path == null )
-        {
-            return false;
-        }
-        return path.startsWith( DOT ) || path.startsWith( "/" + DOT ) || path.startsWith( File.separator + DOT );
+    catch (final IOException e) {
+      return null;
     }
-
-    public static File createTemporaryP2Repository()
-        throws IOException
-    {
-        File tempP2Repository;
-        tempP2Repository = File.createTempFile( "nexus-p2-repository-plugin", "" );
-        tempP2Repository.delete();
-        tempP2Repository.mkdirs();
-        return tempP2Repository;
-    }
-
-    public static void storeItemFromFile( final String path,
-                                          final File file,
-                                          final Repository repository,
-                                          final String mimeType )
-        throws Exception
-    {
-        InputStream in = null;
-        try
-        {
-            in = new FileInputStream( file );
-            final Map<String, String> attributes = new HashMap<String, String>();
-            attributes.put( GENERATED_AT_ATTRIBUTE, new Date().toString() );
-
-            final ResourceStoreRequest request = new ResourceStoreRequest( path );
-
-            storeItem( repository, request, in, mimeType, attributes );
-        }
-        finally
-        {
-            IOUtil.close( in );
-        }
-    }
-
-    private static String[] getReversePathSegments( final File file )
-    {
-        final List<String> paths = new ArrayList<String>();
-
-        File segment;
-        try
-        {
-            segment = file.getCanonicalFile();
-            while ( segment != null )
-            {
-                paths.add( segment.getName() );
-                segment = segment.getParentFile();
-            }
-        }
-        catch ( final IOException e )
-        {
-            return null;
-        }
-        return paths.toArray( new String[paths.size()] );
-    }
+    return paths.toArray(new String[paths.size()]);
+  }
 
 }

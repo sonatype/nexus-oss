@@ -10,114 +10,106 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms;
 
 import java.util.Collection;
+
+import org.sonatype.security.AbstractSecurityTest;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.junit.Ignore;
-import org.sonatype.security.AbstractSecurityTest;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authentication.AuthenticationException;
 
 public class SecurityAuthenticationTest
     extends AbstractSecurityTest
 {
-    private SecuritySystem security;
+  private SecuritySystem security;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        security = (SecuritySystem) lookup( SecuritySystem.class ); // started in parent class
+    security = (SecuritySystem) lookup(SecuritySystem.class); // started in parent class
+  }
+
+  /**
+   * Security system is not restartable since the use of Shiro Guice Module, the Shiro Guice support. Test ignored.
+   */
+  @Ignore
+  public void INGNOREtestAuthcAndAuthzAfterRestart()
+      throws Exception
+  {
+    testSuccessfulAuthentication();
+    testAuthorization();
+    security.stop();
+    security.start();
+    testSuccessfulAuthentication();
+    testAuthorization();
+  }
+
+  public void testSuccessfulAuthentication()
+      throws Exception
+  {
+    UsernamePasswordToken upToken = new UsernamePasswordToken("username", "password");
+
+    // this.setupLoginContext( "test" );
+
+    Subject ai = security.login(upToken);
+
+    assertEquals("username", ai.getPrincipal().toString());
+  }
+
+  public void testFailedAuthentication()
+      throws Exception
+  {
+    UsernamePasswordToken upToken = new UsernamePasswordToken("username", "badpassword");
+
+    try {
+      security.login(upToken);
+
+      fail("Authentication should have failed");
     }
-
-    /**
-     * Security system is not restartable since the use of Shiro Guice Module, the Shiro Guice support. Test ignored.
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    public void INGNOREtestAuthcAndAuthzAfterRestart()
-        throws Exception
-    {
-        testSuccessfulAuthentication();
-        testAuthorization();
-        security.stop();
-        security.start();
-        testSuccessfulAuthentication();
-        testAuthorization();
+    catch (AuthenticationException e) {
+      // good
     }
+  }
 
-    public void testSuccessfulAuthentication()
-        throws Exception
-    {
-        UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "password" );
+  public void testAuthorization()
+      throws Exception
+  {
+    assertTrue(security.isPermitted(new SimplePrincipalCollection("username", FakeRealm1.class.getName()),
+        "test:perm"));
 
-        // this.setupLoginContext( "test" );
+    assertTrue(security.isPermitted(new SimplePrincipalCollection("username", FakeRealm1.class.getName()),
+        "other:perm"));
 
-        Subject ai = security.login( upToken );
+    assertTrue(security.isPermitted(new SimplePrincipalCollection("username", FakeRealm2.class.getName()),
+        "other:perm"));
 
-        assertEquals( "username", ai.getPrincipal().toString() );
+    assertTrue(security.isPermitted(new SimplePrincipalCollection("username", FakeRealm2.class.getName()),
+        "test:perm"));
+  }
+
+  public static void assertImplied(Permission testPermission, Collection<Permission> assignedPermissions) {
+    for (Permission assignedPermission : assignedPermissions) {
+      if (assignedPermission.implies(testPermission)) {
+        return;
+      }
     }
+    fail("Expected " + testPermission + " to be implied by " + assignedPermissions);
+  }
 
-    public void testFailedAuthentication()
-        throws Exception
-    {
-        UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "badpassword" );
-
-        try
-        {
-            security.login( upToken );
-
-            fail( "Authentication should have failed" );
-        }
-        catch ( AuthenticationException e )
-        {
-            // good
-        }
+  public static void assertNotImplied(Permission testPermission, Collection<Permission> assignedPermissions) {
+    for (Permission assignedPermission : assignedPermissions) {
+      if (assignedPermission.implies(testPermission)) {
+        fail("Expected " + testPermission + " not to be implied by " + assignedPermission);
+      }
     }
-
-    public void testAuthorization()
-        throws Exception
-    {
-        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
-                                          "test:perm" ) );
-
-        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
-                                          "other:perm" ) );
-
-        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
-                                          "other:perm" ) );
-
-        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
-                                          "test:perm" ) );
-    }
-
-    public static void assertImplied( Permission testPermission, Collection<Permission> assignedPermissions )
-    {
-        for ( Permission assignedPermission : assignedPermissions )
-        {
-            if ( assignedPermission.implies( testPermission ) )
-            {
-                return;
-            }
-        }
-        fail( "Expected " + testPermission + " to be implied by " + assignedPermissions );
-    }
-
-    public static void assertNotImplied( Permission testPermission, Collection<Permission> assignedPermissions )
-    {
-        for ( Permission assignedPermission : assignedPermissions )
-        {
-            if ( assignedPermission.implies( testPermission ) )
-            {
-                fail( "Expected " + testPermission + " not to be implied by " + assignedPermission );
-            }
-        }
-    }
+  }
 }

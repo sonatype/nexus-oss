@@ -10,20 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.velocity;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.sisu.velocity.internal.VelocityConfigurator;
+
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
-import org.sonatype.sisu.velocity.internal.VelocityConfigurator;
 
 /**
  * Nexus specific {@link VelocityConfigurator} implementation, that configures {@link VelocityEngine} for Nexus. It
- * configures the "production" mode, which is basically turning template caching on without modification check (as Nexus
+ * configures the "production" mode, which is basically turning template caching on without modification check (as
+ * Nexus
  * uses JARred templates that are not changing at runtime).
- * 
+ *
  * @author cstamas
  * @since 2.5
  */
@@ -32,17 +35,16 @@ import org.sonatype.sisu.velocity.internal.VelocityConfigurator;
 public class NexusVelocityConfigurator
     implements VelocityConfigurator
 {
-    @Override
-    public void configure( final VelocityEngine engine )
-    {
-        engine.setProperty( RuntimeConstants.RESOURCE_LOADER, "class" );
-        engine.setProperty( "class.resource.loader.class",
-            "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader" );
-        // caching ON
-        engine.setProperty( "class.resource.loader.cache", "true" );
-        // never check for template modification (they are JARred)
-        engine.setProperty( "class.resource.loader.modificationCheckInterval", "0" );
-        // strict mode OFF
-        engine.setProperty( "runtime.references.strict", "false" );
-    }
+  @Override
+  public void configure(final VelocityEngine engine) {
+    engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "class");
+    engine.setProperty("class.resource.loader.class",
+        "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+    // caching ON
+    engine.setProperty("class.resource.loader.cache", "true");
+    // never check for template modification (they are JARred)
+    engine.setProperty("class.resource.loader.modificationCheckInterval", "0");
+    // strict mode OFF
+    engine.setProperty("runtime.references.strict", "false");
+  }
 }

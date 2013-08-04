@@ -10,17 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.verify;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * {@link NexusIsActiveCondition} UTs.
@@ -31,47 +32,44 @@ public class NexusIsActiveConditionTest
     extends EventBusTestSupport
 {
 
-    private NexusIsActiveCondition underTest;
+  private NexusIsActiveCondition underTest;
 
-    @Before
-    public final void setUpNexusIsActiveCondition()
-        throws Exception
-    {
-        underTest = new NexusIsActiveCondition( eventBus );
-    }
+  @Before
+  public final void setUpNexusIsActiveCondition()
+      throws Exception
+  {
+    underTest = new NexusIsActiveCondition(eventBus);
+  }
 
-    /**
-     * Condition is not satisfied initially.
-     */
-    @Test
-    public void notSatisfiedInitially()
-    {
-        assertThat( underTest.isSatisfied(), is( false ) );
-    }
+  /**
+   * Condition is not satisfied initially.
+   */
+  @Test
+  public void notSatisfiedInitially() {
+    assertThat(underTest.isSatisfied(), is(false));
+  }
 
-    /**
-     * Condition is satisfied when Nexus is started.
-     */
-    @Test
-    public void satisfiedWhenNexusStarted()
-    {
-        underTest.handle( new NexusStartedEvent( this ) );
-        assertThat( underTest.isSatisfied(), is( true ) );
+  /**
+   * Condition is satisfied when Nexus is started.
+   */
+  @Test
+  public void satisfiedWhenNexusStarted() {
+    underTest.handle(new NexusStartedEvent(this));
+    assertThat(underTest.isSatisfied(), is(true));
 
-        verifyEventBusEvents( satisfied( underTest ) );
-    }
+    verifyEventBusEvents(satisfied(underTest));
+  }
 
-    /**
-     * Condition is satisfied when negated is not satisfied.
-     */
-    @Test
-    public void unsatisfiedWhenNexusStopped()
-    {
-        underTest.handle( new NexusStartedEvent( this ) );
-        underTest.handle( new NexusStoppedEvent( this ) );
-        assertThat( underTest.isSatisfied(), is( false ) );
+  /**
+   * Condition is satisfied when negated is not satisfied.
+   */
+  @Test
+  public void unsatisfiedWhenNexusStopped() {
+    underTest.handle(new NexusStartedEvent(this));
+    underTest.handle(new NexusStoppedEvent(this));
+    assertThat(underTest.isSatisfied(), is(false));
 
-        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
-    }
+    verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));
+  }
 
 }

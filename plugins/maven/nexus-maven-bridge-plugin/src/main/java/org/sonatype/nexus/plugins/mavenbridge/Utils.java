@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge;
 
 import org.sonatype.aether.graph.Dependency;
@@ -18,28 +19,25 @@ import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 /**
  * Collection of static utility methods to bridge the "gap" between Aether and Nexus.
- * 
+ *
  * @author cstamas
  */
 public class Utils
 {
-    private Utils()
-    {
-    }
+  private Utils() {
+  }
 
-    /**
-     * A shorthand method to create a Dependency from GAV and scope.
-     * 
-     * @param gav GAV to make Dependency, may not be {@code null}.
-     * @param scope the needed scope, or {@code null}
-     * @return
-     */
-    public static Dependency createDependencyFromGav( final Gav gav, final String scope )
-    {
-        Dependency dependency =
-            new Dependency( new DefaultArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getExtension(),
-                gav.getVersion() ), scope );
+  /**
+   * A shorthand method to create a Dependency from GAV and scope.
+   *
+   * @param gav   GAV to make Dependency, may not be {@code null}.
+   * @param scope the needed scope, or {@code null}
+   */
+  public static Dependency createDependencyFromGav(final Gav gav, final String scope) {
+    Dependency dependency =
+        new Dependency(new DefaultArtifact(gav.getGroupId(), gav.getArtifactId(), gav.getExtension(),
+            gav.getVersion()), scope);
 
-        return dependency;
-    }
+    return dependency;
+  }
 }

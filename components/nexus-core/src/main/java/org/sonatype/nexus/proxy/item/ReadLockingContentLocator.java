@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 import java.io.IOException;
@@ -21,99 +22,88 @@ import org.sonatype.nexus.util.WrappingInputStream;
 /**
  * This is a simple wrapper implementation of ContentLocator, that wraps any other ContentLocator, while doing proper
  * {@link Action} read locking against the UID the locator points to.
- * 
+ *
  * @author cstamas
  */
 public class ReadLockingContentLocator
     extends AbstractWrappingContentLocator
 {
-    private final RepositoryItemUid wrappedUid;
+  private final RepositoryItemUid wrappedUid;
 
-    public ReadLockingContentLocator( final RepositoryItemUid wrappedUid, final ContentLocator wrappedLocator )
-    {
-        super(wrappedLocator);
-        this.wrappedUid = wrappedUid;
+  public ReadLockingContentLocator(final RepositoryItemUid wrappedUid, final ContentLocator wrappedLocator) {
+    super(wrappedLocator);
+    this.wrappedUid = wrappedUid;
+  }
+
+  @Override
+  public InputStream getContent()
+      throws IOException
+  {
+    final RepositoryItemUidLock lock = wrappedUid.getLock();
+
+    lock.lock(Action.read);
+
+    try {
+      return new ReadLockingInputStream(lock, getTarget().getContent());
+    }
+    catch (IOException e) {
+      lock.unlock();
+
+      throw e;
+    }
+    catch (Exception e) {
+      lock.unlock();
+
+      // wrap it
+      IOException w = new IOException(e.getMessage());
+      w.initCause(e);
+      throw w;
+    }
+  }
+
+  // ==
+
+  private static class ReadLockingInputStream
+      extends WrappingInputStream
+  {
+    private volatile RepositoryItemUidLock lock;
+
+    public ReadLockingInputStream(final RepositoryItemUidLock lock, final InputStream wrappedStream) {
+      super(wrappedStream);
+
+      this.lock = lock;
     }
 
     @Override
-    public InputStream getContent()
+    public void close()
         throws IOException
     {
-        final RepositoryItemUidLock lock = wrappedUid.getLock();
+      try {
+        super.close();
+      }
+      finally {
+        if (lock != null) {
+          lock.unlock();
 
-        lock.lock( Action.read );
-
-        try
-        {
-            return new ReadLockingInputStream( lock, getTarget().getContent() );
+          lock = null;
         }
-        catch ( IOException e )
-        {
-            lock.unlock();
-
-            throw e;
-        }
-        catch ( Exception e )
-        {
-            lock.unlock();
-
-            // wrap it
-            IOException w = new IOException( e.getMessage() );
-            w.initCause( e );
-            throw w;
-        }
+      }
     }
 
-    // ==
-
-    private static class ReadLockingInputStream
-        extends WrappingInputStream
+    @Override
+    public void finalize()
+        throws Throwable
     {
-        private volatile RepositoryItemUidLock lock;
+      try {
+        if (lock != null) {
+          lock.unlock();
 
-        public ReadLockingInputStream( final RepositoryItemUidLock lock, final InputStream wrappedStream )
-        {
-            super( wrappedStream );
-
-            this.lock = lock;
+          lock = null;
         }
-
-        @Override
-        public void close()
-            throws IOException
-        {
-            try
-            {
-                super.close();
-            }
-            finally
-            {
-                if ( lock != null )
-                {
-                    lock.unlock();
-
-                    lock = null;
-                }
-            }
-        }
-
-        @Override
-        public void finalize()
-            throws Throwable
-        {
-            try
-            {
-                if ( lock != null )
-                {
-                    lock.unlock();
-
-                    lock = null;
-                }
-            }
-            finally
-            {
-                super.finalize();
-            }
-        }
+      }
+      finally {
+        super.finalize();
+      }
     }
+  }
 }

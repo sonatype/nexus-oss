@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.source;
 
 import java.util.HashMap;
@@ -21,31 +22,28 @@ import org.sonatype.appcontext.AppContextRequest;
 
 /**
  * EntrySource that sources itself from System.getProperties().
- * 
+ *
  * @author cstamas
  */
 public class SystemPropertiesEntrySource
     implements EntrySource, EntrySourceMarker
 {
-    public String getDescription()
-    {
-        return "system(properties)";
-    }
+  public String getDescription() {
+    return "system(properties)";
+  }
 
-    public EntrySourceMarker getEntrySourceMarker()
-    {
-        return this;
-    }
+  public EntrySourceMarker getEntrySourceMarker() {
+    return this;
+  }
 
-    public Map<String, Object> getEntries( AppContextRequest request )
-        throws AppContextException
-    {
-        final Properties sysprops = System.getProperties();
-        final Map<String, Object> result = new HashMap<String, Object>();
-        for ( Map.Entry<Object, Object> entry : sysprops.entrySet() )
-        {
-            result.put( String.valueOf( entry.getKey() ), entry.getValue() );
-        }
-        return result;
+  public Map<String, Object> getEntries(AppContextRequest request)
+      throws AppContextException
+  {
+    final Properties sysprops = System.getProperties();
+    final Map<String, Object> result = new HashMap<String, Object>();
+    for (Map.Entry<Object, Object> entry : sysprops.entrySet()) {
+      result.put(String.valueOf(entry.getKey()), entry.getValue());
     }
+    return result;
+  }
 }

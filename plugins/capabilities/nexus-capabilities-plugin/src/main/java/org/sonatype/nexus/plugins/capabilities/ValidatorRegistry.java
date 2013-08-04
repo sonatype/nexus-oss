@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 import java.util.Collection;
@@ -22,20 +23,20 @@ import java.util.Collection;
 public interface ValidatorRegistry
 {
 
-    /**
-     * Returns the validators that applies to specified capability type.
-     *
-     * @param type capability type to get validators for
-     * @return validators or an empty collection if no validators applies to specified type
-     */
-    Collection<Validator> get( CapabilityType type );
+  /**
+   * Returns the validators that applies to specified capability type.
+   *
+   * @param type capability type to get validators for
+   * @return validators or an empty collection if no validators applies to specified type
+   */
+  Collection<Validator> get(CapabilityType type);
 
-    /**
-     * Returns the validators that applies to specified capability instance.
-     *
-     * @param id id of capability to get validators for
-     * @return validators or an empty collection if no validators applies to specified instance
-     */
-    Collection<Validator> get( CapabilityIdentity id );
+  /**
+   * Returns the validators that applies to specified capability instance.
+   *
+   * @param id id of capability to get validators for
+   * @return validators or an empty collection if no validators applies to specified instance
+   */
+  Collection<Validator> get(CapabilityIdentity id);
 
 }

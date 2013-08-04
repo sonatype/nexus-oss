@@ -10,35 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.auth;
 
 /**
  * Event fired in case of an authorization is tried against given resource.
- * 
+ *
  * @author cstamas
  */
 public class NexusAuthorizationEvent
     extends AbstractSecurityEvent
 {
-    private final ResourceInfo resourceInfo;
+  private final ResourceInfo resourceInfo;
 
-    private final boolean successful;
+  private final boolean successful;
 
-    public NexusAuthorizationEvent( final Object sender, final ClientInfo info, final ResourceInfo resInfo,
-                                    final boolean successful )
-    {
-        super( sender, info );
-        this.resourceInfo = resInfo;
-        this.successful = successful;
-    }
+  public NexusAuthorizationEvent(final Object sender, final ClientInfo info, final ResourceInfo resInfo,
+                                 final boolean successful)
+  {
+    super(sender, info);
+    this.resourceInfo = resInfo;
+    this.successful = successful;
+  }
 
-    public ResourceInfo getResourceInfo()
-    {
-        return resourceInfo;
-    }
+  public ResourceInfo getResourceInfo() {
+    return resourceInfo;
+  }
 
-    public boolean isSuccessful()
-    {
-        return successful;
-    }
+  public boolean isSuccessful() {
+    return successful;
+  }
 }

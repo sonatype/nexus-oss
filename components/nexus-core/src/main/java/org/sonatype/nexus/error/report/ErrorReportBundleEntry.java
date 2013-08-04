@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.report;
 
 import java.io.IOException;
@@ -20,32 +21,29 @@ import org.codehaus.plexus.util.IOUtil;
 public class ErrorReportBundleEntry
 {
 
-    private InputStream content;
+  private InputStream content;
 
-    private String entryName;
+  private String entryName;
 
-    public ErrorReportBundleEntry( String entryName, InputStream content )
-    {
-        super();
-        this.entryName = entryName;
-        this.content = content;
-    }
+  public ErrorReportBundleEntry(String entryName, InputStream content) {
+    super();
+    this.entryName = entryName;
+    this.content = content;
+  }
 
-    public InputStream getContent()
-    {
-        return content;
-    }
+  public InputStream getContent() {
+    return content;
+  }
 
-    public String getEntryName()
-    {
-        return entryName;
-    }
+  public String getEntryName() {
+    return entryName;
+  }
 
-    public void releaseEntry()
-        throws IOException
-    {
-        IOUtil.close( content );
-        content = null;
-    }
+  public void releaseEntry()
+      throws IOException
+  {
+    IOUtil.close(content);
+    content = null;
+  }
 
 }

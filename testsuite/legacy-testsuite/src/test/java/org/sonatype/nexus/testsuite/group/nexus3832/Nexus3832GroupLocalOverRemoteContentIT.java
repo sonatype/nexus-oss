@@ -10,55 +10,57 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.group.nexus3832;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.GavUtil;
 
 import org.apache.maven.index.artifact.Gav;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.sonatype.nexus.test.utils.GavUtil;
+
+import static org.junit.Assert.assertTrue;
 
 @Ignore
 public class Nexus3832GroupLocalOverRemoteContentIT
     extends AbstractNexusProxyIntegrationTest
 {
 
-    @Test
-    public void onLocalCache()
-        throws Exception
-    {
-        Gav gav = GavUtil.newGav( "nexus3832", "artifact", "1.0" );
-        File downloaded = downloadArtifactFromGroup( "public", gav, "target/downloads/nexus3832" );
+  @Test
+  public void onLocalCache()
+      throws Exception
+  {
+    Gav gav = GavUtil.newGav("nexus3832", "artifact", "1.0");
+    File downloaded = downloadArtifactFromGroup("public", gav, "target/downloads/nexus3832");
 
-        assertTrue( FileTestingUtils.compareFileSHA1s( downloaded, getTestResourceAsFile( "projects/p1/artifact.jar" ) ) );
-    }
+    assertTrue(FileTestingUtils.compareFileSHA1s(downloaded, getTestResourceAsFile("projects/p1/artifact.jar")));
+  }
 
-    @Test
-    public void onlyRemote()
-        throws Exception
-    {
-        Gav gav = GavUtil.newGav( "nexus3832", "artifact", "2.0" );
-        File localFile = getLocalFile( "release-proxy-repo-1", gav );
+  @Test
+  public void onlyRemote()
+      throws Exception
+  {
+    Gav gav = GavUtil.newGav("nexus3832", "artifact", "2.0");
+    File localFile = getLocalFile("release-proxy-repo-1", gav);
 
-        File downloaded = downloadArtifactFromGroup( "public", gav, "target/downloads/nexus3832" );
+    File downloaded = downloadArtifactFromGroup("public", gav, "target/downloads/nexus3832");
 
-        assertTrue( FileTestingUtils.compareFileSHA1s( downloaded, localFile ) );
-    }
+    assertTrue(FileTestingUtils.compareFileSHA1s(downloaded, localFile));
+  }
 
-    @Test
-    public void onlyLocal()
-        throws Exception
-    {
-        Gav gav = GavUtil.newGav( "nexus3832", "artifact", "3.0" );
-        File localFile = getTestResourceAsFile( "projects/p3/artifact.jar" );
+  @Test
+  public void onlyLocal()
+      throws Exception
+  {
+    Gav gav = GavUtil.newGav("nexus3832", "artifact", "3.0");
+    File localFile = getTestResourceAsFile("projects/p3/artifact.jar");
 
-        File downloaded = downloadArtifactFromGroup( "public", gav, "target/downloads/nexus3832" );
+    File downloaded = downloadArtifactFromGroup("public", gav, "target/downloads/nexus3832");
 
-        assertTrue( FileTestingUtils.compareFileSHA1s( downloaded, localFile ) );
-    }
+    assertTrue(FileTestingUtils.compareFileSHA1s(downloaded, localFile));
+  }
 }

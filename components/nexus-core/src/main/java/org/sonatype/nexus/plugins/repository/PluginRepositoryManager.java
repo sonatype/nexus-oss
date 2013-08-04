@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 /**
@@ -18,11 +19,11 @@ package org.sonatype.nexus.plugins.repository;
 public interface PluginRepositoryManager
     extends NexusPluginRepository
 {
-    /**
-     * Selects a specific {@link NexusPluginRepository} from the aggregate.
-     * 
-     * @param id The repository ID
-     * @return Selected repository
-     */
-    NexusPluginRepository getNexusPluginRepository( String id );
+  /**
+   * Selects a specific {@link NexusPluginRepository} from the aggregate.
+   *
+   * @param id The repository ID
+   * @return Selected repository
+   */
+  NexusPluginRepository getNexusPluginRepository(String id);
 }

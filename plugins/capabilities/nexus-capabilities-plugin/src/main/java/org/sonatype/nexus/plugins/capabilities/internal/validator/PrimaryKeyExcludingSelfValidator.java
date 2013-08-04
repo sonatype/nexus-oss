@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
+
 import com.google.inject.assistedinject.Assisted;
 
 /**
@@ -35,14 +37,14 @@ public class PrimaryKeyExcludingSelfValidator
     implements Validator
 {
 
-    @Inject
-    PrimaryKeyExcludingSelfValidator( final CapabilityRegistry capabilityRegistry,
-                                      final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
-                                      final @Assisted CapabilityIdentity selfId,
-                                      final @Assisted CapabilityType type,
-                                      final @Assisted String... propertyKeys )
-    {
-        super( capabilityRegistry, capabilityDescriptorRegistryProvider, selfId, type, propertyKeys );
-    }
+  @Inject
+  PrimaryKeyExcludingSelfValidator(final CapabilityRegistry capabilityRegistry,
+                                   final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
+                                   final @Assisted CapabilityIdentity selfId,
+                                   final @Assisted CapabilityType type,
+                                   final @Assisted String... propertyKeys)
+  {
+    super(capabilityRegistry, capabilityDescriptorRegistryProvider, selfId, type, propertyKeys);
+  }
 
 }

@@ -10,45 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoComboFormField;
 
-@Named( "SynchronizeShadow" )
+@Named("SynchronizeShadow")
 @Singleton
 public class SynchronizeShadowTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-    public static final String ID = "SynchronizeShadowsTask";
+  public static final String ID = "SynchronizeShadowsTask";
 
-    public static final String REPO_FIELD_ID = "shadowRepositoryId";
+  public static final String REPO_FIELD_ID = "shadowRepositoryId";
 
-    private final RepoComboFormField repoField =
-        new RepoComboFormField( REPO_FIELD_ID, "Shadow Repository",
-                                       "Select the repository shadow to assign to this task.", FormField.MANDATORY );
+  private final RepoComboFormField repoField =
+      new RepoComboFormField(REPO_FIELD_ID, "Shadow Repository",
+          "Select the repository shadow to assign to this task.", FormField.MANDATORY);
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    public String getName()
-    {
-        return "Synchronize Shadow Repository";
-    }
+  public String getName() {
+    return "Synchronize Shadow Repository";
+  }
 
-    public List<FormField> formFields()
-    {
-        List<FormField> fields = new ArrayList<FormField>();
+  public List<FormField> formFields() {
+    List<FormField> fields = new ArrayList<FormField>();
 
-        fields.add( repoField );
+    fields.add(repoField);
 
-        return fields;
-    }
+    return fields;
+  }
 }

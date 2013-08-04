@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.ui.rest;
 
 import java.io.StringWriter;
@@ -23,6 +24,18 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
+import org.sonatype.nexus.plugins.ui.BuildNumberService;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
+import org.sonatype.plexus.rest.ReferenceFactory;
+import org.sonatype.plexus.rest.representation.VelocityRepresentation;
+import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
+import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.sisu.velocity.Velocity;
 
 import com.google.common.collect.Lists;
 import org.apache.velocity.VelocityContext;
@@ -39,238 +52,211 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
-import org.sonatype.nexus.plugins.ui.BuildNumberService;
-import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
-import org.sonatype.plexus.rest.ReferenceFactory;
-import org.sonatype.plexus.rest.representation.VelocityRepresentation;
-import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
-import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.sisu.velocity.Velocity;
 
 @Named("indexTemplate")
 @Singleton
-@Typed( ManagedPlexusResource.class )
+@Typed(ManagedPlexusResource.class)
 public class IndexTemplatePlexusResource
     extends AbstractPlexusResource
     implements ManagedPlexusResource
 {
-    private Nexus nexus;
+  private Nexus nexus;
 
-    private ReferenceFactory referenceFactory;
+  private ReferenceFactory referenceFactory;
 
-    private Map<String, NexusIndexHtmlCustomizer> bundles;
-    
-    private Velocity velocity;
+  private Map<String, NexusIndexHtmlCustomizer> bundles;
 
-    private BuildNumberService buildNumberService;
+  private Velocity velocity;
 
-    private Set<UiContributor> rJsContributors;
+  private BuildNumberService buildNumberService;
 
-    String templateFilename;
+  private Set<UiContributor> rJsContributors;
 
-    @Inject
-    public IndexTemplatePlexusResource( final Map<String, NexusIndexHtmlCustomizer> bundles, final Nexus nexus,
-                                        final ReferenceFactory referenceFactory,
-                                        final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
-                                        final Velocity velocity, final BuildNumberService buildNumberService,
-                                        final Set<UiContributor> uiContributors)
-    {
-        this();
+  String templateFilename;
 
-        this.bundles = bundles;
-        this.nexus = nexus;
-        this.referenceFactory = referenceFactory;
-        this.templateFilename = templateFilename;
-        this.velocity = velocity;
-        this.buildNumberService = buildNumberService;
-        this.rJsContributors = uiContributors;
-    }
+  @Inject
+  public IndexTemplatePlexusResource(final Map<String, NexusIndexHtmlCustomizer> bundles, final Nexus nexus,
+                                     final ReferenceFactory referenceFactory,
+                                     final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
+                                     final Velocity velocity, final BuildNumberService buildNumberService,
+                                     final Set<UiContributor> uiContributors)
+  {
+    this();
 
-    public IndexTemplatePlexusResource()
-    {
-        setReadable( true );
+    this.bundles = bundles;
+    this.nexus = nexus;
+    this.referenceFactory = referenceFactory;
+    this.templateFilename = templateFilename;
+    this.velocity = velocity;
+    this.buildNumberService = buildNumberService;
+    this.rJsContributors = uiContributors;
+  }
 
-        setModifiable( false );
-    }
+  public IndexTemplatePlexusResource() {
+    setReadable(true);
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        // RO resource
-        return null;
-    }
+    setModifiable(false);
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        return "/index.html";
-    }
+  @Override
+  public Object getPayloadInstance() {
+    // RO resource
+    return null;
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        // unprotected
-        return null;
-    }
+  @Override
+  public String getResourceUri() {
+    return "/index.html";
+  }
 
-    public List<Variant> getVariants()
-    {
-        List<Variant> result = super.getVariants();
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    // unprotected
+    return null;
+  }
 
-        result.clear();
+  public List<Variant> getVariants() {
+    List<Variant> result = super.getVariants();
 
-        result.add( new Variant( MediaType.APPLICATION_XHTML_XML ) );
+    result.clear();
 
-        return result;
-    }
+    result.add(new Variant(MediaType.APPLICATION_XHTML_XML));
 
-    public Representation get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        return render( context, request, response, variant );
-    }
+    return result;
+  }
 
-    protected VelocityRepresentation render( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        getLogger().debug( "Rendering index" );
+  public Representation get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    return render(context, request, response, variant);
+  }
 
-        Map<String, Object> templatingContext = new HashMap<String, Object>();
+  protected VelocityRepresentation render(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    getLogger().debug("Rendering index");
 
-        templatingContext.put( "serviceBase", "service/local" );
+    Map<String, Object> templatingContext = new HashMap<String, Object>();
 
-        templatingContext.put( "contentBase", "content" );
+    templatingContext.put("serviceBase", "service/local");
 
-        templatingContext.put( "nexusVersion", nexus.getSystemStatus().getVersion() );
+    templatingContext.put("contentBase", "content");
 
-        templatingContext.put( "nexusRoot", referenceFactory.getContextRoot(request).toString() );
+    templatingContext.put("nexusVersion", nexus.getSystemStatus().getVersion());
 
-        // gather plugin stuff
+    templatingContext.put("nexusRoot", referenceFactory.getContextRoot(request).toString());
 
-        Map<String, Object> topContext = new HashMap<String, Object>( templatingContext );
+    // gather plugin stuff
 
-        Map<String, Object> pluginContext = null;
+    Map<String, Object> topContext = new HashMap<String, Object>(templatingContext);
 
-        List<String> pluginPreHeadContributions = new ArrayList<String>();
-        List<String> pluginPostHeadContributions = new ArrayList<String>();
+    Map<String, Object> pluginContext = null;
 
-        List<String> pluginPreBodyContributions = new ArrayList<String>();
-        List<String> pluginPostBodyContributions = new ArrayList<String>();
+    List<String> pluginPreHeadContributions = new ArrayList<String>();
+    List<String> pluginPostHeadContributions = new ArrayList<String>();
 
-        List<String> pluginJsFiles = new ArrayList<String>();
+    List<String> pluginPreBodyContributions = new ArrayList<String>();
+    List<String> pluginPostBodyContributions = new ArrayList<String>();
+
+    List<String> pluginJsFiles = new ArrayList<String>();
 
 
+    for (String key : bundles.keySet()) {
+      pluginContext = new HashMap<String, Object>(topContext);
 
-        for ( String key : bundles.keySet() )
-        {
-            pluginContext = new HashMap<String, Object>( topContext );
+      NexusIndexHtmlCustomizer bundle = bundles.get(key);
+      getLogger().debug("Processing customizations: {} -> {}", key, bundle);
 
-            NexusIndexHtmlCustomizer bundle = bundles.get( key );
-            getLogger().debug( "Processing customizations: {} -> {}", key, bundle );
+      pluginContext.put("bundle", bundle);
 
-            pluginContext.put( "bundle", bundle );
+      // pre HEAD
 
-            // pre HEAD
+      String preHeadTemplate = bundle.getPreHeadContribution(pluginContext);
 
-            String preHeadTemplate = bundle.getPreHeadContribution( pluginContext );
+      evaluateIfNeeded(pluginContext, preHeadTemplate, pluginPreHeadContributions);
 
-            evaluateIfNeeded( pluginContext, preHeadTemplate, pluginPreHeadContributions );
+      // post HEAD
 
-            // post HEAD
-
-            String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
-            if ( !StringUtils.isEmpty( postHeadTemplate ) )
-            {
-                final Document html = Jsoup.parse( postHeadTemplate );
-                final Elements scripts = html.select( "script" );
-                for ( Element script : scripts )
-                {
-                    final String src = script.attr( "src" );
-                    if ( !src.isEmpty() )
-                    {
-                        pluginJsFiles.add( src );
-                        script.remove();
-                    }
-                }
-                postHeadTemplate = html.head().children().toString();
-                evaluateIfNeeded( pluginContext, postHeadTemplate, pluginPostHeadContributions );
-            }
-
-            // pre BODY
-
-            String preBodyTemplate = bundle.getPreBodyContribution( pluginContext );
-
-            evaluateIfNeeded( pluginContext, preBodyTemplate, pluginPreBodyContributions );
-
-            // post BODY
-
-            String postBodyTemplate = bundle.getPostBodyContribution( pluginContext );
-
-            evaluateIfNeeded( pluginContext, postBodyTemplate, pluginPostBodyContributions );
+      String postHeadTemplate = bundle.getPostHeadContribution(pluginContext);
+      if (!StringUtils.isEmpty(postHeadTemplate)) {
+        final Document html = Jsoup.parse(postHeadTemplate);
+        final Elements scripts = html.select("script");
+        for (Element script : scripts) {
+          final String src = script.attr("src");
+          if (!src.isEmpty()) {
+            pluginJsFiles.add(src);
+            script.remove();
+          }
         }
+        postHeadTemplate = html.head().children().toString();
+        evaluateIfNeeded(pluginContext, postHeadTemplate, pluginPostHeadContributions);
+      }
 
-        templatingContext.put( "appName", nexus.getSystemStatus().getAppName() );
-        templatingContext.put( "formattedAppName", nexus.getSystemStatus().getFormattedAppName() );
+      // pre BODY
 
-        templatingContext.put( "pluginPreHeadContributions", pluginPreHeadContributions );
-        templatingContext.put( "pluginPostHeadContributions", pluginPostHeadContributions );
+      String preBodyTemplate = bundle.getPreBodyContribution(pluginContext);
 
-        templatingContext.put( "pluginPreBodyContributions", pluginPreBodyContributions );
-        templatingContext.put( "pluginPostBodyContributions", pluginPostBodyContributions );
+      evaluateIfNeeded(pluginContext, preBodyTemplate, pluginPreBodyContributions);
 
-        templatingContext.put( "pluginJsFiles", pluginJsFiles );
+      // post BODY
 
-        final String query = request.getResourceRef().getQuery();
-        final boolean debugMode = query != null && query.contains( "debug" );
-        templatingContext.put( "debug", debugMode );
+      String postBodyTemplate = bundle.getPostBodyContribution(pluginContext);
 
-        List<UiContributor.UiContribution> contributions = Lists.newArrayList();
-        for ( UiContributor rJs : rJsContributors )
-        {
-            UiContribution contribution = rJs.contribute( debugMode );
-            if ( contribution.isEnabled() )
-            {
-                contributions.add( contribution );
-            }
-        }
-        templatingContext.put( "rJsContributions", contributions );
-
-        templatingContext.put( "buildQualifier", buildNumberService.getBuildNumber() );
-
-        return new VelocityRepresentation( context, templateFilename, getClass().getClassLoader(), templatingContext, MediaType.TEXT_HTML );
+      evaluateIfNeeded(pluginContext, postBodyTemplate, pluginPostBodyContributions);
     }
 
-    protected void evaluateIfNeeded( Map<String, Object> context, String template,
-                                     List<String> results )
-        throws ResourceException
-    {
-        if ( !StringUtils.isEmpty( template ) )
-        {
-            StringWriter result = new StringWriter();
+    templatingContext.put("appName", nexus.getSystemStatus().getAppName());
+    templatingContext.put("formattedAppName", nexus.getSystemStatus().getFormattedAppName());
 
-            try
-            {
-                if ( velocity.getEngine().evaluate( new VelocityContext( context ), result, getClass().getName(), template ) )
-                {
-                    results.add( result.toString() );
-                }
-                else
-                {
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                        "Was not able to interpolate (check the logs for Velocity messages about the reason)!" );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new ResourceException(
-                    Status.SERVER_ERROR_INTERNAL,
-                    "Got Exception exception during Velocity invocation!",
-                    e );
-            }
-        }
+    templatingContext.put("pluginPreHeadContributions", pluginPreHeadContributions);
+    templatingContext.put("pluginPostHeadContributions", pluginPostHeadContributions);
+
+    templatingContext.put("pluginPreBodyContributions", pluginPreBodyContributions);
+    templatingContext.put("pluginPostBodyContributions", pluginPostBodyContributions);
+
+    templatingContext.put("pluginJsFiles", pluginJsFiles);
+
+    final String query = request.getResourceRef().getQuery();
+    final boolean debugMode = query != null && query.contains("debug");
+    templatingContext.put("debug", debugMode);
+
+    List<UiContributor.UiContribution> contributions = Lists.newArrayList();
+    for (UiContributor rJs : rJsContributors) {
+      UiContribution contribution = rJs.contribute(debugMode);
+      if (contribution.isEnabled()) {
+        contributions.add(contribution);
+      }
     }
+    templatingContext.put("rJsContributions", contributions);
+
+    templatingContext.put("buildQualifier", buildNumberService.getBuildNumber());
+
+    return new VelocityRepresentation(context, templateFilename, getClass().getClassLoader(), templatingContext,
+        MediaType.TEXT_HTML);
+  }
+
+  protected void evaluateIfNeeded(Map<String, Object> context, String template,
+                                  List<String> results)
+      throws ResourceException
+  {
+    if (!StringUtils.isEmpty(template)) {
+      StringWriter result = new StringWriter();
+
+      try {
+        if (velocity.getEngine().evaluate(new VelocityContext(context), result, getClass().getName(), template)) {
+          results.add(result.toString());
+        }
+        else {
+          throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+              "Was not able to interpolate (check the logs for Velocity messages about the reason)!");
+        }
+      }
+      catch (Exception e) {
+        throw new ResourceException(
+            Status.SERVER_ERROR_INTERNAL,
+            "Got Exception exception during Velocity invocation!",
+            e);
+      }
+    }
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao;
 
 import java.util.SortedSet;
@@ -20,8 +21,10 @@ import org.apache.shiro.realm.ldap.LdapContextFactory;
 
 public interface LdapConnectionTester
 {
-    public void testConnection( LdapContextFactory ldapContextFactory ) throws NamingException;
-    
-    public SortedSet<LdapUser> testUserAndGroupMapping( LdapContextFactory ldapContextFactory, LdapAuthConfiguration ldapAuthConfiguration, int numberOfResults  ) throws LdapDAOException, NamingException;
+  public void testConnection(LdapContextFactory ldapContextFactory) throws NamingException;
+
+  public SortedSet<LdapUser> testUserAndGroupMapping(LdapContextFactory ldapContextFactory,
+                                                     LdapAuthConfiguration ldapAuthConfiguration, int numberOfResults)
+      throws LdapDAOException, NamingException;
 
 }

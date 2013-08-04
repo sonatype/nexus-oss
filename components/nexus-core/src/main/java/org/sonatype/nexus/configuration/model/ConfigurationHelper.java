@@ -10,26 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.model;
 
 public interface ConfigurationHelper
 {
-    /**
-     * Returns a copy of passed in configuration that has password fields encrypted/decrypted. If {@code null} is passed
-     * in, the return value is {@code null} also.
-     * 
-     * @param config
-     * @param encrypt
-     * @return
-     */
-    Configuration encryptDecryptPasswords( Configuration config, boolean encrypt );
+  /**
+   * Returns a copy of passed in configuration that has password fields encrypted/decrypted. If {@code null} is
+   * passed
+   * in, the return value is {@code null} also.
+   */
+  Configuration encryptDecryptPasswords(Configuration config, boolean encrypt);
 
-    /**
-     * Returns a copy of passed in configuration with removed/sanitized sensitive information. If {@code null} is passed
-     * in, the return value is {@code null} also.
-     * 
-     * @param config
-     * @return
-     */
-    Configuration maskPasswords( Configuration config );
+  /**
+   * Returns a copy of passed in configuration with removed/sanitized sensitive information. If {@code null} is
+   * passed
+   * in, the return value is {@code null} also.
+   */
+  Configuration maskPasswords(Configuration config);
 }

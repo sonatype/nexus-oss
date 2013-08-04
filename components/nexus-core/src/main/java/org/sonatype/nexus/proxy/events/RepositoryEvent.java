@@ -10,40 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.events;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The event that is occurred within a Repository, such as content changes or other maintenance stuff.
- * 
+ *
  * @author cstamas
  */
 public abstract class RepositoryEvent
     extends AbstractEvent<Repository>
 {
-    public RepositoryEvent( final Repository repository )
-    {
-        super( checkNotNull( repository ) );
-    }
+  public RepositoryEvent(final Repository repository) {
+    super(checkNotNull(repository));
+  }
 
-    /**
-     * Gets the repository.
-     * 
-     * @return the repository
-     */
-    public Repository getRepository()
-    {
-        return getEventSender();
-    }
+  /**
+   * Gets the repository.
+   *
+   * @return the repository
+   */
+  public Repository getRepository() {
+    return getEventSender();
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "repositoryId=" + getRepository().getId() +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "repositoryId=" + getRepository().getId() +
+        '}';
+  }
 }

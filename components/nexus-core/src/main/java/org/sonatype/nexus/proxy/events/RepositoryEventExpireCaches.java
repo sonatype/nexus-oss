@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.sonatype.nexus.proxy.repository.Repository;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The event fired on Expiring Not Found cache.
@@ -26,26 +27,27 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * and {@link RepositoryEventExpireProxyCaches}.
  * <p>
  * Related change: https://github.com/sonatype/nexus/commit/decd41b64c6515a8822b248dc970c3bcb204faaf
- * 
+ *
  * @author cstamas
- * @deprecated This event is superseded by {@link RepositoryEventExpireNotFoundCaches}. For now, this class is kept, but
+ * @deprecated This event is superseded by {@link RepositoryEventExpireNotFoundCaches}. For now, this class is kept,
+ *             but
  *             is made abstract. The new event does {@link RepositoryEventExpireNotFoundCaches} extends this class and
  *             in future will be removed.
  */
 public abstract class RepositoryEventExpireCaches
     extends RepositoryMaintenanceEvent
 {
-    /** From where it happened */
-    private final String path;
+  /**
+   * From where it happened
+   */
+  private final String path;
 
-    protected RepositoryEventExpireCaches( final Repository repository, final String path )
-    {
-        super( repository );
-        this.path = checkNotNull( path );
-    }
+  protected RepositoryEventExpireCaches(final Repository repository, final String path) {
+    super(repository);
+    this.path = checkNotNull(path);
+  }
 
-    public String getPath()
-    {
-        return path;
-    }
+  public String getPath() {
+    return path;
+  }
 }

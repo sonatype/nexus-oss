@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -21,37 +22,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ReleaseRemovalRequest
 {
-    private final String repositoryId;
+  private final String repositoryId;
 
-    private final int numberOfVersionsToKeep;
+  private final int numberOfVersionsToKeep;
 
-    private final String targetId;
+  private final String targetId;
 
-    /**
-     *
-     * @param repositoryId  the repository to target
-     * @param numberOfVersionsToKeep    the number of released versions to keep for Group/Artifact in the repository
-     * @param targetId    (optional) Repository Target id to be applied
-     */
-    public ReleaseRemovalRequest( final String repositoryId, final int numberOfVersionsToKeep, final String targetId )
-    {
-        this.repositoryId = checkNotNull(repositoryId);
-        this.numberOfVersionsToKeep = checkNotNull(numberOfVersionsToKeep);
-        this.targetId = targetId;
-    }
+  /**
+   * @param repositoryId           the repository to target
+   * @param numberOfVersionsToKeep the number of released versions to keep for Group/Artifact in the repository
+   * @param targetId               (optional) Repository Target id to be applied
+   */
+  public ReleaseRemovalRequest(final String repositoryId, final int numberOfVersionsToKeep, final String targetId) {
+    this.repositoryId = checkNotNull(repositoryId);
+    this.numberOfVersionsToKeep = checkNotNull(numberOfVersionsToKeep);
+    this.targetId = targetId;
+  }
 
-    public String getRepositoryId()
-    {
-        return repositoryId;
-    }
+  public String getRepositoryId() {
+    return repositoryId;
+  }
 
-    public int getNumberOfVersionsToKeep()
-    {
-        return numberOfVersionsToKeep;
-    }
+  public int getNumberOfVersionsToKeep() {
+    return numberOfVersionsToKeep;
+  }
 
-    public String getTargetId()
-    {
-        return targetId;
-    }
+  public String getTargetId() {
+    return targetId;
+  }
 }

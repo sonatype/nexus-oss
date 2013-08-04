@@ -10,32 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
 public class ExceptionerNexusTask
     extends DummyWaitingNexusTask
 {
 
-    private String errorMessage = "Error";
+  private String errorMessage = "Error";
 
-    public final void setErrorMessage( String errorMessage )
-    {
-        this.errorMessage = errorMessage;
-    }
+  public final void setErrorMessage(String errorMessage) {
+    this.errorMessage = errorMessage;
+  }
 
-    @Override
-    public Object call()
-        throws Exception
-    {
-        super.call();
+  @Override
+  public Object call()
+      throws Exception
+  {
+    super.call();
 
-        throw new RuntimeException( errorMessage );
-    }
+    throw new RuntimeException(errorMessage);
+  }
 
-    @Override
-    public String getId()
-    {
-        return "exceptionId";
-    }
+  @Override
+  public String getId() {
+    return "exceptionId";
+  }
 
 }

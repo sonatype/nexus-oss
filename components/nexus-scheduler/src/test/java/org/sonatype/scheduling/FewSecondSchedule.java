@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 import java.util.Calendar;
@@ -23,39 +24,34 @@ public class FewSecondSchedule
     extends DailySchedule
 {
 
-    private final int interval;
+  private final int interval;
 
-    public FewSecondSchedule()
-    {
-        this( new Date( System.currentTimeMillis() + 500 ), null, 5 );
-    }
+  public FewSecondSchedule() {
+    this(new Date(System.currentTimeMillis() + 500), null, 5);
+  }
 
-    public FewSecondSchedule( Date startDate, Date endDate, int interval )
-    {
-        super( startDate, endDate );
-        this.interval = interval;
+  public FewSecondSchedule(Date startDate, Date endDate, int interval) {
+    super(startDate, endDate);
+    this.interval = interval;
+  }
+
+  @Override
+  protected SchedulerIterator createIterator() {
+    return new FewSecondSchedulerIterator();
+  }
+
+  class FewSecondSchedulerIterator
+      extends AbstractCalendarBasedSchedulerIterator
+  {
+
+    public FewSecondSchedulerIterator() {
+      super(getStartDate(), getEndDate());
     }
 
     @Override
-    protected SchedulerIterator createIterator()
-    {
-        return new FewSecondSchedulerIterator();
+    public void stepNext() {
+      getCalendar().add(Calendar.SECOND, interval);
     }
-
-    class FewSecondSchedulerIterator
-        extends AbstractCalendarBasedSchedulerIterator
-    {
-
-        public FewSecondSchedulerIterator()
-        {
-            super( getStartDate(), getEndDate() );
-        }
-
-        @Override
-        public void stepNext()
-        {
-            getCalendar().add( Calendar.SECOND, interval );
-        }
-    }
+  }
 
 }

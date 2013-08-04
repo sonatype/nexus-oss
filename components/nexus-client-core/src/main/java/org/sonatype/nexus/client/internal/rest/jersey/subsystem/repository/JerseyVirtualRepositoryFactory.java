@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository;
 
 import javax.inject.Named;
@@ -33,38 +34,33 @@ public class JerseyVirtualRepositoryFactory
     implements RepositoryFactory<VirtualRepository>
 {
 
-    @Override
-    public int canAdapt( final RepositoryBaseResource resource )
-    {
-        int score = 0;
-        if ( resource instanceof RepositoryShadowResource )
-        {
-            score++;
-        }
-        if ( JerseyVirtualRepository.REPO_TYPE.equals( resource.getRepoType() ) )
-        {
-            score++;
-        }
-        return score;
+  @Override
+  public int canAdapt(final RepositoryBaseResource resource) {
+    int score = 0;
+    if (resource instanceof RepositoryShadowResource) {
+      score++;
     }
+    if (JerseyVirtualRepository.REPO_TYPE.equals(resource.getRepoType())) {
+      score++;
+    }
+    return score;
+  }
 
-    @Override
-    public JerseyVirtualRepository adapt( final JerseyNexusClient nexusClient,
-                                          final RepositoryBaseResource resource )
-    {
-        return new JerseyVirtualRepository( nexusClient, (RepositoryShadowResource) resource );
-    }
+  @Override
+  public JerseyVirtualRepository adapt(final JerseyNexusClient nexusClient,
+                                       final RepositoryBaseResource resource)
+  {
+    return new JerseyVirtualRepository(nexusClient, (RepositoryShadowResource) resource);
+  }
 
-    @Override
-    public boolean canCreate( final Class<? extends Repository> type )
-    {
-        return VirtualRepository.class.equals( type );
-    }
+  @Override
+  public boolean canCreate(final Class<? extends Repository> type) {
+    return VirtualRepository.class.equals(type);
+  }
 
-    @Override
-    public JerseyVirtualRepository create( final JerseyNexusClient nexusClient, final String id )
-    {
-        return new JerseyVirtualRepository( nexusClient, id );
-    }
+  @Override
+  public JerseyVirtualRepository create(final JerseyNexusClient nexusClient, final String id) {
+    return new JerseyVirtualRepository(nexusClient, id);
+  }
 
 }

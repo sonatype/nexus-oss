@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repositories.nexus4807;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.repository.AbstractRepositoryConfigurator;
 
 // see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml

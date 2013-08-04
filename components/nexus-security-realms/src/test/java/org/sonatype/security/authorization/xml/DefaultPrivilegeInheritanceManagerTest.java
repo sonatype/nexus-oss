@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.authorization.xml;
 
 import java.util.List;
@@ -19,52 +20,52 @@ import org.sonatype.guice.bean.containers.InjectedTestCase;
 public class DefaultPrivilegeInheritanceManagerTest
     extends InjectedTestCase
 {
-    private DefaultPrivilegeInheritanceManager manager;
+  private DefaultPrivilegeInheritanceManager manager;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        manager = (DefaultPrivilegeInheritanceManager) this.lookup( PrivilegeInheritanceManager.class );
-    }
+    manager = (DefaultPrivilegeInheritanceManager) this.lookup(PrivilegeInheritanceManager.class);
+  }
 
-    public void testCreateInherit()
-        throws Exception
-    {
-        List<String> methods = manager.getInheritedMethods( "create" );
+  public void testCreateInherit()
+      throws Exception
+  {
+    List<String> methods = manager.getInheritedMethods("create");
 
-        assertTrue( methods.size() == 2 );
-        assertTrue( methods.contains( "read" ) );
-        assertTrue( methods.contains( "create" ) );
-    }
+    assertTrue(methods.size() == 2);
+    assertTrue(methods.contains("read"));
+    assertTrue(methods.contains("create"));
+  }
 
-    public void testReadInherit()
-        throws Exception
-    {
-        List<String> methods = manager.getInheritedMethods( "read" );
+  public void testReadInherit()
+      throws Exception
+  {
+    List<String> methods = manager.getInheritedMethods("read");
 
-        assertTrue( methods.size() == 1 );
-        assertTrue( methods.contains( "read" ) );
-    }
+    assertTrue(methods.size() == 1);
+    assertTrue(methods.contains("read"));
+  }
 
-    public void testUpdateInherit()
-        throws Exception
-    {
-        List<String> methods = manager.getInheritedMethods( "update" );
+  public void testUpdateInherit()
+      throws Exception
+  {
+    List<String> methods = manager.getInheritedMethods("update");
 
-        assertTrue( methods.size() == 2 );
-        assertTrue( methods.contains( "read" ) );
-        assertTrue( methods.contains( "update" ) );
-    }
+    assertTrue(methods.size() == 2);
+    assertTrue(methods.contains("read"));
+    assertTrue(methods.contains("update"));
+  }
 
-    public void testDeleteInherit()
-        throws Exception
-    {
-        List<String> methods = manager.getInheritedMethods( "delete" );
+  public void testDeleteInherit()
+      throws Exception
+  {
+    List<String> methods = manager.getInheritedMethods("delete");
 
-        assertTrue( methods.size() == 2 );
-        assertTrue( methods.contains( "read" ) );
-        assertTrue( methods.contains( "delete" ) );
-    }
+    assertTrue(methods.size() == 2);
+    assertTrue(methods.contains("read"));
+    assertTrue(methods.contains("delete"));
+  }
 }

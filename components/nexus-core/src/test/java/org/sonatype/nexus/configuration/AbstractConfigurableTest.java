@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
+
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-
-import org.junit.Test;
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Tests for {@link AbstractConfigurable}
@@ -30,44 +32,39 @@ public class AbstractConfigurableTest
     extends TestSupport
 {
 
-    private AbstractConfigurable configurable = new AbstractConfigurable()
-    {
-        @Override
-        protected ApplicationConfiguration getApplicationConfiguration()
-        {
-            return null;
-        }
-
-        @Override
-        protected Configurator getConfigurator()
-        {
-            return null;
-        }
-
-        @Override
-        protected Object getCurrentConfiguration( final boolean forWrite )
-        {
-            return null;
-        }
-
-        @Override
-        protected CoreConfiguration wrapConfiguration( final Object configuration )
-            throws ConfigurationException
-        {
-            return null;
-        }
-
-        @Override
-        public String getName()
-        {
-            return null;
-        }
-    };
-
-    @Test
-    public void isDirtyNullConfigShouldReturnFalse()
-    {
-        assertThat( configurable.getCurrentCoreConfiguration(), nullValue() );
-        assertThat( configurable.isDirty(), is( false ) );
+  private AbstractConfigurable configurable = new AbstractConfigurable()
+  {
+    @Override
+    protected ApplicationConfiguration getApplicationConfiguration() {
+      return null;
     }
+
+    @Override
+    protected Configurator getConfigurator() {
+      return null;
+    }
+
+    @Override
+    protected Object getCurrentConfiguration(final boolean forWrite) {
+      return null;
+    }
+
+    @Override
+    protected CoreConfiguration wrapConfiguration(final Object configuration)
+        throws ConfigurationException
+    {
+      return null;
+    }
+
+    @Override
+    public String getName() {
+      return null;
+    }
+  };
+
+  @Test
+  public void isDirtyNullConfigShouldReturnFalse() {
+    assertThat(configurable.getCurrentCoreConfiguration(), nullValue());
+    assertThat(configurable.isDirty(), is(false));
+  }
 }

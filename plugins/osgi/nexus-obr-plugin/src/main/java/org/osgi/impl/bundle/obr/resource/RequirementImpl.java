@@ -10,164 +10,174 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.osgi.impl.bundle.obr.resource;
 
 import java.io.IOException;
-import org.osgi.service.obr.*;
-import org.codehaus.plexus.util.xml.pull.*;
 
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.osgi.service.obr.Capability;
+import org.osgi.service.obr.Requirement;
 
 
 /**
  * Implements the Requirement interface.
- * 
- * 
+ *
  * @version $Revision: 44 $
  */
-public class RequirementImpl implements Requirement {
-	int		id;
-	String	name;
-	String	filter="()";
-	FilterImpl	_filter;
-	String	comment;
-	boolean optional;
-	boolean multiple;
-	boolean extend;
-	
-	/**
-	 * Create a requirement with the given name.
-	 * 
-	 * @param name
-	 */
-	public RequirementImpl(String name) {
-		this.name = name;
-	}
+public class RequirementImpl
+    implements Requirement
+{
+  int id;
+
+  String name;
+
+  String filter = "()";
+
+  FilterImpl _filter;
+
+  String comment;
+
+  boolean optional;
+
+  boolean multiple;
+
+  boolean extend;
+
+  /**
+   * Create a requirement with the given name.
+   */
+  public RequirementImpl(String name) {
+    this.name = name;
+  }
 
 
-	/**
-	 * Parse the requirement from the pull parser.
-	 * 
-	 * @param parser
-	 * @throws Exception
-	 */
-	public RequirementImpl(XmlPullParser parser) throws IOException, XmlPullParserException {
-		parser.require(XmlPullParser.START_TAG, null, null );
-		name = parser.getAttributeValue(null, "name");
-		filter = parser.getAttributeValue(null, "filter");
-		
-		String opt = parser.getAttributeValue(null,"optional");
-		String mul = parser.getAttributeValue(null,"multiple");
-		String ext = parser.getAttributeValue(null,"extend");
-		optional = "true".equalsIgnoreCase(opt);
-		multiple = "true".equalsIgnoreCase(mul);
-		extend = "true".equalsIgnoreCase(ext);
-		
-		
-		StringBuffer sb = new StringBuffer();
-		while ( parser.next() == XmlPullParser.TEXT ) {
-			sb.append( parser.getText() );
-		}
-		if ( sb.length() > 0 )
-			setComment(sb.toString().trim());
-			
-		parser.require(XmlPullParser.END_TAG, null, null );
-	}
+  /**
+   * Parse the requirement from the pull parser.
+   */
+  public RequirementImpl(XmlPullParser parser) throws IOException, XmlPullParserException {
+    parser.require(XmlPullParser.START_TAG, null, null);
+    name = parser.getAttributeValue(null, "name");
+    filter = parser.getAttributeValue(null, "filter");
 
-	public void setFilter(String filter) {
-		this.filter = filter;
-		_filter= null;
-	}
-
-	public String getFilter() {
-		return filter;
-	}
-
-	public Tag toXML(String name) {
-		Tag tag = toXML(this);
-		tag.rename(name);
-		return tag;
-	}
+    String opt = parser.getAttributeValue(null, "optional");
+    String mul = parser.getAttributeValue(null, "multiple");
+    String ext = parser.getAttributeValue(null, "extend");
+    optional = "true".equalsIgnoreCase(opt);
+    multiple = "true".equalsIgnoreCase(mul);
+    extend = "true".equalsIgnoreCase(ext);
 
 
-	public String getName() {
-		return name;
-	}
+    StringBuffer sb = new StringBuffer();
+    while (parser.next() == XmlPullParser.TEXT) {
+      sb.append(parser.getText());
+    }
+    if (sb.length() > 0) {
+      setComment(sb.toString().trim());
+    }
 
-	public boolean isSatisfied(Capability capability) {
-		if (_filter == null)
-			_filter = new FilterImpl(filter);
+    parser.require(XmlPullParser.END_TAG, null, null);
+  }
 
-		boolean result = _filter.match(capability.getProperties());
-		return result;
-	}
+  public void setFilter(String filter) {
+    this.filter = filter;
+    _filter = null;
+  }
 
-	public String toString() {
-		return name + " " + filter;
-	}
+  public String getFilter() {
+    return filter;
+  }
 
-
-	public String getComment() {
-		return comment;
-	}
-
-
-	public void setComment(String comment) {
-		this.comment=comment;
-	}
-
-
-	public static Tag toXML(Requirement requirement) {
-		Tag req = new Tag("require");
-		req.addAttribute("name", requirement.getName());
-		req.addAttribute("filter", requirement.getFilter());
-		
-		req.addAttribute("optional", requirement.isOptional()+"");
-		req.addAttribute("multiple", requirement.isMultiple()+"");
-		req.addAttribute("extend", requirement.isExtend()+"");
-		
-		if ( requirement.getComment() != null )
-			req.addContent(requirement.getComment());
-		
-		return req;
-	}
+  public Tag toXML(String name) {
+    Tag tag = toXML(this);
+    tag.rename(name);
+    return tag;
+  }
 
 
-	public boolean isMultiple() {
-		return multiple;
-	}
+  public String getName() {
+    return name;
+  }
+
+  public boolean isSatisfied(Capability capability) {
+    if (_filter == null) {
+      _filter = new FilterImpl(filter);
+    }
+
+    boolean result = _filter.match(capability.getProperties());
+    return result;
+  }
+
+  public String toString() {
+    return name + " " + filter;
+  }
 
 
-	public boolean isOptional() {
-		return optional;
-	}
+  public String getComment() {
+    return comment;
+  }
 
 
-	public void setOptional(boolean b) {
-		optional = b;
-	}
-
-	public void setMultiple(boolean b) {
-		multiple = b;
-	}
+  public void setComment(String comment) {
+    this.comment = comment;
+  }
 
 
-	public boolean equals(Object o) {
-		if ( ! (o instanceof Requirement) )
-			return false;
-		
-		Requirement r2 = (Requirement)o;
-		return filter.equals(r2.getFilter()) && name.equals(r2.getName()); 
-	}
-	
-	public int hashCode() {
-		return filter.hashCode() ^ name.hashCode();
-	}
-	
-	public boolean isExtend() {
-		return extend;
-	}
-	
-	public void setExtend(boolean extend) {
-		this.extend = extend;
-	}
+  public static Tag toXML(Requirement requirement) {
+    Tag req = new Tag("require");
+    req.addAttribute("name", requirement.getName());
+    req.addAttribute("filter", requirement.getFilter());
+
+    req.addAttribute("optional", requirement.isOptional() + "");
+    req.addAttribute("multiple", requirement.isMultiple() + "");
+    req.addAttribute("extend", requirement.isExtend() + "");
+
+    if (requirement.getComment() != null) {
+      req.addContent(requirement.getComment());
+    }
+
+    return req;
+  }
+
+
+  public boolean isMultiple() {
+    return multiple;
+  }
+
+
+  public boolean isOptional() {
+    return optional;
+  }
+
+
+  public void setOptional(boolean b) {
+    optional = b;
+  }
+
+  public void setMultiple(boolean b) {
+    multiple = b;
+  }
+
+
+  public boolean equals(Object o) {
+    if (!(o instanceof Requirement)) {
+      return false;
+    }
+
+    Requirement r2 = (Requirement) o;
+    return filter.equals(r2.getFilter()) && name.equals(r2.getName());
+  }
+
+  public int hashCode() {
+    return filter.hashCode() ^ name.hashCode();
+  }
+
+  public boolean isExtend() {
+    return extend;
+  }
+
+  public void setExtend(boolean extend) {
+    this.extend = extend;
+  }
 }

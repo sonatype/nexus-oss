@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -19,28 +20,25 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
  * "served" by default by {@link AbstractRepository#getRepositoryMetadataManager()} method. Overriding that method to
  * return some "native" {@link RepositoryMetadataManager} for given repository type is the responsibility of the
  * developer, if needed.
- * 
+ *
  * @author cstamas
  * @since 2.1
  */
 public class NoopRepositoryMetadataManager
     implements RepositoryMetadataManager
 {
-    @Override
-    public boolean recreateMetadata( final ResourceStoreRequest request )
-    {
-        return false; // noop
-    }
+  @Override
+  public boolean recreateMetadata(final ResourceStoreRequest request) {
+    return false; // noop
+  }
 
-    @Override
-    public boolean expireMetadataCaches( final ResourceStoreRequest request )
-    {
-        return false; // noop
-    }
+  @Override
+  public boolean expireMetadataCaches(final ResourceStoreRequest request) {
+    return false; // noop
+  }
 
-    @Override
-    public boolean expireNotFoundMetadataCaches( final ResourceStoreRequest request )
-    {
-        return false; // noop
-    }
+  @Override
+  public boolean expireNotFoundMetadataCaches(final ResourceStoreRequest request) {
+    return false; // noop
+  }
 }

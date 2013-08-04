@@ -10,21 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.when;
+package org.sonatype.nexus.plugins;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
@@ -38,6 +31,15 @@ import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.junit.Test;
+import org.mockito.Mock;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.when;
+
 /**
  * Tests for {@link DefaultNexusPluginManager}.
  *
@@ -47,103 +49,96 @@ public class DefaultNexusPluginManagerTest
     extends TestSupport
 {
 
-    @Mock
-    private RepositoryTypeRegistry repositoryTypeRegistry;
+  @Mock
+  private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    @Mock
-    private EventBus eventBus;
+  @Mock
+  private EventBus eventBus;
 
-    @Mock
-    private PluginRepositoryManager pluginRepositoryManager;
+  @Mock
+  private PluginRepositoryManager pluginRepositoryManager;
 
-    @Mock
-    private NexusPluginRepository nexusPluginRepository;
+  @Mock
+  private NexusPluginRepository nexusPluginRepository;
 
-    @Mock
-    private MimeSupport mimeSupport;
+  @Mock
+  private MimeSupport mimeSupport;
 
-    @Test
-    public void pluginDependenciesAreActivatedByGA()
-        throws Exception
+  @Test
+  public void pluginDependenciesAreActivatedByGA()
+      throws Exception
+  {
+    final DefaultNexusPluginManager underTest = new DefaultNexusPluginManager(
+        repositoryTypeRegistry, eventBus, pluginRepositoryManager,
+        new DefaultPlexusContainer(), mimeSupport, new HashMap<String, String>(),
+        Collections.<AbstractInterceptorModule>emptyList()
+    )
     {
-        final DefaultNexusPluginManager underTest = new DefaultNexusPluginManager(
-            repositoryTypeRegistry, eventBus, pluginRepositoryManager,
-            new DefaultPlexusContainer(), mimeSupport, new HashMap<String, String>(),
-            Collections.<AbstractInterceptorModule>emptyList()
-        )
-        {
-            @Override
-            void createPluginInjector( final PluginRepositoryArtifact plugin, final PluginDescriptor descriptor )
-                throws NoSuchPluginRepositoryArtifactException
-            {
-                // do nothing
-            }
-        };
+      @Override
+      void createPluginInjector(final PluginRepositoryArtifact plugin, final PluginDescriptor descriptor)
+          throws NoSuchPluginRepositoryArtifactException
+      {
+        // do nothing
+      }
+    };
 
-        final GAVCoordinate p1 = new GAVCoordinate( "g", "p1", "1.0" );
-        final PluginMetadata p1Meta = pluginMetadata( pluginDependency( "g", "p2", "1.0" ) );
+    final GAVCoordinate p1 = new GAVCoordinate("g", "p1", "1.0");
+    final PluginMetadata p1Meta = pluginMetadata(pluginDependency("g", "p2", "1.0"));
 
-        final GAVCoordinate p2 = new GAVCoordinate( "g", "p2", "1.1" );
-        final PluginMetadata p2Meta = pluginMetadata();
+    final GAVCoordinate p2 = new GAVCoordinate("g", "p2", "1.1");
+    final PluginMetadata p2Meta = pluginMetadata();
 
-        final PluginRepositoryArtifact pra1 = pluginRepositoryArtifact( p1, p1Meta );
-        final PluginRepositoryArtifact pra2 = pluginRepositoryArtifact( p2, p2Meta );
+    final PluginRepositoryArtifact pra1 = pluginRepositoryArtifact(p1, p1Meta);
+    final PluginRepositoryArtifact pra2 = pluginRepositoryArtifact(p2, p2Meta);
 
-        final Map<GAVCoordinate, PluginMetadata> installedPlugins = new HashMap<GAVCoordinate, PluginMetadata>();
-        installedPlugins.put( p1, p1Meta );
-        installedPlugins.put( p2, p2Meta );
+    final Map<GAVCoordinate, PluginMetadata> installedPlugins = new HashMap<GAVCoordinate, PluginMetadata>();
+    installedPlugins.put(p1, p1Meta);
+    installedPlugins.put(p2, p2Meta);
 
-        when( pluginRepositoryManager.findAvailablePlugins() ).thenReturn( installedPlugins );
-        when( pluginRepositoryManager.resolveArtifact( p1 ) ).thenReturn( pra1 );
-        when( pluginRepositoryManager.resolveArtifact( p2 ) ).thenReturn( pra2 );
+    when(pluginRepositoryManager.findAvailablePlugins()).thenReturn(installedPlugins);
+    when(pluginRepositoryManager.resolveArtifact(p1)).thenReturn(pra1);
+    when(pluginRepositoryManager.resolveArtifact(p2)).thenReturn(pra2);
 
-        final Collection<PluginManagerResponse> responses = underTest.activateInstalledPlugins();
-        assertThat( responses, is( notNullValue() ) );
-        assertThat( responses.size(), is( 2 ) );
-        for ( PluginManagerResponse response : responses )
-        {
-            assertThat( response.isSuccessful(), is( true ) );
-        }
+    final Collection<PluginManagerResponse> responses = underTest.activateInstalledPlugins();
+    assertThat(responses, is(notNullValue()));
+    assertThat(responses.size(), is(2));
+    for (PluginManagerResponse response : responses) {
+      assertThat(response.isSuccessful(), is(true));
+    }
+  }
+
+  private PluginRepositoryArtifact pluginRepositoryArtifact(final GAVCoordinate gav, final PluginMetadata meta) {
+    final PluginRepositoryArtifact pluginRepositoryArtifact = new PluginRepositoryArtifact();
+    pluginRepositoryArtifact.setCoordinate(gav);
+    pluginRepositoryArtifact.setNexusPluginRepository(nexusPluginRepository);
+
+    try {
+      when(nexusPluginRepository.getPluginMetadata(gav)).thenReturn(meta);
+    }
+    catch (NoSuchPluginRepositoryArtifactException e) {
+      // unexpected
+      throw new RuntimeException(e);
     }
 
-    private PluginRepositoryArtifact pluginRepositoryArtifact( final GAVCoordinate gav, final PluginMetadata meta )
-    {
-        final PluginRepositoryArtifact pluginRepositoryArtifact = new PluginRepositoryArtifact();
-        pluginRepositoryArtifact.setCoordinate( gav );
-        pluginRepositoryArtifact.setNexusPluginRepository( nexusPluginRepository );
+    return pluginRepositoryArtifact;
+  }
 
-        try
-        {
-            when( nexusPluginRepository.getPluginMetadata( gav ) ).thenReturn( meta );
-        }
-        catch ( NoSuchPluginRepositoryArtifactException e )
-        {
-            // unexpected
-            throw new RuntimeException( e );
-        }
-
-        return pluginRepositoryArtifact;
+  private PluginMetadata pluginMetadata(final PluginDependency... pluginDependencies) {
+    final PluginMetadata pluginMetadata = new PluginMetadata();
+    for (PluginDependency pluginDependency : pluginDependencies) {
+      pluginMetadata.addPluginDependency(pluginDependency);
     }
 
-    private PluginMetadata pluginMetadata( final PluginDependency... pluginDependencies )
-    {
-        final PluginMetadata pluginMetadata = new PluginMetadata();
-        for ( PluginDependency pluginDependency : pluginDependencies )
-        {
-            pluginMetadata.addPluginDependency( pluginDependency );
-        }
+    return pluginMetadata;
+  }
 
-        return pluginMetadata;
-    }
+  private PluginDependency pluginDependency(final String groupId, final String artifactId, final String version) {
+    final PluginDependency pluginDependency = new PluginDependency();
+    pluginDependency.setGroupId(groupId);
+    pluginDependency.setArtifactId(artifactId);
+    pluginDependency.setVersion(version);
 
-    private PluginDependency pluginDependency( final String groupId, final String artifactId, final String version )
-    {
-        final PluginDependency pluginDependency = new PluginDependency();
-        pluginDependency.setGroupId( groupId );
-        pluginDependency.setArtifactId( artifactId );
-        pluginDependency.setVersion( version );
-
-        return pluginDependency;
-    }
+    return pluginDependency;
+  }
 
 }

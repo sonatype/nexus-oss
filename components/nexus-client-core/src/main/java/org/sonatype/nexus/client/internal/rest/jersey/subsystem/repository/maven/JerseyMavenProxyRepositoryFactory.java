@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.maven;
 
 import javax.inject.Named;
@@ -33,37 +34,32 @@ public class JerseyMavenProxyRepositoryFactory
     extends JerseyProxyRepositoryFactory
 {
 
-    @Override
-    public int canAdapt( final RepositoryBaseResource resource )
-    {
-        int score = super.canAdapt( resource );
-        if ( score > 0 )
-        {
-            if ( JerseyMavenProxyRepository.PROVIDER.equals( resource.getProvider() ) )
-            {
-                score++;
-            }
-        }
-        return score;
+  @Override
+  public int canAdapt(final RepositoryBaseResource resource) {
+    int score = super.canAdapt(resource);
+    if (score > 0) {
+      if (JerseyMavenProxyRepository.PROVIDER.equals(resource.getProvider())) {
+        score++;
+      }
     }
+    return score;
+  }
 
-    @Override
-    public JerseyMavenProxyRepository adapt( final JerseyNexusClient nexusClient,
-                                             final RepositoryBaseResource resource )
-    {
-        return new JerseyMavenProxyRepository( nexusClient, (RepositoryProxyResource) resource );
-    }
+  @Override
+  public JerseyMavenProxyRepository adapt(final JerseyNexusClient nexusClient,
+                                          final RepositoryBaseResource resource)
+  {
+    return new JerseyMavenProxyRepository(nexusClient, (RepositoryProxyResource) resource);
+  }
 
-    @Override
-    public boolean canCreate( final Class<? extends Repository> type )
-    {
-        return MavenProxyRepository.class.equals( type );
-    }
+  @Override
+  public boolean canCreate(final Class<? extends Repository> type) {
+    return MavenProxyRepository.class.equals(type);
+  }
 
-    @Override
-    public JerseyMavenProxyRepository create( final JerseyNexusClient nexusClient, final String id )
-    {
-        return new JerseyMavenProxyRepository( nexusClient, id );
-    }
+  @Override
+  public JerseyMavenProxyRepository create(final JerseyNexusClient nexusClient, final String id) {
+    return new JerseyMavenProxyRepository(nexusClient, id);
+  }
 
 }

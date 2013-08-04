@@ -10,107 +10,97 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.remote;
 
+import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
+
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * TODO: for now, we have limited the RRS selection, but in future, this should be made dynamic!
  */
-@Component( role = RemoteProviderHintFactory.class )
+@Component(role = RemoteProviderHintFactory.class)
 public class DefaultRemoteProviderHintFactory
     implements RemoteProviderHintFactory
 {
-    public final static String DEFAULT_HTTP_PROVIDER_KEY = "nexus.default.http.provider";
+  public final static String DEFAULT_HTTP_PROVIDER_KEY = "nexus.default.http.provider";
 
-    public final static String DEFAULT_HTTP_PROVIDER_FORCED_KEY = "nexus.default.http.providerForced";
+  public final static String DEFAULT_HTTP_PROVIDER_FORCED_KEY = "nexus.default.http.providerForced";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Boolean httpProviderForced = null;
+  private Boolean httpProviderForced = null;
 
-    protected synchronized boolean isHttpProviderForced()
-    {
-        if ( httpProviderForced == null )
-        {
-            httpProviderForced = SystemPropertiesHelper.getBoolean( DEFAULT_HTTP_PROVIDER_FORCED_KEY, false );
+  protected synchronized boolean isHttpProviderForced() {
+    if (httpProviderForced == null) {
+      httpProviderForced = SystemPropertiesHelper.getBoolean(DEFAULT_HTTP_PROVIDER_FORCED_KEY, false);
 
-            if ( httpProviderForced )
-            {
-                logger.warn( "HTTP Provider forcing is in effect (system property \""
-                    + DEFAULT_HTTP_PROVIDER_FORCED_KEY
-                    + "\" is set to \"true\"!), so regardless of your configuration, for HTTP RemoteRepositoryStorage the \""
-                    + getDefaultHttpRoleHint()
-                    + "\" provider will be used! Consider adjusting your configuration instead and stop using provider forcing." );
-            }
-        }
-
-        return httpProviderForced;
+      if (httpProviderForced) {
+        logger.warn("HTTP Provider forcing is in effect (system property \""
+            + DEFAULT_HTTP_PROVIDER_FORCED_KEY
+            + "\" is set to \"true\"!), so regardless of your configuration, for HTTP RemoteRepositoryStorage the \""
+            + getDefaultHttpRoleHint()
+            +
+            "\" provider will be used! Consider adjusting your configuration instead and stop using provider forcing.");
+      }
     }
 
-    public String getDefaultRoleHint( final String remoteUrl )
-        throws IllegalArgumentException
-    {
-        if ( StringUtils.isBlank( remoteUrl ) )
-        {
-            throw new IllegalArgumentException( "Remote URL cannot be null!" );
-        }
+    return httpProviderForced;
+  }
 
-        final String remoteUrlLowered = remoteUrl.toLowerCase();
-
-        if ( remoteUrlLowered.startsWith( "http:" ) || remoteUrlLowered.startsWith( "https:" ) )
-        {
-            return getDefaultHttpRoleHint();
-        }
-
-        throw new IllegalArgumentException( "No known remote repository storage provider for remote URL " + remoteUrl );
+  public String getDefaultRoleHint(final String remoteUrl)
+      throws IllegalArgumentException
+  {
+    if (StringUtils.isBlank(remoteUrl)) {
+      throw new IllegalArgumentException("Remote URL cannot be null!");
     }
 
-    public String getRoleHint( final String remoteUrl, final String hint )
-        throws IllegalArgumentException
-    {
-        if ( StringUtils.isBlank( remoteUrl ) )
-        {
-            throw new IllegalArgumentException( "Remote URL cannot be null!" );
-        }
+    final String remoteUrlLowered = remoteUrl.toLowerCase();
 
-        final String remoteUrlLowered = remoteUrl.toLowerCase();
-
-        if ( remoteUrlLowered.startsWith( "http:" ) || remoteUrlLowered.startsWith( "https:" ) )
-        {
-            return getHttpRoleHint( hint );
-        }
-
-        if ( StringUtils.isBlank( hint ) )
-        {
-            throw new IllegalArgumentException( "RemoteRepositoryStorage hint cannot be null!" );
-        }
-
-        logger.debug( "Returning supplied \"{}\" hint for remote URL {}.", remoteUrl, hint );
-
-        return hint;
+    if (remoteUrlLowered.startsWith("http:") || remoteUrlLowered.startsWith("https:")) {
+      return getDefaultHttpRoleHint();
     }
 
-    public String getDefaultHttpRoleHint()
-    {
-        return SystemPropertiesHelper.getString( DEFAULT_HTTP_PROVIDER_KEY, HttpClientRemoteStorage.PROVIDER_STRING );
+    throw new IllegalArgumentException("No known remote repository storage provider for remote URL " + remoteUrl);
+  }
+
+  public String getRoleHint(final String remoteUrl, final String hint)
+      throws IllegalArgumentException
+  {
+    if (StringUtils.isBlank(remoteUrl)) {
+      throw new IllegalArgumentException("Remote URL cannot be null!");
     }
 
-    public String getHttpRoleHint( final String hint )
-    {
-        if ( isHttpProviderForced() || StringUtils.isBlank( hint ) )
-        {
-            return getDefaultHttpRoleHint();
-        }
-        else
-        {
-            return hint;
-        }
+    final String remoteUrlLowered = remoteUrl.toLowerCase();
+
+    if (remoteUrlLowered.startsWith("http:") || remoteUrlLowered.startsWith("https:")) {
+      return getHttpRoleHint(hint);
     }
+
+    if (StringUtils.isBlank(hint)) {
+      throw new IllegalArgumentException("RemoteRepositoryStorage hint cannot be null!");
+    }
+
+    logger.debug("Returning supplied \"{}\" hint for remote URL {}.", remoteUrl, hint);
+
+    return hint;
+  }
+
+  public String getDefaultHttpRoleHint() {
+    return SystemPropertiesHelper.getString(DEFAULT_HTTP_PROVIDER_KEY, HttpClientRemoteStorage.PROVIDER_STRING);
+  }
+
+  public String getHttpRoleHint(final String hint) {
+    if (isHttpProviderForced() || StringUtils.isBlank(hint)) {
+      return getDefaultHttpRoleHint();
+    }
+    else {
+      return hint;
+    }
+  }
 }

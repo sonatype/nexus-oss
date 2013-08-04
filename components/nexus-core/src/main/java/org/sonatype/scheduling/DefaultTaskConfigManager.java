@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 import java.io.IOException;
@@ -23,12 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
@@ -51,542 +46,463 @@ import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks
  * within nexus.xml file.
  */
-@Component( role = TaskConfigManager.class )
+@Component(role = TaskConfigManager.class)
 public class DefaultTaskConfigManager
     extends AbstractConfigurable
     implements TaskConfigManager
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /**
-     * The app config holding tasks.
-     */
-    @Requirement
-    private NexusConfiguration applicationConfiguration;
+  /**
+   * The app config holding tasks.
+   */
+  @Requirement
+  private NexusConfiguration applicationConfiguration;
 
-    /**
-     * Plexus.
-     */
-    @Requirement
-    private PlexusContainer plexusContainer;
+  /**
+   * Plexus.
+   */
+  @Requirement
+  private PlexusContainer plexusContainer;
 
-    protected PlexusContainer getPlexusContainer()
-    {
-        return plexusContainer;
+  protected PlexusContainer getPlexusContainer() {
+    return plexusContainer;
+  }
+
+  // ==
+
+  public void initializeConfiguration()
+      throws ConfigurationException
+  {
+    if (getApplicationConfiguration() != null && getApplicationConfiguration().getConfigurationModel() != null) {
+      configure(getApplicationConfiguration());
+    }
+  }
+
+  @Override
+  protected ApplicationConfiguration getApplicationConfiguration() {
+    return applicationConfiguration;
+  }
+
+  @Override
+  protected Configurator getConfigurator() {
+    return null;
+  }
+
+  @Override
+  protected List<CScheduledTask> getCurrentConfiguration(boolean forWrite) {
+    return ((CScheduledTaskCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
+  }
+
+  @Override
+  protected CoreConfiguration wrapConfiguration(Object configuration)
+      throws ConfigurationException
+  {
+    if (configuration instanceof ApplicationConfiguration) {
+      return new CScheduledTaskCoreConfiguration((ApplicationConfiguration) configuration);
+    }
+    else {
+      throw new ConfigurationException("The passed configuration object is of class \""
+          + configuration.getClass().getName() + "\" and not the required \""
+          + ApplicationConfiguration.class.getName() + "\"!");
+    }
+  }
+
+  // ==
+
+  public void initializeTasks(Scheduler scheduler) {
+    initializeTasks(scheduler, new ArrayList<CScheduledTask>(getCurrentConfiguration(false)));
+  }
+
+  void initializeTasks(Scheduler scheduler, List<CScheduledTask> tasks) {
+    if (tasks != null) {
+      List<CScheduledTask> tempList = new ArrayList<CScheduledTask>(tasks);
+
+      logger.info(tempList.size() + " task(s) to load.");
+
+      for (CScheduledTask task : tempList) {
+        logger.info("Loading task - " + task.getName());
+
+        try {
+          SchedulerTask<?> nexusTask = createTaskInstance(task.getType());
+
+          for (CProps prop : task.getProperties()) {
+            nexusTask.addParameter(prop.getKey(), prop.getValue());
+          }
+
+          TaskUtils.setId(nexusTask, task.getId());
+          TaskUtils.setName(nexusTask, task.getName());
+
+          DefaultScheduledTask<?> scheduledTask =
+              (DefaultScheduledTask<?>) scheduler.initialize(task.getId(), task.getName(), task.getType(),
+                  nexusTask, translateFrom(task.getSchedule(), new Date(task.getNextRun())),
+                  task.isEnabled());
+
+          // since the default schedules task appends 20 ms to the last run time, we don't want
+          // set the value if it is 0, otherwise will give appearance that task did run, since
+          // timestamp greater than 0
+          if (task.getLastRun() > 0) {
+            scheduledTask.setLastRun(new Date(task.getLastRun()));
+          }
+        }
+        catch (IllegalArgumentException e) {
+          // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
+          // name
+          logger.warn("Unable to initialize task " + task.getName() + ", couldn't load service class "
+              + task.getId(), e);
+        }
+      }
     }
 
-    // ==
+  }
 
-    public void initializeConfiguration()
-        throws ConfigurationException
-    {
-        if ( getApplicationConfiguration() != null && getApplicationConfiguration().getConfigurationModel() != null )
-        {
-            configure( getApplicationConfiguration() );
-        }
+  public <T> void addTask(ScheduledTask<T> task) {
+    // RunNowSchedules are not saved
+    if (RunNowSchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+      return;
     }
 
-    @Override
-    protected ApplicationConfiguration getApplicationConfiguration()
-    {
-        return applicationConfiguration;
+    synchronized (applicationConfiguration) {
+      List<CScheduledTask> tasks = getCurrentConfiguration(true);
+
+      CScheduledTask foundTask = findTask(task.getId(), tasks);
+
+      CScheduledTask storeableTask = translateFrom(task);
+
+      if (storeableTask != null) {
+        if (foundTask != null) {
+          tasks.remove(foundTask);
+
+          storeableTask.setLastRun(foundTask.getLastRun());
+        }
+
+        tasks.add(storeableTask);
+      }
+
+      if (logger.isTraceEnabled()) {
+        logger.trace("Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
+            : "is NOT", new Exception("This is an exception only to provide caller backtrace"));
+      }
+
+      try {
+        applicationConfiguration.saveConfiguration();
+      }
+      catch (IOException e) {
+        logger.warn("Could not save task changes!", e);
+      }
+    }
+  }
+
+  public <T> void removeTask(ScheduledTask<T> task) {
+    synchronized (applicationConfiguration) {
+      List<CScheduledTask> tasks = getCurrentConfiguration(true);
+
+      CScheduledTask foundTask = findTask(task.getId(), tasks);
+
+      if (foundTask != null) {
+        tasks.remove(foundTask);
+      }
+
+      if (logger.isTraceEnabled()) {
+        logger.trace("Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS"
+            : "is NOT", new Exception("This is an exception only to provide caller backtrace"));
+      }
+
+      try {
+        applicationConfiguration.saveConfiguration();
+      }
+      catch (IOException e) {
+        logger.warn("Could not save task changes!", e);
+      }
     }
 
-    @Override
-    protected Configurator getConfigurator()
-    {
-        return null;
+    // TODO: need to also add task to a history file
+  }
+
+  public SchedulerTask<?> createTaskInstance(String taskType)
+      throws IllegalArgumentException
+  {
+    try {
+      return lookupTask(taskType);
+    }
+    catch (ComponentLookupException e) {
+      throw new IllegalArgumentException("Could not create task of type" + taskType, e);
+    }
+  }
+
+  private SchedulerTask<?> lookupTask(final String taskType)
+      throws ComponentLookupException
+  {
+    logger.debug("Looking up task for: " + taskType);
+
+    try {
+      return (SchedulerTask<?>) getPlexusContainer().lookup(SchedulerTask.class, taskType);
+    }
+    catch (ComponentLookupException ignore) {
+      return (SchedulerTask<?>) getPlexusContainer().lookup(NexusTask.class, taskType);
+    }
+  }
+
+  public <T> T createTaskInstance(final Class<T> taskType)
+      throws IllegalArgumentException
+  {
+    logger.debug("Creating task: {}", taskType);
+
+    try {
+      // first try a full class name lookup (modern sisu-style)
+      return (T) lookupTask(taskType.getCanonicalName());
+    }
+    catch (ComponentLookupException e) {
+      try {
+        // fallback to old plexus hint style
+        return (T) lookupTask(taskType.getSimpleName());
+      }
+      catch (ComponentLookupException x) {
+        throw new IllegalArgumentException("Could not create task of type: " + taskType, e);
+      }
+    }
+  }
+
+  // ==
+
+  private CScheduledTask findTask(String id, List<CScheduledTask> tasks) {
+    synchronized (applicationConfiguration) {
+      for (Iterator<CScheduledTask> iter = tasks.iterator(); iter.hasNext(); ) {
+        CScheduledTask storedTask = iter.next();
+
+        if (storedTask.getId().equals(id)) {
+          return storedTask;
+        }
+      }
+
+      return null;
+    }
+  }
+
+  private Map<String, String> translateFrom(List list) {
+    Map<String, String> map = new HashMap<String, String>();
+
+    for (Iterator iter = list.iterator(); iter.hasNext(); ) {
+      CProps prop = (CProps) iter.next();
+
+      map.put(prop.getKey(), prop.getValue());
     }
 
-    @Override
-    protected List<CScheduledTask> getCurrentConfiguration( boolean forWrite )
-    {
-        return ( (CScheduledTaskCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+    return map;
+  }
+
+  private Schedule translateFrom(CScheduleConfig modelSchedule, Date nextRun) {
+    Schedule schedule = null;
+
+    Date startDate = null;
+    Date endDate = null;
+
+    if (modelSchedule.getStartDate() > 0) {
+      startDate = new Date(modelSchedule.getStartDate());
     }
 
-    @Override
-    protected CoreConfiguration wrapConfiguration( Object configuration )
-        throws ConfigurationException
-    {
-        if ( configuration instanceof ApplicationConfiguration )
-        {
-            return new CScheduledTaskCoreConfiguration( (ApplicationConfiguration) configuration );
-        }
-        else
-        {
-            throw new ConfigurationException( "The passed configuration object is of class \""
-                + configuration.getClass().getName() + "\" and not the required \""
-                + ApplicationConfiguration.class.getName() + "\"!" );
-        }
+    if (modelSchedule.getEndDate() > 0) {
+      endDate = new Date(modelSchedule.getEndDate());
     }
 
-    // ==
+    if (CScheduleConfig.TYPE_ADVANCED.equals(modelSchedule.getType())) {
+      try {
+        schedule = new CronSchedule(modelSchedule.getCronCommand());
+      }
+      catch (ParseException e) {
+        // this will not happen, since it was persisted, hence already submitted
+      }
+    }
+    else if (CScheduleConfig.TYPE_MONTHLY.equals(modelSchedule.getType())) {
+      Set<Integer> daysToRun = new HashSet<Integer>();
 
-    public void initializeTasks( Scheduler scheduler )
-    {
-        initializeTasks( scheduler, new ArrayList<CScheduledTask>( getCurrentConfiguration( false ) ) );
+      for (Iterator iter = modelSchedule.getDaysOfMonth().iterator(); iter.hasNext(); ) {
+        String day = (String) iter.next();
+
+        try {
+          daysToRun.add(Integer.valueOf(day));
+        }
+        catch (NumberFormatException nfe) {
+          logger.error("Invalid day being added to monthly schedule - " + day + " - skipping.");
+        }
+      }
+
+      schedule = new MonthlySchedule(startDate, endDate, daysToRun);
+    }
+    else if (CScheduleConfig.TYPE_WEEKLY.equals(modelSchedule.getType())) {
+      Set<Integer> daysToRun = new HashSet<Integer>();
+
+      for (Iterator iter = modelSchedule.getDaysOfWeek().iterator(); iter.hasNext(); ) {
+        String day = (String) iter.next();
+
+        try {
+          daysToRun.add(Integer.valueOf(day));
+        }
+        catch (NumberFormatException nfe) {
+          logger.error("Invalid day being added to weekly schedule - " + day + " - skipping.");
+        }
+      }
+
+      schedule = new WeeklySchedule(startDate, endDate, daysToRun);
+    }
+    else if (CScheduleConfig.TYPE_DAILY.equals(modelSchedule.getType())) {
+      schedule = new DailySchedule(startDate, endDate);
+    }
+    else if (CScheduleConfig.TYPE_HOURLY.equals(modelSchedule.getType())) {
+      schedule = new HourlySchedule(startDate, endDate);
+    }
+    else if (CScheduleConfig.TYPE_ONCE.equals(modelSchedule.getType())) {
+      schedule = new OnceSchedule(startDate);
+    }
+    else if (CScheduleConfig.TYPE_RUN_NOW.equals(modelSchedule.getType())) {
+      schedule = new RunNowSchedule();
+    }
+    else if (CScheduleConfig.TYPE_MANUAL.equals(modelSchedule.getType())) {
+      schedule = new ManualRunSchedule();
+    }
+    else {
+      throw new IllegalArgumentException("Unknown Schedule type: " + modelSchedule.getClass().getName());
     }
 
-    void initializeTasks( Scheduler scheduler, List<CScheduledTask> tasks )
-    {
-        if ( tasks != null )
-        {
-            List<CScheduledTask> tempList = new ArrayList<CScheduledTask>( tasks );
-
-            logger.info( tempList.size() + " task(s) to load." );
-
-            for ( CScheduledTask task : tempList )
-            {
-                logger.info( "Loading task - " + task.getName() );
-
-                try
-                {
-                    SchedulerTask<?> nexusTask = createTaskInstance( task.getType() );
-
-                    for ( CProps prop : task.getProperties() )
-                    {
-                        nexusTask.addParameter( prop.getKey(), prop.getValue() );
-                    }
-
-                    TaskUtils.setId( nexusTask, task.getId() );
-                    TaskUtils.setName( nexusTask, task.getName() );
-
-                    DefaultScheduledTask<?> scheduledTask =
-                        (DefaultScheduledTask<?>) scheduler.initialize( task.getId(), task.getName(), task.getType(),
-                            nexusTask, translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ),
-                            task.isEnabled() );
-
-                    // since the default schedules task appends 20 ms to the last run time, we don't want
-                    // set the value if it is 0, otherwise will give appearance that task did run, since
-                    // timestamp greater than 0
-                    if ( task.getLastRun() > 0 )
-                    {
-                        scheduledTask.setLastRun( new Date( task.getLastRun() ) );
-                    }
-                }
-                catch ( IllegalArgumentException e )
-                {
-                    // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
-                    // name
-                    logger.warn( "Unable to initialize task " + task.getName() + ", couldn't load service class "
-                        + task.getId(), e );
-                }
-            }
-        }
-
+    if (nextRun != null) {
+      Date resetFrom = nextRun;
+      // NEXUS-4465: Cron schedule will add 1 second to given time to calculate next scheduled time
+      // so we subtract it in case that next schedule is actually a valid time to run
+      if (schedule instanceof CronSchedule) {
+        resetFrom = new Date(resetFrom.getTime() - 1000);
+      }
+      schedule.getIterator().resetFrom(resetFrom);
     }
 
-    public <T> void addTask( ScheduledTask<T> task )
-    {
-        // RunNowSchedules are not saved
-        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
-        {
-            return;
-        }
+    return schedule;
+  }
 
-        synchronized ( applicationConfiguration )
-        {
-            List<CScheduledTask> tasks = getCurrentConfiguration( true );
+  private <T> CScheduledTask translateFrom(ScheduledTask<T> task) {
+    CScheduledTask storeableTask = new CScheduledTask();
 
-            CScheduledTask foundTask = findTask( task.getId(), tasks );
+    storeableTask.setEnabled(task.isEnabled());
+    storeableTask.setId(task.getId());
+    storeableTask.setName(task.getName());
+    storeableTask.setType(task.getType());
+    storeableTask.setStatus(task.getTaskState().name());
 
-            CScheduledTask storeableTask = translateFrom( task );
-
-            if ( storeableTask != null )
-            {
-                if ( foundTask != null )
-                {
-                    tasks.remove( foundTask );
-
-                    storeableTask.setLastRun( foundTask.getLastRun() );
-                }
-
-                tasks.add( storeableTask );
-            }
-
-            if ( logger.isTraceEnabled() )
-            {
-                logger.trace( "Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
-                    : "is NOT", new Exception( "This is an exception only to provide caller backtrace" ) );
-            }
-
-            try
-            {
-                applicationConfiguration.saveConfiguration();
-            }
-            catch ( IOException e )
-            {
-                logger.warn( "Could not save task changes!", e );
-            }
-        }
+    if (task.getLastRun() != null) {
+      storeableTask.setLastRun(task.getLastRun().getTime());
     }
 
-    public <T> void removeTask( ScheduledTask<T> task )
-    {
-        synchronized ( applicationConfiguration )
-        {
-            List<CScheduledTask> tasks = getCurrentConfiguration( true );
-
-            CScheduledTask foundTask = findTask( task.getId(), tasks );
-
-            if ( foundTask != null )
-            {
-                tasks.remove( foundTask );
-            }
-
-            if ( logger.isTraceEnabled() )
-            {
-                logger.trace( "Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS"
-                    : "is NOT", new Exception( "This is an exception only to provide caller backtrace" ) );
-            }
-
-            try
-            {
-                applicationConfiguration.saveConfiguration();
-            }
-            catch ( IOException e )
-            {
-                logger.warn( "Could not save task changes!", e );
-            }
-        }
-
-        // TODO: need to also add task to a history file
+    if (task.getNextRun() != null) {
+      storeableTask.setNextRun(task.getNextRun().getTime());
     }
 
-    public SchedulerTask<?> createTaskInstance( String taskType )
-        throws IllegalArgumentException
-    {
-        try
-        {
-            return lookupTask( taskType );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
-        }
+    for (String key : task.getTaskParams().keySet()) {
+      CProps props = new CProps();
+      props.setKey(key);
+      props.setValue(task.getTaskParams().get(key));
+
+      storeableTask.addProperty(props);
     }
 
-    private SchedulerTask<?> lookupTask( final String taskType )
-        throws ComponentLookupException
-    {
-        logger.debug( "Looking up task for: " + taskType );
+    Schedule schedule = task.getSchedule();
+    CScheduleConfig storeableSchedule = new CScheduleConfig();
 
-        try
-        {
-            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.class, taskType );
+    if (schedule != null) {
+      if (CronSchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_ADVANCED);
+
+        storeableSchedule.setCronCommand(((CronSchedule) schedule).getCronString());
+      }
+      else if (MonthlySchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_MONTHLY);
+
+        storeableSchedule.setStartDate(((MonthlySchedule) schedule).getStartDate().getTime());
+
+        Date endDate = ((MonthlySchedule) schedule).getEndDate();
+
+        if (endDate != null) {
+          storeableSchedule.setEndDate(endDate.getTime());
         }
-        catch ( ComponentLookupException ignore )
-        {
-            return (SchedulerTask<?>) getPlexusContainer().lookup( NexusTask.class, taskType );
+
+        for (Iterator iter = ((MonthlySchedule) schedule).getDaysToRun().iterator(); iter.hasNext(); ) {
+          // TODO: String.valueOf is used because currently the days to run are integers in the monthly
+          // schedule
+          // needs to be string
+          storeableSchedule.addDaysOfMonth(String.valueOf(iter.next()));
         }
+      }
+      else if (WeeklySchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_WEEKLY);
+
+        storeableSchedule.setStartDate(((WeeklySchedule) schedule).getStartDate().getTime());
+
+        Date endDate = ((WeeklySchedule) schedule).getEndDate();
+
+        if (endDate != null) {
+          storeableSchedule.setEndDate(endDate.getTime());
+        }
+
+        for (Iterator iter = ((WeeklySchedule) schedule).getDaysToRun().iterator(); iter.hasNext(); ) {
+          // TODO: String.valueOf is used because currently the days to run are integers in the weekly
+          // schedule
+          // needs to be string
+          storeableSchedule.addDaysOfWeek(String.valueOf(iter.next()));
+        }
+      }
+      else if (DailySchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_DAILY);
+
+        storeableSchedule.setStartDate(((DailySchedule) schedule).getStartDate().getTime());
+
+        Date endDate = ((DailySchedule) schedule).getEndDate();
+
+        if (endDate != null) {
+          storeableSchedule.setEndDate(endDate.getTime());
+        }
+      }
+      else if (HourlySchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_HOURLY);
+
+        storeableSchedule.setStartDate(((HourlySchedule) schedule).getStartDate().getTime());
+
+        Date endDate = ((HourlySchedule) schedule).getEndDate();
+
+        if (endDate != null) {
+          storeableSchedule.setEndDate(endDate.getTime());
+        }
+      }
+      else if (OnceSchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_ONCE);
+
+        storeableSchedule.setStartDate(((OnceSchedule) schedule).getStartDate().getTime());
+      }
+      else if (RunNowSchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_RUN_NOW);
+      }
+      else if (ManualRunSchedule.class.isAssignableFrom(schedule.getClass())) {
+        storeableSchedule.setType(CScheduleConfig.TYPE_MANUAL);
+      }
+      else {
+        throw new IllegalArgumentException("Unknown Schedule type: " + schedule.getClass().getName());
+      }
     }
 
-    public <T> T createTaskInstance( final Class<T> taskType )
-        throws IllegalArgumentException
-    {
-        logger.debug( "Creating task: {}", taskType );
+    storeableTask.setSchedule(storeableSchedule);
 
-        try
-        {
-            // first try a full class name lookup (modern sisu-style)
-            return (T) lookupTask( taskType.getCanonicalName() );
-        }
-        catch ( ComponentLookupException e )
-        {
-            try
-            {
-                // fallback to old plexus hint style
-                return (T) lookupTask( taskType.getSimpleName() );
-            }
-            catch ( ComponentLookupException x )
-            {
-                throw new IllegalArgumentException( "Could not create task of type: " + taskType, e );
-            }
-        }
-    }
+    return storeableTask;
+  }
 
-    // ==
-
-    private CScheduledTask findTask( String id, List<CScheduledTask> tasks )
-    {
-        synchronized ( applicationConfiguration )
-        {
-            for ( Iterator<CScheduledTask> iter = tasks.iterator(); iter.hasNext(); )
-            {
-                CScheduledTask storedTask = iter.next();
-
-                if ( storedTask.getId().equals( id ) )
-                {
-                    return storedTask;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    private Map<String, String> translateFrom( List list )
-    {
-        Map<String, String> map = new HashMap<String, String>();
-
-        for ( Iterator iter = list.iterator(); iter.hasNext(); )
-        {
-            CProps prop = (CProps) iter.next();
-
-            map.put( prop.getKey(), prop.getValue() );
-        }
-
-        return map;
-    }
-
-    private Schedule translateFrom( CScheduleConfig modelSchedule, Date nextRun )
-    {
-        Schedule schedule = null;
-
-        Date startDate = null;
-        Date endDate = null;
-
-        if ( modelSchedule.getStartDate() > 0 )
-        {
-            startDate = new Date( modelSchedule.getStartDate() );
-        }
-
-        if ( modelSchedule.getEndDate() > 0 )
-        {
-            endDate = new Date( modelSchedule.getEndDate() );
-        }
-
-        if ( CScheduleConfig.TYPE_ADVANCED.equals( modelSchedule.getType() ) )
-        {
-            try
-            {
-                schedule = new CronSchedule( modelSchedule.getCronCommand() );
-            }
-            catch ( ParseException e )
-            {
-                // this will not happen, since it was persisted, hence already submitted
-            }
-        }
-        else if ( CScheduleConfig.TYPE_MONTHLY.equals( modelSchedule.getType() ) )
-        {
-            Set<Integer> daysToRun = new HashSet<Integer>();
-
-            for ( Iterator iter = modelSchedule.getDaysOfMonth().iterator(); iter.hasNext(); )
-            {
-                String day = (String) iter.next();
-
-                try
-                {
-                    daysToRun.add( Integer.valueOf( day ) );
-                }
-                catch ( NumberFormatException nfe )
-                {
-                    logger.error( "Invalid day being added to monthly schedule - " + day + " - skipping." );
-                }
-            }
-
-            schedule = new MonthlySchedule( startDate, endDate, daysToRun );
-        }
-        else if ( CScheduleConfig.TYPE_WEEKLY.equals( modelSchedule.getType() ) )
-        {
-            Set<Integer> daysToRun = new HashSet<Integer>();
-
-            for ( Iterator iter = modelSchedule.getDaysOfWeek().iterator(); iter.hasNext(); )
-            {
-                String day = (String) iter.next();
-
-                try
-                {
-                    daysToRun.add( Integer.valueOf( day ) );
-                }
-                catch ( NumberFormatException nfe )
-                {
-                    logger.error( "Invalid day being added to weekly schedule - " + day + " - skipping." );
-                }
-            }
-
-            schedule = new WeeklySchedule( startDate, endDate, daysToRun );
-        }
-        else if ( CScheduleConfig.TYPE_DAILY.equals( modelSchedule.getType() ) )
-        {
-            schedule = new DailySchedule( startDate, endDate );
-        }
-        else if ( CScheduleConfig.TYPE_HOURLY.equals( modelSchedule.getType() ) )
-        {
-            schedule = new HourlySchedule( startDate, endDate );
-        }
-        else if ( CScheduleConfig.TYPE_ONCE.equals( modelSchedule.getType() ) )
-        {
-            schedule = new OnceSchedule( startDate );
-        }
-        else if ( CScheduleConfig.TYPE_RUN_NOW.equals( modelSchedule.getType() ) )
-        {
-            schedule = new RunNowSchedule();
-        }
-        else if ( CScheduleConfig.TYPE_MANUAL.equals( modelSchedule.getType() ) )
-        {
-            schedule = new ManualRunSchedule();
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Unknown Schedule type: " + modelSchedule.getClass().getName() );
-        }
-
-        if ( nextRun != null )
-        {
-            Date resetFrom = nextRun;
-            // NEXUS-4465: Cron schedule will add 1 second to given time to calculate next scheduled time
-            // so we subtract it in case that next schedule is actually a valid time to run
-            if ( schedule instanceof CronSchedule )
-            {
-                resetFrom = new Date( resetFrom.getTime() - 1000 );
-            }
-            schedule.getIterator().resetFrom( resetFrom );
-        }
-
-        return schedule;
-    }
-
-    private <T> CScheduledTask translateFrom( ScheduledTask<T> task )
-    {
-        CScheduledTask storeableTask = new CScheduledTask();
-
-        storeableTask.setEnabled( task.isEnabled() );
-        storeableTask.setId( task.getId() );
-        storeableTask.setName( task.getName() );
-        storeableTask.setType( task.getType() );
-        storeableTask.setStatus( task.getTaskState().name() );
-
-        if ( task.getLastRun() != null )
-        {
-            storeableTask.setLastRun( task.getLastRun().getTime() );
-        }
-
-        if ( task.getNextRun() != null )
-        {
-            storeableTask.setNextRun( task.getNextRun().getTime() );
-        }
-
-        for ( String key : task.getTaskParams().keySet() )
-        {
-            CProps props = new CProps();
-            props.setKey( key );
-            props.setValue( task.getTaskParams().get( key ) );
-
-            storeableTask.addProperty( props );
-        }
-
-        Schedule schedule = task.getSchedule();
-        CScheduleConfig storeableSchedule = new CScheduleConfig();
-
-        if ( schedule != null )
-        {
-            if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_ADVANCED );
-
-                storeableSchedule.setCronCommand( ( (CronSchedule) schedule ).getCronString() );
-            }
-            else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_MONTHLY );
-
-                storeableSchedule.setStartDate( ( (MonthlySchedule) schedule ).getStartDate().getTime() );
-
-                Date endDate = ( (MonthlySchedule) schedule ).getEndDate();
-
-                if ( endDate != null )
-                {
-                    storeableSchedule.setEndDate( endDate.getTime() );
-                }
-
-                for ( Iterator iter = ( (MonthlySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
-                {
-                    // TODO: String.valueOf is used because currently the days to run are integers in the monthly
-                    // schedule
-                    // needs to be string
-                    storeableSchedule.addDaysOfMonth( String.valueOf( iter.next() ) );
-                }
-            }
-            else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_WEEKLY );
-
-                storeableSchedule.setStartDate( ( (WeeklySchedule) schedule ).getStartDate().getTime() );
-
-                Date endDate = ( (WeeklySchedule) schedule ).getEndDate();
-
-                if ( endDate != null )
-                {
-                    storeableSchedule.setEndDate( endDate.getTime() );
-                }
-
-                for ( Iterator iter = ( (WeeklySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
-                {
-                    // TODO: String.valueOf is used because currently the days to run are integers in the weekly
-                    // schedule
-                    // needs to be string
-                    storeableSchedule.addDaysOfWeek( String.valueOf( iter.next() ) );
-                }
-            }
-            else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_DAILY );
-
-                storeableSchedule.setStartDate( ( (DailySchedule) schedule ).getStartDate().getTime() );
-
-                Date endDate = ( (DailySchedule) schedule ).getEndDate();
-
-                if ( endDate != null )
-                {
-                    storeableSchedule.setEndDate( endDate.getTime() );
-                }
-            }
-            else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_HOURLY );
-
-                storeableSchedule.setStartDate( ( (HourlySchedule) schedule ).getStartDate().getTime() );
-
-                Date endDate = ( (HourlySchedule) schedule ).getEndDate();
-
-                if ( endDate != null )
-                {
-                    storeableSchedule.setEndDate( endDate.getTime() );
-                }
-            }
-            else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_ONCE );
-
-                storeableSchedule.setStartDate( ( (OnceSchedule) schedule ).getStartDate().getTime() );
-            }
-            else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_RUN_NOW );
-            }
-            else if ( ManualRunSchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule.setType( CScheduleConfig.TYPE_MANUAL );
-            }
-            else
-            {
-                throw new IllegalArgumentException( "Unknown Schedule type: " + schedule.getClass().getName() );
-            }
-        }
-
-        storeableTask.setSchedule( storeableSchedule );
-
-        return storeableTask;
-    }
-
-    public String getName()
-    {
-        return "Scheduled Task Configuration";
-    }
+  public String getName() {
+    return "Scheduled Task Configuration";
+  }
 
 }

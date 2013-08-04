@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.apachehttpclient;
 
 import javax.inject.Inject;
@@ -38,17 +39,15 @@ public class HttpClientProvider
     implements Provider<HttpClient>
 {
 
-    private final Hc4Provider hc4Provider;
+  private final Hc4Provider hc4Provider;
 
-    @Inject
-    public HttpClientProvider( final Hc4Provider hc4Provider )
-    {
-        this.hc4Provider = hc4Provider;
-    }
+  @Inject
+  public HttpClientProvider(final Hc4Provider hc4Provider) {
+    this.hc4Provider = hc4Provider;
+  }
 
-    @Override
-    public HttpClient get()
-    {
-        return hc4Provider.createHttpClient();
-    }
+  @Override
+  public HttpClient get() {
+    return hc4Provider.createHttpClient();
+  }
 }

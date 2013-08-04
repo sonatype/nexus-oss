@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.artifact;
 
 /**
@@ -20,10 +21,10 @@ package org.sonatype.nexus.client.core.subsystem.artifact;
 public interface ArtifactMaven
 {
 
-    /**
-     * Performs a "resolve" operation on Nexus side, using whatever metadata targeted repository uses and returns the
-     * resolved artifact or {@code null} if resolution failed.
-     */
-    ResolveResponse resolve( ResolveRequest req );
+  /**
+   * Performs a "resolve" operation on Nexus side, using whatever metadata targeted repository uses and returns the
+   * resolved artifact or {@code null} if resolution failed.
+   */
+  ResolveResponse resolve(ResolveRequest req);
 
 }

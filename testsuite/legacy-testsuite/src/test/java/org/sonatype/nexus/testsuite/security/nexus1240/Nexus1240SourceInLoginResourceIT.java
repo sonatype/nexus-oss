@@ -10,16 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus1240;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -29,43 +24,49 @@ import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+
 public class Nexus1240SourceInLoginResourceIT
     extends AbstractNexusIntegrationTest
 {
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-    @Test
-    public void sourceInLoginResourceTest() throws IOException
-    {     
-        AuthenticationClientPermissions clientPermissions = this.getPermissions();
-        
-        Assert.assertEquals( clientPermissions.getLoggedInUserSource(), "default" );
-    }
+  @Test
+  public void sourceInLoginResourceTest() throws IOException {
+    AuthenticationClientPermissions clientPermissions = this.getPermissions();
 
-    private AuthenticationClientPermissions getPermissions()
-        throws IOException
-    {
-        Response response = RequestFacade
-            .sendMessage( RequestFacade.SERVICE_LOCAL + "authentication/login", Method.GET );
+    Assert.assertEquals(clientPermissions.getLoggedInUserSource(), "default");
+  }
 
-        Assert.assertTrue( "Status: "+ response.getStatus(), response.getStatus().isSuccess()  );
-        
-        String responseText = response.getEntity().getText();
+  private AuthenticationClientPermissions getPermissions()
+      throws IOException
+  {
+    Response response = RequestFacade
+        .sendMessage(RequestFacade.SERVICE_LOCAL + "authentication/login", Method.GET);
 
-        XStreamRepresentation representation = new XStreamRepresentation(
-            XStreamFactory.getXmlXStream(),
-            responseText,
-            MediaType.APPLICATION_XML );
+    Assert.assertTrue("Status: " + response.getStatus(), response.getStatus().isSuccess());
 
-        AuthenticationLoginResourceResponse resourceResponse = (AuthenticationLoginResourceResponse) representation
-            .getPayload( new AuthenticationLoginResourceResponse() );
+    String responseText = response.getEntity().getText();
 
-        AuthenticationLoginResource resource = resourceResponse.getData();
+    XStreamRepresentation representation = new XStreamRepresentation(
+        XStreamFactory.getXmlXStream(),
+        responseText,
+        MediaType.APPLICATION_XML);
 
-        return resource.getClientPermissions();
-    }
+    AuthenticationLoginResourceResponse resourceResponse = (AuthenticationLoginResourceResponse) representation
+        .getPayload(new AuthenticationLoginResourceResponse());
+
+    AuthenticationLoginResource resource = resourceResponse.getData();
+
+    return resource.getClientPermissions();
+  }
 
 }

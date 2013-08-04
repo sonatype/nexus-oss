@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -33,99 +35,89 @@ public class DefaultNexusScheduler
     implements NexusScheduler
 {
 
-    private final Scheduler scheduler;
+  private final Scheduler scheduler;
 
-    @Inject
-    public DefaultNexusScheduler( final Scheduler scheduler )
-    {
-        this.scheduler = scheduler;
+  @Inject
+  public DefaultNexusScheduler(final Scheduler scheduler) {
+    this.scheduler = scheduler;
+  }
+
+  @Override
+  public void initializeTasks() {
+    scheduler.initializeTasks();
+  }
+
+  @Override
+  public void shutdown() {
+    scheduler.shutdown();
+  }
+
+  @Override
+  public <T> ScheduledTask<T> submit(String name, NexusTask<T> nexusTask)
+      throws RejectedExecutionException, NullPointerException
+  {
+    if (nexusTask.allowConcurrentSubmission(scheduler.getActiveTasks())) {
+      return scheduler.submit(name, nexusTask);
+    }
+    else {
+      throw new RejectedExecutionException("Task of this type is already submitted!");
+    }
+  }
+
+  @Override
+  public <T> ScheduledTask<T> schedule(String name, NexusTask<T> nexusTask, Schedule schedule)
+      throws RejectedExecutionException, NullPointerException
+  {
+    if (nexusTask.allowConcurrentSubmission(scheduler.getActiveTasks())) {
+      return scheduler.schedule(name, nexusTask, schedule);
+    }
+    else {
+      throw new RejectedExecutionException("Task of this type is already scheduled!");
+    }
+  }
+
+  @Override
+  public <T> ScheduledTask<T> updateSchedule(ScheduledTask<T> task)
+      throws RejectedExecutionException, NullPointerException
+  {
+    if (task != null) {
+      scheduler.updateSchedule(task);
     }
 
-    @Override
-    public void initializeTasks()
-    {
-        scheduler.initializeTasks();
-    }
+    return task;
+  }
 
-    @Override
-    public void shutdown()
-    {
-        scheduler.shutdown();
-    }
-    
-    @Override
-    public <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
-        throws RejectedExecutionException, NullPointerException
-    {
-        if ( nexusTask.allowConcurrentSubmission( scheduler.getActiveTasks() ) )
-        {
-            return scheduler.submit( name, nexusTask );
-        }
-        else
-        {
-            throw new RejectedExecutionException( "Task of this type is already submitted!" );
-        }
-    }
+  @Override
+  public Map<String, List<ScheduledTask<?>>> getAllTasks() {
+    return scheduler.getAllTasks();
+  }
 
-    @Override
-    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
-        throws RejectedExecutionException, NullPointerException
-    {
-        if ( nexusTask.allowConcurrentSubmission( scheduler.getActiveTasks() ) )
-        {
-            return scheduler.schedule( name, nexusTask, schedule );
-        }
-        else
-        {
-            throw new RejectedExecutionException( "Task of this type is already scheduled!" );
-        }
-    }
+  @Override
+  public Map<String, List<ScheduledTask<?>>> getActiveTasks() {
+    return scheduler.getActiveTasks();
+  }
 
-    @Override
-    public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException, NullPointerException
-    {
-        if ( task != null )
-        {
-            scheduler.updateSchedule( task );
-        }
+  @Override
+  public ScheduledTask<?> getTaskById(String id)
+      throws NoSuchTaskException
+  {
+    return scheduler.getTaskById(id);
+  }
 
-        return task;
-    }
+  @Override
+  @Deprecated
+  @SuppressWarnings("unchecked")
+  public NexusTask<?> createTaskInstance(String taskType)
+      throws IllegalArgumentException
+  {
+    return (NexusTask) scheduler.createTaskInstance(taskType);
+  }
 
-    @Override
-    public Map<String, List<ScheduledTask<?>>> getAllTasks()
-    {
-        return scheduler.getAllTasks();
-    }
-
-    @Override
-    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
-    {
-        return scheduler.getActiveTasks();
-    }
-
-    @Override
-    public ScheduledTask<?> getTaskById( String id )
-        throws NoSuchTaskException
-    {
-        return scheduler.getTaskById( id );
-    }
-
-    @Override
-    @Deprecated
-    @SuppressWarnings( "unchecked" )
-    public NexusTask<?> createTaskInstance( String taskType )
-        throws IllegalArgumentException
-    {
-        return (NexusTask) scheduler.createTaskInstance( taskType );
-    }
-
-    @Override
-    public <T> T createTaskInstance( Class<T> taskType )
-        throws IllegalArgumentException
-    {
-        return scheduler.createTaskInstance( taskType );
-    }
+  @Override
+  public <T> T createTaskInstance(Class<T> taskType)
+      throws IllegalArgumentException
+  {
+    return scheduler.createTaskInstance(taskType);
+  }
 
 }

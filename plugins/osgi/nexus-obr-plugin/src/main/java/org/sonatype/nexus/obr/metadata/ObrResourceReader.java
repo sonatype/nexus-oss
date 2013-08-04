@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.metadata;
 
 import java.io.Closeable;
@@ -23,12 +24,11 @@ import org.osgi.service.obr.Resource;
 public interface ObrResourceReader
     extends Readable, Closeable
 {
-    /**
-     * Attempts to read an OBR resource from the underlying metadata stream.
-     * 
-     * @return the read resource
-     * @throws IOException
-     */
-    public Resource readResource()
-        throws IOException;
+  /**
+   * Attempts to read an OBR resource from the underlying metadata stream.
+   *
+   * @return the read resource
+   */
+  public Resource readResource()
+      throws IOException;
 }

@@ -10,9 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import java.util.HashMap;
+
+import org.sonatype.nexus.Nexus;
+import org.sonatype.plexus.rest.ReferenceFactory;
+import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -25,54 +30,48 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.service.StatusService;
-import org.sonatype.nexus.Nexus;
-import org.sonatype.plexus.rest.ReferenceFactory;
-import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
 /**
  * Nexus specific status service that simply assembles an "error page" out of a Velocity template but watching to HTML
  * escape any content that might come from external (ie. query param).
- * 
+ *
  * @author cstamas
  */
-@Component( role = StatusService.class )
+@Component(role = StatusService.class)
 public class NexusStatusService
     extends StatusService
 {
-    @Requirement
-    private ReferenceFactory referenceFactory;
+  @Requirement
+  private ReferenceFactory referenceFactory;
 
-    @Requirement
-    private Nexus nexus;
+  @Requirement
+  private Nexus nexus;
 
-    public Representation getRepresentation( final Status status, final Request request, final Response response )
-    {
-        final HashMap<String, Object> dataModel = new HashMap<String, Object>();
+  public Representation getRepresentation(final Status status, final Request request, final Response response) {
+    final HashMap<String, Object> dataModel = new HashMap<String, Object>();
 
-        dataModel.put( "request", request );
-        dataModel.put( "nexusVersion", nexus.getSystemStatus().getVersion() );
-        // getContentRoot(req) always returns Reference with "/" as last character
-        String nexusRoot = referenceFactory.getContextRoot( request ).toString();
-        if ( nexusRoot.endsWith( "/" ) )
-        {
-            nexusRoot = nexusRoot.substring( 0, nexusRoot.length() - 1 );
-        }
-        dataModel.put( "nexusRoot", nexusRoot );
-
-        dataModel.put( "statusCode", status.getCode() );
-        dataModel.put( "statusName", status.getName() );
-        dataModel.put( "errorDescription", StringEscapeUtils.escapeHtml( status.getDescription() ) );
-
-        if ( null != status.getThrowable() )
-        {
-            dataModel.put( "errorStackTrace",
-                StringEscapeUtils.escapeHtml( ExceptionUtils.getStackTrace( status.getThrowable() ) ) );
-        }
-
-        final VelocityRepresentation representation =
-            new VelocityRepresentation( Context.getCurrent(), "/templates/errorPageContentHtml.vm",
-                getClass().getClassLoader(), dataModel, MediaType.TEXT_HTML );
-
-        return representation;
+    dataModel.put("request", request);
+    dataModel.put("nexusVersion", nexus.getSystemStatus().getVersion());
+    // getContentRoot(req) always returns Reference with "/" as last character
+    String nexusRoot = referenceFactory.getContextRoot(request).toString();
+    if (nexusRoot.endsWith("/")) {
+      nexusRoot = nexusRoot.substring(0, nexusRoot.length() - 1);
     }
+    dataModel.put("nexusRoot", nexusRoot);
+
+    dataModel.put("statusCode", status.getCode());
+    dataModel.put("statusName", status.getName());
+    dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(status.getDescription()));
+
+    if (null != status.getThrowable()) {
+      dataModel.put("errorStackTrace",
+          StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(status.getThrowable())));
+    }
+
+    final VelocityRepresentation representation =
+        new VelocityRepresentation(Context.getCurrent(), "/templates/errorPageContentHtml.vm",
+            getClass().getClassLoader(), dataModel, MediaType.TEXT_HTML);
+
+    return representation;
+  }
 }

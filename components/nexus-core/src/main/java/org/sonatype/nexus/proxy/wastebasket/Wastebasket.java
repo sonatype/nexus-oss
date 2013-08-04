@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.IOException;
@@ -21,88 +22,67 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 public interface Wastebasket
 {
-    /**
-     * Returns the delete operation that this Wastebasket operates upon.
-     * 
-     * @return
-     */
-    DeleteOperation getDeleteOperation();
+  /**
+   * Returns the delete operation that this Wastebasket operates upon.
+   */
+  DeleteOperation getDeleteOperation();
 
-    /**
-     * Sets the delete operation to have this Wastebasket operate.
-     * 
-     * @param deleteOperation
-     */
-    void setDeleteOperation( DeleteOperation deleteOperation );
+  /**
+   * Sets the delete operation to have this Wastebasket operate.
+   */
+  void setDeleteOperation(DeleteOperation deleteOperation);
 
-    /**
-     * Returns the sum of sizes of items in the wastebasket.
-     * 
-     * @return
-     * @throws IOException
-     */
-    Long getTotalSize();
+  /**
+   * Returns the sum of sizes of items in the wastebasket.
+   */
+  Long getTotalSize();
 
-    /**
-     * Empties the wastebasket.
-     * 
-     * @throws IOException
-     */
-    void purgeAll()
-        throws IOException;
+  /**
+   * Empties the wastebasket.
+   */
+  void purgeAll()
+      throws IOException;
 
-    /**
-     * Purge the items older than the age
-     * 
-     * @param age age of the items to be deleted, in milliseconds
-     * @throws IOException
-     */
-    void purgeAll( long age )
-        throws IOException;
+  /**
+   * Purge the items older than the age
+   *
+   * @param age age of the items to be deleted, in milliseconds
+   */
+  void purgeAll(long age)
+      throws IOException;
 
-    /**
-     * Returns the sum of sizes of items in the wastebasket.
-     * 
-     * @return
-     * @throws IOException
-     */
-    Long getSize( Repository repository );
+  /**
+   * Returns the sum of sizes of items in the wastebasket.
+   */
+  Long getSize(Repository repository);
 
-    /**
-     * Empties the wastebasket.
-     * 
-     * @throws IOException
-     */
-    void purge( Repository repository )
-        throws IOException;
+  /**
+   * Empties the wastebasket.
+   */
+  void purge(Repository repository)
+      throws IOException;
 
-    /**
-     * Purge the items older than the age
-     * 
-     * @param age age of the items to be deleted, in milliseconds
-     * @throws IOException
-     */
-    void purge( Repository repository, long age )
-        throws IOException;
+  /**
+   * Purge the items older than the age
+   *
+   * @param age age of the items to be deleted, in milliseconds
+   */
+  void purge(Repository repository, long age)
+      throws IOException;
 
-    /**
-     * Performs a delete operation. It deletes at once if item is file or link. If it is a collection, it will delete it
-     * and all it's sub-items (recursively).
-     * 
-     * @param path
-     * @throws IOException
-     */
-    void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
-        throws LocalStorageException;
+  /**
+   * Performs a delete operation. It deletes at once if item is file or link. If it is a collection, it will delete
+   * it
+   * and all it's sub-items (recursively).
+   */
+  void delete(LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request)
+      throws LocalStorageException;
 
-    /**
-     * Performs an un-delete operation. If target (where undeleted item should be returned) exists, false is returned,
-     * true otherwise. It undeletes at once if item is file or link. If it is a collection, it will undelete it and all
-     * it's sub-items (recursively).
-     * 
-     * @param path
-     * @throws IOException
-     */
-    boolean undelete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
-        throws LocalStorageException;
+  /**
+   * Performs an un-delete operation. If target (where undeleted item should be returned) exists, false is returned,
+   * true otherwise. It undeletes at once if item is file or link. If it is a collection, it will undelete it and all
+   * it's sub-items (recursively).
+   */
+  boolean undelete(LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request)
+      throws LocalStorageException;
 }

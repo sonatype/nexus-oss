@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -24,57 +25,55 @@ public class NegationWalkerFilter
     implements WalkerFilter
 {
 
-    /**
-     * Negated filter (can be null).
-     */
-    private final WalkerFilter m_filter;
+  /**
+   * Negated filter (can be null).
+   */
+  private final WalkerFilter m_filter;
 
-    /**
-     * Constructor.
-     *
-     * @param filter negated filter (can be null)
-     */
-    public NegationWalkerFilter( final WalkerFilter filter )
-    {
-        m_filter = filter;
-    }
+  /**
+   * Constructor.
+   *
+   * @param filter negated filter (can be null)
+   */
+  public NegationWalkerFilter(final WalkerFilter filter) {
+    m_filter = filter;
+  }
 
-    /**
-     * Performs a logical NOT on result of calling {@link #shouldProcess(WalkerContext, StorageItem)} on negated filter.
-     * <br/>
-     * If no filter was provided returns true.
-     *
-     * {@inheritDoc}
-     */
-    public boolean shouldProcess( final WalkerContext context,
-                                  final StorageItem item )
-    {
-        return m_filter == null || !m_filter.shouldProcess( context, item );
-    }
+  /**
+   * Performs a logical NOT on result of calling {@link #shouldProcess(WalkerContext, StorageItem)} on negated
+   * filter.
+   * <br/>
+   * If no filter was provided returns true.
+   *
+   * {@inheritDoc}
+   */
+  public boolean shouldProcess(final WalkerContext context,
+                               final StorageItem item)
+  {
+    return m_filter == null || !m_filter.shouldProcess(context, item);
+  }
 
-    /**
-     * Performs a logical NOT on result of calling
-     * {@link #shouldProcessRecursively(WalkerContext, StorageCollectionItem)} on negated filter.<br/>
-     * If no filter was provided returns true.
-     *
-     * {@inheritDoc}
-     */
-    public boolean shouldProcessRecursively( final WalkerContext context,
-                                             final StorageCollectionItem coll )
-    {
-        return m_filter == null || !m_filter.shouldProcessRecursively( context, coll );
-    }
+  /**
+   * Performs a logical NOT on result of calling
+   * {@link #shouldProcessRecursively(WalkerContext, StorageCollectionItem)} on negated filter.<br/>
+   * If no filter was provided returns true.
+   *
+   * {@inheritDoc}
+   */
+  public boolean shouldProcessRecursively(final WalkerContext context,
+                                          final StorageCollectionItem coll)
+  {
+    return m_filter == null || !m_filter.shouldProcessRecursively(context, coll);
+  }
 
-    /**
-     * Builder method.
-     *
-     * @param filter negated filter (can be null or empty)
-     *
-     * @return disjunction between filters
-     */
-    public static NegationWalkerFilter not( final WalkerFilter filter )
-    {
-        return new NegationWalkerFilter( filter );
-    }
+  /**
+   * Builder method.
+   *
+   * @param filter negated filter (can be null or empty)
+   * @return disjunction between filters
+   */
+  public static NegationWalkerFilter not(final WalkerFilter filter) {
+    return new NegationWalkerFilter(filter);
+  }
 
 }

@@ -10,103 +10,108 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.item;
 
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
+package org.sonatype.nexus.proxy.item;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
+
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 
 public class DefaultStorageCollectionItemTest
     extends AbstractStorageItemTest
 {
-    @Test
-    public void testNonVirtualCollectionSimple()
+  @Test
+  public void testNonVirtualCollectionSimple() {
+
+    doReturn("dummy").when(repository).getId();
+    doAnswer(new Answer<RepositoryItemUid>()
     {
+      public RepositoryItemUid answer(InvocationOnMock invocation) {
+        Object[] args = invocation.getArguments();
+        return getRepositoryItemUidFactory().createUid(repository, (String) args[0]);
+      }
+    }).when(repository).createUid("/");
 
-        doReturn( "dummy" ).when( repository ).getId();
-        doAnswer( new Answer<RepositoryItemUid>() {
-            public RepositoryItemUid answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
-            }}).when( repository ).createUid( "/" );
+    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(repository, "/", true, true);
+    checkAbstractStorageItem(repository, coll, false, "", "/", "/");
+  }
 
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( repository, "/", true, true );
-        checkAbstractStorageItem( repository, coll, false, "", "/", "/" );
-    }
+  @Test
+  public void testNonVirtualCollectionList()
+      throws Exception
+  {
+    List<StorageItem> result = new ArrayList<StorageItem>();
 
-    @Test
-    public void testNonVirtualCollectionList()
-        throws Exception
+    doReturn("dummy").when(repository).getId();
+    doAnswer(new Answer<RepositoryItemUid>()
     {
-        List<StorageItem> result = new ArrayList<StorageItem>();
-
-        doReturn( "dummy" ).when( repository ).getId();
-        doAnswer( new Answer<RepositoryItemUid>() {
-            public RepositoryItemUid answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
-            }}).when( repository ).createUid( "/a/some/dir/coll" );
-        String[] items = new String[]{"A","B","C"};
-        for ( String item : items )
-        {
-            doAnswer( new Answer<RepositoryItemUid>() {
-                public RepositoryItemUid answer(InvocationOnMock invocation) {
-                    Object[] args = invocation.getArguments();
-                    return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
-                }}).when( repository ).createUid( "/a/some/dir/coll/" + item );
+      public RepositoryItemUid answer(InvocationOnMock invocation) {
+        Object[] args = invocation.getArguments();
+        return getRepositoryItemUidFactory().createUid(repository, (String) args[0]);
+      }
+    }).when(repository).createUid("/a/some/dir/coll");
+    String[] items = new String[]{"A", "B", "C"};
+    for (String item : items) {
+      doAnswer(new Answer<RepositoryItemUid>()
+      {
+        public RepositoryItemUid answer(InvocationOnMock invocation) {
+          Object[] args = invocation.getArguments();
+          return getRepositoryItemUidFactory().createUid(repository, (String) args[0]);
         }
-        doReturn( result ).when( repository ).list( Matchers.anyBoolean(),Matchers.isA( StorageCollectionItem.class ));
-
-        // and now fill in result, since repo is active
-        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/A", true, true, new StringContentLocator(
-            "A" ) ) );
-        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/B", true, true, new StringContentLocator(
-            "B" ) ) );
-        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/C", true, true, new StringContentLocator(
-            "C" ) ) );
-
-        DefaultStorageCollectionItem coll =
-            new DefaultStorageCollectionItem( repository, "/a/some/dir/coll", true, true );
-        checkAbstractStorageItem( repository, coll, false, "coll", "/a/some/dir/coll", "/a/some/dir" );
-
-        Collection<StorageItem> resultItems = coll.list();
-        assertEquals( 3, resultItems.size() );
+      }).when(repository).createUid("/a/some/dir/coll/" + item);
     }
+    doReturn(result).when(repository).list(Matchers.anyBoolean(), Matchers.isA(StorageCollectionItem.class));
 
-    @Test
-    public void testVirtualCollectionSimple()
-    {
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( router, "/", true, true );
-        checkAbstractStorageItem( router, coll, true, "", "/", "/" );
-    }
+    // and now fill in result, since repo is active
+    result.add(new DefaultStorageFileItem(repository, "/a/some/dir/coll/A", true, true, new StringContentLocator(
+        "A")));
+    result.add(new DefaultStorageFileItem(repository, "/a/some/dir/coll/B", true, true, new StringContentLocator(
+        "B")));
+    result.add(new DefaultStorageFileItem(repository, "/a/some/dir/coll/C", true, true, new StringContentLocator(
+        "C")));
 
-    @Test
-    public void testVirtualCollectionList()
-        throws Exception
-    {
-        List<StorageItem> result = new ArrayList<StorageItem>();
-        doReturn( result ).when( router ).list( Matchers.isA(ResourceStoreRequest.class) );
+    DefaultStorageCollectionItem coll =
+        new DefaultStorageCollectionItem(repository, "/a/some/dir/coll", true, true);
+    checkAbstractStorageItem(repository, coll, false, "coll", "/a/some/dir/coll", "/a/some/dir");
 
-        // and now fill in result, since repo is active
-        result.add( new DefaultStorageFileItem( router, "/a/some/dir/coll/A", true, true,
-            new StringContentLocator( "A" ) ) );
-        result.add( new DefaultStorageFileItem( router, "/a/some/dir/coll/B", true, true,
-            new StringContentLocator( "B" ) ) );
+    Collection<StorageItem> resultItems = coll.list();
+    assertEquals(3, resultItems.size());
+  }
 
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( router, "/and/another/coll", true, true );
-        checkAbstractStorageItem( router, coll, true, "coll", "/and/another/coll", "/and/another" );
+  @Test
+  public void testVirtualCollectionSimple() {
+    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(router, "/", true, true);
+    checkAbstractStorageItem(router, coll, true, "", "/", "/");
+  }
 
-        Collection<StorageItem> items = coll.list();
-        assertEquals( 2, items.size() );
-    }
+  @Test
+  public void testVirtualCollectionList()
+      throws Exception
+  {
+    List<StorageItem> result = new ArrayList<StorageItem>();
+    doReturn(result).when(router).list(Matchers.isA(ResourceStoreRequest.class));
+
+    // and now fill in result, since repo is active
+    result.add(new DefaultStorageFileItem(router, "/a/some/dir/coll/A", true, true,
+        new StringContentLocator("A")));
+    result.add(new DefaultStorageFileItem(router, "/a/some/dir/coll/B", true, true,
+        new StringContentLocator("B")));
+
+    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(router, "/and/another/coll", true, true);
+    checkAbstractStorageItem(router, coll, true, "coll", "/and/another/coll", "/and/another");
+
+    Collection<StorageItem> items = coll.list();
+    assertEquals(2, items.size());
+  }
 
 }

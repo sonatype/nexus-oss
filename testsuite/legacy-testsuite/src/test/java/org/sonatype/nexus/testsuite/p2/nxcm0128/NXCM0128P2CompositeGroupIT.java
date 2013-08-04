@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.p2.nxcm0128;
 
 /**
@@ -19,9 +20,8 @@ public class NXCM0128P2CompositeGroupIT
     extends NXCM0128P2GroupIT
 {
 
-    public NXCM0128P2CompositeGroupIT()
-    {
-        super( "nxcm0128-composite" );
-    }
+  public NXCM0128P2CompositeGroupIT() {
+    super("nxcm0128-composite");
+  }
 
 }

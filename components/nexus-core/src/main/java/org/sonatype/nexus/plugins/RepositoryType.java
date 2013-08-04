@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins;
 
 import java.lang.annotation.Documented;
@@ -21,28 +22,28 @@ import java.lang.annotation.Target;
 /**
  * Marks an interface (must extend org.sonatype.nexus.proxy.repository.Repository) as new repository type to be handled
  * by Nexus.
- * 
+ *
  * @author cstamas
  */
 @Documented
-@Target( ElementType.TYPE )
-@Retention( RetentionPolicy.RUNTIME )
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface RepositoryType
 {
-    /**
-     * The constant denoting unlimited count of instances.
-     */
-    int UNLIMITED_INSTANCES = -1;
+  /**
+   * The constant denoting unlimited count of instances.
+   */
+  int UNLIMITED_INSTANCES = -1;
 
-    /**
-     * The path prefix to "mount" under content URL.
-     */
-    String pathPrefix();
+  /**
+   * The path prefix to "mount" under content URL.
+   */
+  String pathPrefix();
 
-    /**
-     * The "hard" limit of maximal instance count for this repository. Default is unlimited. See NexusConfiguration
-     * iface for details.
-     */
-    int repositoryMaxInstanceCount() default org.sonatype.nexus.plugins.RepositoryType.UNLIMITED_INSTANCES; // fully qualify for http://bugs.sun.com/view_bug.do?bug_id=6512707
-    
+  /**
+   * The "hard" limit of maximal instance count for this repository. Default is unlimited. See NexusConfiguration
+   * iface for details.
+   */
+  int repositoryMaxInstanceCount() default org.sonatype.nexus.plugins.RepositoryType.UNLIMITED_INSTANCES; // fully qualify for http://bugs.sun.com/view_bug.do?bug_id=6512707
+
 }

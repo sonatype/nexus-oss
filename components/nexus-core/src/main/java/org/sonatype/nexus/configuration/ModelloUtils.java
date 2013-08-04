@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration;
 
 import java.util.HashMap;
@@ -20,22 +21,20 @@ import org.sonatype.nexus.configuration.model.CProps;
 
 /**
  * A simple CProps to Map converter, to ease handling of CProps.
- * 
+ *
  * @author cstamas
  */
 public class ModelloUtils
 {
-    @SuppressWarnings( "unchecked" )
-    public static Map<String, String> getMapFromConfigList( List list )
-    {
-        Map<String, String> result = new HashMap<String, String>( list.size() );
+  @SuppressWarnings("unchecked")
+  public static Map<String, String> getMapFromConfigList(List list) {
+    Map<String, String> result = new HashMap<String, String>(list.size());
 
-        for ( Object obj : list )
-        {
-            CProps props = (CProps) obj;
-            result.put( props.getKey(), props.getValue() );
-        }
-
-        return result;
+    for (Object obj : list) {
+      CProps props = (CProps) obj;
+      result.put(props.getKey(), props.getValue());
     }
+
+    return result;
+  }
 }

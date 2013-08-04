@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.ByteArrayOutputStream;
@@ -21,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -33,76 +33,68 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.google.common.base.Preconditions;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * This is a "local" strategy, uses Nexus content for information fetch.
- * 
+ *
  * @author cstamas
  */
 @Singleton
-@Named( "content-get" )
-@Typed( DiscoveryStrategy.class )
+@Named("content-get")
+@Typed(DiscoveryStrategy.class)
 public class ContentGetDiscoveryStrategy
     extends AbstractDiscoveryStrategy
 {
-    private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-    @Inject
-    public ContentGetDiscoveryStrategy( RepositoryRegistry repositoryRegistry )
-    {
-        this.repositoryRegistry = Preconditions.checkNotNull( repositoryRegistry );
+  @Inject
+  public ContentGetDiscoveryStrategy(RepositoryRegistry repositoryRegistry) {
+    this.repositoryRegistry = Preconditions.checkNotNull(repositoryRegistry);
+  }
+
+  public DiscoveryResponse discoverLatestVersion(DiscoveryRequest request)
+      throws NoSuchRepositoryException, IOException
+  {
+    final DiscoveryResponse dr = new DiscoveryResponse(request);
+    final StorageFileItem response = handleRequest(request);
+    if (response != null) {
+      final InputStream is = response.getInputStream();
+      try {
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        IOUtil.copy(is, bos);
+        dr.setVersion(bos.toString());
+        dr.setSuccessful(true);
+      }
+      finally {
+        IOUtil.close(is);
+      }
     }
 
-    public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
-    {
-        final DiscoveryResponse dr = new DiscoveryResponse( request );
-        final StorageFileItem response = handleRequest( request );
-        if ( response != null )
-        {
-            final InputStream is = response.getInputStream();
-            try
-            {
-                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                IOUtil.copy( is, bos );
-                dr.setVersion( bos.toString() );
-                dr.setSuccessful( true );
-            }
-            finally
-            {
-                IOUtil.close( is );
-            }
-        }
+    return dr;
+  }
 
-        return dr;
+  protected StorageFileItem handleRequest(DiscoveryRequest request) {
+    try {
+      // NoSuchRepository if the repoId is not known
+      final Repository repository = repositoryRegistry.getRepository(request.getLvoKey().getRepositoryId());
+
+      // ItemNotFound if the path does not exists
+      final StorageItem item =
+          repository.retrieveItem(false, new ResourceStoreRequest(request.getLvoKey().getLocalPath()));
+
+      // return only if item is a file, nuke it otherwise
+      if (item instanceof StorageFileItem) {
+        return (StorageFileItem) item;
+      }
+      else {
+        return null;
+      }
     }
-
-    protected StorageFileItem handleRequest( DiscoveryRequest request )
-    {
-        try
-        {
-            // NoSuchRepository if the repoId is not known
-            final Repository repository = repositoryRegistry.getRepository( request.getLvoKey().getRepositoryId() );
-
-            // ItemNotFound if the path does not exists
-            final StorageItem item =
-                repository.retrieveItem( false, new ResourceStoreRequest( request.getLvoKey().getLocalPath() ) );
-
-            // return only if item is a file, nuke it otherwise
-            if ( item instanceof StorageFileItem )
-            {
-                return (StorageFileItem) item;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch ( Exception e )
-        {
-            // we are very rude about exceptions here ;)
-            getLogger().warn( "Could not retrieve content!", e );
-            return null;
-        }
+    catch (Exception e) {
+      // we are very rude about exceptions here ;)
+      getLogger().warn("Could not retrieve content!", e);
+      return null;
     }
+  }
 }

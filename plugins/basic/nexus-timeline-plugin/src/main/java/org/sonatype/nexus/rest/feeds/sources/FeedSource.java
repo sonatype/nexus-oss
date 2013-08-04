@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
 import java.io.IOException;
@@ -23,33 +24,28 @@ import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
  * A Feed source. Impementors of this interface produces feeds.
- * 
+ *
  * @author cstamas
  */
 @ExtensionPoint
 @Singleton
 public interface FeedSource
 {
-    /**
-     * Returns the channel key that identifies this channel.
-     * 
-     * @return
-     */
-    String getFeedKey();
+  /**
+   * Returns the channel key that identifies this channel.
+   */
+  String getFeedKey();
 
-    /**
-     * Returns the feed human name.
-     * 
-     * @return
-     */
-    String getFeedName();
+  /**
+   * Returns the feed human name.
+   */
+  String getFeedName();
 
-    /**
-     * Returns a Feed Channel.
-     * 
-     * @return a channel
-     * @throws IOException
-     */
-    SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
-        throws IOException;
+  /**
+   * Returns a Feed Channel.
+   *
+   * @return a channel
+   */
+  SyndFeed getFeed(Integer from, Integer count, Map<String, String> params)
+      throws IOException;
 }

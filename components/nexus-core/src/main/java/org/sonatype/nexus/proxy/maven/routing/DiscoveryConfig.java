@@ -10,52 +10,47 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Configuration properties of the autorouting.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class DiscoveryConfig
 {
-    private final boolean enabled;
+  private final boolean enabled;
 
-    private final long discoveryInterval;
+  private final long discoveryInterval;
 
-    /**
-     * Constructor.
-     * 
-     * @param enabled
-     * @param discoveryInterval
-     */
-    public DiscoveryConfig( final boolean enabled, final long discoveryInterval )
-    {
-        checkArgument( discoveryInterval > 0, "Discovery interval must be strictly positive, greater than 0!" );
-        this.enabled = enabled;
-        this.discoveryInterval = discoveryInterval;
-    }
+  /**
+   * Constructor.
+   */
+  public DiscoveryConfig(final boolean enabled, final long discoveryInterval) {
+    checkArgument(discoveryInterval > 0, "Discovery interval must be strictly positive, greater than 0!");
+    this.enabled = enabled;
+    this.discoveryInterval = discoveryInterval;
+  }
 
-    /**
-     * Enabled flag for remote discovery.
-     * 
-     * @return {@code true} if enabled.
-     */
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
+  /**
+   * Enabled flag for remote discovery.
+   *
+   * @return {@code true} if enabled.
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
 
-    /**
-     * Discovery interval in millis.
-     * 
-     * @return interval in millis.
-     */
-    public long getDiscoveryInterval()
-    {
-        return discoveryInterval;
-    }
+  /**
+   * Discovery interval in millis.
+   *
+   * @return interval in millis.
+   */
+  public long getDiscoveryInterval() {
+    return discoveryInterval;
+  }
 }

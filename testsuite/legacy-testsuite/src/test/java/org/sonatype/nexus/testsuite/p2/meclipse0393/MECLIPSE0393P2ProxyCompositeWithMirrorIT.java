@@ -10,53 +10,51 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.p2.meclipse0393;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+package org.sonatype.nexus.testsuite.p2.meclipse0393;
 
 import java.io.IOException;
 
-import org.junit.Test;
-import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
+
+import org.junit.Test;
 
 public class MECLIPSE0393P2ProxyCompositeWithMirrorIT
     extends AbstractNexusProxyP2IT
 {
 
-    public MECLIPSE0393P2ProxyCompositeWithMirrorIT()
-    {
-        super( "meclipse0393" );
-    }
+  public MECLIPSE0393P2ProxyCompositeWithMirrorIT() {
+    super("meclipse0393");
+  }
 
-    @Override
-    public void copyTestResources()
-        throws IOException
-    {
-        super.copyTestResources();
+  @Override
+  public void copyTestResources()
+      throws IOException
+  {
+    super.copyTestResources();
 
-        final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
+    final String proxyRepoBaseUrl = TestProperties.getString("proxy.repo.base.url");
 
-        replaceInFile(
-            localStorageDir + "/meclipse0393/memberrepo1/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
-        );
-        replaceInFile(
-            localStorageDir + "/meclipse0393/memberrepo2/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
-        );
-        replaceInFile(
-            localStorageDir + "/meclipse0393/memberrepo1/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
-        );
-        replaceInFile(
-            localStorageDir + "/meclipse0393/memberrepo2/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
-        );
-    }
+    replaceInFile(
+        localStorageDir + "/meclipse0393/memberrepo1/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
+    );
+    replaceInFile(
+        localStorageDir + "/meclipse0393/memberrepo2/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
+    );
+    replaceInFile(
+        localStorageDir + "/meclipse0393/memberrepo1/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
+    );
+    replaceInFile(
+        localStorageDir + "/meclipse0393/memberrepo2/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl
+    );
+  }
 
-    @Test
-    public void test()
-        throws Exception
-    {
-        installAndVerifyP2Feature();
-    }
+  @Test
+  public void test()
+      throws Exception
+  {
+    installAndVerifyP2Feature();
+  }
 
 }

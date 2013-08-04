@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -25,86 +26,72 @@ public class DefaultReferenceFactory
     implements ReferenceFactory
 {
 
-    /**
-     * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
-     * mounted (we had a /service => / move).
-     * 
-     * @param request
-     * @return
-     */
-    public Reference getContextRoot( Request request )
-    {
-        Reference result;
+  /**
+   * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
+   * mounted (we had a /service => / move).
+   */
+  public Reference getContextRoot(Request request) {
+    Reference result;
 
-        // if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
-        // {
-        // result = new Reference( getNexus().getBaseUrl() );
-        // }
-        // else
-        // {
-        result = request.getRootRef();
-        // }
+    // if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
+    // {
+    // result = new Reference( getNexus().getBaseUrl() );
+    // }
+    // else
+    // {
+    result = request.getRootRef();
+    // }
 
-        // fix for when restlet is at webapp root
-        if ( StringUtils.isEmpty( result.getPath() ) )
-        {
-            result.setPath( "/" );
-        }
-
-        return result;
+    // fix for when restlet is at webapp root
+    if (StringUtils.isEmpty(result.getPath())) {
+      result.setPath("/");
     }
 
-    private Reference updateBaseRefPath( Reference reference )
-    {
-        if ( reference.getBaseRef().getPath() == null )
-        {
-            reference.getBaseRef().setPath( "/" );
-        }
-        else if ( !reference.getBaseRef().getPath().endsWith( "/" ) )
-        {
-            reference.getBaseRef().setPath( reference.getBaseRef().getPath() + "/" );
-        }
+    return result;
+  }
 
-        return reference;
+  private Reference updateBaseRefPath(Reference reference) {
+    if (reference.getBaseRef().getPath() == null) {
+      reference.getBaseRef().setPath("/");
+    }
+    else if (!reference.getBaseRef().getPath().endsWith("/")) {
+      reference.getBaseRef().setPath(reference.getBaseRef().getPath() + "/");
     }
 
-    public Reference createThisReference( Request request )
-    {
-        String uriPart =
-            request.getResourceRef().getTargetRef().toString().substring(
-                request.getRootRef().getTargetRef().toString().length() );
+    return reference;
+  }
 
-        // trim leading slash
-        if ( uriPart.startsWith( "/" ) )
-        {
-            uriPart = uriPart.substring( 1 );
-        }
+  public Reference createThisReference(Request request) {
+    String uriPart =
+        request.getResourceRef().getTargetRef().toString().substring(
+            request.getRootRef().getTargetRef().toString().length());
 
-        return updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) );
+    // trim leading slash
+    if (uriPart.startsWith("/")) {
+      uriPart = uriPart.substring(1);
     }
 
-    public Reference createChildReference( Request request, String childPath )
-    {
-        Reference result = createThisReference( request ).addSegment( childPath );
+    return updateBaseRefPath(new Reference(getContextRoot(request), uriPart));
+  }
 
-        if ( result.hasQuery() )
-        {
-            result.setQuery( null );
-        }
+  public Reference createChildReference(Request request, String childPath) {
+    Reference result = createThisReference(request).addSegment(childPath);
 
-        return result.getTargetRef();
+    if (result.hasQuery()) {
+      result.setQuery(null);
     }
 
-    public Reference createReference( Reference base, String relPart )
-    {
-        Reference ref = new Reference( base, relPart );
+    return result.getTargetRef();
+  }
 
-        return updateBaseRefPath( ref ).getTargetRef();
-    }
+  public Reference createReference(Reference base, String relPart) {
+    Reference ref = new Reference(base, relPart);
 
-    public Reference createReference( Request base, String relPart )
-    {
-        return createReference( getContextRoot( base ), relPart );
-    }
+    return updateBaseRefPath(ref).getTargetRef();
+  }
+
+  public Reference createReference(Request base, String relPart) {
+    return createReference(getContextRoot(base), relPart);
+  }
 
 }

@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
-import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -23,161 +23,164 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
+import org.junit.Test;
+
 public class RepoConversionTest
     extends AbstractProxyTestEnvironment
 {
-    private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
+  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
 
-    private RemoteRepositoryStorage remoteRepositoryStorage;
+  private RemoteRepositoryStorage remoteRepositoryStorage;
 
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
+  public void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
-    }
+    remoteRepositoryStorage = lookup(RemoteRepositoryStorage.class,
+        getRemoteProviderHintFactory().getDefaultHttpRoleHint());
+  }
 
-    @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
-        throws Exception
-    {
-        ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
-        return jettyTestsuiteEnvironmentBuilder;
-    }
+  @Override
+  protected EnvironmentBuilder getEnvironmentBuilder()
+      throws Exception
+  {
+    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
+    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
+    return jettyTestsuiteEnvironmentBuilder;
+  }
 
-    // WARNING!
-    // ////////////////////////////
-    // The casts you see in this code should be considered ILLEGAL!
-    // This code simply tests some "spicy" nature, but Nexus plugins and other API consumers should
-    // NEVER use casts like these below!
+  // WARNING!
+  // ////////////////////////////
+  // The casts you see in this code should be considered ILLEGAL!
+  // This code simply tests some "spicy" nature, but Nexus plugins and other API consumers should
+  // NEVER use casts like these below!
 
-    protected void convertHosted2Proxy( MavenHostedRepository patient )
-        throws Exception
-    {
-        // check
-        assertTrue( "repo is hosted", patient.getRepositoryKind().isFacetAvailable( HostedRepository.class ) );
-        assertTrue( "repo is hosted", patient.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) );
-        assertFalse( "repo is not proxied", patient.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
-        assertFalse( "repo is not proxied", patient.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) );
+  protected void convertHosted2Proxy(MavenHostedRepository patient)
+      throws Exception
+  {
+    // check
+    assertTrue("repo is hosted", patient.getRepositoryKind().isFacetAvailable(HostedRepository.class));
+    assertTrue("repo is hosted", patient.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class));
+    assertFalse("repo is not proxied", patient.getRepositoryKind().isFacetAvailable(ProxyRepository.class));
+    assertFalse("repo is not proxied", patient.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class));
 
-        // do the conversion
-        // forcing cast
-        MavenProxyRepository repoToBeTreated = (MavenProxyRepository) patient;
+    // do the conversion
+    // forcing cast
+    MavenProxyRepository repoToBeTreated = (MavenProxyRepository) patient;
 
-        repoToBeTreated.setRemoteStorage( remoteRepositoryStorage );
+    repoToBeTreated.setRemoteStorage(remoteRepositoryStorage);
 
-        repoToBeTreated.setRemoteUrl( "http://repo1.maven.org/maven2/" );
+    repoToBeTreated.setRemoteUrl("http://repo1.maven.org/maven2/");
 
-        getApplicationConfiguration().saveConfiguration();
+    getApplicationConfiguration().saveConfiguration();
 
-        // check
-        assertFalse( "repo is not hosted", patient.getRepositoryKind().isFacetAvailable( HostedRepository.class ) );
-        assertFalse( "repo is not hosted", patient.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) );
-        assertTrue( "repo is proxied", patient.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
-        assertTrue( "repo is proxied", patient.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) );
+    // check
+    assertFalse("repo is not hosted", patient.getRepositoryKind().isFacetAvailable(HostedRepository.class));
+    assertFalse("repo is not hosted", patient.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class));
+    assertTrue("repo is proxied", patient.getRepositoryKind().isFacetAvailable(ProxyRepository.class));
+    assertTrue("repo is proxied", patient.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class));
 
-        // now we just walk in, like nothing of above happened :)
-        MavenProxyRepository afterTreatment =
-            getRepositoryRegistry().getRepositoryWithFacet( patient.getId(), MavenProxyRepository.class );
+    // now we just walk in, like nothing of above happened :)
+    MavenProxyRepository afterTreatment =
+        getRepositoryRegistry().getRepositoryWithFacet(patient.getId(), MavenProxyRepository.class);
 
-        assertNotNull( "It should exists (heh, but NoSuchRepo exception should be thrown anyway)", afterTreatment );
+    assertNotNull("It should exists (heh, but NoSuchRepo exception should be thrown anyway)", afterTreatment);
 
-        assertEquals( "This should match, since they should be the same!", remoteRepositoryStorage.getProviderId(),
-                      afterTreatment.getRemoteStorage().getProviderId() );
+    assertEquals("This should match, since they should be the same!", remoteRepositoryStorage.getProviderId(),
+        afterTreatment.getRemoteStorage().getProviderId());
 
-        // before NEXUS-5258, this test used to check that the provider was set. Nexus does not set the provider anymore
-        // if it is the default provider, to let repos pick up the system default.
+    // before NEXUS-5258, this test used to check that the provider was set. Nexus does not set the provider anymore
+    // if it is the default provider, to let repos pick up the system default.
 
-        assertEquals( "Config should state the same as object is", afterTreatment.getRemoteUrl(),
-                      ( ( (CRepositoryCoreConfiguration) afterTreatment.getCurrentCoreConfiguration() )
-                          .getConfiguration( false ) ).getRemoteStorage().getUrl() );
-    }
+    assertEquals("Config should state the same as object is", afterTreatment.getRemoteUrl(),
+        (((CRepositoryCoreConfiguration) afterTreatment.getCurrentCoreConfiguration())
+            .getConfiguration(false)).getRemoteStorage().getUrl());
+  }
 
-    protected void convertProxy2Hosted( MavenProxyRepository patient )
-        throws Exception
-    {
-        // check
-        assertFalse( "repo is not hosted", patient.getRepositoryKind().isFacetAvailable( HostedRepository.class ) );
-        assertFalse( "repo is not hosted", patient.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) );
-        assertTrue( "repo is proxied", patient.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
-        assertTrue( "repo is proxied", patient.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) );
+  protected void convertProxy2Hosted(MavenProxyRepository patient)
+      throws Exception
+  {
+    // check
+    assertFalse("repo is not hosted", patient.getRepositoryKind().isFacetAvailable(HostedRepository.class));
+    assertFalse("repo is not hosted", patient.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class));
+    assertTrue("repo is proxied", patient.getRepositoryKind().isFacetAvailable(ProxyRepository.class));
+    assertTrue("repo is proxied", patient.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class));
 
-        // do the conversion
-        patient.setRemoteStorage( null );
+    // do the conversion
+    patient.setRemoteStorage(null);
 
-        getApplicationConfiguration().saveConfiguration();
+    getApplicationConfiguration().saveConfiguration();
 
-        // check
-        assertTrue( "repo is hosted", patient.getRepositoryKind().isFacetAvailable( HostedRepository.class ) );
-        assertTrue( "repo is hosted", patient.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) );
-        assertFalse( "repo is not proxied", patient.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
-        assertFalse( "repo is not proxied", patient.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) );
+    // check
+    assertTrue("repo is hosted", patient.getRepositoryKind().isFacetAvailable(HostedRepository.class));
+    assertTrue("repo is hosted", patient.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class));
+    assertFalse("repo is not proxied", patient.getRepositoryKind().isFacetAvailable(ProxyRepository.class));
+    assertFalse("repo is not proxied", patient.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class));
 
-        // now we just walk in, like nothing of above happened :)
-        MavenHostedRepository afterTreatment =
-            getRepositoryRegistry().getRepositoryWithFacet( patient.getId(), MavenHostedRepository.class );
+    // now we just walk in, like nothing of above happened :)
+    MavenHostedRepository afterTreatment =
+        getRepositoryRegistry().getRepositoryWithFacet(patient.getId(), MavenHostedRepository.class);
 
-        assertNotNull( "It should exists (heh, but NoSuchRepo exception should be thrown anyway)", afterTreatment );
-    }
+    assertNotNull("It should exists (heh, but NoSuchRepo exception should be thrown anyway)", afterTreatment);
+  }
 
-    @Test
-    public void testHosted2Proxy()
-        throws Exception
-    {
-        Repository patient = getRepositoryRegistry().getRepositoryWithFacet( "inhouse", MavenHostedRepository.class );
+  @Test
+  public void testHosted2Proxy()
+      throws Exception
+  {
+    Repository patient = getRepositoryRegistry().getRepositoryWithFacet("inhouse", MavenHostedRepository.class);
 
-        assertTrue( "This repo should not be READ only!", RepositoryWritePolicy.READ_ONLY != patient.getWritePolicy() );
+    assertTrue("This repo should not be READ only!", RepositoryWritePolicy.READ_ONLY != patient.getWritePolicy());
 
-        convertHosted2Proxy( (MavenHostedRepository) patient );
+    convertHosted2Proxy((MavenHostedRepository) patient);
 
-        assertTrue( "Partient should be proxy", patient.getRepositoryKind()
-            .isFacetAvailable( MavenProxyRepository.class ) );
+    assertTrue("Partient should be proxy", patient.getRepositoryKind()
+        .isFacetAvailable(MavenProxyRepository.class));
 
-        assertTrue( "This repo should be READ only!", RepositoryWritePolicy.READ_ONLY == patient.getWritePolicy() );
-    }
+    assertTrue("This repo should be READ only!", RepositoryWritePolicy.READ_ONLY == patient.getWritePolicy());
+  }
 
-    @Test
-    public void testProxy2Hosted()
-        throws Exception
-    {
-        Repository patient = getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
+  @Test
+  public void testProxy2Hosted()
+      throws Exception
+  {
+    Repository patient = getRepositoryRegistry().getRepositoryWithFacet("repo1", MavenProxyRepository.class);
 
-        assertTrue( "This repo should be READ only!", RepositoryWritePolicy.READ_ONLY == patient.getWritePolicy() );
+    assertTrue("This repo should be READ only!", RepositoryWritePolicy.READ_ONLY == patient.getWritePolicy());
 
-        convertProxy2Hosted( (MavenProxyRepository) patient );
+    convertProxy2Hosted((MavenProxyRepository) patient);
 
-        assertTrue( "Partient should be hosted", patient.getRepositoryKind()
-            .isFacetAvailable( MavenHostedRepository.class ) );
-    }
+    assertTrue("Partient should be hosted", patient.getRepositoryKind()
+        .isFacetAvailable(MavenHostedRepository.class));
+  }
 
-    @Test
-    public void testHosted2Proxy2Hosted()
-        throws Exception
-    {
-        Repository patient = getRepositoryRegistry().getRepositoryWithFacet( "inhouse", MavenHostedRepository.class );
+  @Test
+  public void testHosted2Proxy2Hosted()
+      throws Exception
+  {
+    Repository patient = getRepositoryRegistry().getRepositoryWithFacet("inhouse", MavenHostedRepository.class);
 
-        convertHosted2Proxy( (MavenHostedRepository) patient );
+    convertHosted2Proxy((MavenHostedRepository) patient);
 
-        convertProxy2Hosted( (MavenProxyRepository) patient );
+    convertProxy2Hosted((MavenProxyRepository) patient);
 
-        assertTrue( "Partient should be hosted", patient.getRepositoryKind()
-            .isFacetAvailable( MavenHostedRepository.class ) );
-    }
+    assertTrue("Partient should be hosted", patient.getRepositoryKind()
+        .isFacetAvailable(MavenHostedRepository.class));
+  }
 
-    @Test
-    public void testProxy2Hosted2Proxy()
-        throws Exception
-    {
-        Repository patient = getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
+  @Test
+  public void testProxy2Hosted2Proxy()
+      throws Exception
+  {
+    Repository patient = getRepositoryRegistry().getRepositoryWithFacet("repo1", MavenProxyRepository.class);
 
-        convertProxy2Hosted( (MavenProxyRepository) patient );
+    convertProxy2Hosted((MavenProxyRepository) patient);
 
-        convertHosted2Proxy( (MavenHostedRepository) patient );
+    convertHosted2Proxy((MavenHostedRepository) patient);
 
-        assertTrue( "Partient should be proxy", patient.getRepositoryKind()
-            .isFacetAvailable( MavenProxyRepository.class ) );
-    }
+    assertTrue("Partient should be proxy", patient.getRepositoryKind()
+        .isFacetAvailable(MavenProxyRepository.class));
+  }
 
 }

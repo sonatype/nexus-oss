@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.feed.nexus779;
 
 import java.util.List;
@@ -24,54 +25,48 @@ public abstract class AbstractRssIT
     extends AbstractPrivilegeTest
 {
 
-    private static final String RECENTLY_DEPLOYED = "recentlyDeployedArtifacts";
+  private static final String RECENTLY_DEPLOYED = "recentlyDeployedArtifacts";
 
-    private List<SyndEntry> entries;
+  private List<SyndEntry> entries;
 
-    public AbstractRssIT( String testRepositoryId )
-    {
-        super( testRepositoryId );
+  public AbstractRssIT(String testRepositoryId) {
+    super(testRepositoryId);
+  }
+
+  public AbstractRssIT() {
+    super();
+  }
+
+  protected String entriesToString()
+      throws Exception
+  {
+    if (entries == null) {
+      return "No entries";
     }
 
-    public AbstractRssIT()
-    {
-        super();
+    StringBuilder buffer = new StringBuilder();
+
+    for (SyndEntry syndEntry : entries) {
+      buffer.append("\n").append(syndEntry.getTitle());
     }
 
-    protected String entriesToString()
-        throws Exception
-    {
-        if ( entries == null )
-        {
-            return "No entries";
-        }
+    return buffer.toString();
+  }
 
-        StringBuilder buffer = new StringBuilder();
+  @SuppressWarnings("unchecked")
+  protected boolean feedListContainsArtifact(String groupId, String artifactId, String version)
+      throws Exception
+  {
+    SyndFeed feed = FeedUtil.getFeed(RECENTLY_DEPLOYED);
+    entries = feed.getEntries();
 
-        for ( SyndEntry syndEntry : entries )
-        {
-            buffer.append( "\n" ).append( syndEntry.getTitle() );
-        }
-
-        return buffer.toString();
+    for (SyndEntry entry : entries) {
+      if (entry.getTitle().contains(groupId) && entry.getTitle().contains(artifactId)
+          && entry.getTitle().contains(version)) {
+        return true;
+      }
     }
-
-    @SuppressWarnings( "unchecked" )
-    protected boolean feedListContainsArtifact( String groupId, String artifactId, String version )
-        throws Exception
-    {
-        SyndFeed feed = FeedUtil.getFeed( RECENTLY_DEPLOYED );
-        entries = feed.getEntries();
-
-        for ( SyndEntry entry : entries )
-        {
-            if ( entry.getTitle().contains( groupId ) && entry.getTitle().contains( artifactId )
-                && entry.getTitle().contains( version ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 
 }

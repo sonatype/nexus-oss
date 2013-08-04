@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authz;
 
 import java.util.regex.Pattern;
@@ -17,37 +18,31 @@ import java.util.regex.Pattern;
 public class AbstractNexusAuthorizationFilter
     extends FailureLoggingHttpMethodPermissionFilter
 {
-    private Pattern pathPrefixPattern;
+  private Pattern pathPrefixPattern;
 
-    private String pathPrefix;
+  private String pathPrefix;
 
-    public String getPathPrefix()
-    {
-        return pathPrefix;
+  public String getPathPrefix() {
+    return pathPrefix;
+  }
+
+  public void setPathPrefix(String pathPrefix) {
+    this.pathPrefix = pathPrefix;
+
+    if (pathPrefix != null) {
+      setPathPrefixPattern(Pattern.compile(pathPrefix));
     }
+  }
 
-    public void setPathPrefix( String pathPrefix )
-    {
-        this.pathPrefix = pathPrefix;
+  protected void setPathPrefixPattern(Pattern pathPrefixPattern) {
+    this.pathPrefixPattern = pathPrefixPattern;
+  }
 
-        if ( pathPrefix != null )
-        {
-            setPathPrefixPattern( Pattern.compile( pathPrefix ) );
-        }
-    }
+  protected Pattern getPathPrefixPattern() {
+    return pathPrefixPattern;
+  }
 
-    protected void setPathPrefixPattern( Pattern pathPrefixPattern )
-    {
-        this.pathPrefixPattern = pathPrefixPattern;
-    }
-
-    protected Pattern getPathPrefixPattern()
-    {
-        return pathPrefixPattern;
-    }
-
-    protected Object getAttribute( String key )
-    {
-        return this.getFilterConfig().getServletContext().getAttribute( key );
-    }
+  protected Object getAttribute(String key) {
+    return this.getFilterConfig().getServletContext().getAttribute(key);
+  }
 }

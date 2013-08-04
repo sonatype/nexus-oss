@@ -10,54 +10,53 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.usermanagement;
 
 import java.io.FileOutputStream;
 
-import junit.framework.Assert;
-
-import org.codehaus.plexus.util.IOUtil;
-import org.junit.Test;
 import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 
+import junit.framework.Assert;
+import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
+
 public class LdapUserManagerNotConfiguredIT
     extends LdapTestSupport
 {
-    @Override
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
+  @Override
+  public void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-configuration-no-ldap.xml" ),
-            new FileOutputStream( getNexusSecurityConfiguration() ) );
+    IOUtil.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration-no-ldap.xml"),
+        new FileOutputStream(getNexusSecurityConfiguration()));
 
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-configuration.xml" ),
-            new FileOutputStream( getSecurityConfiguration() ) );
-        
-        getLdapRealmConfig().delete();
+    IOUtil.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration.xml"),
+        new FileOutputStream(getSecurityConfiguration()));
 
-        // IOUtil.copy(
-        // getClass().getResourceAsStream( "/test-conf/conf/ldap.xml" ),
-        // new FileOutputStream( new File( CONF_HOME, "ldap.xml" ) ) );
+    getLdapRealmConfig().delete();
+
+    // IOUtil.copy(
+    // getClass().getResourceAsStream( "/test-conf/conf/ldap.xml" ),
+    // new FileOutputStream( new File( CONF_HOME, "ldap.xml" ) ) );
+  }
+
+  @Test
+  public void testNotConfigured()
+      throws Exception
+  {
+    UserManager userManager = this.lookup(UserManager.class, "LDAP");
+    try {
+      userManager.getUser("cstamas");
+
+      Assert.fail("Expected UserNotFoundTransientException");
     }
-
-    @Test
-    public void testNotConfigured()
-        throws Exception
-    {
-        UserManager userManager = this.lookup( UserManager.class, "LDAP" );
-        try
-        {
-            userManager.getUser( "cstamas" );
-
-            Assert.fail( "Expected UserNotFoundTransientException" );
-        }
-        catch ( UserNotFoundTransientException e )
-        {
-            // expect transient error due to misconfiguration
-        }
+    catch (UserNotFoundTransientException e) {
+      // expect transient error due to misconfiguration
     }
+  }
 }

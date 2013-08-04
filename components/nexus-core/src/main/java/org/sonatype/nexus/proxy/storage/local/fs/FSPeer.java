@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
@@ -25,30 +26,31 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * This is file system specific component encapsulating all the "logic" with file handling, made reusable.
- * 
+ *
  * @author cstamas
  */
 public interface FSPeer
 {
-    public boolean isReachable( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
-        throws LocalStorageException;
+  public boolean isReachable(Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target)
+      throws LocalStorageException;
 
-    public boolean containsItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
-        throws LocalStorageException;
+  public boolean containsItem(Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target)
+      throws LocalStorageException;
 
-    public File retrieveItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
-        throws ItemNotFoundException, LocalStorageException;
+  public File retrieveItem(Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target)
+      throws ItemNotFoundException, LocalStorageException;
 
-    public void storeItem( Repository repository, File repositoryBaseDir, StorageItem item, File target, ContentLocator cl )
-        throws UnsupportedStorageOperationException, LocalStorageException;
+  public void storeItem(Repository repository, File repositoryBaseDir, StorageItem item, File target, ContentLocator cl)
+      throws UnsupportedStorageOperationException, LocalStorageException;
 
-    public void shredItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
+  public void shredItem(Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target)
+      throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
 
-    public void moveItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request1, File target1,
-                         ResourceStoreRequest request2, File target2 )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
+  public void moveItem(Repository repository, File repositoryBaseDir, ResourceStoreRequest request1, File target1,
+                       ResourceStoreRequest request2, File target2)
+      throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
 
-    public Collection<File> listItems( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
-        throws ItemNotFoundException, LocalStorageException;
+  public Collection<File> listItems(Repository repository, File repositoryBaseDir, ResourceStoreRequest request,
+                                    File target)
+      throws ItemNotFoundException, LocalStorageException;
 }

@@ -10,21 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest.dto;
 
-public class Bbb extends Aaa
+public class Bbb
+    extends Aaa
 {
-    
-    private String bValue = "";
 
-    public String getbValue()
-    {
-        return bValue;
-    }
+  private String bValue = "";
 
-    public void setbValue( String bValue )
-    {
-        this.bValue = bValue;
-    }
+  public String getbValue() {
+    return bValue;
+  }
+
+  public void setbValue(String bValue) {
+    this.bValue = bValue;
+  }
 
 }

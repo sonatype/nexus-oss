@@ -10,34 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+package org.sonatype.nexus.security;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 /**
  * FIXME this class does nothing, yet referenced by 3 other classes atm to do 'something' make useful or remove
  */
 public class WebSecurityUtil
 {
-    public static void setupWebContext( String sessionId )
-    {
-        HttpServletRequest mockRequest = mock( HttpServletRequest.class );
-        HttpServletResponse mockResponse = mock( HttpServletResponse.class );
-        HttpSession mockSession = mock( HttpSession.class );
+  public static void setupWebContext(String sessionId) {
+    HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+    HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+    HttpSession mockSession = mock(HttpSession.class);
 
-        doReturn( sessionId ).when(mockSession).getId();
-        doReturn( null ).when(mockRequest).getCookies();
-        doReturn( mockSession ).when(mockRequest).getSession();
-        doReturn( mockSession ).when(mockRequest).getSession( false);
+    doReturn(sessionId).when(mockSession).getId();
+    doReturn(null).when(mockRequest).getCookies();
+    doReturn(mockSession).when(mockRequest).getSession();
+    doReturn(mockSession).when(mockRequest).getSession(false);
 
-        // we need to bind for the "web" impl of the RealmSecurityManager to work
-        // TODO this method no longer exists on shiro! org.apache.shiro.web.util.WebUtils
-        // WebUtils.bind( mockRequest );
-        // WebUtils.bind( mockResponse );
-    }
+    // we need to bind for the "web" impl of the RealmSecurityManager to work
+    // TODO this method no longer exists on shiro! org.apache.shiro.web.util.WebUtils
+    // WebUtils.bind( mockRequest );
+    // WebUtils.bind( mockResponse );
+  }
 }

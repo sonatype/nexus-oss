@@ -10,21 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.lvo.strategy;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.ByteArrayEntity;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
@@ -33,6 +23,17 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Throwables;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.ByteArrayEntity;
+import org.junit.Test;
+import org.mockito.Mock;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for HttpGetPropertiesDiscoveryStrategyTest.
@@ -40,59 +41,55 @@ import com.google.common.base.Throwables;
 public class HttpGetPropertiesDiscoveryStrategyTest
     extends TestSupport
 {
-    @Mock
-    private Hc4Provider hc4provider;
+  @Mock
+  private Hc4Provider hc4provider;
 
-    @Test
-    public void translateProperties()
-        throws IOException, NoSuchRepositoryException
+  @Test
+  public void translateProperties()
+      throws IOException, NoSuchRepositoryException
+  {
+    HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy(hc4provider)
     {
-        HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy( hc4provider )
-        {
-            @Override
-            protected RequestResult handleRequest( final String url )
-            {
-                try
-                {
-                    HttpGet method = mock( HttpGet.class );
-                    HttpResponse response = mock( HttpResponse.class );
-                    when( response.getEntity() ).thenReturn(
-                        new ByteArrayEntity( "test.version=2.0\ntest.url=http://some.url\n".getBytes() ) );
-                    return new RequestResult( method, response );
-                }
-                catch ( IOException e )
-                {
-                    Throwables.propagate( e );
-                }
-                return null;
-            }
-        };
+      @Override
+      protected RequestResult handleRequest(final String url) {
+        try {
+          HttpGet method = mock(HttpGet.class);
+          HttpResponse response = mock(HttpResponse.class);
+          when(response.getEntity()).thenReturn(
+              new ByteArrayEntity("test.version=2.0\ntest.url=http://some.url\n".getBytes()));
+          return new RequestResult(method, response);
+        }
+        catch (IOException e) {
+          Throwables.propagate(e);
+        }
+        return null;
+      }
+    };
 
-        final DiscoveryRequest request = new DiscoveryRequest( "test", mock( CLvoKey.class ) );
-        DiscoveryResponse response = underTest.discoverLatestVersion( request );
+    final DiscoveryRequest request = new DiscoveryRequest("test", mock(CLvoKey.class));
+    DiscoveryResponse response = underTest.discoverLatestVersion(request);
 
-        assertThat( response.getVersion(), is( "2.0" ) );
-        assertThat( response.isSuccessful(), is( true ) );
-    }
+    assertThat(response.getVersion(), is("2.0"));
+    assertThat(response.isSuccessful(), is(true));
+  }
 
-    @Test
-    public void translatePropertiesFail()
-        throws IOException, NoSuchRepositoryException
+  @Test
+  public void translatePropertiesFail()
+      throws IOException, NoSuchRepositoryException
+  {
+    HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy(hc4provider)
     {
-        HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy( hc4provider )
-        {
-            @Override
-            protected RequestResult handleRequest( final String url )
-            {
-                return null;
-            }
-        };
+      @Override
+      protected RequestResult handleRequest(final String url) {
+        return null;
+      }
+    };
 
-        final DiscoveryRequest request = new DiscoveryRequest( "test", mock( CLvoKey.class ) );
-        DiscoveryResponse response = underTest.discoverLatestVersion( request );
+    final DiscoveryRequest request = new DiscoveryRequest("test", mock(CLvoKey.class));
+    DiscoveryResponse response = underTest.discoverLatestVersion(request);
 
-        assertThat( response.getVersion(), nullValue() );
-        assertThat( response.isSuccessful(), is( false ) );
-    }
+    assertThat(response.getVersion(), nullValue());
+    assertThat(response.isSuccessful(), is(false));
+  }
 
 }

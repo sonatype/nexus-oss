@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus4539;
+
+import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.proxy.repository.RemoteStatus;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
-import org.sonatype.nexus.proxy.repository.RemoteStatus;
 
 /**
  * while a proxy is auto-blocked move the proxy repository state to manually blocked. make sure it is still manually
@@ -25,34 +27,33 @@ public class NEXUS4539ManualBlockIT
     extends AutoBlockITSupport
 {
 
-    @Before
-    public void setTimeout()
-    {
-        super.sleepTime = 100;
-    }
+  @Before
+  public void setTimeout() {
+    super.sleepTime = 100;
+  }
 
-    @Test
-    public void manualBlock()
-        throws Exception
-    {
-        // initial status, timing out
-        waitFor( RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO, false );
+  @Test
+  public void manualBlock()
+      throws Exception
+  {
+    // initial status, timing out
+    waitFor(RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO, false);
 
-        // set manual block
-        repoUtil.setBlockProxy( REPO, true );
-        assertRepositoryStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
+    // set manual block
+    repoUtil.setBlockProxy(REPO, true);
+    assertRepositoryStatus(repoUtil.getStatus(REPO), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL);
 
-        // server back to normal
-        super.sleepTime = -1;
+    // server back to normal
+    super.sleepTime = -1;
 
-        // nexus shall not unblock
-        Thread.sleep( 15 * 1000 );
-        assertRepositoryStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
+    // nexus shall not unblock
+    Thread.sleep(15 * 1000);
+    assertRepositoryStatus(repoUtil.getStatus(REPO), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL);
 
-        // must still be manual blocked
-        shakeNexus();
-        assertRepositoryStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
-    }
+    // must still be manual blocked
+    shakeNexus();
+    assertRepositoryStatus(repoUtil.getStatus(REPO), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL);
+  }
 
 
 }

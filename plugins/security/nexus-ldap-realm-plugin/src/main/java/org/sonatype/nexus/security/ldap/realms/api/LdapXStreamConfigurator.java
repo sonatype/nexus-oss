@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.ldap.realms.api;
 
 import org.sonatype.nexus.rest.model.AliasingListConverter;
@@ -28,39 +29,38 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * XStream configurator for LDAP.
- * 
+ *
  * @author cstamas
  */
 public class LdapXStreamConfigurator
 {
-    public static XStream configureXStream( XStream xstream )
-    {
-        xstream.processAnnotations( LdapConnectionInfoResponse.class );
-        xstream.processAnnotations( LdapUserAndGroupConfigurationResponse.class );
-        xstream.processAnnotations( LdapUserListResponse.class );
-        xstream.processAnnotations( LdapAuthenticationTestRequest.class );
-        xstream.processAnnotations( LdapUserAndGroupConfigTestRequest.class );
+  public static XStream configureXStream(XStream xstream) {
+    xstream.processAnnotations(LdapConnectionInfoResponse.class);
+    xstream.processAnnotations(LdapUserAndGroupConfigurationResponse.class);
+    xstream.processAnnotations(LdapUserListResponse.class);
+    xstream.processAnnotations(LdapAuthenticationTestRequest.class);
+    xstream.processAnnotations(LdapUserAndGroupConfigTestRequest.class);
 
-        // NXCM-2974 unescape html entities like "o=org&amp;org", they get escaped by nexus-rest-api json->DTO
-        // conversion
-        final HtmlUnescapeStringConverter converter = new HtmlUnescapeStringConverter( true );
+    // NXCM-2974 unescape html entities like "o=org&amp;org", they get escaped by nexus-rest-api json->DTO
+    // conversion
+    final HtmlUnescapeStringConverter converter = new HtmlUnescapeStringConverter(true);
 
-        xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "systemUsername", converter );
-        xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "systemPassword", converter );
-        xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "searchBase", converter );
-        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupBaseDn", converter );
-        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "userBaseDn", converter );
-        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupMemberFormat", converter );
-        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "ldapFilter", converter );
+    xstream.registerLocalConverter(LdapConnectionInfoDTO.class, "systemUsername", converter);
+    xstream.registerLocalConverter(LdapConnectionInfoDTO.class, "systemPassword", converter);
+    xstream.registerLocalConverter(LdapConnectionInfoDTO.class, "searchBase", converter);
+    xstream.registerLocalConverter(LdapUserAndGroupConfigurationDTO.class, "groupBaseDn", converter);
+    xstream.registerLocalConverter(LdapUserAndGroupConfigurationDTO.class, "userBaseDn", converter);
+    xstream.registerLocalConverter(LdapUserAndGroupConfigurationDTO.class, "groupMemberFormat", converter);
+    xstream.registerLocalConverter(LdapUserAndGroupConfigurationDTO.class, "ldapFilter", converter);
 
-        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemUsername", converter );
-        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemPassword", converter );
-        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "searchBase", converter );
+    xstream.registerLocalConverter(LdapUserAndGroupConfigTestRequestDTO.class, "systemUsername", converter);
+    xstream.registerLocalConverter(LdapUserAndGroupConfigTestRequestDTO.class, "systemPassword", converter);
+    xstream.registerLocalConverter(LdapUserAndGroupConfigTestRequestDTO.class, "searchBase", converter);
 
-        xstream.registerLocalConverter( LdapUserListResponse.class, "data", new AliasingListConverter(
-            LdapUserResponseDTO.class, "user" ) );
+    xstream.registerLocalConverter(LdapUserListResponse.class, "data", new AliasingListConverter(
+        LdapUserResponseDTO.class, "user"));
 
-        return xstream;
-    }
+    return xstream;
+  }
 
 }

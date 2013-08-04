@@ -10,10 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -21,44 +23,41 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
-@Named( "EvictUnusedItems" )
+@Named("EvictUnusedItems")
 @Singleton
 public class EvictUnusedItemsTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-    public static final String ID = "EvictUnusedProxiedItemsTask";
+  public static final String ID = "EvictUnusedProxiedItemsTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
+  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-    public static final String OLDER_THAN_FIELD_ID = "evictOlderCacheItemsThen";
+  public static final String OLDER_THAN_FIELD_ID = "evictOlderCacheItemsThen";
 
-    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
-                                                                                       FormField.MANDATORY );
+  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
+      FormField.MANDATORY);
 
-    private final NumberTextFormField olderThanField =
-        new NumberTextFormField(
-                                 OLDER_THAN_FIELD_ID,
-                                 "Evict items older than (days)",
-                                 "Set the number of days, to evict all unused proxied items that were not used the given number of days.",
-                                 FormField.MANDATORY );
+  private final NumberTextFormField olderThanField =
+      new NumberTextFormField(
+          OLDER_THAN_FIELD_ID,
+          "Evict items older than (days)",
+          "Set the number of days, to evict all unused proxied items that were not used the given number of days.",
+          FormField.MANDATORY);
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    public String getName()
-    {
-        return "Evict Unused Proxied Items From Repository Caches";
-    }
+  public String getName() {
+    return "Evict Unused Proxied Items From Repository Caches";
+  }
 
-    public List<FormField> formFields()
-    {
-        List<FormField> fields = new ArrayList<FormField>();
+  public List<FormField> formFields() {
+    List<FormField> fields = new ArrayList<FormField>();
 
-        fields.add( repoField );
-        fields.add( olderThanField );
+    fields.add(repoField);
+    fields.add(olderThanField);
 
-        return fields;
-    }
+    return fields;
+  }
 }

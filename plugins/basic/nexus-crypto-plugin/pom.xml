@@ -28,8 +28,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-     <pluginName>Nexus Crypto Provider Plugin</pluginName>
-     <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
+    <pluginName>Nexus Crypto Provider Plugin</pluginName>
+    <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
   </properties>
 
   <dependencies>

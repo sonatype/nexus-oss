@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.model;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -21,94 +22,81 @@ public abstract class AbstractCoreConfiguration
     extends AbstractRevertableConfiguration
     implements CoreConfiguration
 {
-    private ApplicationConfiguration applicationConfiguration;
+  private ApplicationConfiguration applicationConfiguration;
 
-    private ExternalConfiguration<?> externalConfiguration;
+  private ExternalConfiguration<?> externalConfiguration;
 
-    public AbstractCoreConfiguration( ApplicationConfiguration applicationConfiguration )
-    {
-        final Object extracted = extractConfiguration( applicationConfiguration.getConfigurationModel() );
+  public AbstractCoreConfiguration(ApplicationConfiguration applicationConfiguration) {
+    final Object extracted = extractConfiguration(applicationConfiguration.getConfigurationModel());
 
-        if ( extracted != null )
-        {
-            setOriginalConfiguration( extracted );
-        }
-        else
-        {
-            setOriginalConfiguration( getDefaultConfiguration() );
-        }
-
-        this.applicationConfiguration = applicationConfiguration;
+    if (extracted != null) {
+      setOriginalConfiguration(extracted);
+    }
+    else {
+      setOriginalConfiguration(getDefaultConfiguration());
     }
 
-    protected ApplicationConfiguration getApplicationConfiguration()
-    {
-        return applicationConfiguration;
+    this.applicationConfiguration = applicationConfiguration;
+  }
+
+  protected ApplicationConfiguration getApplicationConfiguration() {
+    return applicationConfiguration;
+  }
+
+  protected ExternalConfiguration<?> prepareExternalConfiguration(Object configuration) {
+    // usually nothing, but CRepository and CPlugin does have them
+    return null;
+  }
+
+  public ExternalConfiguration<?> getExternalConfiguration() {
+    if (externalConfiguration == null) {
+      externalConfiguration = prepareExternalConfiguration(getOriginalConfiguration());
     }
 
-    protected ExternalConfiguration<?> prepareExternalConfiguration( Object configuration )
-    {
-        // usually nothing, but CRepository and CPlugin does have them
-        return null;
+    return externalConfiguration;
+  }
+
+  public Object getDefaultConfiguration() {
+    return null;
+  }
+
+  @Override
+  public boolean isDirty() {
+    return isThisDirty() || (getExternalConfiguration() != null && getExternalConfiguration().isDirty());
+  }
+
+  @Override
+  public void validateChanges()
+      throws ConfigurationException
+  {
+    super.validateChanges();
+
+    if (getExternalConfiguration() != null) {
+      getExternalConfiguration().validateChanges();
     }
+  }
 
-    public ExternalConfiguration<?> getExternalConfiguration()
-    {
-        if ( externalConfiguration == null )
-        {
-            externalConfiguration = prepareExternalConfiguration( getOriginalConfiguration() );
-        }
+  @Override
+  public void commitChanges()
+      throws ConfigurationException
+  {
+    super.commitChanges();
 
-        return externalConfiguration;
+    if (getExternalConfiguration() != null) {
+      getExternalConfiguration().commitChanges();
     }
+  }
 
-    public Object getDefaultConfiguration()
-    {
-        return null;
+  @Override
+  public void rollbackChanges() {
+    super.rollbackChanges();
+
+    if (getExternalConfiguration() != null) {
+      getExternalConfiguration().rollbackChanges();
     }
+  }
 
-    @Override
-    public boolean isDirty()
-    {
-        return isThisDirty() || ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() );
-    }
+  // ==
 
-    @Override
-    public void validateChanges()
-        throws ConfigurationException
-    {
-        super.validateChanges();
-
-        if ( getExternalConfiguration() != null )
-        {
-            getExternalConfiguration().validateChanges();
-        }
-    }
-
-    @Override
-    public void commitChanges()
-        throws ConfigurationException
-    {
-        super.commitChanges();
-
-        if ( getExternalConfiguration() != null )
-        {
-            getExternalConfiguration().commitChanges();
-        }
-    }
-
-    @Override
-    public void rollbackChanges()
-    {
-        super.rollbackChanges();
-
-        if ( getExternalConfiguration() != null )
-        {
-            getExternalConfiguration().rollbackChanges();
-        }
-    }
-
-    // ==
-
-    protected abstract Object extractConfiguration( Configuration configuration );
+  protected abstract Object extractConfiguration(Configuration configuration);
 }

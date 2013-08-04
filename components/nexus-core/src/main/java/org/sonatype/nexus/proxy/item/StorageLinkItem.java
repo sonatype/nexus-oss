@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 /**
@@ -19,18 +20,16 @@ public interface StorageLinkItem
     extends StorageItem
 {
 
-    /**
-     * Gets the link target.
-     * 
-     * @return the target
-     */
-    RepositoryItemUid getTarget();
+  /**
+   * Gets the link target.
+   *
+   * @return the target
+   */
+  RepositoryItemUid getTarget();
 
-    /**
-     * Sets the link target.
-     * 
-     * @param target
-     */
-    void setTarget( RepositoryItemUid target );
+  /**
+   * Sets the link target.
+   */
+  void setTarget(RepositoryItemUid target);
 
 }

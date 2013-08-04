@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling.schedules;
 
 import java.util.Date;
@@ -21,23 +22,20 @@ import org.sonatype.scheduling.iterators.SchedulerIterator;
 public class MonthlySchedule
     extends AbstractSchedule
 {
-    private final Set<Integer> daysToRun;
+  private final Set<Integer> daysToRun;
 
-    public MonthlySchedule( Date startDate, Date endDate, Set<Integer> daysToRun )
-    {
-        super( startDate, endDate );
+  public MonthlySchedule(Date startDate, Date endDate, Set<Integer> daysToRun) {
+    super(startDate, endDate);
 
-        this.daysToRun = daysToRun;
-    }
+    this.daysToRun = daysToRun;
+  }
 
-    public Set<Integer> getDaysToRun()
-    {
-        return daysToRun;
-    }
+  public Set<Integer> getDaysToRun() {
+    return daysToRun;
+  }
 
-    protected SchedulerIterator createIterator()
-    {
-        return new MonthlySchedulerIterator( getStartDate(), getEndDate(), daysToRun );
-    }
+  protected SchedulerIterator createIterator() {
+    return new MonthlySchedulerIterator(getStartDate(), getEndDate(), daysToRun);
+  }
 
 }

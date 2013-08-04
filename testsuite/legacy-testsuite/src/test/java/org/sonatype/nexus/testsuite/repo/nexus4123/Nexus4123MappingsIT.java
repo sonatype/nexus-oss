@@ -10,19 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus4123;
 
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
+
+import org.junit.Test;
 
 public class Nexus4123MappingsIT
     extends AbstractNexusIntegrationTest
 {
-    @Test
-    public void getRoutes()
-        throws Exception
-    {
-        RoutesMessageUtil.getList();
-    }
+  @Test
+  public void getRoutes()
+      throws Exception
+  {
+    RoutesMessageUtil.getList();
+  }
 }

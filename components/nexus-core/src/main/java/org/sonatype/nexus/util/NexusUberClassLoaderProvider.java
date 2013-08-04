@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util;
 
-import org.codehaus.plexus.PlexusContainer;
+package org.sonatype.nexus.util;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import org.codehaus.plexus.PlexusContainer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,18 +32,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NexusUberClassLoaderProvider
     implements Provider<ClassLoader>
 {
-    private final WholeWorldClassloader classloader;
+  private final WholeWorldClassloader classloader;
 
-    // FIXME: ATM we have to use plexus-specific API here to access the ClassWorld
+  // FIXME: ATM we have to use plexus-specific API here to access the ClassWorld
 
-    @Inject
-    public NexusUberClassLoaderProvider(final PlexusContainer container) {
-        checkNotNull(container);
-        this.classloader = new WholeWorldClassloader(container.getContainerRealm().getWorld());
-    }
+  @Inject
+  public NexusUberClassLoaderProvider(final PlexusContainer container) {
+    checkNotNull(container);
+    this.classloader = new WholeWorldClassloader(container.getContainerRealm().getWorld());
+  }
 
-    @Override
-    public ClassLoader get() {
-        return classloader;
-    }
+  @Override
+  public ClassLoader get() {
+    return classloader;
+  }
 }

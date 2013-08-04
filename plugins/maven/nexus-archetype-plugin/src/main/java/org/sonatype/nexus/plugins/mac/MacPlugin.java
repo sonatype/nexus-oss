@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mac;
 
 import java.io.IOException;
@@ -19,14 +20,14 @@ import org.apache.maven.index.context.IndexingContext;
 
 /**
  * The MavenArchetypePlugin's main component.
- * 
+ *
  * @author cstamas
  */
 public interface MacPlugin
 {
-    /**
-     * Returns the archetype catalog for given request and sourced from given indexing context.
-     */
-    ArchetypeCatalog listArcherypesAsCatalog( MacRequest request, IndexingContext ctx )
-        throws IOException;
+  /**
+   * Returns the archetype catalog for given request and sourced from given indexing context.
+   */
+  ArchetypeCatalog listArcherypesAsCatalog(MacRequest request, IndexingContext ctx)
+      throws IOException;
 }

@@ -10,17 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -29,6 +21,16 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link RepositoryLocalStatusCondition} UTs.
@@ -39,100 +41,96 @@ public class RepositoryLocalStatusConditionTest
     extends EventBusTestSupport
 {
 
-    static final String TEST_REPOSITORY = "test-repository";
+  static final String TEST_REPOSITORY = "test-repository";
 
-    @Mock
-    private Repository repository;
+  @Mock
+  private Repository repository;
 
-    @Mock
-    private RepositoryRegistry repositoryRegistry;
+  @Mock
+  private RepositoryRegistry repositoryRegistry;
 
-    private RepositoryLocalStatusCondition underTest;
+  private RepositoryLocalStatusCondition underTest;
 
-    @Before
-    public final void setUpRepositoryLocalStatusCondition()
-        throws Exception
-    {
-        final RepositoryConditions.RepositoryId repositoryId = mock( RepositoryConditions.RepositoryId.class );
-        when( repositoryId.get() ).thenReturn( TEST_REPOSITORY );
+  @Before
+  public final void setUpRepositoryLocalStatusCondition()
+      throws Exception
+  {
+    final RepositoryConditions.RepositoryId repositoryId = mock(RepositoryConditions.RepositoryId.class);
+    when(repositoryId.get()).thenReturn(TEST_REPOSITORY);
 
-        when( repository.getId() ).thenReturn( TEST_REPOSITORY );
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
+    when(repository.getId()).thenReturn(TEST_REPOSITORY);
+    when(repository.getLocalStatus()).thenReturn(LocalStatus.IN_SERVICE);
 
-        underTest = new RepositoryLocalStatusCondition(
-            eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId
-        );
-        underTest.bind();
+    underTest = new RepositoryLocalStatusCondition(
+        eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId
+    );
+    underTest.bind();
 
-        verify( eventBus ).register( underTest );
+    verify(eventBus).register(underTest);
 
-        assertThat( underTest.isSatisfied(), is( false ) );
+    assertThat(underTest.isSatisfied(), is(false));
 
-        underTest.handle( new RepositoryRegistryEventAdd( repositoryRegistry, repository ) );
-    }
+    underTest.handle(new RepositoryRegistryEventAdd(repositoryRegistry, repository));
+  }
 
-    /**
-     * Condition should become unsatisfied and notification sent when repository is out of service.
-     */
-    @Test
-    public void unsatisfiedWhenRepositoryIsOutOfService()
-    {
-        assertThat( underTest.isSatisfied(), is( true ) );
+  /**
+   * Condition should become unsatisfied and notification sent when repository is out of service.
+   */
+  @Test
+  public void unsatisfiedWhenRepositoryIsOutOfService() {
+    assertThat(underTest.isSatisfied(), is(true));
 
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
-        underTest.handle( new RepositoryEventLocalStatusChanged(
-            repository, LocalStatus.IN_SERVICE, LocalStatus.OUT_OF_SERVICE
-        ) );
-        assertThat( underTest.isSatisfied(), is( false ) );
+    when(repository.getLocalStatus()).thenReturn(LocalStatus.OUT_OF_SERVICE);
+    underTest.handle(new RepositoryEventLocalStatusChanged(
+        repository, LocalStatus.IN_SERVICE, LocalStatus.OUT_OF_SERVICE
+    ));
+    assertThat(underTest.isSatisfied(), is(false));
 
-        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
-    }
+    verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));
+  }
 
-    /**
-     * Condition should become satisfied and notification sent when repository is back on service.
-     */
-    @Test
-    public void satisfiedWhenRepositoryIsBackToService()
-    {
-        assertThat( underTest.isSatisfied(), is( true ) );
+  /**
+   * Condition should become satisfied and notification sent when repository is back on service.
+   */
+  @Test
+  public void satisfiedWhenRepositoryIsBackToService() {
+    assertThat(underTest.isSatisfied(), is(true));
 
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
-        underTest.handle( new RepositoryEventLocalStatusChanged(
-            repository, LocalStatus.IN_SERVICE, LocalStatus.OUT_OF_SERVICE
-        ) );
+    when(repository.getLocalStatus()).thenReturn(LocalStatus.OUT_OF_SERVICE);
+    underTest.handle(new RepositoryEventLocalStatusChanged(
+        repository, LocalStatus.IN_SERVICE, LocalStatus.OUT_OF_SERVICE
+    ));
 
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
-        underTest.handle( new RepositoryEventLocalStatusChanged(
-            repository, LocalStatus.OUT_OF_SERVICE, LocalStatus.IN_SERVICE
-        ) );
-        assertThat( underTest.isSatisfied(), is( true ) );
+    when(repository.getLocalStatus()).thenReturn(LocalStatus.IN_SERVICE);
+    underTest.handle(new RepositoryEventLocalStatusChanged(
+        repository, LocalStatus.OUT_OF_SERVICE, LocalStatus.IN_SERVICE
+    ));
+    assertThat(underTest.isSatisfied(), is(true));
 
-        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ), satisfied( underTest ) );
-    }
+    verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest), satisfied(underTest));
+  }
 
-    /**
-     * Condition should become unsatisfied when repository is removed.
-     */
-    @Test
-    public void unsatisfiedWhenRepositoryIsRemoved()
-    {
-        assertThat( underTest.isSatisfied(), is( true ) );
+  /**
+   * Condition should become unsatisfied when repository is removed.
+   */
+  @Test
+  public void unsatisfiedWhenRepositoryIsRemoved() {
+    assertThat(underTest.isSatisfied(), is(true));
 
-        underTest.handle( new RepositoryRegistryEventRemove( repositoryRegistry, repository ) );
-        assertThat( underTest.isSatisfied(), is( false ) );
+    underTest.handle(new RepositoryRegistryEventRemove(repositoryRegistry, repository));
+    assertThat(underTest.isSatisfied(), is(false));
 
-        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
-    }
+    verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));
+  }
 
-    /**
-     * Event bus handler is removed when releasing.
-     */
-    @Test
-    public void releaseRemovesItselfAsHandler()
-    {
-        underTest.release();
+  /**
+   * Event bus handler is removed when releasing.
+   */
+  @Test
+  public void releaseRemovesItselfAsHandler() {
+    underTest.release();
 
-        verify( eventBus ).unregister( underTest );
-    }
+    verify(eventBus).unregister(underTest);
+  }
 
 }

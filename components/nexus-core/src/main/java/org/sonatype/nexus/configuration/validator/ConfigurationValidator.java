@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.validator;
 
 import org.sonatype.configuration.Configuration;
@@ -18,18 +19,17 @@ import org.sonatype.configuration.validation.ValidationResponse;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.
- * 
+ *
  * @author cstamas
  * @deprecated see Configurable
  */
 @Deprecated
 public interface ConfigurationValidator<E extends Configuration>
 {
-    /**
-     * Validates the model. This does "whole" (contextual) config validation.
-     * 
-     * @param request
-     * @returns response
-     */
-    ValidationResponse validateModel( ValidationRequest<E> request );
+  /**
+   * Validates the model. This does "whole" (contextual) config validation.
+   *
+   * @returns response
+   */
+  ValidationResponse validateModel(ValidationRequest<E> request);
 }

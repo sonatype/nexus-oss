@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.targets;
 
 import java.util.Collection;
@@ -19,86 +20,78 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * This is a repository target.
- * 
+ *
  * @author cstamas
  */
 public class Target
 {
-    private final String id;
+  private final String id;
 
-    private final String name;
+  private final String name;
 
-    private final ContentClass contentClass;
+  private final ContentClass contentClass;
 
-    private final Set<String> patternTexts;
+  private final Set<String> patternTexts;
 
-    private final Set<Pattern> patterns;
+  private final Set<Pattern> patterns;
 
-    public Target( String id, String name, ContentClass contentClass, Collection<String> patternTexts )
-        throws PatternSyntaxException
-    {
-        super();
+  public Target(String id, String name, ContentClass contentClass, Collection<String> patternTexts)
+      throws PatternSyntaxException
+  {
+    super();
 
-        this.id = id;
+    this.id = id;
 
-        this.name = name;
+    this.name = name;
 
-        this.contentClass = contentClass;
+    this.contentClass = contentClass;
 
-        this.patternTexts = new HashSet<String>( patternTexts );
+    this.patternTexts = new HashSet<String>(patternTexts);
 
-        this.patterns = new HashSet<Pattern>( patternTexts.size() );
+    this.patterns = new HashSet<Pattern>(patternTexts.size());
 
-        for ( String patternText : patternTexts )
-        {
-            patterns.add( Pattern.compile( patternText ) );
+    for (String patternText : patternTexts) {
+      patterns.add(Pattern.compile(patternText));
+    }
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public ContentClass getContentClass() {
+    return contentClass;
+  }
+
+  public Set<String> getPatternTexts() {
+    return Collections.unmodifiableSet(patternTexts);
+  }
+
+  public boolean isPathContained(ContentClass contentClass, String path) {
+    // if is the same or is compatible
+    // make sure to check the inverse of the isCompatible too !!
+    if (StringUtils.equals(getContentClass().getId(), contentClass.getId())
+        || getContentClass().isCompatible(contentClass)
+        || contentClass.isCompatible(getContentClass())) {
+      // look for pattern matching
+      for (Pattern pattern : patterns) {
+        if (pattern.matcher(path).matches()) {
+          return true;
         }
+      }
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public ContentClass getContentClass()
-    {
-        return contentClass;
-    }
-
-    public Set<String> getPatternTexts()
-    {
-        return Collections.unmodifiableSet( patternTexts );
-    }
-
-    public boolean isPathContained( ContentClass contentClass, String path )
-    {
-        // if is the same or is compatible
-        // make sure to check the inverse of the isCompatible too !!
-        if ( StringUtils.equals( getContentClass().getId(), contentClass.getId() )
-            || getContentClass().isCompatible( contentClass ) 
-            || contentClass.isCompatible( getContentClass() ) )
-        {
-            // look for pattern matching
-            for ( Pattern pattern : patterns )
-            {
-                if ( pattern.matcher( path ).matches() )
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+    return false;
+  }
 
 }

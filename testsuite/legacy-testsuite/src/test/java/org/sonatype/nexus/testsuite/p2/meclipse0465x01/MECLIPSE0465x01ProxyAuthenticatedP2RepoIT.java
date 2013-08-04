@@ -10,31 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.p2.meclipse0465x01;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+package org.sonatype.nexus.testsuite.p2.meclipse0465x01;
 
 import java.io.File;
 
-import org.junit.Test;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2SecureIT;
+
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 public class MECLIPSE0465x01ProxyAuthenticatedP2RepoIT
     extends AbstractNexusProxyP2SecureIT
 {
 
-    public MECLIPSE0465x01ProxyAuthenticatedP2RepoIT()
-    {
-        super( "meclipse0465x01" );
-    }
+  public MECLIPSE0465x01ProxyAuthenticatedP2RepoIT() {
+    super("meclipse0465x01");
+  }
 
-    @Test
-    public void test()
-        throws Exception
-    {
-        installAndVerifyP2Feature();
-        assertThat( new File( nexusWorkDir + "/conf/eclipse.secure_storage" ), exists() );
-    }
+  @Test
+  public void test()
+      throws Exception
+  {
+    installAndVerifyP2Feature();
+    assertThat(new File(nexusWorkDir + "/conf/eclipse.secure_storage"), exists());
+  }
 
 }

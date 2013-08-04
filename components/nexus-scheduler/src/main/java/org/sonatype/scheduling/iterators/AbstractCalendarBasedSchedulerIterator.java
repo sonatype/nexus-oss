@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling.iterators;
 
 import java.util.Calendar;
@@ -18,34 +19,29 @@ import java.util.Date;
 public abstract class AbstractCalendarBasedSchedulerIterator
     extends AbstractSchedulerIterator
 {
-    private final Calendar calendar;
+  private final Calendar calendar;
 
-    public AbstractCalendarBasedSchedulerIterator( Date startingDate )
-    {
-        this( startingDate, null );
-    }
+  public AbstractCalendarBasedSchedulerIterator(Date startingDate) {
+    this(startingDate, null);
+  }
 
-    public AbstractCalendarBasedSchedulerIterator( Date startingDate, Date endingDate )
-    {
-        super( startingDate, endingDate );
+  public AbstractCalendarBasedSchedulerIterator(Date startingDate, Date endingDate) {
+    super(startingDate, endingDate);
 
-        this.calendar = Calendar.getInstance();
+    this.calendar = Calendar.getInstance();
 
-        calendar.setTime( startingDate );
-    }
+    calendar.setTime(startingDate);
+  }
 
-    protected Calendar getCalendar()
-    {
-        return calendar;
-    }
+  protected Calendar getCalendar() {
+    return calendar;
+  }
 
-    public final Date doPeekNext()
-    {
-        return getCalendar().getTime();
-    }
+  public final Date doPeekNext() {
+    return getCalendar().getTime();
+  }
 
-    public void resetFrom( Date from )
-    {
-        calendar.setTime( from );
-    }
+  public void resetFrom(Date from) {
+    calendar.setTime(from);
+  }
 }

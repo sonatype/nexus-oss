@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -18,23 +19,22 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public abstract class AbstractFileWalkerProcessor
     extends AbstractWalkerProcessor
 {
-    @Override
-    public final void processItem( WalkerContext context, StorageItem item )
-        throws Exception
-    {
-        if ( item instanceof StorageFileItem )
-        {
-            processFileItem( context, (StorageFileItem) item );
-        }
+  @Override
+  public final void processItem(WalkerContext context, StorageItem item)
+      throws Exception
+  {
+    if (item instanceof StorageFileItem) {
+      processFileItem(context, (StorageFileItem) item);
     }
+  }
 
-    /**
-     * Process file item.
-     * 
-     * @param store the store
-     * @param fItem the f item
-     * @param logger the logger
-     */
-    protected abstract void processFileItem( WalkerContext context, StorageFileItem fItem )
-        throws Exception;
+  /**
+   * Process file item.
+   *
+   * @param store  the store
+   * @param fItem  the f item
+   * @param logger the logger
+   */
+  protected abstract void processFileItem(WalkerContext context, StorageFileItem fItem)
+      throws Exception;
 }

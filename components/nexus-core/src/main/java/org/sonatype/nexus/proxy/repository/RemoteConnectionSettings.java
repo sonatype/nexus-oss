@@ -10,23 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 public interface RemoteConnectionSettings
 {
-    int getConnectionTimeout();
+  int getConnectionTimeout();
 
-    void setConnectionTimeout( int connectionTimeout );
+  void setConnectionTimeout(int connectionTimeout);
 
-    int getRetrievalRetryCount();
+  int getRetrievalRetryCount();
 
-    void setRetrievalRetryCount( int retrievalRetryCount );
+  void setRetrievalRetryCount(int retrievalRetryCount);
 
-    String getQueryString();
+  String getQueryString();
 
-    void setQueryString( String queryString );
+  void setQueryString(String queryString);
 
-    String getUserAgentCustomizationString();
+  String getUserAgentCustomizationString();
 
-    void setUserAgentCustomizationString( String userAgentCustomizationString );
+  void setUserAgentCustomizationString(String userAgentCustomizationString);
 }

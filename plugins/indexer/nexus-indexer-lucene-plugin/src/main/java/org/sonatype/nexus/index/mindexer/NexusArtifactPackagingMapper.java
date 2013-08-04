@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.index.mindexer;
 
 import java.io.File;
@@ -20,26 +21,24 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Component that redirects default MI implementation to the one in Nexus Maven support.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
-@Component( role = ArtifactPackagingMapper.class )
+@Component(role = ArtifactPackagingMapper.class)
 public class NexusArtifactPackagingMapper
     implements ArtifactPackagingMapper
 {
-    @Requirement
-    private org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper nexusMapper;
+  @Requirement
+  private org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper nexusMapper;
 
-    @Override
-    public String getExtensionForPackaging( final String packaging )
-    {
-        return nexusMapper.getExtensionForPackaging( packaging );
-    }
+  @Override
+  public String getExtensionForPackaging(final String packaging) {
+    return nexusMapper.getExtensionForPackaging(packaging);
+  }
 
-    @Override
-    public void setPropertiesFile( final File file )
-    {
-        // nop, is handled by Core Maven suport
-    }
+  @Override
+  public void setPropertiesFile(final File file) {
+    // nop, is handled by Core Maven suport
+  }
 }

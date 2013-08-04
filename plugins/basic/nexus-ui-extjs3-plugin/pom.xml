@@ -117,8 +117,10 @@
               <!-- do not fail the build, new version of jslint used by sonatype yuicompress plugin is too thorough -->
               <fail>false</fail>
               <jslintOptions>
-                <white>true</white> <!-- true, if sloppy whitespace is tolerated -->
-                <sloppy>true</sloppy> <!-- true, if the 'use strict'; pragma is optional -->
+                <white>true</white>
+                <!-- true, if sloppy whitespace is tolerated -->
+                <sloppy>true</sloppy>
+                <!-- true, if the 'use strict'; pragma is optional -->
               </jslintOptions>
               <includes>
                 <include>js/nexus/**/*.js</include>

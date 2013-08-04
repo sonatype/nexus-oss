@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.guice.nexus.scanners;
 
 import javax.inject.Singleton;
@@ -17,6 +18,6 @@ import javax.inject.Singleton;
 @Singleton
 public class A
 {
-    // this uncovered a bug where the "type" variable wasn't being
-    // initialized for classes with annotations but no interfaces
+  // this uncovered a bug where the "type" variable wasn't being
+  // initialized for classes with annotations but no interfaces
 }

@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,63 +20,60 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * {@link PrefixSource} implementation backed by {@link ArrayList}.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class ArrayListPrefixSource
     implements PrefixSource
 {
-    private final List<String> entries;
+  private final List<String> entries;
 
-    private final long created;
+  private final long created;
 
-    /**
-     * Constructor with entries. Will have last modified timestamp as "now" (moment of creation).
-     * 
-     * @param entries list of entries, might not be {@code null}
-     */
-    public ArrayListPrefixSource( final List<String> entries )
-    {
-        this( entries, System.currentTimeMillis() );
-    }
+  /**
+   * Constructor with entries. Will have last modified timestamp as "now" (moment of creation).
+   *
+   * @param entries list of entries, might not be {@code null}
+   */
+  public ArrayListPrefixSource(final List<String> entries) {
+    this(entries, System.currentTimeMillis());
+  }
 
-    /**
-     * Constructor with entries and timestamp.
-     * 
-     * @param entries list of entries, might not be {@code null}.
-     * @param created the timestamp this instance should report.
-     */
-    public ArrayListPrefixSource( final List<String> entries, final long created )
-    {
-        this.entries = Collections.unmodifiableList( checkNotNull( entries ) );
-        this.created = created;
-    }
+  /**
+   * Constructor with entries and timestamp.
+   *
+   * @param entries list of entries, might not be {@code null}.
+   * @param created the timestamp this instance should report.
+   */
+  public ArrayListPrefixSource(final List<String> entries, final long created) {
+    this.entries = Collections.unmodifiableList(checkNotNull(entries));
+    this.created = created;
+  }
 
-    @Override
-    public boolean exists()
-    {
-        return true;
-    }
+  @Override
+  public boolean exists() {
+    return true;
+  }
 
-    @Override
-    public boolean supported()
-    {
-        return true;
-    }
+  @Override
+  public boolean supported() {
+    return true;
+  }
 
-    @Override
-    public List<String> readEntries()
-        throws IOException
-    {
-        return entries;
-    }
+  @Override
+  public List<String> readEntries()
+      throws IOException
+  {
+    return entries;
+  }
 
-    @Override
-    public long getLostModifiedTimestamp()
-    {
-        return created;
-    }
+  @Override
+  public long getLostModifiedTimestamp() {
+    return created;
+  }
 }

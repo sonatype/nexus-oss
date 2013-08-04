@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 /**
@@ -17,46 +18,30 @@ package org.sonatype.scheduling;
  */
 public interface TaskConfigManager
 {
-    /**
-     * Add a new scheduled task
-     * 
-     * @param <T>
-     * @param task
-     */
-    <T> void addTask( ScheduledTask<T> task );
+  /**
+   * Add a new scheduled task
+   */
+  <T> void addTask(ScheduledTask<T> task);
 
-    /**
-     * Remove an existing scheduled task
-     * 
-     * @param <T>
-     * @param task
-     */
-    <T> void removeTask( ScheduledTask<T> task );
+  /**
+   * Remove an existing scheduled task
+   */
+  <T> void removeTask(ScheduledTask<T> task);
 
-    /**
-     * Create and start all tasks, usually done once upon starting system (to start tasks that should be recurring)
-     * 
-     * @param scheduler
-     */
-    void initializeTasks( Scheduler scheduler );
+  /**
+   * Create and start all tasks, usually done once upon starting system (to start tasks that should be recurring)
+   */
+  void initializeTasks(Scheduler scheduler);
 
-    /**
-     * A factory for tasks.
-     * 
-     * @param taskType
-     * @return
-     * @throws IllegalArgumentException
-     */
-    SchedulerTask<?> createTaskInstance( String taskType )
-        throws IllegalArgumentException;
+  /**
+   * A factory for tasks.
+   */
+  SchedulerTask<?> createTaskInstance(String taskType)
+      throws IllegalArgumentException;
 
-    /**
-     * A factory for tasks.
-     * 
-     * @param taskType
-     * @return
-     * @throws IllegalArgumentException
-     */
-    <T> T createTaskInstance( Class<T> taskType )
-        throws IllegalArgumentException;
+  /**
+   * A factory for tasks.
+   */
+  <T> T createTaskInstance(Class<T> taskType)
+      throws IllegalArgumentException;
 }

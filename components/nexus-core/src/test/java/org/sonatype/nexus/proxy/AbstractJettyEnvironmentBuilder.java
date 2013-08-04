@@ -10,50 +10,50 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.jettytestsuite.ServletServer;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
 /**
  * The Class JettyTestsuiteEnvironment.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractJettyEnvironmentBuilder
     implements EnvironmentBuilder
 {
-    private ServletServer servletServer;
+  private ServletServer servletServer;
 
-    public AbstractJettyEnvironmentBuilder( ServletServer servletServer )
-    {
-        super();
-        this.servletServer = servletServer;
-    }
+  public AbstractJettyEnvironmentBuilder(ServletServer servletServer) {
+    super();
+    this.servletServer = servletServer;
+  }
 
-    public void startService()
-        throws Exception
-    {
-        servletServer.start();
-    }
+  public void startService()
+      throws Exception
+  {
+    servletServer.start();
+  }
 
-    public void stopService()
-        throws Exception
-    {
-        servletServer.stop();
-    }
+  public void stopService()
+      throws Exception
+  {
+    servletServer.stop();
+  }
 
-    public ServletServer getServletServer()
-    {
-        return servletServer;
-    }
+  public ServletServer getServletServer() {
+    return servletServer;
+  }
 
-    public abstract void buildEnvironment( AbstractProxyTestEnvironment env )
-        throws ConfigurationException,
-            IOException,
-            ComponentLookupException;
+  public abstract void buildEnvironment(AbstractProxyTestEnvironment env)
+      throws ConfigurationException,
+             IOException,
+             ComponentLookupException;
 
 }

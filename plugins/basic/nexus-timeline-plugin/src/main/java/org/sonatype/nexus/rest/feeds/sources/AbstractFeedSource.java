@@ -10,49 +10,48 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * And abstract class for NexusArtifactEvent based feeds. This class implements all needed to create a feed,
  * implementors needs only to implement 3 abtract classes.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractFeedSource
     extends AbstractLoggingComponent
     implements FeedSource
 {
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
+  @Requirement
+  private ApplicationStatusSource applicationStatusSource;
 
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
+  @Requirement
+  private RepositoryRegistry repositoryRegistry;
 
-    @Requirement
-    private FeedRecorder feedRecorder;
+  @Requirement
+  private FeedRecorder feedRecorder;
 
-    protected FeedRecorder getFeedRecorder()
-    {
-        return feedRecorder;
-    }
+  protected FeedRecorder getFeedRecorder() {
+    return feedRecorder;
+  }
 
-    protected RepositoryRegistry getRepositoryRegistry()
-    {
-        return repositoryRegistry;
-    }
-    
-    protected ApplicationStatusSource getApplicationStatusSource()
-    {
-        return applicationStatusSource;
-    }
+  protected RepositoryRegistry getRepositoryRegistry() {
+    return repositoryRegistry;
+  }
 
-    public abstract String getTitle();
+  protected ApplicationStatusSource getApplicationStatusSource() {
+    return applicationStatusSource;
+  }
 
-    public abstract String getDescription();
+  public abstract String getTitle();
+
+  public abstract String getDescription();
 }

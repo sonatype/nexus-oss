@@ -10,21 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.index.nexus4674;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
+package org.sonatype.nexus.testsuite.index.nexus4674;
 
 import java.util.List;
 
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * This test reindex a single version of a GA and check if all versions still present.
@@ -35,47 +37,44 @@ public class Nexus4674UpdateGAVIndexIT
     extends AbstractNexusIntegrationTest
 {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger( Nexus4674UpdateGAVIndexIT.class );
+  private final static Logger LOGGER = LoggerFactory.getLogger(Nexus4674UpdateGAVIndexIT.class);
 
-    @Test
-    public void searchTest()
-        throws Exception
-    {
-        // auto deploy artifacts need time to be indexed
-        TaskScheduleUtil.waitForAllTasksToStop();
-        getEventInspectorsUtil().waitForCalmPeriod();
+  @Test
+  public void searchTest()
+      throws Exception
+  {
+    // auto deploy artifacts need time to be indexed
+    TaskScheduleUtil.waitForAllTasksToStop();
+    getEventInspectorsUtil().waitForCalmPeriod();
 
-        List<NexusArtifact> r = getSearchMessageUtil().searchFor( "nexus4674" );
-        logContent( r );
-        assertThat( r, hasSize( 5 ) );
+    List<NexusArtifact> r = getSearchMessageUtil().searchFor("nexus4674");
+    logContent(r);
+    assertThat(r, hasSize(5));
 
-        // index GAV
-        getSearchMessageUtil().reindexGAV(
-            REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus4674", "artifact", "1" )
-        );
+    // index GAV
+    getSearchMessageUtil().reindexGAV(
+        REPO_TEST_HARNESS_REPO, GavUtil.newGav("nexus4674", "artifact", "1")
+    );
 
-        r = getSearchMessageUtil().searchFor( "nexus4674" );
-        logContent( r );
-        assertThat( r, hasSize( 5 ) );
+    r = getSearchMessageUtil().searchFor("nexus4674");
+    logContent(r);
+    assertThat(r, hasSize(5));
 
-        // index subartifact GAV
-        getSearchMessageUtil().reindexGAV(
-            REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus4674.artifact", "subartifact", "1" )
-        );
+    // index subartifact GAV
+    getSearchMessageUtil().reindexGAV(
+        REPO_TEST_HARNESS_REPO, GavUtil.newGav("nexus4674.artifact", "subartifact", "1")
+    );
 
-        logContent( r );
-        r = getSearchMessageUtil().searchFor( "nexus4674" );
-        assertThat( r, hasSize( 5 ) );
+    logContent(r);
+    r = getSearchMessageUtil().searchFor("nexus4674");
+    assertThat(r, hasSize(5));
+  }
+
+  private void logContent(final List<NexusArtifact> artifacts) {
+    if (artifacts != null && artifacts.size() > 0) {
+      for (final NexusArtifact a : artifacts) {
+        LOGGER.info("Found artifact: {}:{}:{}", $(a.getGroupId(), a.getArtifactId(), a.getVersion()));
+      }
     }
-
-    private void logContent( final List<NexusArtifact> artifacts )
-    {
-        if ( artifacts != null && artifacts.size() > 0 )
-        {
-            for ( final NexusArtifact a : artifacts )
-            {
-                LOGGER.info( "Found artifact: {}:{}:{}", $( a.getGroupId(), a.getArtifactId(), a.getVersion() ) );
-            }
-        }
-    }
+  }
 }

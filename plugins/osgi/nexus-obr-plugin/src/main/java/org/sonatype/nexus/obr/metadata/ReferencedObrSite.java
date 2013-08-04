@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.metadata;
 
 import java.io.IOException;
@@ -22,45 +23,39 @@ import java.net.URL;
 public class ReferencedObrSite
     extends AbstractObrSite
 {
-    private final URL url;
+  private final URL url;
 
-    /**
-     * Creates a referenced OBR site based on the given URL.
-     * 
-     * @param url the metadata URL
-     */
-    public ReferencedObrSite( final URL url )
-    {
-        this.url = url;
-    }
+  /**
+   * Creates a referenced OBR site based on the given URL.
+   *
+   * @param url the metadata URL
+   */
+  public ReferencedObrSite(final URL url) {
+    this.url = url;
+  }
 
-    public URL getMetadataUrl()
-    {
-        return url;
-    }
+  public URL getMetadataUrl() {
+    return url;
+  }
 
-    public String getMetadataPath()
-    {
-        return "";
-    }
+  public String getMetadataPath() {
+    return "";
+  }
 
-    @Override
-    protected InputStream openRawStream()
-        throws IOException
-    {
-        return url.openStream();
-    }
+  @Override
+  protected InputStream openRawStream()
+      throws IOException
+  {
+    return url.openStream();
+  }
 
-    @Override
-    protected String getContentType()
-    {
-        try
-        {
-            return url.openConnection().getContentType();
-        }
-        catch ( final IOException e )
-        {
-            return null;
-        }
+  @Override
+  protected String getContentType() {
+    try {
+      return url.openConnection().getContentType();
     }
+    catch (final IOException e) {
+      return null;
+    }
+  }
 }

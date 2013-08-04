@@ -10,26 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins;
 
 public enum PluginActivationRequest
 {
-    ACTIVATE
-    {
+  ACTIVATE
+      {
         @Override
-        final boolean isSuccessful( final PluginActivationResult result )
-        {
-            return result == PluginActivationResult.ACTIVATED;
+        final boolean isSuccessful(final PluginActivationResult result) {
+          return result == PluginActivationResult.ACTIVATED;
         }
-    },
-    DEACTIVATE
-    {
+      },
+  DEACTIVATE
+      {
         @Override
-        final boolean isSuccessful( final PluginActivationResult result )
-        {
-            return result == PluginActivationResult.DEACTIVATED;
+        final boolean isSuccessful(final PluginActivationResult result) {
+          return result == PluginActivationResult.DEACTIVATED;
         }
-    };
+      };
 
-    abstract boolean isSuccessful( final PluginActivationResult result );
+  abstract boolean isSuccessful(final PluginActivationResult result);
 }

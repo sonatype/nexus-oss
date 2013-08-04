@@ -10,18 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting.modifier;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.sonatype.nexus.error.reporting.ErrorReportRequest;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.error.report.ErrorReportComponent;
-import org.sonatype.nexus.error.reporting.ErrorReportRequest;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link org.sonatype.nexus.error.reporting.modifier.ComponentModifier}
@@ -32,38 +33,37 @@ public class TriggerTypeModifierTest
     extends TestSupport
 {
 
-    @Mock
-    private IssueSubmissionRequest request;
+  @Mock
+  private IssueSubmissionRequest request;
 
-    @Mock
-    private ErrorReportRequest ctx;
+  @Mock
+  private ErrorReportRequest ctx;
 
-    private TriggerTypeModifier underTest;
-    
-    @Before
-    public void init()
-    {
-        when( request.getSummary() ).thenReturn( "summary" );
-        when( request.getContext() ).thenReturn( ctx );
-        
-        underTest = new TriggerTypeModifier();
-    }
+  private TriggerTypeModifier underTest;
 
-    @Test
-    public void testAPR()
-        throws Exception
-    {
-        underTest.modify( request );
-        verify( request ).setSummary( "APR: summary" );
-    }
-    
-    @Test
-    public void testMPR()
-        throws Exception
-    {
-        when( ctx.isManual() ).thenReturn( true );
+  @Before
+  public void init() {
+    when(request.getSummary()).thenReturn("summary");
+    when(request.getContext()).thenReturn(ctx);
 
-        underTest.modify( request );
-        verify( request ).setSummary( "MPR: summary" );
-    }
+    underTest = new TriggerTypeModifier();
+  }
+
+  @Test
+  public void testAPR()
+      throws Exception
+  {
+    underTest.modify(request);
+    verify(request).setSummary("APR: summary");
+  }
+
+  @Test
+  public void testMPR()
+      throws Exception
+  {
+    when(ctx.isManual()).thenReturn(true);
+
+    underTest.modify(request);
+    verify(request).setSummary("MPR: summary");
+  }
 }

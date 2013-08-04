@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
@@ -32,59 +33,52 @@ import com.thoughtworks.xstream.io.xml.XppDomDriver;
 /**
  * This is a "remote" strategy, uses HTTP GET to get a remote LVO Plugin response. It extends the
  * HttpGetDiscoveryStrategy, and assumes that a GETted content is a LVO Plugin response.
- * 
+ *
  * @author cstamas
  */
 @Singleton
-@Named( "http-get-lvo" )
-@Typed( DiscoveryStrategy.class )
+@Named("http-get-lvo")
+@Typed(DiscoveryStrategy.class)
 public class HttpGetLvoDiscoveryStrategy
     extends AbstractRemoteDiscoveryStrategy
 {
-    private XStream xstream;
+  private XStream xstream;
 
-    @Inject
-    public HttpGetLvoDiscoveryStrategy( final Hc4Provider hc4Provider )
-    {
-        super( hc4Provider );
+  @Inject
+  public HttpGetLvoDiscoveryStrategy(final Hc4Provider hc4Provider) {
+    super(hc4Provider);
+  }
+
+  protected synchronized XStream getXStream() {
+    if (xstream == null) {
+      xstream = new XStream(new XppDomDriver());
+      DiscoveryResponse.configureXStream(xstream);
     }
 
-    protected synchronized XStream getXStream()
-    {
-        if ( xstream == null )
-        {
-            xstream = new XStream( new XppDomDriver() );
-            DiscoveryResponse.configureXStream( xstream );
-        }
+    return xstream;
+  }
 
-        return xstream;
-    }
-
-    public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
-    {
-        final DiscoveryResponse dr = new DiscoveryResponse( request );
-        // handle
-        final RequestResult response = handleRequest( getRemoteUrl( request ) );
-        if ( response != null )
-        {
-            try
-            {
-                final DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response.getInputStream() );
-                return remoteResponse;
-            }
-            catch ( XStreamException e )
-            {
-                // handle gracefully, but only XStream problems!
-                dr.setSuccessful( false );
-                return dr;
-            }
-            finally
-            {
-                response.close();
-            }
-        }
-
+  public DiscoveryResponse discoverLatestVersion(DiscoveryRequest request)
+      throws NoSuchRepositoryException, IOException
+  {
+    final DiscoveryResponse dr = new DiscoveryResponse(request);
+    // handle
+    final RequestResult response = handleRequest(getRemoteUrl(request));
+    if (response != null) {
+      try {
+        final DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML(response.getInputStream());
+        return remoteResponse;
+      }
+      catch (XStreamException e) {
+        // handle gracefully, but only XStream problems!
+        dr.setSuccessful(false);
         return dr;
+      }
+      finally {
+        response.close();
+      }
     }
+
+    return dr;
+  }
 }

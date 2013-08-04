@@ -10,17 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.config.nexus1375;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.rest.model.LogConfigResource;
+import org.sonatype.nexus.test.utils.LogConfigMessageUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.LogConfigResource;
-import org.sonatype.nexus.test.utils.LogConfigMessageUtil;
 
 /**
  * @author juven
@@ -29,54 +31,52 @@ public class Nexus1375LogConfigIT
     extends AbstractNexusIntegrationTest
 {
 
-    protected LogConfigMessageUtil messageUtil;
+  protected LogConfigMessageUtil messageUtil;
 
-    @BeforeClass
-    public static void setSecureTest()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-    }
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
+  }
 
-    @Before
-    public void setUp()
-    {
-        messageUtil = new LogConfigMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
-    }
+  @Before
+  public void setUp() {
+    messageUtil = new LogConfigMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
+  }
 
-    @Test
-    public void getLogConfig()
-        throws Exception
-    {
-        LogConfigResource resource = messageUtil.getLogConfig();
+  @Test
+  public void getLogConfig()
+      throws Exception
+  {
+    LogConfigResource resource = messageUtil.getLogConfig();
 
-        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
+    Assert.assertEquals("DEBUG", resource.getRootLoggerLevel());
 
-        Assert.assertEquals( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%thread] - %c - %m%n", resource.getFileAppenderPattern() );
+    Assert.assertEquals("%4d{yyyy-MM-dd HH:mm:ss} %-5p [%thread] - %c - %m%n", resource.getFileAppenderPattern());
 
-        // exposing actual OS file location over REST is very bad idea...
-        // File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
-        // Assert.assertTrue( nexusLog.getAbsoluteFile().equals( actualLoggerLocation.getAbsoluteFile() ) );
-    }
+    // exposing actual OS file location over REST is very bad idea...
+    // File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
+    // Assert.assertTrue( nexusLog.getAbsoluteFile().equals( actualLoggerLocation.getAbsoluteFile() ) );
+  }
 
-    @Test
-    public void updateLogConfig()
-        throws Exception
-    {
-        LogConfigResource resource = messageUtil.getLogConfig();
+  @Test
+  public void updateLogConfig()
+      throws Exception
+  {
+    LogConfigResource resource = messageUtil.getLogConfig();
 
-        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
+    Assert.assertEquals("DEBUG", resource.getRootLoggerLevel());
 
-        resource.setRootLoggerLevel( "ERROR" );
+    resource.setRootLoggerLevel("ERROR");
 
-        messageUtil.updateLogConfig( resource );
+    messageUtil.updateLogConfig(resource);
 
-        Assert.assertEquals("ERROR",  resource.getRootLoggerLevel() );
+    Assert.assertEquals("ERROR", resource.getRootLoggerLevel());
 
-        resource.setRootLoggerLevel( "DEBUG" );
+    resource.setRootLoggerLevel("DEBUG");
 
-        messageUtil.updateLogConfig( resource );
+    messageUtil.updateLogConfig(resource);
 
-        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
-    }
+    Assert.assertEquals("DEBUG", resource.getRootLoggerLevel());
+  }
 }

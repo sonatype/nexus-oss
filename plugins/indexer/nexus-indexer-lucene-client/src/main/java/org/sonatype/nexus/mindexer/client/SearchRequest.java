@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mindexer.client;
 
 import org.sonatype.nexus.client.internal.util.Check;
@@ -17,71 +18,62 @@ import org.sonatype.nexus.client.internal.util.Check;
 public class SearchRequest
 {
 
-    private final Integer from;
+  private final Integer from;
 
-    private final Integer count;
+  private final Integer count;
 
-    private final String repositoryId;
+  private final String repositoryId;
 
-    private final Boolean versionexpand;
+  private final Boolean versionexpand;
 
-    private final Boolean collapseresults;
+  private final Boolean collapseresults;
 
-    private final Query query;
+  private final Query query;
 
-    public SearchRequest( final Query query )
-    {
-        this( null, query );
-    }
+  public SearchRequest(final Query query) {
+    this(null, query);
+  }
 
-    public SearchRequest( final String repositoryId, final Query query )
-    {
-        this( null, null, repositoryId, query );
-    }
+  public SearchRequest(final String repositoryId, final Query query) {
+    this(null, null, repositoryId, query);
+  }
 
-    public SearchRequest( final Integer from, final Integer count, final String repositoryId, final Query query )
-    {
-        this( from, count, repositoryId, null, null, query );
-    }
+  public SearchRequest(final Integer from, final Integer count, final String repositoryId, final Query query) {
+    this(from, count, repositoryId, null, null, query);
+  }
 
-    public SearchRequest( final Integer from, final Integer count, final String repositoryId,
-                          final Boolean versionexpand, final Boolean collapseresults, final Query query )
-    {
-        this.from = from;
-        this.count = count;
-        this.repositoryId = repositoryId;
-        this.versionexpand = versionexpand;
-        this.collapseresults = collapseresults;
-        this.query = Check.notNull( query, Query.class );
-    }
+  public SearchRequest(final Integer from, final Integer count, final String repositoryId,
+                       final Boolean versionexpand, final Boolean collapseresults, final Query query)
+  {
+    this.from = from;
+    this.count = count;
+    this.repositoryId = repositoryId;
+    this.versionexpand = versionexpand;
+    this.collapseresults = collapseresults;
+    this.query = Check.notNull(query, Query.class);
+  }
 
-    public Integer getFrom()
-    {
-        return from;
-    }
+  public Integer getFrom() {
+    return from;
+  }
 
-    public Integer getCount()
-    {
-        return count;
-    }
+  public Integer getCount() {
+    return count;
+  }
 
-    public String getRepositoryId()
-    {
-        return repositoryId;
-    }
+  public String getRepositoryId() {
+    return repositoryId;
+  }
 
-    public Boolean getVersionexpand()
-    {
-        return versionexpand;
-    }
+  public Boolean getVersionexpand() {
+    return versionexpand;
+  }
 
-    public Boolean getCollapseresults()
-    {
-        return collapseresults;
-    }
+  public Boolean getCollapseresults() {
+    return collapseresults;
+  }
 
-    public Query getQuery()
-    {
-        return query;
-    }
+  public Query getQuery() {
+    return query;
+  }
 }

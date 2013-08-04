@@ -10,21 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import javax.inject.Inject;
+
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import org.junit.Test;
 
 /**
  * Tests for {@link AbstractFileNexusPluginRepository}
+ *
  * @author plynch
  */
-public class AbstractFileNexusPluginRepositoryTest {
+public class AbstractFileNexusPluginRepositoryTest
+{
 
-    @Test
-    public void packagingMapperIsInjectableNEXUS4434() throws NoSuchFieldException {
-        assertThat(AbstractFileNexusPluginRepository.class.getDeclaredField("packagingMapper").getAnnotation(Inject.class), notNullValue()) ;
-    }
+  @Test
+  public void packagingMapperIsInjectableNEXUS4434() throws NoSuchFieldException {
+    assertThat(AbstractFileNexusPluginRepository.class.getDeclaredField("packagingMapper").getAnnotation(Inject.class),
+        notNullValue());
+  }
 }

@@ -10,29 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors.properties;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-@Component( role = ScheduledTaskPropertyDescriptor.class, hint = "ResourceStorePath", instantiationStrategy = "per-lookup" )
+@Component(role = ScheduledTaskPropertyDescriptor.class, hint = "ResourceStorePath",
+    instantiationStrategy = "per-lookup")
 public class ResourceStorePathPropertyDescriptor
     extends AbstractStringPropertyDescriptor
 {
-    public static final String ID = "resourceStorePath";
-    
-    public ResourceStorePathPropertyDescriptor()
-    {
-        setHelpText( "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")." );
-        setRequired( false );
-    }
- 
-    public String getId()
-    {
-        return ID;
-    }
+  public static final String ID = "resourceStorePath";
 
-    public String getName()
-    {
-        return "Repository path";
-    }
+  public ResourceStorePathPropertyDescriptor() {
+    setHelpText("Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").");
+    setRequired(false);
+  }
+
+  public String getId() {
+    return ID;
+  }
+
+  public String getName() {
+    return "Repository path";
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -17,18 +18,18 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public interface P2MetadataGenerator
 {
 
-    void addConfiguration( final P2MetadataGeneratorConfiguration configuration );
+  void addConfiguration(final P2MetadataGeneratorConfiguration configuration);
 
-    void removeConfiguration( final P2MetadataGeneratorConfiguration configuration );
+  void removeConfiguration(final P2MetadataGeneratorConfiguration configuration);
 
-    P2MetadataGeneratorConfiguration getConfiguration( final String repositoryId );
+  P2MetadataGeneratorConfiguration getConfiguration(final String repositoryId);
 
-    void generateP2Metadata( StorageItem item );
+  void generateP2Metadata(StorageItem item);
 
-    void removeP2Metadata( StorageItem item );
+  void removeP2Metadata(StorageItem item);
 
-    void scanAndRebuild( String repositoryId, String resourceStorePath );
+  void scanAndRebuild(String repositoryId, String resourceStorePath);
 
-    void scanAndRebuild( String resourceStorePath );
+  void scanAndRebuild(String resourceStorePath);
 
 }

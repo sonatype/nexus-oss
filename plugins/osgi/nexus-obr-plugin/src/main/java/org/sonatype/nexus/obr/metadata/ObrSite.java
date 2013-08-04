@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.obr.metadata;
 
 import java.io.IOException;
@@ -21,26 +22,25 @@ import java.net.URL;
  */
 public interface ObrSite
 {
-    /**
-     * Returns the URL of the OBR metadata, may be local (file:) or remote.
-     * 
-     * @return the metadata URL
-     */
-    URL getMetadataUrl();
+  /**
+   * Returns the URL of the OBR metadata, may be local (file:) or remote.
+   *
+   * @return the metadata URL
+   */
+  URL getMetadataUrl();
 
-    /**
-     * Returns the path to the OBR metadata, relative to the hosting site.
-     * 
-     * @return the relative path
-     */
-    String getMetadataPath();
+  /**
+   * Returns the path to the OBR metadata, relative to the hosting site.
+   *
+   * @return the relative path
+   */
+  String getMetadataPath();
 
-    /**
-     * Opens a new stream to the OBR metadata, caller must close the stream.
-     * 
-     * @return a new input stream
-     * @throws IOException
-     */
-    InputStream openStream()
-        throws IOException;
+  /**
+   * Opens a new stream to the OBR metadata, caller must close the stream.
+   *
+   * @return a new input stream
+   */
+  InputStream openStream()
+      throws IOException;
 }

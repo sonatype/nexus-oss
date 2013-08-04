@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.exception;
 
 import javax.ws.rs.core.Response;
@@ -21,17 +22,17 @@ public class NexusClientNotFoundException
     extends NexusClientResponseException
 {
 
-    public NexusClientNotFoundException( final String reasonPhrase,
-                                         final String responseBody )
-    {
-        super( Response.Status.NOT_FOUND.getStatusCode(), reasonPhrase, responseBody );
-    }
+  public NexusClientNotFoundException(final String reasonPhrase,
+                                      final String responseBody)
+  {
+    super(Response.Status.NOT_FOUND.getStatusCode(), reasonPhrase, responseBody);
+  }
 
-    public NexusClientNotFoundException( final String message,
-                                         final String reasonPhrase,
-                                         final String responseBody )
-    {
-        super( message, Response.Status.NOT_FOUND.getStatusCode(), reasonPhrase, responseBody );
-    }
+  public NexusClientNotFoundException(final String message,
+                                      final String reasonPhrase,
+                                      final String responseBody)
+  {
+    super(message, Response.Status.NOT_FOUND.getStatusCode(), reasonPhrase, responseBody);
+  }
 
 }

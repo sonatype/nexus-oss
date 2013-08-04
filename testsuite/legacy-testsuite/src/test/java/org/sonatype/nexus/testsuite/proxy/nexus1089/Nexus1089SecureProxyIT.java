@@ -10,54 +10,56 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.proxy.nexus1089;
 
 import java.io.File;
+
+import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 public class Nexus1089SecureProxyIT
     extends AbstractNexusProxyIntegrationTest
 {
-    protected ServletServer secureProxyServer = null;
+  protected ServletServer secureProxyServer = null;
 
-    @Override
-    @Before
-    public void startProxy()
-        throws Exception
-    {
-        secureProxyServer = lookup( ServletServer.class, "secure" );
-        secureProxyServer.start();
+  @Override
+  @Before
+  public void startProxy()
+      throws Exception
+  {
+    secureProxyServer = lookup(ServletServer.class, "secure");
+    secureProxyServer.start();
+  }
+
+  @Override
+  @After
+  public void stopProxy()
+      throws Exception
+  {
+    if (secureProxyServer != null) {
+      secureProxyServer.stop();
     }
+  }
 
-    @Override
-    @After
-    public void stopProxy()
-        throws Exception
-    {
-        if ( secureProxyServer != null )
-        {
-            secureProxyServer.stop();
-        }
-    }
+  @Test
+  @Category(PROXY.class)
+  public void downloadArtifact()
+      throws Exception
+  {
+    File localFile = this.getLocalFile("release-proxy-repo-1", "nexus1089", "artifact", "1.0", "jar");
 
-    @Test @Category(PROXY.class)
-    public void downloadArtifact()
-        throws Exception
-    {
-        File localFile = this.getLocalFile( "release-proxy-repo-1", "nexus1089", "artifact", "1.0", "jar" );
+    File artifact = this.downloadArtifact("nexus1089", "artifact", "1.0", "jar", null, "target/downloads");
 
-        File artifact = this.downloadArtifact( "nexus1089", "artifact", "1.0", "jar", null, "target/downloads" );
+    Assert.assertTrue(FileTestingUtils.compareFileSHA1s(artifact, localFile));
 
-        Assert.assertTrue( FileTestingUtils.compareFileSHA1s( artifact, localFile ) );
-
-    }
+  }
 }

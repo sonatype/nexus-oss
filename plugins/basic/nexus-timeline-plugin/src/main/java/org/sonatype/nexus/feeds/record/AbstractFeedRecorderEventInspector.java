@@ -10,15 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.feeds.record;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import com.google.common.base.Preconditions;
+
+import org.codehaus.plexus.component.annotations.Requirement;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author cstamas
@@ -26,36 +27,32 @@ import com.google.common.base.Preconditions;
 public abstract class AbstractFeedRecorderEventInspector
     extends AbstractEventInspector
 {
-    @Requirement
-    private FeedRecorder feedRecorder;
+  @Requirement
+  private FeedRecorder feedRecorder;
 
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
+  @Requirement
+  private ApplicationStatusSource applicationStatusSource;
 
-    public AbstractFeedRecorderEventInspector()
-    {
-    }
+  public AbstractFeedRecorderEventInspector() {
+  }
 
-    // for now used just for UTs
-    AbstractFeedRecorderEventInspector( final FeedRecorder feedRecorder,
-                                        final ApplicationStatusSource applicationStatusSource )
-    {
-        this.feedRecorder = checkNotNull( feedRecorder );
-        this.applicationStatusSource = checkNotNull( applicationStatusSource );
-    }
+  // for now used just for UTs
+  AbstractFeedRecorderEventInspector(final FeedRecorder feedRecorder,
+                                     final ApplicationStatusSource applicationStatusSource)
+  {
+    this.feedRecorder = checkNotNull(feedRecorder);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+  }
 
-    protected FeedRecorder getFeedRecorder()
-    {
-        return feedRecorder;
-    }
+  protected FeedRecorder getFeedRecorder() {
+    return feedRecorder;
+  }
 
-    protected ApplicationStatusSource getApplicationStatusSource()
-    {
-        return applicationStatusSource;
-    }
+  protected ApplicationStatusSource getApplicationStatusSource() {
+    return applicationStatusSource;
+  }
 
-    protected boolean isNexusStarted()
-    {
-        return getApplicationStatusSource().getSystemStatus().isNexusStarted();
-    }
+  protected boolean isNexusStarted() {
+    return getApplicationStatusSource().getSystemStatus().isNexusStarted();
+  }
 }

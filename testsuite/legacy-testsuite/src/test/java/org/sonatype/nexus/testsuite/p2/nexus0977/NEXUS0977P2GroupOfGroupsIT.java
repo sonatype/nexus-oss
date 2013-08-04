@@ -10,29 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.p2.nexus0977;
 
 import java.net.URL;
 
-import org.junit.Test;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
+
+import org.junit.Test;
 
 public class NEXUS0977P2GroupOfGroupsIT
     extends AbstractNexusProxyP2IT
 {
 
-    public NEXUS0977P2GroupOfGroupsIT()
-    {
-        super( "nexus0977" );
-    }
+  public NEXUS0977P2GroupOfGroupsIT() {
+    super("nexus0977");
+  }
 
-    @Test
-    public void test()
-        throws Exception
-    {
-        downloadFile(
-            new URL( getRepositoryUrl( "nexus0977g1" ) + "/content.xml" ), "target/downloads/nexus0977/content.xml"
-        );
-    }
+  @Test
+  public void test()
+      throws Exception
+  {
+    downloadFile(
+        new URL(getRepositoryUrl("nexus0977g1") + "/content.xml"), "target/downloads/nexus0977/content.xml"
+    );
+  }
 
 }

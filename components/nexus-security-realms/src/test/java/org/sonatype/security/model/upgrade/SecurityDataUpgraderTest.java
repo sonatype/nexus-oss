@@ -10,60 +10,62 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.model.upgrade;
 
 import java.io.File;
 import java.io.StringWriter;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.model.AbstractSecurityConfigTest;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
+
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 public class SecurityDataUpgraderTest
     extends AbstractSecurityConfigTest
 {
 
-    protected SecurityConfigurationUpgrader configurationUpgrader;
+  protected SecurityConfigurationUpgrader configurationUpgrader;
 
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
+  public void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        FileUtils.cleanDirectory( new File( getSecurityConfiguration() ).getParentFile() );
+    FileUtils.cleanDirectory(new File(getSecurityConfiguration()).getParentFile());
 
-        this.configurationUpgrader = (SecurityConfigurationUpgrader) lookup( SecurityConfigurationUpgrader.class );
-    }
+    this.configurationUpgrader = (SecurityConfigurationUpgrader) lookup(SecurityConfigurationUpgrader.class);
+  }
 
-    protected void resultIsFine( String path, Configuration configuration )
-        throws Exception
-    {
-        SecurityConfigurationXpp3Writer w = new SecurityConfigurationXpp3Writer();
+  protected void resultIsFine(String path, Configuration configuration)
+      throws Exception
+  {
+    SecurityConfigurationXpp3Writer w = new SecurityConfigurationXpp3Writer();
 
-        StringWriter sw = new StringWriter();
+    StringWriter sw = new StringWriter();
 
-        w.write( sw, configuration );
+    w.write(sw, configuration);
 
-        String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
-        shouldBe = shouldBe.replace( "\r\n", "\n" );
+    String shouldBe = IOUtil.toString(getClass().getResourceAsStream(path + ".result"));
+    shouldBe = shouldBe.replace("\r\n", "\n");
 
-        assertEquals( shouldBe, sw.toString() );
-    }
+    assertEquals(shouldBe, sw.toString());
+  }
 
-    public void testFrom100()
-        throws Exception
-    {
-        copyFromClasspathToFile( "/org/sonatype/security/model/upgrade/data-upgrade/security.xml",
-                                 getSecurityConfiguration() );
+  public void testFrom100()
+      throws Exception
+  {
+    copyFromClasspathToFile("/org/sonatype/security/model/upgrade/data-upgrade/security.xml",
+        getSecurityConfiguration());
 
-        Configuration configuration =
-            configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
+    Configuration configuration =
+        configurationUpgrader.loadOldConfiguration(new File(getSecurityConfiguration()));
 
-        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+    assertEquals(Configuration.MODEL_VERSION, configuration.getVersion());
 
-        resultIsFine( "/org/sonatype/security/model/upgrade/data-upgrade/security.xml", configuration );
-    }
+    resultIsFine("/org/sonatype/security/model/upgrade/data-upgrade/security.xml", configuration);
+  }
 
 }

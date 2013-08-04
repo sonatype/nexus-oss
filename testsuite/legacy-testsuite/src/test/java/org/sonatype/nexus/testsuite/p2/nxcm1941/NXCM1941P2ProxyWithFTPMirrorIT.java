@@ -10,48 +10,49 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.p2.nxcm1941;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.startsWith;
+package org.sonatype.nexus.testsuite.p2.nxcm1941;
 
 import java.io.IOException;
 
-import org.junit.Test;
-import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
+
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 
 public class NXCM1941P2ProxyWithFTPMirrorIT
     extends AbstractNexusProxyP2IT
 {
 
-    public NXCM1941P2ProxyWithFTPMirrorIT()
-    {
-        super( "nxcm1941" );
-    }
+  public NXCM1941P2ProxyWithFTPMirrorIT() {
+    super("nxcm1941");
+  }
 
-    @Override
-    protected void copyTestResources()
-        throws IOException
-    {
-        super.copyTestResources();
+  @Override
+  protected void copyTestResources()
+      throws IOException
+  {
+    super.copyTestResources();
 
-        final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
-        assertThat( proxyRepoBaseUrl, startsWith( "http://" ) );
+    final String proxyRepoBaseUrl = TestProperties.getString("proxy.repo.base.url");
+    assertThat(proxyRepoBaseUrl, startsWith("http://"));
 
-        replaceInFile( localStorageDir + "/nxcm1941/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
-        replaceInFile( localStorageDir + "/nxcm1941/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
-        replaceInFile(
-            localStorageDir + "/nxcm1941/mirrors.xml",
-            "${ftp-proxy-repo-base-url}", "ftp" + proxyRepoBaseUrl.substring( 4 )
-        );
-    }
+    replaceInFile(localStorageDir + "/nxcm1941/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl);
+    replaceInFile(localStorageDir + "/nxcm1941/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl);
+    replaceInFile(
+        localStorageDir + "/nxcm1941/mirrors.xml",
+        "${ftp-proxy-repo-base-url}", "ftp" + proxyRepoBaseUrl.substring(4)
+    );
+  }
 
-    @Test
-    public void test()
-        throws Exception
-    {
-        installAndVerifyP2Feature();
-    }
+  @Test
+  public void test()
+      throws Exception
+  {
+    installAndVerifyP2Feature();
+  }
 
 }

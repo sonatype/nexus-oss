@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.mac;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.mac;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,105 +34,99 @@ import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.expr.SourcedSearchExpression;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Singleton
 @Named
 public class DefaultMacPlugin
     implements MacPlugin
 {
-    private final NexusIndexer indexer;
+  private final NexusIndexer indexer;
 
-    @Inject
-    public DefaultMacPlugin( final NexusIndexer indexer )
-    {
-        this.indexer = checkNotNull( indexer );
+  @Inject
+  public DefaultMacPlugin(final NexusIndexer indexer) {
+    this.indexer = checkNotNull(indexer);
+  }
+
+  /**
+   * Lists available archatypes for given request.
+   */
+  protected IteratorSearchResponse listArchetypes(final MacRequest request, final IndexingContext ctx)
+      throws IOException
+  {
+    // construct the query: we search for artifacts having packing "maven-archetype" exactly and nothing else
+    final Query pq = indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("maven-archetype"));
+
+    // NEXUS-5216: one and only one context must be given. If not given, we have to return "empty hands",
+    // otherwise MI will initiate "untargeted" search. When running in Nexus, it will result in totally invalid
+    // catalog, containing archetypes from all but this repository.
+    if (ctx == null) {
+      return IteratorSearchResponse.empty(pq);
     }
 
-    /**
-     * Lists available archatypes for given request.
-     */
-    protected IteratorSearchResponse listArchetypes( final MacRequest request, final IndexingContext ctx )
-        throws IOException
-    {
-        // construct the query: we search for artifacts having packing "maven-archetype" exactly and nothing else
-        final Query pq = indexer.constructQuery( MAVEN.PACKAGING, new SourcedSearchExpression( "maven-archetype" ) );
+    // to have sorted results by version in descending order
+    final IteratorSearchRequest sreq = new IteratorSearchRequest(pq, ctx);
+    // filter that filters out classified artifacts
+    final ClassifierArtifactInfoFilter classifierFilter = new ClassifierArtifactInfoFilter();
 
-        // NEXUS-5216: one and only one context must be given. If not given, we have to return "empty hands",
-        // otherwise MI will initiate "untargeted" search. When running in Nexus, it will result in totally invalid
-        // catalog, containing archetypes from all but this repository.
-        if ( ctx == null )
-        {
-            return IteratorSearchResponse.empty( pq );
-        }
-
-        // to have sorted results by version in descending order
-        final IteratorSearchRequest sreq = new IteratorSearchRequest( pq, ctx );
-        // filter that filters out classified artifacts
-        final ClassifierArtifactInfoFilter classifierFilter = new ClassifierArtifactInfoFilter();
-
-        // combine it with others if needed (unused in cli, but perm filtering in server!)
-        if ( request.getArtifactInfoFilter() != null )
-        {
-            final AndMultiArtifactInfoFilter andArtifactFilter =
-                new AndMultiArtifactInfoFilter( Arrays.asList( new ArtifactInfoFilter[] { classifierFilter,
-                    request.getArtifactInfoFilter() } ) );
-            sreq.setArtifactInfoFilter( andArtifactFilter );
-        }
-        else
-        {
-            sreq.setArtifactInfoFilter( classifierFilter );
-        }
-
-        return indexer.searchIterator( sreq );
+    // combine it with others if needed (unused in cli, but perm filtering in server!)
+    if (request.getArtifactInfoFilter() != null) {
+      final AndMultiArtifactInfoFilter andArtifactFilter =
+          new AndMultiArtifactInfoFilter(Arrays.asList(new ArtifactInfoFilter[]{
+              classifierFilter,
+              request.getArtifactInfoFilter()
+          }));
+      sreq.setArtifactInfoFilter(andArtifactFilter);
+    }
+    else {
+      sreq.setArtifactInfoFilter(classifierFilter);
     }
 
-    public ArchetypeCatalog listArcherypesAsCatalog( final MacRequest request, final IndexingContext ctx )
-        throws IOException
-    {
-        final IteratorSearchResponse infos = listArchetypes( request, ctx );
+    return indexer.searchIterator(sreq);
+  }
 
-        try
-        {
-            final ArchetypeCatalog catalog = new ArchetypeCatalog();
-            Archetype archetype = null;
-            // fill it in
-            for ( ArtifactInfo info : infos )
-            {
-                archetype = new Archetype();
-                archetype.setGroupId( info.groupId );
-                archetype.setArtifactId( info.artifactId );
-                archetype.setVersion( info.version );
-                archetype.setDescription( info.description );
+  public ArchetypeCatalog listArcherypesAsCatalog(final MacRequest request, final IndexingContext ctx)
+      throws IOException
+  {
+    final IteratorSearchResponse infos = listArchetypes(request, ctx);
 
-                if ( StringUtils.isNotEmpty( request.getRepositoryUrl() ) )
-                {
-                    archetype.setRepository( request.getRepositoryUrl() );
-                }
-                catalog.addArchetype( archetype );
-            }
-            return catalog;
+    try {
+      final ArchetypeCatalog catalog = new ArchetypeCatalog();
+      Archetype archetype = null;
+      // fill it in
+      for (ArtifactInfo info : infos) {
+        archetype = new Archetype();
+        archetype.setGroupId(info.groupId);
+        archetype.setArtifactId(info.artifactId);
+        archetype.setVersion(info.version);
+        archetype.setDescription(info.description);
+
+        if (StringUtils.isNotEmpty(request.getRepositoryUrl())) {
+          archetype.setRepository(request.getRepositoryUrl());
         }
-        finally
-        {
-            if ( infos != null )
-            {
-                infos.close();
-            }
-        }
+        catalog.addArchetype(archetype);
+      }
+      return catalog;
     }
-
-    // ==
-
-    /**
-     * Filters to strip-out possible sub-artifacts of artifacts having packaging "maven-archetype".
-     * 
-     * @author cstamas
-     */
-    public static class ClassifierArtifactInfoFilter
-        implements ArtifactInfoFilter
-    {
-        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-        {
-            return StringUtils.isBlank( ai.classifier );
-        }
+    finally {
+      if (infos != null) {
+        infos.close();
+      }
     }
+  }
+
+  // ==
+
+  /**
+   * Filters to strip-out possible sub-artifacts of artifacts having packaging "maven-archetype".
+   *
+   * @author cstamas
+   */
+  public static class ClassifierArtifactInfoFilter
+      implements ArtifactInfoFilter
+  {
+    public boolean accepts(IndexingContext ctx, ArtifactInfo ai) {
+      return StringUtils.isBlank(ai.classifier);
+    }
+  }
 }

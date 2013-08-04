@@ -10,18 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao.password;
 
 
 public interface PasswordEncoder
 {
 
-    String ROLE = PasswordEncoder.class.getName();
-    
-    String getMethod();
+  String ROLE = PasswordEncoder.class.getName();
 
-    String encodePassword( String password, Object salt );
+  String getMethod();
 
-    boolean isPasswordValid( String encPassword, String inputPassword, Object salt );
-    
+  String encodePassword(String password, Object salt);
+
+  boolean isPasswordValid(String encPassword, String inputPassword, Object salt);
+
 }

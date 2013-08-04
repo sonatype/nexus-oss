@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.authorization.xml;
 
 import java.util.ArrayList;
@@ -22,34 +23,30 @@ import javax.inject.Singleton;
 /**
  * Default implementation of PrivilegeInheritanceManager which adds read to each action. The way we see it, if you can
  * create/update/delete something then you automatically have access to 'read' it as well.
- * 
+ *
  * @author Brian Demers
  */
 @Singleton
-@Typed( PrivilegeInheritanceManager.class )
-@Named( "default" )
+@Typed(PrivilegeInheritanceManager.class)
+@Named("default")
 public class DefaultPrivilegeInheritanceManager
     implements PrivilegeInheritanceManager
 {
-    public List<String> getInheritedMethods( String method )
-    {
-        List<String> methods = new ArrayList<String>();
+  public List<String> getInheritedMethods(String method) {
+    List<String> methods = new ArrayList<String>();
 
-        methods.add( method );
+    methods.add(method);
 
-        if ( "create".equals( method ) )
-        {
-            methods.add( "read" );
-        }
-        else if ( "delete".equals( method ) )
-        {
-            methods.add( "read" );
-        }
-        else if ( "update".equals( method ) )
-        {
-            methods.add( "read" );
-        }
-
-        return methods;
+    if ("create".equals(method)) {
+      methods.add("read");
     }
+    else if ("delete".equals(method)) {
+      methods.add("read");
+    }
+    else if ("update".equals(method)) {
+      methods.add("read");
+    }
+
+    return methods;
+  }
 }

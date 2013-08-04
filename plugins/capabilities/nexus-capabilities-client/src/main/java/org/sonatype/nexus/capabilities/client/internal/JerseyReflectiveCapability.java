@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capabilities.client.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.capabilities.client.internal;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +24,10 @@ import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityImplem
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+
 import com.google.common.primitives.Primitives;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reflection based capability implementation.
@@ -36,104 +38,89 @@ public class JerseyReflectiveCapability
     implements InvocationHandler
 {
 
-    private final Class<? extends Capability> capabilityType;
+  private final Class<? extends Capability> capabilityType;
 
-    private final JerseyCapability delegate;
+  private final JerseyCapability delegate;
 
-    public JerseyReflectiveCapability( final Class<? extends Capability> capabilityType,
-                                       final JerseyNexusClient nexusClient,
-                                       final String type )
-    {
-        this.capabilityType = checkNotNull( capabilityType );
-        delegate = new JerseyCapability( nexusClient, type );
+  public JerseyReflectiveCapability(final Class<? extends Capability> capabilityType,
+                                    final JerseyNexusClient nexusClient,
+                                    final String type)
+  {
+    this.capabilityType = checkNotNull(capabilityType);
+    delegate = new JerseyCapability(nexusClient, type);
+  }
+
+  public JerseyReflectiveCapability(final Class<? extends Capability> capabilityType,
+                                    final JerseyNexusClient nexusClient,
+                                    final CapabilityListItemResource settings)
+  {
+    this.capabilityType = checkNotNull(capabilityType);
+    delegate = new JerseyCapability(nexusClient, settings);
+  }
+
+  @Override
+  public Object invoke(final Object proxy, final Method method, final Object[] args)
+      throws Throwable
+  {
+    final CapabilityProperty capabilityProperty = method.getAnnotation(CapabilityProperty.class);
+    if (capabilityProperty != null) {
+      if (args == null || args.length == 0) {
+        // we have a getter
+        final String value = delegate.property(capabilityProperty.value());
+        if (value == null || Void.TYPE.equals(method.getReturnType())) {
+          return null;
+        }
+        if (method.getReturnType().isAssignableFrom(capabilityType)) {
+          return proxy;
+        }
+        try {
+          return Primitives.wrap(method.getReturnType())
+              .getConstructor(String.class)
+              .newInstance(value);
+        }
+        catch (final Exception e) {
+          throw new ReflectiveCapabilityImplementationException(
+              "Could not convert '" + value + "' to a " + method.getReturnType()
+          );
+        }
+      }
+      else if (args.length == 1) {
+        delegate.withProperty(capabilityProperty.value(), args[0] == null ? null : args[0].toString());
+        if (Void.TYPE.equals(method.getReturnType())) {
+          return null;
+        }
+        if (method.getReturnType().isAssignableFrom(capabilityType)) {
+          return proxy;
+        }
+        throw new ReflectiveCapabilityImplementationException("Could not reflectively implement " + method);
+      }
+      else {
+        throw new ReflectiveCapabilityImplementationException(
+            CapabilityProperty.class.getName() + " annotations are only allowed on setters and getters"
+        );
+      }
     }
-
-    public JerseyReflectiveCapability( final Class<? extends Capability> capabilityType,
-                                       final JerseyNexusClient nexusClient,
-                                       final CapabilityListItemResource settings )
-    {
-        this.capabilityType = checkNotNull( capabilityType );
-        delegate = new JerseyCapability( nexusClient, settings );
+    try {
+      final Method actual = delegate.getClass().getMethod(method.getName(), method.getParameterTypes());
+      final Object result = actual.invoke(delegate, args);
+      if (method.getReturnType() != null && method.getReturnType().isAssignableFrom(capabilityType)) {
+        return proxy;
+      }
+      return result;
     }
-
-    @Override
-    public Object invoke( final Object proxy, final Method method, final Object[] args )
-        throws Throwable
-    {
-        final CapabilityProperty capabilityProperty = method.getAnnotation( CapabilityProperty.class );
-        if ( capabilityProperty != null )
-        {
-            if ( args == null || args.length == 0 )
-            {
-                // we have a getter
-                final String value = delegate.property( capabilityProperty.value() );
-                if ( value == null || Void.TYPE.equals( method.getReturnType() ) )
-                {
-                    return null;
-                }
-                if ( method.getReturnType().isAssignableFrom( capabilityType ) )
-                {
-                    return proxy;
-                }
-                try
-                {
-                    return Primitives.wrap( method.getReturnType() )
-                        .getConstructor( String.class )
-                        .newInstance( value );
-                }
-                catch ( final Exception e )
-                {
-                    throw new ReflectiveCapabilityImplementationException(
-                        "Could not convert '" + value + "' to a " + method.getReturnType()
-                    );
-                }
-            }
-            else if ( args.length == 1 )
-            {
-                delegate.withProperty( capabilityProperty.value(), args[0] == null ? null : args[0].toString() );
-                if ( Void.TYPE.equals( method.getReturnType() ) )
-                {
-                    return null;
-                }
-                if ( method.getReturnType().isAssignableFrom( capabilityType ) )
-                {
-                    return proxy;
-                }
-                throw new ReflectiveCapabilityImplementationException( "Could not reflectively implement " + method );
-            }
-            else
-            {
-                throw new ReflectiveCapabilityImplementationException(
-                    CapabilityProperty.class.getName() + " annotations are only allowed on setters and getters"
-                );
-            }
-        }
-        try
-        {
-            final Method actual = delegate.getClass().getMethod( method.getName(), method.getParameterTypes() );
-            final Object result = actual.invoke( delegate, args );
-            if ( method.getReturnType() != null && method.getReturnType().isAssignableFrom( capabilityType ) )
-            {
-                return proxy;
-            }
-            return result;
-        }
-        catch ( NoSuchMethodException e )
-        {
-            throw new ReflectiveCapabilityImplementationException( "Could not reflectively implement " + method );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw e.getTargetException();
-        }
-        catch ( IllegalAccessException e )
-        {
-            throw new NexusClientException(
-                "Could not reflectively implement " + proxy.getClass(), e
-            )
-            {
-            };
-        }
+    catch (NoSuchMethodException e) {
+      throw new ReflectiveCapabilityImplementationException("Could not reflectively implement " + method);
     }
+    catch (InvocationTargetException e) {
+      throw e.getTargetException();
+    }
+    catch (IllegalAccessException e) {
+      throw new NexusClientException(
+          "Could not reflectively implement " + proxy.getClass(), e
+      )
+      {
+      };
+    }
+  }
 
 }

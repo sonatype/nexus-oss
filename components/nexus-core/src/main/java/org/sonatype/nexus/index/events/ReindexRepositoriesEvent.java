@@ -10,25 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.index.events;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
 
 @Deprecated
 public class ReindexRepositoriesEvent
-extends AbstractEvent<Object>
+    extends AbstractEvent<Object>
 {
 
-    private ReindexRepositoriesRequest reindexRepositoriesRequest;
-    
-    public ReindexRepositoriesEvent( Object component, ReindexRepositoriesRequest reindexRepositoriesRequest )
-    {
-        super( component );
-        this.reindexRepositoriesRequest = reindexRepositoriesRequest;
-    }
+  private ReindexRepositoriesRequest reindexRepositoriesRequest;
 
-    public ReindexRepositoriesRequest getReindexRepositoriesRequest()
-    {
-        return reindexRepositoriesRequest;
-    }
+  public ReindexRepositoriesEvent(Object component, ReindexRepositoriesRequest reindexRepositoriesRequest) {
+    super(component);
+    this.reindexRepositoriesRequest = reindexRepositoriesRequest;
+  }
+
+  public ReindexRepositoriesRequest getReindexRepositoriesRequest() {
+    return reindexRepositoriesRequest;
+  }
 }

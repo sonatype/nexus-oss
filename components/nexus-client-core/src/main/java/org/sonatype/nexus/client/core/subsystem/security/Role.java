@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.security;
 
 import java.util.List;
@@ -25,24 +26,24 @@ public interface Role
     extends Entity<Role>
 {
 
-    String name();
+  String name();
 
-    String description();
+  String description();
 
-    List<String> privileges();
+  List<String> privileges();
 
-    List<String> roles();
+  List<String> roles();
 
-    Role withDescription( String value );
+  Role withDescription(String value);
 
-    Role withName( String value );
+  Role withName(String value);
 
-    Role withPrivilege( String value );
+  Role withPrivilege(String value);
 
-    Role withRole( String value );
+  Role withRole(String value);
 
-    Role removePrivilege( String value );
+  Role removePrivilege(String value);
 
-    Role removeRole( String value );
+  Role removeRole(String value);
 
 }

@@ -10,31 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.mime;
 
 /**
  * Interface to provide "hints" what a given source thinks about MIME type of some items.
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public interface MimeRulesSource
 {
-    MimeRulesSource NOOP = new MimeRulesSource()
-    {
-        @Override
-        public String getRuleForPath( final String path )
-        {
-            return null;
-        }
-    };
+  MimeRulesSource NOOP = new MimeRulesSource()
+  {
+    @Override
+    public String getRuleForPath(final String path) {
+      return null;
+    }
+  };
 
-    /**
-     * Returns the forced MIME type that corresponds (should correspond) to given path in the context of given rule
-     * source. Returns {@code null} if no rules found.
-     * 
-     * @param path
-     * @return
-     */
-    String getRuleForPath( String path );
+  /**
+   * Returns the forced MIME type that corresponds (should correspond) to given path in the context of given rule
+   * source. Returns {@code null} if no rules found.
+   */
+  String getRuleForPath(String path);
 }

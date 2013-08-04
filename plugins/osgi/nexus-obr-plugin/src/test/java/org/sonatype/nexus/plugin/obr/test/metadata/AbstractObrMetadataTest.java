@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugin.obr.test.metadata;
 
 import java.io.IOException;
@@ -35,79 +36,76 @@ public abstract class AbstractObrMetadataTest
     extends NexusTestSupport
 {
 
-    protected ObrMetadataSource obrMetadataSource;
+  protected ObrMetadataSource obrMetadataSource;
 
-    protected Repository testRepository;
+  protected Repository testRepository;
 
-    protected NexusConfiguration nexusConfig;
+  protected NexusConfiguration nexusConfig;
 
-    @Override
-    protected void setUp()
-        throws Exception
+  @Override
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
+
+    nexusConfig = lookup(NexusConfiguration.class);
+
+    obrMetadataSource = lookup(ObrMetadataSource.class, "obr-bindex");
+
+    testRepository = lookup(Repository.class, "maven2");
+
+    nexusConfig.loadConfiguration();
+
+    final CRepository crepo = new DefaultCRepository();
+    crepo.setId("test-repository");
+    crepo.setName("test-repository");
+    final CLocalStorage clocal = new CLocalStorage();
+    clocal.setUrl(getBasedir() + "/target/test-classes");
+    clocal.setProvider("file");
+    crepo.setLocalStorage(clocal);
+    testRepository.configure(crepo);
+
+    // initialize attribute cache, otherwise storeItem recurses
+    testRepository.getRepositoryItemUidAttributeManager().reset();
+  }
+
+  protected ObrSite openObrSite(final RepositoryItemUid uid)
+      throws StorageException, ItemNotFoundException
+  {
+    return openObrSite(uid.getRepository(), uid.getPath());
+  }
+
+  protected ObrSite openObrSite(final Repository repository, final String path)
+      throws StorageException, ItemNotFoundException
+  {
+    final ResourceStoreRequest request = new ResourceStoreRequest(path);
+
+    final URL url = repository.getLocalStorage().getAbsoluteUrlFromBase(repository, request);
+
+    return new ObrSite()
     {
-        super.setUp();
+      public String getMetadataPath() {
+        return path;
+      }
 
-        nexusConfig = lookup( NexusConfiguration.class );
+      public URL getMetadataUrl() {
+        return url;
+      }
 
-        obrMetadataSource = lookup( ObrMetadataSource.class, "obr-bindex" );
+      public InputStream openStream()
+          throws IOException
+      {
+        final URLConnection conn = url.openConnection();
 
-        testRepository = lookup( Repository.class, "maven2" );
+        if ("application/zip".equalsIgnoreCase(conn.getContentType())) {
+          // assume metadata is the first entry in the zipfile
+          final ZipInputStream zis = new ZipInputStream(conn.getInputStream());
+          zis.getNextEntry();
+          return zis;
+        }
 
-        nexusConfig.loadConfiguration();
-
-        final CRepository crepo = new DefaultCRepository();
-        crepo.setId( "test-repository" );
-        crepo.setName( "test-repository" );
-        final CLocalStorage clocal = new CLocalStorage();
-        clocal.setUrl( getBasedir() + "/target/test-classes" );
-        clocal.setProvider( "file" );
-        crepo.setLocalStorage( clocal );
-        testRepository.configure( crepo );
-
-        // initialize attribute cache, otherwise storeItem recurses
-        testRepository.getRepositoryItemUidAttributeManager().reset();
-    }
-
-    protected ObrSite openObrSite( final RepositoryItemUid uid )
-        throws StorageException, ItemNotFoundException
-    {
-        return openObrSite( uid.getRepository(), uid.getPath() );
-    }
-
-    protected ObrSite openObrSite( final Repository repository, final String path )
-        throws StorageException, ItemNotFoundException
-    {
-        final ResourceStoreRequest request = new ResourceStoreRequest( path );
-
-        final URL url = repository.getLocalStorage().getAbsoluteUrlFromBase( repository, request );
-
-        return new ObrSite()
-        {
-            public String getMetadataPath()
-            {
-                return path;
-            }
-
-            public URL getMetadataUrl()
-            {
-                return url;
-            }
-
-            public InputStream openStream()
-                throws IOException
-            {
-                final URLConnection conn = url.openConnection();
-
-                if ( "application/zip".equalsIgnoreCase( conn.getContentType() ) )
-                {
-                    // assume metadata is the first entry in the zipfile
-                    final ZipInputStream zis = new ZipInputStream( conn.getInputStream() );
-                    zis.getNextEntry();
-                    return zis;
-                }
-
-                return conn.getInputStream();
-            }
-        };
-    }
+        return conn.getInputStream();
+      }
+    };
+  }
 }

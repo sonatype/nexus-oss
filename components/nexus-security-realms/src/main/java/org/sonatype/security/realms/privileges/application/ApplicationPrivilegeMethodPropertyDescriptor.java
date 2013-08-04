@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.privileges.application;
 
 import javax.enterprise.inject.Typed;
@@ -19,30 +20,26 @@ import javax.inject.Singleton;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
 @Singleton
-@Typed( PrivilegePropertyDescriptor.class )
-@Named( "ApplicationPrivilegeMethodPropertyDescriptor" )
+@Typed(PrivilegePropertyDescriptor.class)
+@Named("ApplicationPrivilegeMethodPropertyDescriptor")
 public class ApplicationPrivilegeMethodPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
-    public static final String ID = "method";
+  public static final String ID = "method";
 
-    public String getHelpText()
-    {
-        return "The method (create, read, update, delete) assigned to this privilege.";
-    }
+  public String getHelpText() {
+    return "The method (create, read, update, delete) assigned to this privilege.";
+  }
 
-    public String getId()
-    {
-        return ID;
-    }
+  public String getId() {
+    return ID;
+  }
 
-    public String getName()
-    {
-        return "Method";
-    }
+  public String getName() {
+    return "Method";
+  }
 
-    public String getType()
-    {
-        return "string";
-    }
+  public String getType() {
+    return "string";
+  }
 }

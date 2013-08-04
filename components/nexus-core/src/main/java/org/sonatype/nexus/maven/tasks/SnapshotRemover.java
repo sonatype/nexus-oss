@@ -10,19 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 public interface SnapshotRemover
 {
-    /**
-     * A flag to mark that -- even if we are doing something (eg. deleting, see NEXUS-814) within this GAV -- this GAV
-     * is contained multiple times in Repository and this is not the last one, there are more instances (eg. more
-     * snapshot builds) for this GAV still left in Repository.
-     */
-    String MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV = "moreTsSnapshotsExistsForGav";
+  /**
+   * A flag to mark that -- even if we are doing something (eg. deleting, see NEXUS-814) within this GAV -- this GAV
+   * is contained multiple times in Repository and this is not the last one, there are more instances (eg. more
+   * snapshot builds) for this GAV still left in Repository.
+   */
+  String MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV = "moreTsSnapshotsExistsForGav";
 
-    SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-        throws NoSuchRepositoryException, IllegalArgumentException;
+  SnapshotRemovalResult removeSnapshots(SnapshotRemovalRequest request)
+      throws NoSuchRepositoryException, IllegalArgumentException;
 }

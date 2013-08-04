@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -18,8 +19,8 @@ import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 
 public interface AuthenticationInfoConverter
 {
-    RemoteAuthenticationSettings convertAndValidateFromModel( CRemoteAuthentication model )
-        throws ConfigurationException;
+  RemoteAuthenticationSettings convertAndValidateFromModel(CRemoteAuthentication model)
+      throws ConfigurationException;
 
-    CRemoteAuthentication convertToModel( RemoteAuthenticationSettings settings );
+  CRemoteAuthentication convertToModel(RemoteAuthenticationSettings settings);
 }

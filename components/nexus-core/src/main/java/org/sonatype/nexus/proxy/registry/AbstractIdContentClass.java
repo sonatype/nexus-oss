@@ -10,47 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.registry;
 
 public abstract class AbstractIdContentClass
     implements ContentClass
 {
-    public String getName()
-    {
-        return getId();
-    }
-    
-    public boolean isCompatible( ContentClass contentClass )
-    {
-        return getId().equals( contentClass.getId() );
+  public String getName() {
+    return getId();
+  }
+
+  public boolean isCompatible(ContentClass contentClass) {
+    return getId().equals(contentClass.getId());
+  }
+
+  public boolean isGroupable() {
+    return true;
+  }
+
+  // ==
+
+  public int hashCode() {
+    return getId().hashCode();
+  }
+
+  public boolean equals(Object o) {
+    if (o == null) {
+      return false;
     }
 
-    public boolean isGroupable()
-    {
-        return true;
+    if (o instanceof ContentClass) {
+      return getId().equals(((ContentClass) o).getId());
     }
-
-    // ==
-
-    public int hashCode()
-    {
-        return getId().hashCode();
+    else {
+      return false;
     }
-
-    public boolean equals( Object o )
-    {
-        if ( o == null )
-        {
-            return false;
-        }
-
-        if ( o instanceof ContentClass )
-        {
-            return getId().equals( ( (ContentClass) o ).getId() );
-        }
-        else
-        {
-            return false;
-        }
-    }
+  }
 }

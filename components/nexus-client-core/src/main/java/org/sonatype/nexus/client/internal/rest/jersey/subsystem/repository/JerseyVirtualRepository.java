@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository;
 
 import org.sonatype.nexus.client.core.subsystem.repository.RepositoryStatus;
@@ -27,48 +28,42 @@ public class JerseyVirtualRepository<T extends VirtualRepository>
     implements VirtualRepository<T>
 {
 
-    static final String REPO_TYPE = "virtual";
+  static final String REPO_TYPE = "virtual";
 
-    static final String PROVIDER_ROLE = "org.sonatype.nexus.proxy.repository.ShadowRepository";
+  static final String PROVIDER_ROLE = "org.sonatype.nexus.proxy.repository.ShadowRepository";
 
-    public JerseyVirtualRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyVirtualRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyVirtualRepository( final JerseyNexusClient nexusClient, final RepositoryShadowResource settings )
-    {
-        super( nexusClient, settings );
-    }
+  public JerseyVirtualRepository(final JerseyNexusClient nexusClient, final RepositoryShadowResource settings) {
+    super(nexusClient, settings);
+  }
 
-    @Override
-    protected RepositoryShadowResource createSettings()
-    {
-        final RepositoryShadowResource settings = new RepositoryShadowResource();
+  @Override
+  protected RepositoryShadowResource createSettings() {
+    final RepositoryShadowResource settings = new RepositoryShadowResource();
 
-        settings.setRepoType( REPO_TYPE );
-        settings.setProviderRole( PROVIDER_ROLE );
-        settings.setExposed( true );
+    settings.setRepoType(REPO_TYPE);
+    settings.setProviderRole(PROVIDER_ROLE);
+    settings.setExposed(true);
 
-        return settings;
-    }
+    return settings;
+  }
 
-    private T me()
-    {
-        return (T) this;
-    }
+  private T me() {
+    return (T) this;
+  }
 
-    @Override
-    public String virtualizedRepository()
-    {
-        return settings().getShadowOf();
-    }
+  @Override
+  public String virtualizedRepository() {
+    return settings().getShadowOf();
+  }
 
-    @Override
-    public T ofRepository( final String repositoryId )
-    {
-        settings().setShadowOf( repositoryId );
-        return me();
-    }
+  @Override
+  public T ofRepository(final String repositoryId) {
+    settings().setShadowOf(repositoryId);
+    return me();
+  }
 
 }

@@ -10,22 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus;
 
 /**
  * The enum of possible operation modes in which Nexus Application may reside.
- * 
+ *
  * @author cstamas
  */
 public enum OperationMode
 {
-    /**
-     * Nexus is in standalone mode.
-     */
-    STANDALONE,
+  /**
+   * Nexus is in standalone mode.
+   */
+  STANDALONE,
 
-    /**
-     * Nexus is config slave.
-     */
-    CONFIGURATION_SLAVE;
+  /**
+   * Nexus is config slave.
+   */
+  CONFIGURATION_SLAVE;
 }

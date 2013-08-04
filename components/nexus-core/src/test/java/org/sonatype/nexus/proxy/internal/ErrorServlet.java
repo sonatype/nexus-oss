@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.internal;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,31 +29,28 @@ public class ErrorServlet
     extends HttpServlet
 {
 
-    public static String CONTENT = "<html>some content</html>";
+  public static String CONTENT = "<html>some content</html>";
 
-    private static Map<String, String> RESPONSE_HEADERS = new HashMap<String, String>();
+  private static Map<String, String> RESPONSE_HEADERS = new HashMap<String, String>();
 
-    public static void clearHeaders()
-    {
-        RESPONSE_HEADERS.clear();
+  public static void clearHeaders() {
+    RESPONSE_HEADERS.clear();
+  }
+
+  public static void addHeader(String key, String value) {
+    RESPONSE_HEADERS.put(key, value);
+  }
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException
+  {
+    for (Entry<String, String> headerEntry : RESPONSE_HEADERS.entrySet()) {
+      resp.addHeader(headerEntry.getKey(), headerEntry.getValue());
     }
 
-    public static void addHeader( String key, String value )
-    {
-        RESPONSE_HEADERS.put( key, value );
-    }
+    IOUtil.copy(CONTENT, resp.getOutputStream());
 
-    @Override
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException
-    {
-        for ( Entry<String, String> headerEntry : RESPONSE_HEADERS.entrySet() )
-        {
-            resp.addHeader( headerEntry.getKey(), headerEntry.getValue() );
-        }
-
-        IOUtil.copy( CONTENT, resp.getOutputStream() );
-
-    }
+  }
 
 }

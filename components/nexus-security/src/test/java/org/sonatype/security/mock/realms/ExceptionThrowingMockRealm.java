@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.mock.realms;
 
 import javax.enterprise.inject.Typed;
@@ -26,23 +27,22 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 
 @Singleton
-@Typed( Realm.class )
-@Named( "ExceptionThrowingMockRealm" )
+@Typed(Realm.class)
+@Named("ExceptionThrowingMockRealm")
 public class ExceptionThrowingMockRealm
     extends AuthorizingRealm
 {
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
-        throws AuthenticationException
-    {
-        throw new AuthenticationException( "This realm only throws exceptions" );
-    }
+  @Override
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+      throws AuthenticationException
+  {
+    throw new AuthenticationException("This realm only throws exceptions");
+  }
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
-    {
-        throw new AuthorizationException( "This realm only throws exceptions" );
-    }
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    throw new AuthorizationException("This realm only throws exceptions");
+  }
 
 }

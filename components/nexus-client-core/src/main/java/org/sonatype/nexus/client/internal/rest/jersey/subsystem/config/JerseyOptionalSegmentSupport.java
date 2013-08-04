@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.config;
 
 import org.sonatype.nexus.client.core.subsystem.config.OptionalSegment;
@@ -20,19 +21,17 @@ public abstract class JerseyOptionalSegmentSupport<ME extends OptionalSegment, S
     implements OptionalSegment<ME, S>
 {
 
-    public JerseyOptionalSegmentSupport( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
-    }
+  public JerseyOptionalSegmentSupport(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
 
-    @Override
-    public ME disable()
-    {
-        onDisable( settings() );
-        save();
-        return me();
-    }
+  @Override
+  public ME disable() {
+    onDisable(settings());
+    save();
+    return me();
+  }
 
-    protected abstract void onDisable( final S settings );
+  protected abstract void onDisable(final S settings);
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -24,80 +25,71 @@ public class DisjunctionWalkerFilter
     implements WalkerFilter
 {
 
-    /**
-     * OR-ed filters (can be null or empty).
-     */
-    private final WalkerFilter[] m_filters;
+  /**
+   * OR-ed filters (can be null or empty).
+   */
+  private final WalkerFilter[] m_filters;
 
-    /**
-     * Constructor.
-     *
-     * @param filters OR-ed filters (can be null or empty)
-     */
-    public DisjunctionWalkerFilter( final WalkerFilter... filters )
-    {
-        m_filters = filters;
-    }
+  /**
+   * Constructor.
+   *
+   * @param filters OR-ed filters (can be null or empty)
+   */
+  public DisjunctionWalkerFilter(final WalkerFilter... filters) {
+    m_filters = filters;
+  }
 
-    /**
-     * Performs a logical OR between results of calling {@link #shouldProcess(WalkerContext, StorageItem)} on all
-     * filters. It will exit at first filter that returns true. <br/>
-     * If no filters were provided returns true.
-     *
-     * {@inheritDoc}
-     */
-    public boolean shouldProcess( final WalkerContext context,
-                                  final StorageItem item )
-    {
-        if ( m_filters == null || m_filters.length == 0 )
-        {
-            return true;
-        }
-        for ( WalkerFilter filter : m_filters )
-        {
-            if ( filter.shouldProcess( context, item ) )
-            {
-                return true;
-            }
-        }
-        return false;
+  /**
+   * Performs a logical OR between results of calling {@link #shouldProcess(WalkerContext, StorageItem)} on all
+   * filters. It will exit at first filter that returns true. <br/>
+   * If no filters were provided returns true.
+   *
+   * {@inheritDoc}
+   */
+  public boolean shouldProcess(final WalkerContext context,
+                               final StorageItem item)
+  {
+    if (m_filters == null || m_filters.length == 0) {
+      return true;
     }
+    for (WalkerFilter filter : m_filters) {
+      if (filter.shouldProcess(context, item)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-    /**
-     * Performs a logical OR between results of calling
-     * {@link #shouldProcessRecursively(WalkerContext, StorageCollectionItem)}  on all filters. It will exit at first
-     * filter that returns true.<br/>
-     * If no filters were provided returns true.
-     *
-     * {@inheritDoc}
-     */
-    public boolean shouldProcessRecursively( final WalkerContext context,
-                                             final StorageCollectionItem coll )
-    {
-        if ( m_filters == null || m_filters.length == 0 )
-        {
-            return true;
-        }
-        for ( WalkerFilter filter : m_filters )
-        {
-            if ( filter.shouldProcessRecursively( context, coll ) )
-            {
-                return true;
-            }
-        }
-        return false;
+  /**
+   * Performs a logical OR between results of calling
+   * {@link #shouldProcessRecursively(WalkerContext, StorageCollectionItem)}  on all filters. It will exit at first
+   * filter that returns true.<br/>
+   * If no filters were provided returns true.
+   *
+   * {@inheritDoc}
+   */
+  public boolean shouldProcessRecursively(final WalkerContext context,
+                                          final StorageCollectionItem coll)
+  {
+    if (m_filters == null || m_filters.length == 0) {
+      return true;
     }
+    for (WalkerFilter filter : m_filters) {
+      if (filter.shouldProcessRecursively(context, coll)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-    /**
-     * Builder method.
-     *
-     * @param filters OR-ed filters (can be null or empty)
-     *
-     * @return disjunction between filters
-     */
-    public static DisjunctionWalkerFilter statisfiesOneOf( final WalkerFilter... filters )
-    {
-        return new DisjunctionWalkerFilter( filters );
-    }
+  /**
+   * Builder method.
+   *
+   * @param filters OR-ed filters (can be null or empty)
+   * @return disjunction between filters
+   */
+  public static DisjunctionWalkerFilter statisfiesOneOf(final WalkerFilter... filters) {
+    return new DisjunctionWalkerFilter(filters);
+  }
 
 }

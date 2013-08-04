@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.email;
 
 import java.util.List;
@@ -23,21 +24,18 @@ import org.slf4j.LoggerFactory;
 public class NullSecurityEmailer
     implements SecurityEmailer
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public void sendForgotUsername( String email, List<String> userIds )
-    {
-        this.logger.error( "No SecurityEmailer, user will not be notified." );
-    }
+  public void sendForgotUsername(String email, List<String> userIds) {
+    this.logger.error("No SecurityEmailer, user will not be notified.");
+  }
 
-    public void sendNewUserCreated( String email, String userid, String password )
-    {
-        this.logger.error( "No SecurityEmailer, user will not be notified." );
-    }
+  public void sendNewUserCreated(String email, String userid, String password) {
+    this.logger.error("No SecurityEmailer, user will not be notified.");
+  }
 
-    public void sendResetPassword( String email, String password )
-    {
-        this.logger.error( "No SecurityEmailer, user will not be notified." );
-    }
+  public void sendResetPassword(String email, String password) {
+    this.logger.error("No SecurityEmailer, user will not be notified.");
+  }
 
 }

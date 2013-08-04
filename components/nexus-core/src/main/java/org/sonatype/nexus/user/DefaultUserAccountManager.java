@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.user;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.security.SecuritySystem;
@@ -22,50 +21,51 @@ import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * Provides functionality to read and update basic user data.
  *
  * @since 2.1
  */
-@Component( role = UserAccountManager.class )
+@Component(role = UserAccountManager.class)
 public class DefaultUserAccountManager
     extends AbstractLoggingComponent
     implements UserAccountManager
 {
-    @Requirement
-    private SecuritySystem securitySystem;
+  @Requirement
+  private SecuritySystem securitySystem;
 
-    public User readAccount( String userId )
-        throws UserNotFoundException, AuthorizationException
-    {
-        checkPermission( userId );
+  public User readAccount(String userId)
+      throws UserNotFoundException, AuthorizationException
+  {
+    checkPermission(userId);
 
-        return securitySystem.getUser( userId );
+    return securitySystem.getUser(userId);
+  }
+
+  public User updateAccount(User user)
+      throws InvalidConfigurationException, UserNotFoundException, NoSuchUserManagerException,
+             AuthorizationException
+  {
+    checkPermission(user.getUserId());
+
+    return securitySystem.updateUser(user);
+  }
+
+  protected void checkPermission(String userId)
+      throws AuthorizationException
+  {
+    if (!securitySystem.isSecurityEnabled()) {
+      return;
     }
 
-    public User updateAccount( User user )
-        throws InvalidConfigurationException, UserNotFoundException, NoSuchUserManagerException,
-        AuthorizationException
-    {
-        checkPermission( user.getUserId() );
-
-        return securitySystem.updateUser( user );
+    if (securitySystem.getSubject().getPrincipal().equals(userId)) {
+      return;
     }
 
-    protected void checkPermission( String userId )
-        throws AuthorizationException
-    {
-        if ( !securitySystem.isSecurityEnabled() )
-        {
-            return;
-        }
-
-        if ( securitySystem.getSubject().getPrincipal().equals( userId ) )
-        {
-             return;
-        }
-
-        securitySystem.checkPermission( securitySystem.getSubject().getPrincipals(), "security:users" );
-    }
+    securitySystem.checkPermission(securitySystem.getSubject().getPrincipals(), "security:users");
+  }
 
 }

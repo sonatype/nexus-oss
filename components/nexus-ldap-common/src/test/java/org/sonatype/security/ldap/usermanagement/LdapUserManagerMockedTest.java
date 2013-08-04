@@ -10,19 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.usermanagement;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link LdapUserManager}.
@@ -31,30 +33,29 @@ public class LdapUserManagerMockedTest
     extends TestSupport
 {
 
-    private LdapUserManager underTest;
+  private LdapUserManager underTest;
 
-    @Mock
-    private LdapManager ldapManager;
+  @Mock
+  private LdapManager ldapManager;
 
-    @Mock
-    private LdapUser user;
+  @Mock
+  private LdapUser user;
 
-    @Before
-    public void setup()
-    {
-        this.underTest = new LdapUserManager( ldapManager );
-    }
+  @Before
+  public void setup() {
+    this.underTest = new LdapUserManager(ldapManager);
+  }
 
-    @Test
-    public void stripEmailWhitespace()
-        throws Exception
-    {
-        when( ldapManager.getUser( "test" ) ).thenReturn( user );
-        when( user.getEmail() ).thenReturn( " email@with.whitespace.invalid " );
+  @Test
+  public void stripEmailWhitespace()
+      throws Exception
+  {
+    when(ldapManager.getUser("test")).thenReturn(user);
+    when(user.getEmail()).thenReturn(" email@with.whitespace.invalid ");
 
-        final User user = underTest.getUser( "test" );
+    final User user = underTest.getUser("test");
 
-        assertThat( user.getEmailAddress(), is( "email@with.whitespace.invalid" ) );
-    }
+    assertThat(user.getEmailAddress(), is("email@with.whitespace.invalid"));
+  }
 
 }

@@ -10,21 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling;
 
 public class NoSuchTaskException
     extends Exception
 {
-    private static final long serialVersionUID = 9212575645497920481L;
+  private static final long serialVersionUID = 9212575645497920481L;
 
-    public NoSuchTaskException( String id )
-    {
-        super( "There is no running/active task with ID=" + id );
-    }
+  public NoSuchTaskException(String id) {
+    super("There is no running/active task with ID=" + id);
+  }
 
-    public NoSuchTaskException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+  public NoSuchTaskException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

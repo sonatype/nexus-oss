@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
@@ -23,37 +24,33 @@ public class CapabilityRegistryEvent
     extends AbstractEvent<CapabilityRegistry>
 {
 
-    public CapabilityRegistryEvent( final CapabilityRegistry capabilityRegistry )
-    {
-        super( capabilityRegistry );
+  public CapabilityRegistryEvent(final CapabilityRegistry capabilityRegistry) {
+    super(capabilityRegistry);
+  }
+
+  @Override
+  public String toString() {
+    return getEventSender().toString();
+  }
+
+  /**
+   * Event fired after capabilities were loaded loaded from persistence store.
+   *
+   * @since 2.0
+   */
+  public static class AfterLoad
+      extends CapabilityRegistryEvent
+  {
+
+    public AfterLoad(final CapabilityRegistry capabilityRegistry) {
+      super(capabilityRegistry);
     }
 
     @Override
-    public String toString()
-    {
-        return getEventSender().toString();
+    public String toString() {
+      return "Loaded " + super.toString();
     }
 
-    /**
-     * Event fired after capabilities were loaded loaded from persistence store.
-     *
-     * @since 2.0
-     */
-    public static class AfterLoad
-        extends CapabilityRegistryEvent
-    {
-
-        public AfterLoad( final CapabilityRegistry capabilityRegistry )
-        {
-            super( capabilityRegistry );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Loaded " + super.toString();
-        }
-
-    }
+  }
 
 }

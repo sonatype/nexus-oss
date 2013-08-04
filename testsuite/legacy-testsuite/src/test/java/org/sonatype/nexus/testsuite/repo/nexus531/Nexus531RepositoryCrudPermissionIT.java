@@ -10,9 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus531;
 
 import java.io.IOException;
+
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.rest.model.RepositoryResource;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -20,245 +27,246 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
-import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.rest.model.RepositoryResource;
 
 /**
  * Test Repo CRUD privileges.
  */
-public class Nexus531RepositoryCrudPermissionIT extends AbstractPrivilegeTest
+public class Nexus531RepositoryCrudPermissionIT
+    extends AbstractPrivilegeTest
 {
 
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
-    @Test @Category(SECURITY.class)
-    public void testCreatePermission()
-        throws IOException
-    {
-        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
-        
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testCreatePermission" );
-        repo.setName( "testCreatePermission" );
-        repo.setRepoType( "hosted" );
-        repo.setProvider( "maven1" );
-        // format is neglected by server from now on, provider is the new guy in the town
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
-        repo.setChecksumPolicy( "IGNORE" );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+  @Test
+  @Category(SECURITY.class)
+  public void testCreatePermission()
+      throws IOException
+  {
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    RepositoryResource repo = new RepositoryResource();
+    repo.setId("testCreatePermission");
+    repo.setName("testCreatePermission");
+    repo.setRepoType("hosted");
+    repo.setProvider("maven1");
+    // format is neglected by server from now on, provider is the new guy in the town
+    repo.setFormat("maven1");
+    repo.setRepoPolicy(RepositoryPolicy.SNAPSHOT.name());
+    repo.setChecksumPolicy("IGNORE");
 
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // now give create
-        this.giveUserPrivilege( TEST_USER_NAME, "5" );
+    Response response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        // now.... it should work...
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
+    // now give create
+    this.giveUserPrivilege(TEST_USER_NAME, "5");
 
-        // read should succeed (inherited)
-        response = this.repoUtil.sendMessage( Method.GET, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    // now.... it should work...
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // update should fail
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    repo = (RepositoryResource) this.repoUtil.getRepository(repo.getId());
 
-        // delete should fail
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // read should succeed (inherited)
+    response = this.repoUtil.sendMessage(Method.GET, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-    }
+    // update should fail
+    response = this.repoUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-    @Test @Category(SECURITY.class)
-    public void testUpdatePermission()
-        throws IOException
-    {
+    // delete should fail
+    response = this.repoUtil.sendMessage(Method.DELETE, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
-        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
+  }
 
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testUpdatePermission" );
-        repo.setName( "testUpdatePermission" );
-        repo.setRepoType( "hosted" );
-        repo.setProvider( "maven1" );
-        // format is neglected by server from now on, provider is the new guy in the town
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
-        repo.setChecksumPolicy( "IGNORE" );
+  @Test
+  @Category(SECURITY.class)
+  public void testUpdatePermission()
+      throws IOException
+  {
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
 
-        // update repo
-        repo.setName( "tesUpdatePermission2" );
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    RepositoryResource repo = new RepositoryResource();
+    repo.setId("testUpdatePermission");
+    repo.setName("testUpdatePermission");
+    repo.setRepoType("hosted");
+    repo.setProvider("maven1");
+    // format is neglected by server from now on, provider is the new guy in the town
+    repo.setFormat("maven1");
+    repo.setRepoPolicy(RepositoryPolicy.SNAPSHOT.name());
+    repo.setChecksumPolicy("IGNORE");
 
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    Response response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    repo = (RepositoryResource) this.repoUtil.getRepository(repo.getId());
 
-        // now give update
-        this.giveUserPrivilege( TEST_USER_NAME, "7" );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    // update repo
+    repo.setName("tesUpdatePermission2");
+    response = this.repoUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        // should work now...
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // read should succeed (inherited)
-        response = this.repoUtil.sendMessage( Method.GET, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    // now give update
+    this.giveUserPrivilege(TEST_USER_NAME, "7");
 
-        // update should fail
-        response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // delete should fail
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // should work now...
+    response = this.repoUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-    }
+    // read should succeed (inherited)
+    response = this.repoUtil.sendMessage(Method.GET, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-    @Test @Category(SECURITY.class)
-    public void testReadPermission()
-        throws IOException
-    {
+    // update should fail
+    response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
-        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
+    // delete should fail
+    response = this.repoUtil.sendMessage(Method.DELETE, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testReadPermission" );
-        repo.setName( "testReadPermission" );
-        repo.setRepoType( "hosted" );
-        repo.setProvider( "maven1" );
-        // format is neglected by server from now on, provider is the new guy in the town
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
-        repo.setChecksumPolicy( "IGNORE" );
+  }
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
+  @Test
+  @Category(SECURITY.class)
+  public void testReadPermission()
+      throws IOException
+  {
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // update repo
-        repo.setName( "tesUpdatePermission2" );
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
 
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    RepositoryResource repo = new RepositoryResource();
+    repo.setId("testReadPermission");
+    repo.setName("testReadPermission");
+    repo.setRepoType("hosted");
+    repo.setProvider("maven1");
+    // format is neglected by server from now on, provider is the new guy in the town
+    repo.setFormat("maven1");
+    repo.setRepoPolicy(RepositoryPolicy.SNAPSHOT.name());
+    repo.setChecksumPolicy("IGNORE");
 
-        // now give read
-        this.giveUserPrivilege( TEST_USER_NAME, "6" );
+    Response response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    repo = (RepositoryResource) this.repoUtil.getRepository(repo.getId());
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // read should fail
-        response = this.repoUtil.sendMessage( Method.GET, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    // update repo
+    repo.setName("tesUpdatePermission2");
+    response = this.repoUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        // update should fail
-        response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // delete should fail
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // now give read
+    this.giveUserPrivilege(TEST_USER_NAME, "6");
 
-     // should work now...
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-    }
+    // read should fail
+    response = this.repoUtil.sendMessage(Method.GET, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
+
+    // update should fail
+    response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
+
+    // delete should fail
+    response = this.repoUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
+
+    // should work now...
+    response = this.repoUtil.sendMessage(Method.DELETE, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
+
+  }
 
 
-    @Test @Category(SECURITY.class)
-    public void testDeletePermission()
-        throws IOException
-    {
+  @Test
+  @Category(SECURITY.class)
+  public void testDeletePermission()
+      throws IOException
+  {
 
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
-        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testDeletePermission" );
-        repo.setName( "testDeletePermission" );
-        repo.setRepoType( "hosted" );
-        repo.setProvider( "maven1" );
-        // format is neglected by server from now on, provider is the new guy in the town
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
-        repo.setChecksumPolicy( "IGNORE" );
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 201 );
-        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
+    RepositoryResource repo = new RepositoryResource();
+    repo.setId("testDeletePermission");
+    repo.setName("testDeletePermission");
+    repo.setRepoType("hosted");
+    repo.setProvider("maven1");
+    // format is neglected by server from now on, provider is the new guy in the town
+    repo.setFormat("maven1");
+    repo.setRepoPolicy(RepositoryPolicy.SNAPSHOT.name());
+    repo.setChecksumPolicy("IGNORE");
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    Response response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
+    repo = (RepositoryResource) this.repoUtil.getRepository(repo.getId());
 
-        // update repo
-        repo.setName( "tesUpdatePermission2" );
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // use admin
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    // update repo
+    repo.setName("tesUpdatePermission2");
+    response = this.repoUtil.sendMessage(Method.DELETE, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-        // now give delete
-        this.giveUserPrivilege( TEST_USER_NAME, "8" );
+    // use admin
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    // now give delete
+    this.giveUserPrivilege(TEST_USER_NAME, "8");
 
-        // read should succeed (inherited)
-        response = this.repoUtil.sendMessage( Method.GET, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 200 );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        // update should fail
-        response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // read should succeed (inherited)
+    response = this.repoUtil.sendMessage(Method.GET, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 200);
 
-        // delete should fail
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 403 );
+    // update should fail
+    response = this.repoUtil.sendMessage(Method.POST, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-     // should work now...
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", response.getStatus().getCode(), 204 );
+    // delete should fail
+    response = this.repoUtil.sendMessage(Method.PUT, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 403);
 
-    }
+    // should work now...
+    response = this.repoUtil.sendMessage(Method.DELETE, repo);
+    Assert.assertEquals("Response status: ", response.getStatus().getCode(), 204);
+
+  }
 
 }

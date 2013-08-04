@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus142;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.test.utils.UserMessageUtil;
+
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 /**
  * CRUD tests for XML request/response.
@@ -25,18 +27,16 @@ public class Nexus142UserCrudXmlIT
     extends Nexus142UserCrudJsonIT
 {
 
-    public Nexus142UserCrudXmlIT()
-    {
-        this.messageUtil = new UserMessageUtil(this,this.getXMLXStream(), MediaType.APPLICATION_XML );
-    }
-    
-    
-    
-    @Test
-    public void readTest()
-        throws IOException
-    {
-        super.readTest();
-    }
-    
+  public Nexus142UserCrudXmlIT() {
+    this.messageUtil = new UserMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+  }
+
+
+  @Test
+  public void readTest()
+      throws IOException
+  {
+    super.readTest();
+  }
+
 }

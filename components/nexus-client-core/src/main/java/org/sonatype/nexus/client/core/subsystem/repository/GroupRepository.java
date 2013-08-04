@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.repository;
 
 import java.util.List;
@@ -23,30 +24,30 @@ public interface GroupRepository<T extends GroupRepository>
     extends Repository<T, RepositoryStatus>
 {
 
-    List<String> memberRepositories();
+  List<String> memberRepositories();
 
-    /**
-     * Configures member repositories. Provided member repositories will replace exiting members (if any).
-     *
-     * @param memberRepositoryIds ids of member repositories (cannot be null)
-     * @return itself, for fluent api usage
-     */
-    T ofRepositories( String... memberRepositoryIds );
+  /**
+   * Configures member repositories. Provided member repositories will replace exiting members (if any).
+   *
+   * @param memberRepositoryIds ids of member repositories (cannot be null)
+   * @return itself, for fluent api usage
+   */
+  T ofRepositories(String... memberRepositoryIds);
 
-    /**
-     * Adds member repositories at the end of list of current repositories.
-     *
-     * @param memberRepositoryIds ids of member repositories to be added (cannot be null)
-     * @return itself, for fluent api usage
-     */
-    T addMember( String... memberRepositoryIds );
+  /**
+   * Adds member repositories at the end of list of current repositories.
+   *
+   * @param memberRepositoryIds ids of member repositories to be added (cannot be null)
+   * @return itself, for fluent api usage
+   */
+  T addMember(String... memberRepositoryIds);
 
-    /**
-     * Removed member repositories from the list of current repositories.
-     *
-     * @param memberRepositoryIds ids of member repositories to be removed (cannot be null)
-     * @return itself, for fluent api usage
-     */
-    T removeMember( String... memberRepositoryIds );
+  /**
+   * Removed member repositories from the list of current repositories.
+   *
+   * @param memberRepositoryIds ids of member repositories to be removed (cannot be null)
+   * @return itself, for fluent api usage
+   */
+  T removeMember(String... memberRepositoryIds);
 
 }

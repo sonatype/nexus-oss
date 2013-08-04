@@ -10,27 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.events;
 
-import org.sonatype.plexus.appevents.EventListener;
+package org.sonatype.nexus.events;
 
 /**
  * A component that receives events and simply re-emits then to the registered EventInspectors.
- * 
+ *
  * @author cstamas
  */
 public interface EventInspectorHost
 {
-    /**
-     * Shuts down event inspector cleanly (mainly maintains the thread pool).
-     */
-    void shutdown();
+  /**
+   * Shuts down event inspector cleanly (mainly maintains the thread pool).
+   */
+  void shutdown();
 
-    /**
-     * Debug only: returns true if it is "calm period", and no async event inspector is running in the thread pool.
-     * False otherwise.
-     * 
-     * @return
-     */
-    boolean isCalmPeriod();
+  /**
+   * Debug only: returns true if it is "calm period", and no async event inspector is running in the thread pool.
+   * False otherwise.
+   */
+  boolean isCalmPeriod();
 }

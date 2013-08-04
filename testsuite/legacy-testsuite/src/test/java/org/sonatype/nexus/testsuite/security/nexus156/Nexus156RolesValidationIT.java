@@ -10,9 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus156;
 
 import java.io.IOException;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.RoleMessageUtil;
+import org.sonatype.security.rest.model.RoleResource;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,10 +27,6 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.RoleMessageUtil;
-import org.sonatype.security.rest.model.RoleResource;
 
 /**
  * Extra CRUD validation tests.
@@ -33,283 +35,268 @@ public class Nexus156RolesValidationIT
     extends AbstractNexusIntegrationTest
 {
 
-    protected RoleMessageUtil messageUtil;
+  protected RoleMessageUtil messageUtil;
 
-    @BeforeClass
-    public static void setSecureTest()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
+
+  @Before
+  public void setUp() {
+    this.messageUtil = new RoleMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+  }
+
+  @Test
+  public void roleWithNoPrivsTest()
+      throws IOException
+  {
+
+    RoleResource resource = new RoleResource();
+
+    resource.setDescription("roleWithNoPrivsTest");
+    resource.setName("roleWithNoPrivsTest");
+    resource.setSessionTimeout(30);
+    // resource.addPrivilege( "priv1" );
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Role should not have been created: " + response.getStatus());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
+  }
+
+  @Test
+  public void roleWithNoName()
+      throws IOException
+  {
+
+    RoleResource resource = new RoleResource();
+
+    resource.setDescription("roleWithNoName");
+    // resource.setName( "roleWithNoName" );
+    resource.setSessionTimeout(30);
+    resource.addPrivilege("1");
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Role should not have been created: " + response.getStatus());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
+  }
+
+  @Test
+  public void roleWithSpaceInId()
+      throws IOException
+  {
+    RoleResource resource = new RoleResource();
+
+    resource.setId("role With Space In Id");
+    resource.setDescription("roleWithSpaceInId");
+    resource.setName("roleWithSpaceInId");
+    resource.setSessionTimeout(30);
+    resource.addPrivilege("1");
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Response: " + response.getEntity().getText() + "Role should have been created: "
+          + response.getStatus());
     }
 
-    @Before
-    public void setUp()
-    {
-        this.messageUtil = new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    // make sure the get works too
+    Assert.assertEquals(this.messageUtil.getRole(resource.getId()).getId(), "role With Space In Id");
+  }
+
+  @Test
+  public void duplicateIdTest()
+      throws IOException
+  {
+
+    RoleResource resource = new RoleResource();
+
+    resource.setDescription("duplicateIdTest");
+    resource.setName("duplicateIdTest");
+    resource.setId("duplicateIdTest");
+    resource.setSessionTimeout(30);
+    resource.addPrivilege("1");
+
+    // create
+    resource = this.messageUtil.createRole(resource);
+    Assert.assertEquals(resource.getId(), "duplicateIdTest");
+
+    // update
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
+
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Role should not have been updated: " + response.getStatus() + "New Id: "
+          + this.messageUtil.getResourceFromResponse(response).getId());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
+  }
+
+  @Test
+  public void createRecursiveContainment()
+      throws IOException
+  {
+    RoleResource resourceA = new RoleResource();
+    resourceA.setName("recursive1");
+    resourceA.setSessionTimeout(60);
+    resourceA.addPrivilege("1");
+
+    Response response = this.messageUtil.sendMessage(Method.POST, resourceA);
+
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Role should have been created: " + response.getStatus());
     }
 
-    @Test
-    public void roleWithNoPrivsTest()
-        throws IOException
-    {
+    // get the Resource object
+    RoleResource responseResourceA = this.messageUtil.getResourceFromResponse(response);
 
-        RoleResource resource = new RoleResource();
+    RoleResource resourceB = new RoleResource();
+    resourceB = new RoleResource();
+    resourceB.setName("recursive2");
+    resourceB.setSessionTimeout(60);
+    resourceB.addRole(responseResourceA.getId());
 
-        resource.setDescription( "roleWithNoPrivsTest" );
-        resource.setName( "roleWithNoPrivsTest" );
-        resource.setSessionTimeout( 30 );
-        // resource.addPrivilege( "priv1" );
+    response = this.messageUtil.sendMessage(Method.POST, resourceB);
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been created: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Role should have been created: " + response.getStatus());
     }
 
-    @Test
-    public void roleWithNoName()
-        throws IOException
-    {
+    // get the Resource object
+    RoleResource responseResourceB = this.messageUtil.getResourceFromResponse(response);
 
-        RoleResource resource = new RoleResource();
+    RoleResource resourceC = new RoleResource();
+    resourceC = new RoleResource();
+    resourceC.setName("recursive3");
+    resourceC.setSessionTimeout(60);
+    resourceC.addRole(responseResourceB.getId());
 
-        resource.setDescription( "roleWithNoName" );
-        // resource.setName( "roleWithNoName" );
-        resource.setSessionTimeout( 30 );
-        resource.addPrivilege( "1" );
+    response = this.messageUtil.sendMessage(Method.POST, resourceC);
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been created: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Role should have been created: " + response.getStatus());
     }
 
-    @Test
-    public void roleWithSpaceInId()
-        throws IOException
-    {
-        RoleResource resource = new RoleResource();
+    // get the Resource object
+    RoleResource responseResourceC = this.messageUtil.getResourceFromResponse(response);
 
-        resource.setId( "role With Space In Id" );
-        resource.setDescription( "roleWithSpaceInId" );
-        resource.setName( "roleWithSpaceInId" );
-        resource.setSessionTimeout( 30 );
-        resource.addPrivilege( "1" );
+    resourceA.setId(responseResourceA.getId());
+    resourceA.getRoles().clear();
+    resourceA.addRole(responseResourceC.getId());
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resourceA);
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Response: " + response.getEntity().getText() + "Role should have been created: "
-                + response.getStatus() );
-        }
-
-        // make sure the get works too
-        Assert.assertEquals( this.messageUtil.getRole( resource.getId() ).getId(), "role With Space In Id" );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Role should not have been updated: " + response.getStatus());
     }
 
-    @Test
-    public void duplicateIdTest()
-        throws IOException
-    {
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
+  }
 
-        RoleResource resource = new RoleResource();
+  @Test
+  public void updateValidationTests()
+      throws IOException
+  {
+    RoleResource resource = new RoleResource();
 
-        resource.setDescription( "duplicateIdTest" );
-        resource.setName( "duplicateIdTest" );
-        resource.setId( "duplicateIdTest" );
-        resource.setSessionTimeout( 30 );
-        resource.addPrivilege( "1" );
+    resource.setDescription("updateValidationTests");
+    resource.setName("updateValidationTests");
+    resource.setSessionTimeout(99999);
+    resource.addPrivilege("5");
+    resource.addPrivilege("4");
 
-        // create
-        resource = this.messageUtil.createRole( resource );
-        Assert.assertEquals( resource.getId(), "duplicateIdTest" );
+    Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
-        // update
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been updated: " + response.getStatus() + "New Id: "
-                + this.messageUtil.getResourceFromResponse( response ).getId() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not create role: " + response.getStatus());
     }
 
-    @Test
-    public void createRecursiveContainment()
-        throws IOException
-    {
-        RoleResource resourceA = new RoleResource();
-        resourceA.setName( "recursive1" );
-        resourceA.setSessionTimeout( 60 );
-        resourceA.addPrivilege( "1" );
+    // get the Resource object
+    RoleResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resourceA );
+    // make sure the id != null
+    Assert.assertNotNull(responseResource.getId());
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should have been created: " + response.getStatus() );
-        }
+    resource.setId(responseResource.getId());
 
-        // get the Resource object
-        RoleResource responseResourceA = this.messageUtil.getResourceFromResponse( response );
+    Assert.assertEquals(responseResource.getDescription(), resource.getDescription());
+    Assert.assertEquals(responseResource.getName(), resource.getName());
+    Assert.assertEquals(resource.getSessionTimeout(), responseResource.getSessionTimeout());
+    Assert.assertEquals(resource.getPrivileges(), responseResource.getPrivileges());
+    Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
 
-        RoleResource resourceB = new RoleResource();
-        resourceB = new RoleResource();
-        resourceB.setName( "recursive2" );
-        resourceB.setSessionTimeout( 60 );
-        resourceB.addRole( responseResourceA.getId() );
-
-        response = this.messageUtil.sendMessage( Method.POST, resourceB );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should have been created: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RoleResource responseResourceB = this.messageUtil.getResourceFromResponse( response );
-
-        RoleResource resourceC = new RoleResource();
-        resourceC = new RoleResource();
-        resourceC.setName( "recursive3" );
-        resourceC.setSessionTimeout( 60 );
-        resourceC.addRole( responseResourceB.getId() );
-
-        response = this.messageUtil.sendMessage( Method.POST, resourceC );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should have been created: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RoleResource responseResourceC = this.messageUtil.getResourceFromResponse( response );
-
-        resourceA.setId( responseResourceA.getId() );
-        resourceA.getRoles().clear();
-        resourceA.addRole( responseResourceC.getId() );
-
-        response = this.messageUtil.sendMessage( Method.PUT, resourceA );
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been updated: " + response.getStatus() );
-        }
-
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
-    }
-
-    @Test
-    public void updateValidationTests()
-        throws IOException
-    {
-        RoleResource resource = new RoleResource();
-
-        resource.setDescription( "updateValidationTests" );
-        resource.setName( "updateValidationTests" );
-        resource.setSessionTimeout( 99999 );
-        resource.addPrivilege( "5" );
-        resource.addPrivilege( "4" );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create role: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertNotNull( responseResource.getId() );
-
-        resource.setId( responseResource.getId() );
-
-        Assert.assertEquals( responseResource.getDescription(), resource.getDescription() );
-        Assert.assertEquals( responseResource.getName(), resource.getName() );
-        Assert.assertEquals( resource.getSessionTimeout(), responseResource.getSessionTimeout() );
-        Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
-        Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
-
-        getSecurityConfigUtil().verifyRole( resource );
+    getSecurityConfigUtil().verifyRole(resource);
 
         /*
          * NO Name
          */
-        resource.setDescription( "updateValidationTests" );
-        resource.setName( null );
-        resource.setSessionTimeout( 99999 );
-        resource.addPrivilege( "5" );
-        resource.addPrivilege( "4" );
+    resource.setDescription("updateValidationTests");
+    resource.setName(null);
+    resource.setSessionTimeout(99999);
+    resource.addPrivilege("5");
+    resource.addPrivilege("4");
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been updated: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Role should not have been updated: " + response.getStatus());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
 
         /*
          * NO Privs
          */
-        resource.setDescription( "updateValidationTests" );
-        resource.setName( "updateValidationTests" );
-        resource.setSessionTimeout( 99999 );
-        resource.getPrivileges().clear();
+    resource.setDescription("updateValidationTests");
+    resource.setName("updateValidationTests");
+    resource.setSessionTimeout(99999);
+    resource.getPrivileges().clear();
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been updated: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Role should not have been updated: " + response.getStatus());
+    }
+    Assert.assertTrue(response.getEntity().getText().startsWith("{\"errors\":"));
 
         /*
          * INVALID Privs
          */
-        resource.setDescription( "updateValidationTests" );
-        resource.setName( "updateValidationTests" );
-        resource.setSessionTimeout( 99999 );
-        resource.getPrivileges().clear();
-        resource.getPrivileges().add( "junk" );
+    resource.setDescription("updateValidationTests");
+    resource.setName("updateValidationTests");
+    resource.setSessionTimeout(99999);
+    resource.getPrivileges().clear();
+    resource.getPrivileges().add("junk");
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should have been updated: " + response.getStatus() );
-        }
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Role should have been updated: " + response.getStatus());
+    }
 
         /*
          * Update Id
          */
-        resource.setDescription( "updateValidationTests" );
-        resource.setName( "updateValidationTests" );
-        resource.setId( "NEW-ID-WILL-FAIL" );
-        resource.setSessionTimeout( 99999 );
-        resource.addPrivilege( "5" );
-        resource.addPrivilege( "4" );
+    resource.setDescription("updateValidationTests");
+    resource.setName("updateValidationTests");
+    resource.setId("NEW-ID-WILL-FAIL");
+    resource.setSessionTimeout(99999);
+    resource.addPrivilege("5");
+    resource.addPrivilege("4");
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
-        String responseText = response.getEntity().getText();
+    response = this.messageUtil.sendMessage(Method.PUT, resource);
+    String responseText = response.getEntity().getText();
 
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been updated: " + response.getStatus() );
-        }
-        // expect a 404
-        Assert.assertEquals( 404, response.getStatus().getCode() );
-
+    if (response.getStatus().isSuccess()) {
+      Assert.fail("Role should not have been updated: " + response.getStatus());
     }
+    // expect a 404
+    Assert.assertEquals(404, response.getStatus().getCode());
+
+  }
 
 }

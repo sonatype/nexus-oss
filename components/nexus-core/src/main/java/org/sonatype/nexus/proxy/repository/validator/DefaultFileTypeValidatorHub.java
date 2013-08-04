@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository.validator;
 
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,42 +31,36 @@ public class DefaultFileTypeValidatorHub
     implements FileTypeValidatorHub
 {
 
-    private final Map<String, FileTypeValidator> fileTypeValidators;
+  private final Map<String, FileTypeValidator> fileTypeValidators;
 
-    @Inject
-    public DefaultFileTypeValidatorHub( final Map<String, FileTypeValidator> fileTypeValidators )
-    {
-        this.fileTypeValidators = fileTypeValidators;
-    }
+  @Inject
+  public DefaultFileTypeValidatorHub(final Map<String, FileTypeValidator> fileTypeValidators) {
+    this.fileTypeValidators = fileTypeValidators;
+  }
 
-    @Override
-    public boolean isExpectedFileType( final StorageItem item )
-    {
-        if ( item instanceof StorageFileItem )
-        {
-            StorageFileItem file = (StorageFileItem) item;
+  @Override
+  public boolean isExpectedFileType(final StorageItem item) {
+    if (item instanceof StorageFileItem) {
+      StorageFileItem file = (StorageFileItem) item;
 
-            for ( Map.Entry<String, FileTypeValidator> fileTypeValidatorEntry : fileTypeValidators.entrySet() )
-            {
-                FileTypeValidity validity = fileTypeValidatorEntry.getValue().isExpectedFileType( file );
+      for (Map.Entry<String, FileTypeValidator> fileTypeValidatorEntry : fileTypeValidators.entrySet()) {
+        FileTypeValidity validity = fileTypeValidatorEntry.getValue().isExpectedFileType(file);
 
-                if ( FileTypeValidity.INVALID.equals( validity ) )
-                {
-                    getLogger().info( "File item {} evaluated as INVALID during file type validation (validator={})",
-                                      file.getRepositoryItemUid().toString(), fileTypeValidatorEntry.getKey() );
-                    // fail fast
-                    return false;
-                }
-            }
-
-            // return true if not failed for now
-            // later we might get this better
-            return true;
+        if (FileTypeValidity.INVALID.equals(validity)) {
+          getLogger().info("File item {} evaluated as INVALID during file type validation (validator={})",
+              file.getRepositoryItemUid().toString(), fileTypeValidatorEntry.getKey());
+          // fail fast
+          return false;
         }
-        else
-        {
-            // we check files only, so say true here
-            return true;
-        }
+      }
+
+      // return true if not failed for now
+      // later we might get this better
+      return true;
     }
+    else {
+      // we check files only, so say true here
+      return true;
+    }
+  }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.persist;
 
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
@@ -17,10 +18,10 @@ import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 public interface PasswordHelper
 {
 
-    public String encrypt( String password )
-        throws PlexusCipherException;
+  public String encrypt(String password)
+      throws PlexusCipherException;
 
-    public String decrypt( String encodedPassword )
-        throws PlexusCipherException;
+  public String decrypt(String encodedPassword)
+      throws PlexusCipherException;
 
 }

@@ -10,26 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.events;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
  * Event fired when a repository "unpublishes" (removes) it's prefix file.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public class PrefixFileUnpublishedRepositoryEvent
     extends AbstractRoutingRepositoryEvent
 {
-    /**
-     * Constructor.
-     * 
-     * @param mavenRepository the repository that unpublished (removed) the prefix file.
-     */
-    public PrefixFileUnpublishedRepositoryEvent( final MavenRepository mavenRepository )
-    {
-        super( mavenRepository );
-    }
+  /**
+   * Constructor.
+   *
+   * @param mavenRepository the repository that unpublished (removed) the prefix file.
+   */
+  public PrefixFileUnpublishedRepositoryEvent(final MavenRepository mavenRepository) {
+    super(mavenRepository);
+  }
 }

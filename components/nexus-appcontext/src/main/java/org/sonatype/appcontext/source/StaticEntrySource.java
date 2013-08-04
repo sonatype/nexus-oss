@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.appcontext.source;
 
 import java.util.HashMap;
@@ -22,44 +23,39 @@ import org.sonatype.appcontext.internal.Preconditions;
 /**
  * A static EntrySource that holds the key and value to make it into AppContext. Useful in testing, or when you need to
  * add one key=value into context, and you need to calculate those somehow before constructing AppContext.
- * 
+ *
  * @author cstamas
  */
 public class StaticEntrySource
     implements EntrySource, EntrySourceMarker
 {
-    private final String key;
+  private final String key;
 
-    private final Object value;
+  private final Object value;
 
-    public StaticEntrySource( final String key, final Object val )
-    {
-        this.key = Preconditions.checkNotNull( key );
-        this.value = val;
+  public StaticEntrySource(final String key, final Object val) {
+    this.key = Preconditions.checkNotNull(key);
+    this.value = val;
+  }
+
+  public String getDescription() {
+    if (value != null) {
+      return String.format("static(\"%s\"=\"%s\")", key, String.valueOf(value));
     }
-
-    public String getDescription()
-    {
-        if ( value != null )
-        {
-            return String.format( "static(\"%s\"=\"%s\")", key, String.valueOf( value ) );
-        }
-        else
-        {
-            return String.format( "static(\"%s\"=null)", key );
-        }
+    else {
+      return String.format("static(\"%s\"=null)", key);
     }
+  }
 
-    public EntrySourceMarker getEntrySourceMarker()
-    {
-        return this;
-    }
+  public EntrySourceMarker getEntrySourceMarker() {
+    return this;
+  }
 
-    public Map<String, Object> getEntries( AppContextRequest request )
-        throws AppContextException
-    {
-        final Map<String, Object> result = new HashMap<String, Object>( 1 );
-        result.put( key, value );
-        return result;
-    }
+  public Map<String, Object> getEntries(AppContextRequest request)
+      throws AppContextException
+  {
+    final Map<String, Object> result = new HashMap<String, Object>(1);
+    result.put(key, value);
+    return result;
+  }
 }

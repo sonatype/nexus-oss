@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
@@ -22,17 +23,15 @@ import org.sonatype.plugin.ExtensionPoint;
  * A Resource bundle meant for extending/contributing/spoofing existing resources (JS, CSS, Images, etc) of the Nexus
  * Web Application. This component is able only to contribute static resources, if you want to extends REST API, please
  * see PlexusResource.
- * 
+ *
  * @author cstamas
  */
 @ExtensionPoint
 @Singleton
 public interface NexusResourceBundle
 {
-    /**
-     * Returns the list of static resources.
-     * 
-     * @return
-     */
-    List<StaticResource> getContributedResouces();  // FIXME: Spelling!
+  /**
+   * Returns the list of static resources.
+   */
+  List<StaticResource> getContributedResouces();  // FIXME: Spelling!
 }

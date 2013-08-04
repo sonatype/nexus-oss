@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,7 +20,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.Subscribe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Loads configuration when Nexus is initialized.
@@ -34,31 +36,26 @@ import com.google.common.eventbus.Subscribe;
 public class CapabilityRegistryBooter
 {
 
-    private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
+  private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
 
-    @Inject
-    public CapabilityRegistryBooter( final Provider<DefaultCapabilityRegistry> capabilityRegistry )
-    {
-        this.capabilityRegistry = checkNotNull( capabilityRegistry );
-    }
+  @Inject
+  public CapabilityRegistryBooter(final Provider<DefaultCapabilityRegistry> capabilityRegistry) {
+    this.capabilityRegistry = checkNotNull(capabilityRegistry);
+  }
 
-    @Subscribe
-    public void handle( final NexusInitializedEvent event )
-    {
-        try
-        {
-            capabilityRegistry.get().load();
-        }
-        catch ( final Exception e )
-        {
-            throw new RuntimeException( "Could not load configurations", e );
-        }
+  @Subscribe
+  public void handle(final NexusInitializedEvent event) {
+    try {
+      capabilityRegistry.get().load();
     }
+    catch (final Exception e) {
+      throw new RuntimeException("Could not load configurations", e);
+    }
+  }
 
-    @Override
-    public String toString()
-    {
-        return "Load capabilities from persistence store when Nexus is initialized";
-    }
+  @Override
+  public String toString() {
+    return "Load capabilities from persistence store when Nexus is initialized";
+  }
 
 }

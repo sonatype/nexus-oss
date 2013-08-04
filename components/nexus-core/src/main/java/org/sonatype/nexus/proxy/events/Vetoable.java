@@ -10,19 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 import java.util.List;
 
 public interface Vetoable
 {
-    boolean isVetoed();
+  boolean isVetoed();
 
-    void putVeto( Veto veto );
+  void putVeto(Veto veto);
 
-    void putVeto( Object vetoer, Throwable reason );
+  void putVeto(Object vetoer, Throwable reason);
 
-    boolean removeVeto( Veto veto );
+  boolean removeVeto(Veto veto);
 
-    List<Veto> getVetos();
+  List<Veto> getVetos();
 }

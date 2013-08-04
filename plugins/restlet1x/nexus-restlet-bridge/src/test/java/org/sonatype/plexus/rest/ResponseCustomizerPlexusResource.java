@@ -10,7 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest;
+
+import org.sonatype.plexus.rest.resource.RestletResponseCustomizer;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -18,35 +21,32 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
-import org.sonatype.plexus.rest.resource.RestletResponseCustomizer;
 
 public class ResponseCustomizerPlexusResource
     extends SimplePlexusResource
 {
 
-    @Override
-    public Object get( final Context context, final Request request, final Response response, final Variant variant )
-        throws ResourceException
-    {
-        final Object result = super.get( context, request, response, variant );
-        return new CustomStringRepresentation( (String) result );
+  @Override
+  public Object get(final Context context, final Request request, final Response response, final Variant variant)
+      throws ResourceException
+  {
+    final Object result = super.get(context, request, response, variant);
+    return new CustomStringRepresentation((String) result);
+  }
+
+  private static class CustomStringRepresentation
+      extends StringRepresentation
+      implements RestletResponseCustomizer
+  {
+
+    public CustomStringRepresentation(CharSequence text) {
+      super(text);
     }
 
-    private static class CustomStringRepresentation
-        extends StringRepresentation
-        implements RestletResponseCustomizer
-    {
-
-        public CustomStringRepresentation( CharSequence text )
-        {
-            super( text );
-        }
-
-        public void customize( final Response response )
-        {
-            addHttpResponseHeader( response, "X-Custom", "foo" );
-        }
-
+    public void customize(final Response response) {
+      addHttpResponseHeader(response, "X-Custom", "foo");
     }
+
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.mock;
 
 import java.util.HashSet;
@@ -19,6 +20,10 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.security.usermanagement.RoleIdentifier;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -33,81 +38,68 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Singleton
-@Typed( Realm.class )
-@Named( MockRealm.NAME )
+@Typed(Realm.class)
+@Named(MockRealm.NAME)
 public class MockRealm
     extends AuthorizingRealm
 {
-    public static final String NAME = "Mock";
+  public static final String NAME = "Mock";
 
-    private final UserManager userManager;
+  private final UserManager userManager;
 
-    @Inject
-    public MockRealm( @Named( "Mock" ) UserManager userManager )
-    {
-        this.userManager = userManager;
+  @Inject
+  public MockRealm(@Named("Mock") UserManager userManager) {
+    this.userManager = userManager;
+  }
+
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    String userId = principals.getPrimaryPrincipal().toString();
+
+    Set<String> roles = new HashSet<String>();
+    try {
+      for (RoleIdentifier roleIdentifier : userManager.getUser(userId).getRoles()) {
+        roles.add(roleIdentifier.getRoleId());
+      }
+    }
+    catch (UserNotFoundException e) {
+      return null;
     }
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
-    {
-        String userId = principals.getPrimaryPrincipal().toString();
+    return new SimpleAuthorizationInfo(roles);
 
-        Set<String> roles = new HashSet<String>();
-        try
-        {
-            for ( RoleIdentifier roleIdentifier : userManager.getUser( userId ).getRoles() )
-            {
-                roles.add( roleIdentifier.getRoleId() );
-            }
-        }
-        catch ( UserNotFoundException e )
-        {
-            return null;
-        }
+  }
 
-        return new SimpleAuthorizationInfo( roles );
+  @Override
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+      throws AuthenticationException
+  {
 
+    UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+
+    String password = new String(upToken.getPassword());
+    String userId = upToken.getUsername();
+
+    // username == password
+    try {
+      if (userId.endsWith(password) && userManager.getUser(userId) != null) {
+        return new SimpleAuthenticationInfo(new SimplePrincipalCollection(token.getPrincipal(),
+            this.getName()), userId);
+      }
+      else {
+        throw new IncorrectCredentialsException("User [" + userId + "] bad credentials.");
+      }
     }
-
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
-        throws AuthenticationException
-    {
-
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-
-        String password = new String( upToken.getPassword() );
-        String userId = upToken.getUsername();
-
-        // username == password
-        try
-        {
-            if ( userId.endsWith( password ) && userManager.getUser( userId ) != null )
-            {
-                return new SimpleAuthenticationInfo( new SimplePrincipalCollection( token.getPrincipal(),
-                                                                                    this.getName() ), userId );
-            }
-            else
-            {
-                throw new IncorrectCredentialsException( "User [" + userId + "] bad credentials." );
-            }
-        }
-        catch ( UserNotFoundException e )
-        {
-            throw new UnknownAccountException( "User [" + userId + "] not found." );
-        }
+    catch (UserNotFoundException e) {
+      throw new UnknownAccountException("User [" + userId + "] not found.");
     }
+  }
 
-    @Override
-    public String getName()
-    {
-        return "Mock";
-    }
+  @Override
+  public String getName() {
+    return "Mock";
+  }
 
 }

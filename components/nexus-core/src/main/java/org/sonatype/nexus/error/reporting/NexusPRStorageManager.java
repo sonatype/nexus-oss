@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.error.reporting;
 
 import javax.inject.Named;
@@ -29,5 +30,5 @@ public class NexusPRStorageManager
     extends TmpFileStorageManager
     implements StorageManager
 {
-    // no need to override anything
+  // no need to override anything
 }

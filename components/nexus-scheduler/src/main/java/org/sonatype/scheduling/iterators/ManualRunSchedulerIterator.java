@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.scheduling.iterators;
 
 import java.util.Date;
@@ -17,28 +18,23 @@ import java.util.Date;
 public class ManualRunSchedulerIterator
     implements SchedulerIterator
 {
-    public ManualRunSchedulerIterator()
-    {
-        super();
-    }
+  public ManualRunSchedulerIterator() {
+    super();
+  }
 
-    public boolean isFinished()
-    {
-        return false;
-    }
+  public boolean isFinished() {
+    return false;
+  }
 
-    public Date next()
-    {
-        return null;
-    }
+  public Date next() {
+    return null;
+  }
 
-    public Date peekNext()
-    {
-        return null;
-    }
+  public Date peekNext() {
+    return null;
+  }
 
-    public void resetFrom( Date from )
-    {
-        // nothing
-    }
+  public void resetFrom(Date from) {
+    // nothing
+  }
 }

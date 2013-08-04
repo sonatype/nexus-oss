@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.NexusAppTestSupport;
@@ -22,48 +23,47 @@ import org.sonatype.security.SecuritySystem;
 public abstract class AbstractNexusTestEnvironment
     extends NexusAppTestSupport
 {
-    /** The cache manager. */
-    private CacheManager cacheManager;
+  /**
+   * The cache manager.
+   */
+  private CacheManager cacheManager;
 
-    private RepositoryItemUidFactory repositoryItemUidFactory;
+  private RepositoryItemUidFactory repositoryItemUidFactory;
 
-    private MimeSupport mimeSupport;
+  private MimeSupport mimeSupport;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
+  protected void setUp()
+      throws Exception
+  {
+    super.setUp();
 
-        cacheManager = lookup( CacheManager.class );
+    cacheManager = lookup(CacheManager.class);
 
-        repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
+    repositoryItemUidFactory = lookup(RepositoryItemUidFactory.class);
 
-        // rebuild cache
-        lookup( RepositoryItemUidAttributeManager.class ).reset();
+    // rebuild cache
+    lookup(RepositoryItemUidAttributeManager.class).reset();
 
-        mimeSupport = lookup( MimeSupport.class );
+    mimeSupport = lookup(MimeSupport.class);
 
-        this.lookup( SecuritySystem.class ).setSecurityEnabled( false );
-    }
+    this.lookup(SecuritySystem.class).setSecurityEnabled(false);
+  }
 
-    /**
-     * Gets the cache manager.
-     * 
-     * @return the cache manager
-     */
-    protected CacheManager getCacheManager()
-    {
-        return cacheManager;
-    }
+  /**
+   * Gets the cache manager.
+   *
+   * @return the cache manager
+   */
+  protected CacheManager getCacheManager() {
+    return cacheManager;
+  }
 
-    protected RepositoryItemUidFactory getRepositoryItemUidFactory()
-    {
-        return repositoryItemUidFactory;
-    }
+  protected RepositoryItemUidFactory getRepositoryItemUidFactory() {
+    return repositoryItemUidFactory;
+  }
 
-    protected MimeSupport getMimeSupport()
-    {
-        return mimeSupport;
-    }
+  protected MimeSupport getMimeSupport() {
+    return mimeSupport;
+  }
 
 }

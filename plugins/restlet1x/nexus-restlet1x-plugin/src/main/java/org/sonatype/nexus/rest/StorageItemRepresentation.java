@@ -10,41 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
+import org.sonatype.nexus.proxy.item.StorageItem;
+
 import org.restlet.data.MediaType;
 import org.restlet.resource.OutputRepresentation;
-import org.sonatype.nexus.proxy.item.StorageItem;
 
 public class StorageItemRepresentation
     extends OutputRepresentation
 {
-    private final StorageItem item;
+  private final StorageItem item;
 
-    public StorageItemRepresentation( final MediaType mediaType, final StorageItem file )
-    {
-        super( mediaType );
+  public StorageItemRepresentation(final MediaType mediaType, final StorageItem file) {
+    super(mediaType);
 
-        this.item = file;
+    this.item = file;
 
-        setModificationDate( new Date( file.getModified() ) );
+    setModificationDate(new Date(file.getModified()));
 
-        setAvailable( true );
-    }
+    setAvailable(true);
+  }
 
-    protected StorageItem getStorageItem()
-    {
-        return item;
-    }
+  protected StorageItem getStorageItem() {
+    return item;
+  }
 
-    @Override
-    public void write( OutputStream outputStream )
-        throws IOException
-    {
-    }
+  @Override
+  public void write(OutputStream outputStream)
+      throws IOException
+  {
+  }
 
 }

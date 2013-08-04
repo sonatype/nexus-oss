@@ -10,31 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
+
+import org.apache.maven.artifact.repository.metadata.Plugin;
 
 /**
  * Plugin storage
- * 
+ *
  * @author Oleg Gusakov
  * @version $Id: PluginOperand.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
 public class PluginOperand
     extends AbstractOperand
 {
-    private final Plugin plugin;
+  private final Plugin plugin;
 
-    public PluginOperand( final Version originModelVersion, final Plugin data )
-    {
-        super( originModelVersion );
+  public PluginOperand(final Version originModelVersion, final Plugin data) {
+    super(originModelVersion);
 
-        this.plugin = data;
-    }
+    this.plugin = data;
+  }
 
-    public Plugin getOperand()
-    {
-        return plugin;
-    }
+  public Plugin getOperand() {
+    return plugin;
+  }
 }

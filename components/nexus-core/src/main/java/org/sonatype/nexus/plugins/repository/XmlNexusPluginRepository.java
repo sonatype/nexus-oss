@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
@@ -23,19 +24,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.plugin.metadata.GAVCoordinate;
+import org.sonatype.plugins.model.PluginMetadata;
+
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.plugin.metadata.GAVCoordinate;
-import org.sonatype.plugins.model.PluginMetadata;
 
 /**
  * Simple xml-based plugin repository meant to work with IDE workspace dependency resolution, but will likely be useful
  * in other scenarios too. The contents of the repository is configured using xml file passed with
  * -Dnexus.xml-plugin-repository=<path> system property. Below is an example repository configuration file (yes, I know
  * it will not render properly in javadoc, but I want this to be readable in the sources).
- * 
+ *
  * <pre>
  * <plugin-repository>
  *   <artifacts>
@@ -56,138 +58,125 @@ import org.sonatype.plugins.model.PluginMetadata;
  *   </artifacts>
  * </plugin-repository>
  * </pre>
- * 
+ *
  * @since 2.3
  */
-@Named( XmlNexusPluginRepository.ID )
+@Named(XmlNexusPluginRepository.ID)
 @Singleton
 class XmlNexusPluginRepository
     extends AbstractNexusPluginRepository
 {
-    static final String ID = "xml";
+  static final String ID = "xml";
 
-    private final Map<GAVCoordinate, PluginMetadata> plugins;
+  private final Map<GAVCoordinate, PluginMetadata> plugins;
 
-    private final Map<GAVCoordinate, PluginRepositoryArtifact> artifacts;
+  private final Map<GAVCoordinate, PluginRepositoryArtifact> artifacts;
 
-    @Inject
-    public XmlNexusPluginRepository( @Named( "${xml-plugin-repository}" ) @Nullable File pluginRepositoryXml )
-        throws IOException, XmlPullParserException
-    {
-        final Map<GAVCoordinate, PluginMetadata> plugins = new LinkedHashMap<GAVCoordinate, PluginMetadata>();
-        final Map<GAVCoordinate, PluginRepositoryArtifact> artifacts =
-            new LinkedHashMap<GAVCoordinate, PluginRepositoryArtifact>();
+  @Inject
+  public XmlNexusPluginRepository(@Named("${xml-plugin-repository}") @Nullable File pluginRepositoryXml)
+      throws IOException, XmlPullParserException
+  {
+    final Map<GAVCoordinate, PluginMetadata> plugins = new LinkedHashMap<GAVCoordinate, PluginMetadata>();
+    final Map<GAVCoordinate, PluginRepositoryArtifact> artifacts =
+        new LinkedHashMap<GAVCoordinate, PluginRepositoryArtifact>();
 
-        if ( pluginRepositoryXml != null )
-        {
-            Xpp3Dom dom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( pluginRepositoryXml ) );
+    if (pluginRepositoryXml != null) {
+      Xpp3Dom dom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(pluginRepositoryXml));
 
-            Xpp3Dom artifactsDom = dom.getChild( "artifacts" );
+      Xpp3Dom artifactsDom = dom.getChild("artifacts");
 
-            for ( Xpp3Dom artifactDom : artifactsDom.getChildren( "artifact" ) )
-            {
-                String type = getChildText( artifactDom, "type" );
+      for (Xpp3Dom artifactDom : artifactsDom.getChildren("artifact")) {
+        String type = getChildText(artifactDom, "type");
 
-                boolean plugin;
-                if ( "nexus-plugin".equals( type ) )
-                {
-                    plugin = true;
+        boolean plugin;
+        if ("nexus-plugin".equals(type)) {
+          plugin = true;
 
-                    // apparently plugin manager expects plugin artifact gavs to have type==null
-                    type = null;
-                }
-                else
-                {
-                    plugin = false;
-                }
-
-                String location = artifactDom.getChild( "location" ).getValue();
-                String groupId = artifactDom.getChild( "groupId" ).getValue();
-                String artifactId = artifactDom.getChild( "artifactId" ).getValue();
-                String version = artifactDom.getChild( "version" ).getValue();
-                String classifier = getChildText( artifactDom, "classifier" );
-
-                GAVCoordinate gav = new GAVCoordinate( groupId, artifactId, version, classifier, type );
-
-                File file = new File( location ).getCanonicalFile();
-
-                artifacts.put( gav, new PluginRepositoryArtifact( gav, file, this ) );
-
-                if ( plugin )
-                {
-                    try
-                    {
-                        PluginMetadata metadata =
-                            getPluginMetadata( new File( file, "META-INF/nexus/plugin.xml" ).toURI().toURL() );
-
-                        plugins.put( new GAVCoordinate( groupId, artifactId, version, classifier, type ), metadata );
-                    }
-                    catch ( IOException e )
-                    {
-                        // it was not meant to be
-                    }
-                }
-            }
+          // apparently plugin manager expects plugin artifact gavs to have type==null
+          type = null;
+        }
+        else {
+          plugin = false;
         }
 
-        this.plugins = Collections.unmodifiableMap( plugins );
-        this.artifacts = Collections.unmodifiableMap( artifacts );
-    }
+        String location = artifactDom.getChild("location").getValue();
+        String groupId = artifactDom.getChild("groupId").getValue();
+        String artifactId = artifactDom.getChild("artifactId").getValue();
+        String version = artifactDom.getChild("version").getValue();
+        String classifier = getChildText(artifactDom, "classifier");
 
-    private String getChildText( Xpp3Dom dom, String childName )
-    {
-        Xpp3Dom child = dom.getChild( childName );
-        return child != null ? child.getValue() : null;
-    }
+        GAVCoordinate gav = new GAVCoordinate(groupId, artifactId, version, classifier, type);
 
-    @Override
-    public String getId()
-    {
-        return ID;
-    }
+        File file = new File(location).getCanonicalFile();
 
-    @Override
-    public int getPriority()
-    {
-        return 0; // this is meant for IDE integration and should be consulted
-                  // before anything else
-    }
+        artifacts.put(gav, new PluginRepositoryArtifact(gav, file, this));
 
-    @Override
-    public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins()
-    {
-        return plugins;
-    }
+        if (plugin) {
+          try {
+            PluginMetadata metadata =
+                getPluginMetadata(new File(file, "META-INF/nexus/plugin.xml").toURI().toURL());
 
-    @Override
-    public PluginRepositoryArtifact resolveArtifact( GAVCoordinate gav )
-        throws NoSuchPluginRepositoryArtifactException
-    {
-        PluginRepositoryArtifact artifact = artifacts.get( gav );
-        if ( artifact == null )
-        {
-            throw new NoSuchPluginRepositoryArtifactException( this, gav );
+            plugins.put(new GAVCoordinate(groupId, artifactId, version, classifier, type), metadata);
+          }
+          catch (IOException e) {
+            // it was not meant to be
+          }
         }
-        return artifact;
+      }
     }
 
-    @Override
-    public PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact plugin, GAVCoordinate gav )
-        throws NoSuchPluginRepositoryArtifactException
-    {
-        return resolveArtifact( gav );
-    }
+    this.plugins = Collections.unmodifiableMap(plugins);
+    this.artifacts = Collections.unmodifiableMap(artifacts);
+  }
 
-    @Override
-    public PluginMetadata getPluginMetadata( GAVCoordinate gav )
-        throws NoSuchPluginRepositoryArtifactException
-    {
-        PluginMetadata metadata = plugins.get( gav );
-        if ( metadata == null )
-        {
-            throw new NoSuchPluginRepositoryArtifactException( this, gav );
-        }
-        return metadata;
+  private String getChildText(Xpp3Dom dom, String childName) {
+    Xpp3Dom child = dom.getChild(childName);
+    return child != null ? child.getValue() : null;
+  }
+
+  @Override
+  public String getId() {
+    return ID;
+  }
+
+  @Override
+  public int getPriority() {
+    return 0; // this is meant for IDE integration and should be consulted
+    // before anything else
+  }
+
+  @Override
+  public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins() {
+    return plugins;
+  }
+
+  @Override
+  public PluginRepositoryArtifact resolveArtifact(GAVCoordinate gav)
+      throws NoSuchPluginRepositoryArtifactException
+  {
+    PluginRepositoryArtifact artifact = artifacts.get(gav);
+    if (artifact == null) {
+      throw new NoSuchPluginRepositoryArtifactException(this, gav);
     }
+    return artifact;
+  }
+
+  @Override
+  public PluginRepositoryArtifact resolveDependencyArtifact(PluginRepositoryArtifact plugin, GAVCoordinate gav)
+      throws NoSuchPluginRepositoryArtifactException
+  {
+    return resolveArtifact(gav);
+  }
+
+  @Override
+  public PluginMetadata getPluginMetadata(GAVCoordinate gav)
+      throws NoSuchPluginRepositoryArtifactException
+  {
+    PluginMetadata metadata = plugins.get(gav);
+    if (metadata == null) {
+      throw new NoSuchPluginRepositoryArtifactException(this, gav);
+    }
+    return metadata;
+  }
 
 }

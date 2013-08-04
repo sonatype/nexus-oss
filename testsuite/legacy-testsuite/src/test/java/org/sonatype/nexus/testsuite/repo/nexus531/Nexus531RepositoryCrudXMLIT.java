@@ -10,26 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus531;
+
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 public class Nexus531RepositoryCrudXMLIT
     extends Nexus531RepositoryCrudJsonIT
 {
-    public Nexus531RepositoryCrudXMLIT()
-    {
-        this.messageUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-    }
+  public Nexus531RepositoryCrudXMLIT() {
+    this.messageUtil = new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+  }
 
-    @BeforeClass
-    public static void init()
-        throws ComponentLookupException
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
+  @BeforeClass
+  public static void init()
+      throws ComponentLookupException
+  {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 }

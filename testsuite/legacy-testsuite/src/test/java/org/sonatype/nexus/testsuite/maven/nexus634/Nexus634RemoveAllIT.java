@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.maven.nexus634;
 
 import java.io.File;
@@ -20,19 +21,19 @@ import org.junit.Test;
 
 /**
  * Test SnapshotRemoverTask to remove all artifacts
- * 
+ *
  * @author marvin
  */
 public class Nexus634RemoveAllIT
     extends AbstractSnapshotRemoverIT
 {
 
-    @Test
-    public void removeAllSnapshots()
-        throws Exception
-    {
-        // This is THE important part
-        runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 0, true );
+  @Test
+  public void removeAllSnapshots()
+      throws Exception
+  {
+    // This is THE important part
+    runSnapshotRemover("nexus-test-harness-snapshot-repo", 0, 0, true);
 
         /*
          * This IT is now very wrong, as snapshot remover will no longer remove -SNAPSHOT artifacts,
@@ -47,9 +48,9 @@ public class Nexus634RemoveAllIT
             "The folder should be removed since all artifacts should be gone, instead there are files left!",
             artifactFolder.exists() );
         */
-        
-        Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
-        Assert.assertEquals( 1, jars.size() );
-    }
+
+    Collection<File> jars = listFiles(artifactFolder, new String[]{"jar"}, false);
+    Assert.assertEquals(1, jars.size());
+  }
 
 }

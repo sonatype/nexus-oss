@@ -10,27 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.events;
 
 public class VetoFormatterRequest
 {
-    private Vetoable event;
-    
-    private boolean detailed;
-    
-    public VetoFormatterRequest( Vetoable event, boolean detailed )
-    {
-        this.event = event;
-        this.detailed = detailed;
-    }
-    
-    public Vetoable getEvent()
-    {
-        return event;
-    }
-    
-    public boolean isDetailed()
-    {
-        return detailed;
-    }
+  private Vetoable event;
+
+  private boolean detailed;
+
+  public VetoFormatterRequest(Vetoable event, boolean detailed) {
+    this.event = event;
+    this.detailed = detailed;
+  }
+
+  public Vetoable getEvent() {
+    return event;
+  }
+
+  public boolean isDetailed() {
+    return detailed;
+  }
 }

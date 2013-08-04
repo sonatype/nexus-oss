@@ -10,34 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.cache;
 
 import java.util.Collection;
 
 /**
  * Cache that stores paths.
- * 
+ *
  * @author cstamas
  */
 public interface PathCache
 {
-    boolean contains( String path );
+  boolean contains(String path);
 
-    boolean isExpired( String path );
+  boolean isExpired(String path);
 
-    boolean remove( String path );
+  boolean remove(String path);
 
-    boolean removeWithParents( String path );
+  boolean removeWithParents(String path);
 
-    boolean removeWithChildren( String path );
+  boolean removeWithChildren(String path);
 
-    boolean purge();
+  boolean purge();
 
-    void put( String path, Object element );
+  void put(String path, Object element);
 
-    void put( String path, Object element, int expirationSeconds );
+  void put(String path, Object element, int expirationSeconds);
 
-    CacheStatistics getStatistics();
-    
-    Collection<String> listKeysInCache();
+  CacheStatistics getStatistics();
+
+  Collection<String> listKeysInCache();
 }

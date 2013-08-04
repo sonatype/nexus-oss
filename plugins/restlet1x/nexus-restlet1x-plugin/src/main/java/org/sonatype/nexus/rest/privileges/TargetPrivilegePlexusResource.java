@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.privileges;
 
 import java.util.List;
@@ -19,13 +20,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
@@ -42,120 +36,116 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeM
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.privileges.AbstractPrivilegePlexusResource;
 
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
+import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.Context;
+import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
+
 /**
  * Handles the GET and POST request for the Nexus privileges.
- * 
+ *
  * @author tstevens
  */
-@Component( role = PlexusResource.class, hint = "TargetPrivilegeListPlexusResource" )
-@Path( TargetPrivilegePlexusResource.RESOURCE_URI )
-@Produces( { "application/xml", "application/json" } )
-@Consumes( { "application/xml", "application/json" } )
+@Component(role = PlexusResource.class, hint = "TargetPrivilegeListPlexusResource")
+@Path(TargetPrivilegePlexusResource.RESOURCE_URI)
+@Produces({"application/xml", "application/json"})
+@Consumes({"application/xml", "application/json"})
 public class TargetPrivilegePlexusResource
     extends AbstractPrivilegePlexusResource
 {
-    public static final String RESOURCE_URI = "/privileges_target";
-    
-    public TargetPrivilegePlexusResource()
-    {
-        this.setModifiable( true );
-    }
+  public static final String RESOURCE_URI = "/privileges_target";
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return new PrivilegeResourceRequest();
-    }
+  public TargetPrivilegePlexusResource() {
+    this.setModifiable(true);
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return new PrivilegeResourceRequest();
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:privileges]" );
-    }
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
 
-    /**
-     * Add a new set of target privileges against a repository (or group) in nexus.
-     */
-    @Override
-    @POST
-    @ResourceMethodSignature( input = PrivilegeResourceRequest.class, output = PrivilegeListResourceResponse.class )
-    public Object post( Context context, Request request, Response response, Object payload )
-        throws ResourceException
-    {
-        PrivilegeResourceRequest resourceRequest = (PrivilegeResourceRequest) payload;
-        PrivilegeListResourceResponse result = null;
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[security:privileges]");
+  }
 
-        if ( resourceRequest != null )
-        {
-            result = new PrivilegeListResourceResponse();
+  /**
+   * Add a new set of target privileges against a repository (or group) in nexus.
+   */
+  @Override
+  @POST
+  @ResourceMethodSignature(input = PrivilegeResourceRequest.class, output = PrivilegeListResourceResponse.class)
+  public Object post(Context context, Request request, Response response, Object payload)
+      throws ResourceException
+  {
+    PrivilegeResourceRequest resourceRequest = (PrivilegeResourceRequest) payload;
+    PrivilegeListResourceResponse result = null;
 
-            PrivilegeResource resource = resourceRequest.getData();
+    if (resourceRequest != null) {
+      result = new PrivilegeListResourceResponse();
 
-            // currently we are allowing only of repotarget privs, so enforcing checkfor it
-            if ( !TargetPrivilegeDescriptor.TYPE.equals( resource.getType() ) )
-            {
-                throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Configuration error.",
-                    getErrorResponse( "type", "Not allowed privilege type!" ) );
-            }
+      PrivilegeResource resource = resourceRequest.getData();
 
-            List<String> methods = resource.getMethod();
+      // currently we are allowing only of repotarget privs, so enforcing checkfor it
+      if (!TargetPrivilegeDescriptor.TYPE.equals(resource.getType())) {
+        throw new PlexusResourceException(
+            Status.CLIENT_ERROR_BAD_REQUEST,
+            "Configuration error.",
+            getErrorResponse("type", "Not allowed privilege type!"));
+      }
 
-            if ( methods == null || methods.size() == 0 )
-            {
-                throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Configuration error.",
-                    getErrorResponse( "method", "No method(s) supplied, must select at least one method." ) );
-            }
-            else
-            {
-                try
-                {
-                    // Add a new privilege for each method
-                    for ( String method : methods )
-                    {
-                        Privilege priv = new Privilege();
+      List<String> methods = resource.getMethod();
 
-                        priv.setName( resource.getName() != null ? resource.getName() + " - (" + method + ")" : null );
-                        priv.setDescription( resource.getDescription() );
-                        priv.setType( TargetPrivilegeDescriptor.TYPE );
+      if (methods == null || methods.size() == 0) {
+        throw new PlexusResourceException(
+            Status.CLIENT_ERROR_BAD_REQUEST,
+            "Configuration error.",
+            getErrorResponse("method", "No method(s) supplied, must select at least one method."));
+      }
+      else {
+        try {
+          // Add a new privilege for each method
+          for (String method : methods) {
+            Privilege priv = new Privilege();
 
-                        priv.addProperty( ApplicationPrivilegeMethodPropertyDescriptor.ID, method );
+            priv.setName(resource.getName() != null ? resource.getName() + " - (" + method + ")" : null);
+            priv.setDescription(resource.getDescription());
+            priv.setType(TargetPrivilegeDescriptor.TYPE);
 
-                        priv.addProperty( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, resource
-                            .getRepositoryTargetId() );
+            priv.addProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, method);
 
-                        priv.addProperty( TargetPrivilegeRepositoryPropertyDescriptor.ID, resource.getRepositoryId() );
+            priv.addProperty(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, resource
+                .getRepositoryTargetId());
 
-                        priv.addProperty( TargetPrivilegeGroupPropertyDescriptor.ID, resource.getRepositoryGroupId() );
+            priv.addProperty(TargetPrivilegeRepositoryPropertyDescriptor.ID, resource.getRepositoryId());
 
-                        priv = getSecuritySystem().getAuthorizationManager( DEFAULT_SOURCE ).addPrivilege( priv );
+            priv.addProperty(TargetPrivilegeGroupPropertyDescriptor.ID, resource.getRepositoryGroupId());
 
-                        result.addData( this.securityToRestModel( priv, request, true ) );
-                    }
-                }
-                catch ( InvalidConfigurationException e )
-                {
-                    // build and throw exctption
-                    handleInvalidConfigurationException( e );
-                }
-                catch ( NoSuchAuthorizationManagerException e )
-                {
-                    // we should not get here
-                    this.getLogger().warn( "Could not find the default AuthorizationManager", e );
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
-                }
-            }
+            priv = getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).addPrivilege(priv);
+
+            result.addData(this.securityToRestModel(priv, request, true));
+          }
         }
-        return result;
+        catch (InvalidConfigurationException e) {
+          // build and throw exctption
+          handleInvalidConfigurationException(e);
+        }
+        catch (NoSuchAuthorizationManagerException e) {
+          // we should not get here
+          this.getLogger().warn("Could not find the default AuthorizationManager", e);
+          throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+        }
+      }
     }
+    return result;
+  }
 
 }

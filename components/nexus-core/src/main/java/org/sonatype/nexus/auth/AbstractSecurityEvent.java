@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.auth;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
@@ -17,23 +18,21 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 /**
  * Abstract helper class for security related events. It carries the "minimal" subset of authc/authz events: the client
  * information ("who").
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
 public abstract class AbstractSecurityEvent
     extends AbstractEvent<Object>
 {
-    private final ClientInfo clientInfo;
+  private final ClientInfo clientInfo;
 
-    public AbstractSecurityEvent( final Object sender, final ClientInfo clientInfo )
-    {
-        super( sender );
-        this.clientInfo = clientInfo;
-    }
+  public AbstractSecurityEvent(final Object sender, final ClientInfo clientInfo) {
+    super(sender);
+    this.clientInfo = clientInfo;
+  }
 
-    public ClientInfo getClientInfo()
-    {
-        return clientInfo;
-    }
+  public ClientInfo getClientInfo() {
+    return clientInfo;
+  }
 }

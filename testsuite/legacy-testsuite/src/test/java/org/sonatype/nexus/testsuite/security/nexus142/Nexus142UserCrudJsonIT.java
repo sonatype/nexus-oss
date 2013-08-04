@@ -10,14 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.security.nexus142;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+package org.sonatype.nexus.testsuite.security.nexus142;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.test.utils.UserMessageUtil;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.rest.model.UserResource;
 
 import org.apache.shiro.authc.credential.PasswordService;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -27,10 +30,9 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.UserMessageUtil;
-import org.sonatype.security.model.CUser;
-import org.sonatype.security.rest.model.UserResource;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * CRUD tests for JSON request/response.
@@ -38,169 +40,166 @@ import org.sonatype.security.rest.model.UserResource;
 public class Nexus142UserCrudJsonIT
     extends AbstractNexusIntegrationTest
 {
-    protected UserMessageUtil messageUtil;
-    
-    private PasswordService passwordService;
+  protected UserMessageUtil messageUtil;
 
-    public Nexus142UserCrudJsonIT()
-    {
-        this.messageUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-    }
-    
-    @Before
-    public void setUp()
-        throws Exception
-    {
-        passwordService = lookup( PasswordService.class );
-    }
+  private PasswordService passwordService;
 
-    @Test
-    public void createUserTest()
-        throws IOException
-    {
+  public Nexus142UserCrudJsonIT() {
+    this.messageUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+  }
 
-        UserResource resource = new UserResource();
+  @Before
+  public void setUp()
+      throws Exception
+  {
+    passwordService = lookup(PasswordService.class);
+  }
 
-        resource.setFirstName( "Create User" );
-        resource.setUserId( "createUser" );
-        resource.setStatus( "active" );
-        resource.setEmail( "nexus@user.com" );
-        resource.addRole( "role1" );
+  @Test
+  public void createUserTest()
+      throws IOException
+  {
 
-        // this also validates
-        this.messageUtil.createUser( resource );
-    }
+    UserResource resource = new UserResource();
 
-    @Test
-    public void createTestWithPassword()
-        throws IOException, ComponentLookupException
-    {
+    resource.setFirstName("Create User");
+    resource.setUserId("createUser");
+    resource.setStatus("active");
+    resource.setEmail("nexus@user.com");
+    resource.addRole("role1");
 
-        UserResource resource = new UserResource();
-        String password = "defaultPassword";
-        resource.setFirstName( "Create User" );
-        resource.setUserId( "createTestWithPassword" );
-        resource.setStatus( "active" );
-        resource.setEmail( "nexus@user.com" );
-        resource.addRole( "role1" );
-        resource.setPassword( password );
+    // this also validates
+    this.messageUtil.createUser(resource);
+  }
 
-        // this also validates
-        this.messageUtil.createUser( resource );
+  @Test
+  public void createTestWithPassword()
+      throws IOException, ComponentLookupException
+  {
 
-        // validate password is correct
-        CUser cUser = getSecurityConfigUtil().getCUser( "createTestWithPassword" );
-        assertThat( "Expected passwords to match", passwordService.passwordsMatch( password, cUser.getPassword() ), is( true ) );
-    }
+    UserResource resource = new UserResource();
+    String password = "defaultPassword";
+    resource.setFirstName("Create User");
+    resource.setUserId("createTestWithPassword");
+    resource.setStatus("active");
+    resource.setEmail("nexus@user.com");
+    resource.addRole("role1");
+    resource.setPassword(password);
 
-    @Test
-    public void listTest()
-        throws IOException
-    {
-        UserResource resource = new UserResource();
+    // this also validates
+    this.messageUtil.createUser(resource);
 
-        resource.setFirstName( "list Test" );
-        resource.setUserId( "listTest" );
-        resource.setStatus( "active" );
-        resource.setEmail( "listTest@user.com" );
-        resource.addRole( "role1" );
+    // validate password is correct
+    CUser cUser = getSecurityConfigUtil().getCUser("createTestWithPassword");
+    assertThat("Expected passwords to match", passwordService.passwordsMatch(password, cUser.getPassword()), is(true));
+  }
 
-        // this also validates
-        this.messageUtil.createUser( resource );
+  @Test
+  public void listTest()
+      throws IOException
+  {
+    UserResource resource = new UserResource();
 
-        // now that we have at least one element stored (more from other tests, most likely)
+    resource.setFirstName("list Test");
+    resource.setUserId("listTest");
+    resource.setStatus("active");
+    resource.setEmail("listTest@user.com");
+    resource.addRole("role1");
 
-        // NEED to work around a GET problem with the REST client
-        List<UserResource> users = this.messageUtil.getList();
-        getSecurityConfigUtil().verifyUsers( users );
+    // this also validates
+    this.messageUtil.createUser(resource);
 
-    }
+    // now that we have at least one element stored (more from other tests, most likely)
 
-    public void readTest()
-        throws IOException
-    {
+    // NEED to work around a GET problem with the REST client
+    List<UserResource> users = this.messageUtil.getList();
+    getSecurityConfigUtil().verifyUsers(users);
 
-        UserResource resource = new UserResource();
+  }
 
-        resource.setFirstName( "Read User" );
-        resource.setUserId( "readUser" );
-        resource.setStatus( "active" );
-        resource.setEmail( "read@user.com" );
-        resource.addRole( "role1" );
+  public void readTest()
+      throws IOException
+  {
 
-        // this also validates
-        this.messageUtil.createUser( resource );
+    UserResource resource = new UserResource();
 
-        Response response = this.messageUtil.sendMessage( Method.GET, resource );
+    resource.setFirstName("Read User");
+    resource.setUserId("readUser");
+    resource.setStatus("active");
+    resource.setEmail("read@user.com");
+    resource.addRole("role1");
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not GET Repository Target: " + response.getStatus() );
-        }
+    // this also validates
+    this.messageUtil.createUser(resource);
 
-        // get the Resource object
-        UserResource responseResource = this.messageUtil.getResourceFromResponse( response );
+    Response response = this.messageUtil.sendMessage(Method.GET, resource);
 
-        Assert.assertEquals( responseResource.getFirstName(), resource.getFirstName() );
-        Assert.assertEquals( responseResource.getUserId(), resource.getUserId() );
-        Assert.assertEquals( responseResource.getStatus(), "active" );
-        Assert.assertEquals( responseResource.getEmail(), resource.getEmail() );
-        Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not GET Repository Target: " + response.getStatus());
     }
 
-    @Test
-    public void updateTest()
-        throws IOException
-    {
+    // get the Resource object
+    UserResource responseResource = this.messageUtil.getResourceFromResponse(response);
 
-        UserResource resource = new UserResource();
+    Assert.assertEquals(responseResource.getFirstName(), resource.getFirstName());
+    Assert.assertEquals(responseResource.getUserId(), resource.getUserId());
+    Assert.assertEquals(responseResource.getStatus(), "active");
+    Assert.assertEquals(responseResource.getEmail(), resource.getEmail());
+    Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
+  }
 
-        resource.setFirstName( "Update User" );
-        resource.setUserId( "updateUser" );
-        resource.setStatus( "active" );
-        resource.setEmail( "updateUser@user.com" );
-        resource.addRole( "role1" );
+  @Test
+  public void updateTest()
+      throws IOException
+  {
 
-        this.messageUtil.createUser( resource );
+    UserResource resource = new UserResource();
 
-        // update the user
-        // TODO: add tests that changes the userId
-        resource.setFirstName( "Update UserAgain" );
-        resource.setUserId( "updateUser" );
-        resource.setStatus( "active" );
-        resource.setEmail( "updateUser@user2.com" );
-        resource.getRoles().clear();
-        resource.addRole( "role2" );
+    resource.setFirstName("Update User");
+    resource.setUserId("updateUser");
+    resource.setStatus("active");
+    resource.setEmail("updateUser@user.com");
+    resource.addRole("role1");
 
-        // this validates
-        this.messageUtil.updateUser( resource );
+    this.messageUtil.createUser(resource);
 
+    // update the user
+    // TODO: add tests that changes the userId
+    resource.setFirstName("Update UserAgain");
+    resource.setUserId("updateUser");
+    resource.setStatus("active");
+    resource.setEmail("updateUser@user2.com");
+    resource.getRoles().clear();
+    resource.addRole("role2");
+
+    // this validates
+    this.messageUtil.updateUser(resource);
+
+  }
+
+  @Test
+  public void deleteTest()
+      throws IOException
+  {
+
+    UserResource resource = new UserResource();
+
+    resource.setFirstName("Delete User");
+    resource.setUserId("deleteUser");
+    resource.setStatus("active");
+    resource.setEmail("deleteUser@user.com");
+    resource.addRole("role2");
+
+    this.messageUtil.createUser(resource);
+
+    // use the new ID
+    Response response = this.messageUtil.sendMessage(Method.DELETE, resource);
+
+    if (!response.getStatus().isSuccess()) {
+      Assert.fail("Could not delete User: " + response.getStatus());
     }
 
-    @Test
-    public void deleteTest()
-        throws IOException
-    {
-
-        UserResource resource = new UserResource();
-
-        resource.setFirstName( "Delete User" );
-        resource.setUserId( "deleteUser" );
-        resource.setStatus( "active" );
-        resource.setEmail( "deleteUser@user.com" );
-        resource.addRole( "role2" );
-
-        this.messageUtil.createUser( resource );
-
-        // use the new ID
-        Response response = this.messageUtil.sendMessage( Method.DELETE, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not delete User: " + response.getStatus() );
-        }
-
-        getSecurityConfigUtil().verifyUsers( new ArrayList<UserResource>() );
-    }
+    getSecurityConfigUtil().verifyUsers(new ArrayList<UserResource>());
+  }
 
 }

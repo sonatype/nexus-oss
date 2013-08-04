@@ -10,29 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 public class UsernamePasswordRemoteAuthenticationSettings
     implements RemoteAuthenticationSettings
 {
-    private final String username;
+  private final String username;
 
-    private final String password;
+  private final String password;
 
-    public UsernamePasswordRemoteAuthenticationSettings( String username, String password )
-    {
-        this.username = username;
+  public UsernamePasswordRemoteAuthenticationSettings(String username, String password) {
+    this.username = username;
 
-        this.password = password;
-    }
+    this.password = password;
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public String getPassword() {
+    return password;
+  }
 }

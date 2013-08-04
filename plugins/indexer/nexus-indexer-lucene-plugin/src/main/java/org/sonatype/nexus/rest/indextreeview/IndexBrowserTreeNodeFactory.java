@@ -10,89 +10,86 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.indextreeview;
 
+import org.sonatype.nexus.index.treeview.DefaultMergedTreeNodeFactory;
+import org.sonatype.nexus.proxy.repository.Repository;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.treeview.IndexTreeView;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeViewRequest;
-import org.apache.commons.lang.StringUtils;
-import org.sonatype.nexus.index.treeview.DefaultMergedTreeNodeFactory;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 public class IndexBrowserTreeNodeFactory
     extends DefaultMergedTreeNodeFactory
 {
-    private String baseLinkUrl;
+  private String baseLinkUrl;
 
-    public IndexBrowserTreeNodeFactory( Repository repository, String baseLinkUrl )
-    {
-        super( repository );
-        this.baseLinkUrl = baseLinkUrl;
+  public IndexBrowserTreeNodeFactory(Repository repository, String baseLinkUrl) {
+    super(repository);
+    this.baseLinkUrl = baseLinkUrl;
+  }
+
+  @Override
+  protected TreeNode decorateArtifactNode(IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                          TreeNode node)
+  {
+    IndexBrowserTreeNode iNode = (IndexBrowserTreeNode) super.decorateArtifactNode(tview, req, ai, path, node);
+
+    iNode.setClassifier(ai.classifier);
+    iNode.setExtension(ai.fextension);
+    iNode.setPackaging(ai.packaging);
+    iNode.setArtifactUri(buildArtifactUri(iNode));
+    iNode.setPomUri(buildPomUri(iNode));
+
+    return iNode;
+  }
+
+  @Override
+  protected TreeNode instantiateNode(IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                     String nodeName)
+  {
+    return new IndexBrowserTreeNode(tview, req);
+  }
+
+  protected String buildArtifactUri(IndexBrowserTreeNode node) {
+    if (StringUtils.isEmpty(node.getPackaging()) || "pom".equals(node.getPackaging())) {
+      return "";
     }
 
-    @Override
-    protected TreeNode decorateArtifactNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
-                                             TreeNode node )
-    {
-        IndexBrowserTreeNode iNode = (IndexBrowserTreeNode) super.decorateArtifactNode( tview, req, ai, path, node );
+    StringBuilder sb = new StringBuilder();
+    sb.append("?r=");
+    sb.append(node.getRepositoryId());
+    sb.append("&g=");
+    sb.append(node.getGroupId());
+    sb.append("&a=");
+    sb.append(node.getArtifactId());
+    sb.append("&v=");
+    sb.append(node.getVersion());
+    sb.append("&p=");
+    sb.append(node.getPackaging());
 
-        iNode.setClassifier( ai.classifier );
-        iNode.setExtension( ai.fextension );
-        iNode.setPackaging( ai.packaging );
-        iNode.setArtifactUri( buildArtifactUri( iNode ) );
-        iNode.setPomUri( buildPomUri( iNode ) );
+    return this.baseLinkUrl + sb.toString();
+  }
 
-        return iNode;
+  protected String buildPomUri(IndexBrowserTreeNode node) {
+    if (StringUtils.isNotEmpty(node.getClassifier())) {
+      return "";
     }
 
-    @Override
-    protected TreeNode instantiateNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
-                                        String nodeName )
-    {
-        return new IndexBrowserTreeNode( tview, req );
-    }
+    StringBuilder sb = new StringBuilder();
+    sb.append("?r=");
+    sb.append(node.getRepositoryId());
+    sb.append("&g=");
+    sb.append(node.getGroupId());
+    sb.append("&a=");
+    sb.append(node.getArtifactId());
+    sb.append("&v=");
+    sb.append(node.getVersion());
+    sb.append("&p=pom");
 
-    protected String buildArtifactUri( IndexBrowserTreeNode node )
-    {
-        if ( StringUtils.isEmpty( node.getPackaging() ) || "pom".equals( node.getPackaging() ) )
-        {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append( "?r=" );
-        sb.append( node.getRepositoryId() );
-        sb.append( "&g=" );
-        sb.append( node.getGroupId() );
-        sb.append( "&a=" );
-        sb.append( node.getArtifactId() );
-        sb.append( "&v=" );
-        sb.append( node.getVersion() );
-        sb.append( "&p=" );
-        sb.append( node.getPackaging() );
-
-        return this.baseLinkUrl + sb.toString();
-    }
-
-    protected String buildPomUri( IndexBrowserTreeNode node )
-    {
-        if ( StringUtils.isNotEmpty( node.getClassifier() ) )
-        {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append( "?r=" );
-        sb.append( node.getRepositoryId() );
-        sb.append( "&g=" );
-        sb.append( node.getGroupId() );
-        sb.append( "&a=" );
-        sb.append( node.getArtifactId() );
-        sb.append( "&v=" );
-        sb.append( node.getVersion() );
-        sb.append( "&p=pom" );
-
-        return this.baseLinkUrl + sb.toString();
-    }
+    return this.baseLinkUrl + sb.toString();
+  }
 }

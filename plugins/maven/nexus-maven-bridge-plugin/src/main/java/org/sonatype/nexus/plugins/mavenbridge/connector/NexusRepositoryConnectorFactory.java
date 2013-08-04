@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.mavenbridge.connector;
 
 import org.sonatype.aether.RepositorySystemSession;
@@ -22,17 +23,16 @@ public class NexusRepositoryConnectorFactory
     implements RepositoryConnectorFactory
 {
 
-    public RepositoryConnector newInstance( RepositorySystemSession session, RemoteRepository repository )
-        throws NoRepositoryConnectorException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
+      throws NoRepositoryConnectorException
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public int getPriority()
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }
+  public int getPriority() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
 
 }

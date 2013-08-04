@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.site.plugin;
 
 import java.io.IOException;
@@ -26,19 +27,15 @@ public interface SiteRepository
     extends WebSiteRepository
 {
 
-    /**
-     * ID of site repository.
-     */
-    public static final String ID = "site";
+  /**
+   * ID of site repository.
+   */
+  public static final String ID = "site";
 
-    /**
-     * Accepts a web site az ZIP file, and automatically "unzips" it honoring the dir structures in ZIP file and
-     * prefixing those with the prefix.
-     *
-     * @param prefix
-     * @param bundle
-     * @throws IOException
-     */
-    void deploySiteBundle( String prefix, InputStream bundle )
-        throws IOException;
+  /**
+   * Accepts a web site az ZIP file, and automatically "unzips" it honoring the dir structures in ZIP file and
+   * prefixing those with the prefix.
+   */
+  void deploySiteBundle(String prefix, InputStream bundle)
+      throws IOException;
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.List;
@@ -24,14 +25,14 @@ import org.sonatype.plugin.ExtensionPoint;
 @Singleton
 public interface ScheduledTaskDescriptor
 {
-    String getId();
+  String getId();
 
-    String getName();
-    
-    List<FormField> formFields();
-    
-    @Deprecated
-    List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors();
+  String getName();
 
-    boolean isExposed();
+  List<FormField> formFields();
+
+  @Deprecated
+  List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors();
+
+  boolean isExposed();
 }

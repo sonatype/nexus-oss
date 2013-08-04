@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rest;
 
 import java.io.IOException;
@@ -20,125 +21,103 @@ import java.net.URLConnection;
 public class DefaultStaticResource
     implements StaticResource
 {
-    private final URL resourceURL;
+  private final URL resourceURL;
 
-    private final String path;
+  private final String path;
 
-    private volatile URLConnection urlConnection;
-    
-    private String contentType;
-    
-    public DefaultStaticResource(URL url, String path, String contentType)
-    {
-        this.resourceURL = url;
+  private volatile URLConnection urlConnection;
 
-        this.path = path;
-        
-        this.contentType = contentType;
+  private String contentType;
+
+  public DefaultStaticResource(URL url, String path, String contentType) {
+    this.resourceURL = url;
+
+    this.path = path;
+
+    this.contentType = contentType;
+  }
+
+  protected synchronized boolean checkConnection() {
+    if (urlConnection == null) {
+      try {
+        urlConnection = resourceURL.openConnection();
+      }
+      catch (IOException e) {
+        // ignore it?
+        urlConnection = null;
+      }
     }
 
-    protected synchronized boolean checkConnection()
-    {
-        if ( urlConnection == null )
-        {
-            try
-            {
-                urlConnection = resourceURL.openConnection();
-            }
-            catch ( IOException e )
-            {
-                // ignore it?
-                urlConnection = null;
-            }
-        }
+    return urlConnection != null;
+  }
 
-        return urlConnection != null;
+  public String getPath() {
+    if (path != null) {
+      return path;
     }
-
-    public String getPath()
-    {
-        if ( path != null )
-        {
-            return path;
-        }
-        else
-        {
-            return resourceURL.getPath();
-        }
+    else {
+      return resourceURL.getPath();
     }
+  }
 
-    public long getSize()
-    {
-        if ( checkConnection() )
-        {
-            return urlConnection.getContentLength();
-        }
-        else
-        {
-            return -1;
-        }
+  public long getSize() {
+    if (checkConnection()) {
+      return urlConnection.getContentLength();
     }
-
-    public String getContentType()
-    {
-        if ( contentType != null )
-        {
-            return contentType;
-        }
-        else if ( checkConnection() )
-        {
-            return urlConnection.getContentType();
-        }
-        else
-        {
-            return null;
-        }
+    else {
+      return -1;
     }
+  }
 
-    public InputStream getInputStream()
-        throws IOException
-    {
-        if ( checkConnection() )
-        {
-            InputStream is = urlConnection.getInputStream();
-
-            urlConnection = null;
-
-            return is;
-        }
-        else
-        {
-            throw new IOException( "Invalid resource!" );
-        }
+  public String getContentType() {
+    if (contentType != null) {
+      return contentType;
     }
-
-    public Long getLastModified()
-    {
-        if ( checkConnection() )
-        {
-            return urlConnection.getLastModified();
-        }
-        return null;
+    else if (checkConnection()) {
+      return urlConnection.getContentType();
     }
-
-    @Override
-    public String toString()
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.append( "DefaultStaticResource [" );
-        if ( path != null )
-        {
-            builder.append( "path=" );
-            builder.append( path );
-            builder.append( ", " );
-        }
-        if ( contentType != null )
-        {
-            builder.append( "contentType=" );
-            builder.append( contentType );
-        }
-        builder.append( "]" );
-        return builder.toString();
+    else {
+      return null;
     }
+  }
+
+  public InputStream getInputStream()
+      throws IOException
+  {
+    if (checkConnection()) {
+      InputStream is = urlConnection.getInputStream();
+
+      urlConnection = null;
+
+      return is;
+    }
+    else {
+      throw new IOException("Invalid resource!");
+    }
+  }
+
+  public Long getLastModified() {
+    if (checkConnection()) {
+      return urlConnection.getLastModified();
+    }
+    return null;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("DefaultStaticResource [");
+    if (path != null) {
+      builder.append("path=");
+      builder.append(path);
+      builder.append(", ");
+    }
+    if (contentType != null) {
+      builder.append("contentType=");
+      builder.append(contentType);
+    }
+    builder.append("]");
+    return builder.toString();
+  }
 
 }

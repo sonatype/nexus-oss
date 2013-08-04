@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application.upgrade;
 
 import java.io.File;
@@ -22,22 +23,16 @@ import org.sonatype.nexus.configuration.model.Configuration;
 /**
  * A component involved only if old Nexus configuration is found. It will fetch the old configuration, transform it to
  * current Configuration model and return it. Nothing else.
- * 
+ *
  * @author cstamas
  */
 public interface ApplicationConfigurationUpgrader
 {
-    /**
-     * Tries to load an old configuration from file and will try to upgrade it to current model.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
-     * @throws ConfigurationIsCorruptedException
-     * @throws UnsupportedConfigurationVersionException
-     */
-    public Configuration loadOldConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException,
-            UnsupportedConfigurationVersionException;
+  /**
+   * Tries to load an old configuration from file and will try to upgrade it to current model.
+   */
+  public Configuration loadOldConfiguration(File file)
+      throws IOException,
+             ConfigurationIsCorruptedException,
+             UnsupportedConfigurationVersionException;
 }

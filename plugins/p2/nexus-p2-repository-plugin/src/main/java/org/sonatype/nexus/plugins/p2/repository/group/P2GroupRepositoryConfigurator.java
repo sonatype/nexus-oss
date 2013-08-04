@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.group;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
 
-@Component( role = P2GroupRepositoryConfigurator.class )
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component(role = P2GroupRepositoryConfigurator.class)
 public class P2GroupRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator
 {

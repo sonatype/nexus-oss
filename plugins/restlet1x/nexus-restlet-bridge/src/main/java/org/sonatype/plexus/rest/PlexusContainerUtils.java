@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.rest;
 
 import org.codehaus.plexus.ContainerConfiguration;
@@ -19,20 +20,19 @@ import org.codehaus.plexus.PlexusContainerException;
 
 public class PlexusContainerUtils
 {
-    private PlexusContainer container;
+  private PlexusContainer container;
 
-    public PlexusContainer startContainer( ContainerConfiguration configuration )
-        throws PlexusContainerException
-    {
-        container = new DefaultPlexusContainer( configuration );
+  public PlexusContainer startContainer(ContainerConfiguration configuration)
+      throws PlexusContainerException
+  {
+    container = new DefaultPlexusContainer(configuration);
 
-        return container;
-    }
+    return container;
+  }
 
-    public void stopContainer()
-    {
-        container.dispose();
+  public void stopContainer() {
+    container.dispose();
 
-        container = null;
-    }
+    container = null;
+  }
 }

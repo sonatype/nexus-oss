@@ -10,29 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.internal.rest.jersey.subsystem.targets;
 
-import static org.sonatype.nexus.client.internal.rest.jersey.subsystem.targets.JerseyRepositoryTargets.path;
+package org.sonatype.nexus.client.internal.rest.jersey.subsystem.targets;
 
 import java.util.List;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import org.apache.commons.beanutils.BeanUtils;
-import org.sonatype.nexus.client.core.subsystem.security.Privilege;
 import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTarget;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyEntitySupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.rest.model.PrivilegeResource;
-import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
-import org.sonatype.security.rest.model.PrivilegeProperty;
-import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
+
+import com.google.common.collect.Lists;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
+
+import static org.sonatype.nexus.client.internal.rest.jersey.subsystem.targets.JerseyRepositoryTargets.path;
 
 /**
  * Jersey based {@link org.sonatype.nexus.client.core.subsystem.security.RepositoryTarget} implementation.
@@ -44,151 +37,126 @@ public class JerseyRepositoryTarget
     implements RepositoryTarget
 {
 
-    public JerseyRepositoryTarget( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyRepositoryTarget(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyRepositoryTarget( final JerseyNexusClient nexusClient, final String id,
-                                   final RepositoryTargetResource settings )
-    {
-        super( nexusClient, id, settings );
-    }
+  public JerseyRepositoryTarget(final JerseyNexusClient nexusClient, final String id,
+                                final RepositoryTargetResource settings)
+  {
+    super(nexusClient, id, settings);
+  }
 
-    @Override
-    protected RepositoryTargetResource createSettings( final String id )
-    {
-        final RepositoryTargetResource resource = new RepositoryTargetResource();
-        resource.setId( id );
-        return resource;
-    }
+  @Override
+  protected RepositoryTargetResource createSettings(final String id) {
+    final RepositoryTargetResource resource = new RepositoryTargetResource();
+    resource.setId(id);
+    return resource;
+  }
 
-    @Override
-    protected RepositoryTargetResource doGet()
-    {
-        try
-        {
-            return getNexusClient()
-                .serviceResource( path( id() ) )
-                .get( RepositoryTargetResourceResponse.class )
-                .getData();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  @Override
+  protected RepositoryTargetResource doGet() {
+    try {
+      return getNexusClient()
+          .serviceResource(path(id()))
+          .get(RepositoryTargetResourceResponse.class)
+          .getData();
     }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
 
-    @Override
-    protected RepositoryTargetResource doCreate()
-    {
-        final RepositoryTargetResourceResponse request = new RepositoryTargetResourceResponse();
-        request.setData( settings() );
-        try
-        {
-            return getNexusClient()
-                .serviceResource( "repo_targets" )
-                .post( RepositoryTargetResourceResponse.class, request )
-                .getData();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  @Override
+  protected RepositoryTargetResource doCreate() {
+    final RepositoryTargetResourceResponse request = new RepositoryTargetResourceResponse();
+    request.setData(settings());
+    try {
+      return getNexusClient()
+          .serviceResource("repo_targets")
+          .post(RepositoryTargetResourceResponse.class, request)
+          .getData();
     }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
 
-    @Override
-    protected RepositoryTargetResource doUpdate()
-    {
-        final RepositoryTargetResourceResponse request = new RepositoryTargetResourceResponse();
-        request.setData( settings() );
-        try
-        {
-            return getNexusClient()
-                .serviceResource( path( id() ) )
-                .put( RepositoryTargetResourceResponse.class, request )
-                .getData();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  @Override
+  protected RepositoryTargetResource doUpdate() {
+    final RepositoryTargetResourceResponse request = new RepositoryTargetResourceResponse();
+    request.setData(settings());
+    try {
+      return getNexusClient()
+          .serviceResource(path(id()))
+          .put(RepositoryTargetResourceResponse.class, request)
+          .getData();
     }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
 
-    @Override
-    protected void doRemove()
-    {
-        try
-        {
-            getNexusClient()
-                .serviceResource( path( id() ) )
-                .delete();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
+  @Override
+  protected void doRemove() {
+    try {
+      getNexusClient()
+          .serviceResource(path(id()))
+          .delete();
     }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
 
-    @Override
-    public String name()
-    {
-        return settings().getName();
-    }
+  @Override
+  public String name() {
+    return settings().getName();
+  }
 
-    @Override
-    public String contentClass()
-    {
-        return settings().getContentClass();
-    }
+  @Override
+  public String contentClass() {
+    return settings().getContentClass();
+  }
 
-    @Override
-    public List<String> patterns()
-    {
-        return settings().getPatterns();
-    }
+  @Override
+  public List<String> patterns() {
+    return settings().getPatterns();
+  }
 
-    @Override
-    public RepositoryTarget withName( final String name )
-    {
-        settings().setName( name );
-        return this;
-    }
+  @Override
+  public RepositoryTarget withName(final String name) {
+    settings().setName(name);
+    return this;
+  }
 
-    @Override
-    public RepositoryTarget withContentClass( final String cls )
-    {
-        settings().setContentClass( cls );
-        return this;
-    }
+  @Override
+  public RepositoryTarget withContentClass(final String cls) {
+    settings().setContentClass(cls);
+    return this;
+  }
 
-    @Override
-    public RepositoryTarget withPatterns( final String... patterns )
-    {
-        settings().setPatterns( Lists.newArrayList( patterns ) );
-        return this;
-    }
+  @Override
+  public RepositoryTarget withPatterns(final String... patterns) {
+    settings().setPatterns(Lists.newArrayList(patterns));
+    return this;
+  }
 
-    @Override
-    public RepositoryTarget addPattern( final String pattern )
-    {
-        settings().addPattern( pattern );
-        return this;
-    }
+  @Override
+  public RepositoryTarget addPattern(final String pattern) {
+    settings().addPattern(pattern);
+    return this;
+  }
 }

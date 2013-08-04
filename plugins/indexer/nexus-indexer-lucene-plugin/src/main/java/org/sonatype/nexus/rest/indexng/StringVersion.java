@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.indexng;
 
 import org.sonatype.aether.version.Version;
@@ -22,47 +23,40 @@ import org.sonatype.aether.version.Version;
 class StringVersion
     implements Comparable<StringVersion>
 {
-    private final String string;
+  private final String string;
 
-    private final Version version;
+  private final Version version;
 
-    public StringVersion( String string, Version version )
-    {
-        this.string = string;
-        this.version = version;
+  public StringVersion(String string, Version version) {
+    this.string = string;
+    this.version = version;
+  }
+
+  @Override
+  public int hashCode() {
+    return string.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
 
-    @Override
-    public int hashCode()
-    {
-        return string.hashCode();
+    if (!(obj instanceof StringVersion)) {
+      return false;
     }
 
-    @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
-            return true;
-        }
+    return string.equals(((StringVersion) obj).string);
+  }
 
-        if ( !( obj instanceof StringVersion ) )
-        {
-            return false;
-        }
-
-        return string.equals( ( (StringVersion) obj ).string );
+  @Override
+  public int compareTo(StringVersion other) {
+    int c = version.compareTo(other.version);
+    if (c != 0) {
+      return c;
     }
-
-    @Override
-    public int compareTo( StringVersion other )
-    {
-        int c = version.compareTo( other.version );
-        if ( c != 0 )
-        {
-            return c;
-        }
-        return string.compareTo( other.string );
-    }
+    return string.compareTo(other.string);
+  }
 
 }

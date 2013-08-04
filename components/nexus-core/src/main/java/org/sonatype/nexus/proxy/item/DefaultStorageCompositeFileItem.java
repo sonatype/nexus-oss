@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.item;
 
 import java.util.ArrayList;
@@ -26,37 +27,33 @@ public class DefaultStorageCompositeFileItem
     extends DefaultStorageFileItem
     implements StorageCompositeFileItem
 {
-    private transient List<StorageItem> sources;
+  private transient List<StorageItem> sources;
 
-    public DefaultStorageCompositeFileItem( Repository repository, ResourceStoreRequest request, boolean canRead,
-                                            boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources )
-    {
-        super( repository, request, canRead, canWrite, contentLocator );
+  public DefaultStorageCompositeFileItem(Repository repository, ResourceStoreRequest request, boolean canRead,
+                                         boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources)
+  {
+    super(repository, request, canRead, canWrite, contentLocator);
 
-        if ( sources != null )
-        {
-            getSources().addAll( sources );
-        }
+    if (sources != null) {
+      getSources().addAll(sources);
+    }
+  }
+
+  public DefaultStorageCompositeFileItem(RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
+                                         boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources)
+  {
+    super(router, request, canRead, canWrite, contentLocator);
+
+    if (sources != null) {
+      getSources().addAll(sources);
+    }
+  }
+
+  public List<StorageItem> getSources() {
+    if (sources == null) {
+      sources = new ArrayList<StorageItem>();
     }
 
-    public DefaultStorageCompositeFileItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-                                            boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources )
-    {
-        super( router, request, canRead, canWrite, contentLocator );
-
-        if ( sources != null )
-        {
-            getSources().addAll( sources );
-        }
-    }
-
-    public List<StorageItem> getSources()
-    {
-        if ( sources == null )
-        {
-            sources = new ArrayList<StorageItem>();
-        }
-
-        return sources;
-    }
+    return sources;
+  }
 }

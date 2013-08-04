@@ -10,10 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.monitor.commands;
 
-import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
 import org.sonatype.nexus.bootstrap.log.LogProxy;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
 
 /**
  * Responds to pings (by doing nothing).
@@ -24,21 +25,19 @@ public class PingCommand
     implements CommandMonitorThread.Command
 {
 
-    private static final LogProxy log = LogProxy.getLogger( PingCommand.class );
+  private static final LogProxy log = LogProxy.getLogger(PingCommand.class);
 
-    public static final String NAME = "PING";
+  public static final String NAME = "PING";
 
-    @Override
-    public String getId()
-    {
-        return NAME;
-    }
+  @Override
+  public String getId() {
+    return NAME;
+  }
 
-    @Override
-    public boolean execute()
-    {
-        log.debug( "Pinged" );
-        return false;
-    }
+  @Override
+  public boolean execute() {
+    log.debug("Pinged");
+    return false;
+  }
 
 }

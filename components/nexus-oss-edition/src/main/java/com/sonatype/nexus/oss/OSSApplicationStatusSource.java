@@ -10,46 +10,45 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package com.sonatype.nexus.oss;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.AbstractApplicationStatusSource;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 
-@Component( role = ApplicationStatusSource.class )
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
+
+@Component(role = ApplicationStatusSource.class)
 public class OSSApplicationStatusSource
     extends AbstractApplicationStatusSource
     implements ApplicationStatusSource
 {
-    private static final String FORMATTED_APP_NAME_BASE = "Sonatype Nexus&trade;";
+  private static final String FORMATTED_APP_NAME_BASE = "Sonatype Nexus&trade;";
 
-    public OSSApplicationStatusSource()
-    {
-        super();
+  public OSSApplicationStatusSource() {
+    super();
 
-        getSystemStatusInternal().setVersion( discoverApplicationVersion() );
+    getSystemStatusInternal().setVersion(discoverApplicationVersion());
 
-        getSystemStatusInternal().setApiVersion( getSystemStatusInternal().getVersion() );
+    getSystemStatusInternal().setApiVersion(getSystemStatusInternal().getVersion());
 
-        getSystemStatusInternal().setFormattedAppName(
-            FORMATTED_APP_NAME_BASE + " "
-                + ( StringUtils.isEmpty( getSystemStatusInternal().getEditionLong() )
-                        ? ""
-                        : getSystemStatusInternal().getEditionLong() + " Edition " )
-                + getSystemStatusInternal().getVersion() );
-    }
+    getSystemStatusInternal().setFormattedAppName(
+        FORMATTED_APP_NAME_BASE + " "
+            + (StringUtils.isEmpty(getSystemStatusInternal().getEditionLong())
+            ? ""
+            : getSystemStatusInternal().getEditionLong() + " Edition ")
+            + getSystemStatusInternal().getVersion());
+  }
 
-    @Override
-    protected void renewSystemStatus( SystemStatus systemStatus )
-    {
-        // nothing changes in OSS yet
-    }
+  @Override
+  protected void renewSystemStatus(SystemStatus systemStatus) {
+    // nothing changes in OSS yet
+  }
 
-    @Override
-    protected String discoverApplicationVersion()
-    {
-        return readVersion( "/META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties" );
-    }
+  @Override
+  protected String discoverApplicationVersion() {
+    return readVersion("/META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties");
+  }
 }

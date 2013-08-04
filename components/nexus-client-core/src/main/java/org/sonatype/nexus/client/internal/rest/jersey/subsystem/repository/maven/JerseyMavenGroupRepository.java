@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.maven;
 
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepository;
@@ -27,26 +28,23 @@ public class JerseyMavenGroupRepository
     implements MavenGroupRepository
 {
 
-    static final String PROVIDER = "maven2";
+  static final String PROVIDER = "maven2";
 
-    public JerseyMavenGroupRepository( final JerseyNexusClient nexusClient, final String id )
-    {
-        super( nexusClient, id );
-    }
+  public JerseyMavenGroupRepository(final JerseyNexusClient nexusClient, final String id) {
+    super(nexusClient, id);
+  }
 
-    public JerseyMavenGroupRepository( final JerseyNexusClient nexusClient, final RepositoryGroupResource resource )
-    {
-        super( nexusClient, resource );
-    }
+  public JerseyMavenGroupRepository(final JerseyNexusClient nexusClient, final RepositoryGroupResource resource) {
+    super(nexusClient, resource);
+  }
 
-    @Override
-    protected RepositoryGroupResource createSettings()
-    {
-        final RepositoryGroupResource settings = super.createSettings();
+  @Override
+  protected RepositoryGroupResource createSettings() {
+    final RepositoryGroupResource settings = super.createSettings();
 
-        settings.setProvider( PROVIDER );
+    settings.setProvider(PROVIDER);
 
-        return settings;
-    }
+    return settings;
+  }
 
 }

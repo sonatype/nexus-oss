@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.subsystem.repository;
 
 /**
@@ -21,27 +22,27 @@ public interface HostedRepository<T extends HostedRepository>
     extends BaseRepository<T, RepositoryStatus>
 {
 
-    T withRepoPolicy( final String policy );
+  T withRepoPolicy(final String policy);
 
-    /**
-     * Makes repository a read-only repository.
-     *
-     * @return itself, for fluent api usage
-     */
-    T readOnly();
+  /**
+   * Makes repository a read-only repository.
+   *
+   * @return itself, for fluent api usage
+   */
+  T readOnly();
 
-    /**
-     * Allow redeploy of items into repository.
-     *
-     * @return itself, for fluent api usage
-     */
-    T allowRedeploy();
+  /**
+   * Allow redeploy of items into repository.
+   *
+   * @return itself, for fluent api usage
+   */
+  T allowRedeploy();
 
-    /**
-     * Do not allow redeployment into repository (items cannot be updated)
-     *
-     * @return itself, for fluent api usage
-     */
-    T disableRedeploy();
+  /**
+   * Do not allow redeployment into repository (items cannot be updated)
+   *
+   * @return itself, for fluent api usage
+   */
+  T disableRedeploy();
 
 }

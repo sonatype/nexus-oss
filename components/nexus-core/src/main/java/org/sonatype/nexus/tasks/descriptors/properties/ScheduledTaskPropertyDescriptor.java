@@ -10,24 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors.properties;
 
 @Deprecated
 public interface ScheduledTaskPropertyDescriptor
 {
-    String getId();
+  String getId();
 
-    String getName();
+  String getName();
 
-    String getType();
+  String getType();
 
-    boolean isRequired();
+  boolean isRequired();
 
-    void setRequired( boolean required );
+  void setRequired(boolean required);
 
-    String getHelpText();
+  String getHelpText();
 
-    void setHelpText( String helpText );
+  void setHelpText(String helpText);
 
-    String getRegexValidation();
+  String getRegexValidation();
 }

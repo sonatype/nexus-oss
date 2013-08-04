@@ -10,14 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.inject.name.Names.named;
+package org.sonatype.nexus.plugins.capabilities.internal;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,9 +29,14 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+
 import com.google.common.collect.Maps;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Key;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.inject.name.Names.named;
 
 /**
  * Default {@link CapabilityFactoryRegistry} implementation.
@@ -47,91 +50,79 @@ class DefaultCapabilityFactoryRegistry
     implements CapabilityFactoryRegistry
 {
 
-    private final Map<String, CapabilityFactory> factories;
+  private final Map<String, CapabilityFactory> factories;
 
-    private final Map<String, CapabilityFactory> dynamicFactories;
+  private final Map<String, CapabilityFactory> dynamicFactories;
 
-    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+  private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
-    private final BeanLocator beanLocator;
+  private final BeanLocator beanLocator;
 
-    @Inject
-    DefaultCapabilityFactoryRegistry( final Map<String, CapabilityFactory> factories,
-                                      final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                                      final BeanLocator beanLocator )
-    {
-        this.beanLocator = checkNotNull( beanLocator );
-        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
-        this.factories = checkNotNull( factories );
-        this.dynamicFactories = Maps.newConcurrentMap();
+  @Inject
+  DefaultCapabilityFactoryRegistry(final Map<String, CapabilityFactory> factories,
+                                   final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                                   final BeanLocator beanLocator)
+  {
+    this.beanLocator = checkNotNull(beanLocator);
+    this.capabilityDescriptorRegistry = checkNotNull(capabilityDescriptorRegistry);
+    this.factories = checkNotNull(factories);
+    this.dynamicFactories = Maps.newConcurrentMap();
+  }
+
+  @Override
+  public CapabilityFactoryRegistry register(final CapabilityType type, final CapabilityFactory factory) {
+    checkNotNull(factory);
+    checkArgument(!factories.containsKey(type), "Factory already registered for %s", type);
+    checkArgument(!dynamicFactories.containsKey(type), "Factory already registered for %s", type);
+
+    dynamicFactories.put(type.toString(), factory);
+    getLogger().debug("Added {} -> {}", type, factory);
+
+    return this;
+  }
+
+  @Override
+  public CapabilityFactoryRegistry unregister(final CapabilityType type) {
+    if (type != null) {
+      final CapabilityFactory factory = dynamicFactories.remove(type);
+      getLogger().debug("Removed {} -> {}", type, factory);
     }
 
-    @Override
-    public CapabilityFactoryRegistry register( final CapabilityType type, final CapabilityFactory factory )
-    {
-        checkNotNull( factory );
-        checkArgument( !factories.containsKey( type ), "Factory already registered for %s", type );
-        checkArgument( !dynamicFactories.containsKey( type ), "Factory already registered for %s", type );
+    return this;
+  }
 
-        dynamicFactories.put( type.toString(), factory );
-        getLogger().debug( "Added {} -> {}", type, factory );
-
-        return this;
+  @Override
+  public CapabilityFactory get(final CapabilityType type) {
+    CapabilityFactory factory = factories.get(checkNotNull(type).toString());
+    if (factory == null) {
+      factory = dynamicFactories.get(checkNotNull(type).toString());
     }
-
-    @Override
-    public CapabilityFactoryRegistry unregister( final CapabilityType type )
-    {
-        if ( type != null )
-        {
-            final CapabilityFactory factory = dynamicFactories.remove( type );
-            getLogger().debug( "Removed {} -> {}", type, factory );
-        }
-
-        return this;
-    }
-
-    @Override
-    public CapabilityFactory get( final CapabilityType type )
-    {
-        CapabilityFactory factory = factories.get( checkNotNull( type ).toString() );
-        if ( factory == null )
-        {
-            factory = dynamicFactories.get( checkNotNull( type ).toString() );
-        }
-        if ( factory == null )
-        {
-            final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
-            if ( descriptor != null && descriptor instanceof CapabilityFactory )
+    if (factory == null) {
+      final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(type);
+      if (descriptor != null && descriptor instanceof CapabilityFactory) {
+        factory = (CapabilityFactory) descriptor;
+      }
+      if (factory == null) {
+        try {
+          final Iterable<BeanEntry<Annotation, Capability>> entries = beanLocator.locate(
+              Key.get(Capability.class, named(type.toString()))
+          );
+          if (entries != null && entries.iterator().hasNext()) {
+            factory = new CapabilityFactory()
             {
-                factory = (CapabilityFactory) descriptor;
-            }
-            if ( factory == null )
-            {
-                try
-                {
-                    final Iterable<BeanEntry<Annotation, Capability>> entries = beanLocator.locate(
-                        Key.get( Capability.class, named( type.toString() ) )
-                    );
-                    if ( entries != null && entries.iterator().hasNext() )
-                    {
-                        factory = new CapabilityFactory()
-                        {
-                            @Override
-                            public Capability create()
-                            {
-                                return entries.iterator().next().getValue();
-                            }
-                        };
-                    }
-                }
-                catch ( ConfigurationException ignore )
-                {
-                    // ignore
-                }
-            }
+              @Override
+              public Capability create() {
+                return entries.iterator().next().getValue();
+              }
+            };
+          }
         }
-        return factory;
+        catch (ConfigurationException ignore) {
+          // ignore
+        }
+      }
     }
+    return factory;
+  }
 
 }

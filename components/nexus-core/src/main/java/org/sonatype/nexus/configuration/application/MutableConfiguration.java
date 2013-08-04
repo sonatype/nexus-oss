@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.configuration.application;
 
 import java.io.IOException;
@@ -27,151 +28,130 @@ import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
 {
-    // ----------------------------------------------------------------------------------------------------------
-    // Security (TODO: this should be removed, security has to be completely "paralell" and not interleaved!)
-    // ----------------------------------------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------------------------------------
+  // Security (TODO: this should be removed, security has to be completely "paralell" and not interleaved!)
+  // ----------------------------------------------------------------------------------------------------------
 
-    boolean isSecurityEnabled();
+  boolean isSecurityEnabled();
 
-    void setSecurityEnabled( boolean enabled )
-        throws IOException;
+  void setSecurityEnabled(boolean enabled)
+      throws IOException;
 
-    boolean isAnonymousAccessEnabled();
+  boolean isAnonymousAccessEnabled();
 
-    /**
-     * Configures anonymous access in atomic way.
-     * 
-     * @param enabled {@code true} to enable and {@code false} to disable it.
-     * @param username the username of the user to be used as "anonymous" user. If {@code enabled} parameter is
-     *            {@code true}, this value must be non-null.
-     * @param password the password of the user to be used as "anonymous" user. If {@code enabled} parameter is
-     *            {@code true}, this value must be non-null.
-     * @throws InvalidConfigurationException if {@code enabled} parameter is {@code true}, but passed in username or
-     *             password parameters are empty ({@code null} or empty string).
-     */
-    void setAnonymousAccess( boolean enabled, String username, String password )
-        throws InvalidConfigurationException;
+  /**
+   * Configures anonymous access in atomic way.
+   *
+   * @param enabled  {@code true} to enable and {@code false} to disable it.
+   * @param username the username of the user to be used as "anonymous" user. If {@code enabled} parameter is
+   *                 {@code true}, this value must be non-null.
+   * @param password the password of the user to be used as "anonymous" user. If {@code enabled} parameter is
+   *                 {@code true}, this value must be non-null.
+   * @throws InvalidConfigurationException if {@code enabled} parameter is {@code true}, but passed in username or
+   *                                       password parameters are empty ({@code null} or empty string).
+   */
+  void setAnonymousAccess(boolean enabled, String username, String password)
+      throws InvalidConfigurationException;
 
-    String getAnonymousUsername();
+  String getAnonymousUsername();
 
-    String getAnonymousPassword();
+  String getAnonymousPassword();
 
-    /**
-     * Set anonymous access.
-     * 
-     * @param val
-     * @throws IOException
-     * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
-     */
-    @Deprecated
-    void setAnonymousAccessEnabled( boolean enabled )
-        throws IOException;
+  /**
+   * Set anonymous access.
+   *
+   * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
+   */
+  @Deprecated
+  void setAnonymousAccessEnabled(boolean enabled)
+      throws IOException;
 
-    /**
-     * Set anonymous username.
-     * 
-     * @param val
-     * @throws InvalidConfigurationException
-     * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
-     */
-    @Deprecated
-    void setAnonymousUsername( String val )
-        throws InvalidConfigurationException;
+  /**
+   * Set anonymous username.
+   *
+   * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
+   */
+  @Deprecated
+  void setAnonymousUsername(String val)
+      throws InvalidConfigurationException;
 
-    /**
-     * Set anonymous password.
-     * 
-     * @param val
-     * @throws InvalidConfigurationException
-     * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
-     */
-    @Deprecated
-    void setAnonymousPassword( String val )
-        throws InvalidConfigurationException;
+  /**
+   * Set anonymous password.
+   *
+   * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
+   */
+  @Deprecated
+  void setAnonymousPassword(String val)
+      throws InvalidConfigurationException;
 
-    List<String> getRealms();
+  List<String> getRealms();
 
-    void setRealms( List<String> realms )
-        throws InvalidConfigurationException;
+  void setRealms(List<String> realms)
+      throws InvalidConfigurationException;
 
-    // ----------------------------------------------------------------------------
-    // Scheduled Tasks
-    // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // Scheduled Tasks
+  // ----------------------------------------------------------------------------
 
-    List<ScheduledTaskDescriptor> listScheduledTaskDescriptors();
+  List<ScheduledTaskDescriptor> listScheduledTaskDescriptors();
 
-    ScheduledTaskDescriptor getScheduledTaskDescriptor( String id );
+  ScheduledTaskDescriptor getScheduledTaskDescriptor(String id);
 
-    // ----------------------------------------------------------------------------------------------------------
-    // Repositories
-    // ----------------------------------------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------------------------------------
+  // Repositories
+  // ----------------------------------------------------------------------------------------------------------
 
-    /**
-     * Sets the default (applied to all that has no exceptions set with {
-     * {@link #setRepositoryMaxInstanceCount(RepositoryTypeDescriptor, int)} method) maxInstanceCount. Any positive
-     * integer limits the max count of live instances, any less then 0 integer removes the limitation. Note: setting
-     * limitations on already booted instance will not "enforce" the limitation!
-     * 
-     * @param count
-     */
-    void setDefaultRepositoryMaxInstanceCount( int count );
+  /**
+   * Sets the default (applied to all that has no exceptions set with {
+   * {@link #setRepositoryMaxInstanceCount(RepositoryTypeDescriptor, int)} method) maxInstanceCount. Any positive
+   * integer limits the max count of live instances, any less then 0 integer removes the limitation. Note: setting
+   * limitations on already booted instance will not "enforce" the limitation!
+   */
+  void setDefaultRepositoryMaxInstanceCount(int count);
 
-    /**
-     * Limits the maxInstanceCount for the passed in repository type. Any positive integer limits the max count of live
-     * instances, any less then 0 integer removes the limitation. Note: setting limitations on already booted instance
-     * will not "enforce" the limitation!
-     * 
-     * @param rtd
-     * @param count
-     */
-    void setRepositoryMaxInstanceCount( RepositoryTypeDescriptor rtd, int count );
+  /**
+   * Limits the maxInstanceCount for the passed in repository type. Any positive integer limits the max count of live
+   * instances, any less then 0 integer removes the limitation. Note: setting limitations on already booted instance
+   * will not "enforce" the limitation!
+   */
+  void setRepositoryMaxInstanceCount(RepositoryTypeDescriptor rtd, int count);
 
-    /**
-     * Returns the count limit for the passed in repository type.
-     * 
-     * @param rtd
-     * @return
-     */
-    int getRepositoryMaxInstanceCount( RepositoryTypeDescriptor rtd );
+  /**
+   * Returns the count limit for the passed in repository type.
+   */
+  int getRepositoryMaxInstanceCount(RepositoryTypeDescriptor rtd);
 
-    // CRepository: CRUD
+  // CRepository: CRUD
 
-    /**
-     * Creates a repository live instance out of the passed in model. It validates, registers it with repository
-     * registry and puts it into configuration. And finally saves configuration.
-     * 
-     * @return the repository instance.
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    Repository createRepository( CRepository settings )
-        throws ConfigurationException, IOException;
+  /**
+   * Creates a repository live instance out of the passed in model. It validates, registers it with repository
+   * registry and puts it into configuration. And finally saves configuration.
+   *
+   * @return the repository instance.
+   */
+  Repository createRepository(CRepository settings)
+      throws ConfigurationException, IOException;
 
-    /**
-     * Removes repository from configuration, checks it's dependants too (ie shadows), updates groups and path mappings
-     * (Routes on UI) if needed.
-     * 
-     * @param id
-     * @throws NoSuchRepositoryException
-     * @throws IOException
-     * @throws ConfigurationException
-     */
-    void deleteRepository( String id )
-        throws NoSuchRepositoryException, IOException, ConfigurationException;
+  /**
+   * Removes repository from configuration, checks it's dependants too (ie shadows), updates groups and path mappings
+   * (Routes on UI) if needed.
+   */
+  void deleteRepository(String id)
+      throws NoSuchRepositoryException, IOException, ConfigurationException;
 
-    // FIXME: This will be removed: NEXUS-2363 vvvvv
-    // CRemoteNexusInstance
+  // FIXME: This will be removed: NEXUS-2363 vvvvv
+  // CRemoteNexusInstance
 
-    Collection<CRemoteNexusInstance> listRemoteNexusInstances();
+  Collection<CRemoteNexusInstance> listRemoteNexusInstances();
 
-    CRemoteNexusInstance readRemoteNexusInstance( String alias )
-        throws IOException;
+  CRemoteNexusInstance readRemoteNexusInstance(String alias)
+      throws IOException;
 
-    void createRemoteNexusInstance( CRemoteNexusInstance settings )
-        throws IOException;
+  void createRemoteNexusInstance(CRemoteNexusInstance settings)
+      throws IOException;
 
-    void deleteRemoteNexusInstance( String alias )
-        throws IOException;
-    // FIXME: This will be removed: NEXUS-2363 ^^^^^
+  void deleteRemoteNexusInstance(String alias)
+      throws IOException;
+  // FIXME: This will be removed: NEXUS-2363 ^^^^^
 
 }

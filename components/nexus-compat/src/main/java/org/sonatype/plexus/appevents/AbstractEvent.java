@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plexus.appevents;
 
 import java.util.Date;
@@ -18,62 +19,64 @@ import java.util.Map;
 
 /**
  * The superclass for all events.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractEvent<T>
     implements Event<T>
 {
-    /** The event date. */
-    private final Date eventDate;
+  /**
+   * The event date.
+   */
+  private final Date eventDate;
 
-    /** The event context */
-    private final HashMap<Object, Object> eventContext;
+  /**
+   * The event context
+   */
+  private final HashMap<Object, Object> eventContext;
 
-    /** The sender */
-    private final T eventSender;
+  /**
+   * The sender
+   */
+  private final T eventSender;
 
-    /**
-     * Instantiates a new abstract event.
-     */
-    public AbstractEvent( T component )
-    {
-        super();
+  /**
+   * Instantiates a new abstract event.
+   */
+  public AbstractEvent(T component) {
+    super();
 
-        this.eventDate = new Date();
+    this.eventDate = new Date();
 
-        this.eventContext = new HashMap<Object, Object>();
+    this.eventContext = new HashMap<Object, Object>();
 
-        this.eventSender = component;
-    }
+    this.eventSender = component;
+  }
 
-    /**
-     * Gets the event date.
-     * 
-     * @return the event date
-     */
-    public Date getEventDate()
-    {
-        return eventDate;
-    }
+  /**
+   * Gets the event date.
+   *
+   * @return the event date
+   */
+  public Date getEventDate() {
+    return eventDate;
+  }
 
-    /**
-     * Gets the modifiable event context.
-     * 
-     * @return the event context
-     */
-    public Map<Object, Object> getEventContext()
-    {
-        return eventContext;
-    }
+  /**
+   * Gets the modifiable event context.
+   *
+   * @return the event context
+   */
+  public Map<Object, Object> getEventContext() {
+    return eventContext;
+  }
 
-    /**
-     * Gets the sender
-     * 
-     * @return the event sender
-     */
-    public T getEventSender()
-    {
-        return eventSender;
-    }
+  /**
+   * Gets the sender
+   *
+   * @return the event sender
+   */
+  public T getEventSender() {
+    return eventSender;
+  }
 }

@@ -10,86 +10,79 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest.feeds.sources;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Build feeds entry based on files
- * 
+ *
  * @author Juven Xu
  */
-@Component( role = SyndEntryBuilder.class, hint = "file" )
+@Component(role = SyndEntryBuilder.class, hint = "file")
 public class NexusFileEventEntryBuilder
     extends AbstractNexusItemEventEntryBuilder
 {
 
-    @Override
-    protected String buildTitle( NexusArtifactEvent event )
-    {
-        return buildFileName( event );
+  @Override
+  protected String buildTitle(NexusArtifactEvent event) {
+    return buildFileName(event);
+  }
+
+  private String buildFileName(NexusArtifactEvent event) {
+    return buildFilePath(event).substring(buildFilePath(event).lastIndexOf("/") + 1);
+  }
+
+  private String buildFilePath(NexusArtifactEvent event) {
+    return event.getNexusItemInfo().getPath();
+  }
+
+  @Override
+  protected String buildDescriptionMsgItem(NexusArtifactEvent event) {
+    StringBuilder msg = new StringBuilder();
+
+    msg.append("The file '");
+
+    msg.append(buildFileName(event));
+
+    msg.append("' in repository '");
+
+    msg.append(getRepositoryName(event));
+
+    msg.append("' with path '");
+
+    msg.append(buildFilePath(event));
+
+    msg.append("'");
+
+    return msg.toString();
+  }
+
+  @Override
+  public boolean shouldBuildEntry(final NexusArtifactEvent event) {
+    if (!super.shouldBuildEntry(event)) {
+      return false;
     }
 
-    private String buildFileName( NexusArtifactEvent event )
-    {
-        return buildFilePath( event ).substring( buildFilePath( event ).lastIndexOf( "/" ) + 1 );
+    final Gav gav = buildGAV(event);
+
+    if (gav != null) {
+      if (gav.isHash() || gav.isSignature()) {
+        return false;
+      }
     }
 
-    private String buildFilePath( NexusArtifactEvent event )
-    {
-        return event.getNexusItemInfo().getPath();
+    final String path = event.getNexusItemInfo().getPath();
+
+    if (path.contains("maven-metadata.xml")) {
+      return false;
     }
 
-    @Override
-    protected String buildDescriptionMsgItem( NexusArtifactEvent event )
-    {
-        StringBuilder msg = new StringBuilder();
-
-        msg.append( "The file '" );
-
-        msg.append( buildFileName( event ) );
-
-        msg.append( "' in repository '" );
-
-        msg.append( getRepositoryName( event ) );
-
-        msg.append( "' with path '" );
-
-        msg.append( buildFilePath( event ) );
-
-        msg.append( "'" );
-
-        return msg.toString();
-    }
-
-    @Override
-    public boolean shouldBuildEntry( final NexusArtifactEvent event )
-    {
-        if ( !super.shouldBuildEntry( event ) )
-        {
-            return false;
-        }
-
-        final Gav gav = buildGAV( event );
-
-        if ( gav != null )
-        {
-            if ( gav.isHash() || gav.isSignature() )
-            {
-                return false;
-            }
-        }
-
-        final String path = event.getNexusItemInfo().getPath();
-
-        if ( path.contains( "maven-metadata.xml" ) )
-        {
-            return false;
-        }
-
-        return true;
-    }
+    return true;
+  }
 
 }

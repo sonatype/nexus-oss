@@ -10,9 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus1071;
 
 import java.io.File;
+
+import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
@@ -20,9 +25,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
-import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
-import org.sonatype.nexus.integrationtests.TestContainer;
 
 /**
  * @author Juven Xu
@@ -30,122 +32,116 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 public class Nexus1071DeployToRepoAnonCannotAccessIT
     extends AbstractMavenNexusIT
 {
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
+
+  @Test
+  @Category(SECURITY.class)
+  public void deployRepeatly()
+      throws Exception
+  {
+    File mavenProject1 = getTestFile("maven-project-1");
+
+    File settings1 = getTestFile("settings1.xml");
+
+    Verifier verifier1 = null;
+
+    try {
+      verifier1 = createVerifier(mavenProject1, settings1);
+
+      verifier1.executeGoal("deploy");
+
+      verifier1.verifyErrorFreeLog();
     }
 
-    @Test @Category(SECURITY.class)
-    public void deployRepeatly()
-        throws Exception
-    {
-        File mavenProject1 = getTestFile( "maven-project-1" );
-
-        File settings1 = getTestFile( "settings1.xml" );
-
-        Verifier verifier1 = null;
-
-        try
-        {
-            verifier1 = createVerifier( mavenProject1, settings1 );
-
-            verifier1.executeGoal( "deploy" );
-
-            verifier1.verifyErrorFreeLog();
-        }
-
-        catch ( VerificationException e )
-        {
-            failTest( verifier1 );
-        }
-
-        try
-        {
-            verifier1.executeGoal( "deploy" );
-
-            verifier1.verifyErrorFreeLog();
-
-            Assert.fail( "Should return 401 error" );
-        }
-        catch ( VerificationException e )
-        {
-            // 401 error
-        }
+    catch (VerificationException e) {
+      failTest(verifier1);
     }
 
-    @Test @Category(SECURITY.class)
-    public void deploySnapshot()
-        throws Exception
-    {
-        File mavenProject = getTestFile( "maven-project-snapshot" );
+    try {
+      verifier1.executeGoal("deploy");
 
-        File settings = getTestFile( "settings-snapshot.xml" );
+      verifier1.verifyErrorFreeLog();
 
-        Verifier verifier = null;
+      Assert.fail("Should return 401 error");
+    }
+    catch (VerificationException e) {
+      // 401 error
+    }
+  }
 
-        try
-        {
-            verifier = createVerifier( mavenProject, settings );
+  @Test
+  @Category(SECURITY.class)
+  public void deploySnapshot()
+      throws Exception
+  {
+    File mavenProject = getTestFile("maven-project-snapshot");
 
-            verifier.executeGoal( "deploy" );
+    File settings = getTestFile("settings-snapshot.xml");
 
-            verifier.verifyErrorFreeLog();
-        }
+    Verifier verifier = null;
 
-        catch ( VerificationException e )
-        {
-            failTest( verifier );
-        }
+    try {
+      verifier = createVerifier(mavenProject, settings);
+
+      verifier.executeGoal("deploy");
+
+      verifier.verifyErrorFreeLog();
     }
 
-    @Test @Category(SECURITY.class)
-    public void deployToAnotherRepo()
-        throws Exception
-    {
-        File mavenProject2 = getTestFile( "maven-project-2" );
-
-        File settings2 = getTestFile( "settings2.xml" );
-
-        Verifier verifier2 = null;
-
-        try
-        {
-            verifier2 = createVerifier( mavenProject2, settings2 );
-
-            verifier2.executeGoal( "deploy" );
-
-            verifier2.verifyErrorFreeLog();
-        }
-        catch ( VerificationException e )
-        {
-            failTest( verifier2 );
-        }
+    catch (VerificationException e) {
+      failTest(verifier);
     }
+  }
 
-    @Test @Category(SECURITY.class)
-    public void anonDeploy()
-        throws Exception
-    {
-        File mavenProjectAnon = getTestFile( "maven-project-anon" );
+  @Test
+  @Category(SECURITY.class)
+  public void deployToAnotherRepo()
+      throws Exception
+  {
+    File mavenProject2 = getTestFile("maven-project-2");
 
-        File settingsAnon = getTestFile( "settings-anon.xml" );
+    File settings2 = getTestFile("settings2.xml");
 
-        Verifier verifierAnon = null;
+    Verifier verifier2 = null;
 
-        try
-        {
-            verifierAnon = createVerifier( mavenProjectAnon, settingsAnon );
+    try {
+      verifier2 = createVerifier(mavenProject2, settings2);
 
-            verifierAnon.executeGoal( "deploy" );
+      verifier2.executeGoal("deploy");
 
-            verifierAnon.verifyErrorFreeLog();
-
-            Assert.fail( "Should return 401 error" );
-        }
-        catch ( VerificationException e )
-        {
-            // test pass
-        }
+      verifier2.verifyErrorFreeLog();
     }
-    
+    catch (VerificationException e) {
+      failTest(verifier2);
+    }
+  }
+
+  @Test
+  @Category(SECURITY.class)
+  public void anonDeploy()
+      throws Exception
+  {
+    File mavenProjectAnon = getTestFile("maven-project-anon");
+
+    File settingsAnon = getTestFile("settings-anon.xml");
+
+    Verifier verifierAnon = null;
+
+    try {
+      verifierAnon = createVerifier(mavenProjectAnon, settingsAnon);
+
+      verifierAnon.executeGoal("deploy");
+
+      verifierAnon.verifyErrorFreeLog();
+
+      Assert.fail("Should return 401 error");
+    }
+    catch (VerificationException e) {
+      // test pass
+    }
+  }
+
 }
