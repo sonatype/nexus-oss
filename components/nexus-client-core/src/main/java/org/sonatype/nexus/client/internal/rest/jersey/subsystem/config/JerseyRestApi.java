@@ -18,7 +18,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 
 /**
- * @since 2.7
+ * @since 2.6.1
  */
 public class JerseyRestApi
     extends JerseySegmentSupport<RestApi, RestApiSettings>

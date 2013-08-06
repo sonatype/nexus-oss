@@ -59,7 +59,7 @@ public class JerseyServerConfiguration
     }
 
     /**
-     * @since 2.7
+     * @since 2.6.1
      */
     @Override
     public RestApi restApi()

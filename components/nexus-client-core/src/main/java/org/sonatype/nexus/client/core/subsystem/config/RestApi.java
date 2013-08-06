@@ -17,7 +17,7 @@ import org.sonatype.nexus.rest.model.RestApiSettings;
 /**
  * Rest API configuration segment.
  *
- * @since 2.7
+ * @since 2.6.1
  */
 public interface RestApi
     extends Segment<RestApi, RestApiSettings>

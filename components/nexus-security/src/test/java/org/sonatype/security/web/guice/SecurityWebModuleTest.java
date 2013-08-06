@@ -59,7 +59,7 @@ import com.google.inject.Module;
 /**
  * Verifies functionality of SecurityWebModule.
  * 
- * @since 2.7
+ * @since 2.6.1
  */
 public class SecurityWebModuleTest
 {

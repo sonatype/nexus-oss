@@ -60,7 +60,7 @@ import com.google.inject.name.Names;
  * named filters bound in this application are injected into the {@link FilterChainManager} so they can be added to
  * filter chains programatically.
  * 
- * @since 2.7
+ * @since 2.6.1
  */
 public class SecurityWebModule
     extends ShiroWebModule

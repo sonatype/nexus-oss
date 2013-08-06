@@ -39,7 +39,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 /**
  * Extends ShiroModule to configure commonly set commponents such as SessionDAO, Authenticator, Authorizer, etc.
  * 
- * @since 2.7
+ * @since 2.6.1
  */
 public class SecurityModule
     extends ShiroModule
