@@ -32,7 +32,7 @@ public interface ServerConfiguration
 
   /**
    * @return Rest API configuration segment.
-   * @since 2.7
+   * @since 2.6.1
    */
   RestApi restApi();
 
