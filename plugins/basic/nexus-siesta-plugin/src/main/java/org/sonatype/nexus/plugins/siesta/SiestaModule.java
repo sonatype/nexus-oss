@@ -41,14 +41,24 @@ import org.slf4j.LoggerFactory;
 public class SiestaModule
     extends AbstractModule
 {
+
   private static final Logger log = LoggerFactory.getLogger(SiestaModule.class);
 
   public static final String SERVICE_NAME = "siesta";
 
   public static final String MOUNT_POINT = "/service/" + SERVICE_NAME;
 
+  public static final String SKIP_MODULE_CONFIGURATION = SiestaModule.class.getName() + ".skip";
+
   @Override
   protected void configure() {
+    // HACK: avoid configuration of this module in casses as it is not wanted. e.g. automatically discovered by sisu
+    if (!Boolean.getBoolean(SKIP_MODULE_CONFIGURATION)) {
+      doConfigure();
+    }
+  }
+
+  private void doConfigure() {
     // FIXME: Sort this out... nexus-restlet1x-plugin should not have anything to do with this plugin
 
     // We need to import some components from nexus-restlet1x-plugin for SecurityWebFilter, but its use is
