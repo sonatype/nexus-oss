@@ -17,7 +17,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-  <display-name>Sonatype Nexus</display-name>
+  <display-name>Sonatype Nexus ${project.version}</display-name>
 
   <listener>
     <listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
@@ -42,26 +42,26 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>  
 
-  <!-- Welcome File -->
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
   <!--
-    Uncomment this if you need to edit JavaScript files and other
-    resources while Jetty is running (to prevent it from locking
-    everything). 
-    <servlet>
-      <servlet-name>default</servlet-name>
-      <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
-      <init-param>
-        <param-name>useFileMappedBuffer</param-name>
-        <param-value>false</param-value>
-      </init-param>
-      <init-param>
-        <param-name>aliases</param-name>
-        <param-value>true</param-value>
-      </init-param>
-    </servlet>
+  Uncomment this if you need to edit JavaScript files and other
+  resources while Jetty is running (to prevent it from locking
+  everything).
+
+  <servlet>
+    <servlet-name>default</servlet-name>
+    <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+    <init-param>
+      <param-name>useFileMappedBuffer</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>aliases</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </servlet>
   -->
 </web-app>
