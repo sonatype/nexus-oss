@@ -87,4 +87,12 @@ public abstract class NexusStatusConditions
   public static Condition any26AndLaterPro() {
     return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any26AndLaterVersion());
   }
+
+  public static Condition any27AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any27AndLaterVersion());
+  }
+
+  public static Condition any27AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any27AndLaterVersion());
+  }
 }
