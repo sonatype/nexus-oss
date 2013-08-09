@@ -95,14 +95,6 @@
             <!-- Participates in public API of Plexus bridge for Restlet 1.x, is must for consumer to have it -->
             <sharedDependency>commons-fileupload:commons-fileupload</sharedDependency>
           </sharedDependencies>
-
-          <!--
-          Exclude dependencies which are provided by NX core, or unwanted from bundle.
-          -->
-          <classpathDependencyExcludes>
-            <exclude>org.codehaus.plexus:plexus-utils</exclude>
-            <exclude>org.codehaus.enunciate:enunciate-core</exclude>
-          </classpathDependencyExcludes>
         </configuration>
       </plugin>
 
