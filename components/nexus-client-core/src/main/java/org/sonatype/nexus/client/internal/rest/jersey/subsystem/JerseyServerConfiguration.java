@@ -17,8 +17,10 @@ import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
 import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
 import org.sonatype.nexus.client.core.subsystem.config.RestApi;
+import org.sonatype.nexus.client.core.subsystem.config.Security;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyRemoteProxy;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyRestApi;
+import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseySecurity;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
@@ -40,6 +42,12 @@ public class JerseyServerConfiguration
    * Lazy initialized on first request.
    */
   private RestApi restApi;
+
+  /**
+   * {@link Security} configuration segment.
+   * Lazy initialized on first request.
+   */
+  private Security security;
 
   public JerseyServerConfiguration(final JerseyNexusClient nexusClient) {
     super(nexusClient);
@@ -65,6 +73,17 @@ public class JerseyServerConfiguration
       restApi = new JerseyRestApi(getNexusClient());
     }
     return restApi;
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public Security security() {
+    if (security == null) {
+      security = new JerseySecurity(getNexusClient());
+    }
+    return security;
   }
 
 }
