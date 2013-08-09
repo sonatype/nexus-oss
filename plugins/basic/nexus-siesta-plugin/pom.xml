@@ -116,13 +116,6 @@
             <sharedDependency>com.sun.jersey:jersey-client</sharedDependency>
             <sharedDependency>org.sonatype.sisu.jacksbee:jacksbee-runtime</sharedDependency>
           </sharedDependencies>
-
-          <!--
-          Exclude dependencies which are provided by NX core.
-          -->
-          <classpathDependencyExcludes>
-            <exclude>org.sonatype.sisu:sisu-inject-bean</exclude>
-          </classpathDependencyExcludes>
         </configuration>
       </plugin>
 

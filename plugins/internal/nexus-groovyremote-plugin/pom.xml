@@ -74,15 +74,6 @@
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <!--
-          Exclude dependencies which are provided by NX core.
-          -->
-          <classpathDependencyExcludes>
-            <exclude>aopalliance:aopalliance</exclude>
-            <exclude>org.sonatype.sisu:sisu-guice</exclude>
-          </classpathDependencyExcludes>
-        </configuration>
       </plugin>
 
       <plugin>

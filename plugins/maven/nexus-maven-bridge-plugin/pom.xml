@@ -75,29 +75,9 @@
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
         <configuration>
           <sharedDependencies>
-            <sharedDependency>org.sonatype.aether:aether-api</sharedDependency>
-            <sharedDependency>org.sonatype.aether:aether-util</sharedDependency>
             <sharedDependency>org.sonatype.sisu:sisu-maven-bridge</sharedDependency>
             <sharedDependency>org.apache.maven:maven-model-builder</sharedDependency>
           </sharedDependencies>
-
-          <!--
-          Exclude dependencies which are provided by NX core.
-          -->
-          <classpathDependencyExcludes>
-            <exclude>org.codehaus.plexus:plexus-utils</exclude>
-            <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
-            <exclude>org.codehaus.plexus:plexus-component-annotations</exclude>
-            <exclude>org.codehaus.plexus:plexus-interpolation</exclude>
-            <exclude>org.sonatype.sisu:sisu-inject-bean</exclude>
-            <exclude>org.sonatype.sisu:sisu-inject-plexus</exclude>
-            <exclude>org.apache.httpcomponents</exclude>
-            <exclude>org.slf4j</exclude>
-            <exclude>org.sonatype.aether:aether-api</exclude>
-            <exclude>org.sonatype.aether:aether-spi</exclude>
-            <exclude>org.sonatype.aether:aether-impl</exclude>
-            <exclude>org.sonatype.aether:aether-util</exclude>
-          </classpathDependencyExcludes>
         </configuration>
       </plugin>
     </plugins>

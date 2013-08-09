@@ -71,14 +71,6 @@
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <!--
-          Exclude dependencies which are provided by NX core.
-          -->
-          <classpathDependencyExcludes>
-            <exclude>org.codehaus.plexus:plexus-utils</exclude>
-          </classpathDependencyExcludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

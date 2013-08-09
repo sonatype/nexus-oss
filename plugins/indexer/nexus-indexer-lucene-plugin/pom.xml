@@ -113,16 +113,6 @@
             <sharedDependencies>org.sonatype.aether:aether-api</sharedDependencies>
             <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
           </sharedDependencies>
-
-          <!--
-          Exclude dependencies which are provided by NX core.
-          -->
-          <classpathDependencyExcludes>
-            <exclude>org.codehaus.plexus:plexus-utils</exclude>
-            <exclude>org.codehaus.plexus:plexus-component-annotations</exclude>
-            <exclude>org.sonatype.aether:aether-api</exclude>
-            <exclude>org.sonatype.aether:aether-util</exclude>
-          </classpathDependencyExcludes>
         </configuration>
       </plugin>
 
