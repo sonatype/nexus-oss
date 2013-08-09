@@ -71,6 +71,11 @@ public abstract class VersionConditions
    */
   private static final VersionConstraint POST_2_5_VERSIONS = parseVersionConstraint("(2.5.99,)");
 
+  /**
+   * Version constraint that matches all released Nexus versions beginning with version 2.7.
+   */
+  private static final VersionConstraint POST_2_6_VERSIONS = parseVersionConstraint("(2.6.99,)");
+
   // ==
 
   public static Condition anyModernVersion() {
@@ -103,6 +108,10 @@ public abstract class VersionConditions
 
   public static Condition any26AndLaterVersion() {
     return new VersionCondition(POST_2_5_VERSIONS);
+  }
+
+  public static Condition any27AndLaterVersion() {
+    return new VersionCondition(POST_2_6_VERSIONS);
   }
 
   public static Condition withVersion(final String versionRange) {
