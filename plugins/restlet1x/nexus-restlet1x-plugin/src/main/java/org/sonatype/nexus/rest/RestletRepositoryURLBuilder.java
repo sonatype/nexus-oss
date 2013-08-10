@@ -60,22 +60,36 @@ public class RestletRepositoryURLBuilder
   }
 
   @Override
-  public String getRepositoryContentUrl(String repositoryId)
+  public String getRepositoryContentUrl(final String repositoryId)
       throws NoSuchRepositoryException
   {
-    return getRepositoryContentUrl(repositoryRegistry.getRepository(repositoryId));
+    return getRepositoryContentUrl(repositoryId, false);
   }
 
   @Override
-  public String getRepositoryContentUrl(Repository repository) {
-    final boolean forceBaseURL =
-        globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
-            && StringUtils.isNotBlank(globalRestApiSettings.getBaseUrl());
+  public String getRepositoryContentUrl(final String repositoryId, final boolean forceBaseURL)
+      throws NoSuchRepositoryException
+  {
+    return getRepositoryContentUrl(repositoryRegistry.getRepository(repositoryId), forceBaseURL);
+  }
 
-    String baseURL = null;
+  @Override
+  public String getRepositoryContentUrl(final Repository repository) {
+    return getRepositoryContentUrl(repository, false);
+  }
+
+  @Override
+  public String getRepositoryContentUrl(final Repository repository, final boolean forceBaseURL) {
+    final boolean shouldForceBaseUrl = forceBaseURL ||
+        (globalRestApiSettings.isEnabled()
+            && globalRestApiSettings.isForceBaseUrl()
+            && StringUtils.isNotBlank(globalRestApiSettings.getBaseUrl())
+        );
+
+    String baseURL;
 
     // if force, always use force
-    if (forceBaseURL) {
+    if (shouldForceBaseUrl) {
       baseURL = globalRestApiSettings.getBaseUrl();
     }
     // next check if this thread has a restlet request
@@ -111,7 +125,12 @@ public class RestletRepositoryURLBuilder
   }
 
   @Override
-  public String getExposedRepositoryContentUrl(Repository repository) {
+  public String getExposedRepositoryContentUrl(final Repository repository) {
+    return getExposedRepositoryContentUrl(repository, false);
+  }
+
+  @Override
+  public String getExposedRepositoryContentUrl(final Repository repository, final boolean forceBaseURL) {
     if (!repository.isExposed()) {
       return null;
     }
@@ -119,4 +138,5 @@ public class RestletRepositoryURLBuilder
       return getRepositoryContentUrl(repository);
     }
   }
+
 }
