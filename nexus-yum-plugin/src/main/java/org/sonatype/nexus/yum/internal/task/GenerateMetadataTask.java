@@ -181,7 +181,7 @@ public class GenerateMetadataTask
       setRpmDir(RepositoryUtils.getBaseDir(repository).getAbsolutePath());
     }
     if (isBlank(getRpmUrl()) && repository != null) {
-      final String rpmUrl = repositoryURLBuilder.getRepositoryContentUrl(repository);
+      final String rpmUrl = repositoryURLBuilder.getExposedRepositoryContentUrl(repository,true);
       if (StringUtils.isBlank(rpmUrl)) {
         throw new IllegalStateException(
             SimpleFormat.format(

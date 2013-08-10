@@ -205,7 +205,7 @@ public class YumImpl
       File rpmBaseDir = RepositoryUtils.getBaseDir(repository);
       GenerateMetadataTask task = createTask();
       task.setRpmDir(rpmBaseDir.getAbsolutePath());
-      task.setRpmUrl(repositoryURLBuilder.getRepositoryContentUrl(repository));
+      task.setRpmUrl(repositoryURLBuilder.getExposedRepositoryContentUrl(repository,true));
       task.setRepoDir(yumRepoBaseDir);
       task.setRepoUrl(yumRepoUrl.toString());
       task.setRepositoryId(repository.getId());

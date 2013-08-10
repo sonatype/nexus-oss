@@ -42,6 +42,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
@@ -151,7 +152,7 @@ public class GenerateMetadataTaskSettingsTest
 
   private RepositoryURLBuilder repositoryURLBuilder() {
     final RepositoryURLBuilder settings = mock(RepositoryURLBuilder.class);
-    when(settings.getRepositoryContentUrl(any(Repository.class))).thenReturn(RPM_URL);
+    when(settings.getExposedRepositoryContentUrl(any(Repository.class), eq(true))).thenReturn(RPM_URL);
     return settings;
   }
 
