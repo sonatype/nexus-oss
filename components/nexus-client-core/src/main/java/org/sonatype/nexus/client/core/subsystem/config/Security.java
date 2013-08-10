@@ -11,37 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.client.core.subsystem;
-
-import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
-import org.sonatype.nexus.client.core.subsystem.config.RestApi;
-import org.sonatype.nexus.client.core.subsystem.config.Security;
+package org.sonatype.nexus.client.core.subsystem.config;
 
 /**
- * Server configuration subsystem.
+ * Security configuration segment.
  *
- * @since 2.2
+ * @since 2.7
  */
-public interface ServerConfiguration
+public interface Security
+    extends Segment<Security, SecuritySettings>
 {
-
-  /**
-   * @return Remote Proxy configuration segment.
-   * @since 2.6
-   */
-  RemoteProxy remoteProxySettings();
-
-  /**
-   * @return Rest API configuration segment.
-   * @since 2.6.1
-   */
-  RestApi restApi();
-
-  /**
-   * Returns {@link Security} configuration segment.
-   *
-   * @since 2.7
-   */
-  Security security();
 
 }
