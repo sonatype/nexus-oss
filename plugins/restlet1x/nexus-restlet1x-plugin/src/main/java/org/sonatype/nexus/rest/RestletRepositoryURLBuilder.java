@@ -90,7 +90,7 @@ public class RestletRepositoryURLBuilder
 
     // if force, always use force
     if (shouldForceBaseUrl) {
-      baseURL = globalRestApiSettings.getBaseUrl();
+      baseURL = globalRestApiSettings.isEnabled()?globalRestApiSettings.getBaseUrl():null;
     }
     // next check if this thread has a restlet request
     else if (Request.getCurrent() != null) {
