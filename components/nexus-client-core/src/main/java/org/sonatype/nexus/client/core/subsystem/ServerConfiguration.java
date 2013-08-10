@@ -15,6 +15,7 @@ package org.sonatype.nexus.client.core.subsystem;
 
 import org.sonatype.nexus.client.core.subsystem.config.RemoteProxy;
 import org.sonatype.nexus.client.core.subsystem.config.RestApi;
+import org.sonatype.nexus.client.core.subsystem.config.Security;
 
 /**
  * Server configuration subsystem.
@@ -35,5 +36,12 @@ public interface ServerConfiguration
    * @since 2.6.1
    */
   RestApi restApi();
+
+  /**
+   * Returns {@link Security} configuration segment.
+   *
+   * @since 2.7
+   */
+  Security security();
 
 }
