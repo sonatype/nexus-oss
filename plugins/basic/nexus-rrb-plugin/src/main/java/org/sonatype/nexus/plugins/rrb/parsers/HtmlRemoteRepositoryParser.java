@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.plugins.rrb.parsers;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
@@ -97,7 +99,17 @@ public class HtmlRemoteRepositoryParser
         }
         rp.setText(getLinkName(temp).replace("/", "").trim());
         String uri = getLinkUrl(temp).replace(baseUrl, localUrl);
-        uri = uri.startsWith(localUrl) ? uri : localUrl + remotePath + uri;
+        try {
+          new URL(uri);
+          // if URL is valid it means that either the replacement of base url was successful either the url is
+          // absolute but it is not starting with base URL (e.g. in case of remote uses a forced base URL that is
+          // different that the one configured on repository (NEXUS-5811)
+          uri = uri.startsWith(localUrl) ? uri : localUrl + uri;
+        }
+        catch (MalformedURLException e) {
+          // the URL should be relative so let's prepend
+          uri = localUrl + remotePath + uri;
+        }
         rp.setResourceURI(uri);
         rp.setRelativePath(uri.replace(localUrl, ""));
         if (!rp.getRelativePath().startsWith("/")) {

@@ -15,6 +15,8 @@ package org.sonatype.nexus.plugins.rrb;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,13 +82,21 @@ public class MavenRepositoryReader
 
     this.id = id;
 
-    String baseRemoteUrl = proxyRepository.getRemoteUrl();
-
-    if (!baseRemoteUrl.endsWith("/") && !remotePath.startsWith("/")) {
-      this.remoteUrl = baseRemoteUrl + "/" + remotePath;
+    // NEXUS-5811: check first if we have an valid URL as remote path. If we do we use that one, else we have a relative
+    // path and we append it to proxy repository URL
+    try {
+      new URL(remotePath);
+      remoteUrl = remotePath;
     }
-    else {
-      this.remoteUrl = baseRemoteUrl + remotePath;
+    catch (MalformedURLException e) {
+      String baseRemoteUrl = proxyRepository.getRemoteUrl();
+
+      if (!baseRemoteUrl.endsWith("/") && !remotePath.startsWith("/")) {
+        remoteUrl = baseRemoteUrl + "/" + remotePath;
+      }
+      else {
+        remoteUrl = baseRemoteUrl + remotePath;
+      }
     }
 
     StringBuilder html = getContent();
