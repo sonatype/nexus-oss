@@ -18,5 +18,5 @@ define('nexus-indexer-lucene-plugin-boot', [
   'Sonatype/repoServer/searchLeftNav',
   'Sonatype/repoServer/SearchPanel',
   'Sonatype/repoServer/SearchResultGrid',
-  'repoContextMenuContributions'
+  'Sonatype/repoServer/repoContextMenuContributions'
 ]);
