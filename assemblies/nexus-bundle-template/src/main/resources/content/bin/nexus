@@ -171,6 +171,9 @@ case "$DIST_OS" in
         fi
         DIST_ARCH='universal'
         ;;
+    'aix')
+        DIST_BITS=`getconf KERNEL_BITMODE`
+        ;;
 esac
 
 outputFile() {
