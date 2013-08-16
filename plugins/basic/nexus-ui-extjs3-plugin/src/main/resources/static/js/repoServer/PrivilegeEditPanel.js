@@ -373,18 +373,19 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
   this.sp = Sonatype.lib.Permissions;
 
   this.combinedStore = new Ext.data.JsonStore({
-        root : 'data',
-        id : 'id',
-        fields : [{
-              name : 'id'
-            }, {
-              name : 'format'
-            }, {
-              name : 'name',
-              sortType : Ext.data.SortTypes.asUCString
-            }],
-        url : Sonatype.config.repos.urls.repositories
-      });
+    root: 'data',
+    id: 'id',
+    fields: [
+      { name: 'id' },
+      { name: 'format' },
+      { name: 'name', sortType: Ext.data.SortTypes.asUCString }
+    ],
+    sortInfo: {
+      field: 'name',
+      direction: 'ASC'
+    },
+    url: Sonatype.config.repos.urls.repositories,
+  });
   this.initCombinedStore();
 
   this.checkPayload();
