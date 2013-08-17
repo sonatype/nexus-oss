@@ -14,6 +14,7 @@
 package org.sonatype.nexus.yum.internal;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
 
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.RepositoryUtils.getBaseDir;
 
 public class RepositoryUtilsTest
+  extends TestSupport
 {
 
   @Test

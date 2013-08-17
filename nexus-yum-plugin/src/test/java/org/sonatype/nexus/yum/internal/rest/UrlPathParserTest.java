@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.yum.internal.rest;
 
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
@@ -23,6 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UrlPathParserTest
+  extends TestSupport
 {
 
   private static final String DOMAIN = "http://localhost:8081";
