@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,19 +33,19 @@ public class BuildNumberService
 {
   private static final String RESOURCE_NAME = "version.properties";
 
-  private static final Logger logger = LoggerFactory.getLogger(BuildNumberService.class);
+  private static final Logger log = LoggerFactory.getLogger(BuildNumberService.class);
 
   private final String buildNumber;
 
   public BuildNumberService() {
     this.buildNumber = loadVersion();
-    logger.debug("Build number: {}", buildNumber);
+    log.debug("Build number: {}", buildNumber);
   }
 
   private String loadVersion() {
     URL url = getClass().getResource(RESOURCE_NAME);
     if (url == null) {
-      logger.error("Missing resource: {}", "version.properties");
+      log.error("Missing resource: {}", "version.properties");
       return "unknown-version";
     }
 
@@ -55,9 +54,11 @@ public class BuildNumberService
     try {
       input = url.openStream();
       props.load(input);
+
+      log.debug("Loaded properties: {}", props);
     }
     catch (Exception e) {
-      logger.warn("Could not determine build number", e);
+      log.warn("Could not determine build number", e);
     }
     finally {
       IOUtils.closeQuietly(input);
