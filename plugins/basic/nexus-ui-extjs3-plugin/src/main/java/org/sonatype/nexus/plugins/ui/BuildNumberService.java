@@ -14,9 +14,9 @@
 package org.sonatype.nexus.plugins.ui;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,31 +24,47 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Exposes build number/version as filtered by build.
+ */
 @Named
 @Singleton
 public class BuildNumberService
 {
+  private static final String RESOURCE_NAME = "version.properties";
 
-  private static final Logger logger = LoggerFactory.getLogger(BuildNumberService.class);
+  private static final Logger log = LoggerFactory.getLogger(BuildNumberService.class);
 
   private final String buildNumber;
 
-  @Inject
-  BuildNumberService() {
-    Properties props = new Properties();
+  public BuildNumberService() {
+    this.buildNumber = loadVersion();
+    log.debug("Build number: {}", buildNumber);
+  }
 
-    InputStream is = getClass().getResourceAsStream("version.properties");
+  private String loadVersion() {
+    URL url = getClass().getResource(RESOURCE_NAME);
+    if (url == null) {
+      log.error("Missing resource: {}", "version.properties");
+      return "unknown-version";
+    }
+
+    Properties props = new Properties();
+    InputStream input = null;
     try {
-      props.load(is);
+      input = url.openStream();
+      props.load(input);
+
+      log.debug("Loaded properties: {}", props);
     }
     catch (Exception e) {
-      logger.warn("Could not determine build qualifier", e);
+      log.warn("Could not determine build number", e);
     }
     finally {
-      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(input);
     }
 
-    buildNumber = props.getProperty("version", "unknown-version");
+    return props.getProperty("version", "unknown-version");
   }
 
   public String getBuildNumber() {
