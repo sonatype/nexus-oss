@@ -30,10 +30,6 @@
   <properties>
     <pluginName>Nexus ExtJS3 UI</pluginName>
     <pluginDescription>Provides a Nexus user interface based on ExtJS3.</pluginDescription>
-
-    <!-- build.timestamp is used for mapping the js/css files to a timestamped URL -->
-    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
-    <build.timestamp>${maven.build.timestamp}</build.timestamp>
   </properties>
 
   <dependencies>
