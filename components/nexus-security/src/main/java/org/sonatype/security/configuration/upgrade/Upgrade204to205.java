@@ -57,8 +57,12 @@ public class Upgrade204to205
     org.sonatype.security.configuration.model.SecurityConfiguration newc = new BasicVersionUpgrade()
         .upgradeSecurityConfiguration(oldc);
 
-    // NEXUS-5828: Get rid of "web", make it "default"
-    newc.setSecurityManager( "default" );
+    newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+
+    if (newc.getSecurityManager() != null) {
+      // NEXUS-5828: Get rid of "web", make it "default"
+      newc.setSecurityManager( "default" );
+    }
     
     message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);

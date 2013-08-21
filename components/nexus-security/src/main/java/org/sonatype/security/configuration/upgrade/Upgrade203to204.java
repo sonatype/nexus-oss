@@ -70,9 +70,9 @@ public class Upgrade203to204
     org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration newc = new BasicVersionUpgrade()
         .upgradeSecurityConfiguration(oldc);
 
-    newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    newc.setVersion(org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration.MODEL_VERSION);
     newc.setHashIterations(HASH_ITERATIONS);
-    message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    message.setModelVersion(org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);
   }
 
