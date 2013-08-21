@@ -24,54 +24,42 @@ import javax.inject.Singleton;
 
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.security.configuration.model.v2_0_3.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.configuration.model.v2_0_4.upgrade.BasicVersionUpgrade;
+import org.sonatype.security.configuration.model.v2_0_4.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.configuration.model.v2_0_5.upgrade.BasicVersionUpgrade;
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Singleton
 @Typed(SecurityConfigurationVersionUpgrader.class)
-@Named("2.0.3")
-public class Upgrade203to204
+@Named("2.0.4")
+public class Upgrade204to205
     implements SecurityConfigurationVersionUpgrader
 {
-  private final int HASH_ITERATIONS = 1024;
-
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
-    Reader r = null;
-
-    try {
+    try (Reader r = new BufferedReader(ReaderFactory.newXmlReader(file))) {
       // reading without interpolation to preserve user settings as variables
-      r = new BufferedReader(ReaderFactory.newXmlReader(file));
-
-      SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-      return reader.read(r);
+      return new SecurityConfigurationXpp3Reader().read(r);
     }
     catch (XmlPullParserException e) {
       throw new ConfigurationIsCorruptedException(file.getAbsolutePath(), e);
-    }
-    finally {
-      if (r != null) {
-        r.close();
-      }
     }
   }
 
   public void upgrade(UpgradeMessage message)
       throws ConfigurationIsCorruptedException
   {
-    org.sonatype.security.configuration.model.v2_0_3.SecurityConfiguration oldc =
-        (org.sonatype.security.configuration.model.v2_0_3.SecurityConfiguration) message.getConfiguration();
+    org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration oldc =
+        (org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration) message.getConfiguration();
 
-    org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration newc = new BasicVersionUpgrade()
+    org.sonatype.security.configuration.model.SecurityConfiguration newc = new BasicVersionUpgrade()
         .upgradeSecurityConfiguration(oldc);
 
-    newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
-    newc.setHashIterations(HASH_ITERATIONS);
+    // NEXUS-5828: Get rid of "web", make it "default"
+    newc.setSecurityManager( "default" );
+    
     message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);
   }

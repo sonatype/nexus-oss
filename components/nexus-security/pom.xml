@@ -170,12 +170,13 @@
               <goal>xpp3-writer</goal>
             </goals>
             <configuration>
-              <version>2.0.4</version>
+              <version>2.0.5</version>
               <models>
                 <model>src/main/mdo/security-configuration.xml</model>
               </models>
               <packagedVersions>
                 <packagedVersion>2.0.3</packagedVersion>
+                <packagedVersion>2.0.4</packagedVersion>
               </packagedVersions>
               <packageWithVersion>false</packageWithVersion>
             </configuration>
@@ -192,12 +193,13 @@
               <goal>upgrade</goal>
             </goals>
             <configuration>
-              <version>2.0.4</version>
+              <version>2.0.5</version>
               <models>
                 <model>src/main/mdo/security-configuration.xml</model>
               </models>
               <packagedVersions>
                 <packagedVersion>2.0.3</packagedVersion>
+                <packagedVersion>2.0.4</packagedVersion>
               </packagedVersions>
               <packageWithVersion>false</packageWithVersion>
             </configuration>
