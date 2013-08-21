@@ -146,8 +146,9 @@ public class IndexBrowserTreeNode
    * @since 2.7.0
    */
   public IndexBrowserTreeNodeDTO toDTO() {
-    final List<IndexBrowserTreeNodeDTO> children = Lists.newArrayList();
-    if (getChildren() != null) {
+    List<IndexBrowserTreeNodeDTO> children = null;
+    if (getChildren() != null && !getChildren().isEmpty()) {
+      children = Lists.newArrayList();
       for (TreeNode childNode : getChildren()) {
         if (childNode instanceof IndexBrowserTreeNode) {
           children.add(((IndexBrowserTreeNode) childNode).toDTO());
