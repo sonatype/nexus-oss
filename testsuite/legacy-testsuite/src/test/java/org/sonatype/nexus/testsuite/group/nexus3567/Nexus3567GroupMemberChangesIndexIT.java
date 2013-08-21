@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.testsuite.group.nexus3567;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -37,6 +41,7 @@ import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
+
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
@@ -89,9 +94,7 @@ public class Nexus3567GroupMemberChangesIndexIT
 
     node = getIndexContent("nexus3567deletemembergroup");
 
-    children = node.getChildren();
-
-    Assert.assertEquals(0, children.size());
+    assertThat( "member removed, root does not have children", node.getChildren(), is( nullValue() ) );
   }
 
   @Test
@@ -119,9 +122,7 @@ public class Nexus3567GroupMemberChangesIndexIT
 
     node = getIndexContent("nexus3567removemembergroup");
 
-    children = node.getChildren();
-
-    Assert.assertEquals(0, children.size());
+    assertThat( "member removed, root does not have children", node.getChildren(), is( nullValue() ) );
   }
 
   private void prepare(String repoId, String groupId)
