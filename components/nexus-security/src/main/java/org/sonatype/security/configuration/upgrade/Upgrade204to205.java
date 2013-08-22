@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * {@link SecurityConfigurationUpgrader} step for security configuration version 2.0.4 > 2.0.5 upgrade.
+ * {@link SecurityConfigurationVersionUpgrader} step for security configuration version 2.0.4 > 2.0.5 upgrade.
  * 
  * @since 2.7.0
  */
