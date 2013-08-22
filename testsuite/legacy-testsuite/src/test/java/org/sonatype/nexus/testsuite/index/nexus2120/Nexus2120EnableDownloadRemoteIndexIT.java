@@ -13,18 +13,9 @@
 
 package org.sonatype.nexus.testsuite.index.nexus2120;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-
 import java.io.File;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -39,6 +30,15 @@ import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.restlet.data.MediaType;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class Nexus2120EnableDownloadRemoteIndexIT
     extends AbstractNexusIntegrationTest
