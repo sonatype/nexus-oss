@@ -146,15 +146,17 @@ public class IndexBrowserTreeNode
    * @since 2.7.0
    */
   public IndexBrowserTreeNodeDTO toDTO() {
-    final List<IndexBrowserTreeNodeDTO> children = Lists.newArrayList();
-    if (getChildren() != null) {
-      for (TreeNode childNode : getChildren()) {
+    List<IndexBrowserTreeNodeDTO> dtoChildren = null;
+    final List<TreeNode> children = getChildren();
+    if (children != null && !children.isEmpty()) {
+      dtoChildren = Lists.newArrayList();
+      for (TreeNode childNode : children) {
         if (childNode instanceof IndexBrowserTreeNode) {
-          children.add(((IndexBrowserTreeNode) childNode).toDTO());
+          dtoChildren.add(((IndexBrowserTreeNode) childNode).toDTO());
         }
       }
     }
-    return new IndexBrowserTreeNodeDTO(getType().name(), isLeaf(), getNodeName(), getPath(), children,
+    return new IndexBrowserTreeNodeDTO(getType().name(), isLeaf(), getNodeName(), getPath(), dtoChildren,
         getGroupId(), getArtifactId(), getVersion(), getRepositoryId(), isLocallyAvailable(),
         getArtifactTimestamp(), getArtifactSha1Checksum(), getArtifactMd5Checksum(), getInitiatorUserId(),
         getInitiatorIpAddress(), getArtifactOriginReason(), getArtifactOriginUrl(), classifier, extension,
