@@ -238,7 +238,9 @@ public class DefaultIndexerManager
   }
 
   /**
-   * The repository is capable of remote access for indexing purposes
+   * The repository is capable of remote access for indexing purposes.
+   * 
+   * @since 2.7.0
    */
   private boolean REMOTEACCESSALLOWED(Repository repository) {
     final ProxyRepository proxyRepository = repository.adaptToFacet(ProxyRepository.class);
