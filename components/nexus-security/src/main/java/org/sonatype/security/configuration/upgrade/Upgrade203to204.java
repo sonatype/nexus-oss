@@ -30,6 +30,11 @@ import org.sonatype.security.configuration.model.v2_0_4.upgrade.BasicVersionUpgr
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * {@link SecurityConfigurationUpgrader} step for security configuration version 2.0.3 > 2.0.4 upgrade.
+ * 
+ * @since 2.5.0
+ */
 @Singleton
 @Typed(SecurityConfigurationVersionUpgrader.class)
 @Named("2.0.3")
