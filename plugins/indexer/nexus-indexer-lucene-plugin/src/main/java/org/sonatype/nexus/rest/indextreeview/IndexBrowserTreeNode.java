@@ -143,7 +143,7 @@ public class IndexBrowserTreeNode
   /**
    * Converts this instance into a DTO, ready for wire transmission.
    *
-   * @since 2.7.0
+   * @since 2.6.1
    */
   public IndexBrowserTreeNodeDTO toDTO() {
     List<IndexBrowserTreeNodeDTO> dtoChildren = null;
