@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
@@ -149,6 +150,30 @@ public class DownloadRemoteIndexerManagerIT
     searchFor("org.sonatype.nexus", 8, central.getId());
 
     assertRootGroups();
+  }
+
+  /**
+   * All set okay, but repo in question has ProxyMode that does not allow remote access.
+   * 
+   * @since 2.7.0
+   */
+  @Test
+  public void testRepoNoReindexProxyModeNotAllowsRemoteAccess()
+      throws Exception
+  {
+    File index2 = new File(getBasedir(), "src/test/resources/repo-index/index2");
+    File centralIndex = new File(fakeCentral, ".index");
+
+    // copy index 02
+    overwriteIndex(index2, centralIndex);
+    
+    central.setProxyMode(ProxyMode.BLOCKED_MANUAL);
+    central.commitChanges();
+
+    super.indexerManager.reindexRepository(null, central.getId(), true);
+
+    // nothing found as no remote access allowed, index was NOT downloaded
+    searchFor("org.sonatype.nexus", 0, central.getId());
   }
 
   private void assertRootGroups()
