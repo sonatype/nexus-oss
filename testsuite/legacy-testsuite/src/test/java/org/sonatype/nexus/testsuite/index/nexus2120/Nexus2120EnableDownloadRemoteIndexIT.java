@@ -19,7 +19,7 @@ import java.util.List;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeDTO;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.tasks.UpdateIndexTask;
@@ -35,6 +35,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class Nexus2120EnableDownloadRemoteIndexIT
     extends AbstractNexusIntegrationTest
@@ -98,14 +102,14 @@ public class Nexus2120EnableDownloadRemoteIndexIT
 
     XStream xstream = XStreamFactory.getXmlXStream();
 
-    xstream.processAnnotations(IndexBrowserTreeNode.class);
+    xstream.processAnnotations(IndexBrowserTreeNodeDTO.class);
     xstream.processAnnotations(IndexBrowserTreeViewResponseDTO.class);
 
     XStreamRepresentation re = new XStreamRepresentation(xstream, content, MediaType.APPLICATION_XML);
     IndexBrowserTreeViewResponseDTO resourceResponse =
         (IndexBrowserTreeViewResponseDTO) re.getPayload(new IndexBrowserTreeViewResponseDTO());
 
-    Assert.assertTrue("index response should have 0 entries", resourceResponse.getData().getChildren().isEmpty());
+    assertThat( "without index downloaded root node does not have children", resourceResponse.getData().getChildren(), is( nullValue() ) );
 
     // I changed my mind, I do wanna remote index
     basic.setDownloadRemoteIndexes(true);

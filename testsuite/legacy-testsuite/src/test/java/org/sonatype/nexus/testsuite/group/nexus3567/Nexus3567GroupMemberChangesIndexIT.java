@@ -46,6 +46,10 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
 public class Nexus3567GroupMemberChangesIndexIT
     extends AbstractNexusIntegrationTest
 {
@@ -89,9 +93,7 @@ public class Nexus3567GroupMemberChangesIndexIT
 
     node = getIndexContent("nexus3567deletemembergroup");
 
-    children = node.getChildren();
-
-    Assert.assertEquals(0, children.size());
+    assertThat( "member removed, root does not have children", node.getChildren(), is( nullValue() ) );
   }
 
   @Test
@@ -119,9 +121,7 @@ public class Nexus3567GroupMemberChangesIndexIT
 
     node = getIndexContent("nexus3567removemembergroup");
 
-    children = node.getChildren();
-
-    Assert.assertEquals(0, children.size());
+    assertThat( "member removed, root does not have children", node.getChildren(), is( nullValue() ) );
   }
 
   private void prepare(String repoId, String groupId)
