@@ -13,10 +13,6 @@
 
 package org.sonatype.nexus.testsuite.group.nexus3567;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -41,7 +37,6 @@ import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
-
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
@@ -50,6 +45,10 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class Nexus3567GroupMemberChangesIndexIT
     extends AbstractNexusIntegrationTest
