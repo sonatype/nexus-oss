@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,7 +66,9 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -234,6 +235,18 @@ public class DefaultIndexerManager
    */
   private boolean INSERVICE(Repository repository) {
     return LocalStatus.IN_SERVICE.equals(repository.getLocalStatus());
+  }
+
+  /**
+   * The repository is capable of remote access for indexing purposes
+   */
+  private boolean REMOTEACCESSALLOWED(Repository repository) {
+    final ProxyRepository proxyRepository = repository.adaptToFacet(ProxyRepository.class);
+    if (proxyRepository!=null) {
+      return proxyRepository.getProxyMode().shouldProxy();
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -1242,11 +1255,9 @@ public class DefaultIndexerManager
           // We need to use ProxyRepository and get it's RemoteStorage stuff to completely
           // avoid "transparent" proxying, and even the slightest possibility to return
           // some stale file from cache to the updater.
-          if (ISPROXY(repository)) {
-            ProxyRepository proxy = repository.adaptToFacet(ProxyRepository.class);
-
+          if (ISPROXY(repository) && REMOTEACCESSALLOWED(repository)) {
             item =
-                (StorageFileItem) proxy.getRemoteStorage().retrieveItem(proxy, req, proxy.getRemoteUrl());
+                (StorageFileItem) repository.getRemoteStorage().retrieveItem(repository, req, repository.getRemoteUrl());
           }
           else {
             throw new ItemNotFoundException(req, repository);
