@@ -88,7 +88,7 @@ public class DefaultLSAttributeStorage
         final ResourceStoreRequest request =
             new ResourceStoreRequest(getAttributePath(repository, uid.getPath()));
 
-        repository.getLocalStorage().shredItem(repository, request);
+        repository.getLocalStorage().deleteItem(repository, request);
 
         return true;
       }
