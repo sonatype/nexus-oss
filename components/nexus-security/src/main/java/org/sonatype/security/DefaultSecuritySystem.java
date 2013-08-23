@@ -38,6 +38,8 @@ import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.email.NullSecurityEmailer;
 import org.sonatype.security.email.SecurityEmailer;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
+import org.sonatype.security.events.RealmConfigurationUnusableEvent;
+import org.sonatype.security.events.RealmConfigurationUsableEvent;
 import org.sonatype.security.events.SecurityConfigurationChanged;
 import org.sonatype.security.events.UserPrincipalsExpired;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
@@ -849,6 +851,64 @@ public class DefaultSecuritySystem
     this.securityConfiguration.clearCache();
 
     this.setSecurityManagerRealms();
+  }
+
+  /**
+   * Handler of {@link RealmConfigurationUsableEvent}.
+   * 
+   * @since 2.7.0
+   */
+  @Subscribe
+  public void onEvent(final RealmConfigurationUsableEvent evt) {
+    try {
+      mayActivateRealm(evt.getRealmId());
+    }
+    catch (InvalidConfigurationException e) {
+      logger.warn("Problem during activation of realm {}", evt.getRealmId(), e);
+    }
+  }
+
+  /**
+   * Handler of {@link RealmConfigurationUnusableEvent}.
+   * 
+   * @since 2.7.0
+   */
+  @Subscribe
+  public void onEvent(final RealmConfigurationUnusableEvent evt) {
+    try {
+      mayDeactivateRealm(evt.getRealmId());
+    }
+    catch (InvalidConfigurationException e) {
+      logger.warn("Problem during deactivation of realm {}", evt.getRealmId(), e);
+    }
+  }
+
+  /**
+   * Activates, if not activated already, the Realm firing event of {@link RealmConfigurationUsableEvent}.
+   * 
+   * @since 2.7.0
+   */
+  private void mayActivateRealm(final String realmId) throws InvalidConfigurationException {
+    final List<String> activeRealms = getRealms();
+    if (!activeRealms.contains(realmId)) {
+      logger.info("Activating security realm {} as it got configured.", realmId);
+      activeRealms.add(realmId);
+      setRealms(activeRealms);
+    }
+  }
+
+  /**
+   * Deactivates, if not deactivated already, the Realm firing event of {@link RealmConfigurationUnusableEvent}.
+   * 
+   * @since 2.7.0
+   */
+  private void mayDeactivateRealm(final String realmId) throws InvalidConfigurationException {
+    final List<String> activeRealms = getRealms();
+    if (activeRealms.contains(realmId)) {
+      logger.info("Deactivating security realm {} as it got unconfigured.", realmId);
+      activeRealms.remove(realmId);
+      setRealms(activeRealms);
+    }
   }
 
   public RealmSecurityManager getSecurityManager() {
