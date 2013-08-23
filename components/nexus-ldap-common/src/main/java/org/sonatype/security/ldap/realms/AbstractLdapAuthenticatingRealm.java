@@ -48,6 +48,10 @@ public abstract class AbstractLdapAuthenticatingRealm
   @Requirement
   private LdapManager ldapManager;
 
+  protected AbstractLdapAuthenticatingRealm() {
+    setName("LdapAuthenticatingRealm");
+  }
+
   @Inject
   public void setLdapManager(final LdapManager ldapManager) {
     this.ldapManager = checkNotNull(ldapManager);
@@ -103,12 +107,6 @@ public abstract class AbstractLdapAuthenticatingRealm
 
   protected AuthenticationInfo buildAuthenticationInfo(String username, char[] password) {
     return new SimpleAuthenticationInfo(username, password, getName());
-  }
-
-
-  @Override
-  public String getName() {
-    return "LdapAuthenticatingRealm";
   }
 
   /*
