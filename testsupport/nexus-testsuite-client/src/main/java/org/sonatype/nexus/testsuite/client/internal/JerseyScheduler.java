@@ -80,8 +80,16 @@ public class JerseyScheduler
         waitForAllTasksToStop( null );
     }
 
+
+
     @Override
     public void waitForAllTasksToStop( @Nullable final Time timeout )
+    {
+        waitForAllTasksToStop( timeout, null );
+    }
+
+    @Override
+    public void waitForAllTasksToStop(final Time timeout, final Time window)
     {
         try
         {
@@ -91,12 +99,20 @@ public class JerseyScheduler
                 actualTimeout = Time.minutes( 1 );
             }
 
+            Time actualWindow = window;
+            if ( actualWindow == null )
+            {
+                actualWindow = Time.seconds( 10 );
+            }
+
             LOG.info(
-                "Waiting for Nexus to not execute any task (timeouts in {})", actualTimeout.toString()
+                "Waiting for Nexus to not execute any task for {} (timeouts in {})",
+                actualWindow.toString(), actualTimeout.toString()
             );
 
             final MultivaluedMap<String, String> params = new MultivaluedMapImpl();
             params.add( "timeout", String.valueOf( actualTimeout.toMillis() ) );
+            params.add( "window", String.valueOf( actualWindow.toMillis() ) );
 
             final ClientResponse response = getNexusClient()
                 .serviceResource( "tasks/waitFor", params )

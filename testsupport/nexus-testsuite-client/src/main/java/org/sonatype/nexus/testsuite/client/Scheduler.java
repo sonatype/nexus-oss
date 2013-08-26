@@ -33,4 +33,7 @@ public interface Scheduler
     void waitForAllTasksToStop( Time timeout )
         throws TasksAreStillRunningException;
 
+    void waitForAllTasksToStop( Time timeout, Time window )
+        throws TasksAreStillRunningException;
+
 }

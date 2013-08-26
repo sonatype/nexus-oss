@@ -78,6 +78,7 @@ public class TasksWaitForPlexusResource
         final Form form = request.getResourceRef().getQueryAsForm();
         final String name = form.getFirstValue( "name" );
         final String taskType = form.getFirstValue( "taskType" );
+        final long window = Long.parseLong( form.getFirstValue( "window", "10000" ) );
         final long timeout = Long.parseLong( form.getFirstValue( "timeout", "60000" ) );
 
         final ScheduledTask<?> namedTask = getTaskByName( nexusScheduler, name );
@@ -89,6 +90,7 @@ public class TasksWaitForPlexusResource
             return "OK";
         }
 
+        long lastTimeTasksWereStillRunning = System.currentTimeMillis();
         final long startTime = System.currentTimeMillis();
         while ( System.currentTimeMillis() - startTime <= timeout )
         {
@@ -96,8 +98,15 @@ public class TasksWaitForPlexusResource
 
             if ( isTaskCompleted( nexusScheduler, taskType, namedTask ) )
             {
-                response.setStatus( Status.SUCCESS_OK );
-                return "OK";
+              if ( System.currentTimeMillis() - lastTimeTasksWereStillRunning >= window )
+              {
+                  response.setStatus( Status.SUCCESS_OK );
+                  return "OK";
+              }
+            }
+            else
+            {
+                lastTimeTasksWereStillRunning = System.currentTimeMillis();
             }
         }
 
