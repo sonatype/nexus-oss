@@ -23,10 +23,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -61,7 +61,7 @@ import static org.hamcrest.Matchers.is;
  * @author cstamas
  */
 public class DefaultTaskConfigManagerTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   private DefaultScheduler defaultScheduler;
 

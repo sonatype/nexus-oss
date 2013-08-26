@@ -18,9 +18,9 @@ import java.io.StringWriter;
 import java.util.TimeZone;
 
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.configuration.source.FileSecurityConfigurationSource;
@@ -35,7 +35,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class DefaultApplicationConfigurationUpgraderTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   protected ApplicationConfigurationUpgrader configurationUpgrader;
 

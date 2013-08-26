@@ -13,10 +13,10 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
-import org.sonatype.nexus.test.NexusTestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import org.mockito.MockitoAnnotations;
 import static org.mockito.Mockito.when;
 
 public class RemoteScrapeStrategyTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   @Mock
   private MavenProxyRepository mavenProxyRepository;

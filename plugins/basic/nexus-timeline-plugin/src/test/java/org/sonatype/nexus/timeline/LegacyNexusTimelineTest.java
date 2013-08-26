@@ -15,7 +15,7 @@ package org.sonatype.nexus.timeline;
 
 import java.io.File;
 
-import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.nexus.NexusAppTestSupport;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
 public class LegacyNexusTimelineTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   @Test
   public void testMoveLegacyTimeline()

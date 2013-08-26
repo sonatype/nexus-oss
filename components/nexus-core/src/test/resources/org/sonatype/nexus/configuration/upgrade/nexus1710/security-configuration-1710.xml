@@ -10,6 +10,5 @@
     <realm>XmlAuthenticatingRealm</realm>
     <realm>XmlAuthorizingRealm</realm>
   </realms>
-  <securityManager>default</securityManager>
   <hashIterations>1024</hashIterations>
 </security-configuration>
