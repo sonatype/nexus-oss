@@ -183,14 +183,14 @@ public class ExceptionCatchingModularRealmAuthorizer
         if (((Authorizer) realm).isPermitted(subjectPrincipal, permission)) {
           if (logger.isTraceEnabled()) {
             this.logger.trace("Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
-                + " has permisison: " + permission);
+                + " has permission: " + permission);
           }
           return true;
         }
         else {
           if (logger.isTraceEnabled()) {
             this.logger.trace("Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
-                + " does NOT have permisison: " + permission);
+                + " does NOT have permission: " + permission);
           }
         }
 
