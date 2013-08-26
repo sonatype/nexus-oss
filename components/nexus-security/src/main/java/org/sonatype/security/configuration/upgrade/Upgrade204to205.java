@@ -64,10 +64,7 @@ public class Upgrade204to205
 
     newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
 
-    if (newc.getSecurityManager() != null) {
-      // NEXUS-5828: Get rid of "web", make it "default"
-      newc.setSecurityManager( "default" );
-    }
+    // NEXUS-5828: Security Manager field is gone!
     
     message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);
