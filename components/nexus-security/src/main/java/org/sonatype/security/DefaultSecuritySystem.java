@@ -85,7 +85,7 @@ public class DefaultSecuritySystem
 
   private SecurityConfigurationManager securityConfiguration;
 
-  private Map<String, RealmSecurityManager> securityManagers;
+  private RealmSecurityManager securityManager;
 
   private CacheManagerComponent cacheManagerComponent;
 
@@ -112,7 +112,7 @@ public class DefaultSecuritySystem
                                PasswordGenerator passwordGenerator,
                                Map<String, AuthorizationManager> authorizationManagers, Map<String, Realm> realmMap,
                                SecurityConfigurationManager securityConfiguration,
-                               Map<String, RealmSecurityManager> securityManagers,
+                               RealmSecurityManager securityManager,
                                CacheManagerComponent cacheManagerComponent, UserManagerFacade userManagerFacade)
   {
     this.securityEmailers = securityEmailers;
@@ -121,7 +121,7 @@ public class DefaultSecuritySystem
     this.authorizationManagers = authorizationManagers;
     this.realmMap = realmMap;
     this.securityConfiguration = securityConfiguration;
-    this.securityManagers = securityManagers;
+    this.securityManager = securityManager;
     this.cacheManagerComponent = cacheManagerComponent;
 
     this.eventBus.register(this);
@@ -852,6 +852,6 @@ public class DefaultSecuritySystem
   }
 
   public RealmSecurityManager getSecurityManager() {
-    return this.securityManagers.get(this.securityConfiguration.getSecurityManager());
+    return securityManager;
   }
 }

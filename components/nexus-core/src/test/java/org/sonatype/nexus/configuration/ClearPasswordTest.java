@@ -15,13 +15,13 @@ package org.sonatype.nexus.configuration;
 
 import java.io.File;
 
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.test.NexusTestSupport;
 
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.util.FileUtils;
@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ClearPasswordTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   private ApplicationConfigurationSource getConfigSource()
       throws Exception

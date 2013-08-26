@@ -25,8 +25,11 @@ import java.util.HashMap;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Module;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.util.IOUtil;
@@ -38,6 +41,16 @@ public abstract class LdapTestSupport
   private LdapServer ldapServer;
 
   private File ldapRealmConfig;
+
+  @Override
+  protected Module[] getTestCustomModules() {
+    Module[] modules = super.getTestCustomModules();
+    if (modules == null) {
+      modules = new Module[0];
+    }
+    modules = ObjectArrays.concat(modules, new SecurityModule());
+    return modules;
+  }
 
   protected LdapServer getLdapServer() {
     return ldapServer;

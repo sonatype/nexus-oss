@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.nexus.NexusAppTestSupport;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
@@ -29,7 +29,7 @@ import org.apache.maven.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
 
 public abstract class AbstractMacPluginTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   public List<IndexCreator> DEFAULT_CREATORS;
 

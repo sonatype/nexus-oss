@@ -20,13 +20,31 @@ import java.io.InputStream;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.source.FileConfigurationSource;
 import org.sonatype.nexus.util.FileUtils;
+import org.sonatype.security.guice.SecurityModule;
 
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Module;
 import org.junit.Test;
 
 public class FileConfigurationSourceTest
     extends AbstractApplicationConfigurationSourceTest
 
 {
+  /**
+   * Note: adding the module here directly, as this UT cannot extend NexusAppTestSupport
+   * as it's relies on some lazy operations done by configuration. If NexusAppTestSupport
+   * extended, preparations done in these UTs would happen too late.
+   */
+  @Override
+  protected Module[] getTestCustomModules() {
+    Module[] modules = super.getTestCustomModules();
+    if (modules == null) {
+      modules = new Module[0];
+    }
+    modules = ObjectArrays.concat(modules, new SecurityModule());
+    return modules;
+  }
+
   @Override
   protected ApplicationConfigurationSource getConfigurationSource()
       throws Exception

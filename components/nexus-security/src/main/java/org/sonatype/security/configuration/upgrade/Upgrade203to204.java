@@ -29,17 +29,18 @@ import org.sonatype.security.configuration.model.v2_0_4.upgrade.BasicVersionUpgr
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * {@link SecurityConfigurationVersionUpgrader} step for security configuration version 2.0.3 > 2.0.4 upgrade.
+ * 
+ * @since 2.5.0
+ */
 @Singleton
 @Typed(SecurityConfigurationVersionUpgrader.class)
 @Named("2.0.3")
 public class Upgrade203to204
     implements SecurityConfigurationVersionUpgrader
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final int HASH_ITERATIONS = 1024;
 
   public Object loadConfiguration(File file)
@@ -71,12 +72,12 @@ public class Upgrade203to204
     org.sonatype.security.configuration.model.v2_0_3.SecurityConfiguration oldc =
         (org.sonatype.security.configuration.model.v2_0_3.SecurityConfiguration) message.getConfiguration();
 
-    org.sonatype.security.configuration.model.SecurityConfiguration newc = new BasicVersionUpgrade()
+    org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration newc = new BasicVersionUpgrade()
         .upgradeSecurityConfiguration(oldc);
 
-    newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    newc.setVersion(org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration.MODEL_VERSION);
     newc.setHashIterations(HASH_ITERATIONS);
-    message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    message.setModelVersion(org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);
   }
 

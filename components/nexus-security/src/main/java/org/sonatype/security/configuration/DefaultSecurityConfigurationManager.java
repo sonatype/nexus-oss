@@ -184,19 +184,4 @@ public class DefaultSecurityConfigurationManager
 
     return context;
   }
-
-  public String getSecurityManager() {
-    String sm = this.getConfiguration().getSecurityManager();
-    if (sm == null) {
-      setSecurityManager("default");
-      return this.getConfiguration().getSecurityManager();
-    }
-    return sm;
-  }
-
-  public void setSecurityManager(String securityManager) {
-    this.getConfiguration().setSecurityManager(securityManager);
-    save();
-  }
-
 }
