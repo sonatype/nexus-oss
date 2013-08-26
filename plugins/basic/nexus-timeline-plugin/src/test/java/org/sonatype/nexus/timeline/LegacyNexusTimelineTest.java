@@ -15,19 +15,51 @@ package org.sonatype.nexus.timeline;
 
 import java.io.File;
 
-import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.proxy.maven.routing.Config;
+import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
+import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.security.guice.SecurityModule;
+
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
 public class LegacyNexusTimelineTest
-    extends NexusAppTestSupport
+    extends NexusTestSupport
 {
+  /**
+   * Note: these modules must be added here, and the test cannot extend NexusAppTestSupport
+   * as that would "awake" NexusTimeline too early (legacy upgrade happens in init phase),
+   * hence the preparation that this test performs would happen too late.
+   */
+  @Override
+  protected Module[] getTestCustomModules() {
+    Module[] modules = super.getTestCustomModules();
+    if (modules == null) {
+      modules = new Module[0];
+    }
+    modules = ObjectArrays.concat(modules, new SecurityModule());
+    modules = ObjectArrays.concat(modules, new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(Config.class).toInstance(new ConfigImpl(enableAutomaticRoutingFeature()));
+      }
+    });
+    return modules;
+  }
+
+  protected boolean enableAutomaticRoutingFeature() {
+    return false;
+  }
+
   @Test
   public void testMoveLegacyTimeline()
       throws Exception
