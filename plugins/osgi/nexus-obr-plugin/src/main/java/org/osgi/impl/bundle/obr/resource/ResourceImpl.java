@@ -85,10 +85,6 @@ public class ResourceImpl
     if (symbolicName == null) {
       symbolicName = parser.getAttributeValue(null, "name");
     }
-/*[mcculls] ignore
-                        System.err.println("Hey, no symb name! "
-					+ parser.getAttributeValue(null, "uri"));
-*/
 
     map.put(SYMBOLIC_NAME, symbolicName);
     presentationName = parser.getAttributeValue(null, PRESENTATION_NAME);
@@ -232,15 +228,6 @@ public class ResourceImpl
 
   public static Tag toXML(Resource resource, UrlTransformer urlTransformer) {
     Tag meta = new Tag("resource");
-/*[mcculls] make more generic
-                URL url = resource.getURL();
-		String urlString = url.toExternalForm();
-		
-		if ( relative )
-			urlString = makeRelative(resource.getRepository().getURL(), url);
-		
-		meta.addAttribute("uri", urlString );
-*/
     meta.addAttribute("uri", urlTransformer.transform(resource.getURL()));
     meta.addAttribute(SYMBOLIC_NAME, resource.getSymbolicName());
     if (resource.getPresentationName() != null) {
@@ -259,9 +246,6 @@ public class ResourceImpl
           if (value instanceof URL) {
             value = urlTransformer.transform((URL) value);
           }
-/*[mcculls] make more generic
-						value = makeRelative(resource.getRepository().getURL(),(URL) value);
-*/
           meta.addContent(new Tag((String) key, value.toString()));
         }
       }

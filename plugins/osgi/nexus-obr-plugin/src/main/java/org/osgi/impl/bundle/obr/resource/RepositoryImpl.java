@@ -81,9 +81,6 @@ public class RepositoryImpl
       return true;
     }
     catch (Exception e) {
-/*[mcculls] ignore
-                        e.printStackTrace();
-*/
       exception = e;
     }
     return false;
@@ -125,9 +122,6 @@ public class RepositoryImpl
       }
     }
     catch (XmlPullParserException e) {
-/*[mcculls] ignore 
-                        e.printStackTrace();
-*/
       throw new IllegalArgumentException("XML unrecognized around: "
           + e.getLineNumber() + " " + e.getMessage());
     }
@@ -330,9 +324,6 @@ public class RepositoryImpl
   {
     if (!visited.contains(url)) {
       visited.add(url);
-/*[mcculls] ignore 
-				System.out.println("Visiting: " + url);
-*/
       InputStream in = null;
       try {
 
@@ -356,9 +347,6 @@ public class RepositoryImpl
         parseRepository(parser);
       }
       catch (MalformedURLException e) {
-/*[mcculls] ignore
-				System.out.println("Cannot create connection to url");
-*/
       }
       finally {
         IOUtil.close(in);

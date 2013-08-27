@@ -44,10 +44,6 @@ public class BundleInfo
 
   long size;
 
-  /*[mcculls] use inputstream instead
-          File bundleJar;
-          ZipFile jar;
-  */
   String license;
 
   Properties localization;
@@ -61,30 +57,12 @@ public class BundleInfo
    * @param bundleJar Path name
    * @throws Exception Any errors that occur
    */
-/*[mcculls] use inputstream instead
-        public BundleInfo(RepositoryImpl repository, File bundleJar)
-			throws Exception {
-*/
   public BundleInfo(RepositoryImpl repository, InputStream is, String remoteUrl, long size) throws IOException {
-/*[mcculls] use inputstream instead
-                this.bundleJar = bundleJar;
-*/
     this.repository = repository;
     this.zis = new ZipInputStream(is);
     this.remoteUrl = remoteUrl;
     this.size = size;
 
-/*[mcculls] use inputstream instead
-		if (!this.bundleJar.exists())
-			throw new FileNotFoundException(bundleJar.toString());
-
-		jar = new ZipFile(bundleJar);
-		ZipEntry entry = jar.getEntry("META-INF/MANIFEST.MF");
-		if (entry == null)
-			throw new FileNotFoundException("No Manifest in "
-					+ bundleJar.toString());
-		manifest = new Manifest(jar.getInputStream(entry));
-*/
     try {
       ZipEntry e = zis.getNextEntry();
       if (e != null && "META-INF/".equalsIgnoreCase(e.getName())) {
@@ -122,11 +100,6 @@ public class BundleInfo
     try {
 
       // Calculate the location URL of the JAR
-/*[mcculls] use inputstream instead
-			URL location = new URL("jar:" + bundleJar.toURL().toString() + "!/");
-			resource.setURL(bundleJar.toURL());
-			resource.setFile(bundleJar);
-*/
       URL location = new URL("jar:" + remoteUrl + "!/");
       resource.setURL(new URL(remoteUrl));
 
@@ -134,9 +107,6 @@ public class BundleInfo
       doSize(resource);
       doCategories(resource);
       doImportExportServices(resource);
-/*[mcculls] unused
-			doDeclarativeServices(resource);
-*/
       doFragment(resource);
       doRequires(resource);
       doBundle(resource);
@@ -148,9 +118,6 @@ public class BundleInfo
     }
     finally {
       try {
-/*[mcculls] use inputstream instead
-				jar.close();
-*/
         zis.close();
       }
       catch (Exception e) {
@@ -163,9 +130,6 @@ public class BundleInfo
    * Check the size and add it.
    */
   void doSize(ResourceImpl resource) {
-/*[mcculls] use inputstream instead
-		long size = bundleJar.length();
-*/
     if (size > 0) {
       resource.setSize(size);
     }
@@ -225,37 +189,9 @@ public class BundleInfo
       return new URL(location, source);
     }
     catch (Exception e) {
-/*[mcculls] ignore
-			System.err.println("Error in converting url: " + location + " : "
-					+ source);
-*/
       return null;
     }
   }
-
-/*[mcculls] unused
-	void doDeclarativeServices(ResourceImpl resource) throws Exception {
-		String serviceComponent = manifest.getValue("service-component");
-		if (serviceComponent == null)
-			return;
-
-		StringTokenizer st = new StringTokenizer(serviceComponent, " ,\t");
-		String parts[] = new String[st.countTokens()];
-		for (int i = 0; i < parts.length; i++)
-			parts[i] = st.nextToken();
-
-		for (int i = 0; i < parts.length; i++) {
-			ZipEntry entry = jar.getEntry(parts[i]);
-			if (entry == null) {
-				System.err.println("Bad Service-Component header: "
-						+ serviceComponent + ", no such file " + parts[i]);
-			}
-			InputStream in = jar.getInputStream(entry);
-			// TODO parse declarative services files.
-			in.close();
-		}
-	}
-*/
 
   void doImportExportServices(ResourceImpl resource) throws IOException {
     String importServices = manifest.getValue("import-service");
@@ -604,13 +540,6 @@ public class BundleInfo
         String path = manifest
             .getValue("Bundle-Localization", "bundle");
         path += ".properties";
-/*[mcculls] use inputstream instead
-				InputStream in = jar.getInputStream(new ZipEntry(path));
-				if (in != null) {
-					localization.load(in);
-					in.close();
-				}
-*/
         while (zis.available() > 0) {
           if (path.equals(zis.getNextEntry().getName())) {
             localization.load(zis);
@@ -626,9 +555,4 @@ public class BundleInfo
     return localization.getProperty(s, s);
   }
 
-/*[mcculls] unused
-	File getZipFile() {
-		return bundleJar;
-	}
-*/
 }
