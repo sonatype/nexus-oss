@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.support.filters;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.testsuite.support.filters;
 
 import java.util.Map;
 
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.testsuite.support.Filter;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Adds an implicit version "${project.dm.version}" if none provided.
@@ -28,29 +29,25 @@ public class ImplicitVersionFilter
     implements Filter
 {
 
-    /**
-     * Filters by adding an implicit version "${project.dm.version}" if none provided.
-     *
-     * @param context filtering context. Cannot be null.
-     * @param value   value to be filtered. Cannot be null.
-     * @return filtered value
-     */
-    public String filter( final Map<String, String> context, final String value )
-    {
-        String filtered = checkNotNull( value );
-        try
-        {
-            final DefaultArtifact artifact = new DefaultArtifact( value + ":${project.dm.version}" );
-            if ( "${project.dm.version}".equals( artifact.getVersion() ) )
-            {
-                filtered = value + ":${project.dm.version}";
-            }
-        }
-        catch ( IllegalArgumentException ignore )
-        {
-            // do nothing
-        }
-        return filtered;
+  /**
+   * Filters by adding an implicit version "${project.dm.version}" if none provided.
+   *
+   * @param context filtering context. Cannot be null.
+   * @param value   value to be filtered. Cannot be null.
+   * @return filtered value
+   */
+  public String filter(final Map<String, String> context, final String value) {
+    String filtered = checkNotNull(value);
+    try {
+      final DefaultArtifact artifact = new DefaultArtifact(value + ":${project.dm.version}");
+      if ("${project.dm.version}".equals(artifact.getVersion())) {
+        filtered = value + ":${project.dm.version}";
+      }
     }
+    catch (IllegalArgumentException ignore) {
+      // do nothing
+    }
+    return filtered;
+  }
 
 }

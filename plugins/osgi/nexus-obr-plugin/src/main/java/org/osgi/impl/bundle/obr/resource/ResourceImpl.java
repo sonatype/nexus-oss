@@ -233,7 +233,7 @@ public class ResourceImpl
   public static Tag toXML(Resource resource, UrlTransformer urlTransformer) {
     Tag meta = new Tag("resource");
 /*[mcculls] make more generic
-		URL url = resource.getURL();
+                URL url = resource.getURL();
 		String urlString = url.toExternalForm();
 		
 		if ( relative )

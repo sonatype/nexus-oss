@@ -11,8 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * 
+ *
  */
+
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
@@ -22,15 +23,13 @@ public class MavenProjectFileFilter
     implements FileFilter
 {
 
-    public static final MavenProjectFileFilter INSTANCE = new MavenProjectFileFilter();
+  public static final MavenProjectFileFilter INSTANCE = new MavenProjectFileFilter();
 
-    private MavenProjectFileFilter()
-    {
-        super();
-    }
+  private MavenProjectFileFilter() {
+    super();
+  }
 
-    public boolean accept( File pathname )
-    {
-        return ( !pathname.getName().endsWith( ".svn" ) && pathname.isDirectory() && new File( pathname, "pom.xml" ).exists() );
-    }
+  public boolean accept(File pathname) {
+    return (!pathname.getName().endsWith(".svn") && pathname.isDirectory() && new File(pathname, "pom.xml").exists());
+  }
 }

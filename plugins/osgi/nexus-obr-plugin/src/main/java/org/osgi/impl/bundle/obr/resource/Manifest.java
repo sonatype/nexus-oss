@@ -144,7 +144,7 @@ public class Manifest
           catch (Exception e) {
             version = new VersionRange("0");
 /*[mcculls] ignore
-						System.err.println("Invalid version attr for: " + bsn
+                                                System.err.println("Invalid version attr for: " + bsn
 								+ " value is " + value);
 */
           }

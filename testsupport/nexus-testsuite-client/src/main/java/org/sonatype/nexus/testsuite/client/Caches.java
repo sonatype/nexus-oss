@@ -10,19 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client;
 
 /**
  * Shorthands for caches.
- * 
+ *
  * @since 2.4
  */
 public interface Caches
 {
-    /**
-     * Expires all caches (from root) on given repository.
-     * 
-     * @param repositoryId
-     */
-    void expireCaches( String repositoryId );
+  /**
+   * Expires all caches (from root) on given repository.
+   */
+  void expireCaches(String repositoryId);
 }

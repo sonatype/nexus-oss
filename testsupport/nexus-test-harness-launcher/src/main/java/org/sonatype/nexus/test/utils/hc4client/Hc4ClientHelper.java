@@ -10,11 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils.hc4client;
 
 import java.io.IOException;
 import java.util.logging.Level;
 
+import com.noelios.restlet.http.HttpClientCall;
+import com.noelios.restlet.http.HttpClientHelper;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.ClientPNames;
@@ -29,122 +32,106 @@ import org.restlet.Client;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 
-import com.noelios.restlet.http.HttpClientCall;
-import com.noelios.restlet.http.HttpClientHelper;
-
 /**
  * HC4 backed Restlet 1.1 Client, used in legacy ITs only, as many of the IT clients were coded against {@link Client}.
  */
 public class Hc4ClientHelper
     extends HttpClientHelper
 {
-    private volatile DefaultHttpClient httpClient;
+  private volatile DefaultHttpClient httpClient;
 
-    public Hc4ClientHelper( Client client )
-    {
-        super( client );
-        this.httpClient = null;
-        getProtocols().add( Protocol.HTTP );
-        getProtocols().add( Protocol.HTTPS );
+  public Hc4ClientHelper(Client client) {
+    super(client);
+    this.httpClient = null;
+    getProtocols().add(Protocol.HTTP);
+    getProtocols().add(Protocol.HTTPS);
+  }
+
+  @Override
+  public HttpClientCall create(Request request) {
+    HttpClientCall result = null;
+    try {
+      result = new Hc4MethodCall(this, request.getMethod().toString(),
+          request.getResourceRef().toString(), request
+          .isEntityAvailable());
+    }
+    catch (IOException ioe) {
+      getLogger().log(Level.WARNING,
+          "Unable to create the HTTP client call", ioe);
     }
 
-    @Override
-    public HttpClientCall create( Request request )
-    {
-        HttpClientCall result = null;
-        try
-        {
-            result = new Hc4MethodCall( this, request.getMethod().toString(),
-                request.getResourceRef().toString(), request
-                    .isEntityAvailable() );
-        }
-        catch ( IOException ioe )
-        {
-            getLogger().log( Level.WARNING,
-                "Unable to create the HTTP client call", ioe );
-        }
+    return result;
+  }
 
-        return result;
-    }
+  public int getConnectionManagerTimeout() {
+    return Integer.parseInt(getHelpedParameters().getFirstValue(
+        "connectionManagerTimeout", "0"));
+  }
 
-    public int getConnectionManagerTimeout()
-    {
-        return Integer.parseInt( getHelpedParameters().getFirstValue(
-            "connectionManagerTimeout", "0" ) );
-    }
+  public HttpClient getHttpClient() {
+    return this.httpClient;
+  }
 
-    public HttpClient getHttpClient()
-    {
-        return this.httpClient;
-    }
+  public int getMaxConnectionsPerHost() {
+    return Integer.parseInt(getHelpedParameters().getFirstValue(
+        "maxConnectionsPerHost", "2"));
+  }
 
-    public int getMaxConnectionsPerHost()
-    {
-        return Integer.parseInt( getHelpedParameters().getFirstValue(
-            "maxConnectionsPerHost", "2" ) );
-    }
+  public int getMaxTotalConnections() {
+    return Integer.parseInt(getHelpedParameters().getFirstValue(
+        "maxTotalConnections", "20"));
+  }
 
-    public int getMaxTotalConnections()
-    {
-        return Integer.parseInt( getHelpedParameters().getFirstValue(
-            "maxTotalConnections", "20" ) );
-    }
+  public int getReadTimeout() {
+    return Integer.parseInt(getHelpedParameters().getFirstValue(
+        "readTimeout", "0"));
+  }
 
-    public int getReadTimeout()
-    {
-        return Integer.parseInt( getHelpedParameters().getFirstValue(
-            "readTimeout", "0" ) );
-    }
+  public String getRetryHandler() {
+    return getHelpedParameters().getFirstValue("retryHandler", null);
+  }
 
-    public String getRetryHandler()
-    {
-        return getHelpedParameters().getFirstValue( "retryHandler", null );
-    }
+  public int getStopIdleTimeout() {
+    return Integer.parseInt(getHelpedParameters().getFirstValue(
+        "stopIdleTimeout", "1000"));
+  }
 
-    public int getStopIdleTimeout()
-    {
-        return Integer.parseInt( getHelpedParameters().getFirstValue(
-            "stopIdleTimeout", "1000" ) );
-    }
+  public boolean isFollowRedirects() {
+    return Boolean.parseBoolean(getHelpedParameters().getFirstValue(
+        "followRedirects", "false"));
+  }
 
-    public boolean isFollowRedirects()
-    {
-        return Boolean.parseBoolean( getHelpedParameters().getFirstValue(
-            "followRedirects", "false" ) );
-    }
+  public boolean getTcpNoDelay() {
+    return Boolean.parseBoolean(getHelpedParameters().getFirstValue(
+        "tcpNoDelay", "false"));
+  }
 
-    public boolean getTcpNoDelay()
-    {
-        return Boolean.parseBoolean( getHelpedParameters().getFirstValue(
-            "tcpNoDelay", "false" ) );
-    }
+  @Override
+  public void start()
+      throws Exception
+  {
+    super.start();
 
-    @Override
-    public void start()
-        throws Exception
-    {
-        super.start();
+    HttpParams params = new SyncBasicHttpParams();
+    params.setParameter(HttpProtocolParams.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+    params.setBooleanParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
+    params.setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024);
+    params.setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT, getConnectTimeout());
+    params.setIntParameter(HttpConnectionParams.SO_TIMEOUT, getReadTimeout());
+    params.setParameter(ClientPNames.COOKIE_POLICY,
+        CookiePolicy.IGNORE_COOKIES);
+    final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager();
+    connManager.setMaxTotal(getMaxTotalConnections());
+    connManager.setDefaultMaxPerRoute(getMaxConnectionsPerHost());
+    httpClient = new DefaultHttpClient(connManager, params);
+    getLogger().info("Starting the HTTP client");
+  }
 
-        HttpParams params = new SyncBasicHttpParams();
-        params.setParameter( HttpProtocolParams.PROTOCOL_VERSION, HttpVersion.HTTP_1_1 );
-        params.setBooleanParameter( HttpProtocolParams.USE_EXPECT_CONTINUE, false );
-        params.setIntParameter( HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024 );
-        params.setIntParameter( HttpConnectionParams.CONNECTION_TIMEOUT, getConnectTimeout() );
-        params.setIntParameter( HttpConnectionParams.SO_TIMEOUT, getReadTimeout() );
-        params.setParameter( ClientPNames.COOKIE_POLICY,
-            CookiePolicy.IGNORE_COOKIES );
-        final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager();
-        connManager.setMaxTotal( getMaxTotalConnections() );
-        connManager.setDefaultMaxPerRoute( getMaxConnectionsPerHost() );
-        httpClient = new DefaultHttpClient( connManager, params );
-        getLogger().info( "Starting the HTTP client" );
-    }
-
-    @Override
-    public void stop()
-        throws Exception
-    {
-        getHttpClient().getConnectionManager().shutdown();
-        getLogger().info( "Stopping the HTTP client" );
-    }
+  @Override
+  public void stop()
+      throws Exception
+  {
+    getHttpClient().getConnectionManager().shutdown();
+    getLogger().info("Stopping the HTTP client");
+  }
 }

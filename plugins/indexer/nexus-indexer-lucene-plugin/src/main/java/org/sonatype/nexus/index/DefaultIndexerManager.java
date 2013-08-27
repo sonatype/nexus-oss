@@ -66,9 +66,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -239,14 +237,15 @@ public class DefaultIndexerManager
 
   /**
    * The repository is capable of remote access for indexing purposes.
-   * 
+   *
    * @since 2.7.0
    */
   private boolean REMOTEACCESSALLOWED(Repository repository) {
     final ProxyRepository proxyRepository = repository.adaptToFacet(ProxyRepository.class);
-    if (proxyRepository!=null) {
+    if (proxyRepository != null) {
       return proxyRepository.getProxyMode().shouldProxy();
-    } else {
+    }
+    else {
       return false;
     }
   }
@@ -1259,7 +1258,8 @@ public class DefaultIndexerManager
           // some stale file from cache to the updater.
           if (ISPROXY(repository) && REMOTEACCESSALLOWED(repository)) {
             item =
-                (StorageFileItem) repository.getRemoteStorage().retrieveItem(repository, req, repository.getRemoteUrl());
+                (StorageFileItem) repository.getRemoteStorage()
+                    .retrieveItem(repository, req, repository.getRemoteUrl());
           }
           else {
             throw new ItemNotFoundException(req, repository);

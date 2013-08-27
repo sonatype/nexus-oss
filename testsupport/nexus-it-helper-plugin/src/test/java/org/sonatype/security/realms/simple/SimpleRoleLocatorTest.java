@@ -10,44 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms.simple;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.AbstractRealmTest;
+
+import junit.framework.Assert;
+import org.junit.Test;
 
 public class SimpleRoleLocatorTest
     extends AbstractRealmTest
 {
 
-    @Test
-    public void testListRoleIds()
-        throws Exception
-    {
-        AuthorizationManager roleLocator = lookup( AuthorizationManager.class, "Simple" );
+  @Test
+  public void testListRoleIds()
+      throws Exception
+  {
+    AuthorizationManager roleLocator = lookup(AuthorizationManager.class, "Simple");
 
-        Set<String> roleIds = this.toIdSet( roleLocator.listRoles() );
-        Assert.assertTrue( roleIds.contains( "role-xyz" ) );
-        Assert.assertTrue( roleIds.contains( "role-abc" ) );
-        Assert.assertTrue( roleIds.contains( "role-123" ) );
+    Set<String> roleIds = this.toIdSet(roleLocator.listRoles());
+    Assert.assertTrue(roleIds.contains("role-xyz"));
+    Assert.assertTrue(roleIds.contains("role-abc"));
+    Assert.assertTrue(roleIds.contains("role-123"));
+  }
+
+  private Set<String> toIdSet(Set<Role> roles) {
+    Set<String> ids = new HashSet<String>();
+
+    for (Role role : roles) {
+      ids.add(role.getRoleId());
     }
 
-    private Set<String> toIdSet( Set<Role> roles )
-    {
-        Set<String> ids = new HashSet<String>();
-
-        for ( Role role : roles )
-        {
-            ids.add( role.getRoleId() );
-        }
-
-        return ids;
-    }
+    return ids;
+  }
 
 }

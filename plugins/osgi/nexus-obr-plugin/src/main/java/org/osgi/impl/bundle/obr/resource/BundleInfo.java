@@ -67,7 +67,7 @@ public class BundleInfo
 */
   public BundleInfo(RepositoryImpl repository, InputStream is, String remoteUrl, long size) throws IOException {
 /*[mcculls] use inputstream instead
-		this.bundleJar = bundleJar;
+                this.bundleJar = bundleJar;
 */
     this.repository = repository;
     this.zis = new ZipInputStream(is);

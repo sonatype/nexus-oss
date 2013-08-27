@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client;
 
 import java.util.Map;
@@ -25,15 +26,15 @@ import org.sonatype.sisu.goodies.common.Time;
 public interface Scheduler
 {
 
-    void run( String type, Map<String,String> properties );
+  void run(String type, Map<String, String> properties);
 
-    void waitForAllTasksToStop()
-        throws TasksAreStillRunningException;
+  void waitForAllTasksToStop()
+      throws TasksAreStillRunningException;
 
-    void waitForAllTasksToStop( Time timeout )
-        throws TasksAreStillRunningException;
+  void waitForAllTasksToStop(Time timeout)
+      throws TasksAreStillRunningException;
 
-    void waitForAllTasksToStop( Time timeout, Time window )
-        throws TasksAreStillRunningException;
+  void waitForAllTasksToStop(Time timeout, Time window)
+      throws TasksAreStillRunningException;
 
 }

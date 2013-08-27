@@ -10,11 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.tasks.api;
 
-import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.getTaskByName;
-import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.isTaskCompleted;
-import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.sleep;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.scheduling.ScheduledTask;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -25,82 +28,72 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.scheduling.ScheduledTask;
 
-@Component( role = PlexusResource.class, hint = "TaskHelperResource" )
+import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.getTaskByName;
+import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.isTaskCompleted;
+import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.sleep;
+
+@Component(role = PlexusResource.class, hint = "TaskHelperResource")
 public class TaskHelperPlexusResource
     extends AbstractPlexusResource
 {
 
-    @Requirement
-    private NexusScheduler nexusScheduler;
+  @Requirement
+  private NexusScheduler nexusScheduler;
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
+
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "anon");
+  }
+
+  @Override
+  public String getResourceUri() {
+    return "/taskhelper";
+  }
+
+  @Override
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    Form form = request.getResourceRef().getQueryAsForm();
+    String name = form.getFirstValue("name");
+    String taskType = form.getFirstValue("taskType");
+    String attemptsParam = form.getFirstValue("attempts");
+    int attempts = 300;
+
+    if (attemptsParam != null) {
+      try {
+        attempts = Integer.parseInt(attemptsParam);
+      }
+      catch (NumberFormatException e) {
+        // ignore, will use default of 300
+      }
     }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "anon" );
+    final ScheduledTask<?> namedTask = getTaskByName(nexusScheduler, name);
+
+    if (name != null && namedTask == null) {
+      // task wasn't found, so bounce on outta here
+      response.setStatus(Status.SUCCESS_OK);
+      return "OK";
     }
 
-    @Override
-    public String getResourceUri()
-    {
-        return "/taskhelper";
+    for (int i = 0; i < attempts; i++) {
+      sleep();
+
+      if (isTaskCompleted(nexusScheduler, taskType, namedTask)) {
+        response.setStatus(Status.SUCCESS_OK);
+        return "OK";
+      }
     }
 
-    @Override
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        Form form = request.getResourceRef().getQueryAsForm();
-        String name = form.getFirstValue( "name" );
-        String taskType = form.getFirstValue( "taskType" );
-        String attemptsParam = form.getFirstValue( "attempts" );
-        int attempts = 300;
-
-        if ( attemptsParam != null )
-        {
-            try
-            {
-                attempts = Integer.parseInt( attemptsParam );
-            }
-            catch ( NumberFormatException e )
-            {
-                // ignore, will use default of 300
-            }
-        }
-
-        final ScheduledTask<?> namedTask = getTaskByName( nexusScheduler, name );
-
-        if ( name != null && namedTask == null )
-        {
-            // task wasn't found, so bounce on outta here
-            response.setStatus( Status.SUCCESS_OK );
-            return "OK";
-        }
-
-        for ( int i = 0; i < attempts; i++ )
-        {
-            sleep();
-
-            if ( isTaskCompleted( nexusScheduler, taskType, namedTask ) )
-            {
-                response.setStatus( Status.SUCCESS_OK );
-                return "OK";
-            }
-        }
-
-        response.setStatus( Status.SUCCESS_NO_CONTENT );
-        return "Tasks Not Finished";
-    }
+    response.setStatus(Status.SUCCESS_NO_CONTENT);
+    return "Tasks Not Finished";
+  }
 
 }

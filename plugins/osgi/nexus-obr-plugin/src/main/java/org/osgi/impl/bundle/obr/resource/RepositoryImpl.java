@@ -126,7 +126,7 @@ public class RepositoryImpl
     }
     catch (XmlPullParserException e) {
 /*[mcculls] ignore 
-			e.printStackTrace();
+                        e.printStackTrace();
 */
       throw new IllegalArgumentException("XML unrecognized around: "
           + e.getLineNumber() + " " + e.getMessage());

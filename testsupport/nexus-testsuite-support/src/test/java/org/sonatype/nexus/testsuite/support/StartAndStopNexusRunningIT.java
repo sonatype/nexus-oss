@@ -10,7 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.support;
+
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -19,9 +24,6 @@ import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNo
 import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNotHaveFailingPlugins;
 import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logFile;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
-
-import org.junit.Test;
-import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 /**
  * Test starting and stopping of Nexus.
@@ -32,35 +34,35 @@ public class StartAndStopNexusRunningIT
     extends NexusRunningITSupport
 {
 
-    /**
-     * Given a running/started nexus it checks that:<br/>
-     * - Nexus instance is set<br/>
-     * - Nexus state is set<br/>
-     * - Nexus state confirms that is running<br/>
-     * - Nexus responds with 200 at provided URL
-     *
-     * @throws Exception re-thrown
-     */
-    @Test
-    public void startAndStop()
-        throws Exception
-    {
-        assertThat( nexus(), is( notNullValue() ) );
-        assertThat( nexus().isRunning(), is( true ) );
+  /**
+   * Given a running/started nexus it checks that:<br/>
+   * - Nexus instance is set<br/>
+   * - Nexus state is set<br/>
+   * - Nexus state confirms that is running<br/>
+   * - Nexus responds with 200 at provided URL
+   *
+   * @throws Exception re-thrown
+   */
+  @Test
+  public void startAndStop()
+      throws Exception
+  {
+    assertThat(nexus(), is(notNullValue()));
+    assertThat(nexus().isRunning(), is(true));
 
-        assertThat( nexus().getUrl(), respondsWithStatus( 200 ) );
+    assertThat(nexus().getUrl(), respondsWithStatus(200));
 
-        assertThat( nexus().getLauncherLog(), FileMatchers.exists() );
-        assertThat( nexus().getLauncherLog(), FileMatchers.isFile() );
+    assertThat(nexus().getLauncherLog(), FileMatchers.exists());
+    assertThat(nexus().getLauncherLog(), FileMatchers.isFile());
 
-        assertThat( nexus().getNexusLog(), FileMatchers.exists() );
-        assertThat( nexus().getNexusLog(), FileMatchers.isFile() );
+    assertThat(nexus().getNexusLog(), FileMatchers.exists());
+    assertThat(nexus().getNexusLog(), FileMatchers.isFile());
 
-        assertThat( nexus().getNexusLog(), doesNotHaveCommonExceptions() );
-        assertThat( nexus().getNexusLog(), doesNotHaveFailingPlugins() );
+    assertThat(nexus().getNexusLog(), doesNotHaveCommonExceptions());
+    assertThat(nexus().getNexusLog(), doesNotHaveFailingPlugins());
 
-        assertThat( nexus(), logFile( doesNotHaveCommonExceptions() ) );
-        assertThat( nexus(), logFile( doesNotHaveFailingPlugins() ) );
-    }
+    assertThat(nexus(), logFile(doesNotHaveCommonExceptions()));
+    assertThat(nexus(), logFile(doesNotHaveFailingPlugins()));
+  }
 
 }

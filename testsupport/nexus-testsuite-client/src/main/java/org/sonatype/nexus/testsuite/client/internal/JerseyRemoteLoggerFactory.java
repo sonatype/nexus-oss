@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client.internal;
 
-import org.slf4j.Logger;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.testsuite.client.RemoteLoggerFactory;
+
+import org.slf4j.Logger;
 
 /**
  * Jersey based {@link RemoteLoggerFactory} Nexus Client Subsystem implementation.
@@ -27,21 +29,18 @@ public class JerseyRemoteLoggerFactory
     implements RemoteLoggerFactory
 {
 
-    public JerseyRemoteLoggerFactory( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
-    }
+  public JerseyRemoteLoggerFactory(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
 
-    @Override
-    public Logger getLogger( final String name )
-    {
-        return new JerseyRemoteLogger( getNexusClient(), name );
-    }
+  @Override
+  public Logger getLogger(final String name) {
+    return new JerseyRemoteLogger(getNexusClient(), name);
+  }
 
-    @Override
-    public Logger getLogger( final Class clazz )
-    {
-        return getLogger( clazz.getName() );
-    }
+  @Override
+  public Logger getLogger(final Class clazz) {
+    return getLogger(clazz.getName());
+  }
 
 }

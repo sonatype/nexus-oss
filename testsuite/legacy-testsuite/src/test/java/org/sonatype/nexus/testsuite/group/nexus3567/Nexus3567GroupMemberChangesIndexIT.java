@@ -93,7 +93,7 @@ public class Nexus3567GroupMemberChangesIndexIT
 
     node = getIndexContent("nexus3567deletemembergroup");
 
-    assertThat( "member removed, root does not have children", node.getChildren(), is( nullValue() ) );
+    assertThat("member removed, root does not have children", node.getChildren(), is(nullValue()));
   }
 
   @Test
@@ -121,7 +121,7 @@ public class Nexus3567GroupMemberChangesIndexIT
 
     node = getIndexContent("nexus3567removemembergroup");
 
-    assertThat( "member removed, root does not have children", node.getChildren(), is( nullValue() ) );
+    assertThat("member removed, root does not have children", node.getChildren(), is(nullValue()));
   }
 
   private void prepare(String repoId, String groupId)

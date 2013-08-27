@@ -10,56 +10,54 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.timeline;
+
+import java.util.Collection;
+
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.testsuite.client.Scheduler;
+import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+
+import org.junit.runners.Parameterized;
 
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 
-import java.util.Collection;
-
-import org.junit.runners.Parameterized;
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.testsuite.client.Scheduler;
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
 /**
  * Support class for nexus-timeline-plugin related ITs.
- * 
+ *
  * @since 2.6.1
  */
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
+@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public class TimelineITSupport
     extends NexusRunningParametrizedITSupport
 {
-    @Parameterized.Parameters
-    public static Collection<Object[]> data()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            testParameters(
-                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
-            )
-        ).load();
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        testParameters(
+            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
+        )
+    ).load();
+  }
 
-    public TimelineITSupport( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  public TimelineITSupport(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
 
-    @Override
-    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
-    {
-        return super.configureNexus( configuration ).addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement( "org.sonatype.nexus.plugins",
-                "nexus-timeline-plugin" ) );
-    }
+  @Override
+  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+    return super.configureNexus(configuration).addPlugins(
+        artifactResolver().resolvePluginFromDependencyManagement("org.sonatype.nexus.plugins",
+            "nexus-timeline-plugin"));
+  }
 
-    protected Scheduler scheduler()
-    {
-        return client().getSubsystem( Scheduler.class );
-    }
+  protected Scheduler scheduler() {
+    return client().getSubsystem(Scheduler.class);
+  }
 }

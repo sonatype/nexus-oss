@@ -10,15 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.task.nexus3996;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+package org.sonatype.nexus.testsuite.task.nexus3996;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -27,6 +25,9 @@ import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import com.google.common.collect.Lists;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Nexus would not create tasks for the same day if the client is in a timezone with a larger offset from UTC than
@@ -52,39 +53,39 @@ public class Nexus3996ScheduledTasksTimezoneDifferentDayValidationIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
-    public void createTask()
-        throws IOException
-    {
+  @Test
+  public void createTask()
+      throws IOException
+  {
 
-        final ScheduledServiceOnceResource task = new ScheduledServiceOnceResource();
-        task.setName( "name" );
-        task.setSchedule( "once" );
-        task.setTypeId( EmptyTrashTaskDescriptor.ID );
-        ScheduledServicePropertyResource property = new ScheduledServicePropertyResource();
-        property.setKey( EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID );
-        task.setProperties( Lists.newArrayList( property ) );
+    final ScheduledServiceOnceResource task = new ScheduledServiceOnceResource();
+    task.setName("name");
+    task.setSchedule("once");
+    task.setTypeId(EmptyTrashTaskDescriptor.ID);
+    ScheduledServicePropertyResource property = new ScheduledServicePropertyResource();
+    property.setKey(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID);
+    task.setProperties(Lists.newArrayList(property));
 
-        Calendar cal = Calendar.getInstance();
+    Calendar cal = Calendar.getInstance();
 
-        // simulating client timezone here: calculate offset from current timezone
+    // simulating client timezone here: calculate offset from current timezone
 
-        // client is tz+2 -> 3 hours ahead for local tz is one hour ahead for client tz
-        cal.add( Calendar.HOUR_OF_DAY, 3 );
-        task.setStartTime( new SimpleDateFormat( "HH:mm" ).format( cal.getTime() ) );
+    // client is tz+2 -> 3 hours ahead for local tz is one hour ahead for client tz
+    cal.add(Calendar.HOUR_OF_DAY, 3);
+    task.setStartTime(new SimpleDateFormat("HH:mm").format(cal.getTime()));
 
-        cal.set( Calendar.HOUR_OF_DAY, 0 );
-        cal.set( Calendar.MINUTE, 0 );
-        cal.set( Calendar.SECOND, 0 );
-        cal.set( Calendar.MILLISECOND, 0 );
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
 
-        // client is tz+2 -> midnight for client happens 2 hours before servers midnight
-        cal.add( Calendar.HOUR_OF_DAY, -2 );
-        task.setStartDate( String.valueOf( cal.getTimeInMillis() ) );
+    // client is tz+2 -> midnight for client happens 2 hours before servers midnight
+    cal.add(Calendar.HOUR_OF_DAY, -2);
+    task.setStartDate(String.valueOf(cal.getTimeInMillis()));
 
-        log.debug( "request dates:\nmidnight: {}\ntime offset: {}", cal.getTime(), task.getStartTime() );
+    log.debug("request dates:\nmidnight: {}\ntime offset: {}", cal.getTime(), task.getStartTime());
 
-        assertThat( TaskScheduleUtil.create( task ), NexusRequestMatchers.hasStatusCode( 201 ) );
-    }
+    assertThat(TaskScheduleUtil.create(task), NexusRequestMatchers.hasStatusCode(201));
+  }
 
 }
