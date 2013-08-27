@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.support;
 
 import java.util.Map;
@@ -24,13 +25,13 @@ import java.util.Map;
 public interface Filter
 {
 
-    /**
-     * Filters placeholders.
-     *
-     * @param context filtering context. Cannot be null.
-     * @param value   value to be filtered. Cannot be null.
-     * @return filtered value. If null the filter is not considered in filtering chain.
-     */
-    String filter( final Map<String, String> context, String value );
+  /**
+   * Filters placeholders.
+   *
+   * @param context filtering context. Cannot be null.
+   * @param value   value to be filtered. Cannot be null.
+   * @return filtered value. If null the filter is not considered in filtering chain.
+   */
+  String filter(final Map<String, String> context, String value);
 
 }

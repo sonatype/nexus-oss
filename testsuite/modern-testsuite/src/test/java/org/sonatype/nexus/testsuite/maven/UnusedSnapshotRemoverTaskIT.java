@@ -10,22 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.maven;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
+package org.sonatype.nexus.testsuite.maven;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
@@ -35,121 +26,124 @@ import org.sonatype.nexus.testsuite.client.Scheduler;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.sonatype.sisu.goodies.common.Time;
+
 import com.google.common.collect.Maps;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.filetasks.builder.FileRef.file;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * ITs related to unused snapshots remover task.
  *
  * @since 2.7.0
  */
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
+@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public class UnusedSnapshotRemoverTaskIT
     extends NexusRunningParametrizedITSupport
 {
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            testParameters(
-                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
-            )
-        ).load();
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        testParameters(
+            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
+        )
+    ).load();
+  }
+
+  public UnusedSnapshotRemoverTaskIT(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
+
+  @Override
+  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+    return configuration
+        .setLogLevel("org.sonatype.nexus.maven.tasks", "TRACE");
+  }
+
+  @Test
+  public void removeUnusedSnapshots()
+      throws Exception
+  {
+    final MavenHostedRepository repository = repositories()
+        .create(MavenHostedRepository.class, repositoryIdForTest())
+        .withRepoPolicy("SNAPSHOT")
+        .excludeFromSearchResults()
+        .save();
+
+    final long today = System.currentTimeMillis();
+    final long fiveDaysAgo = today - Time.days(5).toMillis();
+
+    tasks().copy().directory(file(testData().resolveFile("removeUnusedSnapshots-storage")))
+        .to().directory(file(new File(nexus().getWorkDirectory(), "storage/" + repository.id())))
+        .filterUsing("today", String.valueOf(today))
+        .filterUsing("fiveDaysAgo", String.valueOf(fiveDaysAgo))
+        .run();
+
+    final Map<String, String> taskProperties = Maps.newHashMap();
+    taskProperties.put("repositoryId", repository.id());
+    taskProperties.put("daysSinceLastRequested", "4");
+
+    scheduler().run("UnusedSnapshotRemoverTask", taskProperties);
+
+    // the following have requested timestamp = today
+    assertExists(repository.id(), "20130102.120000-2.pom");
+    assertExists(repository.id(), "20130102.120000-2.jar");
+    assertExists(repository.id(), "20130102.120000-2-copy.jar");
+
+    // the following have requested timestamp = fiveDaysAgo
+    assertDoesNotExists(repository.id(), "20130101.120000-1.pom");
+    assertDoesNotExists(repository.id(), "20130101.120000-1.jar");
+    assertDoesNotExists(repository.id(), "20130101.120000-1-copy.jar");
+
+    // the following have requested timestamp = fiveDaysAgo
+    assertDoesNotExists(repository.id(), "20130103.120000-3.pom");
+  }
+
+  private void assertExists(final String repositoryId, final String name)
+      throws Exception
+  {
+    content().download(
+        repositoryLocation(repositoryId, "aopalliance/aopalliance/1.0-SNAPSHOT/aopalliance-1.0-" + name),
+        new File(testIndex().getDirectory("downloads"), "aopalliance-1.0-" + name)
+    );
+  }
+
+  private void assertDoesNotExists(final String repositoryId, final String name)
+      throws Exception
+  {
+    try {
+      content().download(
+          repositoryLocation(repositoryId, "aopalliance/aopalliance/1.0-SNAPSHOT/aopalliance-1.0-" + name),
+          new File(testIndex().getDirectory("downloads"), "aopalliance-1.0-" + name)
+      );
+      assertThat(
+          "Snapshot was not removed: aopalliance/aopalliance/1.0-SNAPSHOT/aopalliance-1.0-" + name, false
+      );
     }
-
-    public UnusedSnapshotRemoverTaskIT( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
+    catch (NexusClientNotFoundException e) {
+      // expected
     }
+  }
 
-    @Override
-    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
-    {
-        return configuration
-            .setLogLevel( "org.sonatype.nexus.maven.tasks", "TRACE" );
-    }
+  private Repositories repositories() {
+    return client().getSubsystem(Repositories.class);
+  }
 
-    @Test
-    public void removeUnusedSnapshots()
-        throws Exception
-    {
-        final MavenHostedRepository repository = repositories()
-            .create( MavenHostedRepository.class, repositoryIdForTest() )
-            .withRepoPolicy( "SNAPSHOT" )
-            .excludeFromSearchResults()
-            .save();
+  private Scheduler scheduler() {
+    return client().getSubsystem(Scheduler.class);
+  }
 
-        final long today = System.currentTimeMillis();
-        final long fiveDaysAgo = today - Time.days( 5 ).toMillis();
-
-        tasks().copy().directory( file( testData().resolveFile( "removeUnusedSnapshots-storage" ) ) )
-            .to().directory( file( new File( nexus().getWorkDirectory(), "storage/" + repository.id() ) ) )
-            .filterUsing( "today", String.valueOf( today ) )
-            .filterUsing( "fiveDaysAgo", String.valueOf( fiveDaysAgo ) )
-            .run();
-
-        final Map<String, String> taskProperties = Maps.newHashMap();
-        taskProperties.put( "repositoryId", repository.id() );
-        taskProperties.put( "daysSinceLastRequested", "4" );
-
-        scheduler().run( "UnusedSnapshotRemoverTask", taskProperties );
-
-        // the following have requested timestamp = today
-        assertExists( repository.id(), "20130102.120000-2.pom" );
-        assertExists( repository.id(), "20130102.120000-2.jar" );
-        assertExists( repository.id(), "20130102.120000-2-copy.jar" );
-
-        // the following have requested timestamp = fiveDaysAgo
-        assertDoesNotExists( repository.id(), "20130101.120000-1.pom" );
-        assertDoesNotExists( repository.id(), "20130101.120000-1.jar" );
-        assertDoesNotExists( repository.id(), "20130101.120000-1-copy.jar" );
-
-        // the following have requested timestamp = fiveDaysAgo
-        assertDoesNotExists( repository.id(), "20130103.120000-3.pom" );
-    }
-
-    private void assertExists( final String repositoryId, final String name )
-        throws Exception
-    {
-        content().download(
-            repositoryLocation( repositoryId, "aopalliance/aopalliance/1.0-SNAPSHOT/aopalliance-1.0-" + name ),
-            new File( testIndex().getDirectory( "downloads" ), "aopalliance-1.0-" + name )
-        );
-    }
-
-    private void assertDoesNotExists( final String repositoryId, final String name )
-        throws Exception
-    {
-        try
-        {
-            content().download(
-                repositoryLocation( repositoryId, "aopalliance/aopalliance/1.0-SNAPSHOT/aopalliance-1.0-" + name ),
-                new File( testIndex().getDirectory( "downloads" ), "aopalliance-1.0-" + name )
-            );
-            assertThat(
-                "Snapshot was not removed: aopalliance/aopalliance/1.0-SNAPSHOT/aopalliance-1.0-" + name, false
-            );
-        }
-        catch ( NexusClientNotFoundException e )
-        {
-            // expected
-        }
-    }
-
-    private Repositories repositories()
-    {
-        return client().getSubsystem( Repositories.class );
-    }
-
-    private Scheduler scheduler()
-    {
-        return client().getSubsystem( Scheduler.class );
-    }
-
-    private Content content()
-    {
-        return client().getSubsystem( Content.class );
-    }
+  private Content content() {
+    return client().getSubsystem(Content.class);
+  }
 
 }

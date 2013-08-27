@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus639;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
@@ -24,6 +23,8 @@ import org.sonatype.nexus.timeline.tasks.PurgeTimelineTaskDescriptor;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test if the Purge Timeline Task works.
@@ -32,29 +33,29 @@ public class Nexus639PurgeTaskIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
-    public void doPurgeTaskTest()
-        throws Exception
-    {
-        // an artifact was deployed already, so test the deploy feed has something.
+  @Test
+  public void doPurgeTaskTest()
+      throws Exception
+  {
+    // an artifact was deployed already, so test the deploy feed has something.
 
-        SyndFeed feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
-        List<SyndEntry> entries = feed.getEntries();
+    SyndFeed feed = FeedUtil.getFeed("recentlyDeployedArtifacts");
+    List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected artifacts in the recentlyDeployed feed.", entries.size() > 0 );
+    Assert.assertTrue("Expected artifacts in the recentlyDeployed feed.", entries.size() > 0);
 
-        // run the purge task for everything
-        ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "purgeOlderThan" );
-        repo.setValue( "0" );
-        TaskScheduleUtil.runTask( "purge", PurgeTimelineTaskDescriptor.ID, repo );
+    // run the purge task for everything
+    ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
+    repo.setKey("purgeOlderThan");
+    repo.setValue("0");
+    TaskScheduleUtil.runTask("purge", PurgeTimelineTaskDescriptor.ID, repo);
 
-        // validate the feeds contain nothing.
+    // validate the feeds contain nothing.
 
-        feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
-        entries = feed.getEntries();
+    feed = FeedUtil.getFeed("recentlyDeployedArtifacts");
+    entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected ZERO artifacts in the recentlyDeployed feed.", entries.size() == 0 );
-    }
+    Assert.assertTrue("Expected ZERO artifacts in the recentlyDeployed feed.", entries.size() == 0);
+  }
 
 }

@@ -10,15 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus394;
+
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
 
 /**
  * Test the privilege for forgot password.
@@ -26,30 +28,30 @@ import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
 public class Nexus394ForgotPasswordWithoutPermissionIT
     extends AbstractPrivilegeTest
 {
-	
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
 
-    @Test
-    public void withoutPermission()
-        throws Exception
-    {
-        overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-forgot", "1", "2" /* login */, "6", "14", "17",
-            "19", "44", "54", "55", /* "57" forgot, */"58", "59", "T1", "T2" );
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+  @Test
+  public void withoutPermission()
+      throws Exception
+  {
+    overwriteUserRole(TEST_USER_NAME, "anonymous-with-login-but-forgot", "1", "2" /* login */, "6", "14", "17",
+        "19", "44", "54", "55", /* "57" forgot, */"58", "59", "T1", "T2");
 
-        // NOT Should be able to forgot anyone password
-        Response response =
-            ForgotPasswordUtils.get( this ).recoverUserPassword( "anonymous", "changeme2@yourcompany.com" );
-        Assert.assertEquals( "Status", response.getStatus().getCode(), 403 );
+    TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
+    TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-        // NOT Should be able to forgot my own password
-        response = ForgotPasswordUtils.get( this ).recoverUserPassword( TEST_USER_NAME, "nexus-dev2@sonatype.org" );
-        Assert.assertEquals( "Status", response.getStatus().getCode(), 403 );
+    // NOT Should be able to forgot anyone password
+    Response response =
+        ForgotPasswordUtils.get(this).recoverUserPassword("anonymous", "changeme2@yourcompany.com");
+    Assert.assertEquals("Status", response.getStatus().getCode(), 403);
 
-    }
+    // NOT Should be able to forgot my own password
+    response = ForgotPasswordUtils.get(this).recoverUserPassword(TEST_USER_NAME, "nexus-dev2@sonatype.org");
+    Assert.assertEquals("Status", response.getStatus().getCode(), 403);
+
+  }
 }

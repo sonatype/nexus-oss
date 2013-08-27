@@ -10,137 +10,119 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.integrationtests;
 
-import static com.google.common.base.Preconditions.checkState;
+package org.sonatype.nexus.integrationtests;
 
 import java.util.HashMap;
 
+import static com.google.common.base.Preconditions.checkState;
+
 public class TestContext
 {
-    private boolean secureTest;
+  private boolean secureTest;
 
-    private String username;
+  private String username;
 
-    private String password;
+  private String password;
 
-    private String adminUsername;
+  private String adminUsername;
 
-    private String adminPassword;
+  private String adminPassword;
 
-    private String nexusUrl;
+  private String nexusUrl;
 
-    private final HashMap<String, Object> map;
+  private final HashMap<String, Object> map;
 
-    public TestContext()
-    {
-        map = new HashMap<String, Object>();
-        // nexusUrl is set only once, it does not change (for now)
-        nexusUrl = null;
-        reset();
+  public TestContext() {
+    map = new HashMap<String, Object>();
+    // nexusUrl is set only once, it does not change (for now)
+    nexusUrl = null;
+    reset();
+  }
+
+  public void reset() {
+    secureTest = false;
+    adminUsername = "admin";
+    adminPassword = "admin123";
+    username = adminUsername;
+    password = adminPassword;
+    map.clear();
+  }
+
+  public Object getObject(final String key) {
+    return map.get(key);
+  }
+
+  public boolean getBoolean(final String key) {
+    if (map.containsKey(key)) {
+      return (Boolean) map.get(key);
     }
 
-    public void reset()
-    {
-        secureTest = false;
-        adminUsername = "admin";
-        adminPassword = "admin123";
-        username = adminUsername;
-        password = adminPassword;
-        map.clear();
-    }
+    return false;
+  }
 
-    public Object getObject( final String key )
-    {
-        return map.get( key );
-    }
+  public void put(final String key, final Object value) {
+    this.map.put(key, value);
+  }
 
-    public boolean getBoolean( final String key )
-    {
-        if ( map.containsKey( key ) )
-        {
-            return (Boolean) map.get( key );
-        }
+  public boolean isSecureTest() {
+    return secureTest;
+  }
 
-        return false;
-    }
+  public TestContext setSecureTest(final boolean secureTest) {
+    this.secureTest = secureTest;
+    return this;
+  }
 
-    public void put( final String key, final Object value )
-    {
-        this.map.put( key, value );
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public boolean isSecureTest()
-    {
-        return secureTest;
-    }
+  public TestContext setUsername(final String username) {
+    this.username = username;
+    return this;
+  }
 
-    public TestContext setSecureTest( final boolean secureTest )
-    {
-        this.secureTest = secureTest;
-        return this;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public TestContext setPassword(final String password) {
+    this.password = password;
+    return this;
+  }
 
-    public TestContext setUsername( final String username )
-    {
-        this.username = username;
-        return this;
-    }
+  public String getAdminUsername() {
+    return adminUsername;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public TestContext setAdminUsername(final String adminUsername) {
+    this.adminUsername = adminUsername;
+    return this;
+  }
 
-    public TestContext setPassword( final String password )
-    {
-        this.password = password;
-        return this;
-    }
+  public String getAdminPassword() {
+    return adminPassword;
+  }
 
-    public String getAdminUsername()
-    {
-        return adminUsername;
-    }
+  public TestContext setAdminPassword(final String adminPassword) {
+    this.adminPassword = adminPassword;
+    return this;
+  }
 
-    public TestContext setAdminUsername( final String adminUsername )
-    {
-        this.adminUsername = adminUsername;
-        return this;
-    }
+  public TestContext useAdminForRequests() {
+    this.username = this.adminUsername;
+    this.password = this.adminPassword;
+    return this;
+  }
 
-    public String getAdminPassword()
-    {
-        return adminPassword;
-    }
+  public String getNexusUrl() {
+    checkState(nexusUrl != null, "Nexus URL not set");
+    return nexusUrl;
+  }
 
-    public TestContext setAdminPassword( final String adminPassword )
-    {
-        this.adminPassword = adminPassword;
-        return this;
-    }
-
-    public TestContext useAdminForRequests()
-    {
-        this.username = this.adminUsername;
-        this.password = this.adminPassword;
-        return this;
-    }
-
-    public String getNexusUrl()
-    {
-        checkState( nexusUrl != null, "Nexus URL not set" );
-        return nexusUrl;
-    }
-
-    public TestContext setNexusUrl( final String nexusUrl )
-    {
-        this.nexusUrl = nexusUrl;
-        return this;
-    }
+  public TestContext setNexusUrl(final String nexusUrl) {
+    this.nexusUrl = nexusUrl;
+    return this;
+  }
 }

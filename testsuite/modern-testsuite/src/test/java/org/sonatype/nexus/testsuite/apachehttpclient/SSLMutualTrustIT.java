@@ -10,23 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.apachehttpclient;
 
-import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
+package org.sonatype.nexus.testsuite.apachehttpclient;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
@@ -37,107 +28,111 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+
+import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
+
 /**
  * ITs related accessing a remote server that requires mutual trust client trusts server / server trusts client).
  *
  * @since 2.5.1
  */
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
+@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public class SSLMutualTrustIT
     extends NexusRunningParametrizedITSupport
 {
 
-    private Server httpsRemoteServer;
+  private Server httpsRemoteServer;
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            testParameters( $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" ) )
-        ).load();
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        testParameters($("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle"))
+    ).load();
+  }
 
-    public SSLMutualTrustIT( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  public SSLMutualTrustIT(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
 
-    @Override
-    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
-    {
-        return super.configureNexus( configuration )
-            .setSystemProperty( "javax.net.ssl.keyStore", testData().resolveFile( "keystore-client" ).getAbsolutePath() )
-            .setSystemProperty( "javax.net.ssl.keyStorePassword", "changeit" )
-            .setSystemProperty( "javax.net.ssl.trustStore", testData().resolveFile( "truststore-client" ).getAbsolutePath() )
-            .setSystemProperty( "javax.net.ssl.trustStorePassword", "changeit" );
-    }
+  @Override
+  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+    return super.configureNexus(configuration)
+        .setSystemProperty("javax.net.ssl.keyStore", testData().resolveFile("keystore-client").getAbsolutePath())
+        .setSystemProperty("javax.net.ssl.keyStorePassword", "changeit")
+        .setSystemProperty("javax.net.ssl.trustStore", testData().resolveFile("truststore-client").getAbsolutePath())
+        .setSystemProperty("javax.net.ssl.trustStorePassword", "changeit");
+  }
 
-    @Before
-    public void initRemoteServer()
-        throws Exception
-    {
-        httpsRemoteServer = Server
-            .withPort( 0 )
-            .withKeystore( testData().resolveFile( "keystore-jetty" ).getAbsolutePath(), "changeit" )
-            .withTruststore( testData().resolveFile( "truststore-jetty" ).getAbsolutePath(), "changeit" )
-            .requireClientAuth()
-            .serve( "/*" ).withBehaviours( Behaviours.get( testData().resolveFile( "remote-repo" ) ) )
-            .start();
-    }
+  @Before
+  public void initRemoteServer()
+      throws Exception
+  {
+    httpsRemoteServer = Server
+        .withPort(0)
+        .withKeystore(testData().resolveFile("keystore-jetty").getAbsolutePath(), "changeit")
+        .withTruststore(testData().resolveFile("truststore-jetty").getAbsolutePath(), "changeit")
+        .requireClientAuth()
+        .serve("/*").withBehaviours(Behaviours.get(testData().resolveFile("remote-repo")))
+        .start();
+  }
 
-    @After
-    public void stopRemoteServer()
-        throws Exception
-    {
-        if ( httpsRemoteServer != null )
-        {
-            httpsRemoteServer.stop();
-        }
+  @After
+  public void stopRemoteServer()
+      throws Exception
+  {
+    if (httpsRemoteServer != null) {
+      httpsRemoteServer.stop();
     }
+  }
 
-    /**
-     *
-     */
-    @Test
-    public void downloadFromRemoteRequiringMutualTrust()
-        throws Exception
-    {
-        final MavenProxyRepository repository = createMavenProxyRepository( httpsRemoteServer );
-        downloadArtifact( repository.id() );
-    }
+  /**
+   *
+   */
+  @Test
+  public void downloadFromRemoteRequiringMutualTrust()
+      throws Exception
+  {
+    final MavenProxyRepository repository = createMavenProxyRepository(httpsRemoteServer);
+    downloadArtifact(repository.id());
+  }
 
-    private void downloadArtifact( final String repositoryId )
-        throws IOException
-    {
-        content().download(
-            repositoryLocation( repositoryId, "com/someorg/artifact/1.0/artifact-1.0.pom" ),
-            new File( testIndex().getDirectory( "downloads" ), "artifact-1.0.pom" )
-        );
-    }
+  private void downloadArtifact(final String repositoryId)
+      throws IOException
+  {
+    content().download(
+        repositoryLocation(repositoryId, "com/someorg/artifact/1.0/artifact-1.0.pom"),
+        new File(testIndex().getDirectory("downloads"), "artifact-1.0.pom")
+    );
+  }
 
-    private MavenProxyRepository createMavenProxyRepository( final Server remoteServer )
-        throws MalformedURLException
-    {
-        return repositories()
-            .create( MavenProxyRepository.class, repositoryIdForTest() )
-            .asProxyOf( remoteServer.getUrl().toExternalForm() )
-            .save();
-    }
+  private MavenProxyRepository createMavenProxyRepository(final Server remoteServer)
+      throws MalformedURLException
+  {
+    return repositories()
+        .create(MavenProxyRepository.class, repositoryIdForTest())
+        .asProxyOf(remoteServer.getUrl().toExternalForm())
+        .save();
+  }
 
-    public ServerConfiguration config()
-    {
-        return client().getSubsystem( ServerConfiguration.class );
-    }
+  public ServerConfiguration config() {
+    return client().getSubsystem(ServerConfiguration.class);
+  }
 
-    public Repositories repositories()
-    {
-        return client().getSubsystem( Repositories.class );
-    }
+  public Repositories repositories() {
+    return client().getSubsystem(Repositories.class);
+  }
 
-    public Content content()
-    {
-        return client().getSubsystem( Content.class );
-    }
+  public Content content() {
+    return client().getSubsystem(Content.class);
+  }
 
 }

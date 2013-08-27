@@ -10,25 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.client.exception;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.testsuite.client.exception;
 
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.sisu.goodies.common.Time;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Thrown when waiting for Nexus to not run routing jobs but some jobs are still running in the configured timeout
  * period.
- * 
+ *
  * @since 2.4
  */
 public class RoutingJobsAreStillRunningException
     extends NexusClientException
 {
-    public RoutingJobsAreStillRunningException( final Time timeout )
-    {
-        super( "Nexus was still running routing update jobs, configured timeout of "
-            + checkNotNull( timeout.toString() ) );
-    }
+  public RoutingJobsAreStillRunningException(final Time timeout) {
+    super("Nexus was still running routing update jobs, configured timeout of "
+        + checkNotNull(timeout.toString()));
+  }
 }

@@ -10,24 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.tasks.api;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.scheduling.ScheduledTask;
+
+import org.restlet.Context;
+import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Run a specified task by type, using task parameters provided as query parameters.
@@ -40,69 +43,59 @@ public class TasksRunPlexusResource
     extends AbstractPlexusResource
 {
 
-    private static final String RESOURCE_URI = "/tasks/run/{taskType}";
+  private static final String RESOURCE_URI = "/tasks/run/{taskType}";
 
-    private final NexusScheduler nexusScheduler;
+  private final NexusScheduler nexusScheduler;
 
-    @Inject
-    public TasksRunPlexusResource( final NexusScheduler nexusScheduler )
-    {
-        this.nexusScheduler = checkNotNull( nexusScheduler );
-    }
+  @Inject
+  public TasksRunPlexusResource(final NexusScheduler nexusScheduler) {
+    this.nexusScheduler = checkNotNull(nexusScheduler);
+  }
 
-    @Override
-    public String getResourceUri()
-    {
-        return RESOURCE_URI;
-    }
+  @Override
+  public String getResourceUri() {
+    return RESOURCE_URI;
+  }
 
-    @Override
-    public boolean isModifiable()
-    {
-        return true;
-    }
+  @Override
+  public boolean isModifiable() {
+    return true;
+  }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( "/tasks/run/*/**", "anon" );
-    }
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor("/tasks/run/*/**", "anon");
+  }
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
-    }
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
 
-    @Override
-    public Object post( final Context context, final Request request, final Response response, final Object payload )
-        throws ResourceException
-    {
-        final String taskType = request.getAttributes().get( "taskType" ).toString();
+  @Override
+  public Object post(final Context context, final Request request, final Response response, final Object payload)
+      throws ResourceException
+  {
+    final String taskType = request.getAttributes().get("taskType").toString();
 
-        if ( taskType != null )
-        {
-            final NexusTask<?> taskInstance = nexusScheduler.createTaskInstance( taskType );
-            final Map<String, String> valuesMap = request.getResourceRef().getQueryAsForm().getValuesMap();
-            if ( valuesMap != null && !valuesMap.isEmpty() )
-            {
-                for ( Map.Entry<String, String> entry : valuesMap.entrySet() )
-                {
-                    taskInstance.addParameter( entry.getKey(), entry.getValue() );
-                }
-            }
-            final ScheduledTask<?> scheduledTask = nexusScheduler.submit( taskType, taskInstance );
-            try
-            {
-                scheduledTask.get();
-            }
-            catch ( Exception e )
-            {
-                throw new ResourceException( e );
-            }
+    if (taskType != null) {
+      final NexusTask<?> taskInstance = nexusScheduler.createTaskInstance(taskType);
+      final Map<String, String> valuesMap = request.getResourceRef().getQueryAsForm().getValuesMap();
+      if (valuesMap != null && !valuesMap.isEmpty()) {
+        for (Map.Entry<String, String> entry : valuesMap.entrySet()) {
+          taskInstance.addParameter(entry.getKey(), entry.getValue());
         }
-
-        return null;
+      }
+      final ScheduledTask<?> scheduledTask = nexusScheduler.submit(taskType, taskInstance);
+      try {
+        scheduledTask.get();
+      }
+      catch (Exception e) {
+        throw new ResourceException(e);
+      }
     }
+
+    return null;
+  }
 
 }

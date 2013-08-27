@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils.plugin;
 
 import org.sonatype.nexus.test.utils.XStreamConfigurator;
@@ -19,34 +20,30 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Plugin XStream factory, meant for Plugin ITs, that applies Nexus Core configuration, but also add preferred (usually
  * plugin-specific) configuration too.
- * 
+ *
  * @author cstamas
  */
 public class XStreamFactory
 {
-    public static XStream getXmlXStream( XStreamConfigurator configurator )
-    {
-        XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getXmlXStream();
+  public static XStream getXmlXStream(XStreamConfigurator configurator) {
+    XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getXmlXStream();
 
-        configureXStream( xs, configurator );
+    configureXStream(xs, configurator);
 
-        return xs;
+    return xs;
+  }
+
+  public static XStream getJsonXStream(XStreamConfigurator configurator) {
+    XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getJsonXStream();
+
+    configureXStream(xs, configurator);
+
+    return xs;
+  }
+
+  private static void configureXStream(XStream xstream, XStreamConfigurator configurator) {
+    if (configurator != null) {
+      configurator.configure(xstream);
     }
-
-    public static XStream getJsonXStream( XStreamConfigurator configurator )
-    {
-        XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getJsonXStream();
-
-        configureXStream( xs, configurator );
-
-        return xs;
-    }
-
-    private static void configureXStream( XStream xstream, XStreamConfigurator configurator )
-    {
-        if ( configurator != null )
-        {
-            configurator.configure( xstream );
-        }
-    }
+  }
 }

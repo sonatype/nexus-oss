@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
@@ -21,102 +22,86 @@ import org.apache.maven.it.Verifier;
 public class AbstractMavenNexusIT
     extends AbstractNexusIntegrationTest
 {
-    private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
+  private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
 
-    public AbstractMavenNexusIT()
-    {
-        super();
-    }
+  public AbstractMavenNexusIT() {
+    super();
+  }
 
-    public AbstractMavenNexusIT( String testRepositoryId )
-    {
-        super( testRepositoryId );
-    }
+  public AbstractMavenNexusIT(String testRepositoryId) {
+    super(testRepositoryId);
+  }
 
-    protected MavenVerifierHelper getMavenVerifierHelper()
-    {
-        return getStaticMavenVerifierHelper();
-    }
+  protected MavenVerifierHelper getMavenVerifierHelper() {
+    return getStaticMavenVerifierHelper();
+  }
 
-    private static MavenVerifierHelper getStaticMavenVerifierHelper()
-    {
-        return mavenVerifierHelper;
-    }
+  private static MavenVerifierHelper getStaticMavenVerifierHelper() {
+    return mavenVerifierHelper;
+  }
 
-    @Deprecated
-    public Verifier createVerifier( File mavenProject )
-        throws VerificationException, IOException
-    {
-        return createVerifier( mavenProject, null );
-    }
+  @Deprecated
+  public Verifier createVerifier(File mavenProject)
+      throws VerificationException, IOException
+  {
+    return createVerifier(mavenProject, null);
+  }
 
-    /**
-     * Create a nexus verifier instance
-     * 
-     * @param mavenProject Maven Project folder
-     * @param settings A settings.xml file
-     * @return
-     * @throws VerificationException
-     * @throws IOException
-     */
-    @Deprecated
-    public Verifier createVerifier( File mavenProject, File settings )
-        throws VerificationException, IOException
-    {
-        if ( settings == null )
-        {
-            settings = getOverridableFile( "settings.xml" );
-        }
-        return createMavenVerifier( mavenProject, settings, getTestId() );
+  /**
+   * Create a nexus verifier instance
+   *
+   * @param mavenProject Maven Project folder
+   * @param settings     A settings.xml file
+   */
+  @Deprecated
+  public Verifier createVerifier(File mavenProject, File settings)
+      throws VerificationException, IOException
+  {
+    if (settings == null) {
+      settings = getOverridableFile("settings.xml");
     }
+    return createMavenVerifier(mavenProject, settings, getTestId());
+  }
 
-    @Deprecated
-    public static Verifier createMavenVerifier( File mavenProject, File settings, String testId )
-        throws VerificationException, IOException
-    {
-        String logname = "logs/maven-execution/" + testId + "/" + mavenProject.getName() + ".log";
-        final File logFile = new File( mavenProject, logname );
-        logFile.getParentFile().mkdirs();
-        final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment( logname, settings, mavenProject );
-        cleanRepository( mavenDeployment.getLocalRepositoryFile(), testId );
-        return getStaticMavenVerifierHelper().createMavenVerifier( mavenDeployment );
-    }
+  @Deprecated
+  public static Verifier createMavenVerifier(File mavenProject, File settings, String testId)
+      throws VerificationException, IOException
+  {
+    String logname = "logs/maven-execution/" + testId + "/" + mavenProject.getName() + ".log";
+    final File logFile = new File(mavenProject, logname);
+    logFile.getParentFile().mkdirs();
+    final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment(logname, settings, mavenProject);
+    cleanRepository(mavenDeployment.getLocalRepositoryFile(), testId);
+    return getStaticMavenVerifierHelper().createMavenVerifier(mavenDeployment);
+  }
 
-    /**
-     * Remove all artifacts on <code>testId</code> groupId
-     * 
-     * @param verifier
-     * @throws IOException
-     */
-    @Deprecated
-    public void cleanRepository( File mavenRepo )
-        throws IOException
-    {
-        cleanRepository( mavenRepo, getTestId() );
-    }
+  /**
+   * Remove all artifacts on <code>testId</code> groupId
+   */
+  @Deprecated
+  public void cleanRepository(File mavenRepo)
+      throws IOException
+  {
+    cleanRepository(mavenRepo, getTestId());
+  }
 
-    /**
-     * Remove all artifacts on <code>testId</code> groupId
-     * 
-     * @param verifier
-     * @throws IOException
-     */
-    @Deprecated
-    public static void cleanRepository( File mavenRepo, String testId )
-        throws IOException
-    {
-        getStaticMavenVerifierHelper().cleanRepository( mavenRepo, testId );
-    }
+  /**
+   * Remove all artifacts on <code>testId</code> groupId
+   */
+  @Deprecated
+  public static void cleanRepository(File mavenRepo, String testId)
+      throws IOException
+  {
+    getStaticMavenVerifierHelper().cleanRepository(mavenRepo, testId);
+  }
 
-    /**
-     * Workaround to get some decent logging when tests fail
-     * 
-     * @throws IOException
-     */
-    @Deprecated
-    protected void failTest( Verifier verifier )
-        throws IOException
-    {
-        getStaticMavenVerifierHelper().failTest( verifier );
-    }
+  /**
+   * Workaround to get some decent logging when tests fail
+   */
+  @Deprecated
+  protected void failTest(Verifier verifier)
+      throws IOException
+  {
+    getStaticMavenVerifierHelper().failTest(verifier);
+  }
 }

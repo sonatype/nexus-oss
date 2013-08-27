@@ -10,16 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.ithelper.log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.log.LogConfigurationParticipant;
+
 import com.google.common.io.Closeables;
 
 /**
@@ -33,29 +36,25 @@ public class TestLogConfigurationParticipant
     implements LogConfigurationParticipant
 {
 
-    @Override
-    public String getName()
-    {
-        return "logback-test.xml";
-    }
+  @Override
+  public String getName() {
+    return "logback-test.xml";
+  }
 
-    @Override
-    public InputStream getConfiguration()
-    {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintWriter writer = null;
-        try
-        {
-            writer = new PrintWriter( baos );
-            writer.println( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
-            writer.println();
-            writer.println( "<included/>" );
-        }
-        finally
-        {
-            Closeables.closeQuietly( writer );
-        }
-        return new ByteArrayInputStream( baos.toByteArray() );
+  @Override
+  public InputStream getConfiguration() {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintWriter writer = null;
+    try {
+      writer = new PrintWriter(baos);
+      writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+      writer.println();
+      writer.println("<included/>");
     }
+    finally {
+      Closeables.closeQuietly(writer);
+    }
+    return new ByteArrayInputStream(baos.toByteArray());
+  }
 
 }

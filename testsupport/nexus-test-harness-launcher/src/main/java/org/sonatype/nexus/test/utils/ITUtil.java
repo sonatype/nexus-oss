@@ -10,27 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 /**
  * Very simple superclass.
- * 
+ *
  * @author cstamas
  */
 public class ITUtil
 {
-    protected final AbstractNexusIntegrationTest test;
-    
-    public ITUtil( AbstractNexusIntegrationTest test )
-    {
-        super();
-        this.test = test;
-    }
+  protected final AbstractNexusIntegrationTest test;
 
-    public AbstractNexusIntegrationTest getTest()
-    {
-        return test;
-    }
+  public ITUtil(AbstractNexusIntegrationTest test) {
+    super();
+    this.test = test;
+  }
+
+  public AbstractNexusIntegrationTest getTest() {
+    return test;
+  }
 }

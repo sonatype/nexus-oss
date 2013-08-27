@@ -10,7 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.support;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -24,12 +32,6 @@ import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logFil
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
-
 /**
  * Test starting and stopping of Nexus using parameters.
  *
@@ -39,71 +41,67 @@ public class StartAndStopNexusRunningParametrizedIT
     extends NexusRunningParametrizedITSupport
 {
 
-    // Uncomment the following line to suppress default parameters lookup and use test specific ones
-    // @Parameterized.Parameters
-    public static Collection<Object[]> testSpecificParameters()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            testParameters( StartAndStopNexusRunningParametrizedIT.class )
-        ).load();
-    }
+  // Uncomment the following line to suppress default parameters lookup and use test specific ones
+  // @Parameterized.Parameters
+  public static Collection<Object[]> testSpecificParameters() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        testParameters(StartAndStopNexusRunningParametrizedIT.class)
+    ).load();
+  }
 
-    // Uncomment the following line to suppress default parameters lookup and use the ones specified by the method
-    // @Parameterized.Parameters
-    public static Collection<Object[]> hardcodedParameters()
-    {
-        return Arrays.asList( new Object[][]{
-            { "org.sonatype.nexus.assemblies:nexus-bundle-template:zip:bundle:${project.version}" },
-        } );
-    }
+  // Uncomment the following line to suppress default parameters lookup and use the ones specified by the method
+  // @Parameterized.Parameters
+  public static Collection<Object[]> hardcodedParameters() {
+    return Arrays.asList(new Object[][]{
+        {"org.sonatype.nexus.assemblies:nexus-bundle-template:zip:bundle:${project.version}"},
+    });
+  }
 
-    // Uncomment the following line to suppress default parameters lookup and use test specific ones
-    // @Parameterized.Parameters
-    public static Collection<Object[]> hardcodedAndSystemProperties()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            testParameters(
-                $( "org.sonatype.nexus.assemblies:nexus-bundle-template:zip:bundle:${project.version}" )
-            )
-        ).load();
-    }
+  // Uncomment the following line to suppress default parameters lookup and use test specific ones
+  // @Parameterized.Parameters
+  public static Collection<Object[]> hardcodedAndSystemProperties() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        testParameters(
+            $("org.sonatype.nexus.assemblies:nexus-bundle-template:zip:bundle:${project.version}")
+        )
+    ).load();
+  }
 
-    public StartAndStopNexusRunningParametrizedIT( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  public StartAndStopNexusRunningParametrizedIT(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
 
-    /**
-     * Given a running/started nexus it checks that:<br/>
-     * - Nexus instance is set<br/>
-     * - Nexus state is set<br/>
-     * - Nexus state confirms that is running<br/>
-     * - Nexus responds with 200 at provided URL
-     *
-     * @throws Exception re-thrown
-     */
-    @Test
-    public void startAndStop()
-        throws Exception
-    {
-        assertThat( nexus(), is( notNullValue() ) );
-        assertThat( nexus().isRunning(), is( true ) );
+  /**
+   * Given a running/started nexus it checks that:<br/>
+   * - Nexus instance is set<br/>
+   * - Nexus state is set<br/>
+   * - Nexus state confirms that is running<br/>
+   * - Nexus responds with 200 at provided URL
+   *
+   * @throws Exception re-thrown
+   */
+  @Test
+  public void startAndStop()
+      throws Exception
+  {
+    assertThat(nexus(), is(notNullValue()));
+    assertThat(nexus().isRunning(), is(true));
 
-        assertThat( nexus().getUrl(), respondsWithStatus( 200 ) );
+    assertThat(nexus().getUrl(), respondsWithStatus(200));
 
-        assertThat( nexus().getLauncherLog(), FileMatchers.exists() );
-        assertThat( nexus().getLauncherLog(), FileMatchers.isFile() );
+    assertThat(nexus().getLauncherLog(), FileMatchers.exists());
+    assertThat(nexus().getLauncherLog(), FileMatchers.isFile());
 
-        assertThat( nexus().getNexusLog(), FileMatchers.exists() );
-        assertThat( nexus().getNexusLog(), FileMatchers.isFile() );
+    assertThat(nexus().getNexusLog(), FileMatchers.exists());
+    assertThat(nexus().getNexusLog(), FileMatchers.isFile());
 
-        assertThat( nexus().getNexusLog(), doesNotHaveCommonExceptions() );
-        assertThat( nexus().getNexusLog(), doesNotHaveFailingPlugins() );
+    assertThat(nexus().getNexusLog(), doesNotHaveCommonExceptions());
+    assertThat(nexus().getNexusLog(), doesNotHaveFailingPlugins());
 
-        assertThat( nexus(), logFile( doesNotHaveCommonExceptions() ) );
-        assertThat( nexus(), logFile( doesNotHaveFailingPlugins() ) );
-    }
+    assertThat(nexus(), logFile(doesNotHaveCommonExceptions()));
+    assertThat(nexus(), logFile(doesNotHaveFailingPlugins()));
+  }
 
 }

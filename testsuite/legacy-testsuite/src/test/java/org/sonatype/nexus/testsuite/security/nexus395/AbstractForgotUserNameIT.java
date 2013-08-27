@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus395;
 
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Assert;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
+import org.junit.Assert;
 
 /**
  * @author juven
@@ -25,31 +26,29 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 public abstract class AbstractForgotUserNameIT
     extends AbstractEmailServerNexusIT
 {
-    protected void assertRecoveredUserName( String expectedUserName )
-        throws Exception
-    {
-        // Need 1 message
-        waitForMail( 1 );
+  protected void assertRecoveredUserName(String expectedUserName)
+      throws Exception
+  {
+    // Need 1 message
+    waitForMail(1);
 
-        MimeMessage[] msgs = server.getReceivedMessages();
+    MimeMessage[] msgs = server.getReceivedMessages();
 
-        for ( MimeMessage msg : msgs )
-        {
-            log.debug( "Mail Title:\n" + GreenMailUtil.getHeaders( msg ) );
-            log.debug( "Mail Body:\n" + GreenMailUtil.getBody( msg ) );
-        }
-
-        String username = null;
-        // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
-        String body = GreenMailUtil.getBody( msgs[0] );
-
-        int index = body.indexOf( " - \"" );
-        int usernameStartIndex = index + " - \"".length();
-        if ( index != -1 )
-        {
-            username = body.substring( usernameStartIndex, body.indexOf( '\"', usernameStartIndex ) ).trim();
-        }
-
-        Assert.assertEquals( username, expectedUserName );
+    for (MimeMessage msg : msgs) {
+      log.debug("Mail Title:\n" + GreenMailUtil.getHeaders(msg));
+      log.debug("Mail Body:\n" + GreenMailUtil.getBody(msg));
     }
+
+    String username = null;
+    // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
+    String body = GreenMailUtil.getBody(msgs[0]);
+
+    int index = body.indexOf(" - \"");
+    int usernameStartIndex = index + " - \"".length();
+    if (index != -1) {
+      username = body.substring(usernameStartIndex, body.indexOf('\"', usernameStartIndex)).trim();
+    }
+
+    Assert.assertEquals(username, expectedUserName);
+  }
 }

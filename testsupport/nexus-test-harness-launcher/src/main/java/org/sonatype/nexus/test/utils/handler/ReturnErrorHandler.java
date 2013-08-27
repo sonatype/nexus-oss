@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils.handler;
 
 import java.io.IOException;
@@ -24,50 +25,45 @@ import org.restlet.data.Method;
 
 /**
  * Utility handler for tests needing a misbehaving proxy.
- * 
+ *
  * @since 2.0
  */
 public class ReturnErrorHandler
-        extends AbstractHandler
-    {
-        private final int status;
+    extends AbstractHandler
+{
+  private final int status;
 
-        private boolean headOk = true;
+  private boolean headOk = true;
 
-        public ReturnErrorHandler( final int status )
-        {
-            this.status = status;
-        }
+  public ReturnErrorHandler(final int status) {
+    this.status = status;
+  }
 
-        public ReturnErrorHandler( final int status, final boolean headOk )
-        {
-            this( status );
-            this.headOk = headOk;
-        }
+  public ReturnErrorHandler(final int status, final boolean headOk) {
+    this(status);
+    this.headOk = headOk;
+  }
 
-        public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-            throws IOException,
-            ServletException
-        {
+  public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+      throws IOException,
+             ServletException
+  {
 
-            if ( isHeadOk() && request.getMethod().equals( Method.HEAD ) )
-            {
-                response.setContentType( "text/html" );
-                response.setStatus( HttpServletResponse.SC_OK );
-                response.getWriter().println( "ok" );
-                ( (Request) request ).setHandled( true );
-            }
-            else
-            {
-                response.setContentType( "text/html" );
-                response.setStatus( status );
-                response.getWriter().println( "error" );
-                ( (Request) request ).setHandled( true );
-            }
-        }
-
-        public boolean isHeadOk()
-        {
-            return headOk;
-        }
+    if (isHeadOk() && request.getMethod().equals(Method.HEAD)) {
+      response.setContentType("text/html");
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.getWriter().println("ok");
+      ((Request) request).setHandled(true);
     }
+    else {
+      response.setContentType("text/html");
+      response.setStatus(status);
+      response.getWriter().println("error");
+      ((Request) request).setHandled(true);
+    }
+  }
+
+  public boolean isHeadOk() {
+    return headOk;
+  }
+}

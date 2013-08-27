@@ -266,7 +266,7 @@ public class Tag
    * to entities.
    */
 /*[mcculls] line-wrapping causes round-trip problems
-	void formatted(PrintWriter pw, int left, int width, String s) {
+        void formatted(PrintWriter pw, int left, int width, String s) {
 		int pos = width + 1;
 		s = s.trim();
 

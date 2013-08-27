@@ -10,19 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.security.nexus874;
 
-import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+package org.sonatype.nexus.testsuite.security.nexus874;
 
 import java.io.IOException;
 import java.net.ConnectException;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -33,162 +26,162 @@ import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restlet.data.MediaType;
+
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+
 /**
  * Validate the MemoryRealm that replaces default nexus security
  */
 public class Nexus874SecurityRealmReplacementIT
     extends AbstractNexusIntegrationTest
 {
-    private GroupMessageUtil groupUtil;
+  private GroupMessageUtil groupUtil;
 
-    private RepositoryMessageUtil repoUtil;
+  private RepositoryMessageUtil repoUtil;
 
-    private RoleMessageUtil roleUtil;
+  private RoleMessageUtil roleUtil;
 
-    private UserMessageUtil userUtil;
-    
-    @BeforeClass
-    public static void setSecureTest()
-        throws ComponentLookupException
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
+  private UserMessageUtil userUtil;
+
+  @BeforeClass
+  public static void setSecureTest()
+      throws ComponentLookupException
+  {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
+
+  @Before
+  public void setUp() {
+    groupUtil = new GroupMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    repoUtil = new RepositoryMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    roleUtil = new RoleMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    userUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+  }
+
+  @Test
+  public void authentication()
+      throws Exception
+  {
+    TestContainer.getInstance().getTestContext().setUsername("admin");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
+
+    getNexusStatusUtil().getNexusStatus();
+
+    TestContainer.getInstance().getTestContext().setUsername("deployment");
+    TestContainer.getInstance().getTestContext().setPassword("deployment123");
+
+    getNexusStatusUtil().getNexusStatus();
+
+    TestContainer.getInstance().getTestContext().setUsername("anonymous");
+    TestContainer.getInstance().getTestContext().setPassword("anonymous");
+
+    getNexusStatusUtil().getNexusStatus();
+  }
+
+  @Test
+  public void negativeAuthentication()
+      throws Exception
+  {
+    TestContainer.getInstance().getTestContext().setUsername("admin");
+    TestContainer.getInstance().getTestContext().setPassword("badpassword");
+
+    try {
+      getNexusStatus();
+      Assert.fail();
+    }
+    catch (ConnectException e) {
+      // good
     }
 
-    @Before
-    public void setUp()
-    {
-        groupUtil = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        repoUtil = new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        roleUtil = new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    TestContainer.getInstance().getTestContext().setUsername("deployment");
+    TestContainer.getInstance().getTestContext().setPassword("badpassword");
+
+    try {
+      getNexusStatus();
+      Assert.fail();
+    }
+    catch (ConnectException e) {
+      // good
     }
 
-    @Test
-    public void authentication()
-        throws Exception
-    {
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+    TestContainer.getInstance().getTestContext().setUsername("anonymous");
+    TestContainer.getInstance().getTestContext().setPassword("badpassword");
 
-        getNexusStatusUtil().getNexusStatus();
-
-        TestContainer.getInstance().getTestContext().setUsername( "deployment" );
-        TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
-
-        getNexusStatusUtil().getNexusStatus();
-
-        TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
-        TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
-
-        getNexusStatusUtil().getNexusStatus();
+    try {
+      getNexusStatus();
+      Assert.fail();
     }
-
-    @Test
-    public void negativeAuthentication()
-        throws Exception
-    {
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "badpassword" );
-
-        try
-        {
-            getNexusStatus();
-            Assert.fail();
-        }
-        catch ( ConnectException e )
-        {
-            // good
-        }
-
-        TestContainer.getInstance().getTestContext().setUsername( "deployment" );
-        TestContainer.getInstance().getTestContext().setPassword( "badpassword" );
-
-        try
-        {
-            getNexusStatus();
-            Assert.fail();
-        }
-        catch ( ConnectException e )
-        {
-            // good
-        }
-
-        TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
-        TestContainer.getInstance().getTestContext().setPassword( "badpassword" );
-
-        try
-        {
-            getNexusStatus();
-            Assert.fail();
-        }
-        catch ( ConnectException e )
-        {
-            // good
-        }
+    catch (ConnectException e) {
+      // good
     }
+  }
 
-    public void getNexusStatus()
-        throws IOException
-    {
-        try
-        {
-            RequestFacade.doGet( "service/local/status" );
-        }
-        catch ( AssertionError e )
-        {
-            // unsuccessful response
-            throw new ConnectException( e.getMessage() );
-        }
+  public void getNexusStatus()
+      throws IOException
+  {
+    try {
+      RequestFacade.doGet("service/local/status");
     }
-
-    @Test
-    public void authorization()
-        throws Exception
-    {
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-
-        getNexusStatusUtil().getNexusStatus();
-        groupUtil.getList();
-        repoUtil.getList();
-        TargetMessageUtil.getList();
-        TaskScheduleUtil.getTasks();
-
-        TestContainer.getInstance().getTestContext().setUsername( "deployment" );
-        TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
-
-        getNexusStatusUtil().getNexusStatus();
-        groupUtil.getList();
-        repoUtil.getList();
-
-        TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
-        TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
-
-        getNexusStatusUtil().getNexusStatus();
-        groupUtil.getList();
-        repoUtil.getList();
+    catch (AssertionError e) {
+      // unsuccessful response
+      throw new ConnectException(e.getMessage());
     }
+  }
 
-    @Test
-    public void negativeAuthorization()
-        throws Exception
-    {
-        TestContainer.getInstance().getTestContext().setUsername( "deployment" );
-        TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
+  @Test
+  public void authorization()
+      throws Exception
+  {
+    TestContainer.getInstance().getTestContext().setUsername("admin");
+    TestContainer.getInstance().getTestContext().setPassword("admin123");
 
-        String serviceURI = "service/local/schedules";
+    getNexusStatusUtil().getNexusStatus();
+    groupUtil.getList();
+    repoUtil.getList();
+    TargetMessageUtil.getList();
+    TaskScheduleUtil.getTasks();
 
-        RequestFacade.doGet( "service/local/repo_targets", respondsWithStatusCode( 403 ) );
+    TestContainer.getInstance().getTestContext().setUsername("deployment");
+    TestContainer.getInstance().getTestContext().setPassword("deployment123");
 
-        RequestFacade.doGet( serviceURI, respondsWithStatusCode( 403 ) );
+    getNexusStatusUtil().getNexusStatus();
+    groupUtil.getList();
+    repoUtil.getList();
 
-        TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
-        TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
+    TestContainer.getInstance().getTestContext().setUsername("anonymous");
+    TestContainer.getInstance().getTestContext().setPassword("anonymous");
 
-        RequestFacade.doGet( "service/local/repo_targets", respondsWithStatusCode( 403 ) );
+    getNexusStatusUtil().getNexusStatus();
+    groupUtil.getList();
+    repoUtil.getList();
+  }
 
-        RequestFacade.doGet( serviceURI, respondsWithStatusCode( 403 ) );
+  @Test
+  public void negativeAuthorization()
+      throws Exception
+  {
+    TestContainer.getInstance().getTestContext().setUsername("deployment");
+    TestContainer.getInstance().getTestContext().setPassword("deployment123");
 
-    }
+    String serviceURI = "service/local/schedules";
+
+    RequestFacade.doGet("service/local/repo_targets", respondsWithStatusCode(403));
+
+    RequestFacade.doGet(serviceURI, respondsWithStatusCode(403));
+
+    TestContainer.getInstance().getTestContext().setUsername("anonymous");
+    TestContainer.getInstance().getTestContext().setPassword("anonymous");
+
+    RequestFacade.doGet("service/local/repo_targets", respondsWithStatusCode(403));
+
+    RequestFacade.doGet(serviceURI, respondsWithStatusCode(403));
+
+  }
 }

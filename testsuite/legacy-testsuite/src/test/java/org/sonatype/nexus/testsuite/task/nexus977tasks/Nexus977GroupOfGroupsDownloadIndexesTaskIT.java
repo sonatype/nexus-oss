@@ -10,33 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus977tasks;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 public class Nexus977GroupOfGroupsDownloadIndexesTaskIT
     extends AbstractNexusProxyIntegrationTest
 {
 
-    @Test
-    public void downloadIndexes()
-        throws Exception
-    {
-        Assert.assertTrue( getSearchMessageUtil().searchForGav( getTestId(), "project", "0.8" ).isEmpty() );
-        Assert.assertTrue( getSearchMessageUtil().searchForGav( getTestId(), "project", "2.1" ).isEmpty() );
+  @Test
+  public void downloadIndexes()
+      throws Exception
+  {
+    Assert.assertTrue(getSearchMessageUtil().searchForGav(getTestId(), "project", "0.8").isEmpty());
+    Assert.assertTrue(getSearchMessageUtil().searchForGav(getTestId(), "project", "2.1").isEmpty());
 
-        ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryId" );
-        repo.setValue( "g4" );
-        TaskScheduleUtil.runTask( "DownloadIndexesTaskDescriptor-snapshot", DownloadIndexesTaskDescriptor.ID, repo );
-        
-        Assert.assertFalse( getSearchMessageUtil().searchForGav( getTestId(), "project", "0.8" ).isEmpty() );
-        Assert.assertFalse( getSearchMessageUtil().searchForGav( getTestId(), "project", "2.1" ).isEmpty() );
-    }
+    ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
+    repo.setKey("repositoryId");
+    repo.setValue("g4");
+    TaskScheduleUtil.runTask("DownloadIndexesTaskDescriptor-snapshot", DownloadIndexesTaskDescriptor.ID, repo);
+
+    Assert.assertFalse(getSearchMessageUtil().searchForGav(getTestId(), "project", "0.8").isEmpty());
+    Assert.assertFalse(getSearchMessageUtil().searchForGav(getTestId(), "project", "2.1").isEmpty());
+  }
 
 }

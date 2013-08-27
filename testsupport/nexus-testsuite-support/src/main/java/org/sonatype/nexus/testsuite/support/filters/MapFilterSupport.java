@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.support.filters;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.testsuite.support.filters;
 
 import java.util.Map;
 
 import org.sonatype.nexus.testsuite.support.Filter;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Base class for map based filter replacement. Subclasses just need to provide the filtering map.
@@ -27,38 +28,34 @@ public abstract class MapFilterSupport
     implements Filter
 {
 
-    /**
-     * Filters using mapping provided by subclasses.
-     *
-     * @param context filtering context. Cannot be null.
-     * @param value   value to be filtered. Cannot be null.
-     * @return filtered value
-     */
-    public String filter( final Map<String, String> context, final String value )
-    {
-        String filtered = checkNotNull( value );
-        // TODO use a matcher for ${*}?
-        if ( filtered.contains( "${" ) )
-        {
-            final Map<String, String> mappings = mappings( context, value );
-            if ( mappings != null )
-            {
-                for ( final Map.Entry<String, String> property : mappings.entrySet() )
-                {
-                    filtered = filtered.replace( "${" + property.getKey() + "}", property.getValue() );
-                }
-            }
+  /**
+   * Filters using mapping provided by subclasses.
+   *
+   * @param context filtering context. Cannot be null.
+   * @param value   value to be filtered. Cannot be null.
+   * @return filtered value
+   */
+  public String filter(final Map<String, String> context, final String value) {
+    String filtered = checkNotNull(value);
+    // TODO use a matcher for ${*}?
+    if (filtered.contains("${")) {
+      final Map<String, String> mappings = mappings(context, value);
+      if (mappings != null) {
+        for (final Map.Entry<String, String> property : mappings.entrySet()) {
+          filtered = filtered.replace("${" + property.getKey() + "}", property.getValue());
         }
-        return filtered;
+      }
     }
+    return filtered;
+  }
 
-    /**
-     * Returns the mappings between placeholders and values that this filer supports.
-     *
-     * @param context filtering context. Never null.
-     * @param value   value to be filtered. Cannot be null.
-     * @return mappings. Should not be null.
-     */
-    abstract Map<String, String> mappings( final Map<String, String> context, final String value );
+  /**
+   * Returns the mappings between placeholders and values that this filer supports.
+   *
+   * @param context filtering context. Never null.
+   * @param value   value to be filtered. Cannot be null.
+   * @return mappings. Should not be null.
+   */
+  abstract Map<String, String> mappings(final Map<String, String> context, final String value);
 
 }

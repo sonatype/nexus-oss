@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus2692;
 
 import java.util.ArrayList;
@@ -23,35 +24,35 @@ public class Nexus2692EvictGroupTaskIT
     extends AbstractEvictTaskIt
 {
 
-    @Test
-    public void testEvictPublicGroup()
-        throws Exception
-    {
-        int days = 6;
-        // run Task
-        runTask( days, "public" );
+  @Test
+  public void testEvictPublicGroup()
+      throws Exception
+  {
+    int days = 6;
+    // run Task
+    runTask(days, "public");
 
-        // check files
-        SortedSet<String> resultStorageFiles = getItemFilePaths();
+    // check files
+    SortedSet<String> resultStorageFiles = getItemFilePaths();
 
-        // list of repos NOT in the public group
-        List<String> nonPublicGroupMembers = new ArrayList<String>();
-        nonPublicGroupMembers.add( "apache-snapshots" );
+    // list of repos NOT in the public group
+    List<String> nonPublicGroupMembers = new ArrayList<String>();
+    nonPublicGroupMembers.add("apache-snapshots");
 
-        SortedSet<String> expectedResults = buildListOfExpectedFiles( days, nonPublicGroupMembers );
+    SortedSet<String> expectedResults = buildListOfExpectedFiles(days, nonPublicGroupMembers);
 
-        // calc the diff ( files that were deleted and should not have been )
-        expectedResults.removeAll( resultStorageFiles );
-        Assert.assertTrue( "The following files were deleted and should not have been: "
-            + prettyList( expectedResults ), expectedResults.isEmpty() );
+    // calc the diff ( files that were deleted and should not have been )
+    expectedResults.removeAll(resultStorageFiles);
+    Assert.assertTrue("The following files were deleted and should not have been: "
+        + prettyList(expectedResults), expectedResults.isEmpty());
 
-        // now the other way
-        expectedResults = buildListOfExpectedFiles( days, nonPublicGroupMembers );
-        resultStorageFiles.removeAll( expectedResults );
-        Assert.assertTrue( "The following files should have been deleted: "
-            + prettyList( resultStorageFiles ), resultStorageFiles.isEmpty() );
+    // now the other way
+    expectedResults = buildListOfExpectedFiles(days, nonPublicGroupMembers);
+    resultStorageFiles.removeAll(expectedResults);
+    Assert.assertTrue("The following files should have been deleted: "
+        + prettyList(resultStorageFiles), resultStorageFiles.isEmpty());
 
-        // make sure we don't have any empty directories
-        checkForEmptyDirectories();
-    }
+    // make sure we don't have any empty directories
+    checkForEmptyDirectories();
+  }
 }

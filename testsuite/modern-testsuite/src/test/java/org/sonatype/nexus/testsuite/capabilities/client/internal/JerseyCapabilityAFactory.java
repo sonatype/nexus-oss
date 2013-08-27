@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.capabilities.client.internal;
 
 import javax.inject.Named;
@@ -30,25 +31,21 @@ public class JerseyCapabilityAFactory
     implements JerseyCapabilityFactory<CapabilityA>
 {
 
-    public CapabilityA create( final JerseyNexusClient nexusClient )
-    {
-        return new JerseyCapabilityA( nexusClient );
-    }
+  public CapabilityA create(final JerseyNexusClient nexusClient) {
+    return new JerseyCapabilityA(nexusClient);
+  }
 
-    @Override
-    public CapabilityA create( final JerseyNexusClient nexusClient, final CapabilityListItemResource resource )
-    {
-        return new JerseyCapabilityA( nexusClient, resource );
-    }
+  @Override
+  public CapabilityA create(final JerseyNexusClient nexusClient, final CapabilityListItemResource resource) {
+    return new JerseyCapabilityA(nexusClient, resource);
+  }
 
-    public boolean canCreate( final String type )
-    {
-        return "[a]".equals( type );
-    }
+  public boolean canCreate(final String type) {
+    return "[a]".equals(type);
+  }
 
-    public boolean canCreate( final Class<Capability> type )
-    {
-        return CapabilityA.class.equals( type );
-    }
+  public boolean canCreate(final Class<Capability> type) {
+    return CapabilityA.class.equals(type);
+  }
 
 }

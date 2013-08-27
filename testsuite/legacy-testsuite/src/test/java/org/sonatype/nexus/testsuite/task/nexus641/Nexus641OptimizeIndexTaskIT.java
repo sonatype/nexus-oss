@@ -10,17 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus641;
 
 import java.io.IOException;
 
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test task OptimizeIndex Repositories.
@@ -30,26 +32,26 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus641OptimizeIndexTaskIT
     extends AbstractNexusIntegrationTest
 {
-    protected static Logger logger = LoggerFactory.getLogger( Nexus641OptimizeIndexTaskIT.class );
+  protected static Logger logger = LoggerFactory.getLogger(Nexus641OptimizeIndexTaskIT.class);
 
-    public Nexus641OptimizeIndexTaskIT()
-        throws IOException
-    {
-        super( "nexus641" );
-    }
+  public Nexus641OptimizeIndexTaskIT()
+      throws IOException
+  {
+    super("nexus641");
+  }
 
-    @Test
-    public void testIndexOptimizer()
-        throws Exception
-    {
-        // reindex
-        ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryId" );
-        prop.setValue( "nexus-test-harness-repo" );
+  @Test
+  public void testIndexOptimizer()
+      throws Exception
+  {
+    // reindex
+    ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+    prop.setKey("repositoryId");
+    prop.setValue("nexus-test-harness-repo");
 
-        // reindex
-        TaskScheduleUtil.runTask( OptimizeIndexTaskDescriptor.ID, prop );
+    // reindex
+    TaskScheduleUtil.runTask(OptimizeIndexTaskDescriptor.ID, prop);
 
-    }
+  }
 
 }

@@ -154,7 +154,7 @@ public class DownloadRemoteIndexerManagerIT
 
   /**
    * All set okay, but repo in question has ProxyMode that does not allow remote access.
-   * 
+   *
    * @since 2.7.0
    */
   @Test
@@ -166,7 +166,7 @@ public class DownloadRemoteIndexerManagerIT
 
     // copy index 02
     overwriteIndex(index2, centralIndex);
-    
+
     central.setProxyMode(ProxyMode.BLOCKED_MANUAL);
     central.commitChanges();
 

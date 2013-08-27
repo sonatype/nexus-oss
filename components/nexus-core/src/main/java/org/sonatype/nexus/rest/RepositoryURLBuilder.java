@@ -31,7 +31,7 @@ public interface RepositoryURLBuilder
    * @return the content URL.
    * @since 2.7
    */
-  String getRepositoryContentUrl(String repositoryId, boolean forceBaseURL )
+  String getRepositoryContentUrl(String repositoryId, boolean forceBaseURL)
       throws NoSuchRepositoryException;
 
   /**

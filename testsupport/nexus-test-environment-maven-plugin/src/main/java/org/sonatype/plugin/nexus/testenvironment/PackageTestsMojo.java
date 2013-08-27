@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plugin.nexus.testenvironment;
 
 import java.io.File;
@@ -34,98 +35,88 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 /**
  * @author velo
  */
-@Mojo( name = "package", defaultPhase = LifecyclePhase.PACKAGE )
+@Mojo(name = "package", defaultPhase = LifecyclePhase.PACKAGE)
 public class PackageTestsMojo
     extends AbstractMojo
 {
 
-    @Component
-    private ArchiverManager archiverManager;
+  @Component
+  private ArchiverManager archiverManager;
 
-    @Component
-    private MavenProjectHelper projectHelper;
+  @Component
+  private MavenProjectHelper projectHelper;
 
-    /**
-     * The maven project.
-     */
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
-    private MavenProject project;
+  /**
+   * The maven project.
+   */
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  private MavenProject project;
 
-    @Parameter( defaultValue = "${project.build.testOutputDirectory}" )
-    private File testClasses;
+  @Parameter(defaultValue = "${project.build.testOutputDirectory}")
+  private File testClasses;
 
-    @Parameter( defaultValue = "${project.testResources}" )
-    private List<Resource> testResources;
+  @Parameter(defaultValue = "${project.testResources}")
+  private List<Resource> testResources;
 
-    @Parameter( defaultValue = "${basedir}/resources" )
-    private File resourcesSourceLocation;
+  @Parameter(defaultValue = "${basedir}/resources")
+  private File resourcesSourceLocation;
 
-    @Parameter( defaultValue = "${project.build.directory}/${project.build.finalName}-test-resources.zip" )
-    private File destinationFile;
+  @Parameter(defaultValue = "${project.build.directory}/${project.build.finalName}-test-resources.zip")
+  private File destinationFile;
 
-    @Parameter( property = "maven.test.skip" )
-    private boolean testSkip;
+  @Parameter(property = "maven.test.skip")
+  private boolean testSkip;
 
-    @SuppressWarnings( "unchecked" )
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        if ( testSkip )
-        {
-            return;
-        }
-
-        Archiver archiver;
-        try
-        {
-            archiver = archiverManager.getArchiver( "zip" );
-        }
-        catch ( NoSuchArchiverException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-
-        archiver.setDestFile( destinationFile );
-        try
-        {
-            if ( testClasses.exists() )
-            {
-                archiver.addDirectory( testClasses, "classes/" );
-            }
-
-            if ( resourcesSourceLocation.exists() )
-            {
-                archiver.addDirectory( resourcesSourceLocation, "resources/" );
-            }
-
-            for ( Resource resource : testResources )
-            {
-                File dir = new File( resource.getDirectory() );
-                if ( !dir.exists() )
-                {
-                    continue;
-                }
-
-                String[] includes = (String[]) resource.getIncludes().toArray( new String[0] );
-                String[] excludes = (String[]) resource.getExcludes().toArray( new String[0] );
-
-                archiver.addDirectory( dir, "test-resources/", includes, excludes );
-            }
-
-            archiver.addFile( project.getFile(), "pom.xml" );
-
-            archiver.createArchive();
-        }
-        catch ( ArchiverException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-
-        projectHelper.attachArtifact( project, "zip", "test-resources", destinationFile );
+  @SuppressWarnings("unchecked")
+  public void execute()
+      throws MojoExecutionException, MojoFailureException
+  {
+    if (testSkip) {
+      return;
     }
+
+    Archiver archiver;
+    try {
+      archiver = archiverManager.getArchiver("zip");
+    }
+    catch (NoSuchArchiverException e) {
+      throw new MojoExecutionException(e.getMessage(), e);
+    }
+
+    archiver.setDestFile(destinationFile);
+    try {
+      if (testClasses.exists()) {
+        archiver.addDirectory(testClasses, "classes/");
+      }
+
+      if (resourcesSourceLocation.exists()) {
+        archiver.addDirectory(resourcesSourceLocation, "resources/");
+      }
+
+      for (Resource resource : testResources) {
+        File dir = new File(resource.getDirectory());
+        if (!dir.exists()) {
+          continue;
+        }
+
+        String[] includes = (String[]) resource.getIncludes().toArray(new String[0]);
+        String[] excludes = (String[]) resource.getExcludes().toArray(new String[0]);
+
+        archiver.addDirectory(dir, "test-resources/", includes, excludes);
+      }
+
+      archiver.addFile(project.getFile(), "pom.xml");
+
+      archiver.createArchive();
+    }
+    catch (ArchiverException e) {
+      throw new MojoExecutionException(e.getMessage(), e);
+    }
+    catch (IOException e) {
+      throw new MojoExecutionException(e.getMessage(), e);
+    }
+
+    projectHelper.attachArtifact(project, "zip", "test-resources", destinationFile);
+  }
 
 }

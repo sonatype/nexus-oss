@@ -10,7 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
+
+import java.io.File;
+
+import org.sonatype.nexus.integrationtests.TestContext;
 
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -23,9 +28,6 @@ import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.integrationtests.TestContext;
-
-import java.io.File;
 
 /**
  * Due to a <a href='http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4941958'>bug</a> ( i wouldn't call this a
@@ -38,102 +40,94 @@ import java.io.File;
 public class WagonDeployer
 {
 
-    private Wagon wagon;
+  private Wagon wagon;
 
-    private String protocol = "http";
+  private String protocol = "http";
 
-    private String username;
+  private String username;
 
-    private String password;
+  private String password;
 
-    private String repositoryUrl;
+  private String repositoryUrl;
 
-    private File fileToDeploy;
+  private File fileToDeploy;
 
-    private String artifactPath;
+  private String artifactPath;
 
-    private final TestContext testContext;
+  private final TestContext testContext;
 
-    private static final Logger LOG = LoggerFactory.getLogger( WagonDeployer.class );
+  private static final Logger LOG = LoggerFactory.getLogger(WagonDeployer.class);
 
-    public WagonDeployer( final Wagon wagon,
-                          final String protocol,
-                          final String username,
-                          final String password,
-                          final String repositoryUrl,
-                          final File fileToDeploy,
-                          final String artifactPath,
-                          final TestContext testContext )
-    {
-        super();
-        this.wagon = wagon;
-        this.protocol = protocol;
-        this.username = username;
-        this.password = password;
-        this.repositoryUrl = repositoryUrl;
-        this.fileToDeploy = fileToDeploy;
-        this.artifactPath = artifactPath;
-        this.testContext = testContext;
+  public WagonDeployer(final Wagon wagon,
+                       final String protocol,
+                       final String username,
+                       final String password,
+                       final String repositoryUrl,
+                       final File fileToDeploy,
+                       final String artifactPath,
+                       final TestContext testContext)
+  {
+    super();
+    this.wagon = wagon;
+    this.protocol = protocol;
+    this.username = username;
+    this.password = password;
+    this.repositoryUrl = repositoryUrl;
+    this.fileToDeploy = fileToDeploy;
+    this.artifactPath = artifactPath;
+    this.testContext = testContext;
+  }
+
+  public String getProtocol() {
+    return protocol;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public String getRepositoryUrl() {
+    return repositoryUrl;
+  }
+
+  public File getFileToDeploy() {
+    return fileToDeploy;
+  }
+
+  public String getArtifactPath() {
+    return artifactPath;
+  }
+
+  public void deploy()
+      throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
+             ResourceDoesNotExistException, AuthorizationException
+  {
+    Repository repository = new Repository();
+    repository.setUrl(repositoryUrl);
+
+    wagon.connect(repository, getWagonAuthenticationInfo());
+    wagon.put(fileToDeploy, artifactPath);
+    wagon.disconnect();
+
+  }
+
+  public AuthenticationInfo getWagonAuthenticationInfo() {
+    AuthenticationInfo authInfo = null;
+    // check the text context to see if this is a secure test
+    if (testContext.isSecureTest()) {
+      authInfo = new AuthenticationInfo();
+      authInfo.setUserName(testContext.getUsername());
+      authInfo.setPassword(testContext.getPassword());
     }
+    return authInfo;
+  }
 
-    public String getProtocol()
-    {
-        return protocol;
-    }
-
-    public String getUsername()
-    {
-        return username;
-    }
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-    public String getRepositoryUrl()
-    {
-        return repositoryUrl;
-    }
-
-    public File getFileToDeploy()
-    {
-        return fileToDeploy;
-    }
-
-    public String getArtifactPath()
-    {
-        return artifactPath;
-    }
-
-    public void deploy()
-        throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
-        ResourceDoesNotExistException, AuthorizationException
-    {
-        Repository repository = new Repository();
-        repository.setUrl( repositoryUrl );
-
-        wagon.connect( repository, getWagonAuthenticationInfo() );
-        wagon.put( fileToDeploy, artifactPath );
-        wagon.disconnect();
-
-    }
-
-    public AuthenticationInfo getWagonAuthenticationInfo()
-    {
-        AuthenticationInfo authInfo = null;
-        // check the text context to see if this is a secure test
-        if ( testContext.isSecureTest() )
-        {
-            authInfo = new AuthenticationInfo();
-            authInfo.setUserName( testContext.getUsername() );
-            authInfo.setPassword( testContext.getPassword() );
-        }
-        return authInfo;
-    }
-
-    public static interface Factory
-    {
-        Wagon get( String protocol );
-    }
+  public static interface Factory
+  {
+    Wagon get(String protocol);
+  }
 }

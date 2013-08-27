@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.plugin.nexus.testenvironment.filter;
 
 import java.util.Iterator;
@@ -23,28 +24,24 @@ public class TestScopeFilter
     extends AbstractArtifactsFilter
 {
 
-    @Override
-    public boolean isArtifactIncluded( Artifact artifact )
-    {
-        if ( Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
-        {
-            return false;
-        }
-        return true;
+  @Override
+  public boolean isArtifactIncluded(Artifact artifact) {
+    if (Artifact.SCOPE_TEST.equals(artifact.getScope())) {
+      return false;
     }
+    return true;
+  }
 
-    @SuppressWarnings( "rawtypes" )
-    public Set filter( Set artifacts )
-        throws ArtifactFilterException
-    {
-        for ( Iterator iterator = artifacts.iterator(); iterator.hasNext(); )
-        {
-            Artifact artifact = (Artifact) iterator.next();
-            if ( !isArtifactIncluded( artifact ) )
-            {
-                iterator.remove();
-            }
-        }
-        return artifacts;
+  @SuppressWarnings("rawtypes")
+  public Set filter(Set artifacts)
+      throws ArtifactFilterException
+  {
+    for (Iterator iterator = artifacts.iterator(); iterator.hasNext(); ) {
+      Artifact artifact = (Artifact) iterator.next();
+      if (!isArtifactIncluded(artifact)) {
+        iterator.remove();
+      }
     }
+    return artifacts;
+  }
 }

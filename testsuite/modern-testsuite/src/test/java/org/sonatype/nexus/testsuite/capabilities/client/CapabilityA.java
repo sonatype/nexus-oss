@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.capabilities.client;
 
 import org.sonatype.nexus.capabilities.client.Capability;
@@ -21,8 +22,8 @@ public interface CapabilityA
     extends Capability<CapabilityA>
 {
 
-    String propertyA1();
+  String propertyA1();
 
-    CapabilityA withPropertyA1( String value );
+  CapabilityA withPropertyA1(String value);
 
 }

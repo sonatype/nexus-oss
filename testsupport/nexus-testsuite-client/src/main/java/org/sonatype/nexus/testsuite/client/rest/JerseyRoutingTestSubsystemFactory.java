@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client.rest;
 
 import javax.inject.Named;
@@ -32,21 +33,18 @@ import org.sonatype.nexus.testsuite.client.internal.JerseyRoutingTest;
 public class JerseyRoutingTestSubsystemFactory
     implements SubsystemFactory<RoutingTest, JerseyNexusClient>
 {
-    @Override
-    public Condition availableWhen()
-    {
-        return NexusStatusConditions.any20AndLater();
-    }
+  @Override
+  public Condition availableWhen() {
+    return NexusStatusConditions.any20AndLater();
+  }
 
-    @Override
-    public Class<RoutingTest> getType()
-    {
-        return RoutingTest.class;
-    }
+  @Override
+  public Class<RoutingTest> getType() {
+    return RoutingTest.class;
+  }
 
-    @Override
-    public RoutingTest create( final JerseyNexusClient nexusClient )
-    {
-        return new JerseyRoutingTest( nexusClient );
-    }
+  @Override
+  public RoutingTest create(final JerseyNexusClient nexusClient) {
+    return new JerseyRoutingTest(nexusClient);
+  }
 }

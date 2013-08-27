@@ -10,45 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
+
+import org.restlet.data.Status;
 
 public class UserCreationUtil
 {
 
-    public static Status login()
-        throws IOException
-    {
-        String serviceURI = "service/local/authentication/login";
+  public static Status login()
+      throws IOException
+  {
+    String serviceURI = "service/local/authentication/login";
 
-        return RequestFacade.doGetForStatus( serviceURI, null );
-    }
+    return RequestFacade.doGetForStatus(serviceURI, null);
+  }
 
-    public static Status login( String username, String password )
-        throws IOException
-    {
-        TestContainer.getInstance().getTestContext().setUsername( username );
-        TestContainer.getInstance().getTestContext().setPassword( password );
+  public static Status login(String username, String password)
+      throws IOException
+  {
+    TestContainer.getInstance().getTestContext().setUsername(username);
+    TestContainer.getInstance().getTestContext().setPassword(password);
 
-        return login();
-    }
+    return login();
+  }
 
-    /**
-     * Log out the current user and assert a successful request.
-     * 
-     * @throws IOException
-     * @throws AssertionError
-     */
-    public static void logout()
-        throws IOException, AssertionError
-    {
-        String serviceURI = "service/local/authentication/logout";
-        RequestFacade.doGet( serviceURI );
-    }
+  /**
+   * Log out the current user and assert a successful request.
+   */
+  public static void logout()
+      throws IOException, AssertionError
+  {
+    String serviceURI = "service/local/authentication/logout";
+    RequestFacade.doGet(serviceURI);
+  }
 
 }

@@ -10,54 +10,53 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus533;
 
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
+
+import org.apache.commons.lang.time.DateUtils;
 
 public class Nexus533TaskWeeklyIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceWeeklyResource>
 {
 
-    private static ScheduledServiceWeeklyResource scheduledTask;
+  private static ScheduledServiceWeeklyResource scheduledTask;
 
-    @Override
-    public ScheduledServiceWeeklyResource getTaskScheduled()
-    {
-        if ( scheduledTask == null )
-        {
-            scheduledTask = new ScheduledServiceWeeklyResource();
-            scheduledTask.setEnabled( true );
-            scheduledTask.setId( null );
-            scheduledTask.setName( "taskWeekly" );
-            scheduledTask.setSchedule( "weekly" );
-            // A future date
-            Date startDate = DateUtils.addDays( new Date(), 10 );
-            startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
-            scheduledTask.setStartDate( String.valueOf( startDate.getTime() ) );
-            scheduledTask.setRecurringTime( "03:30" );
-            scheduledTask.setRecurringDay( Arrays.asList( new String[] { "monday", "wednesday", "friday" } ) );
+  @Override
+  public ScheduledServiceWeeklyResource getTaskScheduled() {
+    if (scheduledTask == null) {
+      scheduledTask = new ScheduledServiceWeeklyResource();
+      scheduledTask.setEnabled(true);
+      scheduledTask.setId(null);
+      scheduledTask.setName("taskWeekly");
+      scheduledTask.setSchedule("weekly");
+      // A future date
+      Date startDate = DateUtils.addDays(new Date(), 10);
+      startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
+      scheduledTask.setStartDate(String.valueOf(startDate.getTime()));
+      scheduledTask.setRecurringTime("03:30");
+      scheduledTask.setRecurringDay(Arrays.asList(new String[]{"monday", "wednesday", "friday"}));
 
-            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
+      scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
 
-            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( "repositoryId" );
-            prop.setValue( "all_repo" );
-            scheduledTask.addProperty( prop );
-        }
-        return scheduledTask;
+      ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+      prop.setKey("repositoryId");
+      prop.setValue("all_repo");
+      scheduledTask.addProperty(prop);
     }
+    return scheduledTask;
+  }
 
-    @Override
-    public void updateTask( ScheduledServiceWeeklyResource scheduledTask )
-    {
-        scheduledTask.setRecurringTime( "00:00" );
-    }
+  @Override
+  public void updateTask(ScheduledServiceWeeklyResource scheduledTask) {
+    scheduledTask.setRecurringTime("00:00");
+  }
 
 }

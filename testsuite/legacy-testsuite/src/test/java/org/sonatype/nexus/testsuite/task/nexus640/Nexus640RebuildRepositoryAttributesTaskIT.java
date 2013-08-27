@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus640;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests the rebuild repository attributes task.
@@ -28,22 +30,22 @@ public class Nexus640RebuildRepositoryAttributesTaskIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
-    public void rebuildAttributes()
-        throws Exception
-    {
-        String attributePath = "storage/"+REPO_TEST_HARNESS_REPO+"/.nexus/attributes/nexus640/artifact/1.0.0/";
+  @Test
+  public void rebuildAttributes()
+      throws Exception
+  {
+    String attributePath = "storage/" + REPO_TEST_HARNESS_REPO + "/.nexus/attributes/nexus640/artifact/1.0.0/";
 
-        ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryId" );
-        repo.setValue( REPO_TEST_HARNESS_REPO );
-        TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
+    ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
+    repo.setKey("repositoryId");
+    repo.setValue(REPO_TEST_HARNESS_REPO);
+    TaskScheduleUtil.runTask(RebuildAttributesTaskDescriptor.ID, repo);
 
-        File jar = new File( nexusWorkDir, attributePath + "artifact-1.0.0.jar" );
-        Assert.assertTrue( "Attribute files should be generated after rebuild", jar.exists() );
-        File pom = new File( nexusWorkDir, attributePath + "artifact-1.0.0.pom" );
-        Assert.assertTrue( "Attribute files should be generated after rebuild", pom.exists() );
+    File jar = new File(nexusWorkDir, attributePath + "artifact-1.0.0.jar");
+    Assert.assertTrue("Attribute files should be generated after rebuild", jar.exists());
+    File pom = new File(nexusWorkDir, attributePath + "artifact-1.0.0.pom");
+    Assert.assertTrue("Attribute files should be generated after rebuild", pom.exists());
 
-    }
+  }
 
 }

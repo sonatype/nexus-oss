@@ -10,51 +10,50 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus533;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
+
+import org.apache.commons.lang.time.DateUtils;
 
 public class Nexus533TaskCronIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceAdvancedResource>
 {
 
-    private static ScheduledServiceAdvancedResource scheduledTask;
+  private static ScheduledServiceAdvancedResource scheduledTask;
 
-    @Override
-    public ScheduledServiceAdvancedResource getTaskScheduled()
-    {
-        if ( scheduledTask == null )
-        {   
-            scheduledTask = new ScheduledServiceAdvancedResource();
-            scheduledTask.setEnabled( true );
-            scheduledTask.setId( null );
-            scheduledTask.setName( "taskAdvanced" );
-            scheduledTask.setSchedule( "advanced" );
-            // A future date
-            Date startDate = DateUtils.addDays( new Date(), 10 );
-            startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
-            scheduledTask.setCronCommand( "0 0 12 ? * WED" );
+  @Override
+  public ScheduledServiceAdvancedResource getTaskScheduled() {
+    if (scheduledTask == null) {
+      scheduledTask = new ScheduledServiceAdvancedResource();
+      scheduledTask.setEnabled(true);
+      scheduledTask.setId(null);
+      scheduledTask.setName("taskAdvanced");
+      scheduledTask.setSchedule("advanced");
+      // A future date
+      Date startDate = DateUtils.addDays(new Date(), 10);
+      startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
+      scheduledTask.setCronCommand("0 0 12 ? * WED");
 
-            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
+      scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
 
-            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( "repositoryId" );
-            prop.setValue( "all_repo" );
-            scheduledTask.addProperty( prop );
-        }
-        return scheduledTask;
+      ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+      prop.setKey("repositoryId");
+      prop.setValue("all_repo");
+      scheduledTask.addProperty(prop);
     }
+    return scheduledTask;
+  }
 
-    @Override
-    public void updateTask( ScheduledServiceAdvancedResource scheduledTask )
-    {
-        scheduledTask.setCronCommand( "0 0 12 ? * WED,FRI" );
-    }
+  @Override
+  public void updateTask(ScheduledServiceAdvancedResource scheduledTask) {
+    scheduledTask.setCronCommand("0 0 12 ? * WED,FRI");
+  }
 
 }

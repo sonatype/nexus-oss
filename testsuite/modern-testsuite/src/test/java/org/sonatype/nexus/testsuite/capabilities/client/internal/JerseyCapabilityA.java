@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.capabilities.client.internal;
 
 import org.sonatype.nexus.capabilities.client.support.JerseyCapability;
@@ -25,28 +26,24 @@ public class JerseyCapabilityA
     implements CapabilityA
 {
 
-    public JerseyCapabilityA( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient, "[a]" );
-    }
+  public JerseyCapabilityA(final JerseyNexusClient nexusClient) {
+    super(nexusClient, "[a]");
+  }
 
-    public JerseyCapabilityA( final JerseyNexusClient nexusClient, final CapabilityListItemResource resource )
-    {
-        super( nexusClient, resource );
-    }
+  public JerseyCapabilityA(final JerseyNexusClient nexusClient, final CapabilityListItemResource resource) {
+    super(nexusClient, resource);
+  }
 
-    @Override
-    public String propertyA1()
-    {
-        return property( "a1" );
-    }
+  @Override
+  public String propertyA1() {
+    return property("a1");
+  }
 
-    @Override
-    public CapabilityA withPropertyA1( final String value )
-    {
-        withProperty( "a1", value );
-        return this;
-    }
+  @Override
+  public CapabilityA withPropertyA1(final String value) {
+    withProperty("a1", value);
+    return this;
+  }
 
 
 }

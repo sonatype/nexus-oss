@@ -10,68 +10,62 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.integrationtests;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractEmailServerNexusIT
     extends AbstractNexusIntegrationTest
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( AbstractEmailServerNexusIT.class );
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractEmailServerNexusIT.class);
 
-    private static int emailServerPort;
+  private static int emailServerPort;
 
-    protected static GreenMail server;
+  protected static GreenMail server;
 
-    @BeforeClass
-    public static void startEmailServer()
-    {
-        String port = TestProperties.getString( "email.server.port" );
-        emailServerPort = new Integer( port );
-        // ServerSetup smtp = new ServerSetup( 1234, null, ServerSetup.PROTOCOL_SMTP );
-        ServerSetup smtp = new ServerSetup( emailServerPort, null, ServerSetup.PROTOCOL_SMTP );
+  @BeforeClass
+  public static void startEmailServer() {
+    String port = TestProperties.getString("email.server.port");
+    emailServerPort = new Integer(port);
+    // ServerSetup smtp = new ServerSetup( 1234, null, ServerSetup.PROTOCOL_SMTP );
+    ServerSetup smtp = new ServerSetup(emailServerPort, null, ServerSetup.PROTOCOL_SMTP);
 
-        server = new GreenMail( smtp );
-        server.setUser( "system@nexus.org", "smtp-username", "smtp-password" );
-        LOG.debug( "Starting e-mail server" );
-        server.start();
+    server = new GreenMail(smtp);
+    server.setUser("system@nexus.org", "smtp-username", "smtp-password");
+    LOG.debug("Starting e-mail server");
+    server.start();
+  }
+
+  @AfterClass
+  public static void stopEmailServer() {
+    if (server != null) {
+      LOG.debug("Stoping e-mail server");
+      server.stop();
+
+      server = null;
     }
+  }
 
-    @AfterClass
-    public static void stopEmailServer()
-    {
-        if ( server != null )
-        {
-            LOG.debug( "Stoping e-mail server" );
-            server.stop();
+  protected boolean waitForMail(int count) {
+    return waitForMail(count, 5000);
+  }
 
-            server = null;
-        }
+  protected boolean waitForMail(int count, long timeout) {
+    try {
+      return server.waitForIncomingEmail(timeout, count);
     }
-
-    protected boolean waitForMail( int count )
-    {
-        return waitForMail( count, 5000 );
+    catch (InterruptedException e) {
+      return false;
     }
-
-    protected boolean waitForMail( int count, long timeout )
-    {
-        try
-        {
-            return server.waitForIncomingEmail( timeout, count );
-        }
-        catch ( InterruptedException e )
-        {
-            return false;
-        }
-    }
+  }
 
 }

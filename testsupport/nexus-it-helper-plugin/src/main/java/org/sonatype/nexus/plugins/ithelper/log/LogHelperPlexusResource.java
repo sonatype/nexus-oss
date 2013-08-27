@@ -10,9 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.ithelper.log;
 
 import java.util.Date;
+
+import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
@@ -24,145 +29,115 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "LogHelperResource" )
+@Component(role = PlexusResource.class, hint = "LogHelperResource")
 public class LogHelperPlexusResource
     extends AbstractPlexusResource
 {
 
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
+  @Override
+  public Object getPayloadInstance() {
+    return null;
+  }
+
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(getResourceUri(), "anon");
+  }
+
+  @Override
+  public String getResourceUri() {
+    return "/loghelper";
+  }
+
+  @Override
+  public Object get(Context context, Request request, Response response, Variant variant)
+      throws ResourceException
+  {
+    Form form = request.getResourceRef().getQueryAsForm();
+
+    String loggerName = form.getFirstValue("loggerName");
+    String level = form.getFirstValue("level");
+    String message = form.getFirstValue("message");
+    String exceptionType = form.getFirstValue("exceptionType");
+    String exceptionMessage = form.getFirstValue("exceptionMessage");
+
+    if (message == null) {
+      message = "A log message at " + new Date();
     }
 
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "anon" );
+    Throwable exception = null;
+    if (exceptionType != null || exceptionMessage != null) {
+      if (exceptionMessage == null) {
+        exceptionMessage = "An exception thrown at " + new Date();
+      }
+      exception = new Exception(exceptionMessage);
+      if (exceptionType != null) {
+        try {
+          exception =
+              (Throwable) this.getClass().getClassLoader().loadClass(exceptionType).getConstructor(
+                  String.class).newInstance(exceptionMessage);
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
     }
 
-    @Override
-    public String getResourceUri()
-    {
-        return "/loghelper";
+    Logger logger;
+    if (loggerName == null) {
+      logger = LoggerFactory.getLogger(this.getClass());
+    }
+    else {
+      logger = LoggerFactory.getLogger(loggerName);
     }
 
-    @Override
-    public Object get( Context context, Request request, Response response, Variant variant )
-        throws ResourceException
-    {
-        Form form = request.getResourceRef().getQueryAsForm();
-
-        String loggerName = form.getFirstValue( "loggerName" );
-        String level = form.getFirstValue( "level" );
-        String message = form.getFirstValue( "message" );
-        String exceptionType = form.getFirstValue( "exceptionType" );
-        String exceptionMessage = form.getFirstValue( "exceptionMessage" );
-
-        if ( message == null )
-        {
-            message = "A log message at " + new Date();
-        }
-
-        Throwable exception = null;
-        if ( exceptionType != null || exceptionMessage != null )
-        {
-            if ( exceptionMessage == null )
-            {
-                exceptionMessage = "An exception thrown at " + new Date();
-            }
-            exception = new Exception( exceptionMessage );
-            if ( exceptionType != null )
-            {
-                try
-                {
-                    exception =
-                        (Throwable) this.getClass().getClassLoader().loadClass( exceptionType ).getConstructor(
-                            String.class ).newInstance( exceptionMessage );
-                }
-                catch ( Exception e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        Logger logger;
-        if ( loggerName == null )
-        {
-            logger = LoggerFactory.getLogger( this.getClass() );
-        }
-        else
-        {
-            logger = LoggerFactory.getLogger( loggerName );
-        }
-
-        if ( level == null )
-        {
-            level = "INFO";
-        }
-        if ( level.equalsIgnoreCase( "trace" ) )
-        {
-            if ( exception == null )
-            {
-                logger.trace( message );
-            }
-            else
-            {
-                logger.trace( message, exception );
-            }
-        }
-        else if ( level.equalsIgnoreCase( "debug" ) )
-        {
-            if ( exception == null )
-            {
-                logger.debug( message );
-            }
-            else
-            {
-                logger.debug( message, exception );
-            }
-        }
-        else if ( level.equalsIgnoreCase( "warn" ) )
-        {
-            if ( exception == null )
-            {
-                logger.warn( message );
-            }
-            else
-            {
-                logger.warn( message, exception );
-            }
-        }
-        else if ( level.equalsIgnoreCase( "error" ) )
-        {
-            if ( exception == null )
-            {
-                logger.error( message );
-            }
-            else
-            {
-                logger.error( message, exception );
-            }
-        }
-        else
-        {
-            if ( exception == null )
-            {
-                logger.info( message );
-            }
-            else
-            {
-                logger.info( message, exception );
-            }
-        }
-
-        response.setStatus( Status.SUCCESS_OK );
-        return "OK";
+    if (level == null) {
+      level = "INFO";
     }
+    if (level.equalsIgnoreCase("trace")) {
+      if (exception == null) {
+        logger.trace(message);
+      }
+      else {
+        logger.trace(message, exception);
+      }
+    }
+    else if (level.equalsIgnoreCase("debug")) {
+      if (exception == null) {
+        logger.debug(message);
+      }
+      else {
+        logger.debug(message, exception);
+      }
+    }
+    else if (level.equalsIgnoreCase("warn")) {
+      if (exception == null) {
+        logger.warn(message);
+      }
+      else {
+        logger.warn(message, exception);
+      }
+    }
+    else if (level.equalsIgnoreCase("error")) {
+      if (exception == null) {
+        logger.error(message);
+      }
+      else {
+        logger.error(message, exception);
+      }
+    }
+    else {
+      if (exception == null) {
+        logger.info(message);
+      }
+      else {
+        logger.info(message, exception);
+      }
+    }
+
+    response.setStatus(Status.SUCCESS_OK);
+    return "OK";
+  }
 
 }

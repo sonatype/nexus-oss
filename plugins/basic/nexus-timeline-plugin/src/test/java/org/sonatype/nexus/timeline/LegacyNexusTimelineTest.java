@@ -23,9 +23,9 @@ import org.sonatype.security.guice.SecurityModule;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
 import com.google.inject.Module;
-
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;

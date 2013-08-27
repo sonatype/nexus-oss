@@ -10,55 +10,54 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus533;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
+
+import org.apache.commons.lang.time.DateUtils;
 
 public class Nexus533TaskManualIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceBaseResource>
 {
 
-    private static ScheduledServiceBaseResource scheduledTask;
+  private static ScheduledServiceBaseResource scheduledTask;
 
-    @Override
-    public ScheduledServiceBaseResource getTaskScheduled()
-    {
-        if ( scheduledTask == null )
-        {
-            scheduledTask = new ScheduledServiceBaseResource();
-            scheduledTask.setEnabled( true );
-            scheduledTask.setId( null );
-            scheduledTask.setName( "taskManual" );
-            scheduledTask.setSchedule( "manual" );
-            // A future date
-            Date startDate = DateUtils.addDays( new Date(), 10 );
-            startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
+  @Override
+  public ScheduledServiceBaseResource getTaskScheduled() {
+    if (scheduledTask == null) {
+      scheduledTask = new ScheduledServiceBaseResource();
+      scheduledTask.setEnabled(true);
+      scheduledTask.setId(null);
+      scheduledTask.setName("taskManual");
+      scheduledTask.setSchedule("manual");
+      // A future date
+      Date startDate = DateUtils.addDays(new Date(), 10);
+      startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
 
-            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
+      scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
 
-            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( "repositoryId" );
-            prop.setValue( "all_repo" );
-            scheduledTask.addProperty( prop );
-        }
-        return scheduledTask;
+      ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+      prop.setKey("repositoryId");
+      prop.setValue("all_repo");
+      scheduledTask.addProperty(prop);
     }
+    return scheduledTask;
+  }
 
-    @Override
-    public void updateTask( ScheduledServiceBaseResource scheduledTask )
-    {
-        scheduledTask.getProperties().clear();
+  @Override
+  public void updateTask(ScheduledServiceBaseResource scheduledTask) {
+    scheduledTask.getProperties().clear();
 
-        ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryId" );
-        prop.setValue( "nexus-test-harness-repo" );
-        scheduledTask.addProperty( prop );
-    }
-  
+    ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+    prop.setKey("repositoryId");
+    prop.setValue("nexus-test-harness-repo");
+    scheduledTask.addProperty(prop);
+  }
+
 }

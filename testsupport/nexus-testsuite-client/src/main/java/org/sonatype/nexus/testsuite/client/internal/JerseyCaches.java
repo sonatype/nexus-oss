@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client.internal;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
@@ -18,21 +19,19 @@ import org.sonatype.nexus.testsuite.client.Caches;
 
 /**
  * Jersey implementation of {@link Caches}.
- * 
+ *
  * @since 2.4
  */
 public class JerseyCaches
     extends SubsystemSupport<JerseyNexusClient>
     implements Caches
 {
-    public JerseyCaches( final JerseyNexusClient nexusClient )
-    {
-        super( nexusClient );
-    }
+  public JerseyCaches(final JerseyNexusClient nexusClient) {
+    super(nexusClient);
+  }
 
-    @Override
-    public void expireCaches( final String repositoryId )
-    {
-        getNexusClient().serviceResource( "data_cache/repositories/" + repositoryId + "/content" ).delete();
-    }
+  @Override
+  public void expireCaches(final String repositoryId) {
+    getNexusClient().serviceResource("data_cache/repositories/" + repositoryId + "/content").delete();
+  }
 }

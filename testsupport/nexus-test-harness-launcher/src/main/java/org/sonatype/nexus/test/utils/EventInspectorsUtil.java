@@ -10,14 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.test.utils;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
+
+import org.restlet.data.Status;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Util class to talk with nexus events
@@ -25,59 +27,54 @@ import org.sonatype.nexus.integrationtests.NexusRestClient;
 public class EventInspectorsUtil
 {
 
-    private final NexusRestClient nexusRestClient;
+  private final NexusRestClient nexusRestClient;
 
-    public EventInspectorsUtil( final NexusRestClient nexusRestClient )
-    {
-        this.nexusRestClient = checkNotNull( nexusRestClient );
+  public EventInspectorsUtil(final NexusRestClient nexusRestClient) {
+    this.nexusRestClient = checkNotNull(nexusRestClient);
+  }
+
+  protected boolean isCalmPeriod()
+      throws IOException
+  {
+    final Status status = nexusRestClient.doGetForStatus("service/local/eventInspectors/isCalmPeriod");
+
+    if (status.isSuccess()) {
+      // only 200 Ok means calm period,
+      // otherwise 202 Accepted is returned
+      return status.getCode() == Status.SUCCESS_OK.getCode();
+    }
+    else {
+      throw new IOException("The isCalmPeriod REST resource reported an error ("
+          + status + "), bailing out!");
+    }
+  }
+
+  /**
+   * Hold execution until asynchronous events at nexus side stop running
+   */
+  public void waitForCalmPeriod(final long waitMillis)
+      throws IOException, InterruptedException
+  {
+    Thread.yield();
+    if (waitMillis > 0) {
+      Thread.sleep(waitMillis);
     }
 
-    protected boolean isCalmPeriod()
-        throws IOException
-    {
-        final Status status = nexusRestClient.doGetForStatus( "service/local/eventInspectors/isCalmPeriod" );
+    final Status status =
+        nexusRestClient.doGetForStatus("service/local/eventInspectors/isCalmPeriod?waitForCalm=true");
 
-        if ( status.isSuccess() )
-        {
-            // only 200 Ok means calm period,
-            // otherwise 202 Accepted is returned
-            return status.getCode() == Status.SUCCESS_OK.getCode();
-        }
-        else
-        {
-            throw new IOException( "The isCalmPeriod REST resource reported an error ("
-                                       + status + "), bailing out!" );
-        }
+    if (status.getCode() != Status.SUCCESS_OK.getCode()) {
+      throw new IOException("The isCalmPeriod REST resource reported an error ("
+          + status.toString() + "), bailing out!");
     }
+  }
 
-    /**
-     * Hold execution until asynchronous events at nexus side stop running
-     */
-    public void waitForCalmPeriod( final long waitMillis )
-        throws IOException, InterruptedException
-    {
-        Thread.yield();
-        if ( waitMillis > 0 )
-        {
-            Thread.sleep( waitMillis );
-        }
-
-        final Status status =
-            nexusRestClient.doGetForStatus( "service/local/eventInspectors/isCalmPeriod?waitForCalm=true" );
-
-        if ( status.getCode() != Status.SUCCESS_OK.getCode() )
-        {
-            throw new IOException( "The isCalmPeriod REST resource reported an error ("
-                                       + status.toString() + "), bailing out!" );
-        }
-    }
-
-    /**
-     * Hold execution until asynchronous events at nexus side stop running
-     */
-    public void waitForCalmPeriod()
-        throws IOException, InterruptedException
-    {
-        waitForCalmPeriod( 0 );
-    }
+  /**
+   * Hold execution until asynchronous events at nexus side stop running
+   */
+  public void waitForCalmPeriod()
+      throws IOException, InterruptedException
+  {
+    waitForCalmPeriod(0);
+  }
 }

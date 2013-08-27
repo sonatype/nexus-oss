@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
 import org.sonatype.nexus.rest.MIndexerXStreamConfigurator;
@@ -23,37 +24,34 @@ import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 /**
  * XStream factory for Nexus Core. It gives away a preconfigured XStream to communicate with Core REST Resources.
- * 
+ *
  * @author cstamas
  */
 public class XStreamFactory
 {
 
-    public static XStream getXmlXStream()
-    {
-        XStream xmlXStream = new XStream( new LookAheadXppDriver() );
-        initXStream( xmlXStream );
+  public static XStream getXmlXStream() {
+    XStream xmlXStream = new XStream(new LookAheadXppDriver());
+    initXStream(xmlXStream);
 
-        return xmlXStream;
-    }
+    return xmlXStream;
+  }
 
-    public static XStream getJsonXStream()
-    {
-        XStream jsonXStream = new XStream( new JsonOrgHierarchicalStreamDriver() );
+  public static XStream getJsonXStream() {
+    XStream jsonXStream = new XStream(new JsonOrgHierarchicalStreamDriver());
 
-        // for JSON, we use a custom converter for Maps
-        jsonXStream.registerConverter( new PrimitiveKeyedMapConverter( jsonXStream.getMapper() ) );
+    // for JSON, we use a custom converter for Maps
+    jsonXStream.registerConverter(new PrimitiveKeyedMapConverter(jsonXStream.getMapper()));
 
-        initXStream( jsonXStream );
-        return jsonXStream;
-    }
+    initXStream(jsonXStream);
+    return jsonXStream;
+  }
 
-    private static void initXStream( XStream xstream )
-    {
-        XStreamConfigurator.configureXStream( xstream );
-        MIndexerXStreamConfigurator.configureXStream( xstream );
+  private static void initXStream(XStream xstream) {
+    XStreamConfigurator.configureXStream(xstream);
+    MIndexerXStreamConfigurator.configureXStream(xstream);
 
-        // Nexus replaces the String converter with one that escape HTML, we do NOT want that on the IT client.
-        xstream.registerConverter( new StringConverter() );
-    }
+    // Nexus replaces the String converter with one that escape HTML, we do NOT want that on the IT client.
+    xstream.registerConverter(new StringConverter());
+  }
 }

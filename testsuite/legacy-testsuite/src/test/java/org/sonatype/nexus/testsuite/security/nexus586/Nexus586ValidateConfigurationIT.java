@@ -10,41 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus586;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restlet.data.Status;
+
 
 /**
- * Saving the Nexus config needs to validate the anonymous user information 
+ * Saving the Nexus config needs to validate the anonymous user information
  */
 public class Nexus586ValidateConfigurationIT
     extends AbstractNexusIntegrationTest
 {
 
-    @BeforeClass
-    public static void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-    @Test
-    public void wrongAnonymousAccount()
-        throws Exception
-    {
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+  @Test
+  public void wrongAnonymousAccount()
+      throws Exception
+  {
+    TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-        globalConfig.setSecurityAnonymousUsername( "zigfrid" );
+    GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
+    globalConfig.setSecurityAnonymousUsername("zigfrid");
 
-        Status status = SettingsMessageUtil.save( globalConfig );
-        Assert.assertEquals( "Can't set an invalid user as anonymous", status.getCode(), 400 );
-    }
+    Status status = SettingsMessageUtil.save(globalConfig);
+    Assert.assertEquals("Can't set an invalid user as anonymous", status.getCode(), 400);
+  }
 
 }

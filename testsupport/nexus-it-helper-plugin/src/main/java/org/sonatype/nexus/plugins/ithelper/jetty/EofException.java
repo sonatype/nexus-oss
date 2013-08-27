@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.ithelper.jetty;
 
 // FIXME: Appears unused, verify and remove
@@ -18,11 +19,10 @@ public class EofException
     extends Exception
 {
 
-    private static final long serialVersionUID = -5731938195527790534L;
+  private static final long serialVersionUID = -5731938195527790534L;
 
-    public EofException( String message )
-    {
-        super( message );
-    }
+  public EofException(String message) {
+    super(message);
+  }
 
 }

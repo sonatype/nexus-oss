@@ -10,71 +10,67 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.tasks.api;
 
 import javax.inject.Named;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
-@Named( "SleepRepositoryTask" )
+import org.codehaus.plexus.util.StringUtils;
+
+@Named("SleepRepositoryTask")
 public class SleepRepositoryTask
     extends AbstractNexusRepositoriesTask<Object>
 {
 
-    private boolean cancellable;
+  private boolean cancellable;
 
-    @Override
-    protected Object doRun()
-        throws Exception
-    {
-        cancellable = Boolean.parseBoolean( getParameter( "cancellable" ) );
+  @Override
+  protected Object doRun()
+      throws Exception
+  {
+    cancellable = Boolean.parseBoolean(getParameter("cancellable"));
 
-        getLogger().debug( getMessage() );
+    getLogger().debug(getMessage());
 
-        final int time = getTime();
-        sleep( time );
-        getRepositoryRegistry().getRepository( getRepositoryId() );
-        sleep( time );
-        return null;
+    final int time = getTime();
+    sleep(time);
+    getRepositoryRegistry().getRepository(getRepositoryId());
+    sleep(time);
+    return null;
+  }
+
+  protected void sleep(final int time)
+      throws InterruptedException
+  {
+    for (int i = 0; i < time; i++) {
+      Thread.sleep(1000 / 2);
+      if (cancellable) {
+        checkInterruption();
+      }
     }
+  }
 
-    protected void sleep( final int time )
-        throws InterruptedException
-    {
-        for ( int i = 0; i < time; i++ )
-        {
-            Thread.sleep( 1000 / 2 );
-            if ( cancellable ) {
-                checkInterruption();
-            }
-        }
+  private int getTime() {
+    String t = getParameter("time");
+
+    if (StringUtils.isEmpty(t)) {
+      return 5;
     }
-
-    private int getTime()
-    {
-        String t = getParameter( "time" );
-
-        if ( StringUtils.isEmpty( t ) )
-        {
-            return 5;
-        }
-        else
-        {
-            return new Integer( t );
-        }
+    else {
+      return new Integer(t);
     }
+  }
 
-    @Override
-    protected String getAction()
-    {
-        return "Sleeping";
-    }
+  @Override
+  protected String getAction() {
+    return "Sleeping";
+  }
 
-    @Override
-    protected String getMessage()
-    {
-        return "Sleeping for " + getTime() + " seconds (cancellable: "+ cancellable + ")!";
-    }
+  @Override
+  protected String getMessage() {
+    return "Sleeping for " + getTime() + " seconds (cancellable: " + cancellable + ")!";
+  }
 
 }

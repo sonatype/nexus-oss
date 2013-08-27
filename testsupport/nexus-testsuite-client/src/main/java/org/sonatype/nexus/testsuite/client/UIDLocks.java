@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client;
 
 /**
@@ -20,31 +21,31 @@ package org.sonatype.nexus.testsuite.client;
 public interface UIDLocks
 {
 
-    /**
-     * Locks a repository item for specified action
-     *
-     * @param repository containing the item to be locked
-     * @param path       of item to be locked
-     * @param lockType   on of read/create/delete/update
-     */
-    void lock( String repository, String path, LockType lockType );
+  /**
+   * Locks a repository item for specified action
+   *
+   * @param repository containing the item to be locked
+   * @param path       of item to be locked
+   * @param lockType   on of read/create/delete/update
+   */
+  void lock(String repository, String path, LockType lockType);
 
-    /**
-     * Unlocks a repository item.
-     *
-     * @param repository containing the item to be unlocked
-     * @param path       of item to be unlocked
-     */
-    void unlock( String repository, String path );
+  /**
+   * Unlocks a repository item.
+   *
+   * @param repository containing the item to be unlocked
+   * @param path       of item to be unlocked
+   */
+  void unlock(String repository, String path);
 
-    /**
-     * Allowed locking types.
-     */
-    public enum LockType
-    {
+  /**
+   * Allowed locking types.
+   */
+  public enum LockType
+  {
 
-        read, create, update, delete;
+    read, create, update, delete;
 
-    }
+  }
 
 }
