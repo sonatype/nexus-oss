@@ -19,7 +19,9 @@ import java.io.File;
  * A content locator that emits a InputStream using a File. Reusable.
  *
  * @author cstamas
+ * @deprecated use {@link org.sonatype.nexus.proxy.item.FileContentLocator} instead.
  */
+@Deprecated
 public class FileContentLocator
     extends org.sonatype.nexus.proxy.item.FileContentLocator
 {
