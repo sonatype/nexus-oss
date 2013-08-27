@@ -18,6 +18,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.ZipInputStream;
 
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -29,10 +30,9 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.test.NexusTestSupport;
 
 public abstract class AbstractObrMetadataTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
 
     protected ObrMetadataSource obrMetadataSource;

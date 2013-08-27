@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.configuration;
 
 import java.util.List;
@@ -19,52 +20,44 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 public interface SecurityConfigurationManager
 {
 
-    void setEnabled( boolean enabled );
+  void setEnabled(boolean enabled);
 
-    boolean isEnabled();
+  boolean isEnabled();
 
-    void setAnonymousAccessEnabled( boolean anonymousAccessEnabled );
+  void setAnonymousAccessEnabled(boolean anonymousAccessEnabled);
 
-    boolean isAnonymousAccessEnabled();
+  boolean isAnonymousAccessEnabled();
 
-    void setAnonymousUsername( String anonymousUsername )
-        throws InvalidConfigurationException;
+  void setAnonymousUsername(String anonymousUsername)
+      throws InvalidConfigurationException;
 
-    String getAnonymousUsername();
+  String getAnonymousUsername();
 
-    void setAnonymousPassword( String anonymousPassword )
-        throws InvalidConfigurationException;
+  void setAnonymousPassword(String anonymousPassword)
+      throws InvalidConfigurationException;
 
-    String getAnonymousPassword();
-    
-    /**
-     * The number of iterations to be used when hashing passwords
-     * 
-     * @return number of hash iterations
-     * @since 3.1
-     */
-    int getHashIterations();
+  String getAnonymousPassword();
 
-    void setRealms( List<String> realms )
-        throws InvalidConfigurationException;
+  /**
+   * The number of iterations to be used when hashing passwords
+   *
+   * @return number of hash iterations
+   * @since 3.1
+   */
+  int getHashIterations();
 
-    List<String> getRealms();
+  void setRealms(List<String> realms)
+      throws InvalidConfigurationException;
 
-    /**
-     * Clear the cache and reload from file
-     */
-    void clearCache();
+  List<String> getRealms();
 
-    /**
-     * Save to disk what is currently cached in memory
-     */
-    void save();
+  /**
+   * Clear the cache and reload from file
+   */
+  void clearCache();
 
-    /**
-     * @return the id of a security manager to be used by default security system
-     */
-    String getSecurityManager();
-
-    void setSecurityManager( String securityManager );
-
+  /**
+   * Save to disk what is currently cached in memory
+   */
+  void save();
 }

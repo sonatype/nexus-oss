@@ -17,12 +17,12 @@ import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import static org.mockito.Mockito.when;
 
 public class RemoteScrapeStrategyTest
@@ -34,7 +34,6 @@ public class RemoteScrapeStrategyTest
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
-    when(mavenProxyRepository.getRemoteStorageContext()).thenReturn(new DefaultRemoteStorageContext(null));
   }
 
   @Test(expected = StrategyFailedException.class)
