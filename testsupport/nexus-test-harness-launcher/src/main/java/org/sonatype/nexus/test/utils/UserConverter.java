@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
 import org.sonatype.security.model.CUser;
@@ -18,40 +19,38 @@ import org.sonatype.security.rest.model.UserResource;
 public class UserConverter
 {
 
-    public static UserResource toUserResource( CUser user )
-    {
-        UserResource resource = new UserResource();
-        resource.setEmail( user.getEmail() );
-        resource.setFirstName( user.getFirstName() );
-        resource.setLastName( user.getLastName() );
-        resource.setStatus( user.getStatus() );
-        resource.setUserId( user.getId() );
+  public static UserResource toUserResource(CUser user) {
+    UserResource resource = new UserResource();
+    resource.setEmail(user.getEmail());
+    resource.setFirstName(user.getFirstName());
+    resource.setLastName(user.getLastName());
+    resource.setStatus(user.getStatus());
+    resource.setUserId(user.getId());
 
-//        for ( String roleId : (List<String>) user.getRoles() )
-//        {
-//            resource.addRole( roleId );
-//        }
+    //        for ( String roleId : (List<String>) user.getRoles() )
+    //        {
+    //            resource.addRole( roleId );
+    //        }
 
-        return resource;
-    }
+    return resource;
+  }
 
-    public static CUser toCUser( UserResource resource )
-    {
-        CUser user = new CUser();
+  public static CUser toCUser(UserResource resource) {
+    CUser user = new CUser();
 
-        user.setEmail( resource.getEmail() );
-        user.setFirstName( resource.getFirstName() );
-        user.setLastName( resource.getLastName() );
-        user.setStatus( resource.getStatus() );
-        user.setId( resource.getUserId() );
+    user.setEmail(resource.getEmail());
+    user.setFirstName(resource.getFirstName());
+    user.setLastName(resource.getLastName());
+    user.setStatus(resource.getStatus());
+    user.setId(resource.getUserId());
 
-//        user.getRoles().clear();
-//        for ( String roleId : (List<String>) resource.getRoles() )
-//        {
-//            user.addRole( roleId );
-//        }
+    //        user.getRoles().clear();
+    //        for ( String roleId : (List<String>) resource.getRoles() )
+    //        {
+    //            user.addRole( roleId );
+    //        }
 
-        return user;
-    }
+    return user;
+  }
 
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
@@ -25,40 +26,35 @@ import java.util.ResourceBundle;
 
 public class TestProperties
 {
-    private static ResourceBundle bundle;
+  private static ResourceBundle bundle;
 
-    private static synchronized ResourceBundle getBundle() {
-        if (bundle == null) {
-            bundle = ResourceBundle.getBundle( "baseTest" );
-        }
-        return bundle;
+  private static synchronized ResourceBundle getBundle() {
+    if (bundle == null) {
+      bundle = ResourceBundle.getBundle("baseTest");
     }
+    return bundle;
+  }
 
-    public static String getString( String key )
-    {
-        return getBundle().getString( key );
-    }
+  public static String getString(String key) {
+    return getBundle().getString(key);
+  }
 
-    public static Integer getInteger( String key )
-    {
-        String value = getBundle().getString( key );
-        return new Integer( value );
-    }
+  public static Integer getInteger(String key) {
+    String value = getBundle().getString(key);
+    return new Integer(value);
+  }
 
-    public static Map<String, String> getAll()
-    {
-        Map<String, String> properties = new LinkedHashMap<String, String>();
-        Enumeration<String> keys = getBundle().getKeys();
-        while ( keys.hasMoreElements() )
-        {
-            String key = keys.nextElement();
-            properties.put( key, getBundle().getString( key ) );
-        }
-        return properties;
+  public static Map<String, String> getAll() {
+    Map<String, String> properties = new LinkedHashMap<String, String>();
+    Enumeration<String> keys = getBundle().getKeys();
+    while (keys.hasMoreElements()) {
+      String key = keys.nextElement();
+      properties.put(key, getBundle().getString(key));
     }
+    return properties;
+  }
 
-    public static File getFile( String key )
-    {
-        return new File( getString( key ) );
-    }
+  public static File getFile(String key) {
+    return new File(getString(key));
+  }
 }

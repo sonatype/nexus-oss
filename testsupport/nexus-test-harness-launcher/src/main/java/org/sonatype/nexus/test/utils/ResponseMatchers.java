@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
-import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.InError;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.IsRedirecting;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.IsSuccessful;
@@ -22,49 +21,45 @@ import org.sonatype.nexus.test.utils.NexusRequestMatchers.RedirectLocationMatche
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.RespondsWithStatusCode;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.ResponseTextMatches;
 
+import org.hamcrest.Factory;
+import org.hamcrest.Matcher;
+
 public class ResponseMatchers
 {
 
-    @Factory
-    public static RespondsWithStatusCode respondsWithStatusCode( final int expectedStatusCode )
-    {
-        return new RespondsWithStatusCode( expectedStatusCode );
-    }
+  @Factory
+  public static RespondsWithStatusCode respondsWithStatusCode(final int expectedStatusCode) {
+    return new RespondsWithStatusCode(expectedStatusCode);
+  }
 
-    @Factory
-    public static InError inError()
-    {
-        return new InError();
-    }
+  @Factory
+  public static InError inError() {
+    return new InError();
+  }
 
-    @Factory
-    public static IsSuccessful isSuccessful()
-    {
-        return new IsSuccessful();
-    }
+  @Factory
+  public static IsSuccessful isSuccessful() {
+    return new IsSuccessful();
+  }
 
-    @Factory
-    public static ResponseTextMatches responseText( Matcher<String> matcher )
-    {
-        return new ResponseTextMatches( matcher );
-    }
+  @Factory
+  public static ResponseTextMatches responseText(Matcher<String> matcher) {
+    return new ResponseTextMatches(matcher);
+  }
 
-    @Factory
-    public static IsRedirecting isRedirecting()
-    {
-        return new IsRedirecting();
-    }
+  @Factory
+  public static IsRedirecting isRedirecting() {
+    return new IsRedirecting();
+  }
 
-    @Factory
-    public static RedirectLocationMatches redirectLocation( Matcher<String> matcher )
-    {
-        return new RedirectLocationMatches( matcher );
-    }
+  @Factory
+  public static RedirectLocationMatches redirectLocation(Matcher<String> matcher) {
+    return new RedirectLocationMatches(matcher);
+  }
 
-    @Factory
-    public static IsSuccessfulCode isSuccessfulCode()
-    {
-        return new IsSuccessfulCode();
-    }
+  @Factory
+  public static IsSuccessfulCode isSuccessfulCode() {
+    return new IsSuccessfulCode();
+  }
 
 }

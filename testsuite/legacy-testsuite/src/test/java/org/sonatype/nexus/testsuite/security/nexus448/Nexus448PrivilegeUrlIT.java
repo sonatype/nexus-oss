@@ -10,20 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus448;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
+
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restlet.data.MediaType;
 
 /**
  * GETS for application privileges where returning an error, so this is a really simple test to make sure the GET will
@@ -33,29 +35,28 @@ public class Nexus448PrivilegeUrlIT
     extends AbstractNexusIntegrationTest
 {
 
-    private PrivilegesMessageUtil messageUtil;
+  private PrivilegesMessageUtil messageUtil;
 
-    public Nexus448PrivilegeUrlIT()
-    {
-        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-    }
-    
-    @BeforeClass
-    public static void setSecureTest(){ 
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
+  public Nexus448PrivilegeUrlIT() {
+    this.messageUtil = new PrivilegesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+  }
 
-    @Test
-    public void testUrls()
-        throws IOException
-    {
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
-        PrivilegeStatusResource resource = this.messageUtil.getPrivilegeResource( "T2" );
-        Assert.assertEquals( "Type", resource.getType(), TargetPrivilegeDescriptor.TYPE );
+  @Test
+  public void testUrls()
+      throws IOException
+  {
 
-        resource = this.messageUtil.getPrivilegeResource( "1" );
-        Assert.assertEquals( "Type", resource.getType(), ApplicationPrivilegeDescriptor.TYPE );
+    PrivilegeStatusResource resource = this.messageUtil.getPrivilegeResource("T2");
+    Assert.assertEquals("Type", resource.getType(), TargetPrivilegeDescriptor.TYPE);
 
-    }
+    resource = this.messageUtil.getPrivilegeResource("1");
+    Assert.assertEquals("Type", resource.getType(), ApplicationPrivilegeDescriptor.TYPE);
+
+  }
 
 }

@@ -10,27 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
 public class NexusIllegalStateException
     extends Exception
 {
 
-    private static final long serialVersionUID = -7898195673031677742L;
+  private static final long serialVersionUID = -7898195673031677742L;
 
-    public NexusIllegalStateException()
-    {
-        this( null );
-    }
+  public NexusIllegalStateException() {
+    this(null);
+  }
 
-    public NexusIllegalStateException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+  public NexusIllegalStateException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public NexusIllegalStateException( String message )
-    {
-        this( message, null );
-    }
+  public NexusIllegalStateException(String message) {
+    this(message, null);
+  }
 
 }

@@ -109,7 +109,8 @@ public class Nexus2120EnableDownloadRemoteIndexIT
     IndexBrowserTreeViewResponseDTO resourceResponse =
         (IndexBrowserTreeViewResponseDTO) re.getPayload(new IndexBrowserTreeViewResponseDTO());
 
-    assertThat( "without index downloaded root node does not have children", resourceResponse.getData().getChildren(), is( nullValue() ) );
+    assertThat("without index downloaded root node does not have children", resourceResponse.getData().getChildren(),
+        is(nullValue()));
 
     // I changed my mind, I do wanna remote index
     basic.setDownloadRemoteIndexes(true);

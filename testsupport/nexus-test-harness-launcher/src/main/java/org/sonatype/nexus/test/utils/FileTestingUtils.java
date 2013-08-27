@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.test.utils;
 
 import java.io.ByteArrayInputStream;
@@ -42,283 +43,251 @@ import org.slf4j.LoggerFactory;
 public class FileTestingUtils
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( FileTestingUtils.class );
+  private static final Logger LOG = LoggerFactory.getLogger(FileTestingUtils.class);
 
-    private static final int BUFFER_SIZE = 0x1000;
+  private static final int BUFFER_SIZE = 0x1000;
 
-    private static final String SHA1 = "SHA1";
+  private static final String SHA1 = "SHA1";
 
-    /**
-     * Creates a SHA1 hash from a file.
-     *
-     * @param file The file to be digested.
-     * @return An SHA1 hash based on the contents of the file.
-     * @throws IOException
-     */
-    public static String createSHA1FromFile( File file )
-        throws IOException
-    {
-        FileInputStream fis = null;
-        try
-        {
-            fis = new FileInputStream( file );
-            return createSHA1FromStream( fis );
+  /**
+   * Creates a SHA1 hash from a file.
+   *
+   * @param file The file to be digested.
+   * @return An SHA1 hash based on the contents of the file.
+   */
+  public static String createSHA1FromFile(File file)
+      throws IOException
+  {
+    FileInputStream fis = null;
+    try {
+      fis = new FileInputStream(file);
+      return createSHA1FromStream(fis);
+    }
+    finally {
+      if (fis != null) {
+        fis.close();
+      }
+    }
+  }
+
+  /**
+   * Creates a SHA1 hash from a url.
+   *
+   * @param url The URL to opened and digested.
+   * @return An SHA1 hash based on the contents of the URL.
+   */
+  public static String createSHA1FromURL(URL url)
+      throws IOException
+  {
+    InputStream is = url.openStream();
+    try {
+      return createSHA1FromStream(is);
+    }
+    finally {
+      if (is != null) {
+        is.close();
+      }
+    }
+  }
+
+  /**
+   * Creates a SHA1 hash from the contents of a String.
+   *
+   * @param data the String to be digested.
+   * @return An SHA1 hash based on the contents of the String.
+   */
+  public static String createSHA1FromString(String data)
+      throws IOException
+  {
+
+    ByteArrayInputStream bais = new ByteArrayInputStream(data.getBytes());
+    return createSHA1FromStream(bais);
+
+  }
+
+  /**
+   * Creates a SHA1 hash from an InputStream.
+   *
+   * @param in Inputstream to be digested.
+   * @returnn SHA1 hash based on the contents of the stream.
+   */
+  public static String createSHA1FromStream(InputStream in)
+      throws IOException
+  {
+
+    byte[] bytes = new byte[BUFFER_SIZE];
+
+    try {
+      MessageDigest digest = MessageDigest.getInstance(SHA1);
+      for (int n; (n = in.read(bytes)) >= 0; ) {
+        if (n > 0) {
+          digest.update(bytes, 0, n);
         }
-        finally
-        {
-            if ( fis != null )
-            {
-                fis.close();
-            }
+      }
+
+      bytes = digest.digest();
+      StringBuilder sb = new StringBuilder(bytes.length * 2);
+      for (int i = 0; i < bytes.length; i++) {
+        int n = bytes[i] & 0xFF;
+        if (n < 0x10) {
+          sb.append('0');
         }
+        sb.append(Integer.toHexString(n));
+      }
+
+      return sb.toString();
+    }
+    catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+      throw new IllegalStateException(noSuchAlgorithmException.getMessage(), noSuchAlgorithmException);
+    }
+  }
+
+  public static boolean compareFileSHA1s(File file1, File file2)
+      throws IOException
+  {
+
+    if (file1 != null && file1.exists() && file2 != null && file2.exists() && file1.length() == file2.length()) {
+      String file1SHA1 = createSHA1FromFile(file1);
+      String file2SHA1 = createSHA1FromFile(file2);
+
+      return file1SHA1.equals(file2SHA1);
+    }
+    return false;
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static File getTestFile(Class clazz, String filename) {
+    String resource = clazz.getName().replace('.', '/') + "Resources/" + filename;
+    LOG.debug("Looking for resource: " + resource);
+    URL classURL = Thread.currentThread().getContextClassLoader().getResource(resource);
+    LOG.debug("found: " + classURL);
+    return new File(classURL.getFile());
+  }
+
+  public static void main(String[] args) {
+    String usage = "Usage: java " + FileTestingUtils.class + " <url>";
+
+    if (args == null || args.length != 1) {
+      LOG.info(usage);
+      return;
     }
 
-    /**
-     * Creates a SHA1 hash from a url.
-     *
-     * @param url The URL to opened and digested.
-     * @return An SHA1 hash based on the contents of the URL.
-     * @throws IOException
-     */
-    public static String createSHA1FromURL( URL url )
-        throws IOException
-    {
-        InputStream is = url.openStream();
-        try
-        {
-            return createSHA1FromStream( is );
-        }
-        finally
-        {
-            if ( is != null )
-            {
-                is.close();
-            }
-        }
+    try {
+      URL url = new URL(args[0]);
+      LOG.info(createSHA1FromURL(url));
+    }
+    catch (Exception e) {
+      LOG.warn(usage, e);
     }
 
-    /**
-     * Creates a SHA1 hash from the contents of a String.
-     *
-     * @param data the String to be digested.
-     * @return An SHA1 hash based on the contents of the String.
-     * @throws IOException
-     */
-    public static String createSHA1FromString( String data )
-        throws IOException
-    {
+  }
 
-        ByteArrayInputStream bais = new ByteArrayInputStream( data.getBytes() );
-        return createSHA1FromStream( bais );
-
+  public static void fileCopy(File from, File dest)
+      throws IOException
+  {
+    // we may also need to create any parent directories
+    if (dest.getParentFile() != null && !dest.getParentFile().exists()) {
+      dest.getParentFile().mkdirs();
     }
 
-    /**
-     * Creates a SHA1 hash from an InputStream.
-     *
-     * @param in Inputstream to be digested.
-     * @returnn SHA1 hash based on the contents of the stream.
-     * @throws IOException
-     */
-    public static String createSHA1FromStream( InputStream in )
-        throws IOException
-    {
+    FileReader fileReader = new FileReader(from);
 
-        byte[] bytes = new byte[BUFFER_SIZE];
+    FileWriter fos = new FileWriter(dest);
 
-        try
-        {
-            MessageDigest digest = MessageDigest.getInstance( SHA1 );
-            for ( int n; ( n = in.read( bytes ) ) >= 0; )
-            {
-                if ( n > 0 )
-                {
-                    digest.update( bytes, 0, n );
-                }
-            }
-
-            bytes = digest.digest();
-            StringBuilder sb = new StringBuilder( bytes.length * 2 );
-            for ( int i = 0; i < bytes.length; i++ )
-            {
-                int n = bytes[i] & 0xFF;
-                if ( n < 0x10 )
-                {
-                    sb.append( '0' );
-                }
-                sb.append( Integer.toHexString( n ) );
-            }
-
-            return sb.toString();
-        }
-        catch ( NoSuchAlgorithmException noSuchAlgorithmException )
-        {
-            throw new IllegalStateException( noSuchAlgorithmException.getMessage(), noSuchAlgorithmException );
-        }
+    int readChar = -1;
+    while ((readChar = fileReader.read()) != -1) {
+      fos.write(readChar);
     }
 
-    public static boolean compareFileSHA1s( File file1, File file2 )
-        throws IOException
-    {
+    // close everything
+    fileReader.close();
+    fos.close();
+  }
 
-        if ( file1 != null && file1.exists() && file2 != null && file2.exists() && file1.length() == file2.length() )
-        {
-            String file1SHA1 = createSHA1FromFile( file1 );
-            String file2SHA1 = createSHA1FromFile( file2 );
+  public static void interpolationFileCopy(File from, File dest, Map<String, String> variables)
+      throws IOException
+  {
 
-            return file1SHA1.equals( file2SHA1 );
-        }
-        return false;
+    // we may also need to create any parent directories
+    if (dest.getParentFile() != null && !dest.getParentFile().exists()) {
+      dest.getParentFile().mkdirs();
     }
 
-    @SuppressWarnings( "rawtypes" )
-    public static File getTestFile( Class clazz, String filename )
-    {
-        String resource = clazz.getName().replace( '.', '/' ) + "Resources/" + filename;
-        LOG.debug( "Looking for resource: " + resource );
-        URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
-        LOG.debug( "found: " + classURL );
-        return new File( classURL.getFile() );
+    FileReader fileReader = new FileReader(from);
+    InterpolationFilterReader filterReader = new InterpolationFilterReader(fileReader, variables);
+
+    FileWriter fos = new FileWriter(dest);
+
+    int readChar = -1;
+    while ((readChar = filterReader.read()) != -1) {
+      fos.write(readChar);
     }
 
-    public static void main( String[] args )
-    {
-        String usage = "Usage: java " + FileTestingUtils.class + " <url>";
+    // close everything
+    fileReader.close();
+    fos.close();
+  }
 
-        if ( args == null || args.length != 1 )
-        {
-            LOG.info( usage );
-            return;
+  public static void interpolationDirectoryCopy(File from, File dest, Map<String, String> variables)
+      throws IOException
+  {
+    dest.mkdirs();
+
+    DirectoryScanner scan = new DirectoryScanner();
+    scan.addDefaultExcludes();
+    scan.setBasedir(from);
+    scan.scan();
+
+    String[] files = scan.getIncludedFiles();
+    for (String fileName : files) {
+      String extension = FileUtils.getExtension(fileName);
+      File sourceFile = new File(from, fileName);
+      File destFile = new File(dest, fileName);
+      destFile.getParentFile().mkdirs();
+
+      if (Arrays.asList("zip", "jar", "gz", "jpg", "png").contains(extension)) {
+        // just copy know binaries
+        FileUtils.copyFile(sourceFile, destFile);
+      }
+      else {
+        FileReader reader = null;
+        FileWriter writer = null;
+        try {
+          reader = new FileReader(sourceFile);
+          InterpolationFilterReader filterReader = new InterpolationFilterReader(reader, variables);
+
+          writer = new FileWriter(destFile);
+
+          IOUtil.copy(filterReader, writer);
+        }
+        finally {
+          IOUtil.close(reader);
+          IOUtil.close(writer);
         }
 
-        try
-        {
-            URL url = new URL( args[0] );
-            LOG.info( createSHA1FromURL( url ) );
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( usage, e );
-        }
-
+      }
     }
 
-    public static void fileCopy( File from, File dest )
-        throws IOException
-    {
-        // we may also need to create any parent directories
-        if ( dest.getParentFile() != null && !dest.getParentFile().exists() )
-        {
-            dest.getParentFile().mkdirs();
-        }
+  }
 
-        FileReader fileReader = new FileReader( from );
+  public static File populate(File file, int sizeInMB)
+      throws IOException
+  {
+    file.getParentFile().mkdirs();
 
-        FileWriter fos = new FileWriter( dest );
+    ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(file));
+    zip.putNextEntry(new ZipEntry("content.random"));
+    for (int i = 0; i < sizeInMB * 1024; i++) {
+      byte[] b = new byte[1024];
+      SecureRandom r = new SecureRandom();
+      r.nextBytes(b);
 
-        int readChar = -1;
-        while ( ( readChar = fileReader.read() ) != -1 )
-        {
-            fos.write( readChar );
-        }
-
-        // close everything
-        fileReader.close();
-        fos.close();
+      zip.write(b);
     }
+    zip.closeEntry();
+    zip.close();
 
-    public static void interpolationFileCopy( File from, File dest, Map<String, String> variables )
-        throws IOException
-    {
-
-        // we may also need to create any parent directories
-        if ( dest.getParentFile() != null && !dest.getParentFile().exists() )
-        {
-            dest.getParentFile().mkdirs();
-        }
-
-        FileReader fileReader = new FileReader( from );
-        InterpolationFilterReader filterReader = new InterpolationFilterReader( fileReader, variables );
-
-        FileWriter fos = new FileWriter( dest );
-
-        int readChar = -1;
-        while ( ( readChar = filterReader.read() ) != -1 )
-        {
-            fos.write( readChar );
-        }
-
-        // close everything
-        fileReader.close();
-        fos.close();
-    }
-
-    public static void interpolationDirectoryCopy( File from, File dest, Map<String, String> variables )
-        throws IOException
-    {
-        dest.mkdirs();
-
-        DirectoryScanner scan = new DirectoryScanner();
-        scan.addDefaultExcludes();
-        scan.setBasedir( from );
-        scan.scan();
-
-        String[] files = scan.getIncludedFiles();
-        for ( String fileName : files )
-        {
-            String extension = FileUtils.getExtension( fileName );
-            File sourceFile = new File( from, fileName );
-            File destFile = new File( dest, fileName );
-            destFile.getParentFile().mkdirs();
-
-            if ( Arrays.asList( "zip", "jar", "gz", "jpg", "png" ).contains( extension ) )
-            {
-                // just copy know binaries
-                FileUtils.copyFile( sourceFile, destFile );
-            }
-            else
-            {
-                FileReader reader = null;
-                FileWriter writer = null;
-                try
-                {
-                    reader = new FileReader( sourceFile );
-                    InterpolationFilterReader filterReader = new InterpolationFilterReader( reader, variables );
-
-                    writer = new FileWriter( destFile );
-
-                    IOUtil.copy( filterReader, writer );
-                }
-                finally
-                {
-                    IOUtil.close( reader );
-                    IOUtil.close( writer );
-                }
-
-            }
-        }
-
-    }
-
-    public static File populate( File file, int sizeInMB )
-        throws IOException
-    {
-        file.getParentFile().mkdirs();
-
-        ZipOutputStream zip = new ZipOutputStream( new FileOutputStream( file ) );
-        zip.putNextEntry( new ZipEntry( "content.random" ) );
-        for ( int i = 0; i < sizeInMB * 1024; i++ )
-        {
-            byte[] b = new byte[1024];
-            SecureRandom r = new SecureRandom();
-            r.nextBytes( b );
-
-            zip.write( b );
-        }
-        zip.closeEntry();
-        zip.close();
-
-        return file;
-    }
+    return file;
+  }
 
 }

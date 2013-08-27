@@ -10,27 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus408;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Status;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 
 /**
- * Test change password service. 
+ * Test change password service.
  */
 public class Nexus408ChangePasswordIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
-    public void changeUserPassword()
-        throws Exception
-    {
-        Status status = ChangePasswordUtils.changePassword( "test-user", "admin123", "123admin" );
-        Assert.assertEquals( Status.SUCCESS_ACCEPTED.getCode(), status.getCode() );
-    }
+  @Test
+  public void changeUserPassword()
+      throws Exception
+  {
+    Status status = ChangePasswordUtils.changePassword("test-user", "admin123", "123admin");
+    Assert.assertEquals(Status.SUCCESS_ACCEPTED.getCode(), status.getCode());
+  }
 
 }

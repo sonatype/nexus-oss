@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client;
 
 import org.sonatype.nexus.testsuite.client.exception.RoutingJobsAreStillRunningException;
@@ -17,26 +18,21 @@ import org.sonatype.sisu.goodies.common.Time;
 
 /**
  * IT client for automatic routing feature.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
 public interface RoutingTest
 {
-    /**
-     * Blocks for one minute, or less, if routing update jobs finished earlier.
-     * 
-     * @throws RoutingJobsAreStillRunningException
-     */
-    void waitForAllRoutingUpdateJobToStop()
-        throws RoutingJobsAreStillRunningException;
+  /**
+   * Blocks for one minute, or less, if routing update jobs finished earlier.
+   */
+  void waitForAllRoutingUpdateJobToStop()
+      throws RoutingJobsAreStillRunningException;
 
-    /**
-     * Blocks for given timeout, or less, if routing update jobs finished earlier.
-     * 
-     * @param timeout
-     * @throws RoutingJobsAreStillRunningException
-     */
-    void waitForAllRoutingUpdateJobToStop( Time timeout )
-        throws RoutingJobsAreStillRunningException;
+  /**
+   * Blocks for given timeout, or less, if routing update jobs finished earlier.
+   */
+  void waitForAllRoutingUpdateJobToStop(Time timeout)
+      throws RoutingJobsAreStillRunningException;
 }

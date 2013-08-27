@@ -85,10 +85,6 @@ public class Manifest
     String buffer = rdr.readLine();
     int section = 0;
     if (buffer != null && !buffer.startsWith("Manifest-Version")) {
-/*[mcculls] ignore
-                        System.err
-					.println("The first line of a manifest file must be the Manifest-Version attribute");
-*/
       throw new IOException(
           "The first line of a manifest file must be the Manifest-Version attribute");
     }
@@ -143,10 +139,6 @@ public class Manifest
           }
           catch (Exception e) {
             version = new VersionRange("0");
-/*[mcculls] ignore
-						System.err.println("Invalid version attr for: " + bsn
-								+ " value is " + value);
-*/
           }
         }
         if (header.equals("fragment-host")) {
@@ -180,15 +172,9 @@ public class Manifest
   }
 
   void error(String msg) throws IOException {
-/*[mcculls] ignore
-		System.err.println("Reading manifest: " + msg);
-*/
   }
 
   void warning(String msg) throws IOException {
-/*[mcculls] ignore
-		System.err.println("Reading manifest: " + msg);
-*/
   }
 
   StreamTokenizer getStreamTokenizer(String line) {

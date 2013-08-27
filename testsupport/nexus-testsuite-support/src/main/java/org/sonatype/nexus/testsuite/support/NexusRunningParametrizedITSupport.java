@@ -10,40 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.support;
 
-import static org.junit.runners.Parameterized.Parameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.defaultTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+package org.sonatype.nexus.testsuite.support;
 
 import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import static org.junit.runners.Parameterized.Parameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.defaultTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+
 /**
  * Base class for parametrized Nexus integration tests that starts Nexus before each test and stops it afterwards.
  *
  * @since 2.2
  */
-@RunWith( Parameterized.class )
+@RunWith(Parameterized.class)
 public abstract class NexusRunningParametrizedITSupport
     extends NexusRunningITSupport
 {
 
-    @Parameters
-    public static Collection<Object[]> data()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            defaultTestParameters()
-        ).load();
-    }
+  @Parameters
+  public static Collection<Object[]> data() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        defaultTestParameters()
+    ).load();
+  }
 
-    public NexusRunningParametrizedITSupport( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  public NexusRunningParametrizedITSupport(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
 
 }

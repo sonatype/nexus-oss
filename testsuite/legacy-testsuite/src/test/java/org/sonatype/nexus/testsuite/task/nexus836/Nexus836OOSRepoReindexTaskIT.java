@@ -10,37 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus836;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+import org.junit.Before;
+import org.junit.Test;
+
 public class Nexus836OOSRepoReindexTaskIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Before
-    public void putOutOfService()
-        throws Exception
-    {
-        RepositoryStatusMessageUtil.putOutOfService( REPO_TEST_HARNESS_SHADOW, "hosted" );
-    }
+  @Before
+  public void putOutOfService()
+      throws Exception
+  {
+    RepositoryStatusMessageUtil.putOutOfService(REPO_TEST_HARNESS_SHADOW, "hosted");
+  }
 
-    @Test
-    public void expireAllRepos()
-        throws Exception
-    {
-        ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryId" );
-        prop.setValue( "all_repo" );
+  @Test
+  public void expireAllRepos()
+      throws Exception
+  {
+    ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+    prop.setKey("repositoryId");
+    prop.setValue("all_repo");
 
-        TaskScheduleUtil.waitForAllTasksToStop();
+    TaskScheduleUtil.waitForAllTasksToStop();
 
-        TaskScheduleUtil.runTask( UpdateIndexTaskDescriptor.ID, prop );
-    }
+    TaskScheduleUtil.runTask(UpdateIndexTaskDescriptor.ID, prop);
+  }
 }

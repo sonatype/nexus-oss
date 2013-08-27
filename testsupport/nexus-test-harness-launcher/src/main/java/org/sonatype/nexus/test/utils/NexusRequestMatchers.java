@@ -10,10 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
@@ -28,364 +26,320 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 /**
  * Matchers for {@link NexusRequest}
  */
 public class NexusRequestMatchers
 {
 
-    // **************** Status Matchers ********************
+  // **************** Status Matchers ********************
 
-    public static abstract class BaseStatusMatcher
-        extends TypeSafeMatcher<Status>
-    {
-        @Override
-        protected void describeMismatchSafely( Status status, Description mismatchDescription )
-        {
-            mismatchDescription.appendText( "was " ).appendText( status.toString() );
-        }
+  public static abstract class BaseStatusMatcher
+      extends TypeSafeMatcher<Status>
+  {
+    @Override
+    protected void describeMismatchSafely(Status status, Description mismatchDescription) {
+      mismatchDescription.appendText("was ").appendText(status.toString());
+    }
+  }
+
+  public static class HasCode
+      extends BaseStatusMatcher
+  {
+    private int expectedCode;
+
+    public HasCode(final int expectedCode) {
+      this.expectedCode = expectedCode;
     }
 
-    public static class HasCode
-        extends BaseStatusMatcher
-    {
-        private int expectedCode;
-
-        public HasCode( final int expectedCode )
-        {
-            this.expectedCode = expectedCode;
-        }
-
-        @Override
-        protected boolean matchesSafely( Status item )
-        {
-            return item.getCode() == expectedCode;
-        }
-
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "status code of " ).appendValue( this.expectedCode );
-        }
+    @Override
+    protected boolean matchesSafely(Status item) {
+      return item.getCode() == expectedCode;
     }
 
-    public static class IsSuccess
-        extends BaseStatusMatcher
-    {
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("status code of ").appendValue(this.expectedCode);
+    }
+  }
 
-        @Override
-        protected boolean matchesSafely( Status item )
-        {
-            return item.isSuccess();
-        }
+  public static class IsSuccess
+      extends BaseStatusMatcher
+  {
 
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "success" );
-        }
+    @Override
+    protected boolean matchesSafely(Status item) {
+      return item.isSuccess();
     }
 
-    public static class IsError
-        extends BaseStatusMatcher
-    {
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("success");
+    }
+  }
 
-        @Override
-        protected boolean matchesSafely( Status item )
-        {
-            return item.isError();
-        }
+  public static class IsError
+      extends BaseStatusMatcher
+  {
 
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "error" );
-        }
+    @Override
+    protected boolean matchesSafely(Status item) {
+      return item.isError();
     }
 
-    public static class IsClientError
-        extends BaseStatusMatcher
-    {
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("error");
+    }
+  }
 
-        @Override
-        protected boolean matchesSafely( Status item )
-        {
-            return item.isClientError();
-        }
+  public static class IsClientError
+      extends BaseStatusMatcher
+  {
 
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "client error" );
-        }
+    @Override
+    protected boolean matchesSafely(Status item) {
+      return item.isClientError();
     }
 
-    // **************** Response Matchers ******************
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("client error");
+    }
+  }
 
-    public static abstract class BaseResponseMatcher
-        extends TypeSafeMatcher<Response>
-    {
-        @Override
-        protected void describeMismatchSafely( Response item, Description mismatchDescription )
-        {
-            mismatchDescription.appendText( item.getStatus().toString() );
-            
-            // provide some more info if it's validation error
-            if ( item.getStatus().getCode() == 400 )
-            {
-                try
-                {
-                    mismatchDescription.appendText( item.getEntity().getText() );
-                }
-                catch ( IOException e )
-                {
-                    mismatchDescription.appendText( "response entity could not be converted to text: " + e.getMessage() );
-                }
-            }
+  // **************** Response Matchers ******************
+
+  public static abstract class BaseResponseMatcher
+      extends TypeSafeMatcher<Response>
+  {
+    @Override
+    protected void describeMismatchSafely(Response item, Description mismatchDescription) {
+      mismatchDescription.appendText(item.getStatus().toString());
+
+      // provide some more info if it's validation error
+      if (item.getStatus().getCode() == 400) {
+        try {
+          mismatchDescription.appendText(item.getEntity().getText());
         }
-    }
-
-    public static class RespondsWithStatusCode
-        extends BaseResponseMatcher
-    {
-
-        private int expectedStatusCode;
-
-        public RespondsWithStatusCode( int expectedStatusCode )
-        {
-            this.expectedStatusCode = expectedStatusCode;
+        catch (IOException e) {
+          mismatchDescription.appendText("response entity could not be converted to text: " + e.getMessage());
         }
+      }
+    }
+  }
 
-        @Override
-        protected boolean matchesSafely( Response item )
-        {
-            return item.getStatus().getCode() == expectedStatusCode;
-        }
+  public static class RespondsWithStatusCode
+      extends BaseResponseMatcher
+  {
 
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "Status code " + expectedStatusCode );
-        }
+    private int expectedStatusCode;
+
+    public RespondsWithStatusCode(int expectedStatusCode) {
+      this.expectedStatusCode = expectedStatusCode;
     }
 
-    public static class InError
-        extends BaseResponseMatcher
-    {
-
-        @Override
-        protected boolean matchesSafely( Response resp )
-        {
-            return resp.getStatus().isError();
-        }
-
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "response status in error" );
-        }
-
+    @Override
+    protected boolean matchesSafely(Response item) {
+      return item.getStatus().getCode() == expectedStatusCode;
     }
 
-    public static class IsSuccessful
-        extends BaseResponseMatcher
-    {
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("Status code " + expectedStatusCode);
+    }
+  }
 
-        @Override
-        protected boolean matchesSafely( Response resp )
-        {
-            return resp.getStatus().isSuccess();
-        }
+  public static class InError
+      extends BaseResponseMatcher
+  {
 
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "response status to indicate success status 200" );
-        }
-
+    @Override
+    protected boolean matchesSafely(Response resp) {
+      return resp.getStatus().isError();
     }
 
-    public static class ResponseTextMatches
-        extends BaseResponseMatcher
-    {
-
-        private final Matcher<String> matcher;
-
-        private IOException exception;
-
-        public ResponseTextMatches( Matcher<String> matcher )
-        {
-            this.matcher = matcher;
-        }
-
-        @Override
-        public void describeTo( Description description )
-        {
-            if ( exception != null )
-            {
-                description.appendText( "got exception " + exception.getMessage() );
-            }
-            else
-            {
-                description.appendText( "response text is " ).appendDescriptionOf( matcher );
-            }
-        }
-
-        @Override
-        protected boolean matchesSafely( Response item )
-        {
-            final Representation entity = item.getEntity();
-            MatcherAssert.assertThat( entity, CoreMatchers.notNullValue() );
-            String responseText;
-            try
-            {
-                responseText = entity.getText();
-            }
-            catch ( IOException e )
-            {
-                this.exception = e;
-                return false;
-            }
-            return matcher.matches( responseText );
-        }
-
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("response status in error");
     }
 
-    public static class RedirectLocationMatches
-        extends BaseResponseMatcher
-    {
+  }
 
-        private final Matcher<String> matcher;
+  public static class IsSuccessful
+      extends BaseResponseMatcher
+  {
 
-        public RedirectLocationMatches( Matcher<String> matcher )
-        {
-            this.matcher = matcher;
-        }
-
-        @Override
-        public void describeTo( Description description )
-        {
-                description.appendText( "redirect location is " ).appendDescriptionOf( matcher );
-        }
-
-        @Override
-        protected boolean matchesSafely( Response item )
-        {
-            final Reference ref = item.getLocationRef();
-            MatcherAssert.assertThat( ref, notNullValue() );
-            return matcher.matches( ref.toString() );
-        }
+    @Override
+    protected boolean matchesSafely(Response resp) {
+      return resp.getStatus().isSuccess();
     }
 
-    public static class IsRedirecting
-        extends BaseResponseMatcher
-    {
-
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "redirecting" );
-        }
-
-        @Override
-        protected boolean matchesSafely( Response item )
-        {
-            Status status = item.getStatus();
-            assertThat( status, notNullValue() );
-            return status.isRedirection();
-        }
-
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("response status to indicate success status 200");
     }
 
-    public static abstract class BaseCodeMatcher
-        extends TypeSafeMatcher<Integer>
-    {
-        @Override
-        protected void describeMismatchSafely( Integer code, Description mismatchDescription )
-        {
-            mismatchDescription.appendText( "was " ).appendText( code.toString() );
-        }
+  }
+
+  public static class ResponseTextMatches
+      extends BaseResponseMatcher
+  {
+
+    private final Matcher<String> matcher;
+
+    private IOException exception;
+
+    public ResponseTextMatches(Matcher<String> matcher) {
+      this.matcher = matcher;
     }
 
-    public static class IsSuccessfulCode
-        extends BaseCodeMatcher
-    {
-        @Override
-        protected boolean matchesSafely( Integer resp )
-        {
-            return Status.isSuccess( resp );
-        }
-
-        @Override
-        public void describeTo( Description description )
-        {
-            description.appendText( "response status to indicate success status 20x" );
-        }
+    @Override
+    public void describeTo(Description description) {
+      if (exception != null) {
+        description.appendText("got exception " + exception.getMessage());
+      }
+      else {
+        description.appendText("response text is ").appendDescriptionOf(matcher);
+      }
     }
 
-    @Factory
-    public static <T> IsSuccess isSuccess()
-    {
-        return new IsSuccess();
+    @Override
+    protected boolean matchesSafely(Response item) {
+      final Representation entity = item.getEntity();
+      MatcherAssert.assertThat(entity, CoreMatchers.notNullValue());
+      String responseText;
+      try {
+        responseText = entity.getText();
+      }
+      catch (IOException e) {
+        this.exception = e;
+        return false;
+      }
+      return matcher.matches(responseText);
     }
 
-    @Factory
-    public static <T> IsError isError()
-    {
-        return new IsError();
+  }
+
+  public static class RedirectLocationMatches
+      extends BaseResponseMatcher
+  {
+
+    private final Matcher<String> matcher;
+
+    public RedirectLocationMatches(Matcher<String> matcher) {
+      this.matcher = matcher;
     }
 
-    @Factory
-    public static <T> IsClientError isClientError()
-    {
-        return new IsClientError();
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("redirect location is ").appendDescriptionOf(matcher);
     }
 
-    @Factory
-    public static <T> HasCode hasStatusCode( int expectedCode )
-    {
-        return new HasCode( expectedCode );
+    @Override
+    protected boolean matchesSafely(Response item) {
+      final Reference ref = item.getLocationRef();
+      MatcherAssert.assertThat(ref, notNullValue());
+      return matcher.matches(ref.toString());
+    }
+  }
+
+  public static class IsRedirecting
+      extends BaseResponseMatcher
+  {
+
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("redirecting");
     }
 
-    @Factory
-    public static <T> HasCode isNotFound()
-    {
-        return new HasCode( 404 );
+    @Override
+    protected boolean matchesSafely(Response item) {
+      Status status = item.getStatus();
+      assertThat(status, notNullValue());
+      return status.isRedirection();
     }
 
-    @Factory
-    public static <T> RespondsWithStatusCode respondsWithStatus( Status status )
-    {
-        return respondsWithStatusCode( status.getCode() );
+  }
+
+  public static abstract class BaseCodeMatcher
+      extends TypeSafeMatcher<Integer>
+  {
+    @Override
+    protected void describeMismatchSafely(Integer code, Description mismatchDescription) {
+      mismatchDescription.appendText("was ").appendText(code.toString());
+    }
+  }
+
+  public static class IsSuccessfulCode
+      extends BaseCodeMatcher
+  {
+    @Override
+    protected boolean matchesSafely(Integer resp) {
+      return Status.isSuccess(resp);
     }
 
-    @Factory
-    public static <T> RespondsWithStatusCode respondsWithStatusCode( final int expectedStatusCode )
-    {
-        return new RespondsWithStatusCode( expectedStatusCode );
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("response status to indicate success status 20x");
     }
+  }
 
-    @Factory
-    public static <T> InError inError()
-    {
-        return new InError();
-    }
+  @Factory
+  public static <T> IsSuccess isSuccess() {
+    return new IsSuccess();
+  }
 
-    @Factory
-    public static <T> IsSuccessful isSuccessful()
-    {
-        return new IsSuccessful();
-    }
+  @Factory
+  public static <T> IsError isError() {
+    return new IsError();
+  }
 
-    @Factory
-    public static <T> ResponseTextMatches textMatches( Matcher<String> matcher )
-    {
-        return new ResponseTextMatches( matcher );
-    }
+  @Factory
+  public static <T> IsClientError isClientError() {
+    return new IsClientError();
+  }
 
-    @Factory
-    public static <T> IsSuccessfulCode isSuccessCode()
-    {
-        return new IsSuccessfulCode();
-    }
+  @Factory
+  public static <T> HasCode hasStatusCode(int expectedCode) {
+    return new HasCode(expectedCode);
+  }
+
+  @Factory
+  public static <T> HasCode isNotFound() {
+    return new HasCode(404);
+  }
+
+  @Factory
+  public static <T> RespondsWithStatusCode respondsWithStatus(Status status) {
+    return respondsWithStatusCode(status.getCode());
+  }
+
+  @Factory
+  public static <T> RespondsWithStatusCode respondsWithStatusCode(final int expectedStatusCode) {
+    return new RespondsWithStatusCode(expectedStatusCode);
+  }
+
+  @Factory
+  public static <T> InError inError() {
+    return new InError();
+  }
+
+  @Factory
+  public static <T> IsSuccessful isSuccessful() {
+    return new IsSuccessful();
+  }
+
+  @Factory
+  public static <T> ResponseTextMatches textMatches(Matcher<String> matcher) {
+    return new ResponseTextMatches(matcher);
+  }
+
+  @Factory
+  public static <T> IsSuccessfulCode isSuccessCode() {
+    return new IsSuccessfulCode();
+  }
 }

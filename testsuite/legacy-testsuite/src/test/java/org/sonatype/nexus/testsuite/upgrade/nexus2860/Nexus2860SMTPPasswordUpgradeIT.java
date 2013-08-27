@@ -10,23 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.upgrade.nexus2860;
+
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 public class Nexus2860SMTPPasswordUpgradeIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
-    public void upgradeSmtp()
-        throws Exception
-    {
-        // we need this to have access to uncrypted password (see assertion below)
-        String pw = getNexusConfigUtil().loadAndUpgradeNexusConfiguration().getSmtpConfiguration().getPassword();
-        // ensuring it wasn't encrypted twice
-        Assert.assertEquals( pw, "IT-password" );
-    }
+  @Test
+  public void upgradeSmtp()
+      throws Exception
+  {
+    // we need this to have access to uncrypted password (see assertion below)
+    String pw = getNexusConfigUtil().loadAndUpgradeNexusConfiguration().getSmtpConfiguration().getPassword();
+    // ensuring it wasn't encrypted twice
+    Assert.assertEquals(pw, "IT-password");
+  }
 }

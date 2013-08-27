@@ -10,22 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.inError;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Assert;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -41,369 +31,347 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
+import org.junit.Assert;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.inError;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class RepositoryMessageUtil
     extends ITUtil
 {
 
-    public static final String ALL_SERVICE_PART = RepositoriesNexusRestClient.ALL_SERVICE_PART;
+  public static final String ALL_SERVICE_PART = RepositoriesNexusRestClient.ALL_SERVICE_PART;
 
-    public static final String SERVICE_PART = RepositoriesNexusRestClient.SERVICE_PART;
+  public static final String SERVICE_PART = RepositoriesNexusRestClient.SERVICE_PART;
 
-    private static final Logger LOG = LoggerFactory.getLogger( RepositoryMessageUtil.class );
+  private static final Logger LOG = LoggerFactory.getLogger(RepositoryMessageUtil.class);
 
-    private static final RepositoriesNexusRestClient REPOSITORY_NRC = new RepositoriesNexusRestClient(
+  private static final RepositoriesNexusRestClient REPOSITORY_NRC = new RepositoriesNexusRestClient(
+      RequestFacade.getNexusRestClient(),
+      new TasksNexusRestClient(RequestFacade.getNexusRestClient()),
+      new EventInspectorsUtil(RequestFacade.getNexusRestClient())
+  );
+
+  private final RepositoriesNexusRestClient repositoryNRC;
+
+  public RepositoryMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
+    super(test);
+    repositoryNRC = new RepositoriesNexusRestClient(
         RequestFacade.getNexusRestClient(),
-        new TasksNexusRestClient( RequestFacade.getNexusRestClient() ),
-        new EventInspectorsUtil( RequestFacade.getNexusRestClient() )
+        new TasksNexusRestClient(RequestFacade.getNexusRestClient()),
+        test.getEventInspectorsUtil(),
+        xstream,
+        mediaType
     );
+  }
 
-    private final RepositoriesNexusRestClient repositoryNRC;
+  public RepositoryBaseResource createRepository(RepositoryBaseResource repo)
+      throws IOException
+  {
+    return repositoryNRC.createRepository(repo);
+  }
 
-    public RepositoryMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
-    {
-        super( test );
-        repositoryNRC = new RepositoriesNexusRestClient(
-            RequestFacade.getNexusRestClient(),
-            new TasksNexusRestClient( RequestFacade.getNexusRestClient() ),
-            test.getEventInspectorsUtil(),
-            xstream,
-            mediaType
-        );
+  public RepositoryBaseResource createRepository(RepositoryBaseResource repo, boolean validate)
+      throws IOException
+  {
+    final RepositoryBaseResource resource = repositoryNRC.createRepository(repo);
+    if (validate) {
+      validateResourceResponse(repo, resource);
+    }
+    return resource;
+  }
+
+  public void validateResourceResponse(RepositoryBaseResource repo, RepositoryBaseResource responseResource)
+      throws IOException
+  {
+    Assert.assertEquals(responseResource.getId(), repo.getId());
+    Assert.assertEquals(responseResource.getName(), repo.getName());
+    // Assert.assertEquals( repo.getDefaultLocalStorageUrl(), responseResource.getDefaultLocalStorageUrl() ); //
+    // TODO: add check for this
+
+    // format is not used anymore, removing the check
+    // Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
+    Assert.assertEquals(responseResource.getRepoType(), repo.getRepoType());
+
+    if (repo.getRepoType().equals("virtual")) {
+      // check mirror
+      RepositoryShadowResource expected = (RepositoryShadowResource) repo;
+      RepositoryShadowResource actual = (RepositoryShadowResource) responseResource;
+
+      Assert.assertEquals(actual.getShadowOf(), expected.getShadowOf());
+    }
+    else {
+      RepositoryResource expected = (RepositoryResource) repo;
+      RepositoryResource actual = (RepositoryResource) responseResource;
+
+      // Assert.assertEquals( expected.getChecksumPolicy(), actual.getChecksumPolicy() );
+
+      // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
+      if (actual.getDefaultLocalStorageUrl().endsWith("/")) {
+        Assert.assertTrue("Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
+            + repo.getId()
+            + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
+            actual.getDefaultLocalStorageUrl().endsWith("/storage/" + repo.getId() + "/"));
+      }
+      // NOTE one of these blocks should be removed
+      else {
+        Assert.assertTrue("Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
+            + repo.getId()
+            + "  <actual>" + actual.getDefaultLocalStorageUrl(),
+            actual.getDefaultLocalStorageUrl().endsWith("/storage/" + repo.getId()));
+      }
+
+      Assert.assertEquals(expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL());
+      // Assert.assertEquals( expected.getOverrideLocalStorageUrl(), actual.getOverrideLocalStorageUrl() );
+
+      if (expected.getRemoteStorage() == null) {
+        Assert.assertNull(actual.getRemoteStorage());
+      }
+      else {
+        Assert.assertEquals(actual.getRemoteStorage().getRemoteStorageUrl(),
+            expected.getRemoteStorage().getRemoteStorageUrl());
+      }
+
+      Assert.assertEquals(actual.getRepoPolicy(), expected.getRepoPolicy());
     }
 
-    public RepositoryBaseResource createRepository( RepositoryBaseResource repo )
-        throws IOException
-    {
-        return repositoryNRC.createRepository( repo );
+    // check nexus.xml
+    this.validateRepoInNexusConfig(responseResource);
+  }
+
+  public RepositoryBaseResource getRepository(String repoId)
+      throws IOException
+  {
+    // accepted return codes: OK or redirect
+    final String responseText = RequestFacade.doGetForText(SERVICE_PART + "/" + repoId, not(inError()));
+    LOG.debug("responseText: \n" + responseText);
+
+    // this should use call to: getResourceFromResponse
+    XStreamRepresentation representation =
+        new XStreamRepresentation(XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML);
+
+    RepositoryResourceResponse resourceResponse =
+        (RepositoryResourceResponse) representation.getPayload(new RepositoryResourceResponse());
+
+    return resourceResponse.getData();
+  }
+
+  public RepositoryBaseResource updateRepo(RepositoryBaseResource repo)
+      throws IOException
+  {
+    return updateRepo(repo, true);
+  }
+
+  public RepositoryBaseResource updateRepo(RepositoryBaseResource repo, boolean validate)
+      throws IOException
+  {
+
+    Response response = null;
+    RepositoryBaseResource responseResource;
+    try {
+      response = this.sendMessage(Method.PUT, repo);
+      assertThat("Could not update user", response, isSuccessful());
+      responseResource = this.getRepositoryBaseResourceFromResponse(response);
+    }
+    finally {
+      RequestFacade.releaseResponse(response);
     }
 
-    public RepositoryBaseResource createRepository( RepositoryBaseResource repo, boolean validate )
-        throws IOException
-    {
-        final RepositoryBaseResource resource = repositoryNRC.createRepository( repo );
-        if ( validate )
-        {
-            validateResourceResponse( repo, resource );
-        }
-        return resource;
+    if (validate) {
+      this.validateResourceResponse(repo, responseResource);
     }
 
-    public void validateResourceResponse( RepositoryBaseResource repo, RepositoryBaseResource responseResource )
-        throws IOException
-    {
-        Assert.assertEquals( responseResource.getId(), repo.getId() );
-        Assert.assertEquals( responseResource.getName(), repo.getName() );
-        // Assert.assertEquals( repo.getDefaultLocalStorageUrl(), responseResource.getDefaultLocalStorageUrl() ); //
-        // TODO: add check for this
+    return responseResource;
+  }
 
-        // format is not used anymore, removing the check
-        // Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
-        Assert.assertEquals( responseResource.getRepoType(), repo.getRepoType() );
+  /**
+   * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+   */
+  public Response sendMessage(Method method, RepositoryBaseResource resource, String id)
+      throws IOException
+  {
+    return repositoryNRC.sendMessage(method, resource, id);
+  }
 
-        if ( repo.getRepoType().equals( "virtual" ) )
-        {
-            // check mirror
-            RepositoryShadowResource expected = (RepositoryShadowResource) repo;
-            RepositoryShadowResource actual = (RepositoryShadowResource) responseResource;
+  /**
+   * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+   */
+  public Response sendMessage(Method method, RepositoryBaseResource resource)
+      throws IOException
+  {
+    return repositoryNRC.sendMessage(method, resource);
+  }
 
-            Assert.assertEquals( actual.getShadowOf(), expected.getShadowOf() );
-        }
-        else
-        {
-            RepositoryResource expected = (RepositoryResource) repo;
-            RepositoryResource actual = (RepositoryResource) responseResource;
+  /**
+   * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
+   */
+  public List<RepositoryListResource> getList()
+      throws IOException
+  {
+    return repositoryNRC.getList();
+  }
 
-            // Assert.assertEquals( expected.getChecksumPolicy(), actual.getChecksumPolicy() );
+  public List<RepositoryListResource> getAllList()
+      throws IOException
+  {
+    return repositoryNRC.getAllList();
+  }
 
-            // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
-            if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
-            {
-                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                       + repo.getId()
-                       + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
-                                   actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ) );
-            }
-            // NOTE one of these blocks should be removed
-            else
-            {
-                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                       + repo.getId()
-                       + "  <actual>" + actual.getDefaultLocalStorageUrl(),
-                                   actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ) );
-            }
+  public RepositoryBaseResource getRepositoryBaseResourceFromResponse(Response response)
+      throws IOException
+  {
+    return repositoryNRC.getRepositoryBaseResourceFromResponse(response);
+  }
 
-            Assert.assertEquals( expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL() );
-            // Assert.assertEquals( expected.getOverrideLocalStorageUrl(), actual.getOverrideLocalStorageUrl() );
+  public RepositoryResource getResourceFromResponse(Response response)
+      throws IOException
+  {
+    return repositoryNRC.getResourceFromResponse(response);
+  }
 
-            if ( expected.getRemoteStorage() == null )
-            {
-                Assert.assertNull( actual.getRemoteStorage() );
-            }
-            else
-            {
-                Assert.assertEquals( actual.getRemoteStorage().getRemoteStorageUrl(),
-                                     expected.getRemoteStorage().getRemoteStorageUrl() );
-            }
+  private void validateRepoInNexusConfig(RepositoryBaseResource repo)
+      throws IOException
+  {
 
-            Assert.assertEquals( actual.getRepoPolicy(), expected.getRepoPolicy() );
-        }
+    if (repo.getRepoType().equals("virtual")) {
+      // check mirror
+      RepositoryShadowResource expected = (RepositoryShadowResource) repo;
+      CRepository cRepo = getTest().getNexusConfigUtil().getRepo(repo.getId());
+      M2LayoutedM1ShadowRepositoryConfiguration cShadowRepo =
+          getTest().getNexusConfigUtil().getRepoShadow(repo.getId());
 
-        // check nexus.xml
-        this.validateRepoInNexusConfig( responseResource );
+      Assert.assertEquals(cShadowRepo.getMasterRepositoryId(), expected.getShadowOf());
+      Assert.assertEquals(cRepo.getId(), expected.getId());
+      Assert.assertEquals(cRepo.getName(), expected.getName());
+
+      // cstamas: This is nonsense, this starts in-process (HERE) of nexus internals while IT runs a nexus too,
+      // and they start/try to use same FS resources!
+      // ContentClass expectedCc =
+      // repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
+      // Assert.assertNotNull( expectedCc,
+      // "Unknown shadow repo type='" + cRepo.getProviderRole() + cRepo.getProviderHint()
+      // + "'!" );
+      // Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
     }
+    else {
+      RepositoryResource expected = (RepositoryResource) repo;
+      CRepository cRepo = getTest().getNexusConfigUtil().getRepo(repo.getId());
 
-    public RepositoryBaseResource getRepository( String repoId )
-        throws IOException
-    {
-        // accepted return codes: OK or redirect
-        final String responseText = RequestFacade.doGetForText( SERVICE_PART + "/" + repoId, not( inError() ) );
-        LOG.debug( "responseText: \n" + responseText );
+      Assert.assertEquals(expected.getId(), cRepo.getId());
 
-        // this should use call to: getResourceFromResponse
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+      Assert.assertEquals(expected.getName(), cRepo.getName());
 
-        RepositoryResourceResponse resourceResponse =
-            (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
+      // cstamas: This is nonsense, this starts in-process (HERE) of nexus internals while IT runs a nexus too,
+      // and they start/try to use same FS resources!
+      // ContentClass expectedCc =
+      // repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
+      // Assert.assertNotNull( expectedCc, "Unknown repo type='" + cRepo.getProviderRole() +
+      // cRepo.getProviderHint()
+      // + "'!" );
+      // Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
 
-        return resourceResponse.getData();
-    }
+      Assert.assertEquals(expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL());
 
-    public RepositoryBaseResource updateRepo( RepositoryBaseResource repo )
-        throws IOException
-    {
-        return updateRepo( repo, true );
-    }
+      if (expected.getOverrideLocalStorageUrl() == null) {
+        Assert.assertNull("Expected CRepo localstorage url not be set, because it is the default.",
+            cRepo.getLocalStorage().getUrl());
+      }
+      else {
+        String actualLocalStorage =
+            cRepo.getLocalStorage().getUrl().endsWith("/") ? cRepo.getLocalStorage().getUrl()
+                : cRepo.getLocalStorage().getUrl() + "/";
+        String overridLocalStorage =
+            expected.getOverrideLocalStorageUrl().endsWith("/") ? expected.getOverrideLocalStorageUrl()
+                : expected.getOverrideLocalStorageUrl() + "/";
+        Assert.assertEquals(actualLocalStorage, overridLocalStorage);
+      }
 
-    public RepositoryBaseResource updateRepo( RepositoryBaseResource repo, boolean validate )
-        throws IOException
-    {
+      if (expected.getRemoteStorage() == null) {
+        Assert.assertNull(cRepo.getRemoteStorage());
+      }
+      else {
+        Assert.assertEquals(cRepo.getRemoteStorage().getUrl(),
+            expected.getRemoteStorage().getRemoteStorageUrl());
+      }
 
-        Response response = null;
-        RepositoryBaseResource responseResource;
-        try
-        {
-            response = this.sendMessage( Method.PUT, repo );
-            assertThat( "Could not update user", response, isSuccessful() );
-            responseResource = this.getRepositoryBaseResourceFromResponse( response );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+      // check maven repo props (for not just check everything that is a Repository
+      if (expected.getProvider().matches("maven[12]")) {
+        M2RepositoryConfiguration cM2Repo = getTest().getNexusConfigUtil().getM2Repo(repo.getId());
 
-        if ( validate )
-        {
-            this.validateResourceResponse( repo, responseResource );
-        }
-
-        return responseResource;
-    }
-
-    /**
-     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
-     */
-    public Response sendMessage( Method method, RepositoryBaseResource resource, String id )
-        throws IOException
-    {
-        return repositoryNRC.sendMessage( method, resource, id );
-    }
-
-    /**
-     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
-     */
-    public Response sendMessage( Method method, RepositoryBaseResource resource )
-        throws IOException
-    {
-        return repositoryNRC.sendMessage( method, resource );
-    }
-
-    /**
-     * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     *
-     * @return
-     * @throws IOException
-     */
-    public List<RepositoryListResource> getList()
-        throws IOException
-    {
-        return repositoryNRC.getList();
-    }
-
-    public List<RepositoryListResource> getAllList()
-        throws IOException
-    {
-        return repositoryNRC.getAllList();
-    }
-
-    public RepositoryBaseResource getRepositoryBaseResourceFromResponse( Response response )
-        throws IOException
-    {
-        return repositoryNRC.getRepositoryBaseResourceFromResponse( response );
-    }
-
-    public RepositoryResource getResourceFromResponse( Response response )
-        throws IOException
-    {
-        return repositoryNRC.getResourceFromResponse( response );
-    }
-
-    private void validateRepoInNexusConfig( RepositoryBaseResource repo )
-        throws IOException
-    {
-
-        if ( repo.getRepoType().equals( "virtual" ) )
-        {
-            // check mirror
-            RepositoryShadowResource expected = (RepositoryShadowResource) repo;
-            CRepository cRepo = getTest().getNexusConfigUtil().getRepo( repo.getId() );
-            M2LayoutedM1ShadowRepositoryConfiguration cShadowRepo =
-                getTest().getNexusConfigUtil().getRepoShadow( repo.getId() );
-
-            Assert.assertEquals( cShadowRepo.getMasterRepositoryId(), expected.getShadowOf() );
-            Assert.assertEquals( cRepo.getId(), expected.getId() );
-            Assert.assertEquals( cRepo.getName(), expected.getName() );
-
-            // cstamas: This is nonsense, this starts in-process (HERE) of nexus internals while IT runs a nexus too,
-            // and they start/try to use same FS resources!
-            // ContentClass expectedCc =
-            // repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
-            // Assert.assertNotNull( expectedCc,
-            // "Unknown shadow repo type='" + cRepo.getProviderRole() + cRepo.getProviderHint()
-            // + "'!" );
-            // Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
-        }
-        else
-        {
-            RepositoryResource expected = (RepositoryResource) repo;
-            CRepository cRepo = getTest().getNexusConfigUtil().getRepo( repo.getId() );
-
-            Assert.assertEquals( expected.getId(), cRepo.getId() );
-
-            Assert.assertEquals( expected.getName(), cRepo.getName() );
-
-            // cstamas: This is nonsense, this starts in-process (HERE) of nexus internals while IT runs a nexus too,
-            // and they start/try to use same FS resources!
-            // ContentClass expectedCc =
-            // repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
-            // Assert.assertNotNull( expectedCc, "Unknown repo type='" + cRepo.getProviderRole() +
-            // cRepo.getProviderHint()
-            // + "'!" );
-            // Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
-
-            Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
-
-            if ( expected.getOverrideLocalStorageUrl() == null )
-            {
-                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.",
-                                   cRepo.getLocalStorage().getUrl() );
-            }
-            else
-            {
-                String actualLocalStorage =
-                    cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl()
-                        : cRepo.getLocalStorage().getUrl() + "/";
-                String overridLocalStorage =
-                    expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl()
-                        : expected.getOverrideLocalStorageUrl() + "/";
-                Assert.assertEquals( actualLocalStorage, overridLocalStorage );
-            }
-
-            if ( expected.getRemoteStorage() == null )
-            {
-                Assert.assertNull( cRepo.getRemoteStorage() );
-            }
-            else
-            {
-                Assert.assertEquals( cRepo.getRemoteStorage().getUrl(),
-                                     expected.getRemoteStorage().getRemoteStorageUrl() );
-            }
-
-            // check maven repo props (for not just check everything that is a Repository
-            if ( expected.getProvider().matches( "maven[12]" ) )
-            {
-                M2RepositoryConfiguration cM2Repo = getTest().getNexusConfigUtil().getM2Repo( repo.getId() );
-
-                if ( expected.getChecksumPolicy() != null )
-                {
-                    Assert.assertEquals( cM2Repo.getChecksumPolicy().name(), expected.getChecksumPolicy() );
-                }
-
-                Assert.assertEquals( cM2Repo.getRepositoryPolicy().name(), expected.getRepoPolicy() );
-            }
+        if (expected.getChecksumPolicy() != null) {
+          Assert.assertEquals(cM2Repo.getChecksumPolicy().name(), expected.getChecksumPolicy());
         }
 
+        Assert.assertEquals(cM2Repo.getRepositoryPolicy().name(), expected.getRepoPolicy());
+      }
     }
 
-    public static void updateIndexes( String... repositories )
-        throws Exception
-    {
-        REPOSITORY_NRC.updateIndexes( repositories );
-    }
+  }
 
-    public static void updateIncrementalIndexes( String... repositories )
-        throws Exception
-    {
-        REPOSITORY_NRC.updateIncrementalIndexes( repositories );
-    }
+  public static void updateIndexes(String... repositories)
+      throws Exception
+  {
+    REPOSITORY_NRC.updateIndexes(repositories);
+  }
 
-    public RepositoryStatusResource getStatus( String repoId )
-        throws IOException
-    {
-        return repositoryNRC.getStatus( repoId );
-    }
+  public static void updateIncrementalIndexes(String... repositories)
+      throws Exception
+  {
+    REPOSITORY_NRC.updateIncrementalIndexes(repositories);
+  }
 
-    public RepositoryStatusResource getStatus( String repoId, boolean force )
-        throws IOException
-    {
-        return repositoryNRC.getStatus( repoId, force );
-    }
+  public RepositoryStatusResource getStatus(String repoId)
+      throws IOException
+  {
+    return repositoryNRC.getStatus(repoId);
+  }
 
-    public void updateStatus( RepositoryStatusResource repoStatus )
-        throws IOException
-    {
-        repositoryNRC.updateStatus( repoStatus );
-    }
+  public RepositoryStatusResource getStatus(String repoId, boolean force)
+      throws IOException
+  {
+    return repositoryNRC.getStatus(repoId, force);
+  }
 
-    /**
-     * @param repoId
-     * @return
-     * @throws IOException
-     * @deprecated This is half baked stuff
-     */
-    public static ContentListResourceResponse downloadRepoIndexContent( String repoId )
-        throws IOException
-    {
-        return REPOSITORY_NRC.downloadRepoIndexContent( repoId );
-    }
+  public void updateStatus(RepositoryStatusResource repoStatus)
+      throws IOException
+  {
+    repositoryNRC.updateStatus(repoStatus);
+  }
 
-    /**
-     * Change block proxy state.<BR>
-     * this method only return after all Tasks and Asynchronous events to finish
-     *
-     * @param repoId
-     * @param block
-     * @throws Exception
-     */
-    public void setBlockProxy( final String repoId, final boolean block )
-        throws Exception
-    {
-        repositoryNRC.setBlockProxy( repoId, block );
-    }
+  /**
+   * @deprecated This is half baked stuff
+   */
+  public static ContentListResourceResponse downloadRepoIndexContent(String repoId)
+      throws IOException
+  {
+    return REPOSITORY_NRC.downloadRepoIndexContent(repoId);
+  }
 
-    /**
-     * Change block out of service state.<BR>
-     * this method only return after all Tasks and Asynchronous events to finish
-     *
-     * @param repoId
-     * @param outOfService
-     * @throws Exception
-     */
-    public void setOutOfServiceProxy( final String repoId, final boolean outOfService )
-        throws Exception
-    {
-        repositoryNRC.setOutOfServiceProxy( repoId, outOfService );
-    }
+  /**
+   * Change block proxy state.<BR>
+   * this method only return after all Tasks and Asynchronous events to finish
+   */
+  public void setBlockProxy(final String repoId, final boolean block)
+      throws Exception
+  {
+    repositoryNRC.setBlockProxy(repoId, block);
+  }
+
+  /**
+   * Change block out of service state.<BR>
+   * this method only return after all Tasks and Asynchronous events to finish
+   */
+  public void setOutOfServiceProxy(final String repoId, final boolean outOfService)
+      throws Exception
+  {
+    repositoryNRC.setOutOfServiceProxy(repoId, outOfService);
+  }
 
 }

@@ -10,84 +10,84 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.routing;
+
+import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
+import org.sonatype.sisu.litmus.testsupport.group.Smoke;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
-import org.sonatype.sisu.litmus.testsupport.group.Smoke;
-
 /**
  * NEXUS-5561: When enabling/disabling remote discovery, the update interval should not be lost.
- * 
+ *
  * @author cstamas
  */
-@Category( Smoke.class )
+@Category(Smoke.class)
 public class RoutingEnableDisableDoesNotLoosePeriodIT
     extends RoutingITSupport
 {
 
-    public RoutingEnableDisableDoesNotLoosePeriodIT( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  public RoutingEnableDisableDoesNotLoosePeriodIT(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
 
-    @Before
-    public void waitForDiscoveryOutcome()
-        throws Exception
-    {
-        routingTest().waitForAllRoutingUpdateJobToStop();
-        // waitForWLDiscoveryOutcome( "central" );
-    }
+  @Before
+  public void waitForDiscoveryOutcome()
+      throws Exception
+  {
+    routingTest().waitForAllRoutingUpdateJobToStop();
+    // waitForWLDiscoveryOutcome( "central" );
+  }
 
-    @Test
-    public void checkRoutingEnableDisableDoesNotLoosePeriod()
+  @Test
+  public void checkRoutingEnableDisableDoesNotLoosePeriod() {
+    final int updatePeriod = 11;
+    // get configuration for central and check for sane values (actually, they should be defaults).
     {
-        final int updatePeriod = 11;
-        // get configuration for central and check for sane values (actually, they should be defaults).
-        {
-            final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor( "central" );
-            assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
-            assertThat( centralConfiguration.getIntervalHours(), equalTo( 24 ) );
-            // checked ok, set interval to 11, and enable it
-            centralConfiguration.setIntervalHours( updatePeriod );
-            centralConfiguration.setEnabled( true );
-            routing().setDiscoveryConfigurationFor( "central", centralConfiguration );
-        }
-        // verify is set, but feature remains disabled
-        {
-            final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor( "central" );
-            assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
-            assertThat( centralConfiguration.getIntervalHours(), equalTo( updatePeriod ) );
-            // disable it
-            centralConfiguration.setEnabled( false );
-            routing().setDiscoveryConfigurationFor( "central", centralConfiguration );
-        }
-        // verify is set, but feature remains disabled
-        {
-            final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor( "central" );
-            assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( false ) );
-            assertThat( centralConfiguration.getIntervalHours(), equalTo( updatePeriod ) );
-            // enable it
-            centralConfiguration.setEnabled( true );
-            routing().setDiscoveryConfigurationFor( "central", centralConfiguration );
-        }
-        // verify is set, but feature remains disabled
-        {
-            final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor( "central" );
-            assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
-            assertThat( centralConfiguration.getIntervalHours(), equalTo( updatePeriod ) );
-        }
+      final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor("central");
+      assertThat(centralConfiguration, is(notNullValue()));
+      assertThat(centralConfiguration.isEnabled(), equalTo(true));
+      assertThat(centralConfiguration.getIntervalHours(), equalTo(24));
+      // checked ok, set interval to 11, and enable it
+      centralConfiguration.setIntervalHours(updatePeriod);
+      centralConfiguration.setEnabled(true);
+      routing().setDiscoveryConfigurationFor("central", centralConfiguration);
     }
+    // verify is set, but feature remains disabled
+    {
+      final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor("central");
+      assertThat(centralConfiguration, is(notNullValue()));
+      assertThat(centralConfiguration.isEnabled(), equalTo(true));
+      assertThat(centralConfiguration.getIntervalHours(), equalTo(updatePeriod));
+      // disable it
+      centralConfiguration.setEnabled(false);
+      routing().setDiscoveryConfigurationFor("central", centralConfiguration);
+    }
+    // verify is set, but feature remains disabled
+    {
+      final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor("central");
+      assertThat(centralConfiguration, is(notNullValue()));
+      assertThat(centralConfiguration.isEnabled(), equalTo(false));
+      assertThat(centralConfiguration.getIntervalHours(), equalTo(updatePeriod));
+      // enable it
+      centralConfiguration.setEnabled(true);
+      routing().setDiscoveryConfigurationFor("central", centralConfiguration);
+    }
+    // verify is set, but feature remains disabled
+    {
+      final DiscoveryConfiguration centralConfiguration = routing().getDiscoveryConfigurationFor("central");
+      assertThat(centralConfiguration, is(notNullValue()));
+      assertThat(centralConfiguration.isEnabled(), equalTo(true));
+      assertThat(centralConfiguration.getIntervalHours(), equalTo(updatePeriod));
+    }
+  }
 
 }

@@ -10,40 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus3936;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.security.rest.model.ClientPermission;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 /**
- * Security is already disabled for this Test, we just need to make sure the Status resource returns ALL/15, for all the
+ * Security is already disabled for this Test, we just need to make sure the Status resource returns ALL/15, for all
+ * the
  * permission strings.
  */
 public class Nexus3936DisableSecurityStatusIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
-    public void testSecurityDisabledStatus()
-        throws Exception
-    {
+  @Test
+  public void testSecurityDisabledStatus()
+      throws Exception
+  {
 
-        NexusStatusUtil statusUtil = getNexusStatusUtil();
-        StatusResource statusResource = statusUtil.getNexusStatus( true ).getData();
+    NexusStatusUtil statusUtil = getNexusStatusUtil();
+    StatusResource statusResource = statusUtil.getNexusStatus(true).getData();
 
-        List<ClientPermission> permisisons = statusResource.getClientPermissions().getPermissions();
+    List<ClientPermission> permisisons = statusResource.getClientPermissions().getPermissions();
 
-        Assert.assertTrue( "Permissions are empty, expected a whole bunch, not zero.", permisisons.size() > 0 );
-        for ( ClientPermission clientPermission : permisisons )
-        {
-            Assert.assertEquals( "Permission '"+ clientPermission.getId() +"' should have had a value of '15', the value was" + clientPermission.getValue(), clientPermission.getValue(), 15 );
-        }
-        // that is it, just checking the values, when security is disabled, access is WIDE open.
+    Assert.assertTrue("Permissions are empty, expected a whole bunch, not zero.", permisisons.size() > 0);
+    for (ClientPermission clientPermission : permisisons) {
+      Assert.assertEquals(
+          "Permission '" + clientPermission.getId() + "' should have had a value of '15', the value was" +
+              clientPermission.getValue(), clientPermission.getValue(), 15);
     }
+    // that is it, just checking the values, when security is disabled, access is WIDE open.
+  }
 }

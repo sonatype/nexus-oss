@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * {@link SecurityConfigurationVersionUpgrader} step for security configuration version 2.0.4 > 2.0.5 upgrade.
- * 
+ *
  * @since 2.7.0
  */
 @Singleton
@@ -65,7 +65,7 @@ public class Upgrade204to205
     newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
 
     // NEXUS-5828: Security Manager field is gone!
-    
+
     message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);
   }

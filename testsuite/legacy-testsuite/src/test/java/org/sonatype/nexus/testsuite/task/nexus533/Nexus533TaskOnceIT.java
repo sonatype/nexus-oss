@@ -10,52 +10,51 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus533;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
+
+import org.apache.commons.lang.time.DateUtils;
 
 public class Nexus533TaskOnceIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceOnceResource>
 {
 
-    private static ScheduledServiceOnceResource scheduledTask;
+  private static ScheduledServiceOnceResource scheduledTask;
 
-    @Override
-    public ScheduledServiceOnceResource getTaskScheduled()
-    {
-        if ( scheduledTask == null )
-        {
-            scheduledTask = new ScheduledServiceOnceResource();
-            scheduledTask.setEnabled( true );
-            scheduledTask.setId( null );
-            scheduledTask.setName( "taskOnce" );
-            scheduledTask.setSchedule( "once" );
-            // A future date
-            Date startDate = DateUtils.addDays( new Date(), 10 );
-            startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
-            scheduledTask.setStartDate( String.valueOf( startDate.getTime() ) );
-            scheduledTask.setStartTime( "03:30" );
+  @Override
+  public ScheduledServiceOnceResource getTaskScheduled() {
+    if (scheduledTask == null) {
+      scheduledTask = new ScheduledServiceOnceResource();
+      scheduledTask.setEnabled(true);
+      scheduledTask.setId(null);
+      scheduledTask.setName("taskOnce");
+      scheduledTask.setSchedule("once");
+      // A future date
+      Date startDate = DateUtils.addDays(new Date(), 10);
+      startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
+      scheduledTask.setStartDate(String.valueOf(startDate.getTime()));
+      scheduledTask.setStartTime("03:30");
 
-            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
+      scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
 
-            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( "repositoryId" );
-            prop.setValue( "all_repo" );
-            scheduledTask.addProperty( prop );
-        }
-        return scheduledTask;
+      ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+      prop.setKey("repositoryId");
+      prop.setValue("all_repo");
+      scheduledTask.addProperty(prop);
     }
+    return scheduledTask;
+  }
 
-    @Override
-    public void updateTask( ScheduledServiceOnceResource scheduledTask )
-    {
-        scheduledTask.setStartTime( "00:00" );
-    }
+  @Override
+  public void updateTask(ScheduledServiceOnceResource scheduledTask) {
+    scheduledTask.setStartTime("00:00");
+  }
 
 }

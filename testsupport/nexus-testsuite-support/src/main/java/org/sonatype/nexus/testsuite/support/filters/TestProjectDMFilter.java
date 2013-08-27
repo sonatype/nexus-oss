@@ -10,21 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.support.filters;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.testsuite.support.Filter;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
+
 import com.google.common.collect.Maps;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 
 /**
  * Replaces version placeholder with version from dependencies management.
@@ -40,79 +43,68 @@ public class TestProjectDMFilter
     implements Filter
 {
 
-    /**
-     * Constructor.
-     *
-     * @param modelResolver Model resolver used to resolve effective model of test project (pom). Cannot be null.
-     */
-    @Inject
-    public TestProjectDMFilter( @Named( "remote-model-resolver-using-settings" ) final MavenModelResolver modelResolver,
-                                @Parameters final Map<String, String> properties )
-    {
-        super( modelResolver, properties );
-    }
+  /**
+   * Constructor.
+   *
+   * @param modelResolver Model resolver used to resolve effective model of test project (pom). Cannot be null.
+   */
+  @Inject
+  public TestProjectDMFilter(@Named("remote-model-resolver-using-settings") final MavenModelResolver modelResolver,
+                             @Parameters final Map<String, String> properties)
+  {
+    super(modelResolver, properties);
+  }
 
-    /**
-     * Returns mappings by looking up version out of dependency management.
-     *
-     * @param context filtering context. Cannot be null.
-     * @param value   value to be filtered. Ignored by this filter.
-     * @param model   resolved model of project under test. Cannot be null.
-     * @return mappings extracted from project under test model
-     */
-    @Override
-    Map<String, String> mappings( final Map<String, String> context, final String value, final Model model )
-    {
-        final Map<String, String> mappings = Maps.newHashMap();
+  /**
+   * Returns mappings by looking up version out of dependency management.
+   *
+   * @param context filtering context. Cannot be null.
+   * @param value   value to be filtered. Ignored by this filter.
+   * @param model   resolved model of project under test. Cannot be null.
+   * @return mappings extracted from project under test model
+   */
+  @Override
+  Map<String, String> mappings(final Map<String, String> context, final String value, final Model model) {
+    final Map<String, String> mappings = Maps.newHashMap();
 
-        if ( value.contains( "${project.dm." ) && model.getDependencyManagement() != null )
-        {
-            final DefaultArtifact artifact;
-            try
-            {
-                artifact = new DefaultArtifact( value );
+    if (value.contains("${project.dm.") && model.getDependencyManagement() != null) {
+      final DefaultArtifact artifact;
+      try {
+        artifact = new DefaultArtifact(value);
 
-                final List<Dependency> dependencies = model.getDependencyManagement().getDependencies();
+        final List<Dependency> dependencies = model.getDependencyManagement().getDependencies();
 
-                for ( Dependency dependency : dependencies )
-                {
-                    if ( !dependency.getGroupId().equalsIgnoreCase( artifact.getGroupId() ) )
-                    {
-                        continue;
-                    }
-                    if ( !dependency.getArtifactId().equalsIgnoreCase( artifact.getArtifactId() ) )
-                    {
-                        continue;
-                    }
-                    String extensionToCompare = dependency.getType();
-                    if ( extensionToCompare == null || extensionToCompare.isEmpty() )
-                    {
-                        extensionToCompare = "jar";
-                    }
-                    if ( !extensionToCompare.equals( artifact.getExtension() ) )
-                    {
-                        continue;
-                    }
-                    String classifierToCompare = dependency.getClassifier();
-                    if ( classifierToCompare == null || extensionToCompare.isEmpty() )
-                    {
-                        classifierToCompare = "";
-                    }
-                    if ( !classifierToCompare.equals( artifact.getClassifier() ) )
-                    {
-                        continue;
-                    }
+        for (Dependency dependency : dependencies) {
+          if (!dependency.getGroupId().equalsIgnoreCase(artifact.getGroupId())) {
+            continue;
+          }
+          if (!dependency.getArtifactId().equalsIgnoreCase(artifact.getArtifactId())) {
+            continue;
+          }
+          String extensionToCompare = dependency.getType();
+          if (extensionToCompare == null || extensionToCompare.isEmpty()) {
+            extensionToCompare = "jar";
+          }
+          if (!extensionToCompare.equals(artifact.getExtension())) {
+            continue;
+          }
+          String classifierToCompare = dependency.getClassifier();
+          if (classifierToCompare == null || extensionToCompare.isEmpty()) {
+            classifierToCompare = "";
+          }
+          if (!classifierToCompare.equals(artifact.getClassifier())) {
+            continue;
+          }
 
-                    mappings.put( "project.dm.version", dependency.getVersion() );
-                }
-            }
-            catch ( IllegalArgumentException e )
-            {
-                // TODO log as warning?
-            }
+          mappings.put("project.dm.version", dependency.getVersion());
         }
-
-        return mappings;
+      }
+      catch (IllegalArgumentException e) {
+        // TODO log as warning?
+      }
     }
+
+    return mappings;
+  }
 
 }

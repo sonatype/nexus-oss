@@ -10,7 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite;
+
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+
+import org.sonatype.nexus.client.core.subsystem.content.Content;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+
+import org.junit.runners.Parameterized;
 
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
@@ -18,72 +30,55 @@ import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestP
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-
-import org.junit.runners.Parameterized;
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.client.core.subsystem.content.Content;
-import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
 /**
  * Support for Core integration tests.
  *
  * @since 2.4
  */
-@NexusStartAndStopStrategy( EACH_TEST )
+@NexusStartAndStopStrategy(EACH_TEST)
 public abstract class NexusCoreITSupport
     extends NexusRunningParametrizedITSupport
 {
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data()
-    {
-        return firstAvailableTestParameters(
-            systemTestParameters(),
-            testParameters(
-                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
-            )
-        ).load();
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return firstAvailableTestParameters(
+        systemTestParameters(),
+        testParameters(
+            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
+        )
+    ).load();
+  }
 
-    protected NexusCoreITSupport( final String nexusBundleCoordinates )
-    {
-        super( nexusBundleCoordinates );
-    }
+  protected NexusCoreITSupport(final String nexusBundleCoordinates) {
+    super(nexusBundleCoordinates);
+  }
 
-    /**
-     * Creates unique name with given prefix.
-     *
-     * @param prefix
-     * @return a unique name.
-     */
-    public static String uniqueName( final String prefix )
-    {
-        return prefix + "-" + new SimpleDateFormat( "yyyyMMdd-HHmmss-SSS" ).format( new Date() );
-    }
+  /**
+   * Creates unique name with given prefix.
+   *
+   * @return a unique name.
+   */
+  public static String uniqueName(final String prefix) {
+    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
+  }
 
-    /**
-     * Returns {@link Repositories} client subsystem.
-     *
-     * @return client for repositories.
-     */
-    public Repositories repositories()
-    {
-        return client().getSubsystem( Repositories.class );
-    }
+  /**
+   * Returns {@link Repositories} client subsystem.
+   *
+   * @return client for repositories.
+   */
+  public Repositories repositories() {
+    return client().getSubsystem(Repositories.class);
+  }
 
-    /**
-     * Returns {@link Content} client subsystem.
-     *
-     * @return client for content.
-     */
-    public Content content()
-    {
-        return client().getSubsystem( Content.class );
-    }
+  /**
+   * Returns {@link Content} client subsystem.
+   *
+   * @return client for content.
+   */
+  public Content content() {
+    return client().getSubsystem(Content.class);
+  }
 
 }

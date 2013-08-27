@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.task.nexus2692;
 
 import java.util.SortedSet;
@@ -21,23 +22,23 @@ import org.junit.Test;
 public class Nexus2692EvictHostedSnapshotTaskIT
     extends AbstractEvictTaskIt
 {
-    @Test
-    public void testEvictSnapshotRepo()
-        throws Exception
-    {
-        int days = 1;
-        // run Task
-        runTask( days, "snapshots" );
+  @Test
+  public void testEvictSnapshotRepo()
+      throws Exception
+  {
+    int days = 1;
+    // run Task
+    runTask(days, "snapshots");
 
-        // check files
-        SortedSet<String> resultStorageFiles = getItemFilePaths();
+    // check files
+    SortedSet<String> resultStorageFiles = getItemFilePaths();
 
-        // unexpected deleted files
-        SortedSet<String> storageDiff = new TreeSet<String>( getPathMap().keySet() );
-        storageDiff.removeAll( resultStorageFiles );
+    // unexpected deleted files
+    SortedSet<String> storageDiff = new TreeSet<String>(getPathMap().keySet());
+    storageDiff.removeAll(resultStorageFiles);
 
-        Assert.assertTrue( "Files deleted that should not have been: "
-            + prettyList( storageDiff ), storageDiff.isEmpty() );
-    }
+    Assert.assertTrue("Files deleted that should not have been: "
+        + prettyList(storageDiff), storageDiff.isEmpty());
+  }
 
 }
