@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository.validator;
 
 import java.io.File;
 
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -26,7 +27,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
-import org.sonatype.nexus.test.NexusTestSupport;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
@@ -36,7 +36,7 @@ import org.junit.Assert;
  * specific tests.
  */
 public abstract class AbstractFileTypeValidationUtilTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   /**
    * Override this method if your test files are located elsewhere.
