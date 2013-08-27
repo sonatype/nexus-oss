@@ -20,6 +20,7 @@ import java.net.SocketException;
 
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.RestletResponseCustomizer;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -33,6 +34,8 @@ public class StorageFileItemRepresentation
     extends StorageItemRepresentation
     implements RestletResponseCustomizer
 {
+  private static final int OUTPUT_BUFFER_SIZE = SystemPropertiesHelper.getInteger("org.sonatype.nexus.rest.StorageFileItemRepresentation.outputBufferSize", 4096);
+
   public StorageFileItemRepresentation(StorageFileItem file) {
     super(MediaType.valueOf(file.getMimeType()), file);
 
@@ -69,12 +72,8 @@ public class StorageFileItemRepresentation
   public void write(OutputStream outputStream)
       throws IOException
   {
-    InputStream is = null;
-
-    try {
-      is = getStorageItem().getInputStream();
-
-      IOUtil.copy(is, outputStream);
+    try(final InputStream is = getStorageItem().getInputStream()) {
+      IOUtil.copy(is, outputStream, OUTPUT_BUFFER_SIZE);
     }
     catch (IOException e) {
       if ("EofException".equals(e.getClass().getSimpleName())) {
@@ -87,9 +86,6 @@ public class StorageFileItemRepresentation
       else {
         throw e;
       }
-    }
-    finally {
-      IOUtil.close(is);
     }
   }
 
