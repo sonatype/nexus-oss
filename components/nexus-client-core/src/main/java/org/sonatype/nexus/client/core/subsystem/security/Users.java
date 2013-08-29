@@ -14,12 +14,16 @@
 package org.sonatype.nexus.client.core.subsystem.security;
 
 import org.sonatype.nexus.client.core.subsystem.EntityRepository;
+import org.sonatype.nexus.client.internal.subsystem.security.UsersImpl;
+
+import com.google.inject.ImplementedBy;
 
 /**
  * Nexus {@link User} repository.
  *
  * @since 2.3
  */
+@ImplementedBy(UsersImpl.class)
 public interface Users
     extends EntityRepository<User>
 {
