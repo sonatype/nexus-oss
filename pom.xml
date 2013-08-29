@@ -104,7 +104,7 @@
     <!--
     Configuration of 'nexus-plugin' packaging and bundles.
     -->
-    <nexus-plugin-bundle.version>1.0.2-SNAPSHOT</nexus-plugin-bundle.version>
+    <nexus-plugin-bundle.version>1.1</nexus-plugin-bundle.version>
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
     <!-- logging configuration used in logback config files to control test logging -->
