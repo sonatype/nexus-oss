@@ -110,7 +110,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.jacksbee</groupId>
         <artifactId>jacksbee-runtime</artifactId>
-        <version>1.1.1</version>
+        <version>1.2</version>
         <exclusions>
           <exclusion>
             <groupId>javax.xml.bind</groupId>
@@ -122,7 +122,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.jacksbee</groupId>
         <artifactId>jacksbee-xjc</artifactId>
-        <version>1.1.1</version>
+        <version>1.2</version>
       </dependency>
 
     </dependencies>
