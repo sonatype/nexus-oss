@@ -525,8 +525,7 @@ public class DefaultRepositoryRouter
   {
     final ResourceStoreRequest req = new ResourceStoreRequest(route.getOriginalRequestPath());
     req.getRequestContext().setParentContext(request.getRequestContext());
-    final DefaultStorageCollectionItem result = new DefaultStorageCollectionItem(this, req, true, false);
-    return result;
+    return new DefaultStorageCollectionItem(this, req, true, false);
   }
 
   protected Collection<StorageItem> listVirtualPath(ResourceStoreRequest request, RequestRoute route)

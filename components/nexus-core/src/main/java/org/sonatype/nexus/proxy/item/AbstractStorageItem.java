@@ -20,7 +20,6 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.attributes.internal.AttributesMapAdapter;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -29,9 +28,7 @@ import org.sonatype.nexus.util.ItemPathUtils;
 import com.google.common.base.Strings;
 
 /**
- * The Class AbstractStorageItem.
- *
- * @author cstamas
+ * Abstract class encapsulating properties what all item kinds in Nexus share.
  */
 public abstract class AbstractStorageItem
     implements StorageItem
@@ -61,71 +58,125 @@ public abstract class AbstractStorageItem
    * the attributes
    */
   private transient Attributes itemAttributes;
+  
+  // NOTE: these fields below are deprecated but needed for pre-2.0 instances upgraded to post-2.0!
+  // Do not remove, unless we stop supporting upgrading of pre-2.0 to current version!
 
   /**
    * Used for versioning of attribute
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private int generation = 0;
 
   /**
    * The path.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private String path;
 
   /**
    * The readable.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private boolean readable;
 
   /**
    * The writable.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private boolean writable;
 
   /**
    * The repository id.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private String repositoryId;
 
   /**
    * The created.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private long created;
 
   /**
    * The modified.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private long modified;
 
   /**
    * The stored locally.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private long storedLocally;
 
   /**
    * The last remoteCheck timestamp.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
-  // TODO: leave the field name as-is coz of persistence and old nexuses!
+  @Deprecated
   private long lastTouched;
 
   /**
    * The last requested timestamp.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private long lastRequested;
 
   /**
    * Expired flag
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private boolean expired;
 
   /**
    * The remote url.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private String remoteUrl;
 
   /**
    * The persisted attributes.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen.
    */
+  @Deprecated
   private Map<String, String> attributes;
 
   // ==
@@ -135,7 +186,9 @@ public abstract class AbstractStorageItem
   }
 
   /**
-   * This method should be called ONLY when you load up a _legacy_ attribute using _legacy_ attribute store!
+   * This method should be called ONLY when you load up a _legacy_ attribute using _legacy_ attribute store! Basically
+   * it "repacks" the deprecated fields as loaded by XStream (as back then XStream was used to serialize Item instances)
+   * into new Attributes.
    */
   public void upgrade() {
     this.context = new RequestContext();
@@ -167,16 +220,16 @@ public abstract class AbstractStorageItem
   // ==
 
   /**
-   * Default constructor.
+   * Default constructor, needed for XStream.
+   * 
+   * @deprecated This constructor is here for legacy reasons, do not use it!
    */
+  @Deprecated
   private AbstractStorageItem() {
     this.context = new RequestContext();
     this.itemAttributes = new DefaultAttributes();
   }
 
-  /**
-   * Instantiates a new abstract storage item.
-   */
   public AbstractStorageItem(final ResourceStoreRequest request, final boolean readable, final boolean writable) {
     this();
     this.request = request.cloneAndDetach();
@@ -188,262 +241,176 @@ public abstract class AbstractStorageItem
     setModified(getCreated());
   }
 
-  /**
-   * Instantiates a new abstract storage item.
-   */
-  public AbstractStorageItem(Repository repository, ResourceStoreRequest request, boolean readable,
-                             boolean writable)
-  {
+  public AbstractStorageItem(Repository repository, ResourceStoreRequest request, boolean readable, boolean writable) {
     this(request, readable, writable);
     this.store = repository;
     this.repositoryItemUid = repository.createUid(getPath());
     setRepositoryId(repository.getId());
   }
 
-  /**
-   * Instantiates a new abstract storage item.
-   */
-  public AbstractStorageItem(RepositoryRouter router, ResourceStoreRequest request, boolean readable,
-                             boolean writable)
+  public AbstractStorageItem(RepositoryRouter router, ResourceStoreRequest request, boolean readable, boolean writable)
   {
     this(request, readable, writable);
     this.store = router;
   }
 
   /**
-   * Gets the store.
-   *
-   * @return the store
+   * {@link ResourceStore} is superclass of {@link Repository} and {@link RepositoryRouter}. This is for virtual items,
+   * when they do not originate from a {@link Repository}.
    */
   public ResourceStore getStore() {
     return this.store;
   }
 
-  /**
-   * Sets the store.
-   */
-  public void setStore(ResourceStore store) {
-    // only allow this when we are virtual!
-    if (isVirtual()) {
-      this.store = store;
-    }
-  }
-
+  @Override
   public ResourceStoreRequest getResourceStoreRequest() {
     return request;
   }
 
   public void setResourceStoreRequest(ResourceStoreRequest request) {
     this.request = request;
-
     this.context = new RequestContext(request.getRequestContext());
   }
 
+  @Override
   public RepositoryItemUid getRepositoryItemUid() {
     return repositoryItemUid;
   }
 
-  /**
-   * Sets the UID.
-   */
+  @Override
   public void setRepositoryItemUid(RepositoryItemUid repositoryItemUid) {
     this.repositoryItemUid = repositoryItemUid;
     this.store = repositoryItemUid.getRepository();
-
     getRepositoryItemAttributes().setRepositoryId(repositoryItemUid.getRepository().getId());
     getRepositoryItemAttributes().setPath(repositoryItemUid.getPath());
   }
 
+  @Override
   public String getRepositoryId() {
     return getRepositoryItemAttributes().getRepositoryId();
   }
 
-  /**
-   * Sets the repository id.
-   *
-   * @param repositoryId the new repository id
-   */
   public void setRepositoryId(String repositoryId) {
     getRepositoryItemAttributes().setRepositoryId(repositoryId);
   }
 
+  @Override
   public long getCreated() {
     return getRepositoryItemAttributes().getCreated();
   }
 
-  /**
-   * Sets the created.
-   *
-   * @param created the new created
-   */
   public void setCreated(long created) {
     getRepositoryItemAttributes().setCreated(created);
   }
 
+  @Override
   public long getModified() {
     return getRepositoryItemAttributes().getModified();
   }
 
-  /**
-   * Sets the modified.
-   *
-   * @param modified the new modified
-   */
   public void setModified(long modified) {
     getRepositoryItemAttributes().setModified(modified);
   }
 
+  @Override
   public boolean isReadable() {
     return getRepositoryItemAttributes().isReadable();
   }
 
-  /**
-   * Sets the readable.
-   *
-   * @param readable the new readable
-   */
   public void setReadable(boolean readable) {
     getRepositoryItemAttributes().setReadable(readable);
   }
 
+  @Override
   public boolean isWritable() {
     return getRepositoryItemAttributes().isWritable();
   }
 
-  /**
-   * Sets the writable.
-   *
-   * @param writable the new writable
-   */
   public void setWritable(boolean writable) {
     getRepositoryItemAttributes().setWritable(writable);
   }
 
+  @Override
   public String getPath() {
     return getRepositoryItemAttributes().getPath();
   }
 
-  /**
-   * Sets the path.
-   *
-   * @param path the new path
-   */
   public void setPath(String path) {
     getRepositoryItemAttributes().setPath(ItemPathUtils.cleanUpTrailingSlash(path));
   }
 
+  @Override
   public boolean isExpired() {
     return getRepositoryItemAttributes().isExpired();
   }
 
-  /**
-   * Sets the expired flag.
-   */
+  @Override
   public void setExpired(boolean expired) {
     getRepositoryItemAttributes().setExpired(expired);
   }
 
+  @Override
   public String getName() {
     return new File(getPath()).getName();
   }
 
+  @Override
   public String getParentPath() {
     return ItemPathUtils.getParentPath(getPath());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Deprecated
-  public Map<String, String> getAttributes() {
-    return new AttributesMapAdapter(itemAttributes);
-  }
-
+  @Override
   public RequestContext getItemContext() {
     return context;
   }
 
+  @Override
   public boolean isVirtual() {
     return getRepositoryItemUid() == null;
   }
 
+  @Override
   public String getRemoteUrl() {
     return getRepositoryItemAttributes().getRemoteUrl();
   }
 
-  /**
-   * Sets the remote url.
-   *
-   * @param remoteUrl the new remote url
-   */
   public void setRemoteUrl(String remoteUrl) {
     getRepositoryItemAttributes().setRemoteUrl(remoteUrl);
   }
 
+  @Override
   public long getStoredLocally() {
     return getRepositoryItemAttributes().getStoredLocally();
   }
 
-  /**
-   * Sets the stored locally.
-   *
-   * @param storedLocally the new stored locally
-   */
+  @Override
   public void setStoredLocally(long storedLocally) {
     getRepositoryItemAttributes().setStoredLocally(storedLocally);
   }
 
+  @Override
   public long getRemoteChecked() {
     return getRepositoryItemAttributes().getCheckedRemotely();
   }
 
-  /**
-   * Sets the remote checked.
-   *
-   * @param lastTouched the new remote checked
-   */
+  @Override
   public void setRemoteChecked(long lastTouched) {
     getRepositoryItemAttributes().setCheckedRemotely(lastTouched);
   }
 
+  @Override
   public long getLastRequested() {
     return getRepositoryItemAttributes().getLastRequested();
   }
 
-  /**
-   * Sets the last requested timestamp.
-   */
+  @Override
   public void setLastRequested(long lastRequested) {
     getRepositoryItemAttributes().setLastRequested(lastRequested);
   }
 
-  public int getGeneration() {
-    return getRepositoryItemAttributes().getGeneration();
-  }
-
-  public void incrementGeneration() {
-    getRepositoryItemAttributes().incrementGeneration();
-  }
-
-  @Deprecated
-  public void overlay(StorageItem item)
-      throws IllegalArgumentException
-  {
-    if (item == null) {
-      throw new NullPointerException("Cannot overlay null item onto this item of class "
-          + this.getClass().getName());
-    }
-    // here was the "overlay" implemented, which was moved to DefaultAttributes#overlayAttributes method
-    // instead with much cleaner implementation. Here, it was unlear and code looked "arbitrary" (why
-    // some fields "win" over others).
-  }
-
-  protected boolean isOverlayable(StorageItem item) {
-    return this.getClass().isAssignableFrom(item.getClass());
-  }
-
   // ==
 
+  @Override
   public String toString() {
     if (isVirtual()) {
       return getPath();
@@ -452,5 +419,4 @@ public abstract class AbstractStorageItem
       return getRepositoryItemUid().toString();
     }
   }
-
 }

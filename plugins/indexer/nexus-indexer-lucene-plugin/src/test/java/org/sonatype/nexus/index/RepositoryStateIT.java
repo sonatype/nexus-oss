@@ -19,6 +19,7 @@ import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.AbstractContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.FileContentLocator;
@@ -46,18 +47,8 @@ public class RepositoryStateIT
 {
   private NexusIndexer mavenIndexer;
 
-  private static final ContentLocator contentLocator = new ContentLocator()
+  private static final ContentLocator contentLocator = new AbstractContentLocator("", false, ContentLocator.UNKNOWN_LENGTH)
   {
-    @Override
-    public boolean isReusable() {
-      return false;
-    }
-
-    @Override
-    public String getMimeType() {
-      return null;
-    }
-
     @Override
     public InputStream getContent()
         throws IOException

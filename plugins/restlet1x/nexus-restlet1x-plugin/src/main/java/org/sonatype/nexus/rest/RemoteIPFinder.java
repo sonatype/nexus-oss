@@ -13,36 +13,30 @@
 
 package org.sonatype.nexus.rest;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 
+/**
+ * Restlet specific additions to {@link org.sonatype.nexus.web.RemoteIPFinder} helper class.
+ */
 public class RemoteIPFinder
 {
-  static final String FORWARD_HEADER = "X-Forwarded-For";
-
+  /**
+   * @deprecated Use {@link org.sonatype.nexus.web.RemoteIPFinder#findIP(HttpServletRequest)} instead.
+   */
+  @Deprecated
   public static String findIP(HttpServletRequest request) {
-    String forwardedIP = getFirstForwardedIp(request.getHeader(FORWARD_HEADER));
-
-    if (forwardedIP != null) {
-      return forwardedIP;
-    }
-
-    return request.getRemoteAddr();
+    return org.sonatype.nexus.web.RemoteIPFinder.findIP(request);
   }
 
   public static String findIP(Request request) {
     Form form = (Form) request.getAttributes().get("org.restlet.http.headers");
 
-    String forwardedIP = getFirstForwardedIp(form.getFirstValue(FORWARD_HEADER));
+    String forwardedIP = org.sonatype.nexus.web.RemoteIPFinder.getFirstForwardedIp(form.getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER));
 
     if (forwardedIP != null) {
       return forwardedIP;
@@ -59,7 +53,7 @@ public class RemoteIPFinder
         ipAddresses[i] = clientAddresses.get(j);
       }
 
-      forwardedIP = resolveIp(ipAddresses);
+      forwardedIP = org.sonatype.nexus.web.RemoteIPFinder.resolveIp(ipAddresses);
 
       if (forwardedIP != null) {
         return forwardedIP;
@@ -67,36 +61,5 @@ public class RemoteIPFinder
     }
 
     return request.getClientInfo().getAddress();
-  }
-
-  /**
-   * Returns the *left-most* resolvable IP from the given XFF string; otherwise null.
-   */
-  private static String getFirstForwardedIp(String forwardedFor) {
-    if (!StringUtils.isEmpty(forwardedFor)) {
-      return resolveIp(forwardedFor.split("\\s*,\\s*"));
-    }
-
-    return null;
-  }
-
-  /**
-   * Returns the *left-most* resolvable IP from the given sequence.
-   */
-  private static String resolveIp(String[] ipAddresses) {
-    for (String ip : ipAddresses) {
-      InetAddress ipAdd;
-      try {
-        ipAdd = InetAddress.getByName(ip);
-      }
-      catch (UnknownHostException e) {
-        continue;
-      }
-      if (ipAdd instanceof Inet4Address || ipAdd instanceof Inet6Address) {
-        return ip;
-      }
-    }
-
-    return null;
   }
 }

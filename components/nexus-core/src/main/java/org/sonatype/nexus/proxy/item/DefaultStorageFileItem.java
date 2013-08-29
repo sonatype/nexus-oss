@@ -20,100 +20,56 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
-import org.codehaus.plexus.util.StringUtils;
+import com.google.common.base.Strings;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The Class DefaultStorageFileItem.
+ * Default implementation of {@link StorageFileItem}.
  */
 public class DefaultStorageFileItem
     extends AbstractStorageItem
     implements StorageFileItem
 {
-
-  /**
-   * The Constant serialVersionUID.
-   */
-  private static final long serialVersionUID = 3608889194663697395L;
-
   /**
    * The input stream.
    */
   private transient ContentLocator contentLocator;
 
+  /**
+   * File content length.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen. The actual value comes from {@link ContentLocator#getLength()}!
+   */
+  @Deprecated
   private long length;
 
   /**
-   * This is here for backward compatibility only, to enable XStream to load up the old XML attributes.
-   *
-   * @deprecated The mime-type is now coming from ContentLocator, see getMimeType() method body.
+   * File content MIME type.
+   * 
+   * @deprecated Field left in place for legacy upgrades, to have XStream able to read up serialized item and then have
+   *             {@link #upgrade()} to happen. The actual value comes from {@link ContentLocator#getMimeType()}!
    */
+  @Deprecated
   private String mimeType;
 
-  @Override
-  public void upgrade() {
-    super.upgrade();
-
-    getRepositoryItemAttributes().setLength(length);
-  }
-
-  /**
-   * Instantiates a new default storage file item.
-   *
-   * @param repository     the repository
-   * @param path           the path
-   * @param canRead        the can read
-   * @param canWrite       the can write
-   * @param contentLocator the content locator
-   */
   public DefaultStorageFileItem(Repository repository, ResourceStoreRequest request, boolean canRead,
                                 boolean canWrite, ContentLocator contentLocator)
   {
     super(repository, request, canRead, canWrite);
-    this.contentLocator = contentLocator;
+    setContentLocator(contentLocator);
   }
 
-  /**
-   * Shortcut method.
-   *
-   * @deprecated supply resourceStoreRequest always
-   */
-  public DefaultStorageFileItem(Repository repository, String path, boolean canRead, boolean canWrite,
-                                ContentLocator contentLocator)
-  {
-    this(repository, new ResourceStoreRequest(path, true, false), canRead, canWrite, contentLocator);
-  }
-
-  /**
-   * Instantiates a new default storage file item.
-   *
-   * @param RepositoryRouter router
-   * @param path             the path
-   * @param canRead          the can read
-   * @param canWrite         the can write
-   * @param contentLocator   the content locator
-   */
   public DefaultStorageFileItem(RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
                                 boolean canWrite, ContentLocator contentLocator)
   {
     super(router, request, canRead, canWrite);
-    this.contentLocator = contentLocator;
-  }
-
-  @Deprecated
-  public DefaultStorageFileItem(RepositoryRouter router, String path, boolean canRead, boolean canWrite,
-                                ContentLocator contentLocator)
-  {
-    this(router, new ResourceStoreRequest(path, true, false), canRead, canWrite, contentLocator);
+    setContentLocator(contentLocator);
   }
 
   @Override
   public long getLength() {
-    return getRepositoryItemAttributes().getLength();
-  }
-
-  @Override
-  public void setLength(long length) {
-    getRepositoryItemAttributes().setLength(length);
+    return getContentLocator().getLength();
   }
 
   @Override
@@ -134,19 +90,23 @@ public class DefaultStorageFileItem
   }
 
   @Override
+  public long getModified() {
+    if (isContentGenerated()) {
+      return System.currentTimeMillis();
+    }
+    else {
+      return super.getModified();
+    }
+  }
+
+  @Override
   public void setContentLocator(ContentLocator locator) {
-    this.contentLocator = locator;
+    this.contentLocator = checkNotNull(locator);
   }
 
   @Override
   public ContentLocator getContentLocator() {
-    return this.contentLocator;
-  }
-
-  @Override
-  protected boolean isOverlayable(StorageItem item) {
-    // we have an exception here, so, Files are overlayable with any other Files
-    return super.isOverlayable(item) || StorageFileItem.class.isAssignableFrom(item.getClass());
+    return contentLocator;
   }
 
   @Override
@@ -161,12 +121,10 @@ public class DefaultStorageFileItem
 
   @Override
   public void setContentGeneratorId(String contentGeneratorId) {
-    if (StringUtils.isBlank(contentGeneratorId)) {
-      // rempve it from attributes
+    if (Strings.isNullOrEmpty(contentGeneratorId)) {
       getRepositoryItemAttributes().remove(ContentGenerator.CONTENT_GENERATOR_ID);
     }
     else {
-      // add it to attributes
       getRepositoryItemAttributes().put(ContentGenerator.CONTENT_GENERATOR_ID, contentGeneratorId);
     }
   }
@@ -178,6 +136,7 @@ public class DefaultStorageFileItem
 
   // ==
 
+  @Override
   public String toString() {
     if (isContentGenerated()) {
       return String.format("%s (file, contentGenerator=%s)", super.toString(), getContentGeneratorId());
