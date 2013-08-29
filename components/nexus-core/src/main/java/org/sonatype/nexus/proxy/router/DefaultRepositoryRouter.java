@@ -523,12 +523,9 @@ public class DefaultRepositoryRouter
   protected StorageItem retrieveVirtualPath(ResourceStoreRequest request, RequestRoute route)
       throws ItemNotFoundException
   {
-    ResourceStoreRequest req = new ResourceStoreRequest(route.getOriginalRequestPath());
-
-    DefaultStorageCollectionItem result = new DefaultStorageCollectionItem(this, req, true, false);
-
-    result.getItemContext().putAll(request.getRequestContext());
-
+    final ResourceStoreRequest req = new ResourceStoreRequest(route.getOriginalRequestPath());
+    req.getRequestContext().setParentContext(request.getRequestContext());
+    final DefaultStorageCollectionItem result = new DefaultStorageCollectionItem(this, req, true, false);
     return result;
   }
 
