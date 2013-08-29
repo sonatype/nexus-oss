@@ -40,7 +40,7 @@ import static com.google.common.collect.Collections2.transform;
 /**
  * {@link Users} implementation.
  *
- * @since 2.3
+ * @since 2.7
  */
 public class UsersImpl
     implements Users

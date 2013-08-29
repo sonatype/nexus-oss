@@ -25,9 +25,9 @@ import org.sonatype.security.rest.model.UserResourceRequest;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Jersey based {@link User} implementation.
+ * {@link User} implementation.
  *
- * @since 2.3
+ * @since 2.7
  */
 public class UserImpl
     extends EntitySupport<User, UserResource>
