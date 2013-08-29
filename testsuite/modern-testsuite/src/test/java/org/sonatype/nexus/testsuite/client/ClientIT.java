@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.exception.NexusClientAccessForbiddenException;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
@@ -841,6 +844,23 @@ public class ClientIT
     NexusClient client = createNexusClient(nexus(), "test", password);
     //will fail if can't authenticate
     Assert.assertThat(client.getNexusStatus(), Is.is(notNullValue()));
+  }
+
+  /**
+   * Verify that a client impl is automatically created using siesta client.
+   */
+  @Test
+  public void getUsersUsingSiestaClient() {
+    final UserListResourceResponse userListResourceResponse = client().getSubsystem(UserClient.class).get();
+    assertThat(userListResourceResponse, is(notNullValue()));
+    assertThat(userListResourceResponse.getData(), is(not(empty())));
+  }
+
+  @Path("/service/local/users")
+  public static interface UserClient
+  {
+    @GET
+    UserListResourceResponse get();
   }
 
 }
