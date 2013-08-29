@@ -32,6 +32,7 @@ import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
+import org.sonatype.sisu.siesta.client.filters.RequestFilters;
 
 import com.google.common.base.Preconditions;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -127,6 +128,8 @@ public class NexusClientFactoryImpl
     if (LOG.isDebugEnabled()) {
       client.addFilter(new LoggingFilter());
     }
+
+    client.addFilter(new RequestFilters());
 
     return client;
   }
