@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,20 +39,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Remote scrape strategy.
- *
+ * 
  * @author cstamas
  */
 @Named(RemoteScrapeStrategy.ID)
 @Singleton
 public class RemoteScrapeStrategy
-    extends AbstractRemoteStrategy
+    extends AbstractHttpRemoteStrategy
     implements RemoteStrategy
 {
   protected static final String ID = "scrape";
 
   private final Config config;
-
-  private final HttpClientManager httpClientManager;
 
   private final List<Scraper> scrapers;
 
@@ -62,42 +59,36 @@ public class RemoteScrapeStrategy
    */
   @Inject
   public RemoteScrapeStrategy(final Config config, final HttpClientManager httpClientManager,
-                              final List<Scraper> scrapers)
+      final List<Scraper> scrapers)
   {
     // "last resort"
-    super(Integer.MAX_VALUE, ID);
+    super(Integer.MAX_VALUE, ID, httpClientManager);
     this.config = checkNotNull(config);
-    this.httpClientManager = checkNotNull(httpClientManager);
     this.scrapers = checkNotNull(scrapers);
   }
 
   @Override
-  public StrategyResult discover(final MavenProxyRepository mavenProxyRepository)
-      throws StrategyFailedException, IOException
+  public StrategyResult discover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
+      IOException
   {
+    if (isBlacklistedRemoteServer(mavenProxyRepository)) {
+      throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
+          + " proxy repository is not supported by automatic routing discovery");
+    }
+
     getLogger().debug("Remote scrape on {} tried", mavenProxyRepository);
     // check does a proxy have a valid URL at all
-    final String remoteRepositoryRootUrl = mavenProxyRepository.getRemoteUrl();
-    boolean isValidHttpUrl;
+    final String remoteRepositoryRootUrl;
     try {
-      final URL remoteUrl = new URL(remoteRepositoryRootUrl);
-      isValidHttpUrl =
-          "http".equalsIgnoreCase(remoteUrl.getProtocol())
-              || "https".equalsIgnoreCase(remoteUrl.getProtocol());
+      remoteRepositoryRootUrl = getRemoteUrlOf(mavenProxyRepository);
     }
     catch (MalformedURLException e) {
-      isValidHttpUrl = false;
-    }
-    // if not HTTP URL, we cannot scrape it (at least not using HttpClient4x)
-    if (!isValidHttpUrl) {
-      throw new StrategyFailedException("Remote have no valid HTTP/HTTPS URL, not scraping it.");
+      throw new StrategyFailedException("Remote have no valid HTTP/HTTPS URL, not scraping it:" + e.getMessage(), e);
     }
 
     // get client configured in same way as proxy is using it
-    final HttpClient httpClient =
-        httpClientManager.create(mavenProxyRepository, mavenProxyRepository.getRemoteStorageContext());
-    final ScrapeContext context =
-        new ScrapeContext(mavenProxyRepository, httpClient, config.getRemoteScrapeDepth());
+    final HttpClient httpClient = createHttpClientFor(mavenProxyRepository);
+    final ScrapeContext context = new ScrapeContext(mavenProxyRepository, httpClient, config.getRemoteScrapeDepth());
     final Page rootPage = Page.getPageFor(context, remoteRepositoryRootUrl);
     final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>(scrapers);
     Collections.sort(appliedScrapers, new PriorityOrderingComparator<Scraper>());
@@ -106,8 +97,7 @@ public class RemoteScrapeStrategy
       scraper.scrape(context, rootPage);
       if (context.isStopped()) {
         if (context.isSuccessful()) {
-          getLogger().debug("Remote scraping {} with Scraper {} succeeded.", mavenProxyRepository,
-              scraper.getId());
+          getLogger().debug("Remote scraping {} with Scraper {} succeeded.", mavenProxyRepository, scraper.getId());
           return new StrategyResult(context.getMessage(), context.getPrefixSource(), true);
         }
         else {
