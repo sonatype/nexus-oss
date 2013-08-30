@@ -60,7 +60,7 @@ public abstract class AbstractHttpRemoteStrategy
     // this will throw MURLEx if somethign strange
     final URL remoteUrl = new URL(remoteRepositoryRootUrl);
     // finally, verify that the remote URL is HTTP or HTTPS, only two we support
-    if ("http".equalsIgnoreCase(remoteUrl.getProtocol()) || "https".equalsIgnoreCase(remoteUrl.getProtocol())) {
+    if (!"http".equalsIgnoreCase(remoteUrl.getProtocol()) && !"https".equalsIgnoreCase(remoteUrl.getProtocol())) {
       throw new MalformedURLException("URL protocol unsupported: " + remoteRepositoryRootUrl);
     }
     return remoteRepositoryRootUrl;
