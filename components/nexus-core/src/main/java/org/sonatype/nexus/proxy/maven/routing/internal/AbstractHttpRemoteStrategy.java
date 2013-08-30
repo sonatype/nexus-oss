@@ -20,6 +20,8 @@ import java.net.URL;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
+import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
+import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientManager;
 
 import org.apache.http.HttpResponse;
@@ -32,7 +34,6 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -127,4 +128,18 @@ public abstract class AbstractHttpRemoteStrategy
     }
     return false;
   }
+
+  @Override
+  public StrategyResult discover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
+      IOException
+  {
+    if (isBlacklistedRemoteServer(mavenProxyRepository)) {
+      throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
+          + " proxy repository is not supported by automatic routing discovery");
+    }
+    return doDiscover(mavenProxyRepository);
+  }
+
+  protected abstract StrategyResult doDiscover(final MavenProxyRepository mavenProxyRepository)
+      throws StrategyFailedException, IOException;
 }

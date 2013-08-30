@@ -68,14 +68,9 @@ public class RemoteScrapeStrategy
   }
 
   @Override
-  public StrategyResult discover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
+  public StrategyResult doDiscover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
       IOException
   {
-    if (isBlacklistedRemoteServer(mavenProxyRepository)) {
-      throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
-          + " proxy repository is not supported by automatic routing discovery");
-    }
-
     getLogger().debug("Remote scrape on {} tried", mavenProxyRepository);
     // check does a proxy have a valid URL at all
     final String remoteRepositoryRootUrl;

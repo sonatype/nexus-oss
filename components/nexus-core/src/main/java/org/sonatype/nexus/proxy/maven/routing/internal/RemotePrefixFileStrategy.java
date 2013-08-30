@@ -90,14 +90,9 @@ public class RemotePrefixFileStrategy
   }
 
   @Override
-  public StrategyResult discover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
+  public StrategyResult doDiscover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
       IOException
   {
-    if (isBlacklistedRemoteServer(mavenProxyRepository)) {
-      throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
-          + " proxy repository is not supported by automatic routing discovery");
-    }
-
     StorageFileItem item;
     String path = config.getRemotePrefixFilePath();
     getLogger().debug("Looking for remote prefix on {} at path {}", mavenProxyRepository, path);
