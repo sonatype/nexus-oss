@@ -24,6 +24,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.sonatype.nexus.client.core.subsystem.Restlet1xClient;
 import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.security.rest.model.UserListResourceResponse;
@@ -85,6 +86,7 @@ public class UsersImpl
 
   @Path("/service/local/users")
   public static interface UsersClient
+    extends Restlet1xClient
   {
 
     @GET
