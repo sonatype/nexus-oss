@@ -61,7 +61,7 @@ public abstract class AbstractHttpRemoteStrategy
     final URL remoteUrl = new URL(remoteRepositoryRootUrl);
     // finally, verify that the remote URL is HTTP or HTTPS, only two we support
     if ("http".equalsIgnoreCase(remoteUrl.getProtocol()) || "https".equalsIgnoreCase(remoteUrl.getProtocol())) {
-      throw new MalformedURLException("Remote repository URL does not use any of the HTTP or HTTPS suppoer schemes");
+      throw new MalformedURLException("URL protocol unsupported: " + remoteRepositoryRootUrl);
     }
     return remoteRepositoryRootUrl;
   }

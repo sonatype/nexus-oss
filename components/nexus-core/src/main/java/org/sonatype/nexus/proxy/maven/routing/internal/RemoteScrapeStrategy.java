@@ -78,7 +78,8 @@ public class RemoteScrapeStrategy
       remoteRepositoryRootUrl = getRemoteUrlOf(mavenProxyRepository);
     }
     catch (MalformedURLException e) {
-      throw new StrategyFailedException("Remote have no valid HTTP/HTTPS URL, not scraping it:" + e.getMessage(), e);
+      throw new StrategyFailedException("Proxy repository " + mavenProxyRepository + " remote URL malformed:"
+          + e.getMessage(), e);
     }
 
     // get client configured in same way as proxy is using it
