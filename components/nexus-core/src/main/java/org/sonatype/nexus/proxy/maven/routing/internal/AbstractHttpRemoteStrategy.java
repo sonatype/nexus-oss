@@ -92,10 +92,23 @@ public abstract class AbstractHttpRemoteStrategy
   /**
    * Returns {@code true} if remote server (proxies by {@link MavenProxyRepository}) is recognized as server that MUST
    * NOT be trusted for any automatic routing feature.
+   * 
+   * @throws StrategyFailedException if server is recognized as blacklisted.
    */
-  protected boolean isBlacklistedRemoteServer(final MavenProxyRepository mavenProxyRepository) throws IOException {
+  protected void checkIsBlacklistedRemoteServer(final MavenProxyRepository mavenProxyRepository)
+      throws StrategyFailedException, IOException
+  {
+    // check URL first, we test HTTP and HTTPS only for blacklist, if not, just skip this
+    // but do not report blacklist at all (nor attempt as we cqnnot test non-HTTP for now)
+    final String remoteUrl;
+    try {
+      remoteUrl = getRemoteUrlOf(mavenProxyRepository);
+    }
+    catch (MalformedURLException e) {
+      // non HTTP/HTTPS, just return
+      return;
+    }
     final HttpClient httpClient = createHttpClientFor(mavenProxyRepository);
-    final String remoteUrl = getRemoteUrlOf(mavenProxyRepository);
     {
       // NEXUS-5849: Artifactory will happily serve Central prefixes, effectively shading all the other artifacts from
       // it's group
@@ -105,7 +118,8 @@ public abstract class AbstractHttpRemoteStrategy
         // check response header
         if (response.containsHeader("X-Artifactory-Id")) {
           getLogger().debug("Remote server of proxy {} recognized as ARTF by response header", mavenProxyRepository);
-          return true;
+          throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
+              + " proxy repository is not supported by automatic routing discovery");
         }
         // check content for
         // "<address style="font-size:small;">Artifactory/2.6.0 Server at localhost Port 8081</address>"
@@ -116,7 +130,8 @@ public abstract class AbstractHttpRemoteStrategy
             if (!addressElements.isEmpty() && !addressElements.get(0).text().startsWith("Artifactory")) {
               getLogger().debug("Remote server of proxy {} recognized as ARTF by address element in body",
                   mavenProxyRepository);
-              return true;
+              throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
+                  + " proxy repository is not supported by automatic routing discovery");
             }
 
           }
@@ -126,17 +141,13 @@ public abstract class AbstractHttpRemoteStrategy
         EntityUtils.consumeQuietly(response.getEntity());
       }
     }
-    return false;
   }
 
   @Override
   public StrategyResult discover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
       IOException
   {
-    if (isBlacklistedRemoteServer(mavenProxyRepository)) {
-      throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
-          + " proxy repository is not supported by automatic routing discovery");
-    }
+    checkIsBlacklistedRemoteServer(mavenProxyRepository);
     return doDiscover(mavenProxyRepository);
   }
 
