@@ -37,18 +37,19 @@ import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.maven.routing.internal.TextFilePrefixSourceMarshaller.Result;
+import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Remote prefix file strategy.
- *
+ * 
  * @author cstamas
  */
 @Named(RemotePrefixFileStrategy.ID)
 @Singleton
 public class RemotePrefixFileStrategy
-    extends AbstractRemoteStrategy
+    extends AbstractHttpRemoteStrategy
     implements RemoteStrategy
 {
   private static final PrefixSource UNSUPPORTED_PREFIXSOURCE = new PrefixSource()
@@ -64,9 +65,7 @@ public class RemotePrefixFileStrategy
     }
 
     @Override
-    public List<String> readEntries()
-        throws IOException
-    {
+    public List<String> readEntries() throws IOException {
       return Collections.emptyList();
     }
 
@@ -85,14 +84,14 @@ public class RemotePrefixFileStrategy
    * Constructor.
    */
   @Inject
-  public RemotePrefixFileStrategy(final Config config) {
-    super(100, ID);
+  public RemotePrefixFileStrategy(final Config config, final HttpClientManager httpClientManager) {
+    super(100, ID, httpClientManager);
     this.config = checkNotNull(config);
   }
 
   @Override
-  public StrategyResult discover(final MavenProxyRepository mavenProxyRepository)
-      throws StrategyFailedException, IOException
+  public StrategyResult doDiscover(final MavenProxyRepository mavenProxyRepository) throws StrategyFailedException,
+      IOException
   {
     StorageFileItem item;
     String path = config.getRemotePrefixFilePath();
@@ -118,12 +117,12 @@ public class RemotePrefixFileStrategy
 
         final PrefixSource prefixSource = new FilePrefixSource(mavenProxyRepository, path, config);
         if (prefixFileAgeInDays < 1) {
-          return new StrategyResult("Remote publishes prefix file (is less than a day old), using it.",
-              prefixSource, true);
+          return new StrategyResult("Remote publishes prefix file (is less than a day old), using it.", prefixSource,
+              true);
         }
         else {
-          return new StrategyResult("Remote publishes prefix file (is " + prefixFileAgeInDays
-              + " days old), using it.", prefixSource, true);
+          return new StrategyResult(
+              "Remote publishes prefix file (is " + prefixFileAgeInDays + " days old), using it.", prefixSource, true);
         }
       }
     }
@@ -136,8 +135,7 @@ public class RemotePrefixFileStrategy
   // ==
 
   protected StorageFileItem retrieveFromRemoteIfExists(final MavenProxyRepository mavenProxyRepository,
-                                                       final String path)
-      throws IOException
+      final String path) throws IOException
   {
     final ResourceStoreRequest request = new ResourceStoreRequest(path);
     request.setRequestRemoteOnly(true);
@@ -148,8 +146,7 @@ public class RemotePrefixFileStrategy
     // check for remote presence, as fetching with setRequestRemoteOnly has a side effect of
     // DELETING the file from local cache if not present remotely. In this case, prefix
     // file (on default location) obviously originates from scrape, so we should not delete it.
-    final boolean presentRemotely =
-        mavenProxyRepository.getRemoteStorage().containsItem(mavenProxyRepository, request);
+    final boolean presentRemotely = mavenProxyRepository.getRemoteStorage().containsItem(mavenProxyRepository, request);
     if (!presentRemotely) {
       return null;
     }

@@ -32,8 +32,6 @@ import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus;
 import org.sonatype.nexus.proxy.maven.routing.DiscoveryStatus.DStatus;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
-import com.google.common.io.Closeables;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -93,8 +91,7 @@ public class PropfileDiscoveryStatusSource
     }
 
     final Properties props = new Properties();
-    final InputStream inputStream = file.getInputStream();
-    try {
+    try (final InputStream inputStream = file.getInputStream()) {
       props.load(inputStream);
       final DStatus lastDiscoveryStatus = DStatus.valueOf(props.getProperty(LAST_DISCOVERY_STATUS_KEY));
       final String lastDiscoveryStrategy = props.getProperty(LAST_DISCOVERY_STRATEGY_KEY, "unknown");
@@ -112,9 +109,6 @@ public class PropfileDiscoveryStatusSource
     catch (NullPointerException e) {
       deleteFileItem();
       return null;
-    }
-    finally {
-      Closeables.closeQuietly(inputStream);
     }
   }
 
