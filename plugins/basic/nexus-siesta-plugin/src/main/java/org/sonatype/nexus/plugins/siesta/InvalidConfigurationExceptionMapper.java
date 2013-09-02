@@ -44,8 +44,8 @@ public class InvalidConfigurationExceptionMapper
     final ValidationResponse validationResponse = exception.getValidationResponse();
     if (validationResponse != null) {
       final List<ValidationMessage> validationErrors = validationResponse.getValidationErrors();
-      if (validationErrors != null && validationErrors.isEmpty()) {
-        Lists.transform(validationErrors, new Function<ValidationMessage, ValidationErrorXO>()
+      if (validationErrors != null && !validationErrors.isEmpty()) {
+        return Lists.transform(validationErrors, new Function<ValidationMessage, ValidationErrorXO>()
         {
           @Nullable
           @Override
