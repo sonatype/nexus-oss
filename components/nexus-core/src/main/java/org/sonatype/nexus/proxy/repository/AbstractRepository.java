@@ -1229,22 +1229,23 @@ public abstract class AbstractRepository
   protected StorageItem doRetrieveItem(ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
-    AbstractStorageItem localItem = null;
+    return doRetrieveLocalItem(request);
+  }
 
+  protected AbstractStorageItem doRetrieveLocalItem(final ResourceStoreRequest request)
+      throws ItemNotFoundException, LocalStorageException
+  {
+    AbstractStorageItem localItem = null;
     try {
       localItem = getLocalStorage().retrieveItem(this, request);
-
-      // plain file? wrap it
       if (localItem instanceof StorageFileItem) {
         StorageFileItem file = (StorageFileItem) localItem;
-
         // wrap the content locator if needed
         if (!(file.getContentLocator() instanceof ReadLockingContentLocator)) {
           final RepositoryItemUid uid = createUid(request.getRequestPath());
           file.setContentLocator(new ReadLockingContentLocator(uid, file.getContentLocator()));
         }
       }
-
       if (getLogger().isDebugEnabled()) {
         getLogger().debug("Item " + request.toString() + " found in local storage.");
       }
@@ -1253,7 +1254,6 @@ public abstract class AbstractRepository
       if (getLogger().isDebugEnabled()) {
         getLogger().debug("Item " + request.toString() + " not found in local storage.");
       }
-
       throw ex;
     }
 

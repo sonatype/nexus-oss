@@ -837,7 +837,11 @@ public abstract class AbstractProxyRepository
 
         removeFromNotFoundCache(item.getResourceStoreRequest());
 
-        result = getLocalStorage().retrieveItem(this, new ResourceStoreRequest(item));
+        // we swapped the remote item with the one from local storage
+        // using this method below, we ensure that we get a "wrapped"
+        // content locator that will keel shared-lock on the content
+        // until being fully read
+        result = doRetrieveLocalItem(item.getResourceStoreRequest());
 
       }
       finally {
