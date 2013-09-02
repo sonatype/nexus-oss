@@ -127,14 +127,24 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
 
       if (r)
       {
-        if (options.decodeErrorResponse && r.toLowerCase().indexOf('"errors"') > -1)
-        {
-          errorResponse = Ext.decode(r);
-
-          for (i = 0; i < errorResponse.errors.length; i=i+1)
-          {
-            serverMessage += '<br /><br />';
-            serverMessage += Ext.decode(r).errors[i].msg;
+        if (options.decodeErrorResponse) {
+          var contentType = response.getResponseHeader("Content-Type");
+          if( contentType === "application/vnd.siesta-error-v1+json") {
+            serverMessage = Ext.decode(r).message;
+          } else if( contentType === "application/vnd.siesta-validation-errors-v1+json") {
+            validErrorsResponse = Ext.decode(r);
+            for (i = 0; i < validErrorsResponse.errors.length; i=i+1)
+            {
+              serverMessage += '<br /><br />';
+              serverMessage += validErrorsResponse.errors[i].message;
+            }
+          } else if(r.toLowerCase().indexOf('"errors"') > -1) {
+            errorResponse = Ext.decode(r);
+            for (i = 0; i < errorResponse.errors.length; i=i+1)
+            {
+              serverMessage += '<br /><br />';
+              serverMessage += errorResponse.errors[i].msg;
+            }
           }
         }
         else
