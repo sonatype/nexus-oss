@@ -55,11 +55,8 @@ public abstract class AbstractHttpRemoteStrategy
   }
 
   protected String getRemoteUrlOf(final MavenProxyRepository mavenProxyRepository) throws MalformedURLException {
-    // just get it
     final String remoteRepositoryRootUrl = mavenProxyRepository.getRemoteUrl();
-    // this will throw MURLEx if somethign strange
     final URL remoteUrl = new URL(remoteRepositoryRootUrl);
-    // finally, verify that the remote URL is HTTP or HTTPS, only two we support
     if (!"http".equalsIgnoreCase(remoteUrl.getProtocol()) && !"https".equalsIgnoreCase(remoteUrl.getProtocol())) {
       throw new MalformedURLException("URL protocol unsupported: " + remoteRepositoryRootUrl);
     }
@@ -98,8 +95,8 @@ public abstract class AbstractHttpRemoteStrategy
   protected void checkIsBlacklistedRemoteServer(final MavenProxyRepository mavenProxyRepository)
       throws StrategyFailedException, IOException
   {
-    // check URL first, we test HTTP and HTTPS only for blacklist, if not, just skip this
-    // but do not report blacklist at all (nor attempt as we cqnnot test non-HTTP for now)
+    // check URL first, we currently test HTTP and HTTPS only for blacklist, if not, just skip this
+    // but do not report blacklist at all (nor attempt)
     final String remoteUrl;
     try {
       remoteUrl = getRemoteUrlOf(mavenProxyRepository);
@@ -115,14 +112,11 @@ public abstract class AbstractHttpRemoteStrategy
       final HttpGet get = new HttpGet(remoteUrl);
       final HttpResponse response = executeHttpRequest(httpClient, get);
       try {
-        // check response header
         if (response.containsHeader("X-Artifactory-Id")) {
           getLogger().debug("Remote server of proxy {} recognized as ARTF by response header", mavenProxyRepository);
           throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
               + " proxy repository is not supported by automatic routing discovery");
         }
-        // check content for
-        // "<address style="font-size:small;">Artifactory/2.6.0 Server at localhost Port 8081</address>"
         if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 499) {
           if (response.getEntity() != null) {
             final Document document = Jsoup.parse(response.getEntity().getContent(), null, remoteUrl);
