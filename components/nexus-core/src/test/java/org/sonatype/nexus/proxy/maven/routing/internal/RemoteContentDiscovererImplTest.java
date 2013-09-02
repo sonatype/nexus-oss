@@ -454,8 +454,9 @@ public class RemoteContentDiscovererImplTest
         // it is "prefix" strategy that got into error
         assertThat(status.getDiscoveryStatus().getLastDiscoveryStrategy(),
             equalTo(RemotePrefixFileStrategy.ID));
-        // message is "Transport error...."
-        assertThat(status.getDiscoveryStatus().getLastDiscoveryMessage(), containsString("Transport error"));
+        // message is "Connection to XXX refused"
+        assertThat(status.getDiscoveryStatus().getLastDiscoveryMessage(), containsString("Connection to"));
+        assertThat(status.getDiscoveryStatus().getLastDiscoveryMessage(), containsString("refused"));
       }
     }
     finally {
