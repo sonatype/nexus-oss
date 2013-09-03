@@ -63,7 +63,9 @@ public class UserImpl
   protected UserResource doCreate() {
     final UserResourceRequest request = new UserResourceRequest();
     request.setData(settings());
-    return usersClient.post(request).getData();
+    final UserResource resource = usersClient.post(request).getData();
+    resource.setPassword(null);
+    return resource;
   }
 
   @Override
