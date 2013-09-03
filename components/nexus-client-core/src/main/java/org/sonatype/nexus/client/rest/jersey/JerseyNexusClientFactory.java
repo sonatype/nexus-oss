@@ -50,7 +50,7 @@ public class JerseyNexusClientFactory
 
 
   public JerseyNexusClientFactory(final Set<SubsystemFactory<?, JerseyNexusClient>> subsystemFactories) {
-    super(adapt(subsystemFactories.toArray(new SubsystemFactory<?, JerseyNexusClient>[subsystemFactories.size()])));
+    super(adapt(subsystemFactories.toArray(new SubsystemFactory[subsystemFactories.size()])));
   }
 
   @Inject
