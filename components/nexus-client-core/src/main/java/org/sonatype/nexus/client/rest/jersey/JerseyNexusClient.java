@@ -193,8 +193,8 @@ public class JerseyNexusClient
       }
     }
     throw new IllegalArgumentException(
-        "No " + SubsystemProvider.class.getSimpleName() + " was able to create a subsystem of type"
-            + subsystemType.getSimpleName()
+        "No " + SubsystemProvider.class.getName() + " was able to create a subsystem of type"
+            + subsystemType.getName()
     );
   }
 
