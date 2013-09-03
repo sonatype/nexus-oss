@@ -27,7 +27,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
+ * A {@link SubsystemProvider} that creates subsystems using Guice {@link Injector}.
+ *
  * @since 2.7
  */
 @Named
@@ -45,6 +49,9 @@ public class GuiceSubsystemProvider
 
   @Override
   public Object get(final Class type, final Map<Object, Object> context) {
+    checkNotNull(type, "type cannot be null");
+    checkNotNull(context, "context cannot be null");
+
     try {
       return injector.createChildInjector(
           new AbstractModule()

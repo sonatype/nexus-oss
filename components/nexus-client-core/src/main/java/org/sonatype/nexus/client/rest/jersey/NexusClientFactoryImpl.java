@@ -52,6 +52,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Jersey based {@link NexusClientFactory}.
+ *
  * @since 2.7
  */
 public class NexusClientFactoryImpl

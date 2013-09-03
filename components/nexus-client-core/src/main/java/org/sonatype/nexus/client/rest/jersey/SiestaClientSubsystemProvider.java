@@ -23,7 +23,13 @@ import javax.ws.rs.Path;
 import org.sonatype.nexus.client.core.spi.SubsystemProvider;
 import org.sonatype.sisu.siesta.client.ClientBuilder.Target.Factory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
+ * A {@link SubsystemProvider} that automatically creates implementation of Siesta based subsystems.
+ * A Siesta based subsystem is an interface with at least one method, interface or any of extended interfaces is
+ * annotated with {@link Path}.
+ *
  * @since 2.7
  */
 @Named
@@ -32,8 +38,15 @@ public class SiestaClientSubsystemProvider
     implements SubsystemProvider
 {
 
+  /**
+   * Creates an implementation of specified type if type is an interface and at least on method, the interface or any
+   * of extended interfaces are annotated with {@link Path}.
+   */
   @Override
   public Object get(final Class type, final Map<Object, Object> context) {
+    checkNotNull(type, "type cannot be null");
+    checkNotNull(context, "context cannot be null");
+
     if (!type.isInterface()) {
       return null;
     }

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -47,44 +48,67 @@ public class JerseyNexusClientFactory
     super(connectionCondition, adapt(subsystemFactories));
   }
 
-  @SuppressWarnings({"unchecked"})
+
   public JerseyNexusClientFactory(final Set<SubsystemFactory<?, JerseyNexusClient>> subsystemFactories) {
-    super(adapt(subsystemFactories.toArray(new SubsystemFactory[subsystemFactories.size()])));
+    super(adapt(subsystemFactories.toArray(new SubsystemFactory<?, JerseyNexusClient>[subsystemFactories.size()])));
   }
 
   @Inject
-  @SuppressWarnings({"unchecked"})
   public JerseyNexusClientFactory(final Set<SubsystemFactory<?, JerseyNexusClient>> subsystemFactories,
                                   final List<SubsystemProvider> subsystemProviders)
   {
     super(combine(subsystemFactories, subsystemProviders));
   }
 
-  private static List<SubsystemProvider> adapt(final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories) {
+  /**
+   * Adapts a set of {@link SubsystemFactory}s to a list of {@link SubsystemProvider}s.
+   *
+   * @param subsystemFactories to adapt (can be null)
+   * @return adapted (never null, can be empty if provided subsystem factories is empty)
+   */
+  private static List<SubsystemProvider> adapt(
+      @Nullable final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories)
+  {
     final List<SubsystemProvider> providers = Lists.newArrayList();
-    for (final SubsystemFactory<?, JerseyNexusClient> subsystemFactory : subsystemFactories) {
-      providers.add(
-          new SubsystemProvider()
-          {
-            @Override
-            public Object get(final Class type, final Map<Object, Object> context) {
-              if (type.equals(subsystemFactory.getType())) {
-                return subsystemFactory.create((JerseyNexusClient) context.get(NexusClient.class));
+    if (subsystemFactories != null) {
+      for (final SubsystemFactory<?, JerseyNexusClient> subsystemFactory : subsystemFactories) {
+        providers.add(
+            new SubsystemProvider()
+            {
+              @Override
+              public Object get(final Class type, final Map<Object, Object> context) {
+                if (type.equals(subsystemFactory.getType())) {
+                  return subsystemFactory.create((JerseyNexusClient) context.get(NexusClient.class));
+                }
+                return null;
               }
-              return null;
             }
-          }
-      );
+        );
+      }
     }
     return providers;
   }
 
-  private static List<SubsystemProvider> combine(final Set<SubsystemFactory<?, JerseyNexusClient>> subsystemFactories,
-                                                 final List<SubsystemProvider> subsystemProviders)
+  /**
+   * Combines a set of {@link SubsystemFactory}s and a list of {@link SubsystemProvider}s in a list of
+   * {@link SubsystemProvider}s, adapting the {@link SubsystemFactory}s as {@link SubsystemProvider}s.
+   *
+   * @param subsystemFactories to combine (can be null)
+   * @param subsystemProviders to combine (can be null)
+   * @return combined list (never null)
+   */
+  private static List<SubsystemProvider> combine(
+      @Nullable final Set<SubsystemFactory<?, JerseyNexusClient>> subsystemFactories,
+      @Nullable final List<SubsystemProvider> subsystemProviders)
   {
+
     final List<SubsystemProvider> providers = Lists.newArrayList();
-    providers.addAll(adapt(subsystemFactories.toArray(new SubsystemFactory[subsystemFactories.size()])));
-    providers.addAll(subsystemProviders);
+    if (subsystemFactories != null) {
+      providers.addAll(adapt(subsystemFactories.toArray(new SubsystemFactory[subsystemFactories.size()])));
+    }
+    if (subsystemProviders != null) {
+      providers.addAll(subsystemProviders);
+    }
     return providers;
   }
 

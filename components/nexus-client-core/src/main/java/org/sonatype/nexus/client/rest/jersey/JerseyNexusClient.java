@@ -51,6 +51,9 @@ import com.sun.jersey.api.client.WebResource;
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.util.IOUtil;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Jersey client with some extra fluff: it maintains reference to XStream used by Provider it uses, to make it able to
  * pass XStream around (toward subsystems) to apply needed XStream configuration. As Nexus currently is married to
@@ -177,14 +180,22 @@ public class JerseyNexusClient
   protected <S> S createSubsystem(final Class<S> subsystemType)
       throws IllegalArgumentException
   {
+    checkNotNull(subsystemType, "subsystemType cannot be null");
     for (final SubsystemProvider subsystemProvider : subsystemProviders) {
       final Object subsystem = subsystemProvider.get(subsystemType, context);
       if (subsystem != null) {
-        return (S) subsystem;
+        checkState(
+            subsystemType.isAssignableFrom(subsystem.getClass()),
+            "Subsystem '%s' created by '%s' is not an instance of '%s'",
+            subsystem, subsystemProvider, subsystemType.getSimpleName()
+        );
+        return subsystemType.cast(subsystem);
       }
     }
-    throw new IllegalArgumentException("No SubsystemFactory configured for subsystem having type "
-        + subsystemType.getName());
+    throw new IllegalArgumentException(
+        "No " + SubsystemProvider.class.getSimpleName() + " was able to create a subsystem of type"
+            + subsystemType.getSimpleName()
+    );
   }
 
   public NexusClientNotFoundException convertIf404(final UniformInterfaceException e) {
