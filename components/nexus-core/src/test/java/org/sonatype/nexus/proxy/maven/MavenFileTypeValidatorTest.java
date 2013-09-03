@@ -98,6 +98,10 @@ public class MavenFileTypeValidatorTest
     doTest("something/else/myapp.xml", "error.html", false, false);
     // will be VALID with XML Lax validation ON
     doTest("something/else/myapp.xml", "error.html", true, true);
+    // will be INVALID with XML Lax validation OFF
+    doTest("something/else/myapp.xml", "empty.xml", false, false);
+    // will be VALID with XML Lax validation ON
+    doTest("something/else/myapp.xml", "empty.xml", true, true);
   }
 
   @Test
