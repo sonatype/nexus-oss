@@ -37,20 +37,24 @@
 
   <appender name="metrics" class="com.yammer.metrics.logback.InstrumentedAppender"/>
 
-  <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN" />
-  <logger name="httpclient" level="INFO" />
-  <logger name="org.apache.http" level="INFO" />
-  <logger name="org.restlet" level="INFO" />
-  <logger name="org.apache.commons" level="WARN" />
-  <logger name="org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter" level="INFO" />
+  <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN"/>
+  <logger name="httpclient" level="INFO"/>
+  <logger name="org.apache.http" level="INFO"/>
+  <logger name="org.restlet" level="INFO"/>
+  <logger name="org.apache.commons" level="WARN"/>
+  <logger name="org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter" level="INFO"/>
   <logger name="org.apache.shiro.web.filter.mgt.DefaultFilterChainManager" level="INFO"/>
-  <logger name="org.eclipse.jetty" level="INFO" />
+  <logger name="org.eclipse.jetty" level="INFO"/>
   <logger name="eu.medsea.mimeutil.MimeUtil2" level="INFO"/>
-  
+
+  <!-- NEXUS-5835: limit noisy jmx connections to Nexus when root.level is DEBUG -->
+  <logger name="javax.management" level="INFO"/>
+  <logger name="sun.rmi" level="INFO"/>
+
   <root level="${root.level}">
-    <appender-ref ref="console" />
-    <appender-ref ref="logfile" />
-    <appender-ref ref="metrics" />
+    <appender-ref ref="console"/>
+    <appender-ref ref="logfile"/>
+    <appender-ref ref="metrics"/>
   </root>
-  
+
 </included>
