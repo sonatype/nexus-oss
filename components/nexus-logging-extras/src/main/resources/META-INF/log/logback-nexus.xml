@@ -47,7 +47,7 @@
   <logger name="org.eclipse.jetty" level="INFO"/>
   <logger name="eu.medsea.mimeutil.MimeUtil2" level="INFO"/>
 
-  <!-- NEXUS-5835: limit noisy jmx connections to Nexus when Nexus is root.level is DEBUG -->
+  <!-- NEXUS-5835: limit noisy jmx connections to Nexus when root.level is DEBUG -->
   <logger name="javax.management" level="INFO"/>
   <logger name="sun.rmi" level="INFO"/>
 
