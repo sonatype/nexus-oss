@@ -130,8 +130,10 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
         if (options.decodeErrorResponse) {
           var contentType = response.getResponseHeader("Content-Type");
           if( contentType === "application/vnd.siesta-error-v1+json") {
+            // response will be a json serialized org.sonatype.sisu.siesta.common.error.ErrorXO
             serverMessage = Ext.decode(r).message;
           } else if( contentType === "application/vnd.siesta-validation-errors-v1+json") {
+            // response will be a json serialized array of org.sonatype.sisu.siesta.common.validation.ValidationErrorXO
             validationErrors = Ext.decode(r);
             for (i = 0; i < validationErrors.length; i=i+1)
             {
@@ -141,6 +143,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
               serverMessage += validationErrors[i].message;
             }
           } else if(r.toLowerCase().indexOf('"errors"') > -1) {
+            // last, check if we have an json serialized restlet1x org.sonatype.plexus.rest.resource.error.ErrorResponse
             errorResponse = Ext.decode(r);
             for (i = 0; i < errorResponse.errors.length; i=i+1)
             {
