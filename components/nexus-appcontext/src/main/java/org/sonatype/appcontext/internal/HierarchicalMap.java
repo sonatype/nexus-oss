@@ -32,12 +32,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <V>
  */
 public class HierarchicalMap<K, V>
-    extends ConcurrentHashMap<K, V>
     implements Map<K, V>
 {
     private static final long serialVersionUID = 3445870461584217031L;
 
     private final Map<K, V> parent;
+    private final ConcurrentHashMap<K, V> delegate = new ConcurrentHashMap<K, V>();
 
     public HierarchicalMap()
     {
@@ -101,7 +101,7 @@ public class HierarchicalMap<K, V>
 
     public boolean containsKey( Object key, boolean fallBackToParent )
     {
-        boolean result = super.containsKey( key );
+        boolean result = delegate.containsKey(key);
         if ( fallBackToParent && !result && getParent() != null )
         {
             result = getParent().containsKey( key );
@@ -117,7 +117,7 @@ public class HierarchicalMap<K, V>
 
     public boolean containsValue( Object val, boolean fallBackToParent )
     {
-        boolean result = super.containsValue( val );
+        boolean result = delegate.containsValue( val );
         if ( fallBackToParent && !result && getParent() != null )
         {
             result = getParent().containsValue( val );
@@ -135,7 +135,7 @@ public class HierarchicalMap<K, V>
     {
         if ( containsKey( key, false ) )
         {
-            return super.get( key );
+            return delegate.get( key );
         }
         else if ( fallBackToParent && getParent() != null )
         {
@@ -155,7 +155,7 @@ public class HierarchicalMap<K, V>
         {
             result.addAll( getParent().keySet() );
         }
-        result.addAll( super.keySet() );
+        result.addAll( delegate.keySet() );
         return Collections.unmodifiableSet( result );
     }
 
@@ -167,7 +167,7 @@ public class HierarchicalMap<K, V>
         {
             result.addAll( getParent().values() );
         }
-        result.addAll( super.values() );
+        result.addAll( delegate.values() );
         return Collections.unmodifiableCollection( result );
     }
 
@@ -186,7 +186,7 @@ public class HierarchicalMap<K, V>
                 }
             }
         }
-        result.addAll( super.entrySet() );
+        result.addAll( delegate.entrySet() );
         return Collections.unmodifiableSet( result );
     }
 
@@ -213,7 +213,7 @@ public class HierarchicalMap<K, V>
     public Map<K, V> pullOut()
     {
         final HashMap<K, V> result = new HashMap<K, V>();
-        for ( Entry<K, V> entry : super.entrySet() )
+        for ( Entry<K, V> entry : delegate.entrySet() )
         {
             result.put( entry.getKey(), entry.getValue() );
         }
@@ -243,5 +243,25 @@ public class HierarchicalMap<K, V>
         }
         result.putAll( this );
         return result;
+    }
+
+    @Override
+    public V put(K key, V value) {
+        return delegate.put(key, value);
+    }
+
+    @Override
+    public V remove(Object key) {
+        return delegate.remove(key);
+    }
+
+    @Override
+    public void putAll(Map<? extends K, ? extends V> m) {
+        delegate.putAll(m);
+    }
+
+    @Override
+    public void clear() {
+        delegate.clear();
     }
 }
