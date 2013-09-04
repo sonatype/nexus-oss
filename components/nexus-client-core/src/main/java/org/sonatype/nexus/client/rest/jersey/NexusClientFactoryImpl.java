@@ -37,7 +37,6 @@ import org.sonatype.sisu.siesta.client.filters.RequestFilters;
 import com.google.common.base.Preconditions;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
@@ -46,10 +45,19 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.params.CoreProtocolPNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.sun.jersey.api.client.config.ClientConfig.PROPERTY_FOLLOW_REDIRECTS;
+import static com.sun.jersey.api.json.JSONConfiguration.FEATURE_POJO_MAPPING;
+import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER;
+import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION;
+import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD;
+import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_PROXY_URI;
+import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME;
+import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY;
 
 /**
  * Jersey based {@link NexusClientFactory}.
@@ -113,16 +121,18 @@ public class NexusClientFactoryImpl
     final ApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
     config.getSingletons().add(new XStreamXmlProvider(xstream, APPLICATION_XML_UTF8_TYPE));
     // set _real_ URL for baseUrl, and not a redirection (typically http instead of https)
-    config.getProperties().put(ApacheHttpClient4Config.PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE);
-    config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+    config.getProperties().put(PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE);
+    config.getFeatures().put(FEATURE_POJO_MAPPING, Boolean.TRUE);
+
     applyAuthenticationIfAny(connectionInfo, config);
     applyProxyIfAny(connectionInfo, config);
 
     final ApacheHttpClient4 client = ApacheHttpClient4.create(config);
 
     // set UA
-    client.getClientHandler().getHttpClient().getParams().setParameter(CoreProtocolPNames.USER_AGENT,
-        "Nexus-Client/" + discoverClientVersion());
+    client.getClientHandler().getHttpClient().getParams().setParameter(
+        CoreProtocolPNames.USER_AGENT, "Nexus-Client/" + discoverClientVersion()
+    );
 
     // NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
     enforceProxyUri(config, client);
@@ -148,11 +158,11 @@ public class NexusClientFactoryImpl
    * Revisit for jersey 1.13.
    */
   private void enforceProxyUri(final ApacheHttpClient4Config config, final ApacheHttpClient4 client) {
-    final Object proxyProperty = config.getProperties().get(ApacheHttpClient4Config.PROPERTY_PROXY_URI);
+    final Object proxyProperty = config.getProperties().get(PROPERTY_PROXY_URI);
     if (proxyProperty != null) {
       final URI uri = getProxyUri(proxyProperty);
       final HttpHost proxy = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-      client.getClientHandler().getHttpClient().getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+      client.getClientHandler().getHttpClient().getParams().setParameter(DEFAULT_PROXY, proxy);
     }
   }
 
@@ -164,7 +174,7 @@ public class NexusClientFactoryImpl
       return URI.create((String) proxy);
     }
     else {
-      throw new ClientHandlerException("The proxy URI (" + ApacheHttpClient4Config.PROPERTY_PROXY_URI +
+      throw new ClientHandlerException("The proxy URI (" + PROPERTY_PROXY_URI +
           ") property MUST be an instance of String or URI");
     }
   }
@@ -176,14 +186,13 @@ public class NexusClientFactoryImpl
       if (connectionInfo.getAuthenticationInfo() instanceof UsernamePasswordAuthenticationInfo) {
         final UsernamePasswordAuthenticationInfo upinfo =
             (UsernamePasswordAuthenticationInfo) connectionInfo.getAuthenticationInfo();
-        final CredentialsProvider credentialsProvider =
-            new org.apache.http.impl.client.BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY,
-            new UsernamePasswordCredentials(upinfo.getUsername(),
-                upinfo.getPassword()));
-        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
-            credentialsProvider);
-        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+            AuthScope.ANY,
+            new UsernamePasswordCredentials(upinfo.getUsername(), upinfo.getPassword())
+        );
+        config.getProperties().put(PROPERTY_CREDENTIALS_PROVIDER, credentialsProvider);
+        config.getProperties().put(PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
       }
       else {
         throw new IllegalArgumentException(Template.of("AuthenticationInfo of type %s is not supported!",
@@ -196,17 +205,16 @@ public class NexusClientFactoryImpl
     if (connectionInfo.getProxyInfos().size() > 0) {
       final ProxyInfo proxyInfo = connectionInfo.getProxyInfos().get(connectionInfo.getBaseUrl().getProtocol());
       if (proxyInfo != null) {
-        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_URI,
-            "http://" + proxyInfo.getProxyHost() + ":" + proxyInfo.getProxyPort());
+        config.getProperties().put(
+            PROPERTY_PROXY_URI, "http://" + proxyInfo.getProxyHost() + ":" + proxyInfo.getProxyPort()
+        );
 
         if (proxyInfo.getProxyAuthentication() != null) {
           if (proxyInfo.getProxyAuthentication() instanceof UsernamePasswordAuthenticationInfo) {
             final UsernamePasswordAuthenticationInfo upinfo =
                 (UsernamePasswordAuthenticationInfo) connectionInfo.getAuthenticationInfo();
-            config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME,
-                upinfo.getUsername());
-            config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD,
-                upinfo.getPassword());
+            config.getProperties().put(PROPERTY_PROXY_USERNAME, upinfo.getUsername());
+            config.getProperties().put(PROPERTY_PROXY_PASSWORD, upinfo.getPassword());
           }
           else {
             throw new IllegalArgumentException(Template.of(
