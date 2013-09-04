@@ -40,7 +40,7 @@ public class GuiceSubsystemProvider
     implements SubsystemProvider
 {
 
-  private Injector injector;
+  private final Injector injector;
 
   @Inject
   public GuiceSubsystemProvider(final Injector injector) {
