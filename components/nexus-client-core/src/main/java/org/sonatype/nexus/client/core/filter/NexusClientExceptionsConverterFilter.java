@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.filter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.sonatype.nexus.client.core.exception.NexusClientAccessForbiddenException;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 
+import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
@@ -48,93 +50,67 @@ public class NexusClientExceptionsConverterFilter
   @Override
   public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
     final ClientResponse response = getNext().handle(request);
-    {
-      final NexusClientException exception = convertIf404(response);
-      if (exception != null) {
-        throw exception;
-      }
-    }
-    {
-      final NexusClientException exception = convertIf403(response);
-      if (exception != null) {
-        throw exception;
-      }
-    }
-    {
-      final NexusClientException exception = convertIf400WithErrorMessage(response);
-      if (exception != null) {
-        throw exception;
-      }
-    }
-    {
-      final NexusClientException exception = convertIf400(response);
-      if (exception != null) {
-        throw exception;
-      }
-    }
+    throwIf404(response);
+    throwIf403(response);
+    throwIf400WithErrorMessage(response);
+    throwIf400(response);
     return response;
   }
 
-  private NexusClientException convertIf400WithErrorMessage(final ClientResponse response) {
+  private void throwIf400WithErrorMessage(final ClientResponse response) {
     if (ClientResponse.Status.BAD_REQUEST.equals(response.getClientResponseStatus())) {
       final String body = getResponseBody(response);
+      response.bufferEntity();
+      ErrorResponse errorResponse = null;
       try {
-        response.bufferEntity();
-        final ErrorResponse errorResponse = response.getEntity(ErrorResponse.class);
-        if (errorResponse != null) {
-          // convert them to hide stupid "old" REST model, and not have it leak out
-          final ArrayList<ErrorMessage> errors =
-              new ArrayList<NexusClientErrorResponseException.ErrorMessage>(errorResponse.getErrors().size());
-          for (org.sonatype.nexus.client.internal.msg.ErrorMessage message : errorResponse.getErrors()) {
-            errors.add(
-                new NexusClientErrorResponseException.ErrorMessage(message.getId(), message.getMsg()));
-          }
-          return new NexusClientErrorResponseException(
-              response.getClientResponseStatus().getReasonPhrase(),
-              body,
-              errors
-          );
-        }
+        errorResponse = response.getEntity(ErrorResponse.class);
       }
       catch (Exception ignore) {
-        // ignore, probably we do not have an error response body
-        ignore.printStackTrace();
+        // most probably we do not have an error response
+      }
+      if (errorResponse != null) {
+        // convert them to hide stupid "old" REST model, and not have it leak out
+        final List<ErrorMessage> errors = Lists.newArrayList();
+        for (org.sonatype.nexus.client.internal.msg.ErrorMessage message : errorResponse.getErrors()) {
+          errors.add(new NexusClientErrorResponseException.ErrorMessage(message.getId(), message.getMsg()));
+        }
+        throw new NexusClientErrorResponseException(
+            response.getClientResponseStatus().getReasonPhrase(),
+            body,
+            errors
+        );
       }
     }
-    return null;
   }
 
-  private NexusClientException convertIf400(final ClientResponse response) {
+  private void throwIf400(final ClientResponse response) {
     if (ClientResponse.Status.BAD_REQUEST.equals(response.getClientResponseStatus())) {
-      return new NexusClientBadRequestException(
+      throw new NexusClientBadRequestException(
           response.getClientResponseStatus().getReasonPhrase(),
           getResponseBody(response)
       );
     }
-    return null;
   }
 
-  private NexusClientException convertIf403(final ClientResponse response) {
+  private void throwIf403(final ClientResponse response) {
     if (ClientResponse.Status.FORBIDDEN.equals(response.getClientResponseStatus())) {
-      return new NexusClientAccessForbiddenException(
+      throw new NexusClientAccessForbiddenException(
           response.getClientResponseStatus().getReasonPhrase(),
           getResponseBody(response)
       );
     }
-    return null;
   }
 
-  private NexusClientException convertIf404(final ClientResponse response) {
+  private void throwIf404(final ClientResponse response) {
     if (ClientResponse.Status.NOT_FOUND.equals(response.getClientResponseStatus())) {
-      return new NexusClientNotFoundException(
+      throw new NexusClientNotFoundException(
           response.getClientResponseStatus().getReasonPhrase(),
           getResponseBody(response)
       );
     }
-    return null;
   }
 
-  public String getResponseBody(final ClientResponse response) {
+  private String getResponseBody(final ClientResponse response) {
     try {
       final byte[] body = IOUtil.toByteArray(response.getEntityInputStream());
       response.setEntityInputStream(new ByteArrayInputStream(body));
