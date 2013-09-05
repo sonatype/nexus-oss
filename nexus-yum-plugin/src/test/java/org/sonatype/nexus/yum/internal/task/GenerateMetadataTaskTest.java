@@ -28,12 +28,7 @@ public class GenerateMetadataTaskTest
 
   private static final String SNAPSHOTS = "snapshots";
 
-  private static final String VERSION = "2.2-2";
-
   private static final String BASE_URL = "http://localhost:8080/nexus/content/snapshots";
-
-  private static final String BASE_VERSIONED_URL = "http://localhost:8080/nexus/service/local/yum/snapshots/"
-      + VERSION;
 
   private static final String NO_REPO_URL = null;
 
@@ -42,23 +37,6 @@ public class GenerateMetadataTaskTest
   private static final String NO_ADDED_FILE = null;
 
   private static final boolean SINGLE_RPM_PER_DIRECTORY = true;
-
-  @Test
-  public void shouldFilterForSpecificVersion()
-      throws Exception
-  {
-    executeJob(createTask(
-        rpmsDir(),
-        BASE_URL,
-        repoData(),
-        BASE_VERSIONED_URL,
-        SNAPSHOTS,
-        VERSION,
-        NO_ADDED_FILE,
-        true
-    ));
-    assertThatYumMetadataAreTheSame(repoData(), "filtering");
-  }
 
   @Test(expected = ExecutionException.class)
   public void shouldNotCreateRepoIfPathNotExists()
