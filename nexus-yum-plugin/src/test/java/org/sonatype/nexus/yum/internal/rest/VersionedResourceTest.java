@@ -106,30 +106,6 @@ public class VersionedResourceTest
   }
 
   @Test
-  public void shouldGenerateFileIndex()
-      throws Exception
-  {
-    Request request = createRequest("/repodata/", TESTREPO, VERSION);
-    StringRepresentation representation = (StringRepresentation) resource.get(null, request, null, null);
-    Assert.assertEquals(MediaType.TEXT_HTML, representation.getMediaType());
-    Assert.assertTrue(representation.getText().contains("repomd.xml"));
-  }
-
-  @Test
-  public void shouldGenerateDirectoryIndex()
-      throws Exception
-  {
-    shouldGenerateDirectoryIndexForVersionAndRepo(VERSION, TESTREPO);
-  }
-
-  @Test
-  public void shouldGenerateDirectoryIndexForAlias()
-      throws Exception
-  {
-    shouldGenerateDirectoryIndexForVersionAndRepo(ALIAS, TESTREPO);
-  }
-
-  @Test
   public void shouldNotFindFilesOutsideTheRepository()
       throws Exception
   {
