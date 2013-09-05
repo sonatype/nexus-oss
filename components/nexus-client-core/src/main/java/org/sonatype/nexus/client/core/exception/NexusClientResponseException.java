@@ -44,7 +44,7 @@ public class NexusClientResponseException
     super(message == null ? String.format("%s - %s", responseCode, reasonPhrase) : message);
     this.responseCode = responseCode;
     this.reasonPhrase = checkNotNull(reasonPhrase);
-    this.responseBody = checkNotNull(responseBody);
+    this.responseBody = responseBody;
   }
 
   public int getResponseCode() {
