@@ -66,6 +66,15 @@ public class VersionedIT
     assertThat(content, containsString("<a href=\"repodata/\">repodata/</a>"));
   }
 
+  @Test
+  public void shouldGenerateIndexHtmlForRepodata()
+      throws Exception
+  {
+    final Repository repository = givenRepositoryWithOneRpm();
+
+    final String content = repodata().getIndex(repository.id(), "1.0", "repodata");
+  }
+
   private Repository givenRepositoryWithOneRpm()
       throws Exception
   {
