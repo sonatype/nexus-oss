@@ -110,6 +110,8 @@ public class GenerateMetadataTask
 
   private final Manager routingManager;
 
+  private final CommandLineExecutor commandLineExecutor;
+
   @Inject
   public GenerateMetadataTask(final EventBus eventBus,
                               final RepositoryRegistry repositoryRegistry,
@@ -117,7 +119,8 @@ public class GenerateMetadataTask
                               final RepositoryURLBuilder repositoryURLBuilder,
                               final RpmScanner scanner,
                               final NexusScheduler nexusScheduler,
-                              final Manager routingManager)
+                              final Manager routingManager,
+                              final CommandLineExecutor commandLineExecutor)
   {
     super(eventBus, null);
 
@@ -127,6 +130,7 @@ public class GenerateMetadataTask
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.repositoryURLBuilder = checkNotNull(repositoryURLBuilder);
     this.routingManager = checkNotNull(routingManager);
+    this.commandLineExecutor = checkNotNull(commandLineExecutor);
 
     getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
   }
@@ -142,7 +146,7 @@ public class GenerateMetadataTask
       getRepoDir().mkdirs();
 
       File rpmListFile = createRpmListFile();
-      new CommandLineExecutor().exec(buildCreateRepositoryCommand(rpmListFile));
+      commandLineExecutor.exec(buildCreateRepositoryCommand(rpmListFile));
 
       if (isUseAbsoluteUrls() && StringUtils.isNotBlank(getRpmUrl())) {
         replaceUrlInRepomdXml();
@@ -181,7 +185,7 @@ public class GenerateMetadataTask
       setRpmDir(RepositoryUtils.getBaseDir(repository).getAbsolutePath());
     }
     if (isBlank(getRpmUrl()) && repository != null) {
-      final String rpmUrl = repositoryURLBuilder.getExposedRepositoryContentUrl(repository,true);
+      final String rpmUrl = repositoryURLBuilder.getExposedRepositoryContentUrl(repository, true);
       if (StringUtils.isBlank(rpmUrl)) {
         throw new IllegalStateException(
             SimpleFormat.format(

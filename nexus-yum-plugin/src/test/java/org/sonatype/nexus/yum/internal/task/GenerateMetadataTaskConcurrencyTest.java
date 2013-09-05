@@ -172,7 +172,8 @@ public class GenerateMetadataTaskConcurrencyTest
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         nexusScheduler,
-        mock(Manager.class)
+        mock(Manager.class),
+        mock(CommandLineExecutor.class)
     )
     {
       @Override

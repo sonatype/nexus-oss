@@ -45,7 +45,7 @@ public class MergeMetadataTaskTest
   public void shouldNotAllowConcurrentExecutionForSameRepo()
       throws Exception
   {
-    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class));
+    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class), mock(CommandLineExecutor.class));
     final GroupRepository group = mock(GroupRepository.class);
     when(group.getId()).thenReturn(GROUP_ID_1);
     task.setGroupRepository(group);
@@ -56,7 +56,7 @@ public class MergeMetadataTaskTest
   public void shouldNotAllowConcurrentExecutionIfAnotherTaskIsRunning()
       throws Exception
   {
-    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class));
+    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class), mock(CommandLineExecutor.class));
     final GroupRepository group1 = mock(GroupRepository.class);
     when(group1.getId()).thenReturn(GROUP_ID_1);
     final GroupRepository group2 = mock(GroupRepository.class);
