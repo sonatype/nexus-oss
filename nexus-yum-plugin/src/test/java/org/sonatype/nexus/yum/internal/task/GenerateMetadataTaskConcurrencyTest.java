@@ -38,6 +38,7 @@ import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.RpmScanner;
+import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 
 public class GenerateMetadataTaskConcurrencyTest
-    extends GenerateMetadataTaskTestSupport
+    extends YumNexusTestSupport
 {
 
   private static final String RPM_NAME_2 = "hallomommy";
