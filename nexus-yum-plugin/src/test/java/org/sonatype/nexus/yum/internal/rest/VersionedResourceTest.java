@@ -106,17 +106,6 @@ public class VersionedResourceTest
   }
 
   @Test
-  public void shouldProvideFile()
-      throws Exception
-  {
-    Request request = createRequest("/repodata/repomd.xml", TESTREPO, VERSION);
-    System.out.println(yumRegistry.get(TESTREPO).getVersions());
-
-    FileRepresentation representation = (FileRepresentation) resource.get(null, request, null, null);
-    Assert.assertTrue(representation.getFile().exists());
-  }
-
-  @Test
   public void shouldGenerateFileIndex()
       throws Exception
   {
