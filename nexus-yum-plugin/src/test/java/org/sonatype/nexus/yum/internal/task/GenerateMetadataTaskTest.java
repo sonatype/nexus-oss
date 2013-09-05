@@ -44,19 +44,6 @@ public class GenerateMetadataTaskTest
   private static final boolean SINGLE_RPM_PER_DIRECTORY = true;
 
   @Test
-  public void shouldCreateRepo()
-      throws Exception
-  {
-    executeJob(createTask(
-        rpmsDir(),
-        BASE_URL,
-        repoData(),
-        SNAPSHOTS
-    ));
-    assertThatYumMetadataAreTheSame(repoData(), "default");
-  }
-
-  @Test
   public void shouldFilterForSpecificVersion()
       throws Exception
   {
