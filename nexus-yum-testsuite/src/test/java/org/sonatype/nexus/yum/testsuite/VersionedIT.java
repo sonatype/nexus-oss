@@ -73,6 +73,7 @@ public class VersionedIT
     final Repository repository = givenRepositoryWithOneRpm();
 
     final String content = repodata().getIndex(repository.id(), "1.0", "repodata");
+    assertThat(content, containsString("<a href=\"repomd.xml/\">repomd.xml</a>"));
   }
 
   private Repository givenRepositoryWithOneRpm()
