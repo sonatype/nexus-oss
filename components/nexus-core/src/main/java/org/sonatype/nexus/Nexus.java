@@ -53,6 +53,12 @@ public interface Nexus
   // Reposes
   // ----------------------------------------------------------------------------
 
+  /**
+   * Dereference link.
+   * 
+   * @deprecated Use {@link RepositoryRouter#dereferenceLink(StorageLinkItem)} method instead.
+   */
+  @Deprecated
   StorageItem dereferenceLinkItem(StorageLinkItem item)
       throws NoSuchResourceStoreException, ItemNotFoundException, AccessDeniedException, IllegalOperationException,
              StorageException;
