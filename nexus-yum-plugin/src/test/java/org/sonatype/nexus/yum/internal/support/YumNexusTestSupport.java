@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.nexus.yum.internal.RepoMD;
+import org.sonatype.nexus.yum.internal.task.CommandLineExecutor;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
@@ -238,6 +239,13 @@ public class YumNexusTestSupport
       @Override
       public void configure(final Binder binder) {
         binder.bind(Config.class).toInstance(new ConfigImpl(enableAutomaticRoutingFeature()));
+        binder.bind(CommandLineExecutor.class).toInstance(new CommandLineExecutor(){
+          @Override
+          public int exec(final String command) throws IOException {
+            // do nothing
+            return 0;
+          }
+        });
       }
     });
     return modules;

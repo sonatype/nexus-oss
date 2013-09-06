@@ -15,6 +15,9 @@ package org.sonatype.nexus.yum.internal.task;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -24,7 +27,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @since 3.0
  */
-public final class CommandLineExecutor
+@Named
+@Singleton
+public class CommandLineExecutor
 {
 
   private static final Logger LOG = LoggerFactory.getLogger(CommandLineExecutor.class);

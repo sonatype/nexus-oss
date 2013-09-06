@@ -106,41 +106,6 @@ public class VersionedResourceTest
   }
 
   @Test
-  public void shouldProvideFile()
-      throws Exception
-  {
-    Request request = createRequest("/repodata/repomd.xml", TESTREPO, VERSION);
-    System.out.println(yumRegistry.get(TESTREPO).getVersions());
-
-    FileRepresentation representation = (FileRepresentation) resource.get(null, request, null, null);
-    Assert.assertTrue(representation.getFile().exists());
-  }
-
-  @Test
-  public void shouldGenerateFileIndex()
-      throws Exception
-  {
-    Request request = createRequest("/repodata/", TESTREPO, VERSION);
-    StringRepresentation representation = (StringRepresentation) resource.get(null, request, null, null);
-    Assert.assertEquals(MediaType.TEXT_HTML, representation.getMediaType());
-    Assert.assertTrue(representation.getText().contains("repomd.xml"));
-  }
-
-  @Test
-  public void shouldGenerateDirectoryIndex()
-      throws Exception
-  {
-    shouldGenerateDirectoryIndexForVersionAndRepo(VERSION, TESTREPO);
-  }
-
-  @Test
-  public void shouldGenerateDirectoryIndexForAlias()
-      throws Exception
-  {
-    shouldGenerateDirectoryIndexForVersionAndRepo(ALIAS, TESTREPO);
-  }
-
-  @Test
   public void shouldNotFindFilesOutsideTheRepository()
       throws Exception
   {

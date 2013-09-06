@@ -44,6 +44,7 @@ import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
@@ -65,9 +66,14 @@ public class MergeMetadataTask
 
   private GroupRepository groupRepository;
 
+  private final CommandLineExecutor commandLineExecutor;
+
   @Inject
-  public MergeMetadataTask(final EventBus eventBus) {
+  public MergeMetadataTask(final EventBus eventBus,
+                           final CommandLineExecutor commandLineExecutor)
+  {
     super(eventBus, null);
+    this.commandLineExecutor = checkNotNull(commandLineExecutor);
   }
 
   public void setGroupRepository(final GroupRepository groupRepository) {
@@ -85,7 +91,7 @@ public class MergeMetadataTask
       final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
       if (memberReposBaseDirs.size() > 1) {
         LOG.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
-        new CommandLineExecutor().exec(buildCommand(repoBaseDir, memberReposBaseDirs));
+        commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
         LOG.debug("Group repository '{}' merged", groupRepository.getId());
       }
       else {
