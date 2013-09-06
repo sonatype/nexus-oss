@@ -25,20 +25,18 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A Map (based on HashMap, so all of it's peculiarities applies), that might have a parent. Parent is referred only in
  * case of query operations ({@link #get(Object)}, {@link #containsKey(Object)}, {@link #containsValue(Object)}), so
- * for
- * example the {@link #get(Object)} method may "bubble" up on multiple ancestors to grab a value. Still, even if
- * current
- * map has no entries, but it serves entries from it's parent, {@link #size()} of this map will return 0.
- *
+ * for example the {@link #get(Object)} method may "bubble" up on multiple ancestors to grab a value. Still, even if
+ * current map has no entries, but it serves entries from it's parent, {@link #size()} of this map will return 0.
+ * 
  * @author cstamas
  */
 public class HierarchicalMap<K, V>
-    extends ConcurrentHashMap<K, V>
     implements Map<K, V>
 {
-  private static final long serialVersionUID = 3445870461584217031L;
 
   private final Map<K, V> parent;
+
+  private final ConcurrentHashMap<K, V> delegate = new ConcurrentHashMap<K, V>();
 
   public HierarchicalMap() {
     this(null);
@@ -90,7 +88,7 @@ public class HierarchicalMap<K, V>
   }
 
   public boolean containsKey(Object key, boolean fallBackToParent) {
-    boolean result = super.containsKey(key);
+    boolean result = delegate.containsKey(key);
     if (fallBackToParent && !result && getParent() != null) {
       result = getParent().containsKey(key);
     }
@@ -103,7 +101,7 @@ public class HierarchicalMap<K, V>
   }
 
   public boolean containsValue(Object val, boolean fallBackToParent) {
-    boolean result = super.containsValue(val);
+    boolean result = delegate.containsValue(val);
     if (fallBackToParent && !result && getParent() != null) {
       result = getParent().containsValue(val);
     }
@@ -117,7 +115,7 @@ public class HierarchicalMap<K, V>
 
   public V get(Object key, boolean fallBackToParent) {
     if (containsKey(key, false)) {
-      return super.get(key);
+      return delegate.get(key);
     }
     else if (fallBackToParent && getParent() != null) {
       return getParent().get(key);
@@ -133,7 +131,7 @@ public class HierarchicalMap<K, V>
     if (getParent() != null) {
       result.addAll(getParent().keySet());
     }
-    result.addAll(super.keySet());
+    result.addAll(delegate.keySet());
     return Collections.unmodifiableSet(result);
   }
 
@@ -143,7 +141,7 @@ public class HierarchicalMap<K, V>
     if (getParent() != null) {
       result.addAll(getParent().values());
     }
-    result.addAll(super.values());
+    result.addAll(delegate.values());
     return Collections.unmodifiableCollection(result);
   }
 
@@ -158,7 +156,7 @@ public class HierarchicalMap<K, V>
         }
       }
     }
-    result.addAll(super.entrySet());
+    result.addAll(delegate.entrySet());
     return Collections.unmodifiableSet(result);
   }
 
@@ -172,6 +170,26 @@ public class HierarchicalMap<K, V>
     return keySet().size();
   }
 
+  @Override
+  public V put(K key, V value) {
+    return delegate.put(key, value);
+  }
+
+  @Override
+  public V remove(Object key) {
+    return delegate.remove(key);
+  }
+
+  @Override
+  public void putAll(Map<? extends K, ? extends V> m) {
+    delegate.putAll(m);
+  }
+
+  @Override
+  public void clear() {
+    delegate.clear();
+  }
+
   // ==
 
   /**
@@ -182,7 +200,7 @@ public class HierarchicalMap<K, V>
    */
   public Map<K, V> pullOut() {
     final HashMap<K, V> result = new HashMap<K, V>();
-    for (Entry<K, V> entry : super.entrySet()) {
+    for (Entry<K, V> entry : delegate.entrySet()) {
       result.put(entry.getKey(), entry.getValue());
     }
     return result;
