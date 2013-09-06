@@ -13,10 +13,7 @@
 
 package org.sonatype.nexus.client.internal.rest;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusClient;
@@ -62,11 +59,6 @@ public abstract class AbstractNexusClient
   }
 
   @Override
-  public List<Class<?>> getConfiguredSubsystems() {
-    return new ArrayList<Class<?>>(getConfiguredSubsystemTypes());
-  }
-
-  @Override
   public synchronized <S> S getSubsystem(Class<S> subsystemType) {
     if (subsystemInstanceCache.containsKey(subsystemType)) {
       return subsystemType.cast(subsystemInstanceCache.get(subsystemType));
@@ -99,11 +91,6 @@ public abstract class AbstractNexusClient
           + connectionCondition.explainNotSatisfied(nexusStatus));
     }
   }
-
-  /**
-   * Returns a list of subsystem types that has factories configured.
-   */
-  protected abstract Collection<Class<?>> getConfiguredSubsystemTypes();
 
   /**
    * Creates an instance of the subsystem for given type.

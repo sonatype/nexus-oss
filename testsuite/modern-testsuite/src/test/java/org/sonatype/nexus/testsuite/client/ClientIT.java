@@ -17,11 +17,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.exception.NexusClientAccessForbiddenException;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
+import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
+import org.sonatype.nexus.client.core.filter.NexusClientExceptionsConverterFilter;
+import org.sonatype.nexus.client.core.subsystem.Restlet1xClient;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
@@ -41,6 +48,10 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.security.rest.model.UserListResourceResponse;
+import org.sonatype.security.rest.model.UserResource;
+import org.sonatype.security.rest.model.UserResourceRequest;
+import org.sonatype.security.rest.model.UserResourceResponse;
+import org.sonatype.sisu.siesta.client.Filters;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.hamcrest.core.Is;
@@ -841,6 +852,39 @@ public class ClientIT
     NexusClient client = createNexusClient(nexus(), "test", password);
     //will fail if can't authenticate
     Assert.assertThat(client.getNexusStatus(), Is.is(notNullValue()));
+  }
+
+  /**
+   * Verify that a client impl is automatically created using siesta client.
+   */
+  @Test
+  public void getUsersUsingSiestaClient() {
+    final UserListResourceResponse userListResourceResponse = client().getSubsystem(UserClient.class).get();
+    assertThat(userListResourceResponse, is(notNullValue()));
+    assertThat(userListResourceResponse.getData(), is(not(empty())));
+  }
+
+
+  @Test
+  public void checkValidationErrorsFilter() {
+    final UserResource user = new UserResource();
+    final UserResourceRequest userRequest = new UserResourceRequest();
+    userRequest.setData(user);
+
+    thrown.expect(NexusClientErrorResponseException.class);
+    thrown.expectMessage("Users status is not valid");
+    client().getSubsystem(UserClient.class).create(userRequest);
+  }
+
+  @Path("/service/local/users")
+  public static interface UserClient
+      extends Restlet1xClient
+  {
+    @GET
+    UserListResourceResponse get();
+
+    @POST
+    UserResourceResponse create(UserResourceRequest request);
   }
 
 }

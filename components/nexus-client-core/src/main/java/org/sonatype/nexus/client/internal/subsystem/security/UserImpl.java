@@ -11,40 +11,39 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.client.internal.rest.jersey.subsystem.security;
+package org.sonatype.nexus.client.internal.subsystem.security;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.nexus.client.core.subsystem.security.User;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyEntitySupport;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.client.internal.subsystem.security.UsersImpl.UsersClient;
+import org.sonatype.nexus.client.rest.support.EntitySupport;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
-import org.sonatype.security.rest.model.UserResourceResponse;
-
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.client.internal.rest.jersey.subsystem.security.JerseyUsers.path;
 
 /**
- * Jersey based {@link User} implementation.
+ * {@link User} implementation.
  *
- * @since 2.3
+ * @since 2.7
  */
-public class JerseyUser
-    extends JerseyEntitySupport<User, UserResource>
+public class UserImpl
+    extends EntitySupport<User, UserResource>
     implements User
 {
 
-  public JerseyUser(final JerseyNexusClient nexusClient, final String id) {
-    super(nexusClient, id);
+  private UsersClient usersClient;
+
+  public UserImpl(final UsersClient usersClient, final UserResource settings) {
+    super(settings.getUserId(), settings);
+    this.usersClient = usersClient;
   }
 
-  public JerseyUser(final JerseyNexusClient nexusClient, final UserResource settings) {
-    super(nexusClient, settings.getUserId(), settings);
+  public UserImpl(final UsersClient usersClient, final String id) {
+    super(id);
+    this.usersClient = usersClient;
   }
 
   @Override
@@ -57,71 +56,28 @@ public class JerseyUser
 
   @Override
   protected UserResource doGet() {
-    try {
-      return getNexusClient()
-          .serviceResource(path(id()))
-          .get(UserResourceResponse.class)
-          .getData();
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(e);
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    return usersClient.get(id()).getData();
   }
 
   @Override
   protected UserResource doCreate() {
     final UserResourceRequest request = new UserResourceRequest();
     request.setData(settings());
-    try {
-      final UserResource userResource = getNexusClient()
-          .serviceResource("users")
-          .post(UserResourceResponse.class, request)
-          .getData();
-      userResource.setPassword(null);
-      return userResource;
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(e);
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    final UserResource resource = usersClient.post(request).getData();
+    resource.setPassword(null);
+    return resource;
   }
 
   @Override
   protected UserResource doUpdate() {
     final UserResourceRequest request = new UserResourceRequest();
     request.setData(settings());
-    try {
-      return getNexusClient()
-          .serviceResource(path(id()))
-          .put(UserResourceResponse.class, request)
-          .getData();
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(e);
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    return usersClient.put(id(), request).getData();
   }
 
   @Override
   protected void doRemove() {
-    try {
-      getNexusClient()
-          .serviceResource(path(id()))
-          .delete();
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(e);
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    usersClient.delete(id());
   }
 
   @Override

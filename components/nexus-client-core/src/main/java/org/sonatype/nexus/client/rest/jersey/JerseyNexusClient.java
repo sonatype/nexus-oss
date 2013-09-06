@@ -16,13 +16,14 @@ package org.sonatype.nexus.client.rest.jersey;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.sonatype.nexus.client.core.Condition;
+import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.core.exception.NexusClientAccessForbiddenException;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
@@ -30,7 +31,7 @@ import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseExceptio
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.exception.NexusClientResponseException;
-import org.sonatype.nexus.client.core.spi.SubsystemFactory;
+import org.sonatype.nexus.client.core.spi.SubsystemProvider;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
@@ -38,7 +39,10 @@ import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.sisu.siesta.client.ClientBuilder;
+import org.sonatype.sisu.siesta.client.ClientBuilder.Target.Factory;
 
+import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -46,6 +50,9 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.util.IOUtil;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Jersey client with some extra fluff: it maintains reference to XStream used by Provider it uses, to make it able to
@@ -64,20 +71,28 @@ public class JerseyNexusClient
 
   private final MediaType mediaType;
 
-  private final LinkedHashMap<Class<?>, SubsystemFactory<?, JerseyNexusClient>> subsystemFactoryMap;
+  private final List<SubsystemProvider> subsystemProviders;
+
+  private final Map<Object, Object> context;
 
   public JerseyNexusClient(final Condition connectionCondition,
-                           final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories,
-                           final ConnectionInfo connectionInfo, final XStream xstream, final Client client,
+                           final List<SubsystemProvider> subsystemProviders,
+                           final ConnectionInfo connectionInfo,
+                           final XStream xstream,
+                           final Client client,
                            final MediaType mediaType)
   {
     super(connectionInfo, xstream);
     this.client = Check.notNull(client, Client.class);
     this.mediaType = Check.notNull(mediaType, MediaType.class);
-    this.subsystemFactoryMap = new LinkedHashMap<Class<?>, SubsystemFactory<?, JerseyNexusClient>>();
+    this.subsystemProviders = subsystemProviders;
     getLogger().debug("Client created for media-type {} and connection {}", mediaType, connectionInfo);
+
     initializeConnection(connectionCondition);
-    initializeSubsystems(subsystemFactories);
+
+    context = Maps.newHashMap();
+    context.put(NexusClient.class, this);
+    context.put(Factory.class, ClientBuilder.using(client).toAccess(connectionInfo.getBaseUrl().toUrl()));
   }
 
   public Client getClient() {
@@ -161,38 +176,26 @@ public class JerseyNexusClient
 
   // ==
 
-  protected void initializeSubsystems(final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories) {
-    Check.notNull(subsystemFactories, "Subsystem factories");
-    getLogger().debug("Registering available subsystem factories: {} ", subsystemFactories);
-    for (SubsystemFactory<?, JerseyNexusClient> subsystemFactory : subsystemFactories) {
-      subsystemFactoryMap.put(subsystemFactory.getType(), subsystemFactory);
-    }
-  }
-
-  @Override
-  protected Collection<Class<?>> getConfiguredSubsystemTypes() {
-    return subsystemFactoryMap.keySet();
-  }
-
   @Override
   protected <S> S createSubsystem(final Class<S> subsystemType)
       throws IllegalArgumentException
   {
-    if (subsystemFactoryMap.containsKey(subsystemType)) {
-      final SubsystemFactory<?, JerseyNexusClient> subsystemFactory = subsystemFactoryMap.get(subsystemType);
-      if (subsystemFactory.availableWhen().isSatisfiedBy(getNexusStatus())) {
-        return subsystemType.cast(subsystemFactory.create(this));
-      }
-      else {
-        throw new IllegalArgumentException("Subsystem conditions not satisfied: "
-            + subsystemFactory.availableWhen().explainNotSatisfied(
-            getNexusStatus()));
+    checkNotNull(subsystemType, "subsystemType cannot be null");
+    for (final SubsystemProvider subsystemProvider : subsystemProviders) {
+      final Object subsystem = subsystemProvider.get(subsystemType, context);
+      if (subsystem != null) {
+        checkState(
+            subsystemType.isAssignableFrom(subsystem.getClass()),
+            "Subsystem '%s' created by '%s' is not an instance of '%s'",
+            subsystem, subsystemProvider, subsystemType.getSimpleName()
+        );
+        return subsystemType.cast(subsystem);
       }
     }
-    else {
-      throw new IllegalArgumentException("No SubsystemFactory configured for subsystem having type "
-          + subsystemType.getName());
-    }
+    throw new IllegalArgumentException(
+        "No " + SubsystemProvider.class.getName() + " was able to create a subsystem of type"
+            + subsystemType.getName()
+    );
   }
 
   public NexusClientNotFoundException convertIf404(final UniformInterfaceException e) {
