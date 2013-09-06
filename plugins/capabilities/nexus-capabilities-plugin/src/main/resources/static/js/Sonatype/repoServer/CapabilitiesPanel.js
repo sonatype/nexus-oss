@@ -529,7 +529,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
               items : [{
                     xtype : 'panel',
                     layout : 'fit',
-                    html : '<div class="little-padding">xSelect a capability to edit it, or click "Add" to configure a new one.</div>'
+                    html : '<div class="little-padding">Select a capability to edit it, or click "Add" to configure a new one.</div>'
                   }]
             }]
       });
