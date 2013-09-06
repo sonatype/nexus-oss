@@ -56,15 +56,6 @@ public interface NexusClient
       throws IllegalArgumentException;
 
   /**
-   * Returns the list of configured subsystem factories. The fact that a subsystem is in this list means only it's
-   * configured, but it still might be impossible to get an instance of it! See {@link #getSubsystem(Class)} for
-   * explanation.
-   *
-   * @return a list of subsystem types that are configured.
-   */
-  List<Class<?>> getConfiguredSubsystems();
-
-  /**
    * Disposes the client. After this call, this instance should not be used anymore.
    */
   void close();

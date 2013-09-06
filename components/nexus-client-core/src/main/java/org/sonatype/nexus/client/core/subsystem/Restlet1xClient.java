@@ -11,21 +11,18 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.client.core.subsystem.security;
+package org.sonatype.nexus.client.core.subsystem;
 
-import org.sonatype.nexus.client.core.subsystem.EntityRepository;
-import org.sonatype.nexus.client.internal.subsystem.security.UsersImpl;
-
-import com.google.inject.ImplementedBy;
+import org.sonatype.nexus.client.core.filter.NexusClientExceptionsConverterFilter;
+import org.sonatype.sisu.siesta.client.Filters;
 
 /**
- * Nexus {@link User} repository.
+ * Base interface for clients accessing a restlet1x endpoint.
  *
- * @since 2.3
+ * @since 2.7
  */
-@ImplementedBy(UsersImpl.class)
-public interface Users
-    extends EntityRepository<User>
+@Filters(NexusClientExceptionsConverterFilter.class)
+public interface Restlet1xClient
 {
 
 }
