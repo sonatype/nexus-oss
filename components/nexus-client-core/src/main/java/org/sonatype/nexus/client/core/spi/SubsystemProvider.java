@@ -11,21 +11,27 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.client.core.subsystem.security;
+package org.sonatype.nexus.client.core.spi;
 
-import org.sonatype.nexus.client.core.subsystem.EntityRepository;
-import org.sonatype.nexus.client.internal.subsystem.security.UsersImpl;
-
-import com.google.inject.ImplementedBy;
+import java.util.Map;
 
 /**
- * Nexus {@link User} repository.
+ * Subsystems factory. It creates subsystems of given type in case that it knows how to do it.
+ * If it does not know how to create such a subsystem it should return null, case when the remaining
+ * {@link SubsystemProvider}s will be used to create, until one will be able to do it.
  *
- * @since 2.3
+ * @since 2.7
  */
-@ImplementedBy(UsersImpl.class)
-public interface Users
-    extends EntityRepository<User>
+public interface SubsystemProvider
 {
+
+  /**
+   * Creates an instance of the subsystem for given type.
+   *
+   * @param type    of subsystem to be created (never null)
+   * @param context provides access to client specific components
+   * @return an instance of subsystem or null if it is not able to create a subsystem of specified type
+   */
+  Object get(Class type, Map<Object, Object> context);
 
 }
