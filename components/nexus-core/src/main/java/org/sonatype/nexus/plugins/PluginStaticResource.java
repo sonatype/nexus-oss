@@ -13,20 +13,26 @@
 
 package org.sonatype.nexus.plugins;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 import java.util.jar.JarEntry;
 
+import org.sonatype.nexus.plugins.rest.CacheControl;
 import org.sonatype.nexus.plugins.rest.StaticResource;
+
+import com.google.common.collect.Lists;
 
 /**
  * {@link StaticResource} contributed from a Nexus plugin.
  */
 public final class PluginStaticResource
-    implements StaticResource
+    implements StaticResource, CacheControl
 {
   // ----------------------------------------------------------------------
   // Implementation fields
@@ -38,14 +44,18 @@ public final class PluginStaticResource
 
   private final String contentType;
 
+  private final boolean shouldCache;
+
   // ----------------------------------------------------------------------
   // Constructors
   // ----------------------------------------------------------------------
 
   public PluginStaticResource(final URL resourceURL, final String publishedPath, final String contentType) {
-    this.resourceURL = resourceURL;
+    URL overrideUrl = getResourceIfOnFileSystem(publishedPath);
+    this.resourceURL = overrideUrl != null ? overrideUrl : resourceURL;
     this.publishedPath = publishedPath;
     this.contentType = contentType;
+    this.shouldCache = overrideUrl == null;
   }
 
   // ----------------------------------------------------------------------
@@ -94,4 +104,47 @@ public final class PluginStaticResource
       return null; // default to unknown last modified time
     }
   }
+
+  private static final List<File> directoriesToSearch = initializeLocations();
+
+  private static List<File> initializeLocations() {
+    String directoriesToSearchProperty = System.getenv("NEXUS_RESOURCE_DIRS");
+    if (directoriesToSearchProperty != null) {
+      List<File> directoriesToSearch = Lists.newArrayList();
+      String[] segments = directoriesToSearchProperty.split(",");
+      for (String segment : segments) {
+        File dir = new File(segment);
+        if (dir.exists() && dir.isDirectory()) {
+          directoriesToSearch.add(dir);
+        }
+      }
+      if (!directoriesToSearch.isEmpty()) {
+        return directoriesToSearch;
+      }
+    }
+    return null;
+  }
+
+  public static URL getResourceIfOnFileSystem(String path) {
+    if (directoriesToSearch != null) {
+      try {
+        for (File dir : directoriesToSearch) {
+          File file = new File(dir, path);
+          if (file.exists()) {
+            return file.getAbsoluteFile().toURI().toURL();
+          }
+        }
+      }
+      catch (MalformedURLException e) {
+        // ignore
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public boolean shouldCache() {
+    return shouldCache;
+  }
+
 }
