@@ -15,13 +15,9 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * AttributesHandler manages the storage of item attributes, does their recalculation if needed (how it's done is left
@@ -40,14 +36,6 @@ public interface AttributesHandler
    * @return AttributeStorage used by this instance.
    */
   AttributeStorage getAttributeStorage();
-
-  /**
-   * Sets the attribute storage used by this instance.
-   *
-   * @deprecated For UT uses only!
-   */
-  @Deprecated
-  void setAttributeStorage(AttributeStorage attributeStorage);
 
   /**
    * Fetches the item attributes and decorates the supplied item instance with it.
@@ -97,59 +85,4 @@ public interface AttributesHandler
    */
   void touchItemLastRequested(long timestamp, StorageItem storageItem)
       throws IOException;
-
-  // ==
-
-  /**
-   * Updates the "checkedRemotely" attribute of item in given repository Touch item and sets on it the current time.
-   *
-   * @deprecated Use {@link #touchItemCheckedRemotely(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
-   */
-  @Deprecated
-  void touchItemRemoteChecked(Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException;
-
-  /**
-   * Touch item and sets on it the given timestamp.
-   *
-   * @deprecated Use {@link #touchItemCheckedRemotely(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
-   */
-  @Deprecated
-  void touchItemRemoteChecked(long timestamp, Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException;
-
-  /**
-   * Touch item last requested and sets on it the current time.
-   *
-   * @deprecated Use {@link #touchItemLastRequested(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
-   */
-  @Deprecated
-  void touchItemLastRequested(Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException;
-
-  /**
-   * Touch item last requested and sets on it the given timestamp.
-   *
-   * @deprecated Use {@link #touchItemLastRequested(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
-   */
-  void touchItemLastRequested(long timestamp, Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException;
-
-  /**
-   * Touch only if request is user-request (coming from outside of nexus).
-   *
-   * @deprecated Use {@link #touchItemLastRequested(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
-   */
-  void touchItemLastRequested(long timestamp, Repository repository, ResourceStoreRequest request,
-                              StorageItem storageItem)
-      throws ItemNotFoundException, LocalStorageException, IOException;
-
-  /**
-   * Update item attributes, does not modify the content of it.
-   *
-   * @deprecated Use {@link #storeAttributes(org.sonatype.nexus.proxy.item.StorageItem)} instead!
-   */
-  @Deprecated
-  void updateItemAttributes(Repository repository, ResourceStoreRequest request, StorageItem item)
-      throws ItemNotFoundException, LocalStorageException, IOException;
 }

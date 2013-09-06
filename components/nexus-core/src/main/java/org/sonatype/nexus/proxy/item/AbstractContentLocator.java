@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.item;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * The support for implementing {@link ContentLocator}s.
  * 
@@ -24,17 +26,26 @@ public abstract class AbstractContentLocator
     implements ContentLocator
 {
   private final String mimeType;
+  
+  private final long length;
 
   private final boolean reusable;
 
-  public AbstractContentLocator(final String mimeType, final boolean reusable) {
+  protected AbstractContentLocator(final String mimeType, final boolean reusable, final long length) {
+    checkArgument(length > -1 || length == UNKNOWN_LENGTH);
     this.mimeType = checkNotNull(mimeType);
+    this.length = length;
     this.reusable = reusable;
   }
 
   @Override
   public String getMimeType() {
     return mimeType;
+  }
+  
+  @Override
+  public long getLength() {
+    return length;
   }
 
   @Override

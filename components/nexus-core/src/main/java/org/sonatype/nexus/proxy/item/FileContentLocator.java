@@ -67,7 +67,7 @@ public class FileContentLocator
    *          "non reusable" (method {@link #isReusable()} will return {@code false}).
    */
   public FileContentLocator(final File file, final String mimeType, final boolean deleteOnCloseInput) {
-    super(mimeType, !deleteOnCloseInput);
+    super(mimeType, !deleteOnCloseInput, file.length());
     this.file = Preconditions.checkNotNull(file);
     this.deleteOnCloseInput = deleteOnCloseInput;
   }
@@ -85,6 +85,7 @@ public class FileContentLocator
     return new FileOutputStream(getFile());
   }
 
+  @Override
   public long getLength() {
     return getFile().length();
   }

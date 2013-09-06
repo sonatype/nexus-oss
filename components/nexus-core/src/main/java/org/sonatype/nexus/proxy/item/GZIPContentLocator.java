@@ -46,6 +46,11 @@ public class GZIPContentLocator
   public InputStream getContent() throws IOException {
     return new GZIPInputStream(super.getContent());
   }
+  
+  @Override
+  public long getLength() {
+    return UNKNOWN_LENGTH;
+  }
 
   @Override
   public String getMimeType() {

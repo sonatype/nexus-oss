@@ -17,8 +17,8 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class DefaultStorageNotFoundItem abstracting the "not found" case, used in caches mainly.
- *
+ * Default implementation of {@link StorageNotFoundItem}.
+ * 
  * @author cstamas
  * @since 2.1
  */

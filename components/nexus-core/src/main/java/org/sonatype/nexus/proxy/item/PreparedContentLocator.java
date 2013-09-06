@@ -28,8 +28,8 @@ public class PreparedContentLocator
 {
   private final InputStream content;
 
-  public PreparedContentLocator(final InputStream content, final String mimeType) {
-    super(mimeType, false);
+  public PreparedContentLocator(final InputStream content, final String mimeType, final long length) {
+    super(mimeType, false, length);
     this.content = content;
   }
 

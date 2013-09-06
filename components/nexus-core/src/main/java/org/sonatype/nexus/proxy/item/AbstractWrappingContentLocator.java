@@ -47,6 +47,11 @@ public abstract class AbstractWrappingContentLocator
   }
 
   @Override
+  public long getLength() {
+    return getTarget().getLength();
+  }
+
+  @Override
   public boolean isReusable() {
     return getTarget().isReusable();
   }

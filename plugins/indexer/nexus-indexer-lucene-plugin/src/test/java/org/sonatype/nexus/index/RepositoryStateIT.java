@@ -47,7 +47,7 @@ public class RepositoryStateIT
 {
   private NexusIndexer mavenIndexer;
 
-  private static final ContentLocator contentLocator = new AbstractContentLocator("", false)
+  private static final ContentLocator contentLocator = new AbstractContentLocator("", false, ContentLocator.UNKNOWN_LENGTH)
   {
     @Override
     public InputStream getContent()

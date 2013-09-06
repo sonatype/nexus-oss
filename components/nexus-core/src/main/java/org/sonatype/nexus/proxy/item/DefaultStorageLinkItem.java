@@ -17,91 +17,45 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * The Class DefaultStorageLinkItem.
+ * Default implementation of {@link StorageLinkItem}.
  */
 public class DefaultStorageLinkItem
     extends AbstractStorageItem
     implements StorageLinkItem
 {
-
-  /**
-   * The Constant serialVersionUID.
-   */
-  private static final long serialVersionUID = 4494595788515460394L;
-
-  /**
-   * The target.
-   */
   private transient RepositoryItemUid targetUid;
 
-  /**
-   * Instantiates a new default storage link item.
-   *
-   * @param repository the repository
-   * @param path       the path
-   * @param canRead    the can read
-   * @param canWrite   the can write
-   * @param targetUid  the target uid
-   */
-  public DefaultStorageLinkItem(Repository repository, ResourceStoreRequest request, boolean canRead,
-                                boolean canWrite, RepositoryItemUid targetUid)
+  public DefaultStorageLinkItem(Repository repository, ResourceStoreRequest request, boolean canRead, boolean canWrite,
+      RepositoryItemUid targetUid)
   {
     super(repository, request, canRead, canWrite);
-
     setTarget(targetUid);
   }
 
-  /**
-   * Shortcut method.
-   *
-   * @deprecated supply resourceStoreRequest always
-   */
-  public DefaultStorageLinkItem(Repository repository, String path, boolean canRead, boolean canWrite,
-                                RepositoryItemUid targetUid)
-  {
-    this(repository, new ResourceStoreRequest(path, true, false), canRead, canWrite, targetUid);
-  }
-
-  /**
-   * Instantiates a new default storage link item.
-   *
-   * @param router    the router
-   * @param path      the path
-   * @param canRead   the can read
-   * @param canWrite  the can write
-   * @param targetUid the target uid
-   */
   public DefaultStorageLinkItem(RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-                                boolean canWrite, RepositoryItemUid targetUid)
+      boolean canWrite, RepositoryItemUid targetUid)
   {
     super(router, request, canRead, canWrite);
-
     setTarget(targetUid);
   }
 
+  @Override
   public RepositoryItemUid getTarget() {
     return targetUid;
   }
 
+  @Override
   public void setTarget(RepositoryItemUid target) {
-    this.targetUid = target;
-  }
-
-  public void overlay(StorageItem item)
-      throws IllegalArgumentException
-  {
-    super.overlay(item);
+    this.targetUid = checkNotNull(target);
   }
 
   // ==
 
+  @Override
   public String toString() {
-    if (getTarget() != null) {
-      return String.format("%s (link to %s)", super.toString(), getTarget().toString());
-    }
-    else {
-      return String.format("%s (link NO-TARGET)", super.toString());
-    }
+    return String.format("%s (link to %s)", super.toString(), getTarget().toString());
   }
 }

@@ -19,6 +19,7 @@ import java.io.InputStream;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -66,7 +67,7 @@ public class NEXUS5468ConnectionLeakOnStoreItemTest
       // so execution path is "normal success" of storeItem in this case
       Mockito.when(repository.getLocalUrl()).thenReturn(new File("target").toURI().toURL().toString());
 
-      final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain");
+      final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain", ContentLocator.UNKNOWN_LENGTH);
 
       final DefaultStorageFileItem file =
           new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/file.txt"), true, true, pcl);
@@ -94,7 +95,7 @@ public class NEXUS5468ConnectionLeakOnStoreItemTest
       // so execution path here will be interrupted
       Mockito.when(repository.getLocalUrl()).thenThrow(new RuntimeException("Something unexpected!"));
 
-      final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain");
+      final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain", ContentLocator.UNKNOWN_LENGTH);
 
       final DefaultStorageFileItem file =
           new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/file.txt"), true, true, pcl);

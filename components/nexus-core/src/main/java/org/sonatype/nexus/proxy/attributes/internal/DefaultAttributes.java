@@ -18,12 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.attributes.Attributes;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 
 import com.google.common.base.Preconditions;
 
 /**
  * Default implementation of Attributes.
- *
+ * 
  * @author cstamas
  * @since 2.0
  */
@@ -145,6 +146,7 @@ public class DefaultAttributes
 
   protected void overlayMap(Map<String, String> map) {
     defaults.putAll(map);
+    defaults.remove("length"); // since 2.7.0 no length!
   }
 
   @Override
@@ -278,13 +280,15 @@ public class DefaultAttributes
   }
 
   @Override
+  @Deprecated
   public long getLength() {
-    return getLong(getKeyForAttribute("length"), 0);
+    return ContentLocator.UNKNOWN_LENGTH;
   }
 
   @Override
+  @Deprecated
   public void setLength(final long value) {
-    setLong(getKeyForAttribute("length"), value);
+    // NOOP
   }
 
   @Override

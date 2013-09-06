@@ -13,23 +13,30 @@
 
 package org.sonatype.nexus.proxy.item;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+
 /**
- * The Interface StorageLinkItem.
+ * An item that is a link (idea very similar to Linux symlink). It points to some other content (generated or not) in
+ * any repository within this Nexus instance (even cross repository). It cannot point to target not in repository (like
+ * virtual items). Link itself might be virtual. The path where target UID points might not exists (link is still valid
+ * but stale, as dereferencing it will result simply in {@link ItemNotFoundException}), but if the link target UID
+ * points to a non existing {@link Repository}, link will be automatically removed by Nexus on retrieving the link
+ * itself and {@link ItemNotFoundException} will be thrown.
+ * <p>
+ * For dereferencing links recommended method is {@link RepositoryRouter#dereferenceLink(StorageLinkItem)}.
  */
 public interface StorageLinkItem
     extends StorageItem
 {
-
   /**
-   * Gets the link target.
-   *
-   * @return the target
+   * Returns the target UID.
    */
   RepositoryItemUid getTarget();
 
   /**
-   * Sets the link target.
+   * Sets the target UID.
    */
   void setTarget(RepositoryItemUid target);
-
 }

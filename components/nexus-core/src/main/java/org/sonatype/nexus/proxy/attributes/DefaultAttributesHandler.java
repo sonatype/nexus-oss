@@ -27,8 +27,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -42,6 +40,8 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import org.codehaus.plexus.util.IOUtil;
 
@@ -154,17 +154,6 @@ public class DefaultAttributesHandler
    */
   public DelegatingAttributeStorage getAttributeStorage() {
     return attributeStorage;
-  }
-
-  /**
-   * Sets the attribute storage.
-   *
-   * @param attributeStorage the new attribute storage
-   * @deprecated For UT use only!
-   */
-  @Deprecated
-  public void setAttributeStorage(final AttributeStorage attributeStorage) {
-    this.attributeStorage = new DelegatingAttributeStorage(attributeStorage);
   }
 
   /**
@@ -372,82 +361,6 @@ public class DefaultAttributesHandler
     return doTouch;
   }
 
-  // == Below is junkyard, deprecated methods
-
-  @Override
-  @Deprecated
-  public void touchItemRemoteChecked(Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException
-  {
-    touchItemRemoteChecked(System.currentTimeMillis(), repository, request);
-  }
-
-  @Override
-  @Deprecated
-  public void touchItemRemoteChecked(long timestamp, Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException
-  {
-    RepositoryItemUid uid = repository.createUid(request.getRequestPath());
-
-    Attributes item = getAttributeStorage().getAttributes(uid);
-
-    if (item != null) {
-      item.setRepositoryId(uid.getRepository().getId());
-      item.setPath(uid.getPath());
-      item.setCheckedRemotely(timestamp);
-      item.setExpired(false);
-
-      getAttributeStorage().putAttributes(uid, item);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void touchItemLastRequested(Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException
-  {
-    touchItemLastRequested(System.currentTimeMillis(), repository, request);
-  }
-
-  @Override
-  @Deprecated
-  public void touchItemLastRequested(long timestamp, Repository repository, ResourceStoreRequest request)
-      throws ItemNotFoundException, LocalStorageException, IOException
-  {
-    RepositoryItemUid uid = repository.createUid(request.getRequestPath());
-
-    Attributes item = getAttributeStorage().getAttributes(uid);
-
-    if (item != null) {
-      item.setRepositoryId(uid.getRepository().getId());
-      item.setPath(uid.getPath());
-
-      touchItemLastRequested(timestamp, request, uid, item);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void touchItemLastRequested(long timestamp, Repository repository, ResourceStoreRequest request,
-                                     StorageItem storageItem)
-      throws ItemNotFoundException, LocalStorageException, IOException
-  {
-    if (storageItem instanceof StorageCollectionItem) {
-      return;
-    }
-
-    touchItemLastRequested(timestamp, request, storageItem.getRepositoryItemUid(),
-        storageItem.getRepositoryItemAttributes());
-  }
-
-  @Override
-  @Deprecated
-  public void updateItemAttributes(Repository repository, ResourceStoreRequest request, StorageItem item)
-      throws ItemNotFoundException, LocalStorageException, IOException
-  {
-    storeAttributes(item);
-  }
-
   // ======================================================================
   // Internal
 
@@ -571,14 +484,24 @@ public class DefaultAttributesHandler
   /**
    * For UT access!
    */
-  public long getLastRequestedResolution() {
+  @VisibleForTesting
+  long getLastRequestedResolution() {
     return lastRequestedResolution;
   }
 
   /**
    * For UT access!
    */
-  public void setLastRequestedResolution(long lastRequestedResolution) {
+  @VisibleForTesting
+  void setLastRequestedResolution(long lastRequestedResolution) {
     this.lastRequestedResolution = lastRequestedResolution;
+  }
+
+  /**
+   * For UT access!
+   */
+  @VisibleForTesting
+  void setAttributeStorage(final AttributeStorage attributeStorage) {
+    this.attributeStorage = new DelegatingAttributeStorage(attributeStorage);
   }
 }

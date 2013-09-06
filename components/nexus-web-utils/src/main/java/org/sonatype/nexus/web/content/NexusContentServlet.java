@@ -44,6 +44,7 @@ import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -66,7 +67,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -413,21 +413,16 @@ public class NexusContentServlet
     // content-type
     response.setHeader("Content-Type", file.getMimeType());
 
-    // generated content is special, last-modified is "now" and no known content length in advance
-    if (file.isContentGenerated()) {
-      // TODO: shouldn't this be handled by underlying file implementation instead?
-      // last-modified
-      response.setDateHeader("Last-Modified", System.currentTimeMillis());
-    }
-    else {
-      // content-length
-      // Note: response.setContentLength Servlet API method uses ints!
+    // last-modified
+    response.setDateHeader("Last-Modified", file.getModified());
+
+    // content-length, if known
+    if (file.getLength() != ContentLocator.UNKNOWN_LENGTH) {
+      // Note: response.setContentLength Servlet API method uses ints (max 2GB file)!
       // TODO: apparently, some Servlet containers follow serlvet API and assume
-      // contents can have 2GB max, so even this workaround below in inherently unsafe
-      // TODO: checked, it works in Jetty, but unsure for others
+      // contents can have 2GB max, so even this workaround below in inherently unsafe.
+      // Jetty is checked, and supports this (uses long internally), but unsure for other containers
       response.setHeader("Content-Length", String.valueOf(file.getLength()));
-      // last-modified
-      response.setDateHeader("Last-Modified", file.getModified());
     }
 
     // handle conditional GETs only for "static" content, actual content stored, not generated
@@ -591,7 +586,7 @@ public class NexusContentServlet
    * @return list of {@link Range}, never {@code null}.
    */
   protected List<Range<Long>> getRequestedRanges(final HttpServletRequest request, final long contentLength) {
-    // TODO: Nx limitation: only one Range of bytes supported in forms of "-X", "X-Y" (where X<Y) and "X-".
+    // TODO: Current limitation: only one Range of bytes supported in forms of "-X", "X-Y" (where X<Y) and "X-".
     final String rangeHeader = request.getHeader("Range");
     if (!Strings.isNullOrEmpty(rangeHeader)) {
       try {

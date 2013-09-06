@@ -34,7 +34,7 @@ public class ObrMetadataSourceTest
   public void testBundleItem1()
       throws Exception
   {
-    final ContentLocator content = new AbstractContentLocator("application/java-archive", false)
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
@@ -54,7 +54,7 @@ public class ObrMetadataSourceTest
   public void testBundleItem2()
       throws Exception
   {
-    final ContentLocator content = new AbstractContentLocator("application/java-archive", false)
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
@@ -79,7 +79,7 @@ public class ObrMetadataSourceTest
   public void testNonBundleItem()
       throws Exception
   {
-    final ContentLocator content = new AbstractContentLocator("application/java-archive", false)
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
@@ -97,7 +97,7 @@ public class ObrMetadataSourceTest
   public void testBrokenStream()
       throws Exception
   {
-    final ContentLocator content = new AbstractContentLocator("application/java-archive", false)
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
@@ -115,7 +115,7 @@ public class ObrMetadataSourceTest
   public void testNullStream()
       throws Exception
   {
-    final ContentLocator content = new AbstractContentLocator("application/java-archive", false)
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException

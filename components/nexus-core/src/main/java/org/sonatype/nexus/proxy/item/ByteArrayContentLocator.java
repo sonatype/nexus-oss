@@ -24,7 +24,7 @@ public class ByteArrayContentLocator
   private final byte[] content;
 
   public ByteArrayContentLocator(final byte[] content, final String mimeType) {
-    super(mimeType, true);
+    super(mimeType, true, content.length);
     this.content = Arrays.copyOf(content, content.length);
   }
 
@@ -33,10 +33,6 @@ public class ByteArrayContentLocator
       throws IOException
   {
     return new ByteArrayInputStream(content);
-  }
-
-  public long getLength() {
-    return content.length;
   }
 
   public byte[] getByteArray() {

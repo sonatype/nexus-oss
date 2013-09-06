@@ -57,7 +57,7 @@ public class ArchetypeContentLocator
   public ArchetypeContentLocator(final Repository repository, final String repositoryContentUrl,
       final DefaultIndexerManager nexusIndexer, final MacPlugin macPlugin, final ArtifactInfoFilter artifactInfoFilter)
   {
-    super("text/xml", true);
+    super("text/xml", true, UNKNOWN_LENGTH);
     this.repository = repository;
     this.repositoryContentUrl = repositoryContentUrl;
     this.nexusIndexer = nexusIndexer;

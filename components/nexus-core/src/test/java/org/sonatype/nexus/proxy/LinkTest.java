@@ -50,14 +50,14 @@ public class LinkTest
 
     DefaultStorageFileItem file = new DefaultStorageFileItem(
         repo1,
-        "/a.txt",
+        new ResourceStoreRequest("/a.txt"),
         true,
         true,
         new StringContentLocator(contentString));
-    file.getAttributes().put("attr1", "ATTR1");
+    file.getRepositoryItemAttributes().put("attr1", "ATTR1");
     repo1.storeItem(false, file);
 
-    DefaultStorageLinkItem link = new DefaultStorageLinkItem(repo1, "/b.txt", true, true, file
+    DefaultStorageLinkItem link = new DefaultStorageLinkItem(repo1, new ResourceStoreRequest("/b.txt"), true, true, file
         .getRepositoryItemUid());
     repo1.getLocalStorage().storeItem(repo1, link);
 

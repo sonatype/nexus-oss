@@ -25,22 +25,38 @@ import java.io.InputStream;
 public interface ContentLocator
 {
   /**
-   * Gets the content. It has to be closed by the caller explicitly.
+   * Length marking "unknown" length. This means that locator cannot tell how many bytes will {@link InputStream}
+   * returned by {@link #getContent()} method provide when fully read. This might happen with generated content, or
+   * compressed happening on-the-fly, etc.
+   */
+  long UNKNOWN_LENGTH = -1L;
+
+  /**
+   * Unknown MIME type, basically arbitrary binary data.
    * 
-   * @return the content
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @see <a href="http://www.ietf.org/rfc/rfc2046.txt">RFC2046</a> section 4.5.1.
+   */
+  String UNKNOWN_MIME_TYPE = "application/octet-stream";
+
+  /**
+   * Gets the content as opened and ready to read input stream. It has to be closed by the caller explicitly. Depending
+   * on return value of {@link #isReusable()}, this method might be called only once or multiple times.
    */
   InputStream getContent() throws IOException;
 
   /**
-   * Returns the MIME type of the content.
+   * Returns the MIME type of the content, never {@code null}.
    */
   String getMimeType();
 
   /**
-   * Checks if is reusable.
-   * 
-   * @return true, if is reusable
+   * Returns the length of the content in bytes if known, or {@link #UNKNOWN_LENGTH} if content length unknown.
+   */
+  long getLength();
+
+  /**
+   * Returns {@code true} if this locator is reusable, meaning that it is possible to invoke {@link #getContent()}
+   * multiple times against it, {@code false} otherwise.
    */
   boolean isReusable();
 }

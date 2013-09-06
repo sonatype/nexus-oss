@@ -15,10 +15,13 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+
 /**
  * Attributes are simply a String key-value pairs with some type-safe getters and setters for keys known and used in
  * core.
- *
+ * 
  * @author cstamas
  * @since 2.0
  */
@@ -35,8 +38,8 @@ public interface Attributes
   String get(final String key);
 
   /**
-   * Puts the value for given key, returning any previous values bound. Note: Attributes does not allow {@code null}
-   * for key neither values!
+   * Puts the value for given key, returning any previous values bound. Note: Attributes does not allow {@code null} for
+   * key neither values!
    */
   String put(final String key, final String value);
 
@@ -186,12 +189,21 @@ public interface Attributes
 
   /**
    * Returns the length attribute.
+   * 
+   * @deprecated Attributes does not contain length attribute anymore. For length of a file item use corresponding
+   *             {@link StorageFileItem#getLength()} or it's {@link ContentLocator#getLength()} methods! According to
+   *             sources, this method is NOT used at all by Nexus Core, but is left in place for any 3rd party
+   *             integration, but, value it returns will be always the {@link ContentLocator#UNKNOWN_LENGTH}!
    */
+  @Deprecated
   long getLength();
 
   /**
    * Sets the length attribute.
+   * 
+   * @deprecated Attributes does not contain length attribute anymore. See {@link #getLength()} for more.
    */
+  @Deprecated
   void setLength(final long value);
 
   // ==
