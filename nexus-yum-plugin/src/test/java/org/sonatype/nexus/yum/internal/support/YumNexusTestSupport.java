@@ -38,16 +38,23 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.routing.Config;
+import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.nexus.yum.internal.RepoMD;
+import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
+
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
@@ -66,7 +73,6 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
@@ -218,6 +224,27 @@ public class YumNexusTestSupport
   protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
     super.customizeContainerConfiguration(configuration);
     configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
+  }
+
+  @Override
+  protected Module[] getTestCustomModules() {
+    Module[] modules = super.getTestCustomModules();
+    if (modules == null) {
+      modules = new Module[0];
+    }
+    modules = ObjectArrays.concat(modules, new SecurityModule());
+    modules = ObjectArrays.concat(modules, new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(Config.class).toInstance(new ConfigImpl(enableAutomaticRoutingFeature()));
+      }
+    });
+    return modules;
+  }
+
+  protected boolean enableAutomaticRoutingFeature() {
+    return false;
   }
 
   @Override

@@ -47,4 +47,6 @@ public interface Repodata
 
   String getIndex(String repositoryId, String version);
 
+  String getIndex(String repositoryId, String version, String path);
+
 }

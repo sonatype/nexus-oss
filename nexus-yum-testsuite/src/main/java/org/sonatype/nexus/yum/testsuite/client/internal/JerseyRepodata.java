@@ -100,10 +100,16 @@ public class JerseyRepodata
 
   @Override
   public String getIndex(final String repositoryId, final String version) {
+    return getIndex(repositoryId, version, null);
+  }
+
+  @Override
+  public String getIndex(final String repositoryId, final String version, final String path) {
     try {
       return getNexusClient().serviceResource(
-          "yum/repos/" + repositoryId + "/" + version + "/")
-          .get(String.class);
+          "yum/repos/" + repositoryId + "/" + version + "/"
+              + (path == null ? "" : path + (path.endsWith("/") ? "" : "/"))
+      ).get(String.class);
     }
     catch (UniformInterfaceException e) {
       throw getNexusClient().convert(e);
