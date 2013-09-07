@@ -228,7 +228,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
                           + (offerRestart ? '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' : '');
         Ext.MessageBox.show({
           title : "Error",
-          msg : displayMessage,
+          msg : Ext.util.Format.htmlEncode(displayMessage),
               buttons : offerRestart ? Ext.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
               icon : Ext.MessageBox.ERROR,
               animEl : 'mb3',
