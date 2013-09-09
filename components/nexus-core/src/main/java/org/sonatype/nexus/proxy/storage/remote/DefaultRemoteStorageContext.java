@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.proxy.storage.remote;
 
+import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -21,7 +22,7 @@ import org.sonatype.nexus.proxy.storage.StorageContext;
 
 /**
  * The default remote storage context.
- *
+ * 
  * @author cstamas
  */
 public class DefaultRemoteStorageContext
@@ -59,7 +60,13 @@ public class DefaultRemoteStorageContext
 
   @Override
   public RemoteConnectionSettings getRemoteConnectionSettings() {
-    return (RemoteConnectionSettings) getContextObject(RemoteConnectionSettings.class.getName());
+    final RemoteConnectionSettings remoteConnectionSettings = (RemoteConnectionSettings) getContextObject(RemoteConnectionSettings.class.getName());
+    if (hasContextObject(RemoteConnectionSettings.class.getName())) {
+      return remoteConnectionSettings;
+    }
+    else {
+      return DefaultRemoteConnectionSettings.asReadOnly(remoteConnectionSettings);
+    }
   }
 
   @Override

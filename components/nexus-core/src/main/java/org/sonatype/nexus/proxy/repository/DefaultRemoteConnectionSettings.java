@@ -55,4 +55,37 @@ public class DefaultRemoteConnectionSettings
   public void setUserAgentCustomizationString(String userAgentCustomizationString) {
     this.userAgentCustomizationString = userAgentCustomizationString;
   }
+
+  // ==
+
+  public static RemoteConnectionSettings asReadOnly(final RemoteConnectionSettings remoteConnectionSettings) {
+    return new ReadOnlyRemoteConnectionSettings(remoteConnectionSettings);
+  }
+
+  public static class ReadOnlyRemoteConnectionSettings
+      extends DefaultRemoteConnectionSettings
+  {
+    public ReadOnlyRemoteConnectionSettings(final RemoteConnectionSettings remoteConnectionSettings) {
+      super.setConnectionTimeout(remoteConnectionSettings.getConnectionTimeout());
+      super.setQueryString(remoteConnectionSettings.getQueryString());
+      super.setRetrievalRetryCount(remoteConnectionSettings.getRetrievalRetryCount());
+      super.setUserAgentCustomizationString(remoteConnectionSettings.getUserAgentCustomizationString());
+    }
+
+    public void setConnectionTimeout(int connectionTimeout) {
+      throw new IllegalStateException("Parent instance is not modifiable!");
+    }
+
+    public void setRetrievalRetryCount(int retrievalRetryCount) {
+      throw new IllegalStateException("Parent instance is not modifiable!");
+    }
+
+    public void setQueryString(String queryString) {
+      throw new IllegalStateException("Parent instance is not modifiable!");
+    }
+
+    public void setUserAgentCustomizationString(String userAgentCustomizationString) {
+      throw new IllegalStateException("Parent instance is not modifiable!");
+    }
+  }
 }
