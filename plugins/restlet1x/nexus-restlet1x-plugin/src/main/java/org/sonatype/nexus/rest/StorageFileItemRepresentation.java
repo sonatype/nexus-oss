@@ -19,18 +19,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.restlet.data.Tag;
+
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.RestletResponseCustomizer;
 
 public class StorageFileItemRepresentation
     extends StorageItemRepresentation
     implements RestletResponseCustomizer
 {
+    private static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger("org.sonatype.nexus.rest.StorageFileItemRepresentation.BUFFER_SIZE", 16384);
+
     public StorageFileItemRepresentation( StorageFileItem file )
     {
         super( MediaType.valueOf( file.getMimeType() ), file );
@@ -69,16 +72,12 @@ public class StorageFileItemRepresentation
     }
 
     @Override
-    public void write( OutputStream outputStream )
+    public void write( final OutputStream outputStream )
         throws IOException
     {
-        InputStream is = null;
-
-        try
+        try( final InputStream is = getStorageItem().getInputStream() )
         {
-            is = getStorageItem().getInputStream();
-
-            IOUtil.copy( is, outputStream );
+            copy( is, outputStream );
         }
         catch ( IOException e )
         {
@@ -96,10 +95,6 @@ public class StorageFileItemRepresentation
                 throw e;
             }
         }
-        finally
-        {
-            IOUtil.close( is );
-        }
     }
 
     /**
@@ -114,4 +109,19 @@ public class StorageFileItemRepresentation
         addHttpResponseHeader( response, "X-Content-Type-Options", "nosniff" );
     }
 
+    /**
+     * Copied from Guava 14.0.1 ByteStreams, modified to expose buffer and removed counter.
+     */
+    public static void copy( final InputStream from, final OutputStream to )
+        throws IOException
+    {
+      final byte[] buf = new byte[BUFFER_SIZE];
+      while (true) {
+        int r = from.read(buf);
+        if (r == -1) {
+          break;
+        }
+        to.write(buf, 0, r);
+      }
+    }
 }
