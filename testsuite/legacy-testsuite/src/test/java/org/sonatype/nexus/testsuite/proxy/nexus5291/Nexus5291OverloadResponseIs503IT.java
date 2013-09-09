@@ -54,17 +54,16 @@ public class Nexus5291OverloadResponseIs503IT
   }
 
   @Before
-  public void replaceServers()
+  @Override
+  public void startProxy()
       throws Exception
   {
-    final int proxyPort = proxyServer.getPort();
-    proxyServer.stop();
-    proxyServer = null;
     server = Server.withPort(proxyPort).serve("/").withBehaviours(Behaviours.pause(Time.days(1))).start();
   }
 
   @After
-  public void stopServers()
+  @Override
+  public void stopProxy()
       throws Exception
   {
     if (server != null) {
