@@ -13,15 +13,18 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
+
+import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
@@ -29,7 +32,6 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Singleton
 public class MessageCapabilityDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
 {
 
   static final String TYPE_ID = "[message]";
@@ -40,16 +42,28 @@ public class MessageCapabilityDescriptor
 
   static final String MESSAGE = "message";
 
-  static final RepoOrGroupComboFormField REPOSITORY_FIELD = new RepoOrGroupComboFormField(
-      REPOSITORY, FormField.MANDATORY
-  );
-
-  static final StringTextFormField MESSAGE_FIELD = new StringTextFormField(
-      MESSAGE, "Message", "Enter a message starting with XYZ", FormField.OPTIONAL, "XYZ.*"
-  );
+  private final List<FormField> formFields;
 
   protected MessageCapabilityDescriptor() {
-    super(TYPE, "Message Capability", "What about me?", REPOSITORY_FIELD, MESSAGE_FIELD);
+    formFields = Lists.<FormField>newArrayList(
+        new RepoOrGroupComboFormField(REPOSITORY, FormField.MANDATORY),
+        new StringTextFormField(MESSAGE, "Message", "Enter a message starting with XYZ", FormField.OPTIONAL, "XYZ.*")
+    );
+  }
+
+  @Override
+  public CapabilityType type() {
+    return TYPE;
+  }
+
+  @Override
+  public String name() {
+    return "Message Capability";
+  }
+
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
   }
 
 }

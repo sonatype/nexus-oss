@@ -13,20 +13,23 @@
 
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
-import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
+import org.sonatype.sisu.goodies.i18n.I18N;
+import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.collect.Lists;
+
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration.REPOSITORY;
 import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID;
@@ -35,29 +38,51 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2R
 @Named(TYPE_ID)
 public class P2RepositoryAggregatorCapabilityDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
 {
 
   public static final String TYPE_ID = "p2.repository.aggregator";
 
   private static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-  private final Validators validators;
+  private static interface Messages
+      extends MessageBundle
+  {
+    @DefaultMessage("P2 Repository Aggregator capability")
+    String name();
+
+    @DefaultMessage("Repository/Group")
+    String repositoryLabel();
+
+    @DefaultMessage("Select the repository or repository group")
+    String repositoryHelp();
+  }
+
+  private static final Messages messages = I18N.create(Messages.class);
+
+  private final List<FormField> formFields;
 
   @Inject
-  public P2RepositoryAggregatorCapabilityDescriptor(final Validators validators) {
-    super(
-        TYPE,
-        "P2 Repository Aggregator capability",
-        "Aggregates P2 metadata/artifacts of all OSGi bundles from selected repository\n"
-            + "<br/>\n"
-            + "<br/>\n"
-            + "<span style=\"font-weight: bold;\">EXPERIMENTAL</span>\n"
-            + "<br/>"
-            + "This is an experimental, unsupported feature.",
-        new RepoOrGroupComboFormField(REPOSITORY, FormField.MANDATORY)
+  public P2RepositoryAggregatorCapabilityDescriptor() {
+    formFields = Lists.<FormField>newArrayList(
+        new RepoOrGroupComboFormField(
+            REPOSITORY, messages.repositoryLabel(), messages.repositoryHelp(), FormField.MANDATORY
+        )
     );
-    this.validators = checkNotNull(validators);
+  }
+
+  @Override
+  public CapabilityType type() {
+    return TYPE;
+  }
+
+  @Override
+  public String name() {
+    return messages.name();
+  }
+
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
   }
 
   /**
@@ -67,7 +92,7 @@ public class P2RepositoryAggregatorCapabilityDescriptor
    */
   @Override
   public Validator validator() {
-    return validators.capability().uniquePer(TYPE, REPOSITORY);
+    return validators().capability().uniquePer(TYPE, REPOSITORY);
   }
 
   /**
@@ -77,7 +102,12 @@ public class P2RepositoryAggregatorCapabilityDescriptor
    */
   @Override
   public Validator validator(final CapabilityIdentity id) {
-    return validators.capability().uniquePerExcluding(id, TYPE, REPOSITORY);
+    return validators().capability().uniquePerExcluding(id, TYPE, REPOSITORY);
+  }
+
+  @Override
+  protected String renderAbout() throws Exception {
+    return render(TYPE_ID + "-about.vm");
   }
 
 }
