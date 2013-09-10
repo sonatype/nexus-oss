@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
@@ -51,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -139,6 +141,20 @@ public class GenerateMetadataTask
   protected YumRepository doRun()
       throws Exception
   {
+    String repositoryId = getRepositoryId();
+
+    if (!StringUtils.isEmpty(repositoryId)) {
+      checkState(
+          yumRegistry.isRegistered(repositoryId),
+          "Metadata regeneration can only be run on repositories that have an enabled 'Yum: Generate Metadata' capability"
+      );
+      Yum yum = yumRegistry.get(repositoryId);
+      checkState(
+          yum.getNexusRepository().getRepositoryKind().isFacetAvailable(HostedRepository.class),
+          "Metadata generation can only be run on hosted repositories"
+      );
+    }
+
     setDefaults();
 
     LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
@@ -174,7 +190,7 @@ public class GenerateMetadataTask
     }
 
     regenerateMetadataForGroups();
-    return new YumRepositoryImpl(getRepoDir(), getRepositoryId(), getVersion());
+    return new YumRepositoryImpl(getRepoDir(), repositoryId, getVersion());
   }
 
   protected void setDefaults()
