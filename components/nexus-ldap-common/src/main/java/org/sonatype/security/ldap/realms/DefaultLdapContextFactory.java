@@ -22,11 +22,13 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.google.common.collect.Maps;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * <p>Default implementation of {@link LdapContextFactory} that can be configured or extended to
@@ -62,7 +64,9 @@ public class DefaultLdapContextFactory
     |    I N S T A N C E   V A R I A B L E S    |
     ============================================*/
 
-  private static final Log log = LogFactory.getLog(DefaultLdapContextFactory.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultLdapContextFactory.class);
+
+  public static final String NEXUS_LDAP_ENV_PREFIX = "nexus.ldap.env.";
 
   protected String authentication = "simple";
 
@@ -83,6 +87,23 @@ public class DefaultLdapContextFactory
   private boolean usePooling = true;
 
   private Map<String, String> additionalEnvironment;
+
+  public DefaultLdapContextFactory() {
+    final Map<String, String> envVars = Maps.newHashMap();
+    for (String propertyName : System.getProperties().stringPropertyNames()) {
+      if (propertyName.startsWith(NEXUS_LDAP_ENV_PREFIX) &&
+          propertyName.length() > NEXUS_LDAP_ENV_PREFIX.length()) {
+        String key = propertyName.substring(NEXUS_LDAP_ENV_PREFIX.length());
+        String value = System.getProperty(propertyName);
+        if (value != null) {
+          envVars.put(key, value);
+        }
+      }
+    }
+    if (!envVars.isEmpty()) {
+      setAdditionalEnvironment(envVars);
+    }
+  }
 
     /*--------------------------------------------
     |         C O N S T R U C T O R S           |
@@ -238,7 +259,7 @@ public class DefaultLdapContextFactory
   Hashtable<String, String> getSetupEnvironment(String username, final String password,
                                                 final boolean systemContext)
   {
-    Preconditions.checkNotNull(url, "No ldap URL specified (ldap://<hostname>:<port>)");
+    checkNotNull(url, "No ldap URL specified (ldap://<hostname>:<port>)");
 
     if (username != null && principalSuffix != null) {
       username += principalSuffix;
@@ -274,8 +295,14 @@ public class DefaultLdapContextFactory
     }
 
     if (log.isDebugEnabled()) {
-      log.debug("Initializing LDAP context using URL [" + url + "] and username [" + systemUsername + "] " +
-          "with pooling [" + (usePooling ? "enabled" : "disabled") + "]");
+      final Map<String, String> logEnv = Maps.newHashMap(env);
+      if (logEnv.containsKey(Context.SECURITY_CREDENTIALS)) {
+        logEnv.put(Context.SECURITY_CREDENTIALS, "***");
+      }
+      log.debug(
+          "Initializing LDAP context using URL [{}] and username [{}] with pooling [{}] and environment {}",
+          url, systemUsername, usePooling ? "enabled" : "disabled", logEnv
+      );
     }
     return env;
   }
