@@ -29,6 +29,7 @@
   <modules>
     <module>nexus-ldap-realm-plugin</module>
     <module>nexus-kenai-plugin</module>
+    <module>nexus-rutauth-plugin</module>
   </modules>
 
 </project>

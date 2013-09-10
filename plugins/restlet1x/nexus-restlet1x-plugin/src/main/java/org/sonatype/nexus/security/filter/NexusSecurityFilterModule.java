@@ -17,6 +17,7 @@ import javax.inject.Named;
 import javax.servlet.Filter;
 
 import org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter;
+import org.sonatype.nexus.security.filter.authc.NexusAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusContentAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authz.FailureLoggingHttpMethodPermissionFilter;
@@ -62,7 +63,7 @@ public class NexusSecurityFilterModule
   }
 
   private void bindAuthcFilter(String name, boolean fakeAuthSchem, String applicationName) {
-    NexusSecureHttpAuthenticationFilter filter = new NexusSecureHttpAuthenticationFilter();
+    NexusSecureHttpAuthenticationFilter filter = new NexusAuthenticationFilter();
     filter.setApplicationName(applicationName);
     filter.setFakeAuthScheme(Boolean.toString(fakeAuthSchem));
     bindNamedFilter(name, filter);
