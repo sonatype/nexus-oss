@@ -15,6 +15,7 @@ package org.sonatype.security.ldap.realms;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -26,6 +27,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.sonatype.security.ldap.realms.DefaultLdapContextFactory.NEXUS_LDAP_ENV_PREFIX;
 
 public class DefaultLdapContextFactoryTest
 {
@@ -139,6 +141,27 @@ public class DefaultLdapContextFactoryTest
     {
       final Hashtable<String, String> env = underTest.getSetupEnvironment("user", "pass", false);
       assertThat(env.get(Context.SECURITY_AUTHENTICATION), is("somethingelse"));
+    }
+  }
+
+  @Test
+  public void testEnvVarsFromAppContext() {
+    Properties backup = System.getProperties();
+
+    try {
+      System.setProperty(NEXUS_LDAP_ENV_PREFIX + "foo", "bar");
+      System.setProperty(NEXUS_LDAP_ENV_PREFIX + "bar", "foo");
+      System.setProperty("foo", "bar2");
+
+      DefaultLdapContextFactory underTest = new DefaultLdapContextFactory();
+      underTest.setUrl("ldap://localhost:439");
+      Hashtable<String, String> env = underTest.getSetupEnvironment("user", "pass", true);
+
+      assertThat(env.get("foo"), is("bar"));
+      assertThat(env.get("bar"), is("foo"));
+    }
+    finally {
+      System.setProperties(backup);
     }
   }
 
