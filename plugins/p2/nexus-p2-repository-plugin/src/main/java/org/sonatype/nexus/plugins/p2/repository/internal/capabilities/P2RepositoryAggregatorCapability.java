@@ -65,16 +65,28 @@ public class P2RepositoryAggregatorCapability
   }
 
   @Override
-  public void onActivate()
-      throws Exception
-  {
+  protected void configure(final P2RepositoryAggregatorConfiguration config) throws Exception {
+    service.addConfiguration(config);
+  }
+
+  @Override
+  public void onUpdate() throws Exception {
+    service.removeConfiguration(getConfig());
+    super.onUpdate();
+  }
+
+  @Override
+  protected void onRemove(final P2RepositoryAggregatorConfiguration config) throws Exception {
+    service.removeConfiguration(config);
+  }
+
+  @Override
+  protected void onActivate(final P2RepositoryAggregatorConfiguration config) throws Exception {
     service.enableAggregationFor(getConfig());
   }
 
   @Override
-  public void onPassivate()
-      throws Exception
-  {
+  protected void onPassivate(final P2RepositoryAggregatorConfiguration config) throws Exception {
     service.disableAggregationFor(getConfig());
   }
 
