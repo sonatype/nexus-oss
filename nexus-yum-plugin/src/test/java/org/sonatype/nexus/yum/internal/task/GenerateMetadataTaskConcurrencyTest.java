@@ -38,6 +38,7 @@ import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.RpmScanner;
+import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 
 public class GenerateMetadataTaskConcurrencyTest
-    extends GenerateMetadataTaskTestSupport
+    extends YumNexusTestSupport
 {
 
   private static final String RPM_NAME_2 = "hallomommy";
@@ -143,14 +144,6 @@ public class GenerateMetadataTaskConcurrencyTest
     // then
     assertThat(second, is(first));
     assertThat(((GenerateMetadataTask) first.getTask()).getAddedFiles(), is(file1 + pathSeparator + file2));
-
-    final RepoMD repoMD = new RepoMD(new File(tmpDir, "repodata/repomd.xml"));
-
-    final String content = IOUtils.toString(
-        new GZIPInputStream(new FileInputStream(new File(tmpDir, repoMD.getPrimaryLocation())))
-    );
-    assertThat(content, containsString(RPM_NAME_1));
-    assertThat(content, containsString(RPM_NAME_2));
   }
 
   private void waitFor(List<ScheduledTask<?>> futures)
@@ -171,7 +164,8 @@ public class GenerateMetadataTaskConcurrencyTest
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         nexusScheduler,
-        mock(Manager.class)
+        mock(Manager.class),
+        mock(CommandLineExecutor.class)
     )
     {
       @Override

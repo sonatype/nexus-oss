@@ -205,6 +205,17 @@ public class MergeMetadataIT
     assertThat(primaryXml, containsString("foo-bar"));
   }
 
+  @Test
+  public void shouldGenerateGroupRepo()
+      throws Exception
+  {
+    final GroupRepository groupRepo = givenAYumGroupRepoWith2RPMs();
+
+    final String primaryXml = getPrimaryXmlOf(groupRepo);
+    assertThat(primaryXml, containsString("test-artifact"));
+    assertThat(primaryXml, containsString("test-rpm"));
+  }
+
   private String getPrimaryXmlOf(final GroupRepository groupRepo)
       throws IOException
   {

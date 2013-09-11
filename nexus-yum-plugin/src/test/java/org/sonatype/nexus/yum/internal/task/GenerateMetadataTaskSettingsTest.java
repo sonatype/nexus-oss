@@ -22,9 +22,12 @@ import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RpmScanner;
@@ -36,7 +39,9 @@ import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -66,6 +71,9 @@ public class GenerateMetadataTaskSettingsTest
   private static final String BASE_URL = "http://foo.bla";
 
   private static final String RPM_URL = BASE_URL + "/content/repositories/" + REPO;
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void shouldNotExecuteIfOperateOnSameRepository()
@@ -115,7 +123,8 @@ public class GenerateMetadataTaskSettingsTest
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(NexusScheduler.class),
-        mock(Manager.class)
+        mock(Manager.class),
+        mock(CommandLineExecutor.class)
     );
     task.setRpmDir(rpmsDir().getAbsolutePath());
     task.setRpmUrl(RPM_URL);
@@ -138,7 +147,8 @@ public class GenerateMetadataTaskSettingsTest
         repositoryURLBuilder(),
         mock(RpmScanner.class),
         mock(NexusScheduler.class),
-        mock(Manager.class)
+        mock(Manager.class),
+        mock(CommandLineExecutor.class)
     );
     task.setRepositoryId(REPO);
     // when
@@ -148,6 +158,58 @@ public class GenerateMetadataTaskSettingsTest
     assertThat(task.getRpmUrl(), is(RPM_URL));
     assertThat(task.getRepoDir(), is(rpmsDir().getAbsoluteFile()));
     assertThat(task.getRepoUrl(), is(RPM_URL));
+  }
+
+  @Test
+  public void shouldNotExecuteOnRepositoriesThatAreNotRegistered()
+      throws Exception
+  {
+    GenerateMetadataTask task = new GenerateMetadataTask(
+        mock(EventBus.class),
+        mock(RepositoryRegistry.class),
+        mock(YumRegistry.class),
+        mock(RepositoryURLBuilder.class),
+        mock(RpmScanner.class),
+        mock(NexusScheduler.class),
+        mock(Manager.class),
+        mock(CommandLineExecutor.class)
+    );
+    task.setRepositoryId(REPO);
+
+    thrown.expect(IllegalStateException.class);
+    thrown.expectMessage("enabled 'Yum: Generate Metadata' capability");
+    task.doRun();
+  }
+
+  @Test
+  public void shouldNotExecuteOnNonMavenHostedRepository()
+      throws Exception
+  {
+    RepositoryKind repositoryKind = mock(RepositoryKind.class);
+    when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(false);
+    Repository repository = mock(Repository.class);
+    when(repository.getRepositoryKind()).thenReturn(repositoryKind);
+    Yum yum = mock(Yum.class);
+    when(yum.getNexusRepository()).thenReturn(repository);
+    YumRegistry yumRegistry = mock(YumRegistry.class);
+    when(yumRegistry.isRegistered(REPO)).thenReturn(true);
+    when(yumRegistry.get(REPO)).thenReturn(yum);
+
+    GenerateMetadataTask task = new GenerateMetadataTask(
+        mock(EventBus.class),
+        mock(RepositoryRegistry.class),
+        yumRegistry,
+        mock(RepositoryURLBuilder.class),
+        mock(RpmScanner.class),
+        mock(NexusScheduler.class),
+        mock(Manager.class),
+        mock(CommandLineExecutor.class)
+    );
+    task.setRepositoryId(REPO);
+
+    thrown.expect(IllegalStateException.class);
+    thrown.expectMessage("hosted repositories");
+    task.doRun();
   }
 
   private RepositoryURLBuilder repositoryURLBuilder() {
@@ -193,7 +255,8 @@ public class GenerateMetadataTaskSettingsTest
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(NexusScheduler.class),
-        mock(Manager.class)
+        mock(Manager.class),
+        mock(CommandLineExecutor.class)
     )
     {
 
