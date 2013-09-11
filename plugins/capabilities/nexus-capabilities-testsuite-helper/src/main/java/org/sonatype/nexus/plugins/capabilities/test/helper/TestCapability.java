@@ -14,36 +14,82 @@
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class TestCapability
-    extends CapabilitySupport
+    extends ComponentSupport
     implements Capability
 {
 
+  private CapabilityContext context;
+
+  protected CapabilityContext context() {
+    checkState(context != null, "Capability was not yet initialized");
+    return context;
+  }
+
+  @Override
+  public void init(final CapabilityContext context) {
+    this.context = checkNotNull(context);
+  }
+
   @Override
   public void onCreate() {
-    getLogger().info("Create capability with id {} and properties {}", context().id(), context().properties());
+    log.info("Create capability with id {} and properties {}", context().id(), context().properties());
   }
 
   @Override
   public void onUpdate() {
-    getLogger().info("Update capability with id {} and properties {}", context().id(), context().properties());
+    log.info("Update capability with id {} and properties {}", context().id(), context().properties());
   }
 
   @Override
   public void onLoad() {
-    getLogger().info("Load capability with id {} and properties {}", context().id(), context().properties());
+    log.info("Load capability with id {} and properties {}", context().id(), context().properties());
   }
 
   @Override
   public void onRemove() {
-    getLogger().info("Remove capability with id {}", context().id());
+    log.info("Remove capability with id {}", context().id());
+  }
+
+  @Override
+  public void onActivate()
+      throws Exception
+  {
+    // do nothing
+  }
+
+  @Override
+  public void onPassivate()
+      throws Exception
+  {
+    // do nothing
   }
 
   @Override
   public String status() {
     return "<h3>I'm well. Thanx!</h3>";
+  }
+
+  @Override
+  public String description() {
+    return null;
+  }
+
+  @Override
+  public Condition activationCondition() {
+    return null;
+  }
+
+  @Override
+  public Condition validityCondition() {
+    return null;
   }
 
   @Override

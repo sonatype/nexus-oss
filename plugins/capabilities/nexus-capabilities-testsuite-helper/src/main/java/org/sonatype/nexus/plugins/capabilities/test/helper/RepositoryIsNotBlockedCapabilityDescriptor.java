@@ -13,29 +13,53 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
+
+import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.plugins.capabilities.test.helper.MessageCapabilityDescriptor.REPOSITORY_FIELD;
 
 @Named(RepositoryIsNotBlockedCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class RepositoryIsNotBlockedCapabilityDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
 {
 
   static final String TYPE_ID = "[repositoryIsNotBlocked]";
 
   static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
+  static final String REPOSITORY = "repository";
+
+  private final List<FormField> formFields;
+
   protected RepositoryIsNotBlockedCapabilityDescriptor() {
-    super(TYPE, "Repository Is Not Blocked", "?", REPOSITORY_FIELD);
+    formFields = Lists.<FormField>newArrayList(
+        new RepoOrGroupComboFormField(REPOSITORY, FormField.MANDATORY)
+    );
+  }
+
+  @Override
+  public CapabilityType type() {
+    return TYPE;
+  }
+
+  @Override
+  public String name() {
+    return "Repository Is Not Blocked";
+  }
+
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
   }
 
 }

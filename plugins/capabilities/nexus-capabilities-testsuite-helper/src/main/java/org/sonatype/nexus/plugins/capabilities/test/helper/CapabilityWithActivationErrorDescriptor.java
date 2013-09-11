@@ -13,12 +13,16 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
+import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
+
+import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
@@ -29,15 +33,31 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Singleton
 public class CapabilityWithActivationErrorDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
 {
 
   static final String TYPE_ID = "[withActivationError]";
 
   static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
+  private final List<FormField> formFields;
+
   protected CapabilityWithActivationErrorDescriptor() {
-    super(TYPE, "With Activation Error", "?");
+    formFields = Lists.newArrayList();
+  }
+
+  @Override
+  public CapabilityType type() {
+    return TYPE;
+  }
+
+  @Override
+  public String name() {
+    return "With Activation Error";
+  }
+
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
   }
 
 }

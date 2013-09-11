@@ -13,12 +13,16 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
+import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
+
+import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
@@ -26,15 +30,31 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Singleton
 public class CapabilityOfTypeExistsCapabilityDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
 {
 
   static final String TYPE_ID = "[capabilityOfTypeExists]";
 
   static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
+  private final List<FormField> formFields;
+
   protected CapabilityOfTypeExistsCapabilityDescriptor() {
-    super(TYPE, "Capability Of Type Exists", "?");
+    formFields = Lists.newArrayList();
+  }
+
+  @Override
+  public CapabilityType type() {
+    return TYPE;
+  }
+
+  @Override
+  public String name() {
+    return "Capability Of Type Exists";
+  }
+
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
   }
 
 }
