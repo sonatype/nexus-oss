@@ -19,6 +19,10 @@ import java.util.Collection;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 
+/**
+ * @deprecated Composite capability will no longer be supported
+ */
+@Deprecated
 public class CompositeCapability
     extends CapabilitySupport
 {

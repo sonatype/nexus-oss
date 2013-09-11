@@ -21,6 +21,10 @@ import org.sonatype.nexus.plugins.capabilities.Condition;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * @deprecated Use {@link org.sonatype.nexus.capability.support.CapabilitySupport}
+ */
+@Deprecated
 public abstract class CapabilitySupport
     extends AbstractLoggingComponent
     implements Capability
