@@ -18,9 +18,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
@@ -32,105 +31,73 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2M
 
 @Named(TYPE_ID)
 public class P2MetadataGeneratorCapability
-    extends CapabilitySupport
+    extends CapabilitySupport<P2MetadataGeneratorConfiguration>
 {
 
   private final P2MetadataGenerator service;
 
-  private final Conditions conditions;
-
   private final RepositoryRegistry repositoryRegistry;
-
-  private P2MetadataGeneratorConfiguration configuration;
 
   @Inject
   public P2MetadataGeneratorCapability(final P2MetadataGenerator service,
-                                       final Conditions conditions,
                                        final RepositoryRegistry repositoryRegistry)
   {
     this.service = checkNotNull(service);
-    this.conditions = checkNotNull(conditions);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
   @Override
-  public String description() {
-    if (configuration != null) {
+  protected P2MetadataGeneratorConfiguration createConfig(final Map<String, String> properties) throws Exception {
+    return new P2MetadataGeneratorConfiguration(properties);
+  }
+
+  @Override
+  protected String renderDescription() throws Exception {
+    if (isConfigured()) {
       try {
-        return repositoryRegistry.getRepository(configuration.repositoryId()).getName();
+        return repositoryRegistry.getRepository(getConfig().repositoryId()).getName();
       }
       catch (NoSuchRepositoryException e) {
-        return configuration.repositoryId();
+        return getConfig().repositoryId();
       }
     }
     return null;
   }
 
   @Override
-  public void onCreate()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onLoad()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onUpdate()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onRemove()
-      throws Exception
-  {
-    configuration = null;
-  }
-
-  @Override
   public void onActivate() {
-    service.addConfiguration(configuration);
+    service.addConfiguration(getConfig());
   }
 
   @Override
   public void onPassivate() {
-    service.removeConfiguration(configuration);
+    service.removeConfiguration(getConfig());
   }
 
   @Override
   public Condition activationCondition() {
-    return conditions.logical().and(
-        conditions.repository().repositoryIsInService(new RepositoryConditions.RepositoryId()
+    return conditions().logical().and(
+        conditions().repository().repositoryIsInService(new RepositoryConditions.RepositoryId()
         {
           @Override
           public String get() {
-            return configuration != null ? configuration.repositoryId() : null;
+            return isConfigured() ? getConfig().repositoryId() : null;
           }
         }),
-        conditions.capabilities().passivateCapabilityDuringUpdate()
+        conditions().capabilities().passivateCapabilityDuringUpdate()
     );
   }
 
   @Override
   public Condition validityCondition() {
-    return conditions.repository().repositoryExists(new RepositoryConditions.RepositoryId()
+    return conditions().repository().repositoryExists(new RepositoryConditions.RepositoryId()
     {
       @Override
       public String get() {
-        return configuration != null ? configuration.repositoryId() : null;
+        return isConfigured() ? getConfig().repositoryId() : null;
       }
     });
   }
 
-  private P2MetadataGeneratorConfiguration createConfiguration(final Map<String, String> properties) {
-    return new P2MetadataGeneratorConfiguration(properties);
-  }
 
 }

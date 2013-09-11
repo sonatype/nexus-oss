@@ -13,14 +13,17 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
+
+import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
@@ -28,7 +31,6 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Singleton
 public class CapabilityADescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
 {
 
   static final String TYPE_ID = "[a]";
@@ -37,12 +39,27 @@ public class CapabilityADescriptor
 
   static final String PROPERTY_A1 = "a1";
 
-  static final StringTextFormField PROPERTY_A1_FIELD = new StringTextFormField(
-      PROPERTY_A1, "Property A1", "Some help text", FormField.MANDATORY
-  );
+  private final List<FormField> formFields;
 
   protected CapabilityADescriptor() {
-    super(TYPE, "Capability A", "What about me?", PROPERTY_A1_FIELD);
+    formFields = Lists.<FormField>newArrayList(
+        new StringTextFormField(PROPERTY_A1, "Property A1", "Some help text", FormField.MANDATORY)
+    );
+  }
+
+  @Override
+  public CapabilityType type() {
+    return TYPE;
+  }
+
+  @Override
+  public String name() {
+    return "Capability A";
+  }
+
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
   }
 
 }

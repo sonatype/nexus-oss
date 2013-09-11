@@ -18,9 +18,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
@@ -32,112 +31,88 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2R
 
 @Named(TYPE_ID)
 public class P2RepositoryAggregatorCapability
-    extends CapabilitySupport
+    extends CapabilitySupport<P2RepositoryAggregatorConfiguration>
 {
 
   private final P2RepositoryAggregator service;
 
-  private final Conditions conditions;
-
   private final RepositoryRegistry repositoryRegistry;
-
-  private P2RepositoryAggregatorConfiguration configuration;
 
   @Inject
   public P2RepositoryAggregatorCapability(final P2RepositoryAggregator service,
-                                          final Conditions conditions,
                                           final RepositoryRegistry repositoryRegistry)
   {
     this.service = checkNotNull(service);
-    this.conditions = checkNotNull(conditions);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
   @Override
-  public String description() {
-    if (configuration != null) {
+  protected P2RepositoryAggregatorConfiguration createConfig(final Map<String, String> properties) throws Exception {
+    return new P2RepositoryAggregatorConfiguration(properties);
+  }
+
+  @Override
+  protected String renderDescription() throws Exception {
+    if (isConfigured()) {
       try {
-        return repositoryRegistry.getRepository(configuration.repositoryId()).getName();
+        return repositoryRegistry.getRepository(getConfig().repositoryId()).getName();
       }
       catch (NoSuchRepositoryException e) {
-        return configuration.repositoryId();
+        return getConfig().repositoryId();
       }
     }
     return null;
   }
 
   @Override
-  public void onCreate()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-    service.addConfiguration(configuration);
+  protected void configure(final P2RepositoryAggregatorConfiguration config) throws Exception {
+    service.addConfiguration(config);
   }
 
   @Override
-  public void onLoad()
-      throws Exception
-  {
-    onCreate();
+  public void onUpdate() throws Exception {
+    service.removeConfiguration(getConfig());
+    super.onUpdate();
   }
 
   @Override
-  public void onUpdate()
-      throws Exception
-  {
-    onRemove();
-    onCreate();
+  protected void onRemove(final P2RepositoryAggregatorConfiguration config) throws Exception {
+    service.removeConfiguration(config);
   }
 
   @Override
-  public void onRemove()
-      throws Exception
-  {
-    service.removeConfiguration(configuration);
-    configuration = null;
+  protected void onActivate(final P2RepositoryAggregatorConfiguration config) throws Exception {
+    service.enableAggregationFor(getConfig());
   }
 
   @Override
-  public void onActivate()
-      throws Exception
-  {
-    service.enableAggregationFor(configuration);
-  }
-
-  @Override
-  public void onPassivate()
-      throws Exception
-  {
-    service.disableAggregationFor(configuration);
+  protected void onPassivate(final P2RepositoryAggregatorConfiguration config) throws Exception {
+    service.disableAggregationFor(getConfig());
   }
 
   @Override
   public Condition activationCondition() {
-    return conditions.logical().and(
-        conditions.repository().repositoryIsInService(new RepositoryConditions.RepositoryId()
+    return conditions().logical().and(
+        conditions().repository().repositoryIsInService(new RepositoryConditions.RepositoryId()
         {
           @Override
           public String get() {
-            return configuration != null ? configuration.repositoryId() : null;
+            return isConfigured() ? getConfig().repositoryId() : null;
           }
         }),
-        conditions.capabilities().passivateCapabilityDuringUpdate()
+        conditions().capabilities().passivateCapabilityDuringUpdate()
     );
   }
 
   @Override
   public Condition validityCondition() {
-    return conditions.repository().repositoryExists(new RepositoryConditions.RepositoryId()
+    return conditions().repository().repositoryExists(new RepositoryConditions.RepositoryId()
     {
       @Override
       public String get() {
-        return configuration != null ? configuration.repositoryId() : null;
+        return isConfigured() ? getConfig().repositoryId() : null;
       }
     });
-  }
-
-  private P2RepositoryAggregatorConfiguration createConfiguration(final Map<String, String> properties) {
-    return new P2RepositoryAggregatorConfiguration(properties);
   }
 
 }

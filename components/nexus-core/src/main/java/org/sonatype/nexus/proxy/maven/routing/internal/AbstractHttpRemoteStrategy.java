@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -121,13 +122,15 @@ public abstract class AbstractHttpRemoteStrategy
           if (response.getEntity() != null) {
             final Document document = Jsoup.parse(response.getEntity().getContent(), null, remoteUrl);
             final Elements addressElements = document.getElementsByTag("address");
-            if (!addressElements.isEmpty() && !addressElements.get(0).text().startsWith("Artifactory")) {
-              getLogger().debug("Remote server of proxy {} recognized as ARTF by address element in body",
-                  mavenProxyRepository);
-              throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
-                  + " proxy repository is not supported by automatic routing discovery");
+            if (!addressElements.isEmpty()) {
+              final String addressText = addressElements.get(0).text();
+              if (addressText != null && addressText.toLowerCase(Locale.ENGLISH).startsWith("artifactory")) {
+                getLogger().debug("Remote server of proxy {} recognized as ARTF by address element in body",
+                    mavenProxyRepository);
+                throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
+                    + " proxy repository is not supported by automatic routing discovery");
+              }
             }
-
           }
         }
       }

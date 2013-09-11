@@ -11,62 +11,67 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
+package org.sonatype.nexus.rutauth.internal.capability;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
+import org.sonatype.nexus.rutauth.RutAuthPlugin;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NonNls;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration.REPOSITORY;
-import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapabilityDescriptor.TYPE_ID;
 
+/**
+ * {@link RutAuthCapability} descriptor.
+ *
+ * @since 2.7
+ */
+@Named(RutAuthCapabilityDescriptor.TYPE_ID)
 @Singleton
-@Named(TYPE_ID)
-public class P2MetadataGeneratorCapabilityDescriptor
+public class RutAuthCapabilityDescriptor
     extends CapabilityDescriptorSupport
 {
+  @NonNls
+  public static final String TYPE_ID = RutAuthPlugin.ID_PREFIX;
 
-  public static final String TYPE_ID = "p2.repository.metadata.generator";
-
-  private static final CapabilityType TYPE = capabilityType(TYPE_ID);
+  public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
   private static interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("P2 Metadata Generator capability")
+    @DefaultMessage("Rut Auth")
     String name();
 
-    @DefaultMessage("Repository/Group")
-    String repositoryLabel();
+    @DefaultMessage("HTTP Header name")
+    String httpHeaderLabel();
 
-    @DefaultMessage("Select the repository or repository group")
-    String repositoryHelp();
+    @DefaultMessage(
+        "Handled HTTP Header should contain the name of the header that is used to source the principal of already authenticated user.")
+    String httpHeaderHelp();
   }
 
   private static final Messages messages = I18N.create(Messages.class);
 
   private final List<FormField> formFields;
 
-  @Inject
-  public P2MetadataGeneratorCapabilityDescriptor() {
+  public RutAuthCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
-        new RepoOrGroupComboFormField(
-            REPOSITORY, messages.repositoryLabel(), messages.repositoryHelp(), FormField.MANDATORY
-        )
+        new StringTextFormField(
+            RutAuthCapabilityConfiguration.HTTP_HEADER,
+            messages.httpHeaderLabel(),
+            messages.httpHeaderHelp(),
+            FormField.MANDATORY)
     );
   }
 
@@ -85,24 +90,10 @@ public class P2MetadataGeneratorCapabilityDescriptor
     return formFields;
   }
 
-  /**
-   * Validate on create that there is only one capability for the configured repository.
-   *
-   * @since 2.3.1
-   */
   @Override
   public Validator validator() {
-    return validators().capability().uniquePer(TYPE, REPOSITORY);
-  }
-
-  /**
-   * Validate on update that there is only one capability for the configured repository.
-   *
-   * @since 2.3.1
-   */
-  @Override
-  public Validator validator(final CapabilityIdentity id) {
-    return validators().capability().uniquePerExcluding(id, TYPE, REPOSITORY);
+    // Allow only one capability of this type
+    return validators().capability().uniquePer(RutAuthCapabilityDescriptor.TYPE);
   }
 
   @Override
