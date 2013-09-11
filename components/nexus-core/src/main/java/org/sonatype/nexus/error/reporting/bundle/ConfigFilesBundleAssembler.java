@@ -63,6 +63,8 @@ public class ConfigFilesBundleAssembler
       @Override
       public boolean accept(File pathname) {
         return !pathname.getName().endsWith(".bak")
+            // ignore keystore contents
+            && !pathname.getName().equals("keystore")
             // following files are written with the current in-memory model
             && !pathname.getName().equals("nexus.xml")
             && !pathname.getName().equals("security.xml")
