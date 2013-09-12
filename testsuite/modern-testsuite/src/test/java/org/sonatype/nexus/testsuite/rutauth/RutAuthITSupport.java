@@ -50,6 +50,8 @@ public class RutAuthITSupport
     extends NexusRunningParametrizedITSupport
 {
 
+  static final String RUTAUTH_REALM = "rutauth-realm";
+
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
     return firstAvailableTestParameters(
@@ -81,7 +83,7 @@ public class RutAuthITSupport
   }
 
   void configureSecurityRealms() {
-    serverConfiguration().security().settings().addRealm("rutauth-realm");
+    serverConfiguration().security().settings().addRealm(RUTAUTH_REALM);
     serverConfiguration().security().save();
   }
 
