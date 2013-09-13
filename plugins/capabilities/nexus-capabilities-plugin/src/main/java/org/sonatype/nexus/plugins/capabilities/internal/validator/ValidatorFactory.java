@@ -48,4 +48,15 @@ public interface ValidatorFactory
   RegexpFieldValidator matches(CapabilityType type,
                                @Assisted("key") String propertyKey,
                                @Assisted("regexp") String regexp);
+
+  /**
+   * @since 2.7
+   */
+  UriValidator validUri(CapabilityType type, String propertyKey);
+
+  /**
+   * @since 2.7
+   */
+  UrlValidator validUrl(CapabilityType type, String propertyKey);
+
 }
