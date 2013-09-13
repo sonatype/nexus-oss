@@ -14,7 +14,7 @@
 package org.sonatype.nexus.yum.client;
 
 /**
- * Interface to access nexus-yum-plugin functionality in tests
+ * Interface to access nexus-yum-repository-plugin functionality in tests
  *
  * @since 3.0
  */

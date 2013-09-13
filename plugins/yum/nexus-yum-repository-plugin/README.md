@@ -106,7 +106,7 @@ but shouldn't be edited directly.
 
 ## Getting Started
 
-Here we provide some typical scenarios in which the _nexus-yum-plugin_ is used.
+Here we provide some typical scenarios in which the _nexus-yum-repository-plugin_ is used.
 
 ### Deploy Java Web Application via RPM
 
@@ -188,7 +188,7 @@ build artifact so that the RPM is uploaded to Nexus in the _deploy_ phase. A min
 	
 #### Deploy RPM to Nexus
 	
-If you have the _nexus-yum-plugin_ [installed](#installation) and deploy your application via
+If you have the _nexus-yum-repository-plugin_ [installed](#installation) and deploy your application via
 
 	mvn deploy
 	
@@ -243,7 +243,7 @@ The tomcat restart is optional depending on your webapp and configuration, but a
 
 #### Summary
 
-The _nexus-yum-plugin_ makes deploying Java application to _real_ RHEL-compatible servers really easy and works as a 
+The _nexus-yum-repository-plugin_ makes deploying Java application to _real_ RHEL-compatible servers really easy and works as a 
 relyable platform for your deployments.  
 
 ### Staging RPMs in Nexus Professional
@@ -357,23 +357,23 @@ the integration tests. Just do a
 
 to run all tests and create a plugin bundle.
 
-[1]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/NeuxsYumPlugin.png
+[1]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/NeuxsYumPlugin.png
 [2]: http://nexus.sonatype.org
 [3]: http://maven.apache.org
 [4]: http://www.immobilienscout24.de
 [5]: http://blog.schlomo.schapiro.org/2011/05/configuration-management-with.html
 [6]: http://www.slideshare.net/actionjackx/automated-java-deployments-with-rpm
-[7]: https://groups.google.com/group/nexus-yum-plugin/
-[8]: https://github.com/sonatype/nexus-yum-plugin/issues/new
+[7]: https://groups.google.com/group/nexus-yum-repository-plugin/
+[8]: https://github.com/sonatype/nexus-yum-repository-plugin/issues/new
 [9]: http://www.sonatype.com/books/nexus-book/reference/install-sect-install.html
 [10]: http://createrepo.baseurl.org/
-[11]: http://code.google.com/p/nexus-yum-plugin/issues/detail?id=4
+[11]: http://code.google.com/p/nexus-yum-repository-plugin/issues/detail?id=4
 [12]: http://mojo.codehaus.org/rpm-maven-plugin/
 [13]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-intro.html
 [14]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-prepare-nexus.html
 [15]: http://linux.die.net/man/1/mergerepo
-[16]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/Config-NexusCapabilities.png
-[17]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/Config-3rdPartyCapability.png
-[18]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/Config-GroupRepo.png
+[16]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/Config-NexusCapabilities.png
+[17]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/Config-3rdPartyCapability.png
+[18]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/Config-GroupRepo.png
 
 

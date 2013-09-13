@@ -77,7 +77,7 @@ public class YumITSupport
                 "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
             ),
             artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-yum-plugin"
+                "org.sonatype.nexus.plugins", "nexus-yum-repository-plugin"
             )
         );
   }

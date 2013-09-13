@@ -128,7 +128,7 @@ public class YumRegistryImpl
 
   @Override
   public File getTemporaryDirectory() {
-    return new File(nexusConfiguration.getTemporaryDirectory(), "nexus-yum-plugin");
+    return new File(nexusConfiguration.getTemporaryDirectory(), "nexus-yum-repository-plugin");
   }
 
   private void createVirtualYumConfigFile(final MavenRepository repository) {

@@ -31,7 +31,6 @@
   <properties>
     <pluginName>Nexus Yum Repository Plugin</pluginName>
     <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages.</pluginDescription>
-    <pluginSiteUrl>https://github.com/sonatype/nexus-yum-plugin</pluginSiteUrl>
   </properties>
 
   <dependencies>
