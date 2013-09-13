@@ -28,7 +28,7 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <version>3.0.5</version>
+  <version>3.0.6-SNAPSHOT</version>
 
   <developers>
     <developer>
@@ -117,20 +117,20 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
         <type>nexus-plugin</type>
-        <version>3.0.5</version>
+        <version>3.0.6-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
         <type>jar</type>
-        <version>3.0.5</version>
+        <version>3.0.6-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-client</artifactId>
-        <version>3.0.5</version>
+        <version>3.0.6-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
