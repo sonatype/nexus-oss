@@ -31,11 +31,11 @@ import static org.sonatype.nexus.yum.client.MetadataType.PRIMARY_XML;
  *
  * @since 3.0
  */
-public class GenerateMetadataIT
+public class YumGenerateMetadataIT
     extends YumITSupport
 {
 
-  public GenerateMetadataIT(final String nexusBundleCoordinates) {
+  public YumGenerateMetadataIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
 

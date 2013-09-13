@@ -27,11 +27,11 @@ import static org.sonatype.nexus.yum.client.MetadataType.PRIMARY_XML;
  *
  * @since 3.0
  */
-public class VersionedIT
+public class YumVersionedIT
     extends YumITSupport
 {
 
-  public VersionedIT(final String nexusBundleCoordinates) {
+  public YumVersionedIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
 

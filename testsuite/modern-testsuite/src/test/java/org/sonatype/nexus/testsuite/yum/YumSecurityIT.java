@@ -34,7 +34,7 @@ import static org.junit.Assert.assertThat;
  *
  * @since 3.0
  */
-public class SecurityIT
+public class YumSecurityIT
     extends YumITSupport
 {
 
@@ -47,7 +47,7 @@ public class SecurityIT
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  public SecurityIT(final String nexusBundleCoordinates) {
+  public YumSecurityIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
 

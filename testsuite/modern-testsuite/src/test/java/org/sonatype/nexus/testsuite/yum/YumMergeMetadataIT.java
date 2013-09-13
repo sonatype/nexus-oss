@@ -37,14 +37,14 @@ import static org.sonatype.nexus.yum.client.MetadataType.PRIMARY_XML;
  *
  * @since 3.0
  */
-public class MergeMetadataIT
+public class YumMergeMetadataIT
     extends YumITSupport
 {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  public MergeMetadataIT(final String nexusBundleCoordinates) {
+  public YumMergeMetadataIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
 
