@@ -46,7 +46,7 @@ Nexus.util.FormFieldUtil = {
           // the select handler for the capabilityType
           // combo box handles enabling/disabling as necessary, so each
           // inactive card isn't also included in the form
-          if (curRec.type === 'string') {
+          if (curRec.type === 'string' || curRec.type === 'password') {
             items[j] = {
               xtype : 'textfield',
               htmlDecode : true,
@@ -59,6 +59,9 @@ Nexus.util.FormFieldUtil = {
               width : width,
               regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
             };
+            if (curRec.type === 'password') {
+              items[j].inputType = 'password';
+            }
             if (curRec.initialValue) {
               items[j].value = curRec.initialValue;
             }

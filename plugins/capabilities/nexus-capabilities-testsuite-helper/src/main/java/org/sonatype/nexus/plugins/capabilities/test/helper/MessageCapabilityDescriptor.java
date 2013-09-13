@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.PasswordFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -42,12 +43,15 @@ public class MessageCapabilityDescriptor
 
   static final String MESSAGE = "message";
 
+  static final String PASSWORD = "password";
+
   private final List<FormField> formFields;
 
   protected MessageCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
         new RepoOrGroupComboFormField(REPOSITORY, FormField.MANDATORY),
-        new StringTextFormField(MESSAGE, "Message", "Enter a message starting with XYZ", FormField.OPTIONAL, "XYZ.*")
+        new StringTextFormField(MESSAGE, "Message", "Enter a message starting with XYZ", FormField.OPTIONAL, "XYZ.*"),
+        new PasswordFormField(PASSWORD, "Password", "Enter an arbitrary pasword", FormField.OPTIONAL)
     );
   }
 

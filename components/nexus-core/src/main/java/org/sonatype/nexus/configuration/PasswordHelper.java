@@ -16,6 +16,7 @@ package org.sonatype.nexus.configuration;
 import org.sonatype.plexus.components.cipher.PlexusCipher;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
 
+import com.google.common.base.Preconditions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -27,6 +28,15 @@ public class PasswordHelper
 
   @Requirement
   private PlexusCipher plexusCipher;
+
+  public PasswordHelper() {}
+
+  /**
+   * @since 2.7
+   */
+  public PasswordHelper(final PlexusCipher plexusCipher) {
+    this.plexusCipher = Preconditions.checkNotNull(plexusCipher, "plexusCipher");
+  }
 
   public String encrypt(String password)
       throws PlexusCipherException
