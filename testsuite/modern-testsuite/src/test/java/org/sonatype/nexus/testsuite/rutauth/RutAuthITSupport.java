@@ -81,7 +81,7 @@ public class RutAuthITSupport
   }
 
   void configureSecurityRealms() {
-    serverConfiguration().security().settings().addRealm("remote-user-realm");
+    serverConfiguration().security().settings().addRealm("rutauth-realm");
     serverConfiguration().security().save();
   }
 

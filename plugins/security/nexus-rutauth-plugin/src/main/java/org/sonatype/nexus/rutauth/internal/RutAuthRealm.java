@@ -49,7 +49,7 @@ public class RutAuthRealm
 {
   private static final Logger log = LoggerFactory.getLogger(RutAuthRealm.class);
 
-  public static final String ID = "remote-user-realm";
+  public static final String ID = "rutauth-realm";
 
   private final SecuritySystem securitySystem;
 
