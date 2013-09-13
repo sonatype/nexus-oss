@@ -24,6 +24,8 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Request for a resource. It drives many aspects of the request itself.
  *
@@ -271,9 +273,22 @@ public class ResourceStoreRequest
 
   /**
    * Adds the repository to the list of processed repositories.
+   * 
+   * @deprecated Use the {@link #addProcessedRepository(String)} method instead, as here we actually deal with
+   *             Repository IDs and not with {@link Repository} instances.
    */
+  @Deprecated
   public void addProcessedRepository(Repository repository) {
-    processedRepositories.add(repository.getId());
+    addProcessedRepository(repository.getId());
+  }
+
+  /**
+   * Adds the repository ID to the list of processed repository IDs.
+   * 
+   * @since 2.7.0
+   */
+  public void addProcessedRepository(String repositoryId) {
+    processedRepositories.add(checkNotNull(repositoryId));
   }
 
   /**

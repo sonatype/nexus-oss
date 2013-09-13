@@ -618,10 +618,10 @@
               <fail>true</fail>
               <rules>
                 <!--
-                Require Maven 3.0.4+
+                Require Maven 3.0.4+, but not Maven 3.1+
                 -->
                 <requireMavenVersion>
-                  <version>[3.0.4,)</version>
+                  <version>[3.0.4,3.1)</version>
                 </requireMavenVersion>
 
                 <!--

@@ -183,7 +183,8 @@ NX.define('Sonatype.repoServer.RepositoryGroupEditor', {
                 triggerAction : 'all',
                 emptyText : 'Select...',
                 selectOnFocus : true,
-                allowBlank : false
+                allowBlank : false,
+                value : 'True'
               },
               {
                 xtype : 'twinpanelchooser',
