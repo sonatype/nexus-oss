@@ -642,4 +642,31 @@ public class CapabilitiesIT
         .save();
   }
 
+  /**
+   * Verify url validator accepts a valid URL.
+   *
+   * @since 2.7
+   */
+  @Test
+  public void urlIsValid() {
+    final Capability capability = capabilities().create("[values]")
+        .withProperty("url", "http://localhost")
+        .save();
+    assertThat(capability.isActive(), is(true));
+  }
+
+  /**
+   * Verify url validator rejects and invalid URL.
+   *
+   * @since 2.7
+   */
+  @Test
+  public void urlIsInvalid() {
+    thrown.expect(NexusClientErrorResponseException.class);
+    thrown.expectMessage("Some URL is not a valid URL");
+    capabilities().create("[values]")
+        .withProperty("url", "foo is not valid")
+        .save();
+  }
+
 }

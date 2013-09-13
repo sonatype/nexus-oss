@@ -45,7 +45,8 @@ public class ValuesCapabilityDescriptor
 
   protected ValuesCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
-        new StringTextFormField("uri", "Some URI", "?", false)
+        new StringTextFormField("uri", "Some URI", "?", false),
+        new StringTextFormField("url", "Some URL", "?", false)
     );
   }
 
@@ -66,7 +67,10 @@ public class ValuesCapabilityDescriptor
 
   @Override
   public Validator validator() {
-    return validators().value().validUri(TYPE, "uri");
+    return validators().logical().and(
+        validators().value().validUri(TYPE, "uri"),
+        validators().value().validUrl(TYPE, "url")
+    );
   }
 
 }

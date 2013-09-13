@@ -53,4 +53,18 @@ public class ValueValidators
     return validatorFactory.validUri(type, propertyKey);
   }
 
+  /**
+   * Creates a new validator that checks that a specified property (by key) is a valid URL.
+   *
+   * @param type        capability type
+   * @param propertyKey key of required property
+   * @return created validator
+   */
+  public Validator validUrl(final CapabilityType type,
+                            final String propertyKey)
+  {
+    return validatorFactory.validUrl(type, propertyKey);
+  }
+
+
 }

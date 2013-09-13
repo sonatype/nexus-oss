@@ -53,4 +53,10 @@ public interface ValidatorFactory
    * @since 2.7
    */
   UriValidator validUri(CapabilityType type, String propertyKey);
+
+  /**
+   * @since 2.7
+   */
+  UrlValidator validUrl(CapabilityType type, String propertyKey);
+
 }
