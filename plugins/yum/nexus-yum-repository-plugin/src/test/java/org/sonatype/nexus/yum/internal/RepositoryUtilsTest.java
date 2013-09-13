@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.RepositoryUtils.getBaseDir;
 
 public class RepositoryUtilsTest
-  extends TestSupport
+    extends TestSupport
 {
 
   @Test

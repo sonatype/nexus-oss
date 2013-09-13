@@ -53,13 +53,12 @@ import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 
-import com.google.common.collect.ObjectArrays;
-import com.google.inject.Binder;
-import com.google.inject.Module;
-
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
@@ -74,6 +73,7 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
@@ -239,7 +239,8 @@ public class YumNexusTestSupport
       @Override
       public void configure(final Binder binder) {
         binder.bind(Config.class).toInstance(new ConfigImpl(enableAutomaticRoutingFeature()));
-        binder.bind(CommandLineExecutor.class).toInstance(new CommandLineExecutor(){
+        binder.bind(CommandLineExecutor.class).toInstance(new CommandLineExecutor()
+        {
           @Override
           public int exec(final String command) throws IOException {
             // do nothing

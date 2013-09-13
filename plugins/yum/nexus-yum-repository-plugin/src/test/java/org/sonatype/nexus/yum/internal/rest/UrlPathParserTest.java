@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UrlPathParserTest
-  extends TestSupport
+    extends TestSupport
 {
 
   private static final String DOMAIN = "http://localhost:8081";
