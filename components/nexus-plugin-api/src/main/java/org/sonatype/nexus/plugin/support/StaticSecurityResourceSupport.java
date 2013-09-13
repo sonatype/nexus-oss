@@ -6,8 +6,9 @@
  * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.support;
 
+import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
