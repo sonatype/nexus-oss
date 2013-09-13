@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.rest;
 
+import org.sonatype.nexus.plugins.rest.CacheControl;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
 import org.restlet.Context;
@@ -30,12 +31,13 @@ public class StaticResourceFinder
 
   public StaticResourceFinder(Context context, StaticResource resource) {
     this.context = context;
-
     this.resource = resource;
   }
 
   public Handler createTarget(Request request, Response response) {
-    StaticHeaderUtil.addResponseHeaders(response);
+    if (resource instanceof CacheControl && ((CacheControl) resource).shouldCache()) {
+      StaticHeaderUtil.addResponseHeaders(response);
+    }
 
     StaticResourceResource resourceResource = new StaticResourceResource(context, request, response, resource);
 
