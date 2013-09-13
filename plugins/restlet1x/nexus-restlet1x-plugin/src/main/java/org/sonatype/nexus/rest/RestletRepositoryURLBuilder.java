@@ -135,7 +135,7 @@ public class RestletRepositoryURLBuilder
       return null;
     }
     else {
-      return getRepositoryContentUrl(repository);
+      return getRepositoryContentUrl(repository, forceBaseURL);
     }
   }
 
