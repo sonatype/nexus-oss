@@ -291,7 +291,7 @@ public abstract class AbstractNexusPlexusResource
   protected void handleInvalidConfigurationException(InvalidConfigurationException e)
       throws PlexusResourceException
   {
-    getLogger().warn("Configuration error!", e);
+    getLogger().debug("Configuration error!", e);
 
     ErrorResponse nexusErrorResponse;
 
@@ -311,7 +311,7 @@ public abstract class AbstractNexusPlexusResource
   protected void handleConfigurationException(ConfigurationException e)
       throws PlexusResourceException
   {
-    getLogger().warn("Configuration error!", e);
+    getLogger().debug("Configuration error!", e);
 
     ErrorResponse nexusErrorResponse;
 

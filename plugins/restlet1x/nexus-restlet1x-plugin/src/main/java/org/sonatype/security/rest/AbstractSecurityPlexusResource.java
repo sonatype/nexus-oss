@@ -99,7 +99,7 @@ public abstract class AbstractSecurityPlexusResource
   protected void handleInvalidConfigurationException(InvalidConfigurationException e)
       throws PlexusResourceException
   {
-    getLogger().warn("Configuration error!", e);
+    getLogger().debug("Configuration error!", e);
 
     ErrorResponse errorResponse;
 

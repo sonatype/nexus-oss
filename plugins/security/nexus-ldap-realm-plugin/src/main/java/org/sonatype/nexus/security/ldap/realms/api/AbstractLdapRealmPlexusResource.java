@@ -63,7 +63,7 @@ public abstract class AbstractLdapRealmPlexusResource
   protected void handleConfigurationException(InvalidConfigurationException e)
       throws PlexusResourceException
   {
-    getLogger().warn("Configuration error!", e);
+    getLogger().debug("Configuration error!", e);
 
     ErrorResponse nexusErrorResponse = new ErrorResponse();
 
