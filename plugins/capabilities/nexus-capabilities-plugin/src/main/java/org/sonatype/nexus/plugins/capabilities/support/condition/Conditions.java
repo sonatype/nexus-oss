@@ -37,16 +37,20 @@ public class Conditions
 
   private final NexusConditions nexusConditions;
 
+  private final CryptoConditions cryptoConditions;
+
   @Inject
   public Conditions(final LogicalConditions logicalConditions,
                     final CapabilityConditions capabilityConditions,
                     final RepositoryConditions repositoryConditions,
-                    final NexusConditions nexusConditions)
+                    final NexusConditions nexusConditions,
+                    final CryptoConditions cryptoConditions)
   {
     this.logicalConditions = checkNotNull(logicalConditions);
     this.capabilityConditions = checkNotNull(capabilityConditions);
     this.repositoryConditions = checkNotNull(repositoryConditions);
     this.nexusConditions = checkNotNull(nexusConditions);
+    this.cryptoConditions = checkNotNull(cryptoConditions);
   }
 
   /**
@@ -83,6 +87,15 @@ public class Conditions
    */
   public NexusConditions nexus() {
     return nexusConditions;
+  }
+
+  /**
+   * Access to crypto specific conditions.
+   *
+   * @since 2.7
+   */
+  public CryptoConditions crypto() {
+    return cryptoConditions;
   }
 
 }

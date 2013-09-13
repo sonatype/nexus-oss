@@ -40,8 +40,9 @@ public class ConditionsTest
     final CapabilityConditions capabilityConditions = mock(CapabilityConditions.class);
     final RepositoryConditions repositoryConditions = mock(RepositoryConditions.class);
     final NexusConditions nexusConditions = mock(NexusConditions.class);
+    CryptoConditions cryptoConditions = mock(CryptoConditions.class);
     final Conditions underTest = new Conditions(
-        logicalConditions, capabilityConditions, repositoryConditions, nexusConditions
+        logicalConditions, capabilityConditions, repositoryConditions, nexusConditions, cryptoConditions
     );
     assertThat(underTest.logical(), is(equalTo(logicalConditions)));
     assertThat(underTest.capabilities(), is(equalTo(capabilityConditions)));
