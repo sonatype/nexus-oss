@@ -35,14 +35,18 @@ public class Validators
 
   private final RepositoryValidators repositoryValidators;
 
+  private final ValueValidators valueValidators;
+
   @Inject
   Validators(final CapabilityValidators capabilityValidators,
              final LogicalValidators logicalValidators,
-             final RepositoryValidators repositoryValidators)
+             final RepositoryValidators repositoryValidators,
+             final ValueValidators valueValidators)
   {
     this.capabilityValidators = checkNotNull(capabilityValidators);
     this.logicalValidators = checkNotNull(logicalValidators);
     this.repositoryValidators = checkNotNull(repositoryValidators);
+    this.valueValidators = checkNotNull(valueValidators);
   }
 
   /**
@@ -71,5 +75,16 @@ public class Validators
   public RepositoryValidators repository() {
     return repositoryValidators;
   }
+
+  /**
+   * Access to value specific validators.
+   *
+   * @return value specific validators factory
+   * @since 2.7
+   */
+  public ValueValidators value() {
+    return valueValidators;
+  }
+
 
 }

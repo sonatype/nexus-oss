@@ -615,4 +615,31 @@ public class CapabilitiesIT
     MatcherAssert.assertThat(capability.isActive(), is(false));
   }
 
+  /**
+   * Verify uri validator accepts a valid URI.
+   *
+   * @since 2.7
+   */
+  @Test
+  public void uriIsValid() {
+    final Capability capability = capabilities().create("[values]")
+        .withProperty("uri", "http://localhost")
+        .save();
+    assertThat(capability.isActive(), is(true));
+  }
+
+  /**
+   * Verify uri validator rejects and invalid URI.
+   *
+   * @since 2.7
+   */
+  @Test
+  public void uriIsInvalid() {
+    thrown.expect(NexusClientErrorResponseException.class);
+    thrown.expectMessage("Some URI is not a valid URI");
+    capabilities().create("[values]")
+        .withProperty("uri", "foo is not valid")
+        .save();
+  }
+
 }
