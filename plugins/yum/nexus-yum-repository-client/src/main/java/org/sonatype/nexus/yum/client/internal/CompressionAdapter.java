@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.testsuite.client.internal;
+package org.sonatype.nexus.yum.client.internal;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -11,12 +11,12 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.testsuite.client;
+package org.sonatype.nexus.yum.client;
 
-import org.sonatype.nexus.yum.testsuite.client.internal.CompressionType;
+import org.sonatype.nexus.yum.client.internal.CompressionType;
 
-import static org.sonatype.nexus.yum.testsuite.client.internal.CompressionType.BZIP2;
-import static org.sonatype.nexus.yum.testsuite.client.internal.CompressionType.GZIP;
+import static org.sonatype.nexus.yum.client.internal.CompressionType.BZIP2;
+import static org.sonatype.nexus.yum.client.internal.CompressionType.GZIP;
 
 /**
  * @since 3.0

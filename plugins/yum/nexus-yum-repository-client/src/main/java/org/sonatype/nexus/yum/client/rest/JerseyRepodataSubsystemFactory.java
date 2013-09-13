@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.testsuite.client.rest;
+package org.sonatype.nexus.yum.client.rest;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,8 +22,8 @@ import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.client.rest.jersey.subsystem.JerseyRepositoriesFactory;
-import org.sonatype.nexus.yum.testsuite.client.Repodata;
-import org.sonatype.nexus.yum.testsuite.client.internal.JerseyRepodata;
+import org.sonatype.nexus.yum.client.Repodata;
+import org.sonatype.nexus.yum.client.internal.JerseyRepodata;
 
 /**
  * @since 3.0

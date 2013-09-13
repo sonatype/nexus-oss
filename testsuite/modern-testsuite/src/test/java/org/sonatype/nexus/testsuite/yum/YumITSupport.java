@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.testsuite;
+package org.sonatype.nexus.testsuite.yum;
 
 import java.util.Collection;
 
@@ -29,10 +29,10 @@ import org.sonatype.nexus.testsuite.client.Events;
 import org.sonatype.nexus.testsuite.client.Scheduler;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+import org.sonatype.nexus.yum.client.Repodata;
 import org.sonatype.nexus.yum.client.Yum;
 import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
 import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
-import org.sonatype.nexus.yum.testsuite.client.Repodata;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;

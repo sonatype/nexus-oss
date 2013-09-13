@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.testsuite;
+package org.sonatype.nexus.testsuite.yum;
 
 import java.util.Map;
 
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
+import static org.sonatype.nexus.yum.client.MetadataType.PRIMARY_XML;
 
 /**
  * ITs related to generating metadata.

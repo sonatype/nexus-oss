@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.testsuite;
+package org.sonatype.nexus.testsuite.yum;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.testsuite.client.internal;
+package org.sonatype.nexus.yum.client.internal;
 
 import java.io.IOException;
 
@@ -19,8 +19,8 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.yum.testsuite.client.MetadataType;
-import org.sonatype.nexus.yum.testsuite.client.Repodata;
+import org.sonatype.nexus.yum.client.MetadataType;
+import org.sonatype.nexus.yum.client.Repodata;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
