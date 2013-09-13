@@ -54,6 +54,7 @@
     <module>p2</module>
     <module>restlet1x</module>
     <module>security</module>
+    <module>yum</module>
   </modules>
 
   <dependencyManagement>
