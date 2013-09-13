@@ -20,6 +20,10 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.configuration.DefaultConfigurationIdGenerator;
+import org.sonatype.nexus.configuration.PasswordHelper;
+import org.sonatype.nexus.formfields.Encrypted;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.PasswordFormField;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
@@ -32,6 +36,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
+import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -90,8 +95,10 @@ public class DefaultCapabilityRegistryTest
 
   private ArgumentCaptor<CapabilityEvent> rec;
 
+  private PasswordHelper passwordHelper;
+
   @Before
-  public final void setUpCapabilityRegistry() {
+  public final void setUpCapabilityRegistry() throws Exception {
     final ValidatorRegistryProvider validatorRegistryProvider = mock(ValidatorRegistryProvider.class);
     final ValidatorRegistry validatorRegistry = mock(ValidatorRegistry.class);
     when(validatorRegistryProvider.get()).thenReturn(validatorRegistry);
@@ -130,7 +137,8 @@ public class DefaultCapabilityRegistryTest
         capabilityDescriptorRegistry,
         eventBus,
         achf,
-        vchf
+        vchf,
+        passwordHelper = new PasswordHelper(new DefaultPlexusCipher())
     );
 
     rec = ArgumentCaptor.forClass(CapabilityEvent.class);
@@ -267,6 +275,7 @@ public class DefaultCapabilityRegistryTest
 
     verify(capabilityStorage).getAll();
     verify(descriptor).version();
+    verify(descriptor).formFields();
     verifyNoMoreInteractions(descriptor, capabilityStorage);
   }
 
@@ -340,6 +349,7 @@ public class DefaultCapabilityRegistryTest
     verify(capabilityStorage).getAll();
     verify(descriptor, atLeastOnce()).version();
     verify(descriptor).convert(oldProps, 0);
+    verify(descriptor).formFields();
 
     verifyNoMoreInteractions(descriptor, capabilityStorage);
   }
@@ -365,6 +375,61 @@ public class DefaultCapabilityRegistryTest
     verify(capabilityStorage).getAll();
     final Collection<DefaultCapabilityReference> references = underTest.getAll();
     assertThat(references.size(), is(0));
+  }
+
+  /**
+   * Verify that value is stored encrypted when corresponding field is marked with {@link Encrypted}.
+   */
+  @Test
+  public void createWithEncryptedProperty()
+      throws Exception
+  {
+    final CapabilityDescriptor descriptor = mock(CapabilityDescriptor.class);
+    when(capabilityDescriptorRegistry.get(CAPABILITY_TYPE)).thenReturn(descriptor);
+    when(descriptor.formFields()).thenReturn(Arrays.<FormField>asList(new PasswordFormField("foo")));
+
+    Map<String, String> properties = Maps.newHashMap();
+    properties.put("foo", "bar");
+    underTest.add(CAPABILITY_TYPE, true, null, properties);
+
+    ArgumentCaptor<CapabilityStorageItem> csiRec = ArgumentCaptor.forClass(CapabilityStorageItem.class);
+
+    verify(capabilityStorage).add(csiRec.capture());
+    CapabilityStorageItem item = csiRec.getValue();
+    assertThat(item, is(notNullValue()));
+    String fooValue = item.properties().get("foo");
+    assertThat(fooValue, not(is("bar")));
+    assertThat(passwordHelper.decrypt(fooValue), is("bar"));
+  }
+
+  /**
+   * Verify that value is decrypted when corresponding field is marked with {@link Encrypted}.
+   */
+  @Test
+  public void loadWithEncryptedProperty()
+      throws Exception
+  {
+    Map<String, String> properties = Maps.newHashMap();
+    properties.put("foo", passwordHelper.encrypt("bar"));
+
+    final CapabilityStorageItem item = new CapabilityStorageItem(
+        0, capabilityIdentity("foo"), CAPABILITY_TYPE, true, null, properties
+    );
+    when(capabilityStorage.getAll()).thenReturn(Arrays.asList(item));
+
+    final CapabilityDescriptor descriptor = mock(CapabilityDescriptor.class);
+    when(capabilityDescriptorRegistry.get(CAPABILITY_TYPE)).thenReturn(descriptor);
+    when(descriptor.version()).thenReturn(0);
+    when(descriptor.formFields()).thenReturn(Arrays.<FormField>asList(new PasswordFormField("foo")));
+
+    underTest.load();
+
+    ArgumentCaptor<Object> ebRec = ArgumentCaptor.forClass(Object.class);
+
+    verify(eventBus, times(2)).post(ebRec.capture());
+    assertThat(
+        ((CapabilityEvent) ebRec.getAllValues().get(0)).getReference().context().properties().get("foo"), is("bar")
+    );
   }
 
 }

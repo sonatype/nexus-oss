@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -29,6 +30,9 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
+import org.sonatype.nexus.configuration.PasswordHelper;
+import org.sonatype.nexus.formfields.Encrypted;
+import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -47,6 +51,7 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
+import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -85,6 +90,8 @@ public class DefaultCapabilityRegistry
 
   private final ValidityConditionHandlerFactory validityConditionHandlerFactory;
 
+  private final PasswordHelper passwordHelper;
+
   private final Map<CapabilityIdentity, DefaultCapabilityReference> references;
 
   private final ReentrantReadWriteLock lock;
@@ -97,7 +104,8 @@ public class DefaultCapabilityRegistry
                             final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
                             final EventBus eventBus,
                             final ActivationConditionHandlerFactory activationConditionHandlerFactory,
-                            final ValidityConditionHandlerFactory validityConditionHandlerFactory)
+                            final ValidityConditionHandlerFactory validityConditionHandlerFactory,
+                            final PasswordHelper passwordHelper)
   {
     this.capabilityStorage = checkNotNull(capabilityStorage);
     this.idGenerator = checkNotNull(idGenerator);
@@ -107,6 +115,7 @@ public class DefaultCapabilityRegistry
     this.eventBus = checkNotNull(eventBus);
     this.activationConditionHandlerFactory = checkNotNull(activationConditionHandlerFactory);
     this.validityConditionHandlerFactory = checkNotNull(validityConditionHandlerFactory);
+    this.passwordHelper = checkNotNull(passwordHelper);
 
     references = new HashMap<CapabilityIdentity, DefaultCapabilityReference>();
     lock = new ReentrantReadWriteLock();
@@ -132,11 +141,13 @@ public class DefaultCapabilityRegistry
 
       final CapabilityIdentity generatedId = capabilityIdentity(idGenerator.generateId());
 
+      final Map<String, String> encryptedProps = encryptValuesIfNeeded(descriptor, props);
+
       capabilityStorage.add(new CapabilityStorageItem(
-          descriptor.version(), generatedId, type, enabled, notes, props
+          descriptor.version(), generatedId, type, enabled, notes, encryptedProps
       ));
 
-      getLogger().debug("Added capability '{}' of type '{}' with properties '{}'", generatedId, type, props);
+      getLogger().debug("Added capability '{}' of type '{}' with properties '{}'", generatedId, type, encryptedProps);
 
       final DefaultCapabilityReference reference = create(generatedId, type, descriptor);
 
@@ -172,12 +183,14 @@ public class DefaultCapabilityRegistry
 
       final DefaultCapabilityReference reference = get(id);
 
+      final Map<String, String> encryptedProps = encryptValuesIfNeeded(reference.descriptor(), props);
+
       capabilityStorage.update(new CapabilityStorageItem(
-          reference.descriptor().version(), id, reference.type(), enabled, notes, props)
+          reference.descriptor().version(), id, reference.type(), enabled, notes, encryptedProps)
       );
 
       getLogger().debug(
-          "Updated capability '{}' of type '{}' with properties '{}'", id, reference.type(), props
+          "Updated capability '{}' of type '{}' with properties '{}'", id, reference.type(), encryptedProps
       );
 
       if (reference.isEnabled() && !enabled) {
@@ -302,7 +315,7 @@ public class DefaultCapabilityRegistry
     for (final CapabilityStorageItem item : items) {
       getLogger().debug(
           "Loading capability '{}' of type '{}' with properties '{}'",
-          new Object[]{item.id(), item.type(), item.properties()}
+          item.id(), item.type(), item.properties()
       );
 
       final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(item.type());
@@ -315,28 +328,30 @@ public class DefaultCapabilityRegistry
         continue;
       }
 
-      Map<String, String> properties = item.properties();
+      Map<String, String> properties = decryptValuesIfNeeded(descriptor, item.properties());
       if (descriptor.version() != item.version()) {
         getLogger().debug(
             "Converting capability '{}' properties from version '{}' to version '{}'",
-            new Object[]{item.id(), item.version(), descriptor.version()}
+            item.id(), item.version(), descriptor.version()
         );
         try {
           properties = descriptor.convert(properties, item.version());
           if (properties == null) {
             properties = Collections.emptyMap();
           }
-          getLogger().debug(
-              "Converted capability '{}' properties '{}' (version '{}') to '{}' (version '{}')",
-              new Object[]{item.id(), item.properties(), item.version(), properties, descriptor.version()}
-          );
+          if (getLogger().isDebugEnabled()) {
+            getLogger().debug(
+                "Converted capability '{}' properties '{}' (version '{}') to '{}' (version '{}')",
+                item.id(), item.properties(), item.version(),
+                encryptValuesIfNeeded(descriptor, properties), descriptor.version()
+            );
+          }
         }
         catch (Exception e) {
           getLogger().error(
               "Failed converting capability '{}' properties '{}' from version '{}' to version '{}'."
                   + " Capability will not be loaded",
-              new Object[]{item.id(), item.properties(), item.version(), descriptor.version()},
-              e
+              item.id(), item.properties(), item.version(), descriptor.version(), e
           );
           continue;
         }
@@ -446,6 +461,72 @@ public class DefaultCapabilityRegistry
         throw new InvalidConfigurationException(vr);
       }
     }
+  }
+
+  /**
+   * Encrypts value of properties marked to be stored encrypted.
+   *
+   * @since 2.7
+   */
+  private Map<String, String> encryptValuesIfNeeded(final CapabilityDescriptor descriptor,
+                                                    final Map<String, String> props) throws IOException
+  {
+    if (props == null || props.isEmpty()) {
+      return props;
+    }
+    Map<String, String> encrypted = Maps.newHashMap(props);
+    List<FormField> formFields = descriptor.formFields();
+    if (formFields != null) {
+      for (FormField formField : formFields) {
+        if (formField instanceof Encrypted) {
+          String value = encrypted.get(formField.getId());
+          if (value != null) {
+            try {
+              encrypted.put(formField.getId(), passwordHelper.encrypt(value));
+            }
+            catch (PlexusCipherException e) {
+              throw new IOException(
+                  "Could not encrypt value of '" + formField.getType() + "' due to " + e.getMessage(), e
+              );
+            }
+          }
+        }
+      }
+    }
+    return encrypted;
+  }
+
+  /**
+   * Decrypts value of properties marked to be stored encrypted.
+   *
+   * @since 2.7
+   */
+  private Map<String, String> decryptValuesIfNeeded(final CapabilityDescriptor descriptor,
+                                                    final Map<String, String> props) throws IOException
+  {
+    if (props == null || props.isEmpty()) {
+      return props;
+    }
+    Map<String, String> decrypted = Maps.newHashMap(props);
+    List<FormField> formFields = descriptor.formFields();
+    if (formFields != null) {
+      for (FormField formField : formFields) {
+        if (formField instanceof Encrypted) {
+          String value = decrypted.get(formField.getId());
+          if (value != null) {
+            try {
+              decrypted.put(formField.getId(), passwordHelper.decrypt(value));
+            }
+            catch (PlexusCipherException e) {
+              throw new IOException(
+                  "Could not decrypt value of '" + formField.getType() + "' due to " + e.getMessage(), e
+              );
+            }
+          }
+        }
+      }
+    }
+    return decrypted;
   }
 
 }
