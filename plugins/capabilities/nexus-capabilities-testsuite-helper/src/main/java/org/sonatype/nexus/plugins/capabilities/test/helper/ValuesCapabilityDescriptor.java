@@ -20,38 +20,33 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.PasswordFormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 
 import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
-@Named(MessageCapabilityDescriptor.TYPE_ID)
+/**
+ * @since 2.7
+ */
+@Named(ValuesCapabilityDescriptor.TYPE_ID)
 @Singleton
-public class MessageCapabilityDescriptor
+public class ValuesCapabilityDescriptor
     extends CapabilityDescriptorSupport
 {
 
-  static final String TYPE_ID = "[message]";
+  static final String TYPE_ID = "[values]";
 
   static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-  static final String REPOSITORY = "repository";
-
-  static final String MESSAGE = "message";
-
-  static final String PASSWORD = "password";
-
   private final List<FormField> formFields;
 
-  protected MessageCapabilityDescriptor() {
+  protected ValuesCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
-        new RepoOrGroupComboFormField(REPOSITORY, FormField.MANDATORY),
-        new StringTextFormField(MESSAGE, "Message", "Enter a message starting with XYZ", FormField.OPTIONAL, "XYZ.*"),
-        new PasswordFormField(PASSWORD, "Password", "Enter an arbitrary pasword", FormField.OPTIONAL)
+        new StringTextFormField("uri", "Some URI", "?", false),
+        new StringTextFormField("url", "Some URL", "?", false)
     );
   }
 
@@ -62,12 +57,20 @@ public class MessageCapabilityDescriptor
 
   @Override
   public String name() {
-    return "Message Capability";
+    return "Values";
   }
 
   @Override
   public List<FormField> formFields() {
     return formFields;
+  }
+
+  @Override
+  public Validator validator() {
+    return validators().logical().and(
+        validators().value().validUri(TYPE, "uri"),
+        validators().value().validUrl(TYPE, "url")
+    );
   }
 
 }
