@@ -174,6 +174,7 @@ public abstract class AbstractSecurityPlexusResource
     resource.setFirstName(user.getFirstName());
     resource.setLastName(user.getLastName());
     resource.setEmail(user.getEmailAddress());
+    resource.setStatus(user.getStatus().name());
 
     for (RoleIdentifier role : user.getRoles()) {
       resource.addRole(this.securityToRestModel(role));
