@@ -32,7 +32,7 @@ import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Path(VersionedResource.RESOURCE_URI)
 @Named

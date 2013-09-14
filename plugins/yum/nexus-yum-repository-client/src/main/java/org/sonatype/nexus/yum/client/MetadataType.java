@@ -19,7 +19,7 @@ import static org.sonatype.nexus.yum.client.internal.CompressionType.BZIP2;
 import static org.sonatype.nexus.yum.client.internal.CompressionType.GZIP;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public enum MetadataType
 {

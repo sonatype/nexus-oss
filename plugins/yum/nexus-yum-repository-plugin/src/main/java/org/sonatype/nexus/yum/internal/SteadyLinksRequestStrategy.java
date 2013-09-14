@@ -39,7 +39,7 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

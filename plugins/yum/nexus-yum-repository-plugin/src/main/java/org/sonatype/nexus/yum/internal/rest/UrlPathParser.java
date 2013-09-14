@@ -27,7 +27,7 @@ import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.SERVER_ERROR_INTERNAL;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class UrlPathParser
 {

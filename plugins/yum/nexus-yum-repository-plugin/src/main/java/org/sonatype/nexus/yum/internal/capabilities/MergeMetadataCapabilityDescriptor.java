@@ -31,7 +31,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 import static org.sonatype.nexus.yum.internal.capabilities.MergeMetadataCapabilityConfiguration.REPOSITORY_ID;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Singleton
 @Named(MergeMetadataCapabilityDescriptor.TYPE_ID)

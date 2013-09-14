@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.YumRegistry;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named(MergeMetadataCapabilityDescriptor.TYPE_ID)
 public class MergeMetadataCapability

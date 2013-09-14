@@ -51,7 +51,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 public class YumImpl

@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class RepoMD
 {

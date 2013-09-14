@@ -22,7 +22,7 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidati
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class AliasMappingsValidator
     implements Validator

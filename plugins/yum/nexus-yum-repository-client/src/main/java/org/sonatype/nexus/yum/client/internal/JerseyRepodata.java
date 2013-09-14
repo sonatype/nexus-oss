@@ -27,7 +27,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class JerseyRepodata
     extends SubsystemSupport<JerseyNexusClient>

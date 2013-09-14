@@ -19,7 +19,7 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.FileRepresentation;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class YumFileRepresentation
     extends FileRepresentation

@@ -21,7 +21,7 @@ import org.apache.shiro.util.StringUtils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class AliasMappings
 {

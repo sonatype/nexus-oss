@@ -26,7 +26,7 @@ import org.sonatype.nexus.yum.client.internal.JerseyYum;
 /**
  * Jersey based {@link Yum} Nexus Client Subsystem factory.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

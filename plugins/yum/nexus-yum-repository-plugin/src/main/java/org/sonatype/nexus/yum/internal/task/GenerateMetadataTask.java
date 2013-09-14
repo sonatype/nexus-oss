@@ -64,7 +64,7 @@ import static org.sonatype.scheduling.TaskState.SUBMITTED;
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 @Named(GenerateMetadataTask.ID)
 public class GenerateMetadataTask

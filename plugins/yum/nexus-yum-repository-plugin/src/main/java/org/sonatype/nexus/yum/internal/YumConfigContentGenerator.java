@@ -32,7 +32,7 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import com.google.common.io.Closeables;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named(YumConfigContentGenerator.ID)
 @Singleton

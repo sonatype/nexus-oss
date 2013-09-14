@@ -39,7 +39,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.nexus.yum.internal.RpmScanner.getRelativePath;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class RpmListWriter
 {

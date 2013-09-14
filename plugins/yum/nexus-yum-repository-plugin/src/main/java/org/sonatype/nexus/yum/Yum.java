@@ -24,7 +24,7 @@ import org.sonatype.scheduling.ScheduledTask;
 /**
  * Provides access to Yum functionality ariund a Nexus repository.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public interface Yum
 {

@@ -51,7 +51,7 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named(MergeMetadataTask.ID)
 public class MergeMetadataTask

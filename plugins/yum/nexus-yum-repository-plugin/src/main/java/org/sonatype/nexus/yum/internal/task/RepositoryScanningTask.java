@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * This job scans a {@link Repository} for RPMs and adds each version to Yam.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 @Named(RepositoryScanningTask.ID)
 public class RepositoryScanningTask

@@ -20,7 +20,7 @@ import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
 /**
  * Generate Metadata capability.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 @CapabilityType(GenerateMetadataCapability.TYPE_ID)
 public interface GenerateMetadataCapability

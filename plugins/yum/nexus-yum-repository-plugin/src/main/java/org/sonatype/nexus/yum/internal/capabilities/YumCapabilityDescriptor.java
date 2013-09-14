@@ -29,7 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Singleton
 @Named(YumCapabilityDescriptor.TYPE_ID)

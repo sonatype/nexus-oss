@@ -23,7 +23,7 @@ import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
 /**
  * Jersey Generate Metadata capability factory.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

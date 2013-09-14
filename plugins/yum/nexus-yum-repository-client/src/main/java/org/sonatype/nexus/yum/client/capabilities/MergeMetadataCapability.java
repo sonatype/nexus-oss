@@ -20,7 +20,7 @@ import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
 /**
  * Merge Metadata capability.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 @CapabilityType(MergeMetadataCapability.TYPE_ID)
 public interface MergeMetadataCapability

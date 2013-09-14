@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Configuration adapter for {@link GenerateMetadataCapability}.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public class GenerateMetadataCapabilityConfiguration
     extends MetadataCapabilityConfigurationSupport

@@ -29,7 +29,7 @@ import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 /**
  * Jersey based {@link Yum}.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public class JerseyYum
     extends SubsystemSupport<JerseyNexusClient>

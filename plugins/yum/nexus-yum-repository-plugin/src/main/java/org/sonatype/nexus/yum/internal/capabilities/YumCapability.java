@@ -24,7 +24,7 @@ import org.sonatype.nexus.yum.YumRegistry;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named(YumCapabilityDescriptor.TYPE_ID)
 public class YumCapability

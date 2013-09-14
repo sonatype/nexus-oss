@@ -23,7 +23,7 @@ import org.sonatype.nexus.yum.YumRegistry;
 /**
  * Automatically create Yum capability.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

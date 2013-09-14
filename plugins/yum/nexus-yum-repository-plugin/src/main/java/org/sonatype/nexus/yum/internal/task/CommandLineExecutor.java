@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

@@ -30,7 +30,7 @@ import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_RE
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_ID;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named(GenerateMetadataTask.ID)
 @Singleton

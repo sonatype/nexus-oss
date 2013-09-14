@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Configuration adapter for {@link MergeMetadataCapability}.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public class MergeMetadataCapabilityConfiguration
     extends MetadataCapabilityConfigurationSupport

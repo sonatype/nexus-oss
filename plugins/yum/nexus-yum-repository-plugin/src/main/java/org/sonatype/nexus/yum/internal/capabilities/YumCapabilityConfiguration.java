@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 /**
  * Configuration adapter for {@link YumCapability}.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public class YumCapabilityConfiguration
 {

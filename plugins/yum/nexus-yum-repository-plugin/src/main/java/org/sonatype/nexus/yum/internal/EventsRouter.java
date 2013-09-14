@@ -43,7 +43,7 @@ import com.google.common.eventbus.Subscribe;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

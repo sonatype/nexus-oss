@@ -26,7 +26,7 @@ import org.sonatype.nexus.yum.client.Repodata;
 import org.sonatype.nexus.yum.client.internal.JerseyRepodata;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

@@ -18,7 +18,7 @@ import java.io.File;
 /**
  * Provides access to Yum FS.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public interface YumRepository
 {

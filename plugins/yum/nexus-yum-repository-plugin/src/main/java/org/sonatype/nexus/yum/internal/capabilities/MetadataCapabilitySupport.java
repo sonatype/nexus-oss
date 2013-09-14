@@ -40,7 +40,7 @@ import org.apache.commons.io.IOUtils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConfigurationSupport>
     extends CapabilitySupport

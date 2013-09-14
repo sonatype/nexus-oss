@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class YumRepositoryCache
 {

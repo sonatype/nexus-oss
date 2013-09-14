@@ -36,7 +36,7 @@ import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapab
 import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.REPOSITORY_ID;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Singleton
 @Named(GenerateMetadataCapabilityDescriptor.TYPE_ID)

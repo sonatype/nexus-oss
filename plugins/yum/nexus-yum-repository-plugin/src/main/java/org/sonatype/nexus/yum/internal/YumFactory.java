@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.yum.Yum;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public interface YumFactory
 {

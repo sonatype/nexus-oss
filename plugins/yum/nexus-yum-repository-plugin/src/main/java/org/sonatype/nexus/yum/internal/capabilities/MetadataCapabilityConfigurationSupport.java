@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Support class for Yum repository capability configurations.
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public abstract class MetadataCapabilityConfigurationSupport
 {

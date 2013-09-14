@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.io.File.separator;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 @Singleton

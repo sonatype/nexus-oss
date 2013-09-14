@@ -20,7 +20,7 @@ import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class CompressionAdapter
 {

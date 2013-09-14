@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * Interface to access nexus-yum-repository-plugin functionality in tests
  *
- * @since 3.0
+ * @since yum 3.0
  */
 public interface Repodata
 {

@@ -21,7 +21,7 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.StringRepresentation;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class IndexRepresentation
     extends StringRepresentation

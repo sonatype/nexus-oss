@@ -25,7 +25,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public abstract class AbstractYumRepositoryResource
     extends AbstractPlexusResource

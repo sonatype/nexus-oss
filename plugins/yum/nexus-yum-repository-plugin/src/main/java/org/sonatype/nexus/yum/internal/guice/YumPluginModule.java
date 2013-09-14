@@ -25,7 +25,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 @Named
 public class YumPluginModule

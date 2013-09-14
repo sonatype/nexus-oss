@@ -16,7 +16,7 @@ package org.sonatype.nexus.yum.internal.rest;
 import java.net.URL;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public class UrlPathInterpretation
 {

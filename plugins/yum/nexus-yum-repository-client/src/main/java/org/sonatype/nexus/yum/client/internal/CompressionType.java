@@ -14,7 +14,7 @@
 package org.sonatype.nexus.yum.client.internal;
 
 /**
- * @since 3.0
+ * @since yum 3.0
  */
 public enum CompressionType
 {
