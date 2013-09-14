@@ -14,7 +14,7 @@
  * Capabilities Edit/Create panel layout and controller
  */
 
-/*global Ext, Sonatype, FormFieldGenerator, FormFieldExporter, FormFieldImporter, Nexus*/
+/*global Ext, Sonatype, FormFieldGenerator, FormFieldFactory, FormFieldExporter, FormFieldImporter, Nexus*/
 /*jslint newcap:true*/
 
 define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons'], function() {
@@ -56,28 +56,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         })
   };
 
-  // A record to hold the name and id of a repository
-  this.repositoryRecordConstructor = Ext.data.Record.create([{
-        name : 'id'
-      }, {
-        name : 'name',
-        sortType : Ext.data.SortTypes.asUCString
-      }]);
-
-  // A record to hold the name and id of a repository group
-  this.repositoryGroupRecordConstructor = Ext.data.Record.create([{
-        name : 'id'
-      }, {
-        name : 'name',
-        sortType : Ext.data.SortTypes.asUCString
-      }]);
-
-  this.repositoryOrGroupRecordConstructor = Ext.data.Record.create([{
-        name : 'id'
-      }, {
-        name : 'name',
-        sortType : Ext.data.SortTypes.asUCString
-      }]);
+  this.stores = {},
 
   // A record to hold details of each capability type
   this.capabilityTypeRecordConstructor = Ext.data.Record.create([{
@@ -117,76 +96,6 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
       }, {
         name : 'status'
       }]);
-
-  // Datastore that will hold both repos and repogroups
-  this.repoOrGroupDataStore = new Ext.data.SimpleStore({
-        fields : ['id', 'name'],
-        id : 'id'
-      });
-
-  // Reader and datastore that queries the server for the list of repositories
-  this.repositoryReader = new Ext.data.JsonReader({
-        root : 'data',
-        id : 'id'
-      }, this.repositoryRecordConstructor);
-  this.repositoryDataStore = new Ext.data.Store({
-        url : Sonatype.config.repos.urls.repositories,
-        reader : this.repositoryReader,
-        sortInfo : {
-          field : 'name',
-          direction : 'ASC'
-        },
-        autoLoad : true,
-        listeners : {
-          'load' : {
-            fn : function() {
-              this.repositoryDataStore.each(function(item, i, len) {
-                    var newRec = new this.repositoryOrGroupRecordConstructor({
-                          id : item.data.id,
-                          name : item.data.name + ' (Repo)'
-                        }, item.id);
-                    this.repoOrGroupDataStore.add([newRec]);
-                  }, this);
-              var allRec = new this.repositoryRecordConstructor({
-                    id : '*',
-                    name : 'All Repositories'
-                  }, '*');
-              this.repoOrGroupDataStore.insert(0, allRec);
-            },
-            scope : this
-          }
-        }
-      });
-
-  // Reader and datastore that queries the server for the list of repository
-  // groups
-  this.repositoryGroupReader = new Ext.data.JsonReader({
-        root : 'data',
-        id : 'id'
-      }, this.repositoryGroupRecordConstructor);
-  this.repositoryGroupDataStore = new Ext.data.Store({
-        url : Sonatype.config.repos.urls.groups,
-        reader : this.repositoryGroupReader,
-        sortInfo : {
-          field : 'name',
-          direction : 'ASC'
-        },
-        autoLoad : true,
-        listeners : {
-          'load' : {
-            fn : function() {
-              this.repositoryGroupDataStore.each(function(item, i, len) {
-                    var newRec = new this.repositoryOrGroupRecordConstructor({
-                          id : item.data.id,
-                          name : item.data.name + ' (Group)'
-                        }, item.id);
-                    this.repoOrGroupDataStore.add([newRec]);
-                  }, this);
-            },
-            scope : this
-          }
-        }
-      });
 
   // Reader and datastore that queries the server for the list of capabilities
   // types
@@ -552,20 +461,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           selectId = selected.id;
         }
 
-        this.repoOrGroupDataStore.removeAll();
-        this.repositoryDataStore.removeAll();
-        this.repositoryGroupDataStore.removeAll();
-        this.capabilitiesDataStore.removeAll();
-        this.repositoryDataStore.removeAll();
-        this.repositoryGroupDataStore.removeAll();
+        this.stores = {};
         this.capabilityTypeDataStore.removeAll();
-
-        // repoOrGroupDataStore is created by listeners in repo- and groupDataStore
-        this.repositoryDataStore.reload();
-        this.capabilitiesDataStore.reload();
-        this.repositoryDataStore.reload();
-        this.repositoryGroupDataStore.reload();
+        this.capabilitiesDataStore.removeAll();
         this.capabilityTypeDataStore.reload();
+        this.capabilitiesDataStore.reload();
 
         this.formCards.items.each(
             function(item, i, len) {
@@ -709,7 +609,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
 
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customFieldTypes, this.COMBO_WIDTH));
+        Ext.apply(config.items[2].items, FormFieldFactory(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.stores, this.customFieldTypes, this.COMBO_WIDTH));
         formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -1001,7 +901,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
           config = this.configUniqueIdHelper(id, config);
 
-          Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customFieldTypes));
+          Ext.apply(config.items[2].items, FormFieldFactory(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.stores, this.customFieldTypes, this.COMBO_WIDTH));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
