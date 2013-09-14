@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.capability.support.ValidatorSupport;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;

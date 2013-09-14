@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.capabilities.internal.validator;
+package org.sonatype.nexus.capability.support;
 
 import java.util.List;
 import java.util.Map;
@@ -32,33 +32,33 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.0
  */
-class ValidatorSupport
+public abstract class ValidatorSupport
 {
 
   private final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider;
 
   private final CapabilityType type;
 
-  ValidatorSupport(final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
-                   final CapabilityType type)
+  protected ValidatorSupport(final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
+                             final CapabilityType type)
   {
     this.capabilityDescriptorRegistryProvider = checkNotNull(capabilityDescriptorRegistryProvider);
     this.type = checkNotNull(type);
   }
 
-  CapabilityDescriptorRegistry capabilityDescriptorRegistry() {
+  protected CapabilityDescriptorRegistry capabilityDescriptorRegistry() {
     return capabilityDescriptorRegistryProvider.get();
   }
 
-  CapabilityType capabilityType() {
+  protected CapabilityType capabilityType() {
     return type;
   }
 
-  CapabilityDescriptor capabilityDescriptor() {
+  protected CapabilityDescriptor capabilityDescriptor() {
     return capabilityDescriptorRegistry().get(type);
   }
 
-  String typeName() {
+  protected String typeName() {
     final CapabilityDescriptor descriptor = capabilityDescriptor();
     if (descriptor != null) {
       return descriptor.name();
@@ -66,7 +66,7 @@ class ValidatorSupport
     return capabilityType().toString();
   }
 
-  String propertyName(final String propertyKey) {
+  protected String propertyName(final String propertyKey) {
     String name = extractNames().get(propertyKey);
     if (name == null) {
       name = propertyKey;
