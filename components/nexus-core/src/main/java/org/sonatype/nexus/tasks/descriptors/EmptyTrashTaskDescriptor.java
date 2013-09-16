@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
 @Named("EmptyTrash")
 @Singleton
@@ -31,12 +32,17 @@ public class EmptyTrashTaskDescriptor
 
   public static final String OLDER_THAN_FIELD_ID = "EmptyTrashItemsOlderThan";
 
+  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
+
   private final NumberTextFormField olderThanField =
       new NumberTextFormField(
           OLDER_THAN_FIELD_ID,
           "Purge items older than (days)",
           "Set the number of days, to purge all items that were trashed before the given number of days.",
           FormField.OPTIONAL);
+
+  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
+      FormField.MANDATORY);
 
   public String getId() {
     return ID;
@@ -50,6 +56,7 @@ public class EmptyTrashTaskDescriptor
     List<FormField> fields = new ArrayList<FormField>();
 
     fields.add(olderThanField);
+    fields.add(repoField);
 
     return fields;
   }
