@@ -57,6 +57,8 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
       }, {
         name : 'name',
         sortType : Ext.data.SortTypes.asUCString
+      }, {
+        name : 'patterns'
       }]);
 
   // A record to hold the contentClasses
@@ -294,10 +296,14 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
             }, {
               header : 'Repository Type',
               dataIndex : 'contentClass',
+              width : 200
+            }, {
+              header : 'Patterns',
+              dataIndex : 'patterns',
               width : 200,
-              id : 'repo-target-expandable-col'
+              id : 'patterns-expandable-col'
             }],
-        autoExpandColumn : 'repo-target-expandable-col',
+        autoExpandColumn : 'patterns-expandable-col',
         disableSelection : false,
         viewConfig : {
           emptyText : 'Click "Add" to create a new Repository Target.'
@@ -576,7 +582,8 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
               id : receivedData.id,
               name : receivedData.name,
               resourceURI : action.getUrl() + '/' + receivedData.id,
-              contentClass : receivedData.contentClass
+              contentClass : receivedData.contentClass,
+              patterns : receivedData.patterns
             };
 
             var newRec = new this.repoTargetRecordConstructor(dataObj, action.options.fpanel.id);
@@ -626,6 +633,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         rec.set('name', receivedData.name);
         rec.set('id', receivedData.id);
         rec.set('contentClass', receivedData.contentClass);
+        rec.set('patterns', receivedData.patterns);
         rec.commit();
         rec.endEdit();
       },

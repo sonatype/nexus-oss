@@ -100,6 +100,10 @@ public class RepositoryTargetListPlexusResource
 
       res.setResourceURI(this.createChildReference(request, this, target.getId()).toString());
 
+      for (String pattern : target.getPatternTexts()) {
+        res.addPattern(pattern);
+      }
+
       result.addData(res);
     }
 

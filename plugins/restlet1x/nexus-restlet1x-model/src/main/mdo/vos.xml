@@ -3310,41 +3310,12 @@
     <class>
       <name>RepositoryTargetListResource</name>
       <version>1.0.0+</version>
+      <superClass>RepositoryTargetResource</superClass>
       <description>The repository target list details.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-target-list-resource" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
-      <fields>
-        <field>
-          <name>resourceURI</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>URL that can be used to manage the repository target.</description>
-        </field>
-        <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The id of the repository target.</description>
-        </field>
-        <field>
-          <name>name</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The name of the repository target.</description>
-        </field>
-        <field>
-          <name>contentClass</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The content class of the repository target.</description>
-        </field>
-      </fields>
     </class>
 
     <class>
