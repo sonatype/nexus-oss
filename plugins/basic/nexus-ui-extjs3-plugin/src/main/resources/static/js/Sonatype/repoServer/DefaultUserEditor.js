@@ -226,6 +226,7 @@ NX.define('Sonatype.repoServer.DefaultUserEditor', {
     rec.set('firstName', receivedData.firstName);
     rec.set('lastName', receivedData.lastName);
     rec.set('email', receivedData.email);
+    rec.set('status', receivedData.status);
     rec.set('displayRoles', this.combineRoles(receivedData.roles));
     rec.commit();
     rec.endEdit();

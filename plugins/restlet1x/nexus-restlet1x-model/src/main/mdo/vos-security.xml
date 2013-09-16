@@ -684,6 +684,13 @@
                     <description>The email address of the user.</description>
                 </field>
                 <field>
+                    <name>status</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>false</required>
+                    <description>The status of the user (active, locked, disabled).</description>
+                </field>
+                <field>
                     <name>roles</name>
                     <version>1.0.0+</version>
                     <association>
