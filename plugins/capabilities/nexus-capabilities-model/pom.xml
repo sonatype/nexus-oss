@@ -28,12 +28,6 @@
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-model</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!--
     Use scope=provided dep on nexus-plugin-api here to avoid needing to explicitly call out versions of
     plexus-utils, xstream and commons-lang, and keep the versions in sync with current NX release.

@@ -17,10 +17,10 @@
 /*global Ext, Sonatype, FormFieldGenerator, FormFieldExporter, FormFieldImporter, Nexus*/
 /*jslint newcap:true*/
 
-define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons'], function() {
+define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons','nexus/siesta'], function() {
 
-var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities',
-    CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes',
+var CAPABILITIES_SERVICE_PATH = Nexus.siesta.basePath + '/capabilities',
+    CAPABILITY_TYPES_SERVICE_PATH = Nexus.siesta.basePath + '/capabilities/types',
     CAPABILITY_SETTINGS_PREFIX = '';
 
 Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
@@ -93,7 +93,10 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
 
   // A record that holds the data for each configured capability in the system
   this.capabilityRecordConstructor = Ext.data.Record.create([{
-        name : 'resourceURI'
+        name : 'resourceURI',
+        convert : function(newValue, rec) {
+          return CAPABILITIES_SERVICE_PATH + '/' + rec.id;
+        }
       }, {
         name : 'id'
       }, {
@@ -222,7 +225,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
   // defined capabilities
   this.capabilitiesReader = new Ext.data.JsonReader({
         root : 'data',
-        id : 'resourceURI'
+        id : 'id'
       }, this.capabilityRecordConstructor);
   this.capabilitiesDataStore = new Ext.data.Store({
         url : CAPABILITIES_SERVICE_PATH,
@@ -888,14 +891,14 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               notes:receivedData.notes,
               enabled:receivedData.enabled,
               active:receivedData.active,
-              resourceURI:receivedData.resourceURI,
+              resourceURI:CAPABILITIES_SERVICE_PATH + '/' + receivedData.id,
               typeId:receivedData.typeId,
               typeName:receivedData.typeName,
               stateDescription:receivedData.stateDescription,
               status:receivedData.status
             };
 
-            rec = new this.capabilityRecordConstructor( dataObj, receivedData.resourceURI );
+            rec = new this.capabilityRecordConstructor( dataObj, receivedData.id);
 
             this.capabilitiesDataStore.remove( this.capabilitiesDataStore.getById( action.options.fpanel.id ) );
             this.capabilitiesDataStore.addSorted( rec );
