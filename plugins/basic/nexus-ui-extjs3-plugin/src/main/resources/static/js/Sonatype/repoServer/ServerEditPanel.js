@@ -45,6 +45,14 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               [false, 'Off'],
               [true, 'On']
             ]
+          }),
+          smtpConnectionSettings = new Ext.data.SimpleStore({
+            fields : ['value', 'display'],
+            data : [
+              ['plain', 'Use plain SMTP'],
+              ['ssl', 'Use Secure SMTP (SSL)'],
+              ['tls', 'Use STARTTLS negotiation (TLS)']
+            ]
           });
 
     // Simply a record to hold details of each service type
@@ -137,16 +145,22 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               allowBlank : true
             },
             {
-              xtype : 'checkbox',
-              fieldLabel : 'SSL Enabled',
+              xtype : 'combo',
+              fieldLabel : 'Connection',
               helpText : ht.smtpssl,
-              name : 'smtpSettings.sslEnabled'
-            },
-            {
-              xtype : 'checkbox',
-              fieldLabel : 'TLS Enabled',
-              helpText : ht.smtptls,
-              name : 'smtpSettings.tlsEnabled'
+              width : 150,
+              store : smtpConnectionSettings,
+              valueField : 'value',
+              displayField : 'display',
+              editable : false,
+              forceSelection : true,
+              mode : 'local',
+              triggerAction : 'all',
+              emptyText : 'Select...',
+              selectOnFocus : true,
+              allowBlank : false,
+              name : 'smtpSettings.connection'
+//              value : 'plain'
             },
             {
               xtype : 'textfield',
@@ -966,8 +980,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       username : fpanel.form.findField('smtpSettings.username').getValue(),
       password : fpanel.form.findField('smtpSettings.password').getValue(),
       systemEmailAddress : fpanel.form.findField('smtpSettings.systemEmailAddress').getValue(),
-      sslEnabled : fpanel.form.findField('smtpSettings.sslEnabled').getValue(),
-      tlsEnabled : fpanel.form.findField('smtpSettings.tlsEnabled').getValue()
+      sslEnabled : fpanel.form.findField('smtpSettings.connection').getValue() == "ssl",
+      tlsEnabled : fpanel.form.findField('smtpSettings.connection').getValue() == "tls"
     };
 
     w = new Ext.Window({
