@@ -45,6 +45,14 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               [false, 'Off'],
               [true, 'On']
             ]
+          }),
+          smtpConnectionSettings = new Ext.data.SimpleStore({
+            fields : ['value', 'display'],
+            data : [
+              ['plain', 'Use plain SMTP'],
+              ['ssl', 'Use Secure SMTP (SSL)'],
+              ['tls', 'Use STARTTLS negotiation (TLS)']
+            ]
           });
 
     // Simply a record to hold details of each service type
@@ -137,16 +145,21 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               allowBlank : true
             },
             {
-              xtype : 'checkbox',
-              fieldLabel : 'SSL Enabled',
-              helpText : ht.smtpssl,
-              name : 'smtpSettings.sslEnabled'
-            },
-            {
-              xtype : 'checkbox',
-              fieldLabel : 'TLS Enabled',
-              helpText : ht.smtptls,
-              name : 'smtpSettings.tlsEnabled'
+              xtype : 'combo',
+              fieldLabel : 'Connection',
+              helpText : ht.connection,
+              width : 200,
+              store : smtpConnectionSettings,
+              valueField : 'value',
+              displayField : 'display',
+              editable : false,
+              forceSelection : true,
+              mode : 'local',
+              triggerAction : 'all',
+              emptyText : 'Select...',
+              selectOnFocus : true,
+              allowBlank : false,
+              name : 'smtpSettings.connection'
             },
             {
               xtype : 'textfield',
@@ -882,6 +895,12 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         },
         "remoteProxySettings.nonProxyHosts" : function(val, fpanel) {
           return fpanel.find('name', 'nonProxyHosts')[0].getEntries();
+        },
+        "smtpSettings.sslEnabled" : function(val, fpanel) {
+          return fpanel.find('name', 'smtpSettings.connection')[0].value === 'ssl';
+        },
+        "smtpSettings.tlsEnabled" : function(val, fpanel) {
+          return fpanel.find('name', 'smtpSettings.connection')[0].value === 'tls';
         }
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState,
@@ -951,6 +970,16 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         },
         "remoteProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
           fpanel.find('name', 'nonProxyHosts')[0].setEntries(arr);
+        },
+        "smtpSettings.sslEnabled" : function(arr, srcObj, fpanel) {
+          if (arr) {
+            fpanel.find('name', 'smtpSettings.connection')[0].setValue('ssl');
+          }
+        },
+        "smtpSettings.tlsEnabled" : function(arr, srcObj, fpanel) {
+          if (arr) {
+            fpanel.find('name', 'smtpSettings.connection')[0].setValue('tls');
+          }
         }
       }
     });
@@ -966,8 +995,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       username : fpanel.form.findField('smtpSettings.username').getValue(),
       password : fpanel.form.findField('smtpSettings.password').getValue(),
       systemEmailAddress : fpanel.form.findField('smtpSettings.systemEmailAddress').getValue(),
-      sslEnabled : fpanel.form.findField('smtpSettings.sslEnabled').getValue(),
-      tlsEnabled : fpanel.form.findField('smtpSettings.tlsEnabled').getValue()
+      sslEnabled : fpanel.form.findField('smtpSettings.connection').getValue() === 'ssl',
+      tlsEnabled : fpanel.form.findField('smtpSettings.connection').getValue() === 'tls'
     };
 
     w = new Ext.Window({
