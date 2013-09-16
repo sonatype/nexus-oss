@@ -120,6 +120,22 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
       return;
     }
 
+    var contentType = response.getResponseHeader("Content-Type");
+
+    // response will be a json serialized org.sonatype.sisu.siesta.common.error.ErrorXO
+    if( contentType === "application/vnd.siesta-error-v1+json") {
+      result = { errors: [{ id:'*', msg : result.message }]};
+    }
+
+    // response will be a json serialized array of org.sonatype.sisu.siesta.common.validation.ValidationErrorXO
+    // convert error message field (ExtJs expects a field named "msg")
+    if( contentType === "application/vnd.siesta-validation-errors-v1+json") {
+        result = { errors : result };
+        for (i = 0; i < result.errors.length; i=i+1) {
+          result.errors[i].msg = result.errors[i].message;
+        }
+    }
+
     if (result.errors !== null && result.errors !== undefined)
     {
       if (this.options.validationModifiers)
