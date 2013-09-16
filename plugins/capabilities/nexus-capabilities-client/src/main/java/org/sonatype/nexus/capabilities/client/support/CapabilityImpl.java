@@ -17,38 +17,40 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyEntitySupport;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+import org.sonatype.nexus.client.rest.support.EntitySupport;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import org.apache.commons.beanutils.BeanUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities.CapabilityAwareUniformInterfaceException;
 
 /**
  * Jersey based {@link Capability}.
  *
  * @since 2.2
  */
-public class JerseyCapability<C extends Capability<C>>
-    extends JerseyEntitySupport<C, CapabilityListItemResource>
+public class CapabilityImpl<C extends Capability<C>>
+    extends EntitySupport<C, CapabilityListItemResource>
     implements Capability<C>
 {
 
-  public JerseyCapability(final JerseyNexusClient nexusClient, final String type) {
-    super(nexusClient, null);
+  private final CapabilityClient client;
+
+  public CapabilityImpl(final CapabilityClient client, final String type) {
+    super(null);
+    this.client = checkNotNull(client, "client");
     settings().withTypeId(type);
   }
 
-  public JerseyCapability(final JerseyNexusClient nexusClient, final CapabilityListItemResource settings) {
-    super(nexusClient, settings.getId(), settings);
+  public CapabilityImpl(final CapabilityClient client, final CapabilityListItemResource settings) {
+    super(settings.getId(), settings);
+    this.client = checkNotNull(client, "client");
   }
 
   @Override
@@ -66,69 +68,26 @@ public class JerseyCapability<C extends Capability<C>>
 
   @Override
   protected CapabilityListItemResource doGet() {
-    try {
-      return getNexusClient()
-          .serviceResource(JerseyCapabilities.pathStatus(id()))
-          .get(CapabilityStatusResponseResource.class)
-          .getData();
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(new CapabilityAwareUniformInterfaceException(e.getResponse(), id()));
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    return client.getStatus(id()).getData();
   }
 
   @Override
   protected CapabilityListItemResource doCreate() {
     final CapabilityRequestResource request = new CapabilityRequestResource();
-    request.setData(settings());
-    try {
-      return getNexusClient()
-          .serviceResource("capabilities")
-          .post(CapabilityStatusResponseResource.class, request)
-          .getData();
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(e);
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    request.setData(settingsAsResource());
+    return client.post(request).getData();
   }
 
   @Override
   protected CapabilityListItemResource doUpdate() {
     final CapabilityRequestResource request = new CapabilityRequestResource();
-    request.setData(settings());
-    try {
-      return getNexusClient()
-          .serviceResource(JerseyCapabilities.path(id()))
-          .put(CapabilityStatusResponseResource.class, request)
-          .getData();
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(new CapabilityAwareUniformInterfaceException(e.getResponse(), id()));
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    request.setData(settingsAsResource());
+    return client.put(id(), request).getData();
   }
 
   @Override
   protected void doRemove() {
-    try {
-      getNexusClient()
-          .serviceResource(JerseyCapabilities.path(id()))
-          .delete();
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(new CapabilityAwareUniformInterfaceException(e.getResponse(), id()));
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    client.delete(id());
   }
 
   @Override
@@ -233,6 +192,17 @@ public class JerseyCapability<C extends Capability<C>>
     return me();
   }
 
+  private CapabilityResource settingsAsResource() {
+    final CapabilityResource resource = new CapabilityResource();
+    try {
+      BeanUtils.copyProperties(resource, settings());
+    }
+    catch (final Exception e) {
+      throw Throwables.propagate(e);
+    }
+    return resource;
+  }
+
   private CapabilityPropertyResource getOrCreateProperty(final String key) {
     CapabilityPropertyResource property = getProperty(key);
     if (property == null) {
@@ -265,11 +235,11 @@ public class JerseyCapability<C extends Capability<C>>
     if (this == o) {
       return true;
     }
-    if (!(o instanceof JerseyCapability)) {
+    if (!(o instanceof CapabilityImpl)) {
       return false;
     }
 
-    final JerseyCapability that = (JerseyCapability) o;
+    final CapabilityImpl that = (CapabilityImpl) o;
 
     if (id() != null ? !id().equals(that.id()) : that.id() != null) {
       return false;

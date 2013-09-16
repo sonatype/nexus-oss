@@ -13,37 +13,25 @@
 
 package org.sonatype.nexus.testsuite.capabilities.client.internal;
 
-import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
-import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityFactory;
+import org.sonatype.nexus.testsuite.capabilities.client.CapabilityB;
 
 /**
  * @since 2.2
  */
-public class JerseyCapabilityA
-    extends CapabilityImpl<CapabilityA>
-    implements CapabilityA
+@Named
+@Singleton
+public class CapabilityBFactory
+    extends ReflectiveCapabilityFactory<CapabilityB>
+    implements CapabilityFactory<CapabilityB>
 {
 
-  public JerseyCapabilityA(final CapabilityClient client) {
-    super(client, "[a]");
+  public CapabilityBFactory() {
+    super(CapabilityB.class);
   }
-
-  public JerseyCapabilityA(final CapabilityClient client, final CapabilityListItemResource resource) {
-    super(client, resource);
-  }
-
-  @Override
-  public String propertyA1() {
-    return property("a1");
-  }
-
-  @Override
-  public CapabilityA withPropertyA1(final String value) {
-    withProperty("a1", value);
-    return this;
-  }
-
 
 }

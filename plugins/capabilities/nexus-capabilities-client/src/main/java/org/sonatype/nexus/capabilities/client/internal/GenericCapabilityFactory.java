@@ -14,38 +14,38 @@
 package org.sonatype.nexus.capabilities.client.internal;
 
 import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
-import org.sonatype.nexus.capabilities.client.support.JerseyCapability;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A {@link JerseyCapabilityFactory} that allows working with capabilities in generic ways. Used when no capability
+ * A {@link CapabilityFactory} that allows working with capabilities in generic ways. Used when no capability
  * type
  * specific factory is available.
  *
  * @since 2.2
  */
-public class JerseyGenericCapabilityFactory
-    implements JerseyCapabilityFactory<Capability>
+public class GenericCapabilityFactory
+    implements CapabilityFactory<Capability>
 {
 
   private final String type;
 
-  public JerseyGenericCapabilityFactory(final String type) {
+  public GenericCapabilityFactory(final String type) {
     this.type = checkNotNull(type);
   }
 
   @Override
-  public Capability create(final JerseyNexusClient nexusClient) {
-    return new JerseyCapability(nexusClient, type);
+  public Capability create(final CapabilityClient client) {
+    return new CapabilityImpl(client, type);
   }
 
   @Override
-  public Capability create(final JerseyNexusClient nexusClient, final CapabilityListItemResource resource) {
-    return new JerseyCapability(nexusClient, resource);
+  public Capability create(final CapabilityClient client, final CapabilityListItemResource resource) {
+    return new CapabilityImpl(client, resource);
   }
 
   @Override
