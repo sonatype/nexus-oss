@@ -69,7 +69,7 @@ Same with extra configuration ( -D must be _before_ script ):
 
 ## Running Custom Testsuite Shards
 
-To run custom testsuite shards, here runs all p2 tests:
+To run custom testsuite shards, here runs all p2 tests in the legacy testsuite:
 
     mvn -pl testsuite/legacy-testsuite/pom.xml clean install \
         -Pit,testsuite-gencustom,testsuite-runcustom \
