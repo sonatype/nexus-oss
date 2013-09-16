@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.Validator;
+import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,13 +46,18 @@ public class ConjunctionValidator
 
   @Override
   public ValidationResult validate(final Map<String, String> properties) {
+    final DefaultValidationResult result = new DefaultValidationResult();
     for (final Validator validator : validators) {
       final ValidationResult validationResult = validator.validate(properties);
       if (!validationResult.isValid()) {
-        return validationResult;
+        result.add(validationResult.violations());
       }
     }
-    return ValidationResult.VALID;
+    if(result.isValid())
+    {
+      return ValidationResult.VALID;
+    }
+    return result;
   }
 
   @Override
