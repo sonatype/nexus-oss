@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -31,6 +32,8 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
@@ -120,6 +123,20 @@ public class EventsRouter
       }
       else if (isCollectionItem(itemEvent)) {
         yum.regenerateWhenDirectoryIsRemoved(itemEvent.getItem().getPath());
+      }
+    }
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(RepositoryItemEventCache itemEvent) {
+    ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
+    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/repodata/repomd.xml")) {
+      List<GroupRepository> groups = repositoryRegistry.get().getGroupsOfRepository(repository);
+      for (GroupRepository group : groups) {
+        if (yumRegistryProvider.get().isRegistered(group.getId())) {
+          MergeMetadataTask.createTaskFor(nexusScheduler.get(), group);
+        }
       }
     }
   }
