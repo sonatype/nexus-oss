@@ -47,6 +47,9 @@
   <logger name="org.eclipse.jetty" level="INFO"/>
   <logger name="eu.medsea.mimeutil.MimeUtil2" level="INFO"/>
 
+  <!-- NEXUS-5456: limit noisy guice timing logger -->
+  <logger name="com.google.inject.internal.util.Stopwatch" level="INFO"/>
+
   <!-- NEXUS-5835: limit noisy jmx connections to Nexus when root.level is DEBUG -->
   <logger name="javax.management" level="INFO"/>
   <logger name="sun.rmi" level="INFO"/>
