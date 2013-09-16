@@ -67,3 +67,12 @@ Same with extra configuration ( -D must be _before_ script ):
 
     groovy -Dfixlast=true ./buildsupport/scripts/fixcrlf.groovy
 
+## Running Custom Testsuite Shards
+
+To run custom testsuite shards, here runs all p2 tests:
+
+    mvn -pl testsuite/legacy-testsuite/pom.xml clean install \
+        -Pit,testsuite-gencustom,testsuite-runcustom \
+        -Dautoshard.includes='**/p2/**/*IT.java'
+
+
