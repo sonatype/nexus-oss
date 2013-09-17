@@ -18,8 +18,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import static org.sonatype.nexus.plugins.PluginStaticResource.getResourceIfOnFileSystem;
+
 public class DefaultStaticResource
-    implements StaticResource
+    implements StaticResource, CacheControl
 {
   private final URL resourceURL;
 
@@ -27,14 +29,16 @@ public class DefaultStaticResource
 
   private volatile URLConnection urlConnection;
 
-  private String contentType;
+  private final String contentType;
+
+  private final boolean shouldCache;
 
   public DefaultStaticResource(URL url, String path, String contentType) {
-    this.resourceURL = url;
-
+    URL overrideUrl = getResourceIfOnFileSystem(path);
+    this.resourceURL = overrideUrl != null ? overrideUrl : url;
     this.path = path;
-
     this.contentType = contentType;
+    this.shouldCache = overrideUrl == null;
   }
 
   protected synchronized boolean checkConnection() {
@@ -101,6 +105,11 @@ public class DefaultStaticResource
       return urlConnection.getLastModified();
     }
     return null;
+  }
+
+  @Override
+  public boolean shouldCache() {
+    return shouldCache;
   }
 
   @Override

@@ -451,7 +451,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         columns : [
             // icon
             {
-                width: 25, // some padding here for badges
+                width: 30,
                 resizable: false,
                 sortable: false,
                 fixed: true,

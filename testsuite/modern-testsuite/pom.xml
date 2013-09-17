@@ -61,6 +61,12 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-yum-repository-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-site-repository-client</artifactId>
       <scope>test</scope>
     </dependency>
@@ -97,6 +103,34 @@
                   <properties>
                     <autoshard.mode>normal</autoshard.mode>
                     <autoshard.count>1</autoshard.count>
+
+                    <!--
+                    Yum tests must be run in yum shard.
+                    -->
+                    <autoshard.excludes>**/yum/**</autoshard.excludes>
+                  </properties>
+                </configuration>
+              </execution>
+
+              <!--
+              Generate special shard for execution with a linux that has createrepo/mergerepo.
+              -->
+              <execution>
+                <id>yum</id>
+                <phase>process-test-sources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <autoshard.mode>custom</autoshard.mode>
+                    <autoshard.shardId>yum</autoshard.shardId>
+                    <autoshard.includes>**/yum/**/*IT.java</autoshard.includes>
+
+                    <!--
+                    HACK: gmaven executions leak project.properties, force reconfiguration to avoid using excludes from default execution.
+                    -->
+                    <autoshard.excludes>ignore</autoshard.excludes>
                   </properties>
                 </configuration>
               </execution>

@@ -168,6 +168,15 @@ NX.define('Sonatype.repoServer.UserEditPanel', {
           width : 175
         },
         {
+          name: 'status',
+          header: 'Status',
+          width: 60,
+          renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            // edit panel displays data as capitalized, so we match it here
+            return Ext.util.Format.capitalize(value);
+          }
+        },
+        {
           name : 'roles'
         },
         {

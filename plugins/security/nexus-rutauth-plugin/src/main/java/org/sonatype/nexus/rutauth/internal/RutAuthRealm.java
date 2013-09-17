@@ -43,13 +43,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named(RutAuthRealm.ID)
 @Singleton
-@Description("Rut Auth Realm")
+@Description(RutAuthRealm.DESCRIPTION)
 public class RutAuthRealm
     extends AuthenticatingRealm
 {
+
   private static final Logger log = LoggerFactory.getLogger(RutAuthRealm.class);
 
   public static final String ID = "rutauth-realm";
+
+  public static final String DESCRIPTION = "Rut Auth Realm";
 
   private final SecuritySystem securitySystem;
 

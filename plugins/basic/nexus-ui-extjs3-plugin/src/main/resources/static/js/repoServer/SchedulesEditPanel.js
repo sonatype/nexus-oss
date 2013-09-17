@@ -323,7 +323,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         url : Sonatype.config.repos.urls.scheduleTypes,
         reader : this.serviceTypeReader,
         sortInfo : {
-          field : 'id',
+          field : 'name',
           direction : 'ASC'
         },
         autoLoad : true
