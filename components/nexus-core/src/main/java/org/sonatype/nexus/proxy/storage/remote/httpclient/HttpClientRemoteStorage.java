@@ -47,6 +47,8 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
+import com.yammer.metrics.annotation.Timed;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import org.apache.http.Header;
@@ -147,6 +149,7 @@ public class HttpClientRemoteStorage
   }
 
   @Override
+  @Timed
   public AbstractStorageItem retrieveItem(final ProxyRepository repository, final ResourceStoreRequest request,
                                           final String baseUrl)
       throws ItemNotFoundException, RemoteStorageException
@@ -228,6 +231,7 @@ public class HttpClientRemoteStorage
   }
 
   @Override
+  @Timed
   public void storeItem(final ProxyRepository repository, final StorageItem item)
       throws UnsupportedStorageOperationException, RemoteStorageException
   {
@@ -270,6 +274,7 @@ public class HttpClientRemoteStorage
   }
 
   @Override
+  @Timed
   public void deleteItem(final ProxyRepository repository, final ResourceStoreRequest request)
       throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
   {
@@ -408,24 +413,26 @@ public class HttpClientRemoteStorage
    */
   @VisibleForTesting
   HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-                              final HttpUriRequest httpRequest)
-      throws RemoteStorageException
+      final HttpUriRequest httpRequest) throws RemoteStorageException
   {
-    final Stopwatch stopwatch = timingLog.isDebugEnabled() ? new Stopwatch().start() : null;
+    // HACK: Despite we have Yammer timing muck, request execution logged with method and URI is very
+    // handy for debugging purposes. For it we have a special logger, and enable timingLog by
+    // setting the "remote.storage.timing" logger at DEBUG level.
+    final boolean timingLogEnabled = timingLog.isDebugEnabled();
+    final Stopwatch stopwatch = timingLogEnabled ? new Stopwatch().start() : null;
     try {
       return doExecuteRequest(repository, request, httpRequest);
     }
     finally {
       if (stopwatch != null) {
         stopwatch.stop();
-        if (timingLog.isDebugEnabled()) {
-          timingLog.debug("[{}] {} {} took {}", repository.getId(), httpRequest.getMethod(),
-              httpRequest.getURI(), stopwatch);
-        }
+        timingLog.debug("[{}] {} {} took {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(),
+            stopwatch);
       }
     }
   }
 
+  @Timed
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,
                                         final HttpUriRequest httpRequest)
       throws RemoteStorageException
