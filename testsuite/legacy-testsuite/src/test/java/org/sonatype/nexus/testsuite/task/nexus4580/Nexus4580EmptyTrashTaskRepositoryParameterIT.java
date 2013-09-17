@@ -57,11 +57,11 @@ public class Nexus4580EmptyTrashTaskRepositoryParameterIT
     final File snapshotTrashFile = new File(nexusWorkDir, "storage/" + REPO_TEST_HARNESS_SNAPSHOT_REPO
         + "/.nexus/trash/foo.txt");
 
-    // verify trash have both files
+    // verify both repo trashes have the files
     assertThat(releaseTrashFile, FileMatchers.isFile());
     assertThat(snapshotTrashFile, FileMatchers.isFile());
 
-    // delete only from releases
+    // empty trash but only on snapshot repo
     ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
     age.setKey(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID);
     age.setValue("0");
@@ -70,7 +70,7 @@ public class Nexus4580EmptyTrashTaskRepositoryParameterIT
     age.setValue(REPO_TEST_HARNESS_SNAPSHOT_REPO);
     TaskScheduleUtil.runTask("Empty Trash Older Than", EmptyTrashTaskDescriptor.ID, age, repository);
 
-    // verify trash have only release file
+    // verify that only releases trash has the file (other was nuked)
     assertThat(releaseTrashFile, FileMatchers.isFile());
     assertThat("snapshot file should be deleted", !snapshotTrashFile.exists());
   }
