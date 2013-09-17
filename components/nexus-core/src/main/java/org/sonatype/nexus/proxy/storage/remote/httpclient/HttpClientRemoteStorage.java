@@ -432,7 +432,6 @@ public class HttpClientRemoteStorage
     }
   }
 
-  @Timed
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,
                                         final HttpUriRequest httpRequest)
       throws RemoteStorageException
