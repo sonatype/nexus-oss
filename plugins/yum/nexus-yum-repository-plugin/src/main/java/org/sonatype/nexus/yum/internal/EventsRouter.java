@@ -127,6 +127,11 @@ public class EventsRouter
     }
   }
 
+  /**
+   * Automatically merge group level metadata when "/repodata/repomd.xml" is (re)retrieved from proxy.
+   *
+   * @since 2.7
+   */
   @AllowConcurrentEvents
   @Subscribe
   public void on(RepositoryItemEventCache itemEvent) {
