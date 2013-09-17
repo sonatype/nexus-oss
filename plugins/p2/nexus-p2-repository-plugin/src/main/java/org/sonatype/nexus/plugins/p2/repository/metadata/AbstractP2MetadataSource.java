@@ -116,9 +116,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
   {
     // this is a special one: once cached (hence consumed), temp file get's deleted
     final FileContentLocator fileContentLocator = new FileContentLocator("text/xml");
-    OutputStream buffer = null;
-    try {
-      buffer = fileContentLocator.getOutputStream();
+    try (OutputStream buffer = fileContentLocator.getOutputStream()) {
       final MXSerializer mx = new MXSerializer();
       mx.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  ");
       mx.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n");
@@ -130,9 +128,6 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
       }
       metadata.writeToSerializer(null, mx);
       mx.flush();
-    }
-    finally {
-      IOUtil.close(buffer);
     }
 
     final DefaultStorageFileItem result =
@@ -154,21 +149,12 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     // this is a special one: once cached (hence consumed), temp file gets deleted
     final FileContentLocator fileContentLocator = new FileContentLocator("application/java-archive");
 
-    OutputStream buffer = null;
-    ZipOutputStream out = null;
-    InputStream in = null;
-    try {
-      buffer = fileContentLocator.getOutputStream();
-      out = new ZipOutputStream(buffer);
-      in = metadataXml.getInputStream();
 
+    try (OutputStream buffer = fileContentLocator.getOutputStream();
+         ZipOutputStream out = new ZipOutputStream(buffer);
+         InputStream in = metadataXml.getInputStream()) {
       out.putNextEntry(new JarEntry(metadataXml.getName()));
       IOUtil.copy(in, out);
-    }
-    finally {
-      IOUtil.close(in);
-      IOUtil.close(out);
-      IOUtil.close(buffer);
     }
 
     final DefaultStorageFileItem result = new DefaultStorageFileItem(
