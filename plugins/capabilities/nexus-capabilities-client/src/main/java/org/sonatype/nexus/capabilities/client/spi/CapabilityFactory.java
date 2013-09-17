@@ -14,7 +14,8 @@
 package org.sonatype.nexus.capabilities.client.spi;
 
 import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 
 /**
  * A {@link Capability} factory that can create new ones or from an existing resource.
@@ -26,7 +27,7 @@ public interface CapabilityFactory<C extends Capability>
 
   C create(CapabilityClient client);
 
-  C create(CapabilityClient client, CapabilityListItemResource resource);
+  C create(CapabilityClient client, CapabilityStatusXO settings);
 
   boolean canCreate(String type);
 

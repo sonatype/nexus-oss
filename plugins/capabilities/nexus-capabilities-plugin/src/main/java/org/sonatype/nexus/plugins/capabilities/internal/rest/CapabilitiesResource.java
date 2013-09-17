@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,24 +31,20 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityXO;
+import org.sonatype.nexus.capabilities.model.PropertyXO;
 import org.sonatype.nexus.capability.support.CapabilitiesPlugin;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
-import org.sonatype.sisu.siesta.common.error.ObjectNotFoundException;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
@@ -58,6 +55,11 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabil
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.CapabilityReferenceFilter;
 
+/**
+ * Capabilities REST resource.
+ *
+ * @since 2.7
+ */
 @Named
 @Singleton
 @Path(CapabilitiesResource.RESOURCE_URI)
@@ -86,28 +88,61 @@ public class CapabilitiesResource
   }
 
   /**
+   * Get the details of a capability.
+   */
+  @GET
+  @Path("/{id}")
+  @Produces({APPLICATION_XML, APPLICATION_JSON})
+  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
+  public CapabilityXO get(final @PathParam("id") String id) {
+    final CapabilityIdentity capabilityId = capabilityIdentity(id);
+    final CapabilityReference reference = capabilityRegistry.get(capabilityId);
+    if (reference == null) {
+      throw new CapabilityNotFoundException(capabilityId);
+    }
+    return asCapability(reference);
+  }
+
+  @GET
+  @Path("/{id}/status")
+  @Produces({APPLICATION_XML, APPLICATION_JSON})
+  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
+  public CapabilityStatusXO getInfo(final @PathParam("id") String id) {
+    final CapabilityIdentity capabilityId = capabilityIdentity(id);
+    final CapabilityReference reference = capabilityRegistry.get(capabilityId);
+    if (reference == null) {
+      throw new CapabilityNotFoundException(capabilityId);
+    }
+    return asCapabilityStatus(reference);
+  }
+
+  /**
    * Retrieve a list of capabilities currently configured in nexus.
    */
   @GET
   @Produces({APPLICATION_XML, APPLICATION_JSON})
   @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
-  public CapabilitiesListResponseResource get(@QueryParam($TYPE) String type,
-                                              @QueryParam($ENABLED) Boolean enabled,
-                                              @QueryParam($ACTIVE) Boolean active,
-                                              @QueryParam($INCLUDE_NOT_EXPOSED) Boolean includeNotExposed,
-                                              @QueryParam($PROPERTY) List<String> properties)
+  public List<CapabilityStatusXO> get(@QueryParam($TYPE) String type,
+                                      @QueryParam($ENABLED) Boolean enabled,
+                                      @QueryParam($ACTIVE) Boolean active,
+                                      @QueryParam($INCLUDE_NOT_EXPOSED) Boolean includeNotExposed,
+                                      @QueryParam($PROPERTY) List<String> properties)
   {
-    final CapabilitiesListResponseResource result = new CapabilitiesListResponseResource();
-
     final Collection<? extends CapabilityReference> references = capabilityRegistry.get(
         buildFilter(type, enabled, active, includeNotExposed, properties)
     );
 
-    for (final CapabilityReference reference : references) {
-      result.addData(asCapabilityListItemResource(reference));
-    }
-
-    return result;
+    return Lists.transform(Lists.newArrayList(references), new Function<CapabilityReference, CapabilityStatusXO>()
+    {
+      @Nullable
+      @Override
+      public CapabilityStatusXO apply(@Nullable final CapabilityReference input) {
+        if (input == null) {
+          return null;
+        }
+        return asCapabilityStatus(input);
+      }
+    });
   }
 
   /**
@@ -117,36 +152,17 @@ public class CapabilitiesResource
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
   @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "create")
-  public CapabilityStatusResponseResource post(final CapabilityRequestResource envelope)
+  public CapabilityStatusXO post(final CapabilityXO capability)
       throws Exception
   {
-    final CapabilityReference reference = capabilityRegistry.add(
-        capabilityType(envelope.getData().getTypeId()),
-        envelope.getData().isEnabled(),
-        envelope.getData().getNotes(),
-        asMap(envelope.getData().getProperties())
+    return asCapabilityStatus(
+        capabilityRegistry.add(
+            capabilityType(capability.getTypeId()),
+            capability.isEnabled(),
+            capability.getNotes(),
+            asMap(capability.getProperties())
+        )
     );
-
-    return asCapabilityStatusResponseResource(reference);
-  }
-
-  /**
-   * Get the details of a capability.
-   */
-  @GET
-  @Path("/{id}")
-  @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
-  public CapabilityResponseResource get(final @PathParam("id") String id) {
-    final CapabilityIdentity capabilityId = capabilityIdentity(id);
-    final CapabilityReference reference = capabilityRegistry.get(capabilityId);
-    if (reference == null) {
-      throw new ObjectNotFoundException(
-          String.format("Capability with id '%s' was not found", capabilityId)
-      );
-    }
-
-    return asCapabilityResponseResource(reference);
   }
 
   /**
@@ -157,23 +173,18 @@ public class CapabilitiesResource
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_XML, APPLICATION_JSON})
   @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "update")
-  public CapabilityStatusResponseResource put(final @PathParam("id") String id,
-                                              final CapabilityRequestResource envelope)
+  public CapabilityStatusXO put(final @PathParam("id") String id,
+                                final CapabilityXO capability)
       throws Exception
   {
-    final CapabilityIdentity capabilityId = capabilityIdentity(id);
-    try {
-      final CapabilityReference reference = capabilityRegistry.update(
-          capabilityId,
-          envelope.getData().isEnabled(),
-          envelope.getData().getNotes(),
-          asMap(envelope.getData().getProperties())
-      );
-      return asCapabilityStatusResponseResource(reference);
-    }
-    catch (CapabilityNotFoundException e) {
-      throw new ObjectNotFoundException(e.getMessage(), e);
-    }
+    return asCapabilityStatus(
+        capabilityRegistry.update(
+            capabilityIdentity(id),
+            capability.isEnabled(),
+            capability.getNotes(),
+            asMap(capability.getProperties())
+        )
+    );
   }
 
   /**
@@ -185,64 +196,42 @@ public class CapabilitiesResource
   public void delete(final @PathParam("id") String id)
       throws Exception
   {
-    try {
-      capabilityRegistry.remove(capabilityIdentity(id));
-    }
-    catch (CapabilityNotFoundException e) {
-      throw new ObjectNotFoundException(e.getMessage(), e);
-    }
-  }
-
-  @GET
-  @Path("/{id}/status")
-  @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
-  public CapabilityStatusResponseResource getStatus(final @PathParam("id") String id) {
-    final CapabilityIdentity capabilityId = capabilityIdentity(id);
-    final CapabilityReference reference = capabilityRegistry.get(capabilityId);
-    if (reference == null) {
-      throw new ObjectNotFoundException(
-          String.format("Capability with id '%s' was not found", capabilityId)
-      );
-    }
-    return asCapabilityStatusResponseResource(reference);
+    capabilityRegistry.remove(capabilityIdentity(id));
   }
 
   /**
-   * Update the configuration of an existing capability.
+   * Enable an existing capability.
    */
   @PUT
-  @Path("/{id}/status")
+  @Path("/{id}/enable")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_XML, APPLICATION_JSON})
   @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "update")
-  public CapabilityStatusResponseResource put(final @PathParam("id") String id,
-                                              final CapabilityStatusRequestResource envelope)
+  public CapabilityStatusXO enable(final @PathParam("id") String id)
       throws Exception
   {
-    final CapabilityIdentity capabilityId = capabilityIdentity(id);
-    CapabilityReference reference;
-
-    try {
-      if (envelope.getData().isEnabled()) {
-        reference = capabilityRegistry.enable(capabilityId);
-      }
-      else {
-        reference = capabilityRegistry.disable(capabilityId);
-      }
-    }
-    catch (CapabilityNotFoundException e) {
-      throw new ObjectNotFoundException(e.getMessage(), e);
-    }
-
-    return asCapabilityStatusResponseResource(reference);
+    return asCapabilityStatus(capabilityRegistry.enable(capabilityIdentity(id)));
   }
 
-  static Map<String, String> asMap(final List<CapabilityPropertyResource> properties) {
+  /**
+   * Enable an existing capability.
+   */
+  @PUT
+  @Path("/{id}/disable")
+  @Consumes({APPLICATION_JSON, APPLICATION_XML})
+  @Produces({APPLICATION_XML, APPLICATION_JSON})
+  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "update")
+  public CapabilityStatusXO disable(final @PathParam("id") String id)
+      throws Exception
+  {
+    return asCapabilityStatus(capabilityRegistry.disable(capabilityIdentity(id)));
+  }
+
+  static Map<String, String> asMap(final List<PropertyXO> properties) {
     final Map<String, String> map = Maps.newHashMap();
 
     if (properties != null) {
-      for (final CapabilityPropertyResource property : properties) {
+      for (final PropertyXO property : properties) {
         map.put(property.getKey(), property.getValue());
       }
     }
@@ -250,78 +239,45 @@ public class CapabilitiesResource
     return map;
   }
 
-  static CapabilityResponseResource asCapabilityResponseResource(final CapabilityReference reference) {
+  static CapabilityStatusXO asCapabilityStatus(final CapabilityReference reference) {
     checkNotNull(reference);
 
-    final CapabilityResource resource = new CapabilityResource();
+    final CapabilityStatusXO capabilityStatus = new CapabilityStatusXO()
+        .withCapability(asCapability(reference))
+        .withTypeName(reference.context().descriptor().name())
+        .withActive(reference.context().isActive())
+        .withError(reference.context().hasFailure());
 
-    resource.setId(reference.context().id().toString());
-    resource.setNotes(reference.context().notes());
-    resource.setEnabled(reference.context().isEnabled());
-    resource.setTypeId(reference.context().type().toString());
+    try {
+      capabilityStatus.setDescription(reference.capability().description());
+    }
+    catch (Exception ignore) {
+      capabilityStatus.setDescription(null);
+    }
+    try {
+      capabilityStatus.setStatus(reference.capability().status());
+    }
+    catch (Exception ignore) {
+      capabilityStatus.setStatus(null);
+    }
+    capabilityStatus.setStateDescription(reference.context().stateDescription());
+
+    return capabilityStatus;
+  }
+
+  private static CapabilityXO asCapability(final CapabilityReference reference) {
+    CapabilityXO capability = new CapabilityXO()
+        .withId(reference.context().id().toString())
+        .withNotes(reference.context().notes())
+        .withEnabled(reference.context().isEnabled())
+        .withTypeId(reference.context().type().toString());
 
     if (reference.context().properties() != null) {
       for (final Map.Entry<String, String> entry : reference.context().properties().entrySet()) {
-        final CapabilityPropertyResource resourceProp = new CapabilityPropertyResource();
-        resourceProp.setKey(entry.getKey());
-        resourceProp.setValue(entry.getValue());
-
-        resource.addProperty(resourceProp);
+        capability.getProperties().add(new PropertyXO().withKey(entry.getKey()).withValue(entry.getValue()));
       }
     }
-
-    final CapabilityResponseResource response = new CapabilityResponseResource();
-    response.setData(resource);
-
-    return response;
-  }
-
-  static CapabilityStatusResponseResource asCapabilityStatusResponseResource(final CapabilityReference reference) {
-    checkNotNull(reference);
-
-    final CapabilityStatusResponseResource status = new CapabilityStatusResponseResource();
-
-    status.setData(asCapabilityListItemResource(reference));
-
-    return status;
-  }
-
-  static CapabilityListItemResource asCapabilityListItemResource(final CapabilityReference reference) {
-    checkNotNull(reference);
-
-    final CapabilityListItemResource item = new CapabilityListItemResource();
-    item.setId(reference.context().id().toString());
-    item.setNotes(reference.context().notes());
-    item.setEnabled(reference.context().isEnabled());
-    item.setTypeId(reference.context().type().toString());
-    item.setTypeName(reference.context().descriptor().name());
-    item.setActive(reference.context().isActive());
-    item.setError(reference.context().hasFailure());
-    try {
-      item.setDescription(reference.capability().description());
-    }
-    catch (Exception ignore) {
-      item.setDescription(null);
-    }
-    try {
-      item.setStatus(reference.capability().status());
-    }
-    catch (Exception ignore) {
-      item.setStatus(null);
-    }
-    item.setStateDescription(reference.context().stateDescription());
-
-    if (reference.context().properties() != null) {
-      for (final Map.Entry<String, String> entry : reference.context().properties().entrySet()) {
-        final CapabilityPropertyResource resourceProp = new CapabilityPropertyResource();
-        resourceProp.setKey(entry.getKey());
-        resourceProp.setValue(entry.getValue());
-
-        item.addProperty(resourceProp);
-      }
-    }
-
-    return item;
+    return capability;
   }
 
 

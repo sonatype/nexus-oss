@@ -16,6 +16,7 @@ package org.sonatype.nexus.capabilities.client.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -29,10 +30,9 @@ import org.sonatype.nexus.capabilities.client.exceptions.CapabilityFactoryNotAva
 import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.sisu.siesta.client.ClientBuilder.Target.Factory;
 
 import com.google.common.base.Function;
@@ -78,7 +78,7 @@ public class CapabilitiesImpl
 
   @Override
   public Capability get(final String id) {
-    return convert(client.getStatus(checkNotNull(id)).getData());
+    return convert(client.getStatus(checkNotNull(id)));
   }
 
   @Override
@@ -200,7 +200,7 @@ public class CapabilitiesImpl
   }
 
   private Collection<Capability> queryFor(final Filter filter) {
-    final CapabilitiesListResponseResource resource;
+    final List<CapabilityStatusXO> resource;
     if (filter != null) {
       resource = client.search(filter.toQueryMap());
     }
@@ -208,20 +208,20 @@ public class CapabilitiesImpl
       resource = client.get();
     }
 
-    return Collections2.transform(resource.getData(), new Function<CapabilityListItemResource, Capability>()
+    return Collections2.transform(resource, new Function<CapabilityStatusXO, Capability>()
     {
       @Override
-      public Capability apply(@Nullable final CapabilityListItemResource input) {
+      public Capability apply(@Nullable final CapabilityStatusXO input) {
         return convert(input);
       }
     });
   }
 
-  private Capability convert(final CapabilityListItemResource resource) {
+  private Capability convert(final CapabilityStatusXO resource) {
     if (resource == null) {
       return null;
     }
-    return findFactoryOf(resource.getTypeId()).create(client, resource);
+    return findFactoryOf(resource.getCapability().getTypeId()).create(client, resource);
   }
 
   public static String path(final String id) {

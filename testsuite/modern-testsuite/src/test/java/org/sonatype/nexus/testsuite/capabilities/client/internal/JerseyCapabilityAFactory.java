@@ -19,7 +19,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
 
 /**
@@ -36,8 +37,8 @@ public class JerseyCapabilityAFactory
   }
 
   @Override
-  public CapabilityA create(final CapabilityClient client, final CapabilityListItemResource resource) {
-    return new JerseyCapabilityA(client, resource);
+  public CapabilityA create(final CapabilityClient client, final CapabilityStatusXO settings) {
+    return new JerseyCapabilityA(client, settings);
   }
 
   public boolean canCreate(final String type) {

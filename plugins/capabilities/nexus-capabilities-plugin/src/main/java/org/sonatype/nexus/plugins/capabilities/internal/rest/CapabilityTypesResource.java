@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -24,21 +24,27 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.sonatype.nexus.capabilities.model.CapabilityTypeXO;
+import org.sonatype.nexus.capabilities.model.FormFieldXO;
 import org.sonatype.nexus.capability.support.CapabilitiesPlugin;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityFormFieldResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityTypeResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityTypeResourceResponse;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
+/**
+ * Capabilities Types REST resource.
+ *
+ * @since 2.7
+ */
 @Named
 @Singleton
 @Path(CapabilityTypesResource.RESOURCE_URI)
@@ -65,51 +71,52 @@ public class CapabilityTypesResource
   @GET
   @Produces({APPLICATION_XML, APPLICATION_JSON})
   @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX_TYPES + "read")
-  public CapabilityTypeResourceResponse get(@QueryParam($INCLUDE_NOT_EXPOSED) Boolean includeNotExposed) {
-    final CapabilityTypeResourceResponse envelope = new CapabilityTypeResourceResponse();
+  public List<CapabilityTypeXO> get(@QueryParam($INCLUDE_NOT_EXPOSED) Boolean includeNotExposed) {
 
+    final List<CapabilityTypeXO> types = Lists.newArrayList();
     final CapabilityDescriptor[] descriptors = capabilityDescriptorRegistry.getAll();
 
     if (descriptors != null) {
       for (final CapabilityDescriptor descriptor : descriptors) {
         if (((includeNotExposed != null && includeNotExposed) || descriptor.isExposed())) {
-          final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
-          capabilityTypeResource.setId(descriptor.type().toString());
-          capabilityTypeResource.setName(descriptor.name());
-          capabilityTypeResource.setAbout(descriptor.about());
 
-          envelope.addData(capabilityTypeResource);
+          CapabilityTypeXO type = new CapabilityTypeXO()
+              .withId(descriptor.type().toString())
+              .withName(descriptor.name())
+              .withAbout(descriptor.about());
 
-          final List<FormField> formFields = descriptor.formFields();
+          types.add(type);
 
-          capabilityTypeResource.setFormFields(formFieldToDTO(formFields));
+          if (descriptor.formFields() != null) {
+            type.withFormFields(Lists.transform(descriptor.formFields(), new Function<FormField, FormFieldXO>()
+            {
+              @Nullable
+              @Override
+              public FormFieldXO apply(@Nullable final FormField input) {
+                if (input == null) {
+                  return null;
+                }
+
+                FormFieldXO formField = new FormFieldXO()
+                    .withId(input.getId())
+                    .withType(input.getType())
+                    .withLabel(input.getLabel())
+                    .withHelpText(input.getHelpText())
+                    .withRequired(input.isRequired())
+                    .withRegexValidation(input.getRegexValidation());
+
+                if (input.getInitialValue() != null) {
+                  formField.setInitialValue(input.getInitialValue().toString());
+                }
+                return formField;
+              }
+            }));
+          }
         }
-
       }
     }
 
-    return envelope;
-  }
-
-  protected List<CapabilityFormFieldResource> formFieldToDTO(List<FormField> fields) {
-    List<CapabilityFormFieldResource> dtoList = new ArrayList<>();
-
-    for (FormField field : fields) {
-      CapabilityFormFieldResource dto = new CapabilityFormFieldResource();
-      dto.setHelpText(field.getHelpText());
-      dto.setId(field.getId());
-      dto.setLabel(field.getLabel());
-      dto.setRegexValidation(field.getRegexValidation());
-      dto.setRequired(field.isRequired());
-      dto.setType(field.getType());
-      if (field.getInitialValue() != null) {
-        dto.setInitialValue(field.getInitialValue().toString());
-      }
-
-      dtoList.add(dto);
-    }
-
-    return dtoList;
+    return types;
   }
 
 }

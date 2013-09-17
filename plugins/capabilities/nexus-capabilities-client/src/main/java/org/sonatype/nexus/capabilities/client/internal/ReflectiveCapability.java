@@ -22,8 +22,9 @@ import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityProperty;
 import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
 import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityImplementationException;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 
 import com.google.common.primitives.Primitives;
 
@@ -52,7 +53,7 @@ public class ReflectiveCapability
 
   public ReflectiveCapability(final Class<? extends Capability> capabilityType,
                               final CapabilityClient client,
-                              final CapabilityListItemResource settings)
+                              final CapabilityStatusXO settings)
   {
     this.capabilityType = checkNotNull(capabilityType);
     delegate = new CapabilityImpl(client, settings);

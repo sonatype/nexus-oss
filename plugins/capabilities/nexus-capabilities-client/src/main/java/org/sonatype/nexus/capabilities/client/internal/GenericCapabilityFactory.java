@@ -17,7 +17,8 @@ import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
 import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,8 +45,8 @@ public class GenericCapabilityFactory
   }
 
   @Override
-  public Capability create(final CapabilityClient client, final CapabilityListItemResource resource) {
-    return new CapabilityImpl(client, resource);
+  public Capability create(final CapabilityClient client, final CapabilityStatusXO settings) {
+    return new CapabilityImpl(client, settings);
   }
 
   @Override

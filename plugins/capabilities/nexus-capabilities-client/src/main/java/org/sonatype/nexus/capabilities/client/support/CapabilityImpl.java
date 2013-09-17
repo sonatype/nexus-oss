@@ -18,15 +18,13 @@ import java.util.Map;
 
 import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityXO;
+import org.sonatype.nexus.capabilities.model.PropertyXO;
 import org.sonatype.nexus.client.rest.support.EntitySupport;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
-import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.beanutils.BeanUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.2
  */
 public class CapabilityImpl<C extends Capability<C>>
-    extends EntitySupport<C, CapabilityListItemResource>
+    extends EntitySupport<C, CapabilityStatusXO>
     implements Capability<C>
 {
 
@@ -45,44 +43,43 @@ public class CapabilityImpl<C extends Capability<C>>
   public CapabilityImpl(final CapabilityClient client, final String type) {
     super(null);
     this.client = checkNotNull(client, "client");
-    settings().withTypeId(type);
+    settings().getCapability().withTypeId(type);
   }
 
-  public CapabilityImpl(final CapabilityClient client, final CapabilityListItemResource settings) {
-    super(settings.getId(), settings);
+  public CapabilityImpl(final CapabilityClient client, final CapabilityStatusXO settings) {
+    super(settings.getCapability().getId(), settings);
     this.client = checkNotNull(client, "client");
   }
 
   @Override
   public String id() {
-    return settings().getId();
+    return settings().getCapability().getId();
   }
 
   @Override
-  protected CapabilityListItemResource createSettings(final String id) {
-    final CapabilityListItemResource resource = new CapabilityListItemResource();
-    resource.setId(id);
-    resource.setEnabled(true);
-    return resource;
+  protected CapabilityStatusXO createSettings(final String id) {
+    return new CapabilityStatusXO()
+        .withCapability(
+            new CapabilityXO()
+                .withId(id)
+                .withEnabled(true)
+                .withProperties(Lists.<PropertyXO>newArrayList())
+        );
   }
 
   @Override
-  protected CapabilityListItemResource doGet() {
-    return client.getStatus(id()).getData();
+  protected CapabilityStatusXO doGet() {
+    return client.getStatus(id());
   }
 
   @Override
-  protected CapabilityListItemResource doCreate() {
-    final CapabilityRequestResource request = new CapabilityRequestResource();
-    request.setData(settingsAsResource());
-    return client.post(request).getData();
+  protected CapabilityStatusXO doCreate() {
+    return client.create(settings().getCapability());
   }
 
   @Override
-  protected CapabilityListItemResource doUpdate() {
-    final CapabilityRequestResource request = new CapabilityRequestResource();
-    request.setData(settingsAsResource());
-    return client.put(id(), request).getData();
+  protected CapabilityStatusXO doUpdate() {
+    return client.update(id(), settings().getCapability());
   }
 
   @Override
@@ -92,17 +89,17 @@ public class CapabilityImpl<C extends Capability<C>>
 
   @Override
   public String type() {
-    return settings().getTypeId();
+    return settings().getCapability().getTypeId();
   }
 
   @Override
   public String notes() {
-    return settings().getNotes();
+    return settings().getCapability().getNotes();
   }
 
   @Override
   public boolean isEnabled() {
-    return settings().isEnabled();
+    return settings().getCapability().isEnabled();
   }
 
   @Override
@@ -121,9 +118,9 @@ public class CapabilityImpl<C extends Capability<C>>
   @Override
   public Map<String, String> properties() {
     final Map<String, String> propertiesMap = Maps.newHashMap();
-    final List<CapabilityPropertyResource> properties = settings().getProperties();
+    final List<PropertyXO> properties = settings().getCapability().getProperties();
     if (properties != null && !properties.isEmpty()) {
-      for (final CapabilityPropertyResource property : properties) {
+      for (final PropertyXO property : properties) {
         propertiesMap.put(property.getKey(), property.getValue());
       }
     }
@@ -132,7 +129,7 @@ public class CapabilityImpl<C extends Capability<C>>
 
   @Override
   public String property(final String key) {
-    final CapabilityPropertyResource property = getProperty(checkNotNull(key));
+    final PropertyXO property = getProperty(checkNotNull(key));
     if (property != null) {
       return property.getValue();
     }
@@ -159,7 +156,7 @@ public class CapabilityImpl<C extends Capability<C>>
 
   @Override
   public C withNotes(final String notes) {
-    settings().setNotes(notes);
+    settings().getCapability().setNotes(notes);
     return me();
   }
 
@@ -175,7 +172,7 @@ public class CapabilityImpl<C extends Capability<C>>
 
   @Override
   public C withEnabled(final boolean enabled) {
-    settings().setEnabled(enabled);
+    settings().getCapability().setEnabled(enabled);
     return me();
   }
 
@@ -188,34 +185,23 @@ public class CapabilityImpl<C extends Capability<C>>
 
   @Override
   public C removeProperty(final String key) {
-    settings().getProperties().remove(getProperty(key));
+    settings().getCapability().getProperties().remove(getProperty(key));
     return me();
   }
 
-  private CapabilityResource settingsAsResource() {
-    final CapabilityResource resource = new CapabilityResource();
-    try {
-      BeanUtils.copyProperties(resource, settings());
-    }
-    catch (final Exception e) {
-      throw Throwables.propagate(e);
-    }
-    return resource;
-  }
-
-  private CapabilityPropertyResource getOrCreateProperty(final String key) {
-    CapabilityPropertyResource property = getProperty(key);
+  private PropertyXO getOrCreateProperty(final String key) {
+    PropertyXO property = getProperty(key);
     if (property == null) {
-      property = new CapabilityPropertyResource().withKey(key);
-      settings().getProperties().add(property);
+      property = new PropertyXO().withKey(key);
+      settings().getCapability().getProperties().add(property);
     }
     return property;
   }
 
-  private CapabilityPropertyResource getProperty(final String key) {
-    final List<CapabilityPropertyResource> properties = settings().getProperties();
+  private PropertyXO getProperty(final String key) {
+    final List<PropertyXO> properties = settings().getCapability().getProperties();
     if (properties != null && !properties.isEmpty()) {
-      for (final CapabilityPropertyResource property : properties) {
+      for (final PropertyXO property : properties) {
         if (key.equals(property.getKey())) {
           return property;
         }

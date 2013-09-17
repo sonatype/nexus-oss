@@ -15,7 +15,8 @@ package org.sonatype.nexus.testsuite.capabilities.client.internal;
 
 import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
 
 /**
@@ -30,8 +31,8 @@ public class JerseyCapabilityA
     super(client, "[a]");
   }
 
-  public JerseyCapabilityA(final CapabilityClient client, final CapabilityListItemResource resource) {
-    super(client, resource);
+  public JerseyCapabilityA(final CapabilityClient client, final CapabilityStatusXO settings) {
+    super(client, settings);
   }
 
   @Override

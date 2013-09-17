@@ -20,7 +20,8 @@ import org.sonatype.nexus.capabilities.client.internal.ReflectiveCapability;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -54,11 +55,11 @@ public class ReflectiveCapabilityFactory<C extends Capability>
 
   @SuppressWarnings("unchecked")
   @Override
-  public C create(final CapabilityClient client, final CapabilityListItemResource resource) {
+  public C create(final CapabilityClient client, final CapabilityStatusXO settings) {
     return (C) Proxy.newProxyInstance(
         type.getClassLoader(),
         new Class[]{type},
-        new ReflectiveCapability(type, client, resource)
+        new ReflectiveCapability(type, client, settings)
     );
   }
 

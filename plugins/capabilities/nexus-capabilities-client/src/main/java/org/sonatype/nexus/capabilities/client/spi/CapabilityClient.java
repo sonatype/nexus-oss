@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.capabilities.client.spi;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,12 +26,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityXO;
 import org.sonatype.nexus.client.core.subsystem.SiestaClient;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -43,21 +42,26 @@ public interface CapabilityClient
 
   @GET
   @Consumes({APPLICATION_JSON})
-  CapabilitiesListResponseResource get();
+  List<CapabilityStatusXO> get();
 
   @GET
   @Consumes({APPLICATION_JSON})
-  CapabilitiesListResponseResource search(@QueryParam("filter") MultivaluedMap<String, String> filter);
+  List<CapabilityStatusXO> search(@QueryParam("filter") MultivaluedMap<String, String> filter);
 
   @GET
   @Consumes({APPLICATION_JSON})
   @Path("/{id}")
-  CapabilityResponseResource get(@PathParam("id") String id);
+  CapabilityXO get(@PathParam("id") String id);
+
+  @GET
+  @Consumes({APPLICATION_JSON})
+  @Path("/{id}/status")
+  CapabilityStatusXO getStatus(@PathParam("id") String id);
 
   @POST
   @Produces({APPLICATION_JSON})
   @Consumes({APPLICATION_JSON})
-  CapabilityStatusResponseResource post(CapabilityRequestResource envelope);
+  CapabilityStatusXO create(CapabilityXO capability);
 
   @DELETE
   @Path("/{id}")
@@ -67,19 +71,18 @@ public interface CapabilityClient
   @Produces({APPLICATION_JSON})
   @Consumes({APPLICATION_JSON})
   @Path("/{id}")
-  CapabilityStatusResponseResource put(@PathParam("id") String id,
-                                       CapabilityRequestResource envelope);
-
-  @GET
-  @Consumes({APPLICATION_JSON})
-  @Path("/{id}/status")
-  CapabilityStatusResponseResource getStatus(@PathParam("id") String id);
+  CapabilityStatusXO update(@PathParam("id") String id, CapabilityXO capability);
 
   @PUT
-  @Path("/{id}/status")
+  @Path("/{id}/enable")
   @Produces({APPLICATION_JSON})
   @Consumes({APPLICATION_JSON})
-  public CapabilityStatusResponseResource put(@PathParam("id") String id,
-                                              CapabilityStatusRequestResource envelope);
+  CapabilityStatusXO enable(@PathParam("id") String id);
+
+  @PUT
+  @Path("/{id}/disable")
+  @Produces({APPLICATION_JSON})
+  @Consumes({APPLICATION_JSON})
+  CapabilityStatusXO disable(@PathParam("id") String id);
 
 }
