@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named(EmptyTrashTaskDescriptor.ID)
 public class EmptyTrashTask
-    extends AbstractNexusTask<Object>
+    extends AbstractNexusRepositoriesTask<Object>
 {
   /**
    * System event action: empty trash
@@ -52,11 +52,22 @@ public class EmptyTrashTask
   protected Object doRun()
       throws Exception
   {
+    final String repositoryId = getRepositoryId();
     if (getEmptyOlderCacheItemsThan() == DEFAULT_OLDER_THAN_DAYS) {
-      wastebasket.purgeAll();
+      if (repositoryId == null) {
+        // all
+        wastebasket.purgeAll();
+      } else {
+        wastebasket.purge(getRepositoryRegistry().getRepository(repositoryId));
+      }
     }
     else {
-      wastebasket.purgeAll(getEmptyOlderCacheItemsThan() * A_DAY);
+      if (repositoryId == null) {
+        // all
+        wastebasket.purgeAll(getEmptyOlderCacheItemsThan() * A_DAY);
+      } else {
+        wastebasket.purge(getRepositoryRegistry().getRepository(repositoryId), getEmptyOlderCacheItemsThan() * A_DAY);
+      }
     }
 
     return null;
@@ -70,6 +81,11 @@ public class EmptyTrashTask
   @Override
   protected String getMessage() {
     return "Emptying Trash.";
+  }
+
+  @Override
+  protected String getRepositoryFieldId() {
+    return EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
   }
 
   public int getEmptyOlderCacheItemsThan() {
