@@ -14,11 +14,18 @@
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.Manifest;
+import java.util.zip.ZipOutputStream;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
@@ -40,6 +47,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
+import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.MXSerializer;
@@ -54,17 +62,55 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
       P2Constants.COMPOSITE_CONTENT_XML, P2Constants.COMPOSITE_CONTENT_JAR, P2Constants.COMPOSITE_ARTIFACTS_XML,
       P2Constants.COMPOSITE_ARTIFACTS_JAR, P2Constants.P2_INDEX);
 
-  private StorageFileItem cacheMetadataItem(final StorageFileItem result, final Map<String, Object> context,
-                                            final E repository)
+  private Map<String, StorageItem> cacheMetadataItems(final Map<String, StorageFileItem> metadataItems,
+                                                      final Map<String, Object> context,
+                                                      final E repository)
       throws IOException
   {
-    setItemAttributes(result, context, repository);
-    getLogger().debug("Repository " + repository.getId() + ": Created metadata item " + result.getName());
-    return doCacheItem(result, repository);
+    Map<String, StorageItem> cached = Maps.newHashMap();
+    for (Entry<String, StorageFileItem> entry : metadataItems.entrySet()) {
+      setItemAttributes(entry.getValue(), context, repository);
+      getLogger().debug("Repository " + repository.getId() + ": Created metadata item " + entry.getValue().getPath());
+      cached.put(entry.getKey(), doCacheItem(entry.getValue(), repository));
+    }
+    return cached;
   }
 
-  protected static StorageFileItem createMetadataItem(final Repository repository, final String path,
-                                                      final Xpp3Dom metadata, final String hack,
+  protected static Map<String, StorageFileItem> createMetadataItems(final Repository repository,
+                                                                    final String path,
+                                                                    final String pathCompressed,
+                                                                    final AbstractMetadata metadata,
+                                                                    final String hack,
+                                                                    final Map<String, Object> context)
+      throws IOException
+  {
+    LinkedHashMap<String, String> properties = metadata.getProperties();
+    properties.remove(P2Constants.PROP_COMPRESSED);
+    metadata.setProperties(properties);
+
+    Map<String, StorageFileItem> metadataItems = Maps.newHashMap();
+    metadataItems.put(
+        path,
+        createMetadataItem(repository, path, metadata.getDom(), hack, context)
+    );
+
+    properties = metadata.getProperties();
+    properties.put(P2Constants.PROP_COMPRESSED, Boolean.TRUE.toString());
+    metadata.setProperties(properties);
+
+    metadataItems.put(
+        pathCompressed,
+        compressMetadataItem(
+            repository, pathCompressed, createMetadataItem(repository, path, metadata.getDom(), hack, context)
+        )
+    );
+    return metadataItems;
+  }
+
+  protected static StorageFileItem createMetadataItem(final Repository repository,
+                                                      final String path,
+                                                      final Xpp3Dom metadata,
+                                                      final String hack,
                                                       final Map<String, Object> context)
       throws IOException
   {
@@ -93,6 +139,41 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
         new DefaultStorageFileItem(repository, new ResourceStoreRequest(path), true /* isReadable */,
             false /* isWritable */, fileContentLocator);
     result.getItemContext().putAll(context);
+    result.setLength(fileContentLocator.getLength());
+    return result;
+  }
+
+  private static StorageFileItem compressMetadataItem(final Repository repository,
+                                                      final String path,
+                                                      final StorageFileItem metadataXml)
+      throws IOException
+  {
+    final Manifest manifest = new Manifest();
+    manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+
+    // this is a special one: once cached (hence consumed), temp file gets deleted
+    final FileContentLocator fileContentLocator = new FileContentLocator("application/java-archive");
+
+    OutputStream buffer = null;
+    ZipOutputStream out = null;
+    InputStream in = null;
+    try {
+      buffer = fileContentLocator.getOutputStream();
+      out = new ZipOutputStream(buffer);
+      in = metadataXml.getInputStream();
+
+      out.putNextEntry(new JarEntry(metadataXml.getName()));
+      IOUtil.copy(in, out);
+    }
+    finally {
+      IOUtil.close(in);
+      IOUtil.close(out);
+      IOUtil.close(buffer);
+    }
+
+    final DefaultStorageFileItem result = new DefaultStorageFileItem(
+        repository, new ResourceStoreRequest(path), true /* isReadable */, false /* isWritable */, fileContentLocator
+    );
     result.setLength(fileContentLocator.getLength());
     return result;
   }
@@ -165,7 +246,8 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     // start with read lock, no need to do a write lock until we find it necessary
     try {
       repoLock.lock(Action.read);
-      if (P2Constants.CONTENT_PATH.equals(request.getRequestPath())) {
+      if (P2Constants.CONTENT_XML.equals(request.getRequestPath())
+          || P2Constants.CONTENT_JAR.equals(request.getRequestPath())) {
         try {
           final AbstractStorageItem contentItem = doRetrieveLocalItem(request, repository);
           if (request.isRequestLocalOnly() || !isContentOld(contentItem, repository)) {
@@ -193,8 +275,10 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
           }
 
           try {
-            final StorageItem result = doRetrieveContentItem(request.getRequestContext(), repository);
-            doRetrieveArtifactsItem(request.getRequestContext(), repository);
+            final StorageItem result = doRetrieveContentItems(request.getRequestContext(), repository).get(
+                request.getRequestPath()
+            );
+            doRetrieveArtifactsItems(request.getRequestContext(), repository);
             return result;
           }
           catch (final P2RuntimeExceptionMaskedAsINFException e) {
@@ -208,7 +292,8 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
           itemLock.lock(Action.read);
         }
       }
-      else if (P2Constants.ARTIFACTS_PATH.equals(request.getRequestPath())) {
+      else if (P2Constants.ARTIFACTS_XML.equals(request.getRequestPath())
+          || P2Constants.ARTIFACTS_JAR.equals(request.getRequestPath())) {
         try {
           final AbstractStorageItem artifactsItem = doRetrieveLocalItem(request, repository);
           if (request.isRequestLocalOnly() || !isArtifactsOld(artifactsItem, repository)) {
@@ -237,8 +322,8 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
 
           try {
             deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.PRIVATE_ROOT));
-            doRetrieveContentItem(request.getRequestContext(), repository);
-            return doRetrieveArtifactsItem(request.getRequestContext(), repository);
+            doRetrieveContentItems(request.getRequestContext(), repository);
+            return doRetrieveArtifactsItems(request.getRequestContext(), repository).get(request.getRequestPath());
           }
           catch (final P2RuntimeExceptionMaskedAsINFException e) {
             return doRetrieveLocalOnTransferError(request, repository, e);
@@ -321,44 +406,43 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     throw new ItemNotFoundException(request, repository);
   }
 
-  protected StorageItem doRetrieveArtifactsItem(final Map<String, Object> context, final E repository)
+  protected Map<String, StorageItem> doRetrieveArtifactsItems(final Map<String, Object> context, final E repository)
       throws IOException, ItemNotFoundException
   {
-    final StorageFileItem fileItem = doRetrieveArtifactsFileItem(context, repository);
+    final Map<String, StorageFileItem> fileItems = doRetrieveArtifactsFileItems(context, repository);
     try {
       getLogger().debug("Repository " + repository.getId() + ": Deleting p2 artifacts metadata items.");
-      deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.ARTIFACTS_JAR));
-      deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.ARTIFACTS_XML));
-      getLogger().debug("Repository " + repository.getId() + ": Deleted p2 artifacts metadata items.");
-
-      return cacheMetadataItem(fileItem, context, repository);
+      for (StorageFileItem fileItem : fileItems.values()) {
+        deleteItemSilently(repository, new ResourceStoreRequest(fileItem.getPath()));
+      }
+      return cacheMetadataItems(fileItems, context, repository);
     }
     catch (final IOException e) {
       throw new LocalStorageException(e.getMessage(), e);
     }
   }
 
-  protected StorageItem doRetrieveContentItem(final Map<String, Object> context, final E repository)
+  protected Map<String, StorageItem> doRetrieveContentItems(final Map<String, Object> context, final E repository)
       throws IOException, ItemNotFoundException
   {
-    final StorageFileItem fileItem = doRetrieveContentFileItem(context, repository);
+    final Map<String, StorageFileItem> fileItems = doRetrieveContentFileItems(context, repository);
     try {
       getLogger().debug("Repository " + repository.getId() + ": Deleting p2 content metadata items.");
-      deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.CONTENT_JAR));
-      deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.CONTENT_XML));
-      getLogger().debug("Repository " + repository.getId() + ": Deleted p2 content metadata items.");
-
-      return cacheMetadataItem(fileItem, context, repository);
+      for (StorageFileItem fileItem : fileItems.values()) {
+        deleteItemSilently(repository, new ResourceStoreRequest(fileItem.getPath()));
+      }
+      return cacheMetadataItems(fileItems, context, repository);
     }
     catch (final IOException e) {
       throw new LocalStorageException(e.getMessage(), e);
     }
   }
 
-  protected abstract StorageFileItem doRetrieveArtifactsFileItem(Map<String, Object> context, E repository)
+  protected abstract Map<String, StorageFileItem> doRetrieveArtifactsFileItems(Map<String, Object> context,
+                                                                               E repository)
       throws RemoteStorageException, ItemNotFoundException;
 
-  protected abstract StorageFileItem doRetrieveContentFileItem(Map<String, Object> context, E repository)
+  protected abstract Map<String, StorageFileItem> doRetrieveContentFileItems(Map<String, Object> context, E repository)
       throws RemoteStorageException, ItemNotFoundException;
 
   protected abstract boolean isArtifactsOld(AbstractStorageItem artifactsItem, E repository);
