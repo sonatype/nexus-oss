@@ -47,8 +47,8 @@ public class P2GroupMetadataSource
   private static final String ATTR_HASH_PREFIX = "original";
 
   @Override
-  protected StorageFileItem doRetrieveArtifactsFileItem(final Map<String, Object> context,
-                                                        final P2GroupRepository repository)
+  protected Map<String, StorageFileItem> doRetrieveArtifactsFileItems(final Map<String, Object> context,
+                                                                      final P2GroupRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
     try {
@@ -56,15 +56,14 @@ public class P2GroupMetadataSource
       final ArtifactsMerge m = new ArtifactsMerge();
       final Artifacts metadata = m.mergeArtifactsMetadata(repository.getName(), fileItems);
 
-      final LinkedHashMap<String, String> properties = metadata.getProperties();
-      // properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
-      metadata.setProperties(properties);
-
-      final StorageFileItem mergedItem =
-          createMetadataItem(repository, P2Constants.ARTIFACTS_XML, metadata.getDom(),
-              P2Constants.XMLPI_ARTIFACTS, context);
-
-      return mergedItem;
+      return createMetadataItems(
+          repository,
+          P2Constants.ARTIFACTS_XML,
+          P2Constants.ARTIFACTS_JAR,
+          metadata,
+          P2Constants.XMLPI_ARTIFACTS,
+          context
+      );
     }
     catch (final P2MetadataMergeException e) {
       throw new RemoteStorageException(e);
@@ -75,8 +74,8 @@ public class P2GroupMetadataSource
   }
 
   @Override
-  protected StorageFileItem doRetrieveContentFileItem(final Map<String, Object> context,
-                                                      final P2GroupRepository repository)
+  protected Map<String, StorageFileItem> doRetrieveContentFileItems(final Map<String, Object> context,
+                                                                    final P2GroupRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
     try {
@@ -84,15 +83,14 @@ public class P2GroupMetadataSource
       final ArtifactsMerge m = new ArtifactsMerge();
       final Content metadata = m.mergeContentMetadata(repository.getName(), fileItems);
 
-      final LinkedHashMap<String, String> properties = metadata.getProperties();
-      // properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
-      metadata.setProperties(properties);
-
-      final StorageFileItem mergedItem =
-          createMetadataItem(repository, P2Constants.CONTENT_XML, metadata.getDom(), P2Constants.XMLPI_CONTENT,
-              context);
-
-      return mergedItem;
+      return createMetadataItems(
+          repository,
+          P2Constants.CONTENT_XML,
+          P2Constants.CONTENT_JAR,
+          metadata,
+          P2Constants.XMLPI_CONTENT,
+          context
+      );
     }
     catch (final P2MetadataMergeException e) {
       throw new RemoteStorageException(e);

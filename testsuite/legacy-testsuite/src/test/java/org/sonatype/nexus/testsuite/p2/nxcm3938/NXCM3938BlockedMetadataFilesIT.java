@@ -46,14 +46,14 @@ public class NXCM3938BlockedMetadataFilesIT
   public void test()
       throws Exception
   {
-    // artifacts.xml and content.xml must exist
+    // artifacts.xml/jar and content.xml/jar must exist
     assertThat(downloadFile(P2Constants.ARTIFACTS_XML), exists());
     assertThat(downloadFile(P2Constants.CONTENT_XML), exists());
+    assertThat(downloadFile(P2Constants.ARTIFACTS_JAR), exists());
+    assertThat(downloadFile(P2Constants.CONTENT_JAR), exists());
 
     // other metadata files should be blocked
     assertThat(downloadFile(P2Constants.P2_INDEX), not(exists()));
-    assertThat(downloadFile(P2Constants.ARTIFACTS_JAR), not(exists()));
-    assertThat(downloadFile(P2Constants.CONTENT_JAR), not(exists()));
     assertThat(downloadFile(P2Constants.SITE_XML), not(exists()));
     assertThat(downloadFile(P2Constants.COMPOSITE_ARTIFACTS_JAR), not(exists()));
     assertThat(downloadFile(P2Constants.COMPOSITE_ARTIFACTS_XML), not(exists()));
