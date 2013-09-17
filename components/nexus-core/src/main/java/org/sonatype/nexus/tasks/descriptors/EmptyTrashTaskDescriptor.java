@@ -55,8 +55,8 @@ public class EmptyTrashTaskDescriptor
   public List<FormField> formFields() {
     List<FormField> fields = new ArrayList<FormField>();
 
-    fields.add(olderThanField);
     fields.add(repoField);
+    fields.add(olderThanField);
 
     return fields;
   }
