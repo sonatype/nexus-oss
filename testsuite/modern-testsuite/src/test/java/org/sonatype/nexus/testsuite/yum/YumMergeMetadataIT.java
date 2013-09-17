@@ -19,6 +19,7 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
+import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
 import org.sonatype.nexus.client.core.subsystem.routing.Routing;
 
 import org.junit.Ignore;
@@ -206,6 +207,92 @@ public class YumMergeMetadataIT
   }
 
   @Test
+  public void shouldRegenerateGroupRepoWhenProxyMetadataChanges()
+      throws Exception
+  {
+    final Repository repo1 = createYumEnabledRepository(repositoryIdForTest("1"));
+    final Repository repo2 = createYumEnabledRepository(repositoryIdForTest("2"));
+
+    final Repository proxyRepo = repositories()
+        .create(MavenProxyRepository.class, repositoryIdForTest("proxy"))
+        .asProxyOf(repo1.contentUri())
+        .withItemMaxAge(0)
+        .save();
+
+    // disable routing for proxy
+    client().getSubsystem(Routing.class).setDiscoveryConfigurationFor(
+        proxyRepo.id(), new DiscoveryConfiguration(false, 1)
+    );
+
+    final GroupRepository groupRepo = createYumEnabledGroupRepository(
+        repositoryIdForTest(), proxyRepo.id(), repo2.id()
+    );
+
+    content().upload(
+        repositoryLocation(repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm"),
+        testData().resolveFile("/rpms/test-artifact-1.2.3-1.noarch.rpm")
+    );
+    content().upload(
+        repositoryLocation(repo2.id(), "a_group3/an_artifact3/3.0/an_artifact3-3.0.rpm"),
+        testData().resolveFile("/rpms/foo-bar-5.1.2-1.noarch.rpm")
+    );
+
+    waitForNexusToSettleDown();
+
+    // hosted should have uploaded rpm
+    {
+      final String primaryXml = getPrimaryXmlOf(repo1);
+      assertThat(primaryXml, containsString("test-artifact"));
+    }
+    // proxy should have uploaded rpm
+    {
+      final String primaryXml = getPrimaryXmlOf(proxyRepo);
+      assertThat(primaryXml, containsString("test-artifact"));
+    }
+    // group should have uploaded rpm
+    {
+      final String primaryXml = getPrimaryXmlOf(groupRepo);
+      assertThat(primaryXml, containsString("test-artifact"));
+    }
+
+    content().upload(
+        repositoryLocation(repo1.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm"),
+        testData.resolveFile("/rpms/test-rpm-5.6.7-1.noarch.rpm")
+    );
+
+    waitForNexusToSettleDown();
+
+    // hosted should have last uploaded rpm
+    {
+      final String primaryXml = getPrimaryXmlOf(repo1);
+      assertThat(primaryXml, containsString("test-artifact"));
+      assertThat(primaryXml, containsString("test-rpm"));
+    }
+    // group should not have last uploaded rpm as nothing yet triggered the merge
+    {
+      final String primaryXml = getPrimaryXmlOf(groupRepo);
+      assertThat(primaryXml, containsString("test-artifact"));
+      assertThat(primaryXml, not(containsString("test-rpm")));
+    }
+    // retrieving primary.xml will trigger a cache event that will trigger the metadata merge
+    // proxy should have last uploaded rpm
+    {
+      final String primaryXml = getPrimaryXmlOf(proxyRepo);
+      assertThat(primaryXml, containsString("test-artifact"));
+      assertThat(primaryXml, containsString("test-rpm"));
+    }
+
+    waitForNexusToSettleDown();
+
+    // group should have last uploaded rpm
+    {
+      final String primaryXml = getPrimaryXmlOf(groupRepo);
+      assertThat(primaryXml, containsString("test-artifact"));
+      assertThat(primaryXml, containsString("test-rpm"));
+    }
+  }
+
+  @Test
   public void shouldGenerateGroupRepo()
       throws Exception
   {
@@ -216,10 +303,10 @@ public class YumMergeMetadataIT
     assertThat(primaryXml, containsString("test-rpm"));
   }
 
-  private String getPrimaryXmlOf(final GroupRepository groupRepo)
+  private String getPrimaryXmlOf(final Repository repo)
       throws IOException
   {
-    return repodata().getMetadata(groupRepo.id(), PRIMARY_XML, String.class);
+    return repodata().getMetadata(repo.id(), PRIMARY_XML, String.class);
   }
 
   private GroupRepository givenAYumGroupRepoWith2RPMs()
