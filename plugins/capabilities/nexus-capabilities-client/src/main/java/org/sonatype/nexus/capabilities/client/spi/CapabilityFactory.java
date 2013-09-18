@@ -11,29 +11,25 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.client.internal;
+package org.sonatype.nexus.capabilities.client.spi;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
-import org.sonatype.nexus.capabilities.client.support.JerseyReflectiveCapabilityFactory;
-import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
+import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 
 /**
- * Jersey Generate Metadata capability factory.
+ * A {@link Capability} factory that can create new ones or from an existing resource.
  *
- * @since yum 3.0
+ * @since 2.2
  */
-@Named
-@Singleton
-public class JerseyGenerateMetadataCapabilityFactory
-    extends JerseyReflectiveCapabilityFactory<GenerateMetadataCapability>
-    implements JerseyCapabilityFactory<GenerateMetadataCapability>
+public interface CapabilityFactory<C extends Capability>
 {
 
-  public JerseyGenerateMetadataCapabilityFactory() {
-    super(GenerateMetadataCapability.class);
-  }
+  C create(CapabilityClient client);
+
+  C create(CapabilityClient client, CapabilityListItemResource resource);
+
+  boolean canCreate(String type);
+
+  boolean canCreate(Class<Capability> type);
 
 }

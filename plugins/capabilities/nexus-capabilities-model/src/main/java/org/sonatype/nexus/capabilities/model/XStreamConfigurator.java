@@ -20,7 +20,6 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityReque
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
-import org.sonatype.nexus.rest.model.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.StringConverter;

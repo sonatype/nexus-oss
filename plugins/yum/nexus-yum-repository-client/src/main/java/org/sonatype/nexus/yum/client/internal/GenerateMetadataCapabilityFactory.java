@@ -11,27 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite.capabilities.client.internal;
+package org.sonatype.nexus.yum.client.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
-import org.sonatype.nexus.capabilities.client.support.JerseyReflectiveCapabilityFactory;
-import org.sonatype.nexus.testsuite.capabilities.client.CapabilityB;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityFactory;
+import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
 
 /**
- * @since 2.2
+ * Jersey Generate Metadata capability factory.
+ *
+ * @since yum 3.0
  */
 @Named
 @Singleton
-public class JerseyCapabilityBFactory
-    extends JerseyReflectiveCapabilityFactory<CapabilityB>
-    implements JerseyCapabilityFactory<CapabilityB>
+public class GenerateMetadataCapabilityFactory
+    extends ReflectiveCapabilityFactory<GenerateMetadataCapability>
+    implements CapabilityFactory<GenerateMetadataCapability>
 {
 
-  public JerseyCapabilityBFactory() {
-    super(CapabilityB.class);
+  public GenerateMetadataCapabilityFactory() {
+    super(GenerateMetadataCapability.class);
   }
 
 }

@@ -30,7 +30,7 @@ public class Filter
 
   private static final String $TYPE = "$type";
 
-  private static final String $PROPERTY_PREFIX = "$p$";
+  private static final String $PROPERTY = "$p";
 
   private static final String $ENABLED = "$enabled";
 
@@ -122,7 +122,7 @@ public class Filter
       queryMap.putSingle($INCLUDE_NOT_EXPOSED, includeNotExposed.toString());
     }
     for (Map.Entry<String, String> entry : properties.entrySet()) {
-      queryMap.putSingle($PROPERTY_PREFIX + entry.getKey(), entry.getValue() == null ? "*" : entry.getValue());
+      queryMap.add($PROPERTY, entry.getKey() + ":" + (entry.getValue() == null ? "*" : entry.getValue()));
     }
     return queryMap;
   }

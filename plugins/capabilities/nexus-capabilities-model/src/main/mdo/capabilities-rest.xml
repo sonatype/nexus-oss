@@ -39,7 +39,6 @@
     <class>
       <name>CapabilityResponseResource</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>REST Response object for a capability configuration request, contains the typical 'data' parameter, which is the capability configuration.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capability" )</annotation>
@@ -62,7 +61,6 @@
     <class>
       <name>CapabilityRequestResource</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>REST Request object for a capability configuration add/update operation, contains the typical 'data' parameter, which is the capability configuration.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capability" )</annotation>
@@ -85,7 +83,6 @@
     <class>
       <name>CapabilityResource</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>The capability configuration.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "capability-resource" )</annotation>
@@ -235,7 +232,6 @@
     <class>
       <name>CapabilityStatusResponseResource</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>REST Response object for a capability configuration add/update operation, contains the typical 'data' parameter, which is the capability configuration.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capability-status" )</annotation>
@@ -258,7 +254,6 @@
     <class>
       <name>CapabilitiesListResponseResource</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>REST Response object for a list of capabilities items, contains the typical 'data' parameter, which is the list of capabilities.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capabilities-list" )</annotation>
@@ -294,13 +289,6 @@
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
       <fields>
-        <field>
-          <name>resourceURI</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The URL that can be used to manage the capability.</description>
-        </field>
         <field>
           <name>description</name>
           <version>1.0.0+</version>
@@ -351,7 +339,6 @@
     <class>
       <name>CapabilityTypeResourceResponse</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>REST Response object for a capability type list request, contains the typical 'data' parameter, which is the capability type details.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capability-types" )</annotation>
@@ -425,14 +412,68 @@
 
     <class>
       <name>CapabilityFormFieldResource</name>
-      <superClass>org.sonatype.nexus.rest.model.FormFieldResource</superClass>
       <version>1.0.0+</version>
+      <description>Form Field definition.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "form-field" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The id of the field.</description>
+        </field>
+        <field>
+          <name>type</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The type of the field.</description>
+        </field>
+        <field>
+          <name>label</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The label of the field.</description>
+        </field>
+        <field>
+          <name>helpText</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The help text of the field.</description>
+        </field>
+        <field>
+          <name>required</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>flag that states if the field is required.</description>
+        </field>
+        <field>
+          <name>regexValidation</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>regex validation that will validate the field.</description>
+        </field>
+        <field>
+          <name>initialValue</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Initial value of the field.</description>
+        </field>
+      </fields>
     </class>
 
     <class>
       <name>CapabilityStatusRequestResource</name>
       <version>2.0.0+</version>
-      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>REST Request object for a capability status change operation (enable/disable), contains the typical 'data' parameter, which is the capability status.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capability-status" )</annotation>

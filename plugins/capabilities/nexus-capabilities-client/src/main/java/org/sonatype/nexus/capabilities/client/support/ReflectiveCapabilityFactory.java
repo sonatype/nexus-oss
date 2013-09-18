@@ -16,49 +16,49 @@ package org.sonatype.nexus.capabilities.client.support;
 import java.lang.reflect.Proxy;
 
 import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.capabilities.client.internal.JerseyReflectiveCapability;
+import org.sonatype.nexus.capabilities.client.internal.ReflectiveCapability;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
-import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A {@link JerseyCapabilityFactory} that implements capabilities via reflection.
+ * A {@link CapabilityFactory} that implements capabilities via reflection.
  *
  * @since 2.2
  */
-public class JerseyReflectiveCapabilityFactory<C extends Capability>
-    implements JerseyCapabilityFactory<C>
+public class ReflectiveCapabilityFactory<C extends Capability>
+    implements CapabilityFactory<C>
 {
 
   private final Class<C> type;
 
   final CapabilityType capabilityType;
 
-  public JerseyReflectiveCapabilityFactory(final Class<C> type) {
+  public ReflectiveCapabilityFactory(final Class<C> type) {
     this.type = checkNotNull(type);
     capabilityType = type.getAnnotation(CapabilityType.class);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public C create(final JerseyNexusClient nexusClient) {
+  public C create(final CapabilityClient client) {
     return (C) Proxy.newProxyInstance(
         type.getClassLoader(),
         new Class[]{type},
-        new JerseyReflectiveCapability(type, nexusClient, capabilityType.value())
+        new ReflectiveCapability(type, client, capabilityType.value())
     );
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public C create(final JerseyNexusClient nexusClient, final CapabilityListItemResource resource) {
+  public C create(final CapabilityClient client, final CapabilityListItemResource resource) {
     return (C) Proxy.newProxyInstance(
         type.getClassLoader(),
         new Class[]{type},
-        new JerseyReflectiveCapability(type, nexusClient, resource)
+        new ReflectiveCapability(type, client, resource)
     );
   }
 
