@@ -400,7 +400,7 @@ Nexus.util.FormFieldUtil = {
                  reader : storeReader,
                  sortInfo : {
                    field : 'name',
-                   direction : 'DESC'
+                   direction : 'ASC'
                  },
                  autoLoad : true
                });
