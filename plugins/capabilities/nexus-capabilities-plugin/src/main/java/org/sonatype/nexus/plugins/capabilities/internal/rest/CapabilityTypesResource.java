@@ -26,7 +26,7 @@ import javax.ws.rs.QueryParam;
 
 import org.sonatype.nexus.capabilities.model.CapabilityTypeXO;
 import org.sonatype.nexus.capabilities.model.FormFieldXO;
-import org.sonatype.nexus.capability.support.CapabilitiesPlugin;
+import org.sonatype.nexus.capability.CapabilitiesPlugin;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.Selectable;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;

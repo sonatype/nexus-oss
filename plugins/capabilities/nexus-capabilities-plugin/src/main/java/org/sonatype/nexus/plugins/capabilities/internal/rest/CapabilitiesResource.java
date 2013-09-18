@@ -34,7 +34,7 @@ import javax.ws.rs.QueryParam;
 import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.capabilities.model.CapabilityXO;
 import org.sonatype.nexus.capabilities.model.PropertyXO;
-import org.sonatype.nexus.capability.support.CapabilitiesPlugin;
+import org.sonatype.nexus.capability.CapabilitiesPlugin;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
