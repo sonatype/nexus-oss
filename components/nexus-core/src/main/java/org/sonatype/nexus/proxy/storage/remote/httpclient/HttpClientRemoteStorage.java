@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -50,7 +49,6 @@ import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Maps;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
@@ -128,8 +126,6 @@ public class HttpClientRemoteStorage
   
   private final MetricsRegistry metricsRegistry;
   
-  private final ConcurrentMap<MetricName, Timer> timers;
-
   private final QueryStringBuilder queryStringBuilder;
 
   private final HttpClientManager httpClientManager;
@@ -145,7 +141,6 @@ public class HttpClientRemoteStorage
   {
     super(userAgentBuilder, applicationStatusSource, mimeSupport);
     this.metricsRegistry = Metrics.defaultRegistry();
-    this.timers = Maps.newConcurrentMap();
     this.queryStringBuilder = queryStringBuilder;
     this.httpClientManager = httpClientManager;
   }
@@ -438,16 +433,7 @@ public class HttpClientRemoteStorage
   private Timer timer(final ProxyRepository repository, final HttpUriRequest httpRequest, final String baseUrl) {
     final MetricName timerName = new MetricName(HttpClientRemoteStorage.class.getPackage().getName(),
         HttpClientRemoteStorage.class.getSimpleName() + "-" + repository.getId(), baseUrl, httpRequest.getMethod());
-    Timer existingTimer = timers.get(timerName);
-    if (existingTimer == null) {
-      // HACK: using the fact, that MetricsRegistry uses method getOrAdd (is resilient to adding existing named metrics)
-      final Timer newTimer = metricsRegistry.newTimer(timerName, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-      existingTimer = timers.putIfAbsent(timerName, newTimer);
-      if (existingTimer == null) {
-        existingTimer = newTimer;
-      }
-    }
-    return existingTimer;
+    return metricsRegistry.newTimer(timerName, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
   }
 
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,
