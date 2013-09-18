@@ -45,7 +45,9 @@ public class RepositoryCombobox
 
   private boolean regardlessViewPermissions;
 
-  private String[] contentClasses;
+  private List<String> includingContentClasses;
+
+  private List<String> excludingContentClasses;
 
   private boolean generateAllRepositoriesEntry;
 
@@ -103,8 +105,16 @@ public class RepositoryCombobox
   /**
    * Repository will be present if has any of specified content classes.
    */
-  public RepositoryCombobox withAnyOfContentClasses(final String... contentClasses) {
-    this.contentClasses = contentClasses;
+  public RepositoryCombobox includingAnyOfContentClasses(final String... contentClasses) {
+    this.includingContentClasses = Arrays.asList(contentClasses);
+    return this;
+  }
+
+  /**
+   * Repository will not be present if has any of specified content classes.
+   */
+  public RepositoryCombobox excludingAnyOfContentClasses(final String... contentClasses) {
+    this.excludingContentClasses = Arrays.asList(contentClasses);
     return this;
   }
 
@@ -153,12 +163,22 @@ public class RepositoryCombobox
         sb.append(FACET).append("=!").append(facet.getName());
       }
     }
-    if (contentClasses != null) {
-      for (String contentClass : contentClasses) {
+    if (includingContentClasses != null) {
+      for (String contentClass : includingContentClasses) {
+        if (excludingContentClasses == null || !excludingContentClasses.contains(contentClass)) {
+          if (sb.length() > 0) {
+            sb.append("&");
+          }
+          sb.append(CONTENT_CLASS).append("=").append(contentClass);
+        }
+      }
+    }
+    if (excludingContentClasses != null) {
+      for (String contentClass : excludingContentClasses) {
         if (sb.length() > 0) {
           sb.append("&");
         }
-        sb.append(CONTENT_CLASS).append("=").append(contentClass);
+        sb.append(CONTENT_CLASS).append("=!").append(contentClass);
       }
     }
     if (sb.length() > 0) {

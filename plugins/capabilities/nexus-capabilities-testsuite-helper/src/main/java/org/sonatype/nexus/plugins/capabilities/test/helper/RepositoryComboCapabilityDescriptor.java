@@ -72,10 +72,13 @@ public class RepositoryComboCapabilityDescriptor
             .includingAnyOfFacets(WebSiteRepository.class),
         new RepositoryCombobox("maven1", "Maven 1", "?", FormField.OPTIONAL)
             .includingAnyOfFacets(MavenRepository.class)
-            .withAnyOfContentClasses(Maven1ContentClass.ID),
+            .includingAnyOfContentClasses(Maven1ContentClass.ID),
         new RepositoryCombobox("maven2", "Maven 2", "?", FormField.OPTIONAL)
             .includingAnyOfFacets(MavenRepository.class)
-            .withAnyOfContentClasses(Maven2ContentClass.ID)
+            .includingAnyOfContentClasses(Maven2ContentClass.ID),
+        new RepositoryCombobox("hosted!maven1", "Hosted except Maven 1", "?", FormField.OPTIONAL)
+            .includingAnyOfFacets(HostedRepository.class)
+            .excludingAnyOfContentClasses(Maven1ContentClass.ID)
     );
   }
 

@@ -104,7 +104,8 @@ public class StoresResource
         hasRightsToView(regardlessViewPermissions),
         hasAnyOfFacets(facets),
         hasNoneOfFacets(facets),
-        anyOfContentClasses(contentClasses)
+        hasAnyOfContentClasses(contentClasses),
+        hasNoneOfContentClasses(contentClasses)
     ));
 
     List<SelectableEntryXO> entries = Lists.transform(
@@ -217,16 +218,40 @@ public class StoresResource
     return null;
   }
 
-  private Predicate<Repository> anyOfContentClasses(final List<String> contentClasses) {
+  private Predicate<Repository> hasAnyOfContentClasses(final List<String> contentClasses) {
     if (contentClasses != null && !contentClasses.isEmpty()) {
       List<Predicate<Repository>> predicates = Lists.newArrayList();
       for (final String contentClass : contentClasses) {
-        if (StringUtils.isNotEmpty(contentClass)) {
+        if (StringUtils.isNotEmpty(contentClass) && !contentClass.startsWith("!")) {
           predicates.add(new Predicate<Repository>()
           {
             @Override
             public boolean apply(@Nullable final Repository input) {
               return input != null && input.getRepositoryContentClass().getId().equals(contentClass);
+            }
+          });
+        }
+      }
+      if (!predicates.isEmpty()) {
+        if (predicates.size() == 1) {
+          return predicates.get(0);
+        }
+        return Predicates.or(predicates);
+      }
+    }
+    return null;
+  }
+
+  private Predicate<Repository> hasNoneOfContentClasses(final List<String> contentClasses) {
+    if (contentClasses != null && !contentClasses.isEmpty()) {
+      List<Predicate<Repository>> predicates = Lists.newArrayList();
+      for (final String contentClass : contentClasses) {
+        if (StringUtils.isNotEmpty(contentClass) && contentClass.startsWith("!")) {
+          predicates.add(new Predicate<Repository>()
+          {
+            @Override
+            public boolean apply(@Nullable final Repository input) {
+              return input != null && !input.getRepositoryContentClass().getId().equals(contentClass.substring(1));
             }
           });
         }
