@@ -16,13 +16,13 @@ package org.sonatype.nexus.testsuite.capabilities;
 import java.util.Collection;
 
 import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
-import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
 import org.sonatype.nexus.testsuite.capabilities.client.CapabilityB;
+import org.sonatype.sisu.siesta.common.validation.ValidationErrorsException;
 
+import com.sun.jersey.api.client.UniformInterfaceException;
 import org.hamcrest.MatcherAssert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,7 +81,7 @@ public class CapabilitiesIT
     // delete
     read.remove();
 
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage(String.format("Capability with id '%s' was not found", created.id()));
     capabilities().get(CapabilityA.class, created.id());
   }
@@ -119,7 +119,7 @@ public class CapabilitiesIT
     // delete
     read.remove();
 
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage(String.format("Capability with id '%s' was not found", created.id()));
     capabilities().get(CapabilityB.class, created.id());
   }
@@ -170,14 +170,14 @@ public class CapabilitiesIT
 
   @Test
   public void getInexistentTypedA() {
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage("Capability with id 'getInexistent' was not found");
     capabilities().get(CapabilityA.class, "getInexistent");
   }
 
   @Test
   public void getInexistentTypedB() {
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage("Capability with id 'getInexistent' was not found");
     capabilities().get(CapabilityB.class, "getInexistent");
   }
@@ -192,7 +192,7 @@ public class CapabilitiesIT
     final CapabilityA read = capabilities().get(CapabilityA.class, created.id());
     created.remove();
 
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage(String.format("Capability with id '%s' was not found", created.id()));
     read.save();
   }
@@ -207,7 +207,7 @@ public class CapabilitiesIT
     final CapabilityB read = capabilities().get(CapabilityB.class, created.id());
     created.remove();
 
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage(String.format("Capability with id '%s' was not found", created.id()));
     read.save();
   }
@@ -222,7 +222,7 @@ public class CapabilitiesIT
     final CapabilityA read = capabilities().get(CapabilityA.class, created.id());
     created.remove();
 
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage(String.format("Capability with id '%s' was not found", created.id()));
     read.remove();
   }
@@ -237,7 +237,7 @@ public class CapabilitiesIT
     final CapabilityB read = capabilities().get(CapabilityB.class, created.id());
     created.remove();
 
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage(String.format("Capability with id '%s' was not found", created.id()));
     read.remove();
   }
@@ -332,8 +332,8 @@ public class CapabilitiesIT
    */
   @Test
   public void failIfMandatoryPropertyNotPresent() {
-    thrown.expect(NexusClientErrorResponseException.class);
-    thrown.expectMessage("[repository] Repository/Group is required");
+    thrown.expect(ValidationErrorsException.class);
+    thrown.expectMessage("Repository/Group is required");
     capabilities().create("[message]")
         .save();
   }
@@ -343,8 +343,8 @@ public class CapabilitiesIT
    */
   @Test
   public void failIfNotMatchingRegexp() {
-    thrown.expect(NexusClientErrorResponseException.class);
-    thrown.expectMessage("[message] Message does not match 'XYZ.*'");
+    thrown.expect(ValidationErrorsException.class);
+    thrown.expectMessage("Message does not match 'XYZ.*'");
     capabilities().create("[message]")
         .withProperty("repository", "releases")
         .withProperty("message", "Blah")
@@ -553,7 +553,7 @@ public class CapabilitiesIT
     logRemote("Remove repository '{}'", rId);
     repository.remove();
 
-    thrown.expect(NexusClientNotFoundException.class);
+    thrown.expect(UniformInterfaceException.class);
     thrown.expectMessage(String.format("Capability with id '%s' was not found", capability.id()));
     capability.refresh();
   }
@@ -635,7 +635,7 @@ public class CapabilitiesIT
    */
   @Test
   public void uriIsInvalid() {
-    thrown.expect(NexusClientErrorResponseException.class);
+    thrown.expect(ValidationErrorsException.class);
     thrown.expectMessage("Some URI is not a valid URI");
     capabilities().create("[values]")
         .withProperty("uri", "foo is not valid")
@@ -662,7 +662,7 @@ public class CapabilitiesIT
    */
   @Test
   public void urlIsInvalid() {
-    thrown.expect(NexusClientErrorResponseException.class);
+    thrown.expect(ValidationErrorsException.class);
     thrown.expectMessage("Some URL is not a valid URL");
     capabilities().create("[values]")
         .withProperty("url", "foo is not valid")

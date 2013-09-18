@@ -18,12 +18,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityProperty;
-import org.sonatype.nexus.capabilities.client.support.JerseyCapability;
+import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
 import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityImplementationException;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 
 import com.google.common.primitives.Primitives;
 
@@ -34,28 +35,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.2
  */
-public class JerseyReflectiveCapability
+public class ReflectiveCapability
     implements InvocationHandler
 {
 
   private final Class<? extends Capability> capabilityType;
 
-  private final JerseyCapability delegate;
+  private final CapabilityImpl delegate;
 
-  public JerseyReflectiveCapability(final Class<? extends Capability> capabilityType,
-                                    final JerseyNexusClient nexusClient,
-                                    final String type)
+  public ReflectiveCapability(final Class<? extends Capability> capabilityType,
+                              final CapabilityClient client,
+                              final String type)
   {
     this.capabilityType = checkNotNull(capabilityType);
-    delegate = new JerseyCapability(nexusClient, type);
+    delegate = new CapabilityImpl(client, type);
   }
 
-  public JerseyReflectiveCapability(final Class<? extends Capability> capabilityType,
-                                    final JerseyNexusClient nexusClient,
-                                    final CapabilityListItemResource settings)
+  public ReflectiveCapability(final Class<? extends Capability> capabilityType,
+                              final CapabilityClient client,
+                              final CapabilityStatusXO settings)
   {
     this.capabilityType = checkNotNull(capabilityType);
-    delegate = new JerseyCapability(nexusClient, settings);
+    delegate = new CapabilityImpl(client, settings);
   }
 
   @Override

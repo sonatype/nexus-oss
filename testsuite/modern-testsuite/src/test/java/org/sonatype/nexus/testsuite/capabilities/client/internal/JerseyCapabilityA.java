@@ -13,25 +13,26 @@
 
 package org.sonatype.nexus.testsuite.capabilities.client.internal;
 
-import org.sonatype.nexus.capabilities.client.support.JerseyCapability;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
 
 /**
  * @since 2.2
  */
 public class JerseyCapabilityA
-    extends JerseyCapability<CapabilityA>
+    extends CapabilityImpl<CapabilityA>
     implements CapabilityA
 {
 
-  public JerseyCapabilityA(final JerseyNexusClient nexusClient) {
-    super(nexusClient, "[a]");
+  public JerseyCapabilityA(final CapabilityClient client) {
+    super(client, "[a]");
   }
 
-  public JerseyCapabilityA(final JerseyNexusClient nexusClient, final CapabilityListItemResource resource) {
-    super(nexusClient, resource);
+  public JerseyCapabilityA(final CapabilityClient client, final CapabilityStatusXO settings) {
+    super(client, settings);
   }
 
   @Override

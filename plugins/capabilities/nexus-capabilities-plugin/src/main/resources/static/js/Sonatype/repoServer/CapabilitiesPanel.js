@@ -17,10 +17,10 @@
 /*global Ext, Sonatype, FormFieldGenerator, FormFieldFactory, FormFieldExporter, FormFieldImporter, Nexus*/
 /*jslint newcap:true*/
 
-define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons'], function() {
+define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons','nexus/siesta'], function() {
 
-var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities',
-    CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes',
+var CAPABILITIES_SERVICE_PATH = Nexus.siesta.basePath + '/capabilities',
+    CAPABILITY_TYPES_SERVICE_PATH = Nexus.siesta.basePath + '/capabilities/types',
     CAPABILITY_SETTINGS_PREFIX = '';
 
 Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
@@ -72,17 +72,23 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
 
   // A record that holds the data for each configured capability in the system
   this.capabilityRecordConstructor = Ext.data.Record.create([{
-        name : 'resourceURI'
+        name : 'resourceURI',
+        convert : function(newValue, rec) {
+          return CAPABILITIES_SERVICE_PATH + '/' + rec.capability.id;
+        }
       }, {
-        name : 'id'
+        name : 'id',
+        mapping: 'capability.id'
       }, {
         name : 'description',
         sortType : Ext.data.SortTypes.asUCString
       }, {
         name : 'notes',
+        mapping: 'capability.notes',
         sortType : Ext.data.SortTypes.asUCString
       }, {
-        name : 'enabled'
+        name : 'enabled',
+        mapping: 'capability.enabled'
       }, {
         name : 'active'
       }, {
@@ -90,7 +96,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
       }, {
         name : 'typeName'
       }, {
-        name : 'typeId'
+        name : 'typeId',
+        mapping: 'capability.typeId'
       }, {
         name : 'stateDescription'
       }, {
@@ -100,7 +107,6 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
   // Reader and datastore that queries the server for the list of capabilities
   // types
   this.capabilityTypeReader = new Ext.data.JsonReader({
-        root : 'data',
         id : 'id'
       }, this.capabilityTypeRecordConstructor);
   this.capabilityTypeDataStore = new Ext.data.Store({
@@ -130,8 +136,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
   // Reader and datastore that queries the server for the list of currently
   // defined capabilities
   this.capabilitiesReader = new Ext.data.JsonReader({
-        root : 'data',
-        id : 'resourceURI'
+        id : 'capability.id'
       }, this.capabilityRecordConstructor);
   this.capabilitiesDataStore = new Ext.data.Store({
         url : CAPABILITIES_SERVICE_PATH,
@@ -543,6 +548,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               capability : Sonatype.utils.lowercase,
               properties : this.exportCapabilityPropertiesHelper.createDelegate(this)
             },
+            noEnvelope : true,
             serviceDataObj : {
               id : "",
               enabled : true,
@@ -695,10 +701,12 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                   single : true
                 });
 
+            description = rec.get('description') ? ' - ' + rec.get('description') : '';
+
             Sonatype.MessageBox.show({
                   animEl : this.capabilitiesGridPanel.getEl(),
                   title : 'Delete Capability?',
-                  msg : 'Delete the "' + rec.get('typeName') + ' - ' + rec.get('description') + '" capability?',
+                  msg : 'Delete the "' + rec.get('typeName') + description + '" capability?',
                   buttons : Sonatype.MessageBox.YESNO,
                   scope : this,
                   icon : Sonatype.MessageBox.QUESTION,
@@ -772,44 +780,37 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
       // (Ext.form.BasicForm, Ext.form.Action)
       actionCompleteHandler : function(form, action) {
-        // @todo: handle server error response here!!
 
         if (action.type === 'sonatypeSubmit')
         {
-          var
-                i, rec, dataObj, sortState,
-                receivedData = action.handleResponse(action.response).data;
+          var receivedData = action.handleResponse(action.response);
 
           if ( action.options.isNew ) {
             // successful create
             dataObj = {
-              id:receivedData.id,
+              id:receivedData.capability.id,
               description:receivedData.description,
-              notes:receivedData.notes,
-              enabled:receivedData.enabled,
+              notes:receivedData.capability.notes,
+              enabled:receivedData.capability.enabled,
               active:receivedData.active,
-              resourceURI:receivedData.resourceURI,
-              typeId:receivedData.typeId,
+              resourceURI:CAPABILITIES_SERVICE_PATH + '/' + receivedData.capability.id,
+              typeId:receivedData.capability.typeId,
               typeName:receivedData.typeName,
               stateDescription:receivedData.stateDescription,
               status:receivedData.status
             };
 
-            rec = new this.capabilityRecordConstructor( dataObj, receivedData.resourceURI );
+            rec = new this.capabilityRecordConstructor( dataObj, receivedData.capability.id);
 
             this.capabilitiesDataStore.remove( this.capabilitiesDataStore.getById( action.options.fpanel.id ) );
             this.capabilitiesDataStore.addSorted( rec );
           }
           else {
-            i = this.capabilitiesDataStore.indexOfId( action.options.fpanel.id );
-            rec = this.capabilitiesDataStore.getAt( i );
-
-            this.updateCapabilityRecord( rec, receivedData );
-            sortState = this.capabilitiesDataStore.getSortState();
-            this.capabilitiesDataStore.sort( sortState.field, sortState.direction );
+            rec = this.capabilitiesDataStore.getById( receivedData.capability.id );
           }
 
           this.capabilitiesDataStore.reload();
+
           this.formCards.items.each(
               function ( item, i, len ) {
                 if ( i > 0 ) {
@@ -821,20 +822,6 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
           this.capabilitiesGridPanel.getSelectionModel().selectRecords( [rec], false );
         }
-      },
-
-      updateCapabilityRecord : function(rec, receivedData) {
-        rec.beginEdit();
-        rec.set('description', receivedData.description);
-        rec.set('notes', receivedData.notes);
-        rec.set('typeId', receivedData.typeId);
-        rec.set('enabled', receivedData.enabled);
-        rec.set('active', receivedData.active);
-        rec.set('typeName', receivedData.typeName);
-        rec.set('stateDescription', receivedData.stateDescription);
-        rec.set('status', receivedData.status);
-        rec.commit();
-        rec.endEdit();
       },
 
       // (Ext.form.BasicForm, Ext.form.Action)
@@ -866,6 +853,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               url : resourceURI,
               method : 'GET',
               fpanel : formPanel,
+              noEnvelope : true,
               dataModifiers : {
                 capability : Sonatype.utils.capitalize,
                 properties : this.importCapabilityPropertiesHelper.createDelegate(this)
@@ -1122,7 +1110,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 rec = this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().getSelected();
 
           Ext.Ajax.request({
-            url : rec.data.resourceURI + '/status',
+            url : rec.data.resourceURI + '/enable',
             jsonData : {
               data : {
                 id : rec.data.id,
@@ -1147,7 +1135,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 waitBox = Ext.MessageBox.wait('Disabling capability...','Please Wait...');
 
           Ext.Ajax.request({
-            url : rec.data.resourceURI + '/status',
+            url : rec.data.resourceURI + '/disable',
             waitMsg : 'Disabling capability...',
             jsonData : {
               data : {

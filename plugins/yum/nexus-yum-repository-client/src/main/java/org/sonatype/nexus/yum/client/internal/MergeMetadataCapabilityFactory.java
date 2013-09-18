@@ -16,8 +16,8 @@ package org.sonatype.nexus.yum.client.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
-import org.sonatype.nexus.capabilities.client.support.JerseyReflectiveCapabilityFactory;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityFactory;
 import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 
 /**
@@ -27,12 +27,12 @@ import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
  */
 @Named
 @Singleton
-public class JerseyMergeMetadataCapabilityFactory
-    extends JerseyReflectiveCapabilityFactory<MergeMetadataCapability>
-    implements JerseyCapabilityFactory<MergeMetadataCapability>
+public class MergeMetadataCapabilityFactory
+    extends ReflectiveCapabilityFactory<MergeMetadataCapability>
+    implements CapabilityFactory<MergeMetadataCapability>
 {
 
-  public JerseyMergeMetadataCapabilityFactory() {
+  public MergeMetadataCapabilityFactory() {
     super(MergeMetadataCapability.class);
   }
 
