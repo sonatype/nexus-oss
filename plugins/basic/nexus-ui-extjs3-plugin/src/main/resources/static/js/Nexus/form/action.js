@@ -112,7 +112,7 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
           remainingErrors = [];
 
     // if a 204 response, we arent looking at errors, it should go through ok
-    if (result === true || result.data || response.status === 204 ||
+    if (result === true || result.data || response.status === 200 || response.status === 204 ||
       // 1223 is the IE way to deal with 204 http://goo.gl/xzJt1
           response.status === 1223)
     {
@@ -207,9 +207,14 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
           output = Sonatype.utils.cloneObj(this.options.serviceDataObj),
           resultOutput = this.serializeFormHelper(fpanel, output, this.options.serviceDataObj, '');
 
-    this.output = {
-      "data" : resultOutput || output
-    };
+    if(this.options.noEnvelope){
+      this.output = resultOutput || output;
+    } else {
+      this.output = {
+        "data" : resultOutput || output
+      };
+    }
+
     Nexus.Log.debug(this.options.method + ' ' + this.options.url + ' ', this.output);
 
     return Ext.encode(this.output);
@@ -361,14 +366,18 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
   success : function(response) {
     var flatData, result = this.processResponse(response);
 
-    if (result === true || !result.data)
+    data = result.data;
+    if(this.options.noEnvelope){
+      data = result;
+    }
+    if (result === true || !data)
     {
       this.failureType = Ext.form.Action.LOAD_FAILURE;
       this.form.afterAction(this, false);
       return;
     }
     this.form.clearInvalid();
-    flatData = this.translateDataToFieldValues(this.options.fpanel, result.data);
+    flatData = this.translateDataToFieldValues(this.options.fpanel, data);
     this.form.setValues(flatData);
     this.form.afterAction(this, true);
   },
