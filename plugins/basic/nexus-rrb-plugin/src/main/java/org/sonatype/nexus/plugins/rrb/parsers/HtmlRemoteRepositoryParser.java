@@ -14,6 +14,8 @@
 package org.sonatype.nexus.plugins.rrb.parsers;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -49,12 +51,20 @@ public class HtmlRemoteRepositoryParser
   protected String id;
 
   protected String baseUrl;
+  
+  protected String basePath;
 
   public HtmlRemoteRepositoryParser(String remotePath, String localUrl, String id, String baseUrl) {
     this.remotePath = remotePath;
     this.localUrl = localUrl;
     this.id = id;
     this.baseUrl = baseUrl;
+    try {
+      this.basePath = new URI(baseUrl).getPath();
+    } catch (URISyntaxException e) {
+      // TODO: in this case was should not even be called?
+      this.basePath = null;
+    }
   }
 
   /**
@@ -98,7 +108,14 @@ public class HtmlRemoteRepositoryParser
           rp.setLeaf(true);
         }
         rp.setText(getLinkName(temp).replace("/", "").trim());
-        String uri = getLinkUrl(temp).replace(baseUrl, localUrl);
+        String linkUrl = getLinkUrl(temp);
+        if (!StringUtils.isBlank(basePath) && linkUrl.startsWith(basePath)) {
+          linkUrl = linkUrl.substring(basePath.length(), linkUrl.length());
+          if (!StringUtils.isBlank(remotePath) && linkUrl.startsWith(remotePath)) {
+            linkUrl = linkUrl.substring(remotePath.length(), linkUrl.length());
+          }
+        }
+        String uri = linkUrl.replace(baseUrl, localUrl);
         try {
           new URL(uri);
           // if URL is valid it means that either the replacement of base url was successful either the url is

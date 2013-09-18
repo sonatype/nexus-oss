@@ -125,8 +125,8 @@ public class RemoteBrowserResourceAuthTest
     String jsonString = plexusResource.get(null, request, null, null).toString();
 
     // TODO: do some better validation then this
-    Assert.assertTrue(jsonString.contains("/auth-test/classes/"));
-    Assert.assertTrue(jsonString.contains("/auth-test/test-classes/"));
+    Assert.assertTrue(jsonString.contains("/classes/"));
+    Assert.assertTrue(jsonString.contains("/test-classes/"));
 
   }
 
