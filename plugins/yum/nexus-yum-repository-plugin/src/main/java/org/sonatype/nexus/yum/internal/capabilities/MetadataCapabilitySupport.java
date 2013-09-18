@@ -14,13 +14,11 @@
 package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.io.InputStream;
-import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -38,83 +36,56 @@ import com.google.common.io.Closeables;
 import org.apache.commons.io.IOUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.yum.internal.capabilities.MetadataCapabilityConfigurationSupport.REPOSITORY_ID;
 
 /**
  * @since yum 3.0
  */
 public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConfigurationSupport>
-    extends CapabilitySupport
+    extends CapabilitySupport<C>
 {
 
   private final YumRegistry yumRegistry;
 
-  private final Conditions conditions;
-
   private final RepositoryRegistry repositoryRegistry;
-
-  private C configuration;
 
   @Inject
   public MetadataCapabilitySupport(final YumRegistry yumRegistry,
-                                   final Conditions conditions,
                                    final RepositoryRegistry repositoryRegistry)
   {
     this.yumRegistry = checkNotNull(yumRegistry);
-    this.conditions = checkNotNull(conditions);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
   @Override
-  public String description() {
+  public String renderDescription() {
     if (isConfigured()) {
       try {
-        return repositoryRegistry.getRepository(configuration.repository()).getName();
+        return repositoryRegistry.getRepository(getConfig().repository()).getName();
       }
       catch (NoSuchRepositoryException e) {
-        return configuration.repository();
+        return getConfig().repository();
       }
     }
     return null;
   }
 
   @Override
-  public void onCreate()
+  public void onUpdate(final C config)
       throws Exception
   {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onLoad()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onUpdate()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-    final Yum yum = yumRegistry.get(configuration.repository());
+    final Yum yum = yumRegistry.get(config.repository());
     // yum is not present when repository is changed
     if (yum != null) {
-      configureYum(yum);
+      configureYum(yum, config);
     }
   }
 
   @Override
-  public void onRemove()
-      throws Exception
-  {
-    configuration = null;
-  }
-
-  @Override
-  public void onActivate() {
+  public void onActivate(final C config) {
     try {
-      final Repository repository = repositoryRegistry.getRepository(configuration.repository());
-      configureYum(yumRegistry.register(repository.adaptToFacet(MavenRepository.class)));
+      final Repository repository = repositoryRegistry.getRepository(config.repository());
+      configureYum(yumRegistry.register(repository.adaptToFacet(MavenRepository.class)), config);
     }
     catch (NoSuchRepositoryException e) {
       // TODO
@@ -123,43 +94,41 @@ public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConf
   }
 
   @Override
-  public void onPassivate() {
-    yumRegistry.unregister(configuration.repository());
+  public void onPassivate(final C config) {
+    yumRegistry.unregister(config.repository());
   }
 
   @Override
   public Condition activationCondition() {
-    return conditions.logical().and(
-        conditions.capabilities().capabilityOfTypeActive(YumCapabilityDescriptor.TYPE),
-        conditions.repository().repositoryIsInService(new RepositoryConditions.RepositoryId()
+    return conditions().logical().and(
+        conditions().capabilities().capabilityOfTypeActive(YumCapabilityDescriptor.TYPE),
+        conditions().repository().repositoryIsInService(new RepositoryConditions.RepositoryId()
         {
           @Override
           public String get() {
-            return isConfigured() ? configuration.repository() : null;
+            return isConfigured() ? getConfig().repository() : null;
           }
         }),
-        conditions.capabilities().passivateCapabilityWhenPropertyChanged(
-            MetadataCapabilityConfigurationSupport.REPOSITORY_ID
-        )
+        conditions().capabilities().passivateCapabilityWhenPropertyChanged(REPOSITORY_ID)
     );
   }
 
   @Override
   public Condition validityCondition() {
-    return conditions.repository().repositoryExists(new RepositoryConditions.RepositoryId()
+    return conditions().repository().repositoryExists(new RepositoryConditions.RepositoryId()
     {
       @Override
       public String get() {
-        return isConfigured() ? configuration.repository() : null;
+        return isConfigured() ? getConfig().repository() : null;
       }
     });
   }
 
   @Override
-  public String status() {
+  public String renderStatus() {
     if (isConfigured()) {
       try {
-        final Repository repository = repositoryRegistry.getRepository(configuration.repository());
+        final Repository repository = repositoryRegistry.getRepository(getConfig().repository());
         final StorageItem storageItem = repository.retrieveItem(
             new ResourceStoreRequest(YumConfigContentGenerator.configFilePath(repository.getId()), true)
         );
@@ -185,24 +154,14 @@ public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConf
     return null;
   }
 
-  public C configuration() {
-    return configuration;
-  }
-
-  void configureYum(final Yum yum) {
+  void configureYum(final Yum yum, C config) {
     // template method
-  }
-
-  abstract C createConfiguration(final Map<String, String> properties);
-
-  boolean isConfigured() {
-    return configuration != null;
   }
 
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
-        + (isConfigured() ? "{repository=" + configuration.repository() + "}" : "");
+        + (isConfigured() ? "{repository=" + getConfig().repository() + "}" : "");
   }
 
 }

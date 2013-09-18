@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
@@ -36,25 +35,24 @@ public class GenerateMetadataCapability
 
   @Inject
   public GenerateMetadataCapability(final YumRegistry yumRegistry,
-                                    final Conditions conditions,
                                     final RepositoryRegistry repositoryRegistry)
   {
-    super(yumRegistry, conditions, repositoryRegistry);
+    super(yumRegistry, repositoryRegistry);
   }
 
   @Override
-  void configureYum(final Yum yum) {
+  void configureYum(final Yum yum, GenerateMetadataCapabilityConfiguration config) {
     checkNotNull(yum);
     checkState(isConfigured());
 
-    yum.setAliases(configuration().aliases());
-    yum.setProcessDeletes(configuration().shouldProcessDeletes());
-    yum.setDeleteProcessingDelay(configuration().deleteProcessingDelay());
-    yum.setYumGroupsDefinitionFile(configuration().getYumGroupsDefinitionFile());
+    yum.setAliases(config.aliases());
+    yum.setProcessDeletes(config.shouldProcessDeletes());
+    yum.setDeleteProcessingDelay(config.deleteProcessingDelay());
+    yum.setYumGroupsDefinitionFile(config.getYumGroupsDefinitionFile());
   }
 
   @Override
-  GenerateMetadataCapabilityConfiguration createConfiguration(final Map<String, String> properties) {
+  protected GenerateMetadataCapabilityConfiguration createConfig(final Map<String, String> properties) {
     return new GenerateMetadataCapabilityConfiguration(properties);
   }
 

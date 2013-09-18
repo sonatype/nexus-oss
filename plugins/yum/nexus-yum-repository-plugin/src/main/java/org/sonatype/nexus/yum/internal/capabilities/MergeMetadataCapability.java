@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.YumRegistry;
 
@@ -32,14 +31,13 @@ public class MergeMetadataCapability
 
   @Inject
   public MergeMetadataCapability(final YumRegistry service,
-                                 final Conditions conditions,
                                  final RepositoryRegistry repositoryRegistry)
   {
-    super(service, conditions, repositoryRegistry);
+    super(service, repositoryRegistry);
   }
 
   @Override
-  MergeMetadataCapabilityConfiguration createConfiguration(final Map<String, String> properties) {
+  protected MergeMetadataCapabilityConfiguration createConfig(final Map<String, String> properties) {
     return new MergeMetadataCapabilityConfiguration(properties);
   }
 
