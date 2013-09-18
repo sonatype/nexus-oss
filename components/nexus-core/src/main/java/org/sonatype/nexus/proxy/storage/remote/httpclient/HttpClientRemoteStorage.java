@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,10 +48,13 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
-import com.yammer.metrics.annotation.Timed;
-
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Stopwatch;
+import com.google.common.collect.Maps;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.annotation.Timed;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -120,6 +124,10 @@ public class HttpClientRemoteStorage
    * Created items while retrieving, can be written.
    */
   private static final boolean CAN_WRITE = true;
+  
+  private final MetricsRegistry metricsRegistry;
+  
+  private final ConcurrentMap<String, Timer> timers;
 
   private final QueryStringBuilder queryStringBuilder;
 
@@ -135,6 +143,8 @@ public class HttpClientRemoteStorage
                           final QueryStringBuilder queryStringBuilder, final HttpClientManager httpClientManager)
   {
     super(userAgentBuilder, applicationStatusSource, mimeSupport);
+    this.metricsRegistry = Metrics.defaultRegistry();
+    this.timers = Maps.newConcurrentMap();
     this.queryStringBuilder = queryStringBuilder;
     this.httpClientManager = httpClientManager;
   }
@@ -170,7 +180,7 @@ public class HttpClientRemoteStorage
 
     final HttpGet method = new HttpGet(url);
 
-    final HttpResponse httpResponse = executeRequest(repository, request, method);
+    final HttpResponse httpResponse = executeRequest(repository, request, method, baseUrl);
 
     if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
       InputStream is;
@@ -261,7 +271,7 @@ public class HttpClientRemoteStorage
     entity.setContentType(fileItem.getMimeType());
     method.setEntity(entity);
 
-    final HttpResponse httpResponse = executeRequestAndRelease(repository, request, method);
+    final HttpResponse httpResponse = executeRequestAndRelease(repository, request, method, repository.getRemoteUrl());
     final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
     if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED
@@ -282,7 +292,7 @@ public class HttpClientRemoteStorage
 
     final HttpDelete method = new HttpDelete(remoteUrl.toExternalForm());
 
-    final HttpResponse httpResponse = executeRequestAndRelease(repository, request, method);
+    final HttpResponse httpResponse = executeRequestAndRelease(repository, request, method, repository.getRemoteUrl());
     final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
     if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_NO_CONTENT
@@ -311,7 +321,7 @@ public class HttpClientRemoteStorage
     {
       method = new HttpHead(remoteUrl.toExternalForm());
       try {
-        httpResponse = executeRequestAndRelease(repository, request, method);
+        httpResponse = executeRequestAndRelease(repository, request, method, repository.getRemoteUrl());
         statusCode = httpResponse.getStatusLine().getStatusCode();
       }
       catch (RemoteStorageException e) {
@@ -336,7 +346,7 @@ public class HttpClientRemoteStorage
         method = new HttpGet(remoteUrl.toExternalForm());
 
         // execute it
-        httpResponse = executeRequestAndRelease(repository, request, method);
+        httpResponse = executeRequestAndRelease(repository, request, method, repository.getRemoteUrl());
         statusCode = httpResponse.getStatusLine().getStatusCode();
       }
     }
@@ -413,23 +423,31 @@ public class HttpClientRemoteStorage
    */
   @VisibleForTesting
   HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-      final HttpUriRequest httpRequest) throws RemoteStorageException
+      final HttpUriRequest httpRequest, final String baseUrl) throws RemoteStorageException
   {
-    // HACK: Despite we have Yammer timing muck, request execution logged with method and URI is very
-    // handy for debugging purposes. For it we have a special logger, and enable timingLog by
-    // setting the "remote.storage.timing" logger at DEBUG level.
-    final boolean timingLogEnabled = timingLog.isDebugEnabled();
-    final Stopwatch stopwatch = timingLogEnabled ? new Stopwatch().start() : null;
+    final Timer timer = timer(httpRequest, baseUrl);
+    final TimerContext timerContext = timer.time();
     try {
       return doExecuteRequest(repository, request, httpRequest);
     }
     finally {
-      if (stopwatch != null) {
-        stopwatch.stop();
-        timingLog.debug("[{}] {} {} took {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(),
-            stopwatch);
+      timerContext.stop();
+      timingLog.debug("[{}] {} {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI());
+    }
+  }
+
+  private Timer timer(final HttpUriRequest httpRequest, final String baseUrl) {
+    final String timerName = httpRequest.getMethod() + " " + baseUrl;
+    Timer existingTimer = timers.get(timerName);
+    if (existingTimer == null) {
+      // HACK: using the fact, that MetricsRegistry uses method getOrAdd (is resilient to adding existing named metrics)
+      final Timer newTimer = metricsRegistry.newTimer(HttpClientRemoteStorage.class, timerName);
+      existingTimer = timers.putIfAbsent(baseUrl, newTimer);
+      if (existingTimer == null) {
+        existingTimer = newTimer;
       }
     }
+    return existingTimer;
   }
 
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,
@@ -518,10 +536,10 @@ public class HttpClientRemoteStorage
    * @throws RemoteStorageException If an error occurred during execution of HTTP request
    */
   private HttpResponse executeRequestAndRelease(final ProxyRepository repository,
-                                                final ResourceStoreRequest request, final HttpUriRequest httpRequest)
+                                                final ResourceStoreRequest request, final HttpUriRequest httpRequest, final String baseUrl)
       throws RemoteStorageException
   {
-    final HttpResponse httpResponse = executeRequest(repository, request, httpRequest);
+    final HttpResponse httpResponse = executeRequest(repository, request, httpRequest, baseUrl);
     release(httpResponse);
     return httpResponse;
   }
