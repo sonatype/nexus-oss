@@ -159,7 +159,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               emptyText : 'Select...',
               selectOnFocus : true,
               allowBlank : false,
-              name : 'smtpSettings.connection'
+              name : 'smtpSettings.connection',
+              value : 'plain'
             },
             {
               xtype : 'textfield',
