@@ -52,7 +52,8 @@ public class RepositoryComboCapabilityDescriptor
 
   protected RepositoryComboCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
-        new RepositoryCombobox("all", "All", "?", FormField.OPTIONAL),
+        new RepositoryCombobox("all", "All", "?", FormField.OPTIONAL)
+            .includeAnEntryForAllRepositories(),
         new RepositoryCombobox("hosted", "Hosted", "?", FormField.OPTIONAL)
             .withAnyOfFacets(HostedRepository.class),
         new RepositoryCombobox("proxy", "Proxy", "?", FormField.OPTIONAL)

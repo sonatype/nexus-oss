@@ -34,11 +34,15 @@ public class RepositoryCombobox
 
   public static final String CONTENT_CLASS = "contentClass";
 
+  public static final String ALL_REPOS_ENTRY = "allReposEntry";
+
   private Class<?>[] facets;
 
   private boolean regardlessViewPermissions;
 
   private String[] contentClasses;
+
+  private boolean generateAllRepositoriesEntry;
 
   private static interface Messages
       extends MessageBundle
@@ -99,6 +103,14 @@ public class RepositoryCombobox
     return this;
   }
 
+  /**
+   * Will add an entry for "All repositories". The value will be "*".
+   */
+  public RepositoryCombobox includeAnEntryForAllRepositories() {
+    this.generateAllRepositoriesEntry = true;
+    return this;
+  }
+
   @Override
   public String getStorePath() {
     Preconditions.checkState(StringUtils.isNotEmpty(super.getStorePath()), "Store path cannot be empty");
@@ -106,6 +118,9 @@ public class RepositoryCombobox
     StringBuilder sb = new StringBuilder();
     if (regardlessViewPermissions) {
       sb.append(REGARDLESS_VIEW_PERMISSIONS).append("=true");
+    }
+    if (generateAllRepositoriesEntry) {
+      sb.append(ALL_REPOS_ENTRY).append("=true");
     }
     if (facets != null) {
       for (Class<?> facet : facets) {

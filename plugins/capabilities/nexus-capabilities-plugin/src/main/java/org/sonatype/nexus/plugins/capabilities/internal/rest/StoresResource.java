@@ -32,6 +32,8 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.i18n.I18N;
+import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import org.sonatype.sisu.siesta.common.Resource;
 
 import com.google.common.base.Function;
@@ -61,6 +63,18 @@ public class StoresResource
 
   public static final String RESOURCE_URI = CapabilitiesPlugin.REST_PREFIX + "/stores";
 
+  private static interface Messages
+      extends MessageBundle
+  {
+
+    @DefaultMessage("(All Repositories)")
+    String allRepositoriesName();
+
+  }
+
+  private static final Messages messages = I18N.create(Messages.class);
+
+
   private final RepositoryRegistry repositoryRegistry;
 
   private final NexusItemAuthorizer nexusItemAuthorizer;
@@ -81,6 +95,7 @@ public class StoresResource
   @Produces({APPLICATION_XML, APPLICATION_JSON})
   @RequiresPermissions("nexus:repositories:read")
   public List<SelectableEntryXO> getRepositories(
+      final @QueryParam(RepositoryCombobox.ALL_REPOS_ENTRY) Boolean allReposEntry,
       final @QueryParam(RepositoryCombobox.REGARDLESS_VIEW_PERMISSIONS) Boolean regardlessViewPermissions,
       final @QueryParam(RepositoryCombobox.FACET) List<String> facets,
       final @QueryParam(RepositoryCombobox.CONTENT_CLASS) List<String> contentClasses)
@@ -91,7 +106,7 @@ public class StoresResource
         anyOfContentClasses(contentClasses)
     ));
 
-    return Lists.transform(
+    List<SelectableEntryXO> entries = Lists.transform(
         Lists.newArrayList(Iterables.filter(
             repositoryRegistry.getRepositories(),
             new Predicate<Repository>()
@@ -108,7 +123,15 @@ public class StoresResource
           public SelectableEntryXO apply(final Repository input) {
             return new SelectableEntryXO().withId(input.getId()).withName(input.getName());
           }
-        });
+        }
+    );
+
+    if (allReposEntry != null && allReposEntry) {
+      entries = Lists.newArrayList(entries);
+      entries.add(0, new SelectableEntryXO().withId("*").withName(messages.allRepositoriesName()));
+    }
+
+    return entries;
   }
 
   private Predicate<Repository> hasRightsToView(final Boolean skipPermissions) {
