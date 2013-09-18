@@ -16,13 +16,18 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.configuration.ModelloUtils;
+import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 
 import com.google.common.io.Closeables;
 import org.codehaus.plexus.component.annotations.Component;
@@ -74,10 +79,30 @@ public class Upgrade250to270
     BasicVersionUpgrade versionConverter = new BasicVersionUpgrade();
 
     Configuration newc = versionConverter.upgradeConfiguration(oldc);
-
     newc.setVersion(Configuration.MODEL_VERSION);
+
+    upgradeEmptyTrashTaskConfiguration(newc);
+
     message.setModelVersion(Configuration.MODEL_VERSION);
     message.setConfiguration(newc);
   }
 
+  /**
+   * Performs upgrade for EmptyTrashTask tasks.
+   * 
+   * @param conf the new model (2.7.0)
+   * @see <a href="https://issues.sonatype.org/browse/NEXUS-4580">NEXUS-4580</a>
+   */
+  protected void upgradeEmptyTrashTaskConfiguration(final Configuration conf) {
+    final List<CScheduledTask> tasks = conf.getTasks();
+    for (CScheduledTask task : tasks) {
+      if (EmptyTrashTaskDescriptor.ID.equals(task.getType())) {
+        final Map<String, String> taskConfig = ModelloUtils.getMapFromConfigList(task.getProperties());
+        if (!taskConfig.containsKey(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID)) {
+          taskConfig.put(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID, "all_repo");
+          task.setProperties(ModelloUtils.getConfigListFromMap(taskConfig));
+        }
+      }
+    }
+  }
 }

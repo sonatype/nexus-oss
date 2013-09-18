@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.configuration;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.model.CProps;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * A simple CProps to Map converter, to ease handling of CProps.
@@ -26,15 +28,22 @@ import org.sonatype.nexus.configuration.model.CProps;
  */
 public class ModelloUtils
 {
-  @SuppressWarnings("unchecked")
-  public static Map<String, String> getMapFromConfigList(List list) {
-    Map<String, String> result = new HashMap<String, String>(list.size());
-
-    for (Object obj : list) {
-      CProps props = (CProps) obj;
+  public static Map<String, String> getMapFromConfigList(List<CProps> list) {
+    final Map<String, String> result = Maps.newHashMapWithExpectedSize(list.size());
+    for (CProps props : list) {
       result.put(props.getKey(), props.getValue());
     }
+    return result;
+  }
 
+  public static List<CProps> getConfigListFromMap(final Map<String, String> map) {
+    final List<CProps> result = Lists.newArrayListWithExpectedSize(map.size());
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      final CProps cprop = new CProps();
+      cprop.setKey(entry.getKey());
+      cprop.setValue(entry.getValue());
+      result.add(cprop);
+    }
     return result;
   }
 }
