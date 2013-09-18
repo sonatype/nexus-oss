@@ -16,6 +16,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.ui;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.CapabilitiesPlugin;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
@@ -29,12 +30,9 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 public class CapabilitiesUiContributor
     implements UiContributor
 {
-  private static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  private static final String ARTIFACT_ID = "nexus-capabilities-plugin";
 
   @Override
   public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
+    return new UiContributionBuilder(this, CapabilitiesPlugin.GROUP_ID, CapabilitiesPlugin.ARTIFACT_ID).build(debug);
   }
 }

@@ -16,6 +16,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.ui;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.CapabilitiesPlugin;
 import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 
 @Named
@@ -26,7 +27,7 @@ public class CapabilityDocumentationResourceBundle
 
   @Override
   public String getPluginId() {
-    return "nexus-capabilities-plugin";
+    return CapabilitiesPlugin.ARTIFACT_ID;
   }
 
   @Override
