@@ -25,6 +25,7 @@ import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.nexus.client.rest.jersey.GuiceSubsystemProvider;
 import org.sonatype.nexus.client.rest.jersey.NexusClientFactoryImpl;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
@@ -33,6 +34,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.BeforeClass;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,6 +48,11 @@ public abstract class AbstractNexusP2GeneratorIT
 
   public AbstractNexusP2GeneratorIT(final String repoId) {
     super(repoId);
+  }
+
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
   }
 
   protected NexusClient client() {
