@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,7 +52,7 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.annotation.Timed;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -89,7 +90,7 @@ public class HttpClientRemoteStorage
     implements RemoteRepositoryStorage
 {
 
-  private static final Logger timingLog = LoggerFactory.getLogger("remote.storage.timing");
+  private static final Logger outboundRequestLog = LoggerFactory.getLogger("remote.storage.outbound");
 
   // ----------------------------------------------------------------------
   // Constants
@@ -127,7 +128,7 @@ public class HttpClientRemoteStorage
   
   private final MetricsRegistry metricsRegistry;
   
-  private final ConcurrentMap<String, Timer> timers;
+  private final ConcurrentMap<MetricName, Timer> timers;
 
   private final QueryStringBuilder queryStringBuilder;
 
@@ -159,7 +160,6 @@ public class HttpClientRemoteStorage
   }
 
   @Override
-  @Timed
   public AbstractStorageItem retrieveItem(final ProxyRepository repository, final ResourceStoreRequest request,
                                           final String baseUrl)
       throws ItemNotFoundException, RemoteStorageException
@@ -241,7 +241,6 @@ public class HttpClientRemoteStorage
   }
 
   @Override
-  @Timed
   public void storeItem(final ProxyRepository repository, final StorageItem item)
       throws UnsupportedStorageOperationException, RemoteStorageException
   {
@@ -284,7 +283,6 @@ public class HttpClientRemoteStorage
   }
 
   @Override
-  @Timed
   public void deleteItem(final ProxyRepository repository, final ResourceStoreRequest request)
       throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
   {
@@ -415,9 +413,10 @@ public class HttpClientRemoteStorage
    * In case of any exception thrown by HttpClient, it will release the connection. In other cases it is the duty of
    * caller to do it, or process the input stream.
    *
-   * @param repository  to execute the HTTP method fpr
+   * @param repository  to execute the HTTP method for
    * @param request     resource store request that triggered the HTTP request
    * @param httpRequest HTTP request to be executed
+   * @param baseUrl     The BaseURL used to construct final httpRequest
    * @return response of making the request
    * @throws RemoteStorageException If an error occurred during execution of HTTP request
    */
@@ -425,24 +424,25 @@ public class HttpClientRemoteStorage
   HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
       final HttpUriRequest httpRequest, final String baseUrl) throws RemoteStorageException
   {
-    final Timer timer = timer(httpRequest, baseUrl);
+    final Timer timer = timer(repository, httpRequest, baseUrl);
     final TimerContext timerContext = timer.time();
     try {
       return doExecuteRequest(repository, request, httpRequest);
     }
     finally {
       timerContext.stop();
-      timingLog.debug("[{}] {} {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI());
+      outboundRequestLog.debug("[{}] {} {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI());
     }
   }
 
-  private Timer timer(final HttpUriRequest httpRequest, final String baseUrl) {
-    final String timerName = httpRequest.getMethod() + " " + baseUrl;
+  private Timer timer(final ProxyRepository repository, final HttpUriRequest httpRequest, final String baseUrl) {
+    final MetricName timerName = new MetricName(HttpClientRemoteStorage.class.getPackage().getName(),
+        HttpClientRemoteStorage.class.getSimpleName() + "-" + repository.getId(), baseUrl, httpRequest.getMethod());
     Timer existingTimer = timers.get(timerName);
     if (existingTimer == null) {
       // HACK: using the fact, that MetricsRegistry uses method getOrAdd (is resilient to adding existing named metrics)
-      final Timer newTimer = metricsRegistry.newTimer(HttpClientRemoteStorage.class, timerName);
-      existingTimer = timers.putIfAbsent(baseUrl, newTimer);
+      final Timer newTimer = metricsRegistry.newTimer(timerName, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+      existingTimer = timers.putIfAbsent(timerName, newTimer);
       if (existingTimer == null) {
         existingTimer = newTimer;
       }
