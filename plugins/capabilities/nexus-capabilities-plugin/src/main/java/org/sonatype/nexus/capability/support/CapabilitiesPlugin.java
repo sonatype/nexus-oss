@@ -37,7 +37,7 @@ public class CapabilitiesPlugin
   /**
    * Expected groupId for plugin artifact.
    */
-  public static final String GROUP_ID = "com.sonatype.nexus.plugins";
+  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
   /**
    * Expected artifactId for plugin artifact.
