@@ -104,7 +104,7 @@ public class AliasResourceTest
     when(reference.capabilityAs(GenerateMetadataCapability.class)).thenReturn(yumRepositoryCapability);
     Map<String, String> aliases = Maps.newHashMap();
     aliases.put("foo", "bar");
-    when(yumRepositoryCapability.configuration()).thenReturn(
+    when(yumRepositoryCapability.getConfig()).thenReturn(
         new GenerateMetadataCapabilityConfiguration(RELEASES, aliases, true, 1, "/comps.xml")
     );
 

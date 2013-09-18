@@ -172,7 +172,7 @@ public class AliasResource
 
     final CapabilityReference capabilityReference = capabilities.iterator().next();
     final GenerateMetadataCapabilityConfiguration configuration =
-        capabilityReference.capabilityAs(GenerateMetadataCapability.class).configuration();
+        capabilityReference.capabilityAs(GenerateMetadataCapability.class).getConfig();
 
     final String version = payload.toString();
 
