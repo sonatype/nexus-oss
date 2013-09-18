@@ -55,24 +55,26 @@ public class RepositoryComboCapabilityDescriptor
         new RepositoryCombobox("all", "All", "?", FormField.OPTIONAL)
             .includeAnEntryForAllRepositories(),
         new RepositoryCombobox("hosted", "Hosted", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(HostedRepository.class),
+            .includingAnyOfFacets(HostedRepository.class),
         new RepositoryCombobox("proxy", "Proxy", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(ProxyRepository.class),
+            .includingAnyOfFacets(ProxyRepository.class),
         new RepositoryCombobox("hosted+proxy", "Hosted and Proxy", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(HostedRepository.class, ProxyRepository.class),
+            .includingAnyOfFacets(HostedRepository.class, ProxyRepository.class),
         new RepositoryCombobox("group", "Groups", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(GroupRepository.class),
+            .includingAnyOfFacets(GroupRepository.class),
+        new RepositoryCombobox("!group", "Any except Groups", "?", FormField.OPTIONAL)
+            .excludingAnyOfFacets(GroupRepository.class),
         new RepositoryCombobox("virtual", "Virtual", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(ShadowRepository.class),
+            .includingAnyOfFacets(ShadowRepository.class),
         new RepositoryCombobox("maven", "Maven", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(MavenRepository.class),
+            .includingAnyOfFacets(MavenRepository.class),
         new RepositoryCombobox("site", "Sites", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(WebSiteRepository.class),
+            .includingAnyOfFacets(WebSiteRepository.class),
         new RepositoryCombobox("maven1", "Maven 1", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(MavenRepository.class)
+            .includingAnyOfFacets(MavenRepository.class)
             .withAnyOfContentClasses(Maven1ContentClass.ID),
         new RepositoryCombobox("maven2", "Maven 2", "?", FormField.OPTIONAL)
-            .withAnyOfFacets(MavenRepository.class)
+            .includingAnyOfFacets(MavenRepository.class)
             .withAnyOfContentClasses(Maven2ContentClass.ID)
     );
   }

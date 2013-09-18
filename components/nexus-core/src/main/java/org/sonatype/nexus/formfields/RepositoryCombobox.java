@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.formfields;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -36,7 +39,9 @@ public class RepositoryCombobox
 
   public static final String ALL_REPOS_ENTRY = "allReposEntry";
 
-  private Class<?>[] facets;
+  private List<Class<?>> includingFacets;
+
+  private List<Class<?>> excludingFacets;
 
   private boolean regardlessViewPermissions;
 
@@ -82,8 +87,16 @@ public class RepositoryCombobox
   /**
    * Repository will be present if implements any of specified facets.
    */
-  public RepositoryCombobox withAnyOfFacets(final Class<?>... facets) {
-    this.facets = facets;
+  public RepositoryCombobox includingAnyOfFacets(final Class<?>... facets) {
+    this.includingFacets = Arrays.asList(facets);
+    return this;
+  }
+
+  /**
+   * Repository will not be present if implements any of specified facets.
+   */
+  public RepositoryCombobox excludingAnyOfFacets(final Class<?>... facets) {
+    this.excludingFacets = Arrays.asList(facets);
     return this;
   }
 
@@ -122,12 +135,22 @@ public class RepositoryCombobox
     if (generateAllRepositoriesEntry) {
       sb.append(ALL_REPOS_ENTRY).append("=true");
     }
-    if (facets != null) {
-      for (Class<?> facet : facets) {
+    if (includingFacets != null) {
+      for (Class<?> facet : includingFacets) {
+        if (excludingFacets == null || !excludingFacets.contains(facet)) {
+          if (sb.length() > 0) {
+            sb.append("&");
+          }
+          sb.append(FACET).append("=").append(facet.getName());
+        }
+      }
+    }
+    if (excludingFacets != null) {
+      for (Class<?> facet : excludingFacets) {
         if (sb.length() > 0) {
           sb.append("&");
         }
-        sb.append(FACET).append("=").append(facet.getName());
+        sb.append(FACET).append("=!").append(facet.getName());
       }
     }
     if (contentClasses != null) {

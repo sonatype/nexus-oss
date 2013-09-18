@@ -102,7 +102,8 @@ public class StoresResource
   {
     final Predicate<Repository> predicate = Predicates.and(removeNulls(
         hasRightsToView(regardlessViewPermissions),
-        anyOfFacts(facets),
+        hasAnyOfFacets(facets),
+        hasNoneOfFacets(facets),
         anyOfContentClasses(contentClasses)
     ));
 
@@ -149,11 +150,11 @@ public class StoresResource
     return null;
   }
 
-  private Predicate<Repository> anyOfFacts(@Nullable final List<String> facets) {
+  private Predicate<Repository> hasAnyOfFacets(@Nullable final List<String> facets) {
     if (facets != null && !facets.isEmpty()) {
       List<Predicate<Repository>> predicates = Lists.newArrayList();
       for (String facet : facets) {
-        if (StringUtils.isNotEmpty(facet)) {
+        if (StringUtils.isNotEmpty(facet) && !facet.startsWith("!")) {
           try {
             final Class<?> facetClass = Class.forName(facet);
             predicates.add(new Predicate<Repository>()
@@ -166,14 +167,51 @@ public class StoresResource
           }
           catch (ClassNotFoundException e) {
             log.warn(
-                "Repositories with facet {} will not be available for selection as facet class could not be loaded",
+                "Repositories will not be filtered by facet {} as it could not be loaded",
                 facet
             );
           }
         }
       }
       if (!predicates.isEmpty()) {
+        if (predicates.size() == 1) {
+          return predicates.get(0);
+        }
         return Predicates.or(predicates);
+      }
+    }
+    return null;
+  }
+
+  private Predicate<Repository> hasNoneOfFacets(@Nullable final List<String> facets) {
+    if (facets != null && !facets.isEmpty()) {
+      List<Predicate<Repository>> predicates = Lists.newArrayList();
+      for (String facet : facets) {
+        if (StringUtils.isNotEmpty(facet) && facet.startsWith("!")) {
+          String actualFacet = facet.substring(1);
+          try {
+            final Class<?> facetClass = Class.forName(actualFacet);
+            predicates.add(new Predicate<Repository>()
+            {
+              @Override
+              public boolean apply(@Nullable final Repository input) {
+                return input != null && !input.getRepositoryKind().isFacetAvailable(facetClass);
+              }
+            });
+          }
+          catch (ClassNotFoundException e) {
+            log.warn(
+                "Repositories will not be filtered by facet {} as it could not be loaded",
+                actualFacet
+            );
+          }
+        }
+      }
+      if (!predicates.isEmpty()) {
+        if (predicates.size() == 1) {
+          return predicates.get(0);
+        }
+        return Predicates.and(predicates);
       }
     }
     return null;
