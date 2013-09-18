@@ -1667,6 +1667,12 @@
         <type>daily</type>
         <startDate>1230777000000</startDate>
       </schedule>
+      <properties>
+        <property>
+          <key>repositoryId</key>
+          <value>all_repo</value>
+        </property>
+      </properties>
     </task>
     <task>
       <id>22</id>
