@@ -28,6 +28,7 @@ import org.sonatype.nexus.capabilities.model.CapabilityTypeXO;
 import org.sonatype.nexus.capabilities.model.FormFieldXO;
 import org.sonatype.nexus.capability.support.CapabilitiesPlugin;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.Selectable;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -108,6 +109,15 @@ public class CapabilityTypesResource
                 if (input.getInitialValue() != null) {
                   formField.setInitialValue(input.getInitialValue().toString());
                 }
+
+                if (input instanceof Selectable) {
+                  formField
+                      .withStorePath(((Selectable) input).getStorePath())
+                      .withStoreRoot(((Selectable) input).getStoreRoot())
+                      .withIdMapping(((Selectable) input).getIdMapping())
+                      .withNameMapping(((Selectable) input).getNameMapping());
+                }
+
                 return formField;
               }
             }));
