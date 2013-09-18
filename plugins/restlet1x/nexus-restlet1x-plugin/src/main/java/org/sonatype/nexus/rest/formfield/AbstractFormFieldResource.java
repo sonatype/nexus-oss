@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.Selectable;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.FormFieldResource;
 
@@ -40,13 +41,15 @@ public abstract class AbstractFormFieldResource
         if (field.getInitialValue() != null) {
           dto.setInitialValue(field.getInitialValue().toString());
         }
-
+        if (field instanceof Selectable) {
+          dto.setStorePath(((Selectable) field).getStorePath());
+          dto.setStoreRoot(((Selectable) field).getStoreRoot());
+          dto.setIdMapping(((Selectable) field).getIdMapping());
+          dto.setNameMapping(((Selectable) field).getNameMapping());
+        }
         dtoList.add(dto);
       }
-      catch (InstantiationException e) {
-        getLogger().error("Unable to properly translate DTO", e);
-      }
-      catch (IllegalAccessException e) {
+      catch (InstantiationException | IllegalAccessException e) {
         getLogger().error("Unable to properly translate DTO", e);
       }
     }

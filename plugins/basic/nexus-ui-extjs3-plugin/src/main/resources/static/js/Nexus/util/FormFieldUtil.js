@@ -265,7 +265,213 @@ Nexus.util.FormFieldUtil = {
     }, this);
 
     return allTypes;
-  }, "exportForm" : function(formPanel, panelIdSuffix, formFieldPrefix, customTypes) {
+  }, createForm : function(panelId, fieldSetName, fieldNamePrefix, typeStore, stores, customTypes, width) {
+    var allTypes = [];
+
+    if (!width) {
+     width = 300;
+    }
+
+    storeRecordConstructor = Ext.data.Record.create([{
+       name : 'id'
+     }, {
+       name : 'name',
+       sortType : Ext.data.SortTypes.asUCString
+    }]);
+
+    allTypes[0] = {
+     xtype : 'fieldset',
+     id : panelId + '_emptyItem',
+     checkboxToggle : false,
+     title : fieldSetName,
+     anchor : Sonatype.view.FIELDSET_OFFSET,
+     collapsible : false,
+     autoHeight : true,
+     layoutConfig : {
+       labelSeparator : ''
+     }
+    };
+
+    // Now add the dynamic content
+    typeStore.each(function(item, i, len) {
+     var j, items = [], curRec;
+     if (item.data.formFields.length > 0) {
+       for (j = 0; j < item.data.formFields.length; j = j + 1) {
+         curRec = item.data.formFields[j];
+         // Note that each item is disabled initially, this is because
+         // the select handler for the capabilityType
+         // combo box handles enabling/disabling as necessary, so each
+         // inactive card isn't also included in the form
+         if (curRec.type === 'string' || curRec.type === 'password') {
+           curItem = items[items.length] = {
+             xtype : 'textfield',
+             htmlDecode : true,
+             fieldLabel : curRec.label,
+             itemCls : curRec.required ? 'required-field' : '',
+             helpText : curRec.helpText,
+             name : fieldNamePrefix + curRec.id,
+             allowBlank : curRec.required ? false : true,
+             disabled : true,
+             width : width,
+             regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
+           };
+           if (curRec.type === 'password') {
+             curItem.inputType = 'password';
+           }
+           if (curRec.initialValue) {
+             curItem.value = curRec.initialValue;
+           }
+         }
+         else if (curRec.type === 'number') {
+           curItem = items[items.length] = {
+             xtype : 'numberfield',
+             fieldLabel : curRec.label,
+             itemCls : curRec.required ? 'required-field' : '',
+             helpText : curRec.helpText,
+             name : fieldNamePrefix + curRec.id,
+             allowBlank : curRec.required ? false : true,
+             disabled : true,
+             width : width,
+             regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
+           };
+           if (curRec.initialValue) {
+             curItem.value = Number(curRec.initialValue);
+           }
+         }
+         else if (curRec.type === 'text-area') {
+           curItem = items[items.length] = {
+             xtype : 'textarea',
+             htmlDecode : true,
+             fieldLabel : curRec.label,
+             itemCls : curRec.required ? 'required-field' : '',
+             helpText : curRec.helpText,
+             name : fieldNamePrefix + curRec.id,
+             allowBlank : curRec.required ? false : true,
+             disabled : true,
+             anchor : '-20',
+             height : '138',
+             regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
+           };
+           if (curRec.initialValue) {
+             curItem.value = curRec.initialValue;
+           }
+         }
+         else if (curRec.type === 'checkbox') {
+           curItem = items[items.length] = {
+             xtype : 'checkbox',
+             fieldLabel : curRec.label,
+             helpText : curRec.helpText,
+             name : fieldNamePrefix + curRec.id,
+             disabled : true
+           };
+           if (curRec.initialValue) {
+             curItem.checked = Boolean('true' === curRec.initialValue);
+           }
+         }
+         else if (curRec.type === 'date') {
+           curItem = items[items.length] = {
+             xtype : 'datefield',
+             fieldLabel : curRec.label,
+             itemCls : curRec.required ? 'required-field' : '',
+             helpText : curRec.helpText,
+             name : fieldNamePrefix + curRec.id,
+             allowBlank : curRec.required ? false : true,
+             disabled : true,
+             value : new Date()
+           };
+           if (curRec.initialValue) {
+             curItem.value = new Date(Number(curRec.initialValue));
+           }
+         }
+         else if (curRec.type === 'combobox' || curRec.type === 'repo' || curRec.type === 'repo-or-group' || curRec.type === 'repo-target') {
+           if(curRec.storePath){
+             store = stores[curRec.storePath];
+             if(!store) {
+               storeReader = new Ext.data.JsonReader({
+                 root : curRec.storeRoot,
+                 idProperty : curRec.idMapping ? curRec.idMapping : 'id',
+                 fields: [
+                   {name: 'id', mapping: curRec.idMapping ? curRec.idMapping : 'id'},
+                   {name: 'name', mapping: curRec.nameMapping ? curRec.nameMapping : 'name', sortType : Ext.data.SortTypes.asUCString},
+                 ]
+               });
+               store = new Ext.data.Store({
+                 url : Sonatype.config.contextPath + curRec.storePath,
+                 reader : storeReader,
+                 sortInfo : {
+                   field : 'name',
+                   direction : 'DESC'
+                 },
+                 autoLoad : true
+               });
+               store[curRec.storePath] = store
+             }
+             curItem = items[items.length] = {
+               xtype : 'combo',
+               fieldLabel : curRec.label,
+               itemCls : curRec.required ? 'required-field' : '',
+               helpText : curRec.helpText,
+               name : fieldNamePrefix + curRec.id,
+               store : store,
+               displayField : 'name',
+               valueField : 'id',
+               editable : false,
+               forceSelection : true,
+               mode : 'local',
+               triggerAction : 'all',
+               emptyText : 'Select...',
+               selectOnFocus : true,
+               allowBlank : curRec.required ? false : true,
+               disabled : true,
+               width : width,
+               minListWidth : width
+             };
+             if (curRec.initialValue) {
+               curItem.value = curRec.initialValue;
+             }
+           }
+         }
+         else if (customTypes && customTypes[curRec.type]) {
+           items[items.length] = customTypes[curRec.type].createItem.call(this, curRec, fieldNamePrefix, width);
+         }
+
+         allTypes[allTypes.length] = {
+           xtype : 'fieldset',
+           id : panelId + '_' + item.data.id,
+           checkboxToggle : false,
+           title : fieldSetName,
+           anchor : Sonatype.view.FIELDSET_OFFSET,
+           collapsible : false,
+           autoHeight : true,
+           labelWidth : 175,
+           layoutConfig : {
+             labelSeparator : ''
+           }
+         };
+         if (items.length > 0) {
+           allTypes[allTypes.length - 1].items = items;
+         }
+       }
+     }
+     else {
+       allTypes[allTypes.length] = {
+         xtype : 'fieldset',
+         id : panelId + '_' + item.data.id,
+         checkboxToggle : false,
+         title : fieldSetName,
+         anchor : Sonatype.view.FIELDSET_OFFSET,
+         collapsible : false,
+         autoHeight : true,
+         labelWidth : 175,
+         layoutConfig : {
+           labelSeparator : ''
+         }
+       };
+     }
+    }, this);
+
+    return allTypes;
+ }, "exportForm" : function(formPanel, panelIdSuffix, formFieldPrefix, customTypes) {
     var outputArr = [], i = 0, formFieldPanel = formPanel.findById(formPanel.id + panelIdSuffix);
 
     // These are dynamic fields here, so some pretty straightforward generic
@@ -347,6 +553,7 @@ Nexus.util.FormFieldUtil = {
 
 // FIXME legacy
 top.FormFieldGenerator = Nexus.util.FormFieldUtil.generateForm;
+top.FormFieldFactory = Nexus.util.FormFieldUtil.createForm;
 top.FormFieldImporter = Nexus.util.FormFieldUtil.importForm;
 top.FormFieldExporter = Nexus.util.FormFieldUtil.exportForm;
 
