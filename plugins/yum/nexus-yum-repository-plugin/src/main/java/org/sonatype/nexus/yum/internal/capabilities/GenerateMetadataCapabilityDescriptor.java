@@ -23,7 +23,7 @@ import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.formfields.TextAreaFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -72,9 +72,9 @@ public class GenerateMetadataCapabilityDescriptor
   @Inject
   public GenerateMetadataCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
-        new RepoOrGroupComboFormField(
+        new RepositoryCombobox(
             REPOSITORY_ID, messages.repositoryLabel(), messages.repositoryHelp(), FormField.MANDATORY
-        ),
+        ).includingAnyOfFacets(MavenHostedRepository.class),
         new TextAreaFormField(
             GenerateMetadataCapabilityConfiguration.ALIASES,
             "Aliases",
