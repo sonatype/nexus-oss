@@ -132,8 +132,16 @@ public interface Nexus
   // Repo templates
   // ----------------------------------------------------------------------------
 
+  /**
+   * @deprecated Use TemplateManager component instead.
+   */
+  @Deprecated
   TemplateSet getRepositoryTemplates();
 
+  /**
+   * @deprecated Use TemplateManager component instead.
+   */
+  @Deprecated
   RepositoryTemplate getRepositoryTemplateById(String id)
       throws NoSuchTemplateIdException;
 
