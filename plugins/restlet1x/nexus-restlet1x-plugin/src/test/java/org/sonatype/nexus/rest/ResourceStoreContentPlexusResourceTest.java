@@ -123,7 +123,7 @@ public class ResourceStoreContentPlexusResourceTest
   @Before
   public void setup() {
 
-    underTest = new AbstractResourceStoreContentPlexusResource(security, views)
+    underTest = new AbstractResourceStoreContentPlexusResource(security, nexus, views)
     {
       @Override
       protected ResourceStore getResourceStore(final Request request)

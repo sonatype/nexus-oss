@@ -28,6 +28,11 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.templates.NoSuchTemplateIdException;
+import org.sonatype.nexus.templates.TemplateManager;
+import org.sonatype.nexus.templates.TemplateSet;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -78,6 +83,12 @@ public abstract class AbstractNexusPlexusResource
 
   @Requirement
   private ReferenceFactory referenceFactory;
+  
+  @Requirement
+  private TemplateManager templateManager;
+  
+  @Requirement
+  private RepositoryRouter repositoryRouter;
 
   @Inject
   public void setNexus(final Nexus nexus) {
@@ -109,6 +120,17 @@ public abstract class AbstractNexusPlexusResource
     this.referenceFactory = checkNotNull(referenceFactory);
   }
 
+  @Inject
+  public void setTemplateManager(final TemplateManager templateManager) {
+    this.templateManager = checkNotNull(templateManager);
+  }
+  
+  @Inject
+  public void setRepositoryRouter(final RepositoryRouter repositoryRouter) {
+    this.repositoryRouter = checkNotNull(repositoryRouter);
+  }
+
+  @Deprecated
   protected Nexus getNexus() {
     return nexus;
   }
@@ -123,6 +145,24 @@ public abstract class AbstractNexusPlexusResource
 
   protected RepositoryRegistry getUnprotectedRepositoryRegistry() {
     return defaultRepositoryRegistry;
+  }
+  
+  protected TemplateManager getTemplateManager() {
+    return templateManager;
+  }
+  
+  protected RepositoryRouter getRepositoryRouter() {
+    return repositoryRouter;
+  }
+  
+  protected TemplateSet getRepositoryTemplates() {
+    return getTemplateManager().getTemplates().getTemplates(RepositoryTemplate.class);
+  }
+
+  protected RepositoryTemplate getRepositoryTemplateById(String id)
+      throws NoSuchTemplateIdException
+  {
+    return (RepositoryTemplate) getTemplateManager().getTemplate(RepositoryTemplate.class, id);
   }
 
   /**
