@@ -35,13 +35,15 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-lifecycle</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-groovy-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-lifecycle</artifactId>
     </dependency>
 
     <dependency>
@@ -66,7 +68,6 @@
       <artifactId>animal-sniffer-annotations</artifactId>
       <optional>true</optional>
     </dependency>
-
   </dependencies>
 
   <build>
