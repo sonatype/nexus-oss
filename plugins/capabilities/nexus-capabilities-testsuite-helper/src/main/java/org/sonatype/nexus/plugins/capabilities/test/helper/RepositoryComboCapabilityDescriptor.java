@@ -36,6 +36,8 @@ import com.google.common.collect.Lists;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 /**
+ * A test/demo capability descriptor for using {@link RepositoryCombobox}.
+ *
  * @since 2.7
  */
 @Named(RepositoryComboCapabilityDescriptor.TYPE_ID)

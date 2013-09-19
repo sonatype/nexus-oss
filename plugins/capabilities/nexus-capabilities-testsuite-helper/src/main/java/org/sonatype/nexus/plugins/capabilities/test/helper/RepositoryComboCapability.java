@@ -15,12 +15,15 @@ package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 
 /**
+ * A test/demo capability for using {@link RepositoryCombobox}.
+ *
  * @since 2.7
  */
-@Named(ValuesCapabilityDescriptor.TYPE_ID)
+@Named(RepositoryComboCapabilityDescriptor.TYPE_ID)
 public class RepositoryComboCapability
     extends TestCapability
     implements Capability
