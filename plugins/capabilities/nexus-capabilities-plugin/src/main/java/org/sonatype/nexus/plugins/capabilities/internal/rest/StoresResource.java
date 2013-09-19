@@ -167,10 +167,7 @@ public class StoresResource
             });
           }
           catch (ClassNotFoundException e) {
-            log.warn(
-                "Repositories will not be filtered by facet {} as it could not be loaded",
-                facet
-            );
+            log.warn("Repositories will not be filtered by facet {} as it could not be loaded", facet);
           }
         }
       }
@@ -201,10 +198,7 @@ public class StoresResource
             });
           }
           catch (ClassNotFoundException e) {
-            log.warn(
-                "Repositories will not be filtered by facet {} as it could not be loaded",
-                actualFacet
-            );
+            log.warn("Repositories will not be filtered by facet {} as it could not be loaded", actualFacet);
           }
         }
       }
