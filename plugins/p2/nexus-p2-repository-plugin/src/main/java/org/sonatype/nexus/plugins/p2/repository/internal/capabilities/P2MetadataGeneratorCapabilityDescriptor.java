@@ -21,10 +21,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -64,9 +65,8 @@ public class P2MetadataGeneratorCapabilityDescriptor
   @Inject
   public P2MetadataGeneratorCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
-        new RepoOrGroupComboFormField(
-            REPOSITORY, messages.repositoryLabel(), messages.repositoryHelp(), FormField.MANDATORY
-        )
+        new RepositoryCombobox(REPOSITORY, messages.repositoryLabel(), messages.repositoryHelp(), FormField.MANDATORY)
+            .excludingAnyOfFacets(GroupRepository.class)
     );
   }
 

@@ -102,11 +102,6 @@
 
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-i18n</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-crypto</artifactId>
     </dependency>
 
