@@ -26,7 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.sonatype.nexus.capabilities.model.SelectableEntryXO;
-import org.sonatype.nexus.capability.support.CapabilitiesPlugin;
+import org.sonatype.nexus.capability.CapabilitiesPlugin;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
