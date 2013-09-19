@@ -532,10 +532,12 @@ public class DefaultNexus
   // Repo templates
   // ----------------------------------------------------------------------------
 
+  @Deprecated
   public TemplateSet getRepositoryTemplates() {
     return templateManager.getTemplates().getTemplates(RepositoryTemplate.class);
   }
 
+  @Deprecated
   public RepositoryTemplate getRepositoryTemplateById(String id)
       throws NoSuchTemplateIdException
   {

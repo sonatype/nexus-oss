@@ -17,13 +17,17 @@ import java.util.Collection;
 
 import org.sonatype.nexus.capabilities.client.exceptions.CapabilityFactoryNotAvailableException;
 import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
+import org.sonatype.nexus.capabilities.client.internal.CapabilitiesImpl;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
+
+import com.google.inject.ImplementedBy;
 
 /**
  * Capabilities Nexus Client Subsystem.
  *
  * @since 2.1
  */
+@ImplementedBy(CapabilitiesImpl.class)
 public interface Capabilities
 {
 

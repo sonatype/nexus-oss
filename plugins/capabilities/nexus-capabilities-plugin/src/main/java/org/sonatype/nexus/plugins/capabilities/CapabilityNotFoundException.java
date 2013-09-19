@@ -24,7 +24,7 @@ public class CapabilityNotFoundException
 {
 
   public CapabilityNotFoundException(final CapabilityIdentity id) {
-    super(String.format("Cannot find a capability with specified id of %s", id));
+    super(String.format("Capability with id '%s' was not found", id));
   }
 
 }

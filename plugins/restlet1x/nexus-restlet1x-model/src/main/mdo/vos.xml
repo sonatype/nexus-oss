@@ -4433,6 +4433,30 @@
           <required>false</required>
           <description>Initial value of the field.</description>
         </field>
+        <field>
+          <name>storePath</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>storeRoot</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>idMapping</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>nameMapping</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
       </fields>
     </class>
 

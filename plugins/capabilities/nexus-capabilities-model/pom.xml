@@ -29,18 +29,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-model</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!--
-    Use scope=provided dep on nexus-plugin-api here to avoid needing to explicitly call out versions of
-    plexus-utils, xstream and commons-lang, and keep the versions in sync with current NX release.
-    -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -69,21 +59,21 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
         <executions>
           <execution>
-            <id>capabilities-rest</id>
             <goals>
-              <goal>java</goal>
+              <goal>generate</goal>
             </goals>
             <configuration>
-              <version>2.1.0</version>
-              <models>
-                <model>src/main/mdo/capabilities-rest.xml</model>
-              </models>
-              <packageWithVersion>false</packageWithVersion>
-              <useJava5>true</useJava5>
+              <args>
+                <arg>-Xsetters</arg>
+                <arg>-Xfluent-api</arg>
+                <arg>-Xgenerated</arg>
+                <arg>-Xannotate</arg>
+                <arg>-XjsonProperty</arg>
+              </args>
             </configuration>
           </execution>
         </executions>

@@ -67,8 +67,8 @@ public class P2ProxyMetadataSource
   public static final String CTX_MIRRORS_URL = P2Constants.PROP_MIRRORS_URL;
 
   @Override
-  protected StorageFileItem doRetrieveArtifactsFileItem(final Map<String, Object> context,
-                                                        final P2ProxyRepository repository)
+  protected Map<String, StorageFileItem> doRetrieveArtifactsFileItems(final Map<String, Object> context,
+                                                                      final P2ProxyRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
     Xpp3Dom dom;
@@ -126,25 +126,25 @@ public class P2ProxyMetadataSource
       throw new RemoteStorageException(e);
     }
 
-    final Artifacts artifacts = new Artifacts(dom);
-    artifacts.setRepositoryAttributes(repository.getName());
-    final LinkedHashMap<String, String> properties = artifacts.getProperties();
+    final Artifacts metadata = new Artifacts(dom);
+    metadata.setRepositoryAttributes(repository.getName());
+    final LinkedHashMap<String, String> properties = metadata.getProperties();
     final String mirrorsURL = properties.get(P2Constants.PROP_MIRRORS_URL);
     if (mirrorsURL != null) {
       context.put(CTX_MIRRORS_URL, mirrorsURL);
     }
-
     properties.remove(P2Constants.PROP_MIRRORS_URL);
-    final boolean compressed = P2Constants.ARTIFACTS_PATH.equals(P2Constants.ARTIFACTS_JAR);
-    properties.put(P2Constants.PROP_COMPRESSED, Boolean.toString(compressed));
-    // properties.put( P2Facade.PROP_REPOSITORY_ID, getId( repository ) );
-    artifacts.setProperties(properties);
+    metadata.setProperties(properties);
 
     try {
-      final StorageFileItem artifactsItem =
-          createMetadataItem(repository, P2Constants.ARTIFACTS_XML, artifacts.getDom(),
-              P2Constants.XMLPI_ARTIFACTS, context);
-      return artifactsItem;
+      return createMetadataItems(
+          repository,
+          P2Constants.ARTIFACTS_XML,
+          P2Constants.ARTIFACTS_JAR,
+          metadata,
+          P2Constants.XMLPI_ARTIFACTS,
+          context
+      );
     }
     catch (IOException e) {
       throw new RemoteStorageException(e);
@@ -152,8 +152,8 @@ public class P2ProxyMetadataSource
   }
 
   @Override
-  protected StorageFileItem doRetrieveContentFileItem(final Map<String, Object> context,
-                                                      final P2ProxyRepository repository)
+  protected Map<String, StorageFileItem> doRetrieveContentFileItems(final Map<String, Object> context,
+                                                                    final P2ProxyRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
     Xpp3Dom dom;
@@ -204,20 +204,21 @@ public class P2ProxyMetadataSource
       throw new RemoteStorageException(e);
     }
 
-    final Content content = new Content(dom);
-    content.setRepositoryAttributes(repository.getName());
-    final LinkedHashMap<String, String> properties = content.getProperties();
+    final Content metadata = new Content(dom);
+    metadata.setRepositoryAttributes(repository.getName());
+    final LinkedHashMap<String, String> properties = metadata.getProperties();
     properties.remove(P2Constants.PROP_MIRRORS_URL);
-    final boolean compressed = P2Constants.CONTENT_PATH.equals(P2Constants.CONTENT_JAR);
-    properties.put(P2Constants.PROP_COMPRESSED, Boolean.toString(compressed));
-    // properties.put( P2Facade.PROP_REPOSITORY_ID, getId( repository ) );
-    content.setProperties(properties);
+    metadata.setProperties(properties);
 
     try {
-      final StorageFileItem contentItem =
-          createMetadataItem(repository, P2Constants.CONTENT_XML, content.getDom(), P2Constants.XMLPI_CONTENT,
-              context);
-      return contentItem;
+      return createMetadataItems(
+          repository,
+          P2Constants.CONTENT_XML,
+          P2Constants.CONTENT_JAR,
+          metadata,
+          P2Constants.XMLPI_CONTENT,
+          context
+      );
     }
     catch (IOException e) {
       throw new RemoteStorageException(e);

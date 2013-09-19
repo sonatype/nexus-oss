@@ -11,26 +11,34 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.capabilities.client.spi;
+package org.sonatype.nexus.capabilities.client.internal;
 
-import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A {@link Capability} factory that can create new ones or from an existing resource.
- *
- * @since 2.2
+ * @since 2.7
  */
-public interface JerseyCapabilityFactory<C extends Capability>
+@Named
+@Singleton
+public class CapabilityFactoriesSet
 {
 
-  C create(JerseyNexusClient nexusClient);
+  private final Set<CapabilityFactory> capabilityFactories;
 
-  C create(JerseyNexusClient nexusClient, CapabilityListItemResource resource);
+  @Inject
+  public CapabilityFactoriesSet(final Set<CapabilityFactory> capabilityFactories) {
+    this.capabilityFactories = checkNotNull(capabilityFactories);
+  }
 
-  boolean canCreate(String type);
-
-  boolean canCreate(Class<Capability> type);
-
+  public Set<CapabilityFactory> get() {
+    return capabilityFactories;
+  }
 }
