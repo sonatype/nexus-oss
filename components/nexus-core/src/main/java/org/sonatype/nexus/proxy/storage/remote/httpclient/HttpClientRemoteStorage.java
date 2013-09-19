@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,7 +49,6 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -426,14 +424,14 @@ public class HttpClientRemoteStorage
     }
     finally {
       timerContext.stop();
-      outboundRequestLog.debug("[{}] {} {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI());
+      if (outboundRequestLog.isDebugEnabled()) {
+        outboundRequestLog.debug("[{}] {} {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI());
+      }
     }
   }
 
   private Timer timer(final ProxyRepository repository, final HttpUriRequest httpRequest, final String baseUrl) {
-    final MetricName timerName = new MetricName(HttpClientRemoteStorage.class.getPackage().getName(),
-        HttpClientRemoteStorage.class.getSimpleName() + "-" + repository.getId(), baseUrl, httpRequest.getMethod());
-    return metricsRegistry.newTimer(timerName, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    return metricsRegistry.newTimer(HttpClientRemoteStorage.class, baseUrl, httpRequest.getMethod());
   }
 
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,
