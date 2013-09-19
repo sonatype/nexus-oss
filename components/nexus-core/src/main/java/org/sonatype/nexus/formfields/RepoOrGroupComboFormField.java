@@ -14,7 +14,7 @@
 package org.sonatype.nexus.formfields;
 
 public class RepoOrGroupComboFormField
-    extends AbstractFormField<String>
+    extends ComboboxFormField<String>
 {
   public static final String DEFAULT_HELP_TEXT = "Select the repository or repository group";
 
@@ -40,9 +40,14 @@ public class RepoOrGroupComboFormField
     return "repo-or-group";
   }
 
-  public RepoOrGroupComboFormField withInitialValue(final String initialValue) {
-    setInitialValue(initialValue);
-    return this;
+  @Override
+  protected String defaultStorePath() {
+    return restlet1xStore("/repositories");
+  }
+
+  @Override
+  protected String defaultStoreRoot() {
+    return "data";
   }
 
 }

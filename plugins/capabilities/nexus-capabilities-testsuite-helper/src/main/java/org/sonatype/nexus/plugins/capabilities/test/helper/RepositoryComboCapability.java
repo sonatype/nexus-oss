@@ -11,20 +11,22 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.capabilities;
+package org.sonatype.nexus.plugins.capabilities.test.helper;
+
+import javax.inject.Named;
+
+import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.plugins.capabilities.Capability;
 
 /**
- * Exception thrown when a capability was not found (e.g. updating an inexistent capability, removing an inexistent
- * capability,...).
+ * A test/demo capability for using {@link RepositoryCombobox}.
  *
- * @since 2.2
+ * @since 2.7
  */
-public class CapabilityNotFoundException
-    extends RuntimeException
+@Named(RepositoryComboCapabilityDescriptor.TYPE_ID)
+public class RepositoryComboCapability
+    extends TestCapability
+    implements Capability
 {
-
-  public CapabilityNotFoundException(final CapabilityIdentity id) {
-    super(String.format("Capability with id '%s' was not found", id));
-  }
 
 }

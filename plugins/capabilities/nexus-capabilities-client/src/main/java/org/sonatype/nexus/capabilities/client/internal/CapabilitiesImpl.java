@@ -16,9 +16,11 @@ package org.sonatype.nexus.capabilities.client.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
@@ -26,22 +28,17 @@ import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.Filter;
 import org.sonatype.nexus.capabilities.client.exceptions.CapabilityFactoryNotAvailableException;
 import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
-import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
-import org.sonatype.nexus.capabilities.model.XStreamConfigurator;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
-import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
+import org.sonatype.sisu.siesta.client.ClientBuilder.Target.Factory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,48 +49,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.1
  */
-public class JerseyCapabilities
-    extends SubsystemSupport<JerseyNexusClient>
+public class CapabilitiesImpl
     implements Capabilities
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JerseyCapabilities.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CapabilitiesImpl.class);
 
   private static final Filter ALL = null;
 
   public static final String NO_RESPONSE_BODY = null;
 
-  private final Set<JerseyCapabilityFactory> capabilityFactories;
+  private final CapabilityClient client;
 
-  public JerseyCapabilities(final JerseyNexusClient nexusClient,
-                            final Set<JerseyCapabilityFactory> capabilityFactories)
+  private final Set<CapabilityFactory> capabilityFactories;
+
+  @Inject
+  public CapabilitiesImpl(final Factory factory,
+                          final CapabilityFactoriesSet capabilityFactoriesSet)
   {
-    super(nexusClient);
-    XStreamConfigurator.configureXStream(nexusClient.getXStream());
-    this.capabilityFactories = checkNotNull(capabilityFactories);
+    client = checkNotNull(factory, "factory").build(CapabilityClient.class);
+    this.capabilityFactories = checkNotNull(capabilityFactoriesSet).get();
   }
 
   @Override
   public Capability create(final String type) {
-    return findFactoryOf(type).create(getNexusClient());
+    return findFactoryOf(type).create(client);
   }
 
   @Override
   public Capability get(final String id) {
-    try {
-      return convert(
-          getNexusClient()
-              .serviceResource(pathStatus(id))
-              .get(CapabilityStatusResponseResource.class)
-              .getData()
-      );
-    }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(new CapabilityAwareUniformInterfaceException(e.getResponse(), id));
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
-    }
+    return convert(client.getStatus(checkNotNull(id)));
   }
 
   @Override
@@ -129,7 +114,7 @@ public class JerseyCapabilities
   public <C extends Capability> C create(final Class<C> type)
       throws CapabilityFactoryNotAvailableException
   {
-    return findFactoryOf(type).create(getNexusClient());
+    return findFactoryOf(type).create(client);
   }
 
   @Override
@@ -183,22 +168,22 @@ public class JerseyCapabilities
   }
 
   @SuppressWarnings("unchecked")
-  private <C extends Capability> JerseyCapabilityFactory<C> findFactoryOf(final Class<C> type) {
-    for (final JerseyCapabilityFactory factory : capabilityFactories) {
-      if (factory.canCreate((Class<Capability>) type)) {
+  private <C extends Capability> CapabilityFactory<C> findFactoryOf(final Class<C> type) {
+    for (final CapabilityFactory factory : capabilityFactories) {
+      if (factory.canCreate(type)) {
         LOG.debug(
             "Using factory {} for capability type {}",
             factory.getClass().getName(), type.getName()
         );
-        return (JerseyCapabilityFactory<C>) factory;
+        return (CapabilityFactory<C>) factory;
       }
     }
     throw new CapabilityFactoryNotAvailableException((Class<Capability>) type);
   }
 
-  private JerseyCapabilityFactory findFactoryOf(final String type) {
+  private CapabilityFactory findFactoryOf(final String type) {
     checkNotNull(type);
-    for (final JerseyCapabilityFactory factory : capabilityFactories) {
+    for (final CapabilityFactory factory : capabilityFactories) {
       if (factory.canCreate(type)) {
         LOG.debug(
             "Using factory {} for type '{}'",
@@ -209,46 +194,34 @@ public class JerseyCapabilities
     }
     LOG.debug(
         "Using factory {} for type '{}'",
-        JerseyGenericCapabilityFactory.class.getName(), type
+        GenericCapabilityFactory.class.getName(), type
     );
-    return new JerseyGenericCapabilityFactory(type);
+    return new GenericCapabilityFactory(type);
   }
 
   private Collection<Capability> queryFor(final Filter filter) {
-    final CapabilitiesListResponseResource resource;
-    try {
-      if (filter != null) {
-        resource = getNexusClient()
-            .serviceResource("capabilities", filter.toQueryMap())
-            .get(CapabilitiesListResponseResource.class);
-      }
-      else {
-        resource = getNexusClient()
-            .serviceResource("capabilities")
-            .get(CapabilitiesListResponseResource.class);
-      }
+    final List<CapabilityStatusXO> resource;
+    if (filter != null) {
+      resource = client.search(filter.toQueryMap());
     }
-    catch (UniformInterfaceException e) {
-      throw getNexusClient().convert(e);
-    }
-    catch (ClientHandlerException e) {
-      throw getNexusClient().convert(e);
+    else {
+      resource = client.get();
     }
 
-    return Collections2.transform(resource.getData(), new Function<CapabilityListItemResource, Capability>()
+    return Collections2.transform(resource, new Function<CapabilityStatusXO, Capability>()
     {
       @Override
-      public Capability apply(@Nullable final CapabilityListItemResource input) {
+      public Capability apply(@Nullable final CapabilityStatusXO input) {
         return convert(input);
       }
     });
   }
 
-  private Capability convert(final CapabilityListItemResource resource) {
+  private Capability convert(final CapabilityStatusXO resource) {
     if (resource == null) {
       return null;
     }
-    return findFactoryOf(resource.getTypeId()).create(getNexusClient(), resource);
+    return findFactoryOf(resource.getCapability().getTypeId()).create(client, resource);
   }
 
   public static String path(final String id) {

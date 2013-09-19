@@ -11,40 +11,26 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite.capabilities.client.internal;
+package org.sonatype.nexus.capabilities.client.spi;
 
-import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
-import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
+import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
-import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
 
 /**
+ * A {@link Capability} factory that can create new ones or from an existing resource.
+ *
  * @since 2.2
  */
-public class JerseyCapabilityA
-    extends CapabilityImpl<CapabilityA>
-    implements CapabilityA
+public interface CapabilityFactory<C extends Capability>
 {
 
-  public JerseyCapabilityA(final CapabilityClient client) {
-    super(client, "[a]");
-  }
+  C create(CapabilityClient client);
 
-  public JerseyCapabilityA(final CapabilityClient client, final CapabilityStatusXO settings) {
-    super(client, settings);
-  }
+  C create(CapabilityClient client, CapabilityStatusXO settings);
 
-  @Override
-  public String propertyA1() {
-    return property("a1");
-  }
+  boolean canCreate(String type);
 
-  @Override
-  public CapabilityA withPropertyA1(final String value) {
-    withProperty("a1", value);
-    return this;
-  }
-
+  boolean canCreate(Class<Capability> type);
 
 }

@@ -16,8 +16,12 @@ package org.sonatype.nexus.testsuite.p2;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
+import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.Verifier;
@@ -51,39 +55,73 @@ public abstract class AbstractNexusP2IT
                                 final Map<String, String> sysProps)
       throws Exception
   {
-    FileUtils.deleteDirectory(new File(destination));
+    final boolean wasSecurityEnabled = SettingsMessageUtil.getCurrentSettings().isSecurityEnabled();
 
-    String tempDirPath = System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir"));
-    File testDir = new File(tempDirPath, getTestId() + "/run-p2/" + System.currentTimeMillis());
+    try {
+      // put security off so repository content can be accessed easy from maven
+      TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
+      {
+        @Override
+        public Object call()
+            throws Exception
+        {
+          final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
+          globalConfig.setSecurityEnabled(false);
+          SettingsMessageUtil.save(globalConfig);
+          return null;
+        }
+      });
 
-    FileUtils.deleteDirectory(testDir);
+      FileUtils.deleteDirectory(new File(destination));
 
-    final File basedir = ResourceExtractor.extractResourcePath(getClass(), "/run-p2", testDir, false);
+      String tempDirPath = System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir"));
+      File testDir = new File(tempDirPath, getTestId() + "/run-p2/" + System.currentTimeMillis());
 
-    final Verifier verifier = new Verifier(basedir.getAbsolutePath());
+      FileUtils.deleteDirectory(testDir);
 
-    verifier.setLocalRepo(new File(getBasedir(), "target/maven/fake-repo").getAbsolutePath());
+      final File basedir = ResourceExtractor.extractResourcePath(getClass(), "/run-p2", testDir, false);
 
-    verifier.setSystemProperty("org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000");
-    verifier.setSystemProperty("p2.installIU", installIU);
-    verifier.setSystemProperty("p2.destination", destination);
-    verifier.setSystemProperty("p2.metadataRepository", repositoryURL);
-    verifier.setSystemProperty("p2.artifactRepository", repositoryURL);
-    verifier.setSystemProperty("p2.profile", getTestId());
+      final Verifier verifier = new Verifier(basedir.getAbsolutePath());
 
-    if (sysProps != null) {
-      for (Map.Entry<String, String> entry : sysProps.entrySet()) {
-        verifier.setSystemProperty(entry.getKey(), entry.getValue());
+      verifier.setLocalRepo(new File(getBasedir(), "target/maven/fake-repo").getAbsolutePath());
+
+      verifier.setSystemProperty("org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000");
+      verifier.setSystemProperty("p2.installIU", installIU);
+      verifier.setSystemProperty("p2.destination", destination);
+      verifier.setSystemProperty("p2.metadataRepository", repositoryURL);
+      verifier.setSystemProperty("p2.artifactRepository", repositoryURL);
+      verifier.setSystemProperty("p2.profile", getTestId());
+
+      if (sysProps != null) {
+        for (Map.Entry<String, String> entry : sysProps.entrySet()) {
+          verifier.setSystemProperty(entry.getKey(), entry.getValue());
+        }
       }
+
+      verifier.setLogFileName(getTestId() + "-maven-output.log");
+      verifier.addCliOption("-X");
+      verifier.executeGoals(Arrays.asList("verify"));
+      verifier.verifyErrorFreeLog();
+      verifier.resetStreams();
+
+      FileUtils.deleteDirectory(testDir);
     }
-
-    verifier.setLogFileName(getTestId() + "-maven-output.log");
-    verifier.addCliOption("-X");
-    verifier.executeGoals(Arrays.asList("verify"));
-    verifier.verifyErrorFreeLog();
-    verifier.resetStreams();
-
-    FileUtils.deleteDirectory(testDir);
+    finally {
+      TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
+      {
+        @Override
+        public Object call()
+            throws Exception
+        {
+          final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
+          if (wasSecurityEnabled != globalConfig.isSecurityEnabled()) {
+            globalConfig.setSecurityEnabled(wasSecurityEnabled);
+            SettingsMessageUtil.save(globalConfig);
+          }
+          return null;
+        }
+      });
+    }
   }
 
   protected void installAndVerifyP2Feature(String repoId)
