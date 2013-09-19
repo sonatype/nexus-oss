@@ -21,7 +21,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
@@ -67,9 +67,9 @@ public class MergeMetadataCapabilityDescriptor
   @Inject
   public MergeMetadataCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
-        new RepoOrGroupComboFormField(
+        new RepositoryCombobox(
             REPOSITORY_ID, messages.repositoryLabel(), messages.repositoryHelp(), FormField.MANDATORY
-        )
+        ).includingAnyOfFacets(GroupRepository.class)
     );
   }
 

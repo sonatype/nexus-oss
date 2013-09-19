@@ -79,8 +79,16 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <xsd:complexType name="selectableEntry">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:string"/>
+      <xsd:element name="name" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
   <xsd:element name="capability" type="model:capability"/>
   <xsd:element name="capabilityStatus" type="model:capabilityStatus"/>
   <xsd:element name="capabilityType" type="model:capabilityType"/>
+  <xsd:element name="selectableEntry" type="model:selectableEntry"/>
 
 </xsd:schema>
