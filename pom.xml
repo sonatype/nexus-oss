@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.buildsupport</groupId>
     <artifactId>public-parent</artifactId>
-    <version>3</version>
+    <version>4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -350,7 +350,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
           <dependencies>
             <!--
             Keep versions in sync with buildsupport/groovy/pom.xml
@@ -379,12 +378,6 @@
             -->
             <!--<compilerId>groovy-eclipse-compiler</compilerId>-->
           </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4</version>
         </plugin>
 
         <!--
@@ -549,7 +542,6 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>sisu-maven-plugin</artifactId>
-          <version>1.1</version>
           <executions>
             <execution>
               <goals>
@@ -560,12 +552,9 @@
           </executions>
         </plugin>
 
-        <!--
-        See 'license-check' profile.
-        -->
         <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
+          <groupId>com.mycila</groupId>
+          <artifactId>license-maven-plugin</artifactId>
           <configuration>
             <excludes combine.children="append">
               <!--
@@ -898,36 +887,6 @@
             </executions>
           </plugin>
         </plugins>
-      </build>
-    </profile>
-
-    <!--
-    Verify license headers; use: mvn -Dlicense-check -N
-    -->
-    <profile>
-      <id>license-check</id>
-      <activation>
-        <property>
-          <name>license-check</name>
-        </property>
-      </activation>
-      <build>
-        <defaultGoal>com.mycila.maven-license-plugin:maven-license-plugin:check</defaultGoal>
-      </build>
-    </profile>
-
-    <!--
-    Format license headers; use: mvn -Dlicense-format -N
-    -->
-    <profile>
-      <id>license-format</id>
-      <activation>
-        <property>
-          <name>license-format</name>
-        </property>
-      </activation>
-      <build>
-        <defaultGoal>com.mycila.maven-license-plugin:maven-license-plugin:format</defaultGoal>
       </build>
     </profile>
 
