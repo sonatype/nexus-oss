@@ -13,17 +13,15 @@
 
 package org.sonatype.nexus.formfields;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A combo box {@link FormField}.
+ * A mutable combo box {@link FormField}.
  *
  * @since 2.7
  */
 public class ComboboxFormField<V>
-    extends AbstractFormField<V>
-    implements Selectable
+    extends Combobox<V>
 {
 
   private String storePath;
@@ -40,7 +38,7 @@ public class ComboboxFormField<V>
                            final boolean required,
                            final V initialValue)
   {
-    super(id, label, helpText, required, null, initialValue);
+    super(id, label, helpText, required, initialValue);
     this.storePath = defaultStorePath();
     this.storeRoot = defaultStoreRoot();
   }
@@ -64,11 +62,6 @@ public class ComboboxFormField<V>
                            final String label)
   {
     this(id, label, null);
-  }
-
-  @Override
-  public String getType() {
-    return "combobox";
   }
 
   @Override
@@ -111,44 +104,6 @@ public class ComboboxFormField<V>
     return this;
   }
 
-  public ComboboxFormField<V> withId(final String id) {
-    setId(id);
-    return this;
-  }
-
-  public ComboboxFormField<V> witLabel(final String label) {
-    setLabel(label);
-    return this;
-  }
-
-  public ComboboxFormField<V> witHelpText(final String helpText) {
-    setHelpText(helpText);
-    return this;
-  }
-
-  public ComboboxFormField<V> withRegexValidation(final String regex) {
-    setRegexValidation(regex);
-    return this;
-  }
-
-  public ComboboxFormField<V> withRequired(final boolean required) {
-    setRequired(required);
-    return this;
-  }
-
-  public ComboboxFormField<V> optional() {
-    return withRequired(FormField.OPTIONAL);
-  }
-
-  public ComboboxFormField<V> mandatory() {
-    return withRequired(FormField.MANDATORY);
-  }
-
-  public ComboboxFormField<V> withInitialValue(final V value) {
-    setInitialValue(value);
-    return this;
-  }
-
   protected String defaultStorePath() {
     return null;
   }
@@ -157,14 +112,5 @@ public class ComboboxFormField<V>
     return null;
   }
 
-  public static String siestaStore(final String path) {
-    checkArgument(path.startsWith("/"), "Path '%s' must start with slash ('/')", path);
-    return "/service/siesta" + path;
-  }
-
-  public static String restlet1xStore(final String path) {
-    checkArgument(path.startsWith("/"), "Path '%s' must start with slash ('/')", path);
-    return "/service/local" + path;
-  }
 
 }
