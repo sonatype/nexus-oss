@@ -19,7 +19,7 @@ package org.sonatype.nexus.formfields;
  * @since 2.5
  */
 public class RepoTargetComboFormField
-    extends ComboboxFormField<String>
+    extends Combobox<String>
 {
 
   public static final String DEFAULT_HELP_TEXT = "Select the repository target to apply ";
@@ -49,12 +49,12 @@ public class RepoTargetComboFormField
   }
 
   @Override
-  protected String defaultStorePath() {
+  public String getStorePath() {
     return restlet1xStore("/repo_targets");
   }
 
   @Override
-  protected String defaultStoreRoot() {
+  public String getStoreRoot() {
     return "data";
   }
 

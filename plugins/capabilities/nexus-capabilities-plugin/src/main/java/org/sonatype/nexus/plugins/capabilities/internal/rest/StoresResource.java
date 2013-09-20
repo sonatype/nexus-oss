@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -22,11 +23,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.sonatype.nexus.capabilities.model.SelectableEntryXO;
 import org.sonatype.nexus.capability.CapabilitiesPlugin;
+import org.sonatype.nexus.capability.spi.SelectableEntryProvider;
+import org.sonatype.nexus.capability.spi.SelectableEntryProvider.Parameters;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -74,6 +81,7 @@ public class StoresResource
 
   private static final Messages messages = I18N.create(Messages.class);
 
+  private final Map<String, SelectableEntryProvider> namedProviders;
 
   private final RepositoryRegistry repositoryRegistry;
 
@@ -81,10 +89,12 @@ public class StoresResource
 
   @Inject
   public StoresResource(final RepositoryRegistry repositoryRegistry,
-                        final NexusItemAuthorizer nexusItemAuthorizer)
+                        final NexusItemAuthorizer nexusItemAuthorizer,
+                        final Map<String, SelectableEntryProvider> namedProviders)
   {
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.nexusItemAuthorizer = checkNotNull(nexusItemAuthorizer);
+    this.namedProviders = checkNotNull(namedProviders);
   }
 
   /**
@@ -134,6 +144,52 @@ public class StoresResource
     }
 
     return entries;
+  }
+
+  /**
+   * Delegates retrieval of {@link SelectableEntryXO} to the named {@link SelectableEntryProvider}.
+   */
+  @GET
+  @Path("/provider/{name}")
+  @Produces({APPLICATION_XML, APPLICATION_JSON})
+  public List<SelectableEntryXO> getFromProvider(final @PathParam("name") String name,
+                                                 final @Context UriInfo uriInfo)
+  {
+    SelectableEntryProvider provider = namedProviders.get(name);
+    List<SelectableEntryXO> entries = null;
+    if (provider == null) {
+      log.warn("Could not find a {} bounded to name {}", SelectableEntryProvider.class.getName(), name);
+    }
+    else {
+      try {
+        entries = provider.get(asParameters(uriInfo.getQueryParameters()));
+      }
+      catch (Exception e) {
+        log.warn(
+            "Provider {} failed to provide the list of entries due to {}/{}",
+            provider, e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+        );
+      }
+    }
+    if (entries == null) {
+      return Lists.newArrayList();
+    }
+    return entries;
+  }
+
+  private Parameters asParameters(final MultivaluedMap<String, String> queryParameters) {
+    return new Parameters()
+    {
+      @Override
+      public String getFirst(final String name) {
+        return queryParameters.getFirst(name);
+      }
+
+      @Override
+      public List<String> get(final String name) {
+        return queryParameters.get(name);
+      }
+    };
   }
 
   private Predicate<Repository> hasRightsToView(final Boolean skipPermissions) {

@@ -19,16 +19,13 @@ import java.util.List;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
-import com.google.common.base.Preconditions;
-import org.codehaus.plexus.util.StringUtils;
-
 /**
  * A repository combo box {@link FormField}.
  *
  * @since 2.7
  */
 public class RepositoryCombobox
-    extends ComboboxFormField<String>
+    extends Combobox<String>
 {
 
   public static final String REGARDLESS_VIEW_PERMISSIONS = "regardlessViewPermissions";
@@ -81,11 +78,6 @@ public class RepositoryCombobox
     super(id, messages.label(), messages.helpText(), false);
   }
 
-  @Override
-  protected String defaultStorePath() {
-    return siestaStore("/capabilities/stores/repositories");
-  }
-
   /**
    * Repository will be present if implements any of specified facets.
    */
@@ -136,8 +128,6 @@ public class RepositoryCombobox
 
   @Override
   public String getStorePath() {
-    Preconditions.checkState(StringUtils.isNotEmpty(super.getStorePath()), "Store path cannot be empty");
-
     StringBuilder sb = new StringBuilder();
     if (regardlessViewPermissions) {
       sb.append(REGARDLESS_VIEW_PERMISSIONS).append("=true");
@@ -184,7 +174,7 @@ public class RepositoryCombobox
     if (sb.length() > 0) {
       sb.insert(0, "?");
     }
-    sb.insert(0, super.getStorePath());
+    sb.insert(0, siestaStore("/capabilities/stores/repositories"));
 
     return sb.toString();
   }
