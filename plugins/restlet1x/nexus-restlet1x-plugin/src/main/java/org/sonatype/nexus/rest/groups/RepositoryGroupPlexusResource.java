@@ -179,7 +179,7 @@ public class RepositoryGroupPlexusResource
       // to check does ID really cover a group?
       getRepositoryRegistry().getRepositoryWithFacet(getGroupId(request), GroupRepository.class);
 
-      getNexus().deleteRepository(getGroupId(request));
+      getNexusConfiguration().deleteRepository(getGroupId(request));
     }
     catch (NoSuchRepositoryAccessException e) {
       getLogger().warn("Repository group Access Denied, id=" + getGroupId(request));

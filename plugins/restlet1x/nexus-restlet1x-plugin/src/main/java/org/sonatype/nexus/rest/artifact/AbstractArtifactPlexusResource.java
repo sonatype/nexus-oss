@@ -304,7 +304,7 @@ public abstract class AbstractArtifactPlexusResource
       throws ResourceException
   {
     final PomArtifactManager pomManager =
-        new PomArtifactManager(getNexus().getNexusConfiguration().getTemporaryDirectory());
+        new PomArtifactManager(getNexusConfiguration().getTemporaryDirectory());
 
     final UploadContext uploadContext = createUploadContext();
 

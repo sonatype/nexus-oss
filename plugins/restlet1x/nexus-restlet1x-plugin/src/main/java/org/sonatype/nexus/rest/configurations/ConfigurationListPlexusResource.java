@@ -73,7 +73,7 @@ public class ConfigurationListPlexusResource
   {
     ConfigurationsListResourceResponse result = new ConfigurationsListResourceResponse();
 
-    Map<String, String> configFileNames = getNexus().getConfigurationFiles();
+    Map<String, String> configFileNames = getNexusConfiguration().getConfigurationFiles();
 
     for (Map.Entry<String, String> entry : configFileNames.entrySet()) {
       ConfigurationsListResource resource = new ConfigurationsListResource();

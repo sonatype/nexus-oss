@@ -47,6 +47,7 @@ import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValida
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.RepositoryType;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
@@ -245,12 +246,14 @@ public class DefaultNexusConfiguration
     }
   }
 
+  @Override
   public void loadConfiguration()
       throws ConfigurationException, IOException
   {
     loadConfiguration(false);
   }
 
+  @Override
   public synchronized void loadConfiguration(boolean force)
       throws ConfigurationException, IOException
   {
@@ -391,6 +394,7 @@ public class DefaultNexusConfiguration
     }
   }
 
+  @Override
   public synchronized void saveConfiguration()
       throws IOException
   {
@@ -421,43 +425,53 @@ public class DefaultNexusConfiguration
     saveConfiguration();
   }
 
+  @Override
   @Deprecated
   public Configuration getConfigurationModel() {
     return configurationSource.getConfiguration();
   }
 
+  @Override
   public ApplicationConfigurationSource getConfigurationSource() {
     return configurationSource;
   }
 
+  @Override
   public boolean isInstanceUpgraded() {
     return configurationSource.isInstanceUpgraded();
   }
 
+  @Override
   public boolean isConfigurationUpgraded() {
     return configurationSource.isConfigurationUpgraded();
   }
 
+  @Override
   public boolean isConfigurationDefaulted() {
     return configurationSource.isConfigurationDefaulted();
   }
 
+  @Override
   public LocalStorageContext getGlobalLocalStorageContext() {
     return globalLocalStorageContext;
   }
 
+  @Override
   public RemoteStorageContext getGlobalRemoteStorageContext() {
     return globalRemoteStorageContext;
   }
 
+  @Override
   public File getWorkingDirectory() {
     return workingDirectory;
   }
 
+  @Override
   public File getWorkingDirectory(String key) {
     return getWorkingDirectory(key, true);
   }
 
+  @Override
   public File getWorkingDirectory(final String key, final boolean createIfNeeded) {
     final File keyedDirectory = new File(getWorkingDirectory(), key);
     if (createIfNeeded) {
@@ -466,14 +480,17 @@ public class DefaultNexusConfiguration
     return canonicalize(keyedDirectory);
   }
 
+  @Override
   public File getTemporaryDirectory() {
     return temporaryDirectory;
   }
 
+  @Override
   public File getConfigurationDirectory() {
     return configurationDirectory;
   }
 
+  @Override
   @Deprecated
   public Repository createRepositoryFromModel(CRepository repository)
       throws ConfigurationException
@@ -481,10 +498,12 @@ public class DefaultNexusConfiguration
     return runtimeConfigurationBuilder.createRepositoryFromModel(getConfigurationModel(), repository);
   }
 
+  @Override
   public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors() {
     return Collections.unmodifiableList(scheduledTaskDescriptors);
   }
 
+  @Override
   public ScheduledTaskDescriptor getScheduledTaskDescriptor(String id) {
     for (ScheduledTaskDescriptor descriptor : scheduledTaskDescriptors) {
       if (descriptor.getId().equals(id)) {
@@ -498,26 +517,31 @@ public class DefaultNexusConfiguration
   // ------------------------------------------------------------------
   // Security
 
+  @Override
   public boolean isSecurityEnabled() {
     return getSecuritySystem() != null && getSecuritySystem().isSecurityEnabled();
   }
 
+  @Override
   public void setSecurityEnabled(boolean enabled)
       throws IOException
   {
     getSecuritySystem().setSecurityEnabled(enabled);
   }
 
+  @Override
   public void setRealms(List<String> realms)
       throws org.sonatype.configuration.validation.InvalidConfigurationException
   {
     getSecuritySystem().setRealms(realms);
   }
 
+  @Override
   public boolean isAnonymousAccessEnabled() {
     return getSecuritySystem() != null && getSecuritySystem().isAnonymousAccessEnabled();
   }
 
+  @Override
   public void setAnonymousAccess(final boolean enabled, final String username, final String password)
       throws InvalidConfigurationException
   {
@@ -631,15 +655,18 @@ public class DefaultNexusConfiguration
     }
   }
 
+  @Override
   @Deprecated
   public void setAnonymousAccessEnabled(boolean enabled) {
     getSecuritySystem().setAnonymousAccessEnabled(enabled);
   }
 
+  @Override
   public String getAnonymousUsername() {
     return getSecuritySystem().getAnonymousUsername();
   }
 
+  @Override
   @Deprecated
   public void setAnonymousUsername(String val)
       throws org.sonatype.configuration.validation.InvalidConfigurationException
@@ -647,10 +674,12 @@ public class DefaultNexusConfiguration
     getSecuritySystem().setAnonymousUsername(val);
   }
 
+  @Override
   public String getAnonymousPassword() {
     return getSecuritySystem().getAnonymousPassword();
   }
 
+  @Override
   @Deprecated
   public void setAnonymousPassword(String val)
       throws org.sonatype.configuration.validation.InvalidConfigurationException
@@ -658,6 +687,7 @@ public class DefaultNexusConfiguration
     getSecuritySystem().setAnonymousPassword(val);
   }
 
+  @Override
   public List<String> getRealms() {
     return getSecuritySystem().getRealms();
   }
@@ -665,12 +695,14 @@ public class DefaultNexusConfiguration
   // ------------------------------------------------------------------
   // Booting
 
+  @Override
   public void createInternals()
       throws ConfigurationException
   {
     createRepositories();
   }
 
+  @Override
   public void dropInternals() {
     dropRepositories();
   }
@@ -766,6 +798,7 @@ public class DefaultNexusConfiguration
     return repositoryMaxInstanceCountLimits;
   }
 
+  @Override
   public void setDefaultRepositoryMaxInstanceCount(int count) {
     if (count < 0) {
       getLogger().info("Default repository maximal instance limit set to UNLIMITED.");
@@ -779,6 +812,7 @@ public class DefaultNexusConfiguration
     }
   }
 
+  @Override
   public void setRepositoryMaxInstanceCount(RepositoryTypeDescriptor rtd, int count) {
     if (count < 0) {
       getLogger().info("Repository type " + rtd.toString() + " maximal instance limit set to UNLIMITED.");
@@ -792,6 +826,7 @@ public class DefaultNexusConfiguration
     }
   }
 
+  @Override
   public int getRepositoryMaxInstanceCount(RepositoryTypeDescriptor rtd) {
     Integer limit = getRepositoryMaxInstanceCountLimits().get(rtd);
 
@@ -863,6 +898,7 @@ public class DefaultNexusConfiguration
     }
   }
 
+  @Override
   public synchronized Repository createRepository(CRepository settings)
       throws ConfigurationException, IOException
   {
@@ -880,10 +916,23 @@ public class DefaultNexusConfiguration
     return repository;
   }
 
-  public synchronized void deleteRepository(String id)
-      throws NoSuchRepositoryException, IOException, ConfigurationException
+  @Override
+  public void deleteRepository(String id)
+      throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException
+  {
+    deleteRepository(id, false);
+  }
+
+  @Override
+  public synchronized void deleteRepository(String id, boolean force)
+      throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException
   {
     Repository repository = repositoryRegistry.getRepository(id);
+
+    if (!force && !repository.isUserManaged()) {
+      throw new AccessDeniedException("Not allowed to delete non-user-managed repository '" + id + "'.");
+    }
+
     // put out of service so wont be accessed any longer
     repository.setLocalStatus(LocalStatus.OUT_OF_SERVICE);
     // disable indexing for same purpose
@@ -948,6 +997,7 @@ public class DefaultNexusConfiguration
 
   // ===
 
+  @Override
   public Collection<CRemoteNexusInstance> listRemoteNexusInstances() {
     List<CRemoteNexusInstance> result = null;
 
@@ -958,6 +1008,7 @@ public class DefaultNexusConfiguration
     return result;
   }
 
+  @Override
   public CRemoteNexusInstance readRemoteNexusInstance(String alias)
       throws IOException
   {
@@ -974,6 +1025,7 @@ public class DefaultNexusConfiguration
     return null;
   }
 
+  @Override
   public void createRemoteNexusInstance(CRemoteNexusInstance settings)
       throws IOException
   {
@@ -982,6 +1034,7 @@ public class DefaultNexusConfiguration
     applyAndSaveConfiguration();
   }
 
+  @Override
   public void deleteRemoteNexusInstance(String alias)
       throws IOException
   {
@@ -998,6 +1051,7 @@ public class DefaultNexusConfiguration
     applyAndSaveConfiguration();
   }
 
+  @Override
   public Map<String, String> getConfigurationFiles() {
     if (configurationFiles == null) {
       configurationFiles = new HashMap<String, String>();
@@ -1023,6 +1077,7 @@ public class DefaultNexusConfiguration
     return configurationFiles;
   }
 
+  @Override
   public NexusStreamResponse getConfigurationAsStreamByKey(String key)
       throws IOException
   {

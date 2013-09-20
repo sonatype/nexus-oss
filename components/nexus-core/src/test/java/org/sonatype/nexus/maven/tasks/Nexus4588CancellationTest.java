@@ -69,7 +69,7 @@ public class Nexus4588CancellationTest
 
     TaskUtil.getCurrentProgressListener().cancel();
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = lookup(SnapshotRemover.class).removeSnapshots(snapshotRemovalRequest);
   }
 
   @Test(expected = TaskInterruptedException.class)
@@ -87,7 +87,7 @@ public class Nexus4588CancellationTest
     // against SnapshotRemover component implementation changes
     ((Nexus4588CancellationEventInspector) lookup(EventInspector.class, "nexus4588")).setActive(true);
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = lookup(SnapshotRemover.class).removeSnapshots(snapshotRemovalRequest);
   }
 
 }

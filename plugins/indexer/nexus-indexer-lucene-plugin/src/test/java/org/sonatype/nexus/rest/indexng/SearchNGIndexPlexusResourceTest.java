@@ -106,8 +106,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     // disable security completely, as it just interferes with test
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -122,8 +122,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     // disable security completely, as it just interferes with test
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -138,8 +138,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     // disable security completely, as it just interferes with test
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -154,8 +154,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     // disable security completely, as it just interferes with test
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -248,8 +248,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     // disable security completely, as it just interferes with test
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -276,8 +276,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     // disable security completely, as it just interferes with test
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -321,8 +321,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     // disable security completely, as it just interferes with test
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -338,8 +338,8 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     fillInRepo();
-    getNexus().getNexusConfiguration().setSecurityEnabled(false);
-    getNexus().getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().setSecurityEnabled(false);
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 

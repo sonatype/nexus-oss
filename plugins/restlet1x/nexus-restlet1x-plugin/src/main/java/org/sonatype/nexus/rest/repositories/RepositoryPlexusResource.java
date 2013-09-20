@@ -333,7 +333,7 @@ public class RepositoryPlexusResource
   {
     String repoId = this.getRepositoryId(request);
     try {
-      getNexus().deleteRepository(repoId);
+      getNexusConfiguration().deleteRepository(repoId);
 
       response.setStatus(Status.SUCCESS_NO_CONTENT);
     }

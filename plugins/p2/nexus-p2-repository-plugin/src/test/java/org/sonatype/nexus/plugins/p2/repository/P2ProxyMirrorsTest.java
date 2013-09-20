@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -40,8 +39,6 @@ import org.junit.Test;
 public class P2ProxyMirrorsTest
     extends NexusAppTestSupport
 {
-  protected Nexus nexus;
-
   protected NexusConfiguration nexusConfiguration;
 
   private P2ProxyRepository repository;
@@ -63,7 +60,7 @@ public class P2ProxyMirrorsTest
     // next line will force initialization of P2 repository types
     lookup(TemplateProvider.class, "p2-repository");
 
-    nexus = lookup(Nexus.class);
+    startNx();
 
     nexusConfiguration = lookup(NexusConfiguration.class);
 

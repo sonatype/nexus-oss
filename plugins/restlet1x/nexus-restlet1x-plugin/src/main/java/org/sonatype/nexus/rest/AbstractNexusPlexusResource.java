@@ -20,7 +20,6 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -28,6 +27,11 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.templates.NoSuchTemplateIdException;
+import org.sonatype.nexus.templates.TemplateManager;
+import org.sonatype.nexus.templates.TemplateSet;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -62,9 +66,6 @@ public abstract class AbstractNexusPlexusResource
   public static final String AS_EXPIRED_PARAMETER = "asExpired";
 
   @Requirement
-  private Nexus nexus;
-
-  @Requirement
   private NexusConfiguration nexusConfiguration;
 
   @Requirement(hint = "protected")
@@ -78,11 +79,12 @@ public abstract class AbstractNexusPlexusResource
 
   @Requirement
   private ReferenceFactory referenceFactory;
-
-  @Inject
-  public void setNexus(final Nexus nexus) {
-    this.nexus = nexus;
-  }
+  
+  @Requirement
+  private TemplateManager templateManager;
+  
+  @Requirement
+  private RepositoryRouter repositoryRouter;
 
   @Inject
   public void setNexusConfiguration(final NexusConfiguration nexusConfiguration) {
@@ -109,8 +111,14 @@ public abstract class AbstractNexusPlexusResource
     this.referenceFactory = checkNotNull(referenceFactory);
   }
 
-  protected Nexus getNexus() {
-    return nexus;
+  @Inject
+  public void setTemplateManager(final TemplateManager templateManager) {
+    this.templateManager = checkNotNull(templateManager);
+  }
+  
+  @Inject
+  public void setRepositoryRouter(final RepositoryRouter repositoryRouter) {
+    this.repositoryRouter = checkNotNull(repositoryRouter);
   }
 
   protected NexusConfiguration getNexusConfiguration() {
@@ -123,6 +131,24 @@ public abstract class AbstractNexusPlexusResource
 
   protected RepositoryRegistry getUnprotectedRepositoryRegistry() {
     return defaultRepositoryRegistry;
+  }
+  
+  protected TemplateManager getTemplateManager() {
+    return templateManager;
+  }
+  
+  protected RepositoryRouter getRepositoryRouter() {
+    return repositoryRouter;
+  }
+  
+  protected TemplateSet getRepositoryTemplates() {
+    return getTemplateManager().getTemplates().getTemplates(RepositoryTemplate.class);
+  }
+
+  protected RepositoryTemplate getRepositoryTemplateById(String id)
+      throws NoSuchTemplateIdException
+  {
+    return (RepositoryTemplate) getTemplateManager().getTemplate(RepositoryTemplate.class, id);
   }
 
   /**

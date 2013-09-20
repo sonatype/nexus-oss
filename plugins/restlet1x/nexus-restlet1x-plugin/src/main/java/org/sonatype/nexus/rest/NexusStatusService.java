@@ -15,7 +15,8 @@ package org.sonatype.nexus.rest;
 
 import java.util.HashMap;
 
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
@@ -45,13 +46,14 @@ public class NexusStatusService
   private ReferenceFactory referenceFactory;
 
   @Requirement
-  private Nexus nexus;
+  private ApplicationStatusSource applicationStatusSource;
 
   public Representation getRepresentation(final Status status, final Request request, final Response response) {
     final HashMap<String, Object> dataModel = new HashMap<String, Object>();
 
+    final SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
     dataModel.put("request", request);
-    dataModel.put("nexusVersion", nexus.getSystemStatus().getVersion());
+    dataModel.put("nexusVersion", systemStatus.getVersion());
     // getContentRoot(req) always returns Reference with "/" as last character
     String nexusRoot = referenceFactory.getContextRoot(request).toString();
     if (nexusRoot.endsWith("/")) {

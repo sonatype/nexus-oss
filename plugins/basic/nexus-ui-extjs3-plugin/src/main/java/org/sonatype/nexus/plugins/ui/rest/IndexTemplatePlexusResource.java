@@ -25,7 +25,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.ui.BuildNumberService;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
@@ -60,7 +61,7 @@ public class IndexTemplatePlexusResource
     extends AbstractPlexusResource
     implements ManagedPlexusResource
 {
-  private Nexus nexus;
+  private ApplicationStatusSource applicationStatusSource;
 
   private ReferenceFactory referenceFactory;
 
@@ -75,7 +76,7 @@ public class IndexTemplatePlexusResource
   String templateFilename;
 
   @Inject
-  public IndexTemplatePlexusResource(final Map<String, NexusIndexHtmlCustomizer> bundles, final Nexus nexus,
+  public IndexTemplatePlexusResource(final Map<String, NexusIndexHtmlCustomizer> bundles, final ApplicationStatusSource applicationStatusSource,
                                      final ReferenceFactory referenceFactory,
                                      final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
                                      final Velocity velocity, final BuildNumberService buildNumberService,
@@ -84,7 +85,7 @@ public class IndexTemplatePlexusResource
     this();
 
     this.bundles = bundles;
-    this.nexus = nexus;
+    this.applicationStatusSource = applicationStatusSource;
     this.referenceFactory = referenceFactory;
     this.templateFilename = templateFilename;
     this.velocity = velocity;
@@ -136,13 +137,15 @@ public class IndexTemplatePlexusResource
   {
     getLogger().debug("Rendering index");
 
+    final SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
+
     Map<String, Object> templatingContext = new HashMap<String, Object>();
 
     templatingContext.put("serviceBase", "service/local");
 
     templatingContext.put("contentBase", "content");
 
-    templatingContext.put("nexusVersion", nexus.getSystemStatus().getVersion());
+    templatingContext.put("nexusVersion", systemStatus.getVersion());
 
     templatingContext.put("nexusRoot", referenceFactory.getContextRoot(request).toString());
 
@@ -205,8 +208,8 @@ public class IndexTemplatePlexusResource
       evaluateIfNeeded(pluginContext, postBodyTemplate, pluginPostBodyContributions);
     }
 
-    templatingContext.put("appName", nexus.getSystemStatus().getAppName());
-    templatingContext.put("formattedAppName", nexus.getSystemStatus().getFormattedAppName());
+    templatingContext.put("appName", systemStatus.getAppName());
+    templatingContext.put("formattedAppName", systemStatus.getFormattedAppName());
 
     templatingContext.put("pluginPreHeadContributions", pluginPreHeadContributions);
     templatingContext.put("pluginPostHeadContributions", pluginPostHeadContributions);

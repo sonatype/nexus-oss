@@ -43,12 +43,11 @@ public class RoutingStatusResourceTest
 {
   private final String REPO_ID = "releases";
 
-  private Subject subject;
-
   @Before
   public void login()
       throws Exception
   {
+    startNx();
     lookup(ApplicationStatusSource.class).setState(SystemState.STARTED);
     ThreadContext.bind(new Subject.Builder().buildSubject());
   }

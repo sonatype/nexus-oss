@@ -88,7 +88,7 @@ public class RepositoryTypesComponentListPlexusResource
     // such horrible terminology for this class, its actually repo providers that are being returned
     String repoType = form.getFirstValue("repoType");
 
-    TemplateSet templateSet = getNexus().getRepositoryTemplates();
+    TemplateSet templateSet = getRepositoryTemplates();
 
     if ("hosted".equals(repoType)) {
       templateSet = templateSet.getTemplates(HostedRepository.class);

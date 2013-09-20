@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
@@ -72,8 +71,6 @@ public class RequestFlagsTest
 
   private LastModifiedSender lastModifiedSender;
 
-  private Nexus nexus;
-
   private ProxyRepository proxyRepository;
 
   @Before
@@ -90,7 +87,7 @@ public class RequestFlagsTest
     server =
         Proxy.withPort(0).serve(PATH).withBehaviours(recordedRequestsBehaviour, lastModifiedSender,
             content(CONTENT)).start();
-    nexus = lookup(Nexus.class);
+    startNx();
     proxyRepository = createProxyRepository();
 
     // disable security
@@ -110,7 +107,7 @@ public class RequestFlagsTest
       throws Exception
   {
     final RepositoryTemplate template =
-        (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(Maven2ContentClass.class,
+        (RepositoryTemplate) getRepositoryTemplates().getTemplates(Maven2ContentClass.class,
             RepositoryPolicy.RELEASE, MavenProxyRepository.class).pick();
     final ConfigurableRepository templateConf = template.getConfigurableRepository();
     templateConf.setId("test");

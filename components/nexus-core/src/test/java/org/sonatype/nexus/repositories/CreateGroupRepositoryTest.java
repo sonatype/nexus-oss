@@ -14,7 +14,6 @@
 package org.sonatype.nexus.repositories;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -28,9 +27,6 @@ import org.junit.Test;
 public class CreateGroupRepositoryTest
     extends NexusAppTestSupport
 {
-
-  private Nexus nexus;
-
   private NexusConfiguration nexusConfiguration;
 
   @Override
@@ -43,8 +39,7 @@ public class CreateGroupRepositoryTest
       throws Exception
   {
     super.setUp();
-
-    this.nexus = this.lookup(Nexus.class);
+    startNx();
     this.nexusConfiguration = this.lookup(NexusConfiguration.class);
   }
 
@@ -56,7 +51,7 @@ public class CreateGroupRepositoryTest
     String groupId = "group-id";
 
     Maven2GroupRepositoryTemplate template =
-        (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+        (Maven2GroupRepositoryTemplate) getRepositoryTemplates()
             .getTemplates(Maven2GroupRepositoryTemplate.class).pick();
 
     template.getConfigurableRepository().setId(groupId);
@@ -107,7 +102,7 @@ public class CreateGroupRepositoryTest
     String groupId = "group-id";
 
     Maven2GroupRepositoryTemplate template =
-        (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+        (Maven2GroupRepositoryTemplate) getRepositoryTemplates()
             .getTemplates(Maven2GroupRepositoryTemplate.class).pick();
 
     template.getConfigurableRepository().setId(groupId);
@@ -151,7 +146,7 @@ public class CreateGroupRepositoryTest
     String groupId = null;
 
     Maven2GroupRepositoryTemplate template =
-        (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+        (Maven2GroupRepositoryTemplate) getRepositoryTemplates()
             .getTemplates(Maven2GroupRepositoryTemplate.class).pick();
 
     template.getConfigurableRepository().setId(groupId);
@@ -177,7 +172,7 @@ public class CreateGroupRepositoryTest
     String groupId = "";
 
     Maven2GroupRepositoryTemplate template =
-        (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+        (Maven2GroupRepositoryTemplate) getRepositoryTemplates()
             .getTemplates(Maven2GroupRepositoryTemplate.class).pick();
 
     template.getConfigurableRepository().setId(groupId);

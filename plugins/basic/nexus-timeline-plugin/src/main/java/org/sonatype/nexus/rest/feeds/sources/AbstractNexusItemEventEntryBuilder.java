@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Date;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -40,14 +39,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
     implements SyndEntryBuilder<NexusArtifactEvent>
 {
   @Requirement
-  private Nexus nexus;
-
-  @Requirement
   private RepositoryRegistry repositoryRegistry;
-
-  protected Nexus getNexus() {
-    return nexus;
-  }
 
   protected RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;

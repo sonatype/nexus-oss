@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.events.EventInspector;
 
@@ -56,7 +55,7 @@ public class SecurityConfigurationUpgradeTest
 
     this.copySecurityConfigToPlace();
 
-    this.lookup(Nexus.class);
+    startNx();
 
     // verify
     this.verifyUpgrade("/org/sonatype/nexus/security/upgrade/security.result.xml");

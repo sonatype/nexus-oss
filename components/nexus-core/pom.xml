@@ -67,6 +67,11 @@
 
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-lifecycle</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-eventbus</artifactId>
     </dependency>
 

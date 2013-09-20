@@ -43,9 +43,9 @@ public abstract class AbstractIndexerManagerTest
   {
     super.setUp();
 
-    nexusConfiguration.setSecurityEnabled(false);
+    nexusConfiguration().setSecurityEnabled(false);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     indexerManager = (DefaultIndexerManager) lookup(IndexerManager.class);
 

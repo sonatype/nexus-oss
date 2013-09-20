@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -74,9 +73,8 @@ public class DefaultRepositoryRouterTest
     super.setUp();
 
     // loads up config, defaults
-    nexusConfiguration = this.lookup(NexusConfiguration.class);
-    nexusConfiguration.loadConfiguration(false);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().loadConfiguration(false);
+    nexusConfiguration().saveConfiguration();
 
     applicationConfiguration = this.lookup(ApplicationConfiguration.class);
     applicationConfiguration.saveConfiguration();

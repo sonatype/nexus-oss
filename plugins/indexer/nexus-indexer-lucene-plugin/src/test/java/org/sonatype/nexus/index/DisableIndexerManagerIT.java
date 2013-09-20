@@ -32,7 +32,7 @@ public class DisableIndexerManagerIT
 
     snapshots.setSearchable(false);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     searchFor("org.sonatype.plexus", 0);
   }

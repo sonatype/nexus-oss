@@ -32,6 +32,7 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
+import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate.ProviderHint;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
@@ -39,8 +40,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-
-import static org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate.ProviderHint;
 
 public abstract class AbstractRepositoryGroupPlexusResource
     extends AbstractNexusPlexusResource
@@ -199,7 +198,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
       ContentClass contentClass =
           repositoryTypeRegistry.getRepositoryContentClass(GroupRepository.class, model.getProvider());
 
-      RepositoryTemplate template = (RepositoryTemplate) getNexus().getRepositoryTemplates().getTemplates(
+      RepositoryTemplate template = (RepositoryTemplate) getRepositoryTemplates().getTemplates(
           GroupRepository.class, contentClass, new ProviderHint(model.getProvider())
       ).pick();
 

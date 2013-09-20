@@ -11,29 +11,18 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.sisu.ehcache;
+package org.sonatype.nexus;
 
-import org.sonatype.appcontext.lifecycle.Stoppable;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
- * Simple reusable CacheManager component lifecycle handler.
- *
+ * Component performing Nexus Application boot.
+ * 
  * @author cstamas
- * @since 1.1
+ * @since 2.7.0
  */
-public class CacheManagerLifecycleHandler
-    implements Stoppable
+public interface NxApplication
+    extends Lifecycle
 {
-  private final CacheManagerComponent cacheManagerComponent;
 
-  public CacheManagerLifecycleHandler(final CacheManagerComponent cacheManagerComponent) {
-    if (cacheManagerComponent == null) {
-      throw new NullPointerException("Supplied CacheManagerComponent  cannot be null!");
-    }
-    this.cacheManagerComponent = cacheManagerComponent;
-  }
-
-  public void handle() {
-    cacheManagerComponent.shutdown();
-  }
 }

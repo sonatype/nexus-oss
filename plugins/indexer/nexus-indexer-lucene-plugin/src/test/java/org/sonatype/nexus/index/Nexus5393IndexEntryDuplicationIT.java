@@ -104,7 +104,7 @@ public class Nexus5393IndexEntryDuplicationIT
     central.setDownloadRemoteIndexes(false);
     central.setRemoteUrl("http://localhost:" + port);
     central.setRepositoryPolicy(RepositoryPolicy.RELEASE);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     // wait a bit for async stuff
     waitForAsync();
@@ -132,7 +132,7 @@ public class Nexus5393IndexEntryDuplicationIT
       throws Exception
   {
     central.setDownloadRemoteIndexes(true);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     waitForAsync();
   }
 

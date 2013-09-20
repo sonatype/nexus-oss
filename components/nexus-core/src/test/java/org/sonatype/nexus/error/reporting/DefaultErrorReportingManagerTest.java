@@ -25,7 +25,6 @@ import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
 import org.sonatype.jira.test.JiraXmlRpcTestServlet;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
@@ -209,7 +208,7 @@ public class DefaultErrorReportingManagerTest
 
     manager.setEnabled(true);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     ErrorReportRequest request = new ErrorReportRequest();
     request.setThrowable(exception);
@@ -274,7 +273,7 @@ public class DefaultErrorReportingManagerTest
     // since Timeline moved into plugin, we need EventInspectorHost too
     // That's why we add a "ping" for Nexus component, and it installs the EventInspectorHost too
     // awake nexus, to awake EventInspector host too
-    lookup(Nexus.class);
+    startNx();
     // we will need this to properly wait the async event inspectors to finish
     final EventInspectorHost eventInspectorHost = lookup(EventInspectorHost.class);
 

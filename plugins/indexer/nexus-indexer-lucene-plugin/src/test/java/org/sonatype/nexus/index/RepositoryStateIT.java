@@ -89,7 +89,7 @@ public class RepositoryStateIT
       throws Exception
   {
     releases.setIndexable(false);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -136,7 +136,7 @@ public class RepositoryStateIT
     fillInRepo();
 
     snapshots.setSearchable(false);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 

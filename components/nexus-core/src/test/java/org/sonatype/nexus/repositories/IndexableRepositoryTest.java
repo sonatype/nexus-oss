@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.repositories;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -28,24 +27,12 @@ public class IndexableRepositoryTest
     extends NexusAppTestSupport
 {
 
-  private Nexus nexus;
-
   @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
-
-    this.nexus = this.lookup(Nexus.class);
-  }
-
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-    this.nexus = null;
-
-    super.tearDown();
+    startNx();
   }
 
   @Override
@@ -60,7 +47,7 @@ public class IndexableRepositoryTest
     String repoId = "indexableM1";
 
     RepositoryTemplate repoTemplate =
-        (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(Maven1HostedRepositoryTemplate.class,
+        (RepositoryTemplate) getRepositoryTemplates().getTemplates(Maven1HostedRepositoryTemplate.class,
             RepositoryPolicy.RELEASE).pick();
 
     repoTemplate.getConfigurableRepository().setId(repoId);
@@ -84,7 +71,7 @@ public class IndexableRepositoryTest
     String repoId = "indexableM2";
 
     RepositoryTemplate repoTemplate =
-        (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(Maven2HostedRepositoryTemplate.class)
+        (RepositoryTemplate) getRepositoryTemplates().getTemplates(Maven2HostedRepositoryTemplate.class)
             .getTemplates(RepositoryPolicy.RELEASE).pick();
 
     repoTemplate.getConfigurableRepository().setId(repoId);
@@ -104,7 +91,7 @@ public class IndexableRepositoryTest
     String repoId = "nonIndexableM2";
 
     RepositoryTemplate repoTemplate =
-        (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(Maven2HostedRepositoryTemplate.class)
+        (RepositoryTemplate) getRepositoryTemplates().getTemplates(Maven2HostedRepositoryTemplate.class)
             .getTemplates(RepositoryPolicy.RELEASE).pick();
 
     repoTemplate.getConfigurableRepository().setId(repoId);

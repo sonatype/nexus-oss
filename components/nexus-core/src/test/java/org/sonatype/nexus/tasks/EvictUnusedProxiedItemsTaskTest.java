@@ -13,11 +13,17 @@
 
 package org.sonatype.nexus.tasks;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 
 import org.junit.Test;
@@ -35,9 +41,9 @@ public class EvictUnusedProxiedItemsTaskTest
   {
     super.setUp();
 
-    nexusConfiguration.setSecurityEnabled(false);
+    nexusConfiguration().setSecurityEnabled(false);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     scheduler = (NexusScheduler) lookup(NexusScheduler.class);
   }
@@ -84,7 +90,7 @@ public class EvictUnusedProxiedItemsTaskTest
       apacheSnapshots.storeItem(false, storageItem);
     }
 
-    defaultNexus.evictAllUnusedProxiedItems(new ResourceStoreRequest("/"), tsDeleting);
+    evictAllUnusedProxiedItems(new ResourceStoreRequest("/"), tsDeleting);
 
     for (String item : itemsToBeKept) {
       try {
@@ -123,7 +129,7 @@ public class EvictUnusedProxiedItemsTaskTest
 
     apacheSnapshots.retrieveItem(request);
 
-    defaultNexus.evictAllUnusedProxiedItems(new ResourceStoreRequest("/"), System.currentTimeMillis() - 7
+    evictAllUnusedProxiedItems(new ResourceStoreRequest("/"), System.currentTimeMillis() - 7
         * A_DAY);
 
     try {
@@ -132,5 +138,21 @@ public class EvictUnusedProxiedItemsTaskTest
     catch (ItemNotFoundException e) {
       fail("Item should not have been deleted: " + item);
     }
+  }
+  
+  // ==
+  
+  protected Collection<String> evictAllUnusedProxiedItems(ResourceStoreRequest req, long timestamp)
+      throws IOException
+  {
+    ArrayList<String> result = new ArrayList<String>();
+
+    for (Repository repository : repositoryRegistry.getRepositories()) {
+      if (LocalStatus.IN_SERVICE.equals(repository.getLocalStatus())) {
+        result.addAll(repository.evictUnusedItems(req, timestamp));
+      }
+    }
+
+    return result;
   }
 }

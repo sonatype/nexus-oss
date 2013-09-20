@@ -16,50 +16,34 @@ package org.sonatype.nexus;
 import java.io.IOException;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class RebuildAttributesTest
     extends NexusAppTestSupport
 {
-  private DefaultNexus defaultNexus;
-
-  private RepositoryRegistry repositoryRegistry;
-
+  private TemplateManager templateManager;
+  
+  @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
-
-    defaultNexus = (DefaultNexus) lookup(Nexus.class);
-
-    repositoryRegistry = lookup(RepositoryRegistry.class);
+    startNx();
+    this.templateManager = lookup(TemplateManager.class);
   }
 
-  protected void tearDown()
-      throws Exception
-  {
-    super.tearDown();
-  }
-
+  @Override
   protected boolean loadConfigurationAtSetUp() {
     return false;
-  }
-
-  public DefaultNexus getDefaultNexus() {
-    return defaultNexus;
-  }
-
-  public void setDefaultNexus(DefaultNexus defaultNexus) {
-    this.defaultNexus = defaultNexus;
   }
 
   @Test
@@ -68,7 +52,7 @@ public class RebuildAttributesTest
   {
     try {
       RepositoryTemplate hostedRepoTemplate =
-          (RepositoryTemplate) getDefaultNexus().getRepositoryTemplates()
+          (RepositoryTemplate) templateManager.getTemplates()
               .getTemplates(Maven2HostedRepositoryTemplate.class).getTemplates(RepositoryPolicy.RELEASE)
               .pick();
 
@@ -76,16 +60,10 @@ public class RebuildAttributesTest
       hostedRepoTemplate.getConfigurableRepository().setName("Test");
       hostedRepoTemplate.getConfigurableRepository().setLocalStatus(LocalStatus.IN_SERVICE);
 
-      hostedRepoTemplate.create();
-
-      repositoryRegistry.getRepository("test")
-          .recreateAttributes(new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT), null);
+      hostedRepoTemplate.create().recreateAttributes(new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT), null);
     }
     catch (ConfigurationException e) {
-      fail("ConfigurationException creating repository");
-    }
-    catch (NoSuchRepositoryException e) {
-      fail("NoSuchRepositoryException reindexing repository");
+      Assert.fail("ConfigurationException creating repository");
     }
   }
 }

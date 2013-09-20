@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -50,7 +49,7 @@ public class AccessTest
       throws Exception
   {
     // loads up config, defaults
-    lookup(Nexus.class);
+    startNx();
 
     super.setUp();
 

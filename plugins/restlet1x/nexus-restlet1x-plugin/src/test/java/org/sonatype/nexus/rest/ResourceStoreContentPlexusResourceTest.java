@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-import org.sonatype.nexus.Nexus;
+import com.sonatype.nexus.build.BuildApplicationStatusSource;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.uid.IsRemotelyAccessibleAttribute;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -79,7 +81,7 @@ public class ResourceStoreContentPlexusResourceTest
   private SecuritySystem security;
 
   @Mock
-  private Nexus nexus;
+  private RepositoryRouter rootRouter;
 
   @Mock
   private Context context;
@@ -123,7 +125,7 @@ public class ResourceStoreContentPlexusResourceTest
   @Before
   public void setup() {
 
-    underTest = new AbstractResourceStoreContentPlexusResource(security, views)
+    underTest = new AbstractResourceStoreContentPlexusResource(security, new BuildApplicationStatusSource(), views)
     {
       @Override
       protected ResourceStore getResourceStore(final Request request)
@@ -164,8 +166,8 @@ public class ResourceStoreContentPlexusResourceTest
       }
 
       @Override
-      protected Nexus getNexus() {
-        return nexus;
+      protected RepositoryRouter getRepositoryRouter() {
+        return rootRouter;
       }
     };
 
@@ -203,7 +205,7 @@ public class ResourceStoreContentPlexusResourceTest
   public void testNexus5155CacheHeadersForLinkedCollectionItems()
       throws Exception
   {
-    when(nexus.dereferenceLinkItem(linkItem)).thenReturn(collectionItem);
+    when(rootRouter.dereferenceLink(linkItem)).thenReturn(collectionItem);
 
     underTest.renderStorageLinkItem(context, request, response, variant, resourceStore, linkItem);
 
@@ -224,7 +226,7 @@ public class ResourceStoreContentPlexusResourceTest
   public void testNexus5155OmitCacheHeadersForLinkedFileItems()
       throws Exception
   {
-    when(nexus.dereferenceLinkItem(linkItem)).thenReturn(fileItem);
+    when(rootRouter.dereferenceLink(linkItem)).thenReturn(fileItem);
 
     underTest.renderStorageLinkItem(context, request, response, variant, resourceStore, linkItem);
 

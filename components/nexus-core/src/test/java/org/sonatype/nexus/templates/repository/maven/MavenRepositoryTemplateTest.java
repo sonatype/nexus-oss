@@ -13,57 +13,47 @@
 
 package org.sonatype.nexus.templates.repository.maven;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class MavenRepositoryTemplateTest
     extends NexusAppTestSupport
 {
-  private Nexus nexus;
-
+  @Override
   protected boolean loadConfigurationAtSetUp() {
     return false;
   }
 
-  protected void setUp()
-      throws Exception
-  {
+  @Override
+  protected void setUp() throws Exception {
     super.setUp();
-
-    nexus = lookup(Nexus.class);
-  }
-
-  protected Nexus getNexus() {
-    return nexus;
+    startNx();
   }
 
   @Test
-  public void testAvailableRepositoryTemplateCount()
-      throws Exception
-  {
-    TemplateSet templates = getNexus().getRepositoryTemplates();
-
-    assertEquals("Template count is wrong!", 12, templates.size());
+  public void testAvailableRepositoryTemplateCount() throws Exception {
+    TemplateSet templates = lookup(TemplateManager.class).getTemplates().getTemplates(RepositoryTemplate.class);
+    assertThat(templates.size(), equalTo(12));
   }
 
   @Test
-  public void testSimpleSelection()
-      throws Exception
-  {
-    TemplateSet groups = getNexus().getRepositoryTemplates().getTemplates(MavenGroupRepository.class);
-
-    assertEquals("Template count is wrong!", 2, groups.size());
-
-    assertEquals("Template count is wrong!", 1, groups.getTemplates(new Maven1ContentClass()).size());
-    assertEquals("Template count is wrong!", 1, groups.getTemplates(Maven1ContentClass.class).size());
-
-    assertEquals("Template count is wrong!", 1, groups.getTemplates(new Maven2ContentClass()).size());
-    assertEquals("Template count is wrong!", 1, groups.getTemplates(Maven2ContentClass.class).size());
+  public void testSimpleSelection() throws Exception {
+    TemplateSet groups = lookup(TemplateManager.class).getTemplates().getTemplates(RepositoryTemplate.class)
+        .getTemplates(MavenGroupRepository.class);
+    assertThat(groups.size(), equalTo(2));
+    assertThat(groups.getTemplates(new Maven1ContentClass()).size(), equalTo(1));
+    assertThat(groups.getTemplates(Maven1ContentClass.class).size(), equalTo(1));
+    assertThat(groups.getTemplates(new Maven2ContentClass()).size(), equalTo(1));
+    assertThat(groups.getTemplates(Maven2ContentClass.class).size(), equalTo(1));
   }
 }

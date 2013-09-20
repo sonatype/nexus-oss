@@ -56,8 +56,6 @@ public class ProtectedRepositoryRegistryTest
 
   private SecuritySystem securitySystem = null;
 
-  private Nexus nexus;
-
   @Override
   protected boolean loadConfigurationAtSetUp() {
     return false;
@@ -82,7 +80,7 @@ public class ProtectedRepositoryRegistryTest
     }
 
     // this will trigger config load!
-    this.nexus = lookup(Nexus.class);
+    startNx();
 
     this.repositoryRegistry = this.lookup(RepositoryRegistry.class, "protected");
 
@@ -100,7 +98,7 @@ public class ProtectedRepositoryRegistryTest
     Target t1 =
         new Target("maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList(new String[]{".*"}));
     targetRegistry.addRepositoryTarget(t1);
-    nexus.getNexusConfiguration().saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     // setup security
     this.securitySystem = this.lookup(SecuritySystem.class);
@@ -323,7 +321,7 @@ public class ProtectedRepositoryRegistryTest
       throws Exception
   {
     Maven2HostedRepositoryTemplate template =
-        (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+        (Maven2HostedRepositoryTemplate) getRepositoryTemplates().getTemplates(
             Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE).pick();
 
     template.getConfigurableRepository().setIndexable(false);
@@ -336,7 +334,7 @@ public class ProtectedRepositoryRegistryTest
       throws Exception
   {
     Maven2GroupRepositoryTemplate template =
-        (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+        (Maven2GroupRepositoryTemplate) getRepositoryTemplates().getTemplates(
             Maven2GroupRepositoryTemplate.class).pick();
 
     template.getConfigurableRepository().setIndexable(false);
@@ -349,7 +347,7 @@ public class ProtectedRepositoryRegistryTest
       throws Exception
   {
     Maven2HostedRepositoryTemplate template =
-        (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+        (Maven2HostedRepositoryTemplate) getRepositoryTemplates().getTemplates(
             Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE).pick();
 
     template.getConfigurableRepository().setIndexable(false);
@@ -360,7 +358,7 @@ public class ProtectedRepositoryRegistryTest
 
     // now for the shadow
     Maven2Maven1ShadowRepositoryTemplate shadowTemplate =
-        (Maven2Maven1ShadowRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+        (Maven2Maven1ShadowRepositoryTemplate) getRepositoryTemplates().getTemplates(
             Maven2Maven1ShadowRepositoryTemplate.class).pick();
 
     shadowTemplate.getConfigurableRepository().setIndexable(false);

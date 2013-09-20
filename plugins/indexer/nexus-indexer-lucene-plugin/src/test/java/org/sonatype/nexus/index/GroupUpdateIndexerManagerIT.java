@@ -67,7 +67,7 @@ public class GroupUpdateIndexerManagerIT
 
     // reconfigure group: remove snapshots
     group.removeMemberRepositoryId(snapshots.getId());
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
     wairForAsyncEventsToCalmDown();
 
@@ -83,7 +83,7 @@ public class GroupUpdateIndexerManagerIT
 
     // reconfigure group: add apache-snapshots
     group.addMemberRepositoryId(apacheSnapshots.getId());
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
     wairForAsyncEventsToCalmDown();
 
@@ -137,7 +137,7 @@ public class GroupUpdateIndexerManagerIT
     // reconfigure group member: make it non-indexable
     member.setSearchable(false);
     member.setIndexable(false);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
     wairForAsyncEventsToCalmDown();
 
@@ -153,7 +153,7 @@ public class GroupUpdateIndexerManagerIT
     // reconfigure group: add apache-snapshots
     member.setSearchable(true);
     member.setIndexable(true);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
     wairForAsyncEventsToCalmDown();
 

@@ -95,7 +95,7 @@ public class RepositoryTemplatePlexusResource
     RepositoryResourceResponse result = new RepositoryResourceResponse();
 
     try {
-      RepositoryTemplate template = getNexus().getRepositoryTemplateById(getRepositoryId(request));
+      RepositoryTemplate template = getRepositoryTemplateById(getRepositoryId(request));
 
       RepositoryBaseResource repoRes = null;
 
