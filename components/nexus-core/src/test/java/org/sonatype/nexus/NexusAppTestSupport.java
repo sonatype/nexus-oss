@@ -23,10 +23,14 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.templates.TemplateManager;
+import org.sonatype.nexus.templates.TemplateSet;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import org.junit.After;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -42,11 +46,49 @@ public abstract class NexusAppTestSupport
 
   private EventBus eventBus;
 
-  protected NexusConfiguration nexusConfiguration;
+  private NexusConfiguration nexusConfiguration;
+  
+  private TemplateManager templateManager;
 
   protected boolean loadConfigurationAtSetUp() {
     return true;
   }
+  
+  // NxApplication
+  
+  private boolean nexusStarted = false;
+  
+  /**
+   * Preferred way to "boot" Nexus in unit tests. Previously, UTs were littered with code like this:
+   * 
+   * <pre>
+   * lookup(Nexus.class); // boot nexus
+   * </pre>
+   * 
+   * This was usually in {@link #setUp()} method override, and then another override was made in {@link #tearDown()}.
+   * Using this method you don't have to fiddle with "shutdown" anymore, and also, you can invoke it in some prepare
+   * method (like setUp) but also from test at any place. You have to ensure this method is not called multiple times,
+   * as that signals a bad test (start nexus twice?), and exception will be thrown. 
+   */
+  protected void startNx() throws Exception {
+    if (nexusStarted) {
+      throw new IllegalStateException("Bad test, as startNx was already invoked once!");
+    }
+    lookup(NxApplication.class).start();
+    nexusStarted = true;
+  }
+  
+  /**
+   * Shutdown Nexus if started.
+   */
+  @After
+  public void stopNx() throws Exception {
+    if (nexusStarted) {
+      lookup(NxApplication.class).stop();
+    }
+  }
+  
+  // NxApplication
 
   @Override
   protected Module[] getTestCustomModules() {
@@ -80,6 +122,8 @@ public abstract class NexusAppTestSupport
     nexusScheduler = lookup(NexusScheduler.class);
     eventInspectorHost = lookup(EventInspectorHost.class);
     eventBus = lookup(EventBus.class);
+    nexusConfiguration = lookup(NexusConfiguration.class);
+    templateManager = lookup(TemplateManager.class);
 
     if (loadConfigurationAtSetUp()) {
       shutDownSecurity();
@@ -101,13 +145,19 @@ public abstract class NexusAppTestSupport
   protected EventBus eventBus() {
     return eventBus;
   }
+  
+  protected NexusConfiguration nexusConfiguration() {
+    return nexusConfiguration;
+  }
+  
+  protected TemplateSet getRepositoryTemplates() {
+    return templateManager.getTemplates().getTemplates(RepositoryTemplate.class);
+  }
 
   protected void shutDownSecurity()
       throws Exception
   {
     System.out.println("== Shutting down SECURITY!");
-
-    nexusConfiguration = this.lookup(NexusConfiguration.class);
 
     nexusConfiguration.loadConfiguration(false);
 

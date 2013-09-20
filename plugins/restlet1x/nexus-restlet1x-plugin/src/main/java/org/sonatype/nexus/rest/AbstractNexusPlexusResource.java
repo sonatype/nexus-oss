@@ -20,7 +20,6 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -67,9 +66,6 @@ public abstract class AbstractNexusPlexusResource
   public static final String AS_EXPIRED_PARAMETER = "asExpired";
 
   @Requirement
-  private Nexus nexus;
-
-  @Requirement
   private NexusConfiguration nexusConfiguration;
 
   @Requirement(hint = "protected")
@@ -89,11 +85,6 @@ public abstract class AbstractNexusPlexusResource
   
   @Requirement
   private RepositoryRouter repositoryRouter;
-
-  @Inject
-  public void setNexus(final Nexus nexus) {
-    this.nexus = nexus;
-  }
 
   @Inject
   public void setNexusConfiguration(final NexusConfiguration nexusConfiguration) {
@@ -128,11 +119,6 @@ public abstract class AbstractNexusPlexusResource
   @Inject
   public void setRepositoryRouter(final RepositoryRouter repositoryRouter) {
     this.repositoryRouter = checkNotNull(repositoryRouter);
-  }
-
-  @Deprecated
-  protected Nexus getNexus() {
-    return nexus;
   }
 
   protected NexusConfiguration getNexusConfiguration() {

@@ -19,7 +19,6 @@ import java.util.Map;
 
 import com.sonatype.nexus.build.BuildApplicationStatusSource;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -57,6 +56,7 @@ import org.restlet.resource.Variant;
 import org.restlet.util.Series;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
@@ -79,9 +79,6 @@ public class ResourceStoreContentPlexusResourceTest
 
   @Mock
   private SecuritySystem security;
-
-  @Mock
-  private Nexus nexus;
 
   @Mock
   private RepositoryRouter rootRouter;
@@ -168,11 +165,6 @@ public class ResourceStoreContentPlexusResourceTest
         return reference;
       }
 
-      @Override
-      protected Nexus getNexus() {
-        return nexus;
-      }
-      
       @Override
       protected RepositoryRouter getRepositoryRouter() {
         return rootRouter;

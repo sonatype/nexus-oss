@@ -13,8 +13,8 @@
 
 package org.sonatype.nexus.rest.repositories;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -37,8 +37,6 @@ import org.restlet.data.Response;
 public class RepositoryCreateUpdateTest
     extends NexusAppTestSupport
 {
-  protected Nexus nexus;
-
   @Override
   protected boolean loadConfigurationAtSetUp() {
     return false;
@@ -48,10 +46,8 @@ public class RepositoryCreateUpdateTest
       throws Exception
   {
     super.setUp();
-
-    nexus = lookup(Nexus.class);
-
-    nexus.getNexusConfiguration().setSecurityEnabled(false);
+    startNx();
+    lookup(NexusConfiguration.class).setSecurityEnabled(false);
   }
 
   @Test

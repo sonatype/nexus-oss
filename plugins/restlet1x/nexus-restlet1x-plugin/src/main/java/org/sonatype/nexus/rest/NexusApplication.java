@@ -77,9 +77,6 @@ public class NexusApplication
   @Requirement(hint = "StatusPlexusResource")
   private ManagedPlexusResource statusPlexusResource;
 
-  @Requirement(hint = "CommandPlexusResource")
-  private ManagedPlexusResource commandPlexusResource;
-
   @Requirement(role = NexusResourceBundle.class)
   private List<NexusResourceBundle> nexusResourceBundles;
 
@@ -166,8 +163,6 @@ public class NexusApplication
     // SERVICE (two always connected, unrelated to isStarted)
 
     attach(getApplicationRouter(), false, statusPlexusResource);
-
-    attach(getApplicationRouter(), false, commandPlexusResource);
 
     // ==========
     // INDEX.HTML and WAR contents

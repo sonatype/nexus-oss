@@ -129,7 +129,7 @@ public class DeleteRepositoryWhileDownloadingIndexIT
     central.setRemoteUrl("http://localhost:" + 12345);
     central.setRepositoryPolicy(RepositoryPolicy.SNAPSHOT);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     // central.setRemoteStorage( new StuckRemoteStorage() );
     StuckRemoteStorage stuckRemoteStorage = new StuckRemoteStorage();
