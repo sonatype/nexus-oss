@@ -24,6 +24,7 @@ import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.ModelloUtils;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -82,6 +83,7 @@ public class Upgrade250to270
     newc.setVersion(Configuration.MODEL_VERSION);
 
     upgradeEmptyTrashTaskConfiguration(newc);
+    updateSmtpSslTlsSettings(newc);
 
     message.setModelVersion(Configuration.MODEL_VERSION);
     message.setConfiguration(newc);
@@ -102,6 +104,25 @@ public class Upgrade250to270
           taskConfig.put(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID, "all_repo");
           task.setProperties(ModelloUtils.getConfigListFromMap(taskConfig));
         }
+      }
+    }
+  }
+
+  /**
+   * Performs upgrade for SMTP SSL/TLS settings
+   * 
+   * @param conf the new model (2.7.0)
+   * @see <a href="https://issues.sonatype.org/browse/NEXUS-4997">NEXUS-4997</a>
+   */
+  protected void updateSmtpSslTlsSettings(final Configuration conf) {
+    final CSmtpConfiguration smtp = conf.getSmtpConfiguration();
+    if (smtp != null) {
+      if (smtp.isSslEnabled() && smtp.isTlsEnabled()) {
+        smtp.setSslEnabled(true);
+        smtp.setTlsEnabled(false);
+        getLogger()
+            .warn(
+                "SMTP related configuration change happened: both SSL and TLS was set, updated to use SSL only, assuming that SMTP server port is set to a port where remote SMTP server accepts SSL connections.");
       }
     }
   }
