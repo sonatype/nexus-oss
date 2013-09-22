@@ -25,6 +25,10 @@ import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.NoSuchKeyException;
@@ -33,18 +37,24 @@ import org.sonatype.nexus.plugins.lvo.config.model.Configuration;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Writer;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-@Component(role = LvoPluginConfiguration.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultLvoPluginConfiguration
     extends AbstractLoggingComponent
     implements LvoPluginConfiguration
 {
-  @org.codehaus.plexus.component.annotations.Configuration(value = "${nexus-work}/conf/lvo-plugin.xml")
-  private File configurationFile;
+  private final File configurationFile;
+
+  @Inject
+  public DefaultLvoPluginConfiguration(final @Named("${nexus-work}/conf/lvo-plugin.xml") File configurationFile) {
+    this.configurationFile = checkNotNull(configurationFile);
+  }
 
   private Configuration configuration;
 

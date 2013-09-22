@@ -15,6 +15,10 @@ package org.sonatype.nexus.plugins.lvo.api;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.LvoPlugin;
 import org.sonatype.nexus.plugins.lvo.NoSuchKeyException;
@@ -22,10 +26,7 @@ import org.sonatype.nexus.plugins.lvo.NoSuchStrategyException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -33,12 +34,19 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "LvoQueryPlexusResource")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class LvoQueryPlexusResource
     extends AbstractPlexusResource
 {
-  @Requirement
-  private LvoPlugin lvoPlugin;
+  private final LvoPlugin lvoPlugin;
+
+  @Inject
+  public LvoQueryPlexusResource(final LvoPlugin lvoPlugin) {
+    this.lvoPlugin = checkNotNull(lvoPlugin);
+  }
 
   @Override
   public Object getPayloadInstance() {
