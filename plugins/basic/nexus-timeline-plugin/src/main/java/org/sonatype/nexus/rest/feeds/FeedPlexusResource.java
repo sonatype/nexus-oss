@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -41,6 +42,7 @@ import org.restlet.data.Request;
  */
 @Path("/feeds/{" + FeedPlexusResource.FEED_KEY + "}")
 @Produces({"application/rss+xml", "application/atom+xml", "text/xml"})
+@Named
 @Singleton
 public class FeedPlexusResource
     extends AbstractFeedPlexusResource

@@ -55,7 +55,7 @@ public class NexusAuthenticationEventInspectorTest
 
     final NexusAuthenticationEventInspector naei =
         (NexusAuthenticationEventInspector) lookup(EventInspector.class,
-            NexusAuthenticationEventInspector.class.getSimpleName());
+            NexusAuthenticationEventInspector.class.getName());
 
     final ClientInfo authSuccess = new ClientInfo(username, "192.168.0.1", "Foo/Bar");
     final ClientInfo authFailed = new ClientInfo(username, "192.168.0.1", "Foo/Bar");
