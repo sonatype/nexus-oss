@@ -15,7 +15,6 @@ package org.sonatype.nexus.plugins.mac;
 
 import java.io.File;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -64,7 +63,7 @@ public class MacPluginEventInspectorTest
   {
     indexerManager = lookup(IndexerManager.class);
     repositoryRegistry = lookup(RepositoryRegistry.class);
-    lookup(Nexus.class);
+    startNx();
     repository = createRepository("test");
     repositoryRegistry.addRepository(repository); // need to be in registry to hand it over to indexerManager
     indexerManager.addRepositoryIndexContext(repository.getId());

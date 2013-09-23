@@ -11,29 +11,22 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.index;
+package org.sonatype.nexus.plugins.capabilities.test.helper;
 
-import org.junit.Test;
+import javax.inject.Named;
 
-// This is an IT just because it runs longer then 15 seconds
-public class DisableIndexerManagerIT
-    extends AbstractIndexerManagerTest
+import org.sonatype.nexus.formfields.ProviderCombobox;
+import org.sonatype.nexus.plugins.capabilities.Capability;
+
+/**
+ * A test/demo capability for using {@link ProviderCombobox}.
+ *
+ * @since 2.7
+ */
+@Named(ProviderComboCapabilityDescriptor.TYPE_ID)
+public class ProviderComboCapability
+    extends TestCapability
+    implements Capability
 {
 
-  @Test
-  public void testDisableIndex()
-      throws Exception
-  {
-    fillInRepo();
-
-    indexerManager.reindexRepository("/", snapshots.getId(), false);
-
-    searchFor("org.sonatype.plexus", 1);
-
-    snapshots.setSearchable(false);
-
-    nexusConfiguration().saveConfiguration();
-
-    searchFor("org.sonatype.plexus", 0);
-  }
 }

@@ -11,29 +11,37 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.index;
+package org.sonatype.nexus.capability.spi;
 
-import org.junit.Test;
+import java.util.List;
 
-// This is an IT just because it runs longer then 15 seconds
-public class DisableIndexerManagerIT
-    extends AbstractIndexerManagerTest
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.sonatype.nexus.capabilities.model.SelectableEntryXO;
+
+/**
+ * A {@link SelectableEntryXO} collection provider.
+ *
+ * @since 2.7
+ */
+public interface SelectableEntryProvider
 {
 
-  @Test
-  public void testDisableIndex()
-      throws Exception
+  /**
+   * Returns a list of id/name mappings based on provided params.
+   */
+  List<SelectableEntryXO> get(Parameters params);
+
+  /**
+   * A read-only view of {@link MultivaluedMap}.
+   * Why not directly using {@link MultivaluedMap}? To not force implementations depend on version of jaxrs from Siesta
+   * (e.g. implementations based on restlet1x)
+   */
+  public static interface Parameters
   {
-    fillInRepo();
+    String getFirst(String name);
 
-    indexerManager.reindexRepository("/", snapshots.getId(), false);
-
-    searchFor("org.sonatype.plexus", 1);
-
-    snapshots.setSearchable(false);
-
-    nexusConfiguration().saveConfiguration();
-
-    searchFor("org.sonatype.plexus", 0);
+    List<String> get(String name);
   }
+
 }

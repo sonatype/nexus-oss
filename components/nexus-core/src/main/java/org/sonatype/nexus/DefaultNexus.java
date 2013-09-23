@@ -190,6 +190,7 @@ public class DefaultNexus
   // Config
   // ----------------------------------------------------------------------------------------------------------
 
+  @Deprecated
   public NexusConfiguration getNexusConfiguration() {
     return nexusConfiguration;
   }
@@ -198,14 +199,15 @@ public class DefaultNexus
   // Repositories
   // ----------------------------------------------------------------------------------------------------------
 
+  @Deprecated
   public StorageItem dereferenceLinkItem(StorageLinkItem item)
       throws NoSuchResourceStoreException, ItemNotFoundException, AccessDeniedException, IllegalOperationException,
              StorageException
-
   {
     return getRootRouter().dereferenceLink(item);
   }
 
+  @Deprecated
   public RepositoryRouter getRootRouter() {
     return rootRepositoryRouter;
   }
@@ -214,28 +216,24 @@ public class DefaultNexus
   // Repo maintenance
   // ----------------------------------------------------------------------------
 
+  @Deprecated
   public void deleteRepository(String id)
       throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException
   {
-    deleteRepository(id, false);
+    nexusConfiguration.deleteRepository(id);
   }
 
+  @Deprecated
   public void deleteRepository(String id, boolean force)
       throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException
   {
-    Repository repository = repositoryRegistry.getRepository(id);
-
-    if (!force && !repository.isUserManaged()) {
-      throw new AccessDeniedException("Not allowed to delete non-user-managed repository '" + id + "'.");
-    }
-
-    // delete the configuration
-    nexusConfiguration.deleteRepository(id);
+    nexusConfiguration.deleteRepository(id, force);
   }
 
   // Maintenance
   // ----------------------------------------------------------------------------
 
+  @Deprecated
   public NexusStreamResponse getConfigurationAsStream()
       throws IOException
   {
@@ -315,10 +313,12 @@ public class DefaultNexus
     return snapshotRemover.removeSnapshots(request);
   }
 
+  @Deprecated
   public Map<String, String> getConfigurationFiles() {
     return nexusConfiguration.getConfigurationFiles();
   }
 
+  @Deprecated
   public NexusStreamResponse getConfigurationAsStreamByKey(String key)
       throws IOException
   {

@@ -148,7 +148,7 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               xtype : 'combo',
               fieldLabel : 'Connection',
               helpText : ht.connection,
-              width : 200,
+              width : 210,
               store : smtpConnectionSettings,
               valueField : 'value',
               displayField : 'display',

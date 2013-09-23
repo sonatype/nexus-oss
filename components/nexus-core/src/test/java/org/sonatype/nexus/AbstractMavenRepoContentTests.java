@@ -18,7 +18,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -39,10 +38,6 @@ import org.codehaus.plexus.util.FileUtils;
 public abstract class AbstractMavenRepoContentTests
     extends NexusAppTestSupport
 {
-  protected DefaultNexus defaultNexus;
-
-  protected NexusConfiguration nexusConfiguration;
-
   protected RepositoryRegistry repositoryRegistry;
 
   protected MavenRepository snapshots;
@@ -63,9 +58,7 @@ public abstract class AbstractMavenRepoContentTests
 
     getLoggerManager().setThresholds(Logger.LEVEL_DEBUG);
 
-    defaultNexus = (DefaultNexus) lookup(Nexus.class);
-
-    nexusConfiguration = lookup(NexusConfiguration.class);
+    startNx();
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
 
@@ -82,19 +75,8 @@ public abstract class AbstractMavenRepoContentTests
     central = (MavenProxyRepository) repositoryRegistry.getRepository("central");
   }
 
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-    super.tearDown();
-  }
-
   protected boolean loadConfigurationAtSetUp() {
     return false;
-  }
-
-  public Nexus getNexus() {
-    return defaultNexus;
   }
 
   public void fillInRepo()
@@ -138,7 +120,7 @@ public abstract class AbstractMavenRepoContentTests
     ((MavenProxyRepository) apacheSnapshots).setRemoteUrl("http://localhost:" +
         super.getContainer().getContext().get(PROXY_SERVER_PORT) + "/apache-snapshots/");
     ((MavenProxyRepository) apacheSnapshots).setDownloadRemoteIndexes(false);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
     // saving the configuration will trigger an re-indexing task for apache-snapshots
     // wait for this tasks to run
     // waiting was introduced as a fix for NEXUS-4530 but will benefit all subclasses of this test as it will

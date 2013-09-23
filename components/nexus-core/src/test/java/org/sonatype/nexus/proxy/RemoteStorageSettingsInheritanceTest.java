@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.proxy;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -44,7 +43,7 @@ public class RemoteStorageSettingsInheritanceTest
       throws Exception
   {
     // loads up config, defaults
-    lookup(Nexus.class);
+    startNx();
 
     super.setUp();
 
