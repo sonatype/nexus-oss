@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugins.lvo.api;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -42,6 +43,7 @@ public class LvoConfigPlexusResource
 {
   private final LvoPluginConfiguration config;
 
+  @Inject
   public LvoConfigPlexusResource(final LvoPluginConfiguration config) {
     this.config = checkNotNull(config);
     this.setModifiable(true);
