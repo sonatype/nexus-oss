@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.obr.group;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = ObrGroupRepositoryConfigurator.class)
+@Named
+@Singleton
 public class ObrGroupRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator
 {

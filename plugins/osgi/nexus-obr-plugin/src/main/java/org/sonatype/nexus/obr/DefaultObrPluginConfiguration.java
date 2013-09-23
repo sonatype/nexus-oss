@@ -22,31 +22,40 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.PropertyUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = ObrPluginConfiguration.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultObrPluginConfiguration
     extends AbstractLoggingComponent
     implements ObrPluginConfiguration
 {
   private static final String DEFAULT_OBR_PROPERTY_PATH = "/META-INF/nexus-obr-plugin/nexus-obr-plugin.properties";
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
   private Map<String, String> configMap;
 
   private long lastLoaded;
+
+  @Inject
+  public DefaultObrPluginConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+  }
 
   protected File getConfigurationFile() {
     return new File(applicationConfiguration.getConfigurationDirectory(), "nexus-obr-plugin.properties");
