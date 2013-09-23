@@ -13,8 +13,6 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<!-- Default nexus security configuration -->
-<!-- used as default config source -->
 <security>
     <version>2.0.1</version>
     <roles>

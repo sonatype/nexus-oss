@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.unpack.internal;
+package org.sonatype.nexus.unpack.rest;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -29,23 +31,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.apache.commons.fileupload.FileItem;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
@@ -55,15 +50,18 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 
+import static org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY;
+
 /**
  * A REST Resource that accepts upload (zip file), and it simply explodes it in the root of the given repository.
  *
  * @author cstamas
  */
-@Component(role = PlexusResource.class, hint = "UnpackPlexusResource")
-@Path("/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/content-compressed")
+@Path("/repositories/{" + REPOSITORY_ID_KEY + "}/content-compressed")
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
+@Named
+@Singleton
 public class UnpackPlexusResource
     extends AbstractResourceStoreContentPlexusResource
 {
@@ -86,7 +84,7 @@ public class UnpackPlexusResource
 
   @Override
   public String getResourceUri() {
-    return "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/content-compressed";
+    return "/repositories/{" + REPOSITORY_ID_KEY + "}/content-compressed";
   }
 
   @Override
@@ -100,9 +98,13 @@ public class UnpackPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY)},
-      queryParams = {@QueryParam(DELETE_BEFORE_UNPACK)})
-  public Object upload(final Context context, final Request request, final Response response,
+  @ResourceMethodSignature(
+      pathParams = {@PathParam(REPOSITORY_ID_KEY)},
+      queryParams = {@QueryParam(DELETE_BEFORE_UNPACK)}
+  )
+  public Object upload(final Context context,
+                       final Request request,
+                       final Response response,
                        final List<FileItem> files)
       throws ResourceException
   {
@@ -172,9 +174,13 @@ public class UnpackPlexusResource
    * everything at the current path will be removed before the zip file is unpacked.
    */
   @PUT
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY)},
-      queryParams = {@QueryParam(DELETE_BEFORE_UNPACK)})
-  public Object uploadPut(final Context context, final Request request, final Response response,
+  @ResourceMethodSignature(
+      pathParams = {@PathParam(REPOSITORY_ID_KEY)},
+      queryParams = {@QueryParam(DELETE_BEFORE_UNPACK)}
+  )
+  public Object uploadPut(final Context context,
+                          final Request request,
+                          final Response response,
                           final List<FileItem> files)
       throws ResourceException
   {
@@ -183,10 +189,7 @@ public class UnpackPlexusResource
     return this.upload(context, request, response, files);
   }
 
-  private void deleteItem(final Repository repository, final StorageItem item)
-      throws AccessDeniedException, StorageException, NoSuchResourceStoreException, IllegalOperationException,
-             ItemNotFoundException, UnsupportedStorageOperationException
-  {
+  private void deleteItem(final Repository repository, final StorageItem item) throws Exception {
     repository.deleteItem(item.getResourceStoreRequest());
   }
 
@@ -215,9 +218,7 @@ public class UnpackPlexusResource
   protected Repository getResourceStore(final Request request)
       throws NoSuchResourceStoreException, ResourceException
   {
-    final String repoId =
-        request.getAttributes().get(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY).toString();
-    final Repository repository = getUnprotectedRepositoryRegistry().getRepository(repoId);
-    return repository;
+    final String repoId = request.getAttributes().get(REPOSITORY_ID_KEY).toString();
+    return getUnprotectedRepositoryRegistry().getRepository(repoId);
   }
 }

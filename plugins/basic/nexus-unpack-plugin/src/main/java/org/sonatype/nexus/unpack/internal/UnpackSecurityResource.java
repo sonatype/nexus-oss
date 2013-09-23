@@ -13,20 +13,23 @@
 
 package org.sonatype.nexus.unpack.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = StaticSecurityResource.class, hint = "UnpackSecurityResource")
+/**
+ * Unpack plugin security configuration.
+ */
+@Named
+@Singleton
 public class UnpackSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-
   @Override
   public String getResourcePath() {
     return "/META-INF/nexus-unpack-plugin-security.xml";
   }
-
 }
