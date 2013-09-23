@@ -59,14 +59,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
       </plugin>
-
-      <!--
-      FIXME: This module uses legacy Plexus components.
-      -->
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
     </plugins>
   </build>
 
