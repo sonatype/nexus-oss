@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
@@ -70,7 +69,7 @@ public class DefaultLvoPluginConfiguration
     try {
       Configuration c = getConfiguration();
 
-      for (CLvoKey lvoKey : (List<CLvoKey>) c.getLvoKeys()) {
+      for (CLvoKey lvoKey : c.getLvoKeys()) {
         if (key.equals(lvoKey.getKey())) {
           return lvoKey;
         }
@@ -87,36 +86,24 @@ public class DefaultLvoPluginConfiguration
     try {
       return getConfiguration().isEnabled();
     }
-    catch (ConfigurationException e) {
-      getLogger().error("Unable to read configuration", e);
-    }
-    catch (IOException e) {
+    catch (ConfigurationException | IOException e) {
       getLogger().error("Unable to read configuration", e);
     }
 
     return false;
   }
 
-  public void enable()
-      throws ConfigurationException,
-             IOException
-  {
+  public void enable() throws ConfigurationException, IOException {
     getConfiguration().setEnabled(true);
     save();
   }
 
-  public void disable()
-      throws ConfigurationException,
-             IOException
-  {
+  public void disable() throws ConfigurationException, IOException {
     getConfiguration().setEnabled(false);
     save();
   }
 
-  protected Configuration getConfiguration()
-      throws ConfigurationException,
-             IOException
-  {
+  protected Configuration getConfiguration() throws ConfigurationException, IOException {
     if (configuration != null) {
       return configuration;
     }
@@ -180,9 +167,7 @@ public class DefaultLvoPluginConfiguration
     return configuration;
   }
 
-  protected void save()
-      throws IOException
-  {
+  protected void save() throws IOException {
     lock.lock();
 
     configurationFile.getParentFile().mkdirs();
