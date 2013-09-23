@@ -14,13 +14,12 @@
 package org.sonatype.nexus.proxy.item;
 
 /**
- * The Interface StorageNotFoundItem abstracting the "not found" case, used in caches mainly.
- *
+ * A "not found" item, abstracting the "not found" case, used in caches mainly (and later maybe in item cache?).
+ * 
  * @author cstamas
  * @since 2.1
  */
 public interface StorageNotFoundItem
     extends StorageItem
 {
-
 }

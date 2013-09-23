@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -188,13 +189,11 @@ public class HttpClientRemoteStorage
                   request.getRequestPath());
         }
 
+        final long entityLength = httpResponse.getEntity().getContentLength();
         final DefaultStorageFileItem httpItem =
             new DefaultStorageFileItem(repository, request, CAN_READ, CAN_WRITE, new PreparedContentLocator(
-                is, mimeType));
+                is, mimeType, entityLength != -1 ? entityLength : ContentLocator.UNKNOWN_LENGTH));
 
-        if (httpResponse.getEntity().getContentLength() != -1) {
-          httpItem.setLength(httpResponse.getEntity().getContentLength());
-        }
         httpItem.setRemoteUrl(remoteURL.toString());
         httpItem.setModified(makeDateFromHeader(httpResponse.getFirstHeader("last-modified")));
         httpItem.setCreated(httpItem.getModified());

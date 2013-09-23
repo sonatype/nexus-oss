@@ -17,30 +17,46 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The Interface ContentLocator. Implements a strategy to fetch content of an item.
- *
- * @author cstamas
+ * The Interface ContentLocator. Implements a strategy to fetch content of an item. For implementors, it's recommended
+ * to use {@link AbstractContentLocator}.
+ * 
+ * @see AbstractContentLocator
  */
 public interface ContentLocator
 {
   /**
-   * Gets the content. It has to be closed by the caller explicitly.
-   *
-   * @return the content
-   * @throws IOException Signals that an I/O exception has occurred.
+   * Length marking "unknown" length. This means that locator cannot tell how many bytes will {@link InputStream}
+   * returned by {@link #getContent()} method provide when fully read. This might happen with generated content, or
+   * compressed happening on-the-fly, etc.
    */
-  InputStream getContent()
-      throws IOException;
+  long UNKNOWN_LENGTH = -1L;
 
   /**
-   * Returns the MIME type of the content.
+   * Unknown MIME type, basically arbitrary binary data.
+   * 
+   * @see <a href="http://www.ietf.org/rfc/rfc2046.txt">RFC2046</a> section 4.5.1.
+   */
+  String UNKNOWN_MIME_TYPE = "application/octet-stream";
+
+  /**
+   * Gets the content as opened and ready to read input stream. It has to be closed by the caller explicitly. Depending
+   * on return value of {@link #isReusable()}, this method might be called only once or multiple times.
+   */
+  InputStream getContent() throws IOException;
+
+  /**
+   * Returns the MIME type of the content, never {@code null}.
    */
   String getMimeType();
 
   /**
-   * Checks if is reusable.
-   *
-   * @return true, if is reusable
+   * Returns the length of the content in bytes if known, or {@link #UNKNOWN_LENGTH} if content length unknown.
+   */
+  long getLength();
+
+  /**
+   * Returns {@code true} if this locator is reusable, meaning that it is possible to invoke {@link #getContent()}
+   * multiple times against it, {@code false} otherwise.
    */
   boolean isReusable();
 }

@@ -17,16 +17,14 @@ import java.util.List;
 
 /**
  * The Interface StorageCompositeItem. These items are "composed" from multiple other items, like merged
- * maven-metadata.xml.
+ * or processed in some other way.
  */
 public interface StorageCompositeItem
     extends StorageItem
 {
   /**
-   * Lists this sources that makes up this composite item. The order is important, usually it is order how a group
-   * processes it's members and items are fetched from them.
-   *
-   * @return the sources for this composite item
+   * Returns unmodifiable list of sources that makes up this composite item. The order is important, as it is the order used in composition
+   * (actually depends on actual operation used to create this item.
    */
   List<StorageItem> getSources();
 }

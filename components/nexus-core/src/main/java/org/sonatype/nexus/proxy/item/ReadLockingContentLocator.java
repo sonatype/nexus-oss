@@ -19,10 +19,12 @@ import java.io.InputStream;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.util.WrappingInputStream;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * This is a simple wrapper implementation of ContentLocator, that wraps any other ContentLocator, while doing proper
  * {@link Action} read locking against the UID the locator points to.
- *
+ * 
  * @author cstamas
  */
 public class ReadLockingContentLocator
@@ -36,15 +38,13 @@ public class ReadLockingContentLocator
   }
 
   @Override
-  public InputStream getContent()
-      throws IOException
-  {
+  public InputStream getContent() throws IOException {
     final RepositoryItemUidLock lock = wrappedUid.getLock();
 
     lock.lock(Action.read);
 
     try {
-      return new ReadLockingInputStream(lock, getTarget().getContent());
+      return new ReadLockingInputStream(wrappedUid, lock, getTarget().getContent());
     }
     catch (IOException e) {
       lock.unlock();
@@ -66,39 +66,38 @@ public class ReadLockingContentLocator
   private static class ReadLockingInputStream
       extends WrappingInputStream
   {
+    private final RepositoryItemUid uid;
+
     private volatile RepositoryItemUidLock lock;
 
-    public ReadLockingInputStream(final RepositoryItemUidLock lock, final InputStream wrappedStream) {
+    public ReadLockingInputStream(final RepositoryItemUid uid, final RepositoryItemUidLock lock,
+        final InputStream wrappedStream)
+    {
       super(wrappedStream);
-
+      this.uid = uid;
       this.lock = lock;
     }
 
     @Override
-    public void close()
-        throws IOException
-    {
+    public void close() throws IOException {
       try {
         super.close();
       }
       finally {
         if (lock != null) {
           lock.unlock();
-
           lock = null;
         }
       }
     }
 
     @Override
-    public void finalize()
-        throws Throwable
-    {
+    public void finalize() throws Throwable {
       try {
         if (lock != null) {
           lock.unlock();
-
           lock = null;
+          LoggerFactory.getLogger(ReadLockingContentLocator.class).warn("UID lock leak detected for UID {}", uid);
         }
       }
       finally {

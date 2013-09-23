@@ -19,16 +19,13 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 public class ByteArrayContentLocator
-    implements ContentLocator
+    extends AbstractContentLocator
 {
   private final byte[] content;
 
-  private final String mimeType;
-
   public ByteArrayContentLocator(final byte[] content, final String mimeType) {
+    super(mimeType, true, content.length);
     this.content = Arrays.copyOf(content, content.length);
-
-    this.mimeType = mimeType;
   }
 
   @Override
@@ -36,20 +33,6 @@ public class ByteArrayContentLocator
       throws IOException
   {
     return new ByteArrayInputStream(content);
-  }
-
-  @Override
-  public String getMimeType() {
-    return mimeType;
-  }
-
-  @Override
-  public boolean isReusable() {
-    return true;
-  }
-
-  public long getLength() {
-    return content.length;
   }
 
   public byte[] getByteArray() {

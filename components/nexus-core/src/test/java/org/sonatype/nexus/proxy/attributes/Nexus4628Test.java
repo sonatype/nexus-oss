@@ -136,7 +136,7 @@ public class Nexus4628Test
     final DelegatingAttributeStorage das =
         (DelegatingAttributeStorage) repository.getAttributesHandler().getAttributeStorage();
     final AttributeStorage attributeStorageSpy = Mockito.spy(das.getDelegate());
-    repository.getAttributesHandler().setAttributeStorage(attributeStorageSpy);
+    ((DefaultAttributesHandler)repository.getAttributesHandler()).setAttributeStorage(attributeStorageSpy);
     return attributeStorageSpy;
   }
 

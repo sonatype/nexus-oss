@@ -46,34 +46,24 @@ public class NexusRepositoryMetadataContentGenerator
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
     InputStream is = null;
-
     try {
       is = item.getInputStream();
 
       IOUtil.copy(is, bos);
-
       String body = new String(bos.toByteArray(), "UTF-8");
-
       StringContentLocator result = null;
-
       if (item.getItemContext().getRequestAppRootUrl() != null) {
         String appRootUrl = item.getItemContext().getRequestAppRootUrl();
-
         // trim last slash NEXUS-1736
         if (appRootUrl.endsWith("/")) {
           appRootUrl = appRootUrl.substring(0, appRootUrl.length() - 1);
         }
-
         result = new StringContentLocator(body.replace("@rootUrl@", appRootUrl));
       }
       else {
         result = new StringContentLocator(body.replace("@rootUrl@", ""));
       }
-
-      item.setLength(result.getByteArray().length);
-
       return result;
     }
     catch (IOException e) {

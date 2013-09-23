@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.AbstractContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -33,20 +34,12 @@ public class ObrMetadataSourceTest
   public void testBundleItem1()
       throws Exception
   {
-    final ContentLocator content = new ContentLocator()
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
       {
         return getResourceAsStream("/obr/jars/osgi.core.jar");
-      }
-
-      public boolean isReusable() {
-        return false;
-      }
-
-      public String getMimeType() {
-        return "application/java-archive";
       }
     };
 
@@ -61,20 +54,12 @@ public class ObrMetadataSourceTest
   public void testBundleItem2()
       throws Exception
   {
-    final ContentLocator content = new ContentLocator()
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
       {
         return getResourceAsStream("/obr/jars/org.eclipse.core.runtime_3.4.0.v20080512.jar");
-      }
-
-      public boolean isReusable() {
-        return false;
-      }
-
-      public String getMimeType() {
-        return "application/java-archive";
       }
     };
 
@@ -94,20 +79,12 @@ public class ObrMetadataSourceTest
   public void testNonBundleItem()
       throws Exception
   {
-    final ContentLocator content = new ContentLocator()
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
       {
         return getResourceAsStream("/obr/jars/maven-model-2.0.jar");
-      }
-
-      public boolean isReusable() {
-        return false;
-      }
-
-      public String getMimeType() {
-        return "application/java-archive";
       }
     };
 
@@ -120,20 +97,12 @@ public class ObrMetadataSourceTest
   public void testBrokenStream()
       throws Exception
   {
-    final ContentLocator content = new ContentLocator()
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
       {
         throw new IOException("EOF");
-      }
-
-      public boolean isReusable() {
-        return false;
-      }
-
-      public String getMimeType() {
-        return "application/java-archive";
       }
     };
 
@@ -146,20 +115,12 @@ public class ObrMetadataSourceTest
   public void testNullStream()
       throws Exception
   {
-    final ContentLocator content = new ContentLocator()
+    final ContentLocator content = new AbstractContentLocator("application/java-archive", false, ContentLocator.UNKNOWN_LENGTH)
     {
       public InputStream getContent()
           throws IOException
       {
         return null;
-      }
-
-      public boolean isReusable() {
-        return false;
-      }
-
-      public String getMimeType() {
-        return "application/java-archive";
       }
     };
 

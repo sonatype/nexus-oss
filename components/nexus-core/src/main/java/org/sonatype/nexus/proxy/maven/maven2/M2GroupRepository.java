@@ -341,8 +341,6 @@ public class M2GroupRepository
     DefaultStorageCompositeFileItem result =
         new DefaultStorageCompositeFileItem(this, request, true, false, contentLocator, sources);
 
-    result.setLength(content.length);
-
     result.setCreated(getNewestCreatedDate(sources));
 
     result.setModified(result.getCreated());

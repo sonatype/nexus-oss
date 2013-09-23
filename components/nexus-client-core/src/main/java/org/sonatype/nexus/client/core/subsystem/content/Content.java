@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.google.common.collect.Range;
+
 /**
  * @since 2.1
  */
@@ -51,5 +53,19 @@ public interface Content
   void delete(Location location)
       throws IOException;
 
-  // describe
+  /**
+   * Downloads a range of content from given location.
+   * 
+   * @since 2.7.0
+   */
+  void downloadRange(Location location, File target, Range<Long> range)
+      throws IOException;
+
+  /**
+   * Downloads a range of content from given location.
+   * 
+   * @since 2.7.0
+   */
+  void downloadRange(Location location, OutputStream target, Range<Long> range)
+      throws IOException;
 }

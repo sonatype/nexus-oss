@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
@@ -48,7 +49,6 @@ import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractNexusPlexusResource
@@ -59,11 +59,11 @@ public abstract class AbstractNexusPlexusResource
 
   public static final String PASSWORD_PLACE_HOLDER = "|$|N|E|X|U|S|$|";
 
-  public static final String IS_LOCAL_PARAMETER = "isLocal";
+  public static final String IS_LOCAL_PARAMETER = Constants.REQ_QP_IS_LOCAL_PARAMETER;
 
-  public static final String IS_REMOTE_PARAMETER = "isRemote";
+  public static final String IS_REMOTE_PARAMETER = Constants.REQ_QP_IS_REMOTE_PARAMETER;
 
-  public static final String AS_EXPIRED_PARAMETER = "asExpired";
+  public static final String AS_EXPIRED_PARAMETER = Constants.REQ_QP_AS_EXPIRED_PARAMETER;
 
   @Requirement
   private NexusConfiguration nexusConfiguration;

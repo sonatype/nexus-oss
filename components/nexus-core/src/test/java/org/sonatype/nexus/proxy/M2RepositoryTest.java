@@ -52,7 +52,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -141,13 +140,13 @@ public class M2RepositoryTest
     repository.getCurrentCoreConfiguration().commitChanges();
 
     DefaultStorageFileItem item =
-        new DefaultStorageFileItem(repository, SPOOF_RELEASE, true, true, new StringContentLocator(SPOOF_RELEASE));
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(SPOOF_RELEASE));
 
     repository.storeItem(false, item);
 
     try {
       item =
-          new DefaultStorageFileItem(repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+          new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(
               SPOOF_SNAPSHOT));
 
       repository.storeItem(false, item);
@@ -166,14 +165,14 @@ public class M2RepositoryTest
     repository.getCurrentCoreConfiguration().commitChanges();
 
     item =
-        new DefaultStorageFileItem(repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(
             SPOOF_SNAPSHOT));
 
     repository.storeItem(false, item);
 
     try {
       item =
-          new DefaultStorageFileItem(repository, SPOOF_RELEASE, true, true, new StringContentLocator(
+          new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(
               SPOOF_RELEASE));
 
       repository.storeItem(false, item);
@@ -877,9 +876,9 @@ public class M2RepositoryTest
 
     StorageItem item = repository.retrieveItem(new ResourceStoreRequest("/spoof/simple.txt"));
 
-    repository.storeItem(false, new DefaultStorageFileItem(repository, item.getPath() + ".sha1", true, true,
+    repository.storeItem(false, new DefaultStorageFileItem(repository, new ResourceStoreRequest(item.getPath() + ".sha1"), true, true,
         new StringContentLocator(sha1str)));
-    repository.storeItem(false, new DefaultStorageFileItem(repository, item.getPath() + ".md5", true, true,
+    repository.storeItem(false, new DefaultStorageFileItem(repository, new ResourceStoreRequest(item.getPath() + ".md5"), true, true,
         new StringContentLocator(md5str)));
 
     // reread the item to refresh attributes map

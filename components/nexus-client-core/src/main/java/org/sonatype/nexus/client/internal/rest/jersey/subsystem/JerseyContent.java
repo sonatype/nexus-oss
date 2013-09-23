@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,11 +27,14 @@ import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
+import com.sun.jersey.api.client.ClientResponse.Status;
+
+import com.google.common.collect.Range;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import org.codehaus.plexus.util.IOUtil;
-
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -107,27 +111,33 @@ public class JerseyContent
   }
 
   @Override
-  public void download(final Location location, final File target)
-      throws IOException
-  {
-    download(location, toUri(location, null), target);
+  public void download(final Location location, final File target) throws IOException {
+    download(location, toUri(location, null), target, null);
   }
 
   @Override
-  public void downloadWith(final Location location, final Directive directive, final File target)
-      throws IOException
-  {
-    download(location, toUri(location, directive), target);
+  public void downloadRange(final Location location, final File target, final Range<Long> range) throws IOException {
+    download(location, toUri(location, null), target, range);
   }
 
   @Override
-  public void downloadWith(Location location, Directive directive, OutputStream target)
+  public void downloadRange(final Location location, final OutputStream stream, final Range<Long> range)
       throws IOException
   {
-    download(location, toUri(location, directive), target);
+    download(location, toUri(location, null), stream, range);
   }
 
-  protected void download(final Location location, final String uri, final File target)
+  @Override
+  public void downloadWith(final Location location, final Directive directive, final File target) throws IOException {
+    download(location, toUri(location, directive), target, null);
+  }
+
+  @Override
+  public void downloadWith(Location location, Directive directive, OutputStream target) throws IOException {
+    download(location, toUri(location, directive), target, null);
+  }
+
+  protected void download(final Location location, final String uri, final File target, final Range<Long> range)
       throws IOException
   {
     if (!target.exists()) {
@@ -140,23 +150,36 @@ public class JerseyContent
           target.getAbsolutePath());
     }
 
-    FileOutputStream fos = null;
+    OutputStream os = null;
     try {
-      fos = new FileOutputStream(target);
-      download(location, uri, fos);
+      os = new BufferedOutputStream(new FileOutputStream(target));
+      download(location, uri, os, range);
     }
     finally {
-      IOUtil.close(fos);
+      IOUtil.close(os);
     }
   }
 
-  protected void download(final Location location, final String uri, final OutputStream target)
+  protected void download(final Location location, final String uri, final OutputStream target, final Range<Long> range)
       throws IOException
   {
     try {
-      final ClientResponse response = getNexusClient().uri(uri).get(ClientResponse.class);
+      final WebResource.Builder wrb = getNexusClient().uri(uri);
+      if (range != null && (range.hasLowerBound() || range.hasUpperBound())) {
+        final StringBuilder rangeHeaderValue = new StringBuilder("bytes=");
+        if (range.hasLowerBound()) {
+          rangeHeaderValue.append(range.lowerEndpoint());
+        }
+        rangeHeaderValue.append("-");
+        if (range.hasUpperBound()) {
+          rangeHeaderValue.append(range.upperEndpoint());
+        }
+        wrb.header("Range", rangeHeaderValue);
+      }
+      final ClientResponse response = wrb.get(ClientResponse.class);
 
-      if (!ClientResponse.Status.OK.equals(response.getClientResponseStatus())) {
+      if (!(Status.OK.equals(response.getClientResponseStatus()) || Status.PARTIAL_CONTENT
+          .equals(response.getClientResponseStatus()))) {
         throw getNexusClient().convert(new ContextAwareUniformInterfaceException(response)
         {
           @Override
@@ -182,9 +205,7 @@ public class JerseyContent
   }
 
   @Override
-  public void upload(final Location location, final File target)
-      throws IOException
-  {
+  public void upload(final Location location, final File target) throws IOException {
     try {
       getNexusClient().uri(CONTENT_PREFIX + location.toContentPath()).put(target);
     }
@@ -206,9 +227,7 @@ public class JerseyContent
   }
 
   @Override
-  public void delete(final Location location)
-      throws IOException
-  {
+  public void delete(final Location location) throws IOException {
     try {
       getNexusClient().uri(CONTENT_PREFIX + location.toContentPath()).delete();
     }
