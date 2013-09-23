@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -48,6 +49,7 @@ import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +75,11 @@ public class DefaultTaskConfigManager
 
   private final Map<String, Provider<SchedulerTask<?>>> tasks;
 
-  public DefaultTaskConfigManager(NexusConfiguration nexusConfiguration, Map<String, Provider<SchedulerTask<?>>> tasks)
+  @Inject
+  public DefaultTaskConfigManager(final EventBus eventBus, final NexusConfiguration nexusConfiguration,
+      final Map<String, Provider<SchedulerTask<?>>> tasks)
   {
+    super(eventBus);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.tasks = checkNotNull(tasks);
   }
