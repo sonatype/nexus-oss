@@ -18,7 +18,6 @@ import java.net.ServerSocket;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.AbstractPluginTestCase;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
@@ -48,7 +47,7 @@ public class RemoteBrowserResourceAuthTest
     this.server = this.lookup(ServletServer.class);
 
     // ping nexus to wake up
-    lookup(Nexus.class);
+    startNx();
   }
 
   @Override

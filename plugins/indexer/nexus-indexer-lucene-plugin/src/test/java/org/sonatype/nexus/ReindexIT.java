@@ -92,7 +92,7 @@ public class ReindexIT
     // make the central download the remote indexes is found
     central.setDownloadRemoteIndexes(true);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     waitForTasksToStop();
   }

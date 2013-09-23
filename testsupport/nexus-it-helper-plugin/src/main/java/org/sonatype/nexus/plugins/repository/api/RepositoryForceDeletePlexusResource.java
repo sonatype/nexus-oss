@@ -59,7 +59,7 @@ public class RepositoryForceDeletePlexusResource
   {
     String repoId = this.getRepositoryId(request);
     try {
-      getNexus().deleteRepository(repoId, true);
+      getNexusConfiguration().deleteRepository(repoId, true);
 
       response.setStatus(Status.SUCCESS_NO_CONTENT);
     }

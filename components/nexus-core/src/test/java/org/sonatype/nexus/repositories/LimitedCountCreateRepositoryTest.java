@@ -14,9 +14,7 @@
 package org.sonatype.nexus.repositories;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -30,10 +28,6 @@ import org.junit.Test;
 public class LimitedCountCreateRepositoryTest
     extends NexusAppTestSupport
 {
-  private Nexus nexus;
-
-  private NexusConfiguration nexusConfiguration;
-
   private RepositoryTypeRegistry repositoryTypeRegistry;
 
   @Override
@@ -46,9 +40,7 @@ public class LimitedCountCreateRepositoryTest
       throws Exception
   {
     super.setUp();
-
-    this.nexus = this.lookup(Nexus.class);
-    this.nexusConfiguration = this.lookup(NexusConfiguration.class);
+    startNx();
     this.repositoryTypeRegistry = this.lookup(RepositoryTypeRegistry.class);
   }
 
@@ -75,7 +67,7 @@ public class LimitedCountCreateRepositoryTest
     // FIXME: this number here depends on _default_ config nexus uses!
     // We set limit to 3, since default-config contains 1 group, and we will add 3.
     // The 3rd and after of additions should fail with ConfigurationException!
-    nexusConfiguration.setDefaultRepositoryMaxInstanceCount(3);
+    nexusConfiguration().setDefaultRepositoryMaxInstanceCount(3);
 
     long repoId = System.currentTimeMillis();
 
@@ -89,7 +81,7 @@ public class LimitedCountCreateRepositoryTest
     createRepository(repoId + 3, true);
 
     // now we lift the limitation for one
-    nexusConfiguration.setDefaultRepositoryMaxInstanceCount(4);
+    nexusConfiguration().setDefaultRepositoryMaxInstanceCount(4);
 
     // this one should pass, we lifted for +1
     createRepository(repoId + 4, false);
@@ -97,7 +89,7 @@ public class LimitedCountCreateRepositoryTest
     createRepository(repoId + 5, true);
 
     // now we lift the limitation completely
-    nexusConfiguration.setDefaultRepositoryMaxInstanceCount(-1);
+    nexusConfiguration().setDefaultRepositoryMaxInstanceCount(-1);
 
     // this one should pass, these are the default
     createRepository(repoId + 6, false);
@@ -116,7 +108,7 @@ public class LimitedCountCreateRepositoryTest
     // FIXME: this number here depends on _default_ config nexus uses!
     // We set limit to 3, since default-config contains 1 group, and we will add 3.
     // The 3rd and after of additions should fail with ConfigurationException!
-    nexusConfiguration.setRepositoryMaxInstanceCount(rtd, 3);
+    nexusConfiguration().setRepositoryMaxInstanceCount(rtd, 3);
 
     long repoId = System.currentTimeMillis();
 
@@ -130,7 +122,7 @@ public class LimitedCountCreateRepositoryTest
     createRepository(repoId + 3, true);
 
     // now we lift the limitation for one
-    nexusConfiguration.setRepositoryMaxInstanceCount(rtd, 4);
+    nexusConfiguration().setRepositoryMaxInstanceCount(rtd, 4);
 
     // this one should pass, we lifted for +1
     createRepository(repoId + 4, false);
@@ -138,7 +130,7 @@ public class LimitedCountCreateRepositoryTest
     createRepository(repoId + 5, true);
 
     // now we lift the limitation completely
-    nexusConfiguration.setRepositoryMaxInstanceCount(rtd, -1);
+    nexusConfiguration().setRepositoryMaxInstanceCount(rtd, -1);
 
     // this one should pass, these are the default
     createRepository(repoId + 6, false);
@@ -146,7 +138,7 @@ public class LimitedCountCreateRepositoryTest
 
   protected RepositoryTemplate getTemplate() {
     Maven2GroupRepositoryTemplate template =
-        (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+        (Maven2GroupRepositoryTemplate) getRepositoryTemplates().getTemplates(
             Maven2GroupRepositoryTemplate.class).pick();
 
     return template;
@@ -177,7 +169,7 @@ public class LimitedCountCreateRepositoryTest
 
     boolean found = false;
     // verify nexus config in memory
-    for (CRepository cRepo : this.nexusConfiguration.getConfigurationModel().getRepositories()) {
+    for (CRepository cRepo : nexusConfiguration().getConfigurationModel().getRepositories()) {
       if (repoId.equals(cRepo.getId())) {
         found = true;
       }
@@ -191,11 +183,11 @@ public class LimitedCountCreateRepositoryTest
     }
 
     // reload the config and see if the repo is still there
-    this.nexusConfiguration.loadConfiguration(true);
+    nexusConfiguration().loadConfiguration(true);
 
     found = false;
     // verify nexus config in memory
-    for (CRepository cRepo : this.nexusConfiguration.getConfigurationModel().getRepositories()) {
+    for (CRepository cRepo : nexusConfiguration().getConfigurationModel().getRepositories()) {
       if (repoId.equals(cRepo.getId())) {
         found = true;
       }

@@ -13,19 +13,31 @@
 
 package org.sonatype.nexus.proxy.maven.packaging;
 
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.when;
 
 public class DefaultArtifactPackagingMapperTest
     extends TestSupport
 {
+  @Mock
+  private NexusConfiguration nexusConfiguration;
+  
+  @Before
+  public void prepare() {
+    when(nexusConfiguration.getConfigurationDirectory()).thenReturn(util.createTempDir());
+  }
+  
   @Test
   public void defaults() {
-    final ArtifactPackagingMapper apm = new DefaultArtifactPackagingMapper();
+    final ArtifactPackagingMapper apm = new DefaultArtifactPackagingMapper(nexusConfiguration);
     assertThat(apm.getExtensionForPackaging("jar"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("ejb-client"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("ejb"), equalTo("jar"));
@@ -46,7 +58,7 @@ public class DefaultArtifactPackagingMapperTest
 
   @Test
   public void overrides() {
-    final ArtifactPackagingMapper apm = new DefaultArtifactPackagingMapper();
+    final ArtifactPackagingMapper apm = new DefaultArtifactPackagingMapper(nexusConfiguration);
     apm.setPropertiesFile(util.resolveFile("src/test/resources/packaging2extension-mapping.properties"));
     assertThat(apm.getExtensionForPackaging("jar"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("ejb-client"), equalTo("jar"));

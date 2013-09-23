@@ -17,8 +17,11 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.MediaType;
@@ -31,6 +34,9 @@ public class ContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
     implements ManagedPlexusResource
 {
+  @Requirement
+  private RepositoryRouter repositoryRouter;
+  
   @Override
   public Object getPayloadInstance() {
     return null;
@@ -72,6 +78,6 @@ public class ContentPlexusResource
       throws NoSuchRepositoryException,
              ResourceException
   {
-    return getNexus().getRootRouter();
+    return repositoryRouter;
   }
 }

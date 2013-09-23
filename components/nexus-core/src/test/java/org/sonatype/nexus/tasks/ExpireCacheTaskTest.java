@@ -32,9 +32,9 @@ public class ExpireCacheTaskTest
   {
     super.setUp();
 
-    nexusConfiguration.setSecurityEnabled(false);
+    nexusConfiguration().setSecurityEnabled(false);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     scheduler = lookup(NexusScheduler.class);
   }
@@ -51,7 +51,7 @@ public class ExpireCacheTaskTest
     }
 
     central.setLocalStatus(LocalStatus.OUT_OF_SERVICE);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     GroupRepository group = repositoryRegistry.getRepositoryWithFacet("public", GroupRepository.class);
     group.expireCaches(new ResourceStoreRequest("/"));
