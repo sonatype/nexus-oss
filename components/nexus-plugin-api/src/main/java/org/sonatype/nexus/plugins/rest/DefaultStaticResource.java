@@ -101,6 +101,9 @@ public class DefaultStaticResource
   }
 
   public Long getLastModified() {
+    if (!shouldCache) {
+      return System.currentTimeMillis();
+    }
     if (checkConnection()) {
       return urlConnection.getLastModified();
     }
