@@ -90,13 +90,7 @@ public class LvoPlexusResource
     catch (NoSuchKeyException e) {
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, e.getMessage(), e);
     }
-    catch (NoSuchStrategyException e) {
-      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
-    }
-    catch (NoSuchRepositoryException e) {
-      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
-    }
-    catch (IOException e) {
+    catch (NoSuchStrategyException | NoSuchRepositoryException | IOException e) {
       throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
     }
   }
