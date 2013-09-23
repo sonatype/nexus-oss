@@ -134,7 +134,6 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
         new DefaultStorageFileItem(repository, new ResourceStoreRequest(path), true /* isReadable */,
             false /* isWritable */, fileContentLocator);
     result.getItemContext().putAll(context);
-    result.setLength(fileContentLocator.getLength());
     return result;
   }
 
@@ -160,7 +159,6 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     final DefaultStorageFileItem result = new DefaultStorageFileItem(
         repository, new ResourceStoreRequest(path), true /* isReadable */, false /* isWritable */, fileContentLocator
     );
-    result.setLength(fileContentLocator.getLength());
     return result;
   }
 

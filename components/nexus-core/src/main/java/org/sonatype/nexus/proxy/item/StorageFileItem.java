@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The Interface StorageFileItem.
+ * A file item, it has content and other properties typical to plain files.
  */
 public interface StorageFileItem
     extends StorageItem
@@ -34,62 +34,55 @@ public interface StorageFileItem
   public static final String DIGEST_MD5_KEY = "digest.md5";
 
   /**
-   * Gets the length.
-   *
-   * @return the length
+   * Returns the file content length in bytes, or {@link ContentLocator#UNKNOWN_LENGTH} if unknown. Shortcut method for
+   * {@link ContentLocator#getLength()}.
    */
   long getLength();
 
   /**
-   * Sets the length of file.
-   */
-  void setLength(long length);
-
-  /**
-   * Gets the mime type.
-   *
-   * @return the mime type
+   * Returns the MIME type of the file content, never {@code null}. Shortcut method for
+   * {@link ContentLocator#getMimeType()}.
    */
   String getMimeType();
 
   /**
-   * Shorthand method, goes to ContentLocator. Reusable stream. See {@link ContentLocator}
-   *
-   * @return true, if successful
+   * Returns {@code true} if this item's content might be requested multiple times (by calling {@link #getInputStream()}
+   * for example). Shortcut method for {@link ContentLocator#isReusable()}.
    */
   boolean isReusableStream();
 
   /**
-   * Shorthand method, goes to ContentLocator. Gets the input stream. Caller must close the stream. See
-   * {@link ContentLocator}
-   *
-   * @return the input stream
+   * Returns the content as opened ready to read input stream. It has to be closed by the caller explicitly. Shortcut
+   * method for {@link ContentLocator#getContent()}.
    */
-  InputStream getInputStream()
-      throws IOException;
+  InputStream getInputStream() throws IOException;
 
   /**
-   * Sets the content locator.
+   * Sets the {@link ContentLocator} (that provides the actual content of this file). Passed in value cannot be
+   * {@code null}.
    */
   void setContentLocator(ContentLocator locator);
 
   /**
-   * Exposes the content locator.
+   * Returns the {@link ContentLocator} of this file item, never {@code null}.
    */
   ContentLocator getContentLocator();
 
   /**
-   * Returns the ID of content generator to be used with this file, or null if not set.
+   * Returns the ID of the {@link ContentGenerator} used to generate content for this item. This method returns
+   * {@code null} if method {@link #isContentGenerated()} returns {@code false}, hence, if the item is not generated.
    */
   String getContentGeneratorId();
 
   /**
-   * Set's content generator to be used with this file item. Passing in null removes use of content generator.
+   * Sets the {@link ContentGenerator} to be used to generate content for this item. Passed in value might be
+   * {@code null}, in which case you "demote", remove an associated generator from this file item. If non null, the
+   * {@link ContentGenerator} with given ID will be used to generate content.
    */
   void setContentGeneratorId(String contentGeneratorId);
 
   /**
-   * Returns true if this file item's content is generated on the fly (is not static).
+   * Returns {@code true} if this file item content is generated content (is not static, coming from storage).
    */
   boolean isContentGenerated();
 }

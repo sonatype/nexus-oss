@@ -1,0 +1,159 @@
+#*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2013 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *#
+<html>
+  <head>
+    <title>Description of request processing of $req.getRequestAppRootUrl()</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <link rel="icon" type="image/png" href="$nexusRoot/favicon.png"><!-- Major Browsers -->
+    <!--[if IE]><link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/><![endif]--><!-- Internet Explorer-->
+
+    <link rel="stylesheet" href="$nexusRoot/static/css/Sonatype-content.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
+  </head>
+  <body>
+    <h1>Describe of $req.getRequestAppRootUrl()</h1>
+    <p>This page describes the processing of a request made by external client,
+    using informations from request, retrieved item (or exception if not item was retrieved)
+    and some intermittent processing states.</p>
+
+    <h3>Processing time</h3>
+    <p>$req.getRequestContext().get("org.sonatype.nexus.web.content.NexusContentServlet.stopwatch")</p>
+
+    <h3>Request URL</h3>
+    <p>$req.getRequestAppRootUrl()</p>
+
+    <h3>Request Context</h3>
+    <p>
+	    <table cellspacing="10">
+	      <tr>
+	        <th>Key</th>
+	        <th>Value</th>
+	      </tr>
+          #foreach ($entry in $req.getRequestContext().flatten().entrySet())
+	      <tr>
+	        <td>
+	          $entry.key
+	        </td>
+	        <td>
+	          $entry.value
+	        </td>
+	      </tr>
+          #end
+        </table>
+    </p>
+
+    <h3>Response Outcome</h3>
+    <p>
+      #if( $item )
+        FOUND (Item found and retrieved)
+      #elseif ( $exception )
+        NOT FOUND (Item not found, core throwed exception)
+      #end
+    </p>
+
+    <h3>Processed repositories (IDs)</h3>
+    <p>
+      #foreach ($entry in $req.getProcessedRepositories())
+        $entry <br/>
+      #end
+    </p>
+
+    <h3>Applied Routings</h3>
+    <p>
+	    <table cellspacing="10">
+	      <tr>
+	        <th>Repository</th>
+	        <th>Mapping</th>
+	      </tr>
+          #foreach ($entry in $req.getAppliedMappings().entrySet())
+	      <tr>
+	        <td>
+	          $entry.key
+	        </td>
+	        <td>
+	          $entry.value
+	        </td>
+	      </tr>
+          #end
+        </table>
+    </p>
+
+    #if( $item )
+
+	    <h3>Retrieved Item UID</h3>
+	    <p>
+	        #if( $item.getRepositoryItemUid() )
+	          $item.getRepositoryItemUid()
+	        #else
+	          No UID (item is virtual).
+	        #end
+	    </p>
+
+	    <h3>Retrieved Item Type</h3>
+	    <p>
+	        $item.getClass().getName()
+	    </p>
+
+	    <h3>Retrieved Item Context</h3>
+	    <p>
+		    <table cellspacing="10">
+		      <tr>
+		        <th>Key</th>
+		        <th>Value</th>
+		      </tr>
+	          #foreach ($entry in $item.getItemContext().flatten().entrySet())
+		      <tr>
+		        <td>
+		          $entry.key
+		        </td>
+		        <td>
+		          $entry.value
+		        </td>
+		      </tr>
+	          #end
+	        </table>
+	    </p>
+
+	    <h3>Retrieved Item Attributes</h3>
+	    <p>
+		    <table cellspacing="10">
+		      <tr>
+		        <th>Key</th>
+		        <th>Value</th>
+		      </tr>
+	          #foreach ($entry in $item.getRepositoryItemAttributes().asMap().entrySet())
+		      <tr>
+		        <td>
+		          $entry.key
+		        </td>
+		        <td>
+		          $entry.value
+		        </td>
+		      </tr>
+	          #end
+	        </table>
+	    </p>
+    #end
+    
+    #if( $exception )
+
+	    <h3>Exception type</h3>
+	    <p>$exception.getClass().getName()</p>
+
+	    <h3>Exception message</h3>
+	    <p>$exception.getMessage()</p>
+
+    #end
+
+  </body>
+</html>

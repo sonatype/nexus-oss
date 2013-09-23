@@ -48,65 +48,65 @@ public class RemoteIPFinderTest
 
     // HTTP
 
-    Mockito.doReturn("").when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals(null, RemoteIPFinder.findIP(http));
 
-    Mockito.doReturn(null).when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn(null).when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals(null, RemoteIPFinder.findIP(http));
 
-    Mockito.doReturn("127.0.0.1").when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("127.0.0.1").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("127.0.0.1", RemoteIPFinder.findIP(http));
 
     // Note that if you use a DNS provider, such as OpenDNS, or internet cafe which buckets non-resolvable host names
     // to a landing page host, these tests will fail when the name 'missing' actually resolves to an IP
-    Mockito.doReturn("missing, 127.0.0.2, unknown, 127.0.0.1").when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("missing, 127.0.0.2, unknown, 127.0.0.1").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("127.0.0.2", RemoteIPFinder.findIP(http));
 
-    Mockito.doReturn("127.0.0.3, 127.0.0.2, 127.0.0.1").when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("127.0.0.3, 127.0.0.2, 127.0.0.1").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("127.0.0.3", RemoteIPFinder.findIP(http));
 
-    Mockito.doReturn("localhost").when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("localhost").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("localhost", RemoteIPFinder.findIP(http));
 
-    Mockito.doReturn("client, proxy1, proxy2").when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("client, proxy1, proxy2").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Mockito.doReturn(null).when(http).getRemoteAddr();
     Assert.assertEquals(null, RemoteIPFinder.findIP(http));
 
-    Mockito.doReturn("client, proxy1, proxy2").when(http).getHeader(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("client, proxy1, proxy2").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Mockito.doReturn("upstream").when(http).getRemoteAddr();
     Assert.assertEquals("upstream", RemoteIPFinder.findIP(http));
 
     // RESTLET
 
-    Mockito.doReturn("").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals(null, RemoteIPFinder.findIP(restlet));
 
-    Mockito.doReturn(null).when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn(null).when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals(null, RemoteIPFinder.findIP(restlet));
 
-    Mockito.doReturn("127.0.0.1").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("127.0.0.1").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("127.0.0.1", RemoteIPFinder.findIP(restlet));
 
-    Mockito.doReturn("missing, 127.0.0.2, unknown, 127.0.0.1").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("missing, 127.0.0.2, unknown, 127.0.0.1").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("127.0.0.2", RemoteIPFinder.findIP(restlet));
 
-    Mockito.doReturn("127.0.0.3, 127.0.0.2, 127.0.0.1").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("127.0.0.3, 127.0.0.2, 127.0.0.1").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("127.0.0.3", RemoteIPFinder.findIP(restlet));
 
-    Mockito.doReturn("localhost").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("localhost").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("localhost", RemoteIPFinder.findIP(restlet));
 
     clientInfo.setAddresses(null);
-    Mockito.doReturn("client, proxy1, proxy2").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("client, proxy1, proxy2").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals(null, RemoteIPFinder.findIP(restlet));
 
     clientInfo.setAddresses(Collections.<String>emptyList());
-    Mockito.doReturn("client, proxy1, proxy2").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("client, proxy1, proxy2").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals(null, RemoteIPFinder.findIP(restlet));
 
     // restlet1x clientInfo addresses are the last known upstream address + reverse of XFF
     clientInfo.setAddresses(Arrays.asList("upstream", "proxy2", "proxy1", "client"));
-    Mockito.doReturn("client, proxy1, proxy2").when(form).getFirstValue(RemoteIPFinder.FORWARD_HEADER);
+    Mockito.doReturn("client, proxy1, proxy2").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals("upstream", RemoteIPFinder.findIP(restlet));
   }
 }

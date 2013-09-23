@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,9 +21,9 @@ import java.util.Properties;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -127,7 +126,7 @@ public class PropfileDiscoveryStatusSource
 
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     props.store(bos, "Nexus discovery status");
-    putFileItem(new PreparedContentLocator(new ByteArrayInputStream(bos.toByteArray()), "text/plain"));
+    putFileItem(new ByteArrayContentLocator(bos.toByteArray(), "text/plain"));
   }
 
   /**

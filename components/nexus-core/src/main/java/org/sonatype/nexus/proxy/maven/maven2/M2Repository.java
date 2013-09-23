@@ -371,7 +371,6 @@ public class M2Repository
 
           DefaultStorageFileItem result =
               new DefaultStorageFileItem(this, request, true, false, contentLocator);
-          result.setLength(content.length);
           result.setCreated(mdItem.getCreated());
           result.setModified(System.currentTimeMillis());
           return result;

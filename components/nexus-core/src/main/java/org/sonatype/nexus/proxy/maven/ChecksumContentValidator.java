@@ -288,7 +288,6 @@ public class ChecksumContentValidator
     // XXX do we need to clone request here?
     DefaultStorageFileItem hashItem =
         new DefaultStorageFileItem(proxy, request, true /* canRead */, false/* canWrite */, content);
-    hashItem.setLength(content.getLength());
     hashItem.setModified(artifact.getModified());
     return hashItem;
   }

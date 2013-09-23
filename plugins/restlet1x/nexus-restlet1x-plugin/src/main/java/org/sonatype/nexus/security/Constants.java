@@ -23,5 +23,8 @@ package org.sonatype.nexus.security;
  */
 public interface Constants
 {
-  String REQUEST_IS_AUTHZ_REJECTED = "request.is.authz.rejected";
+  /**
+   * @see {@link org.sonatype.nexus.web.Constants#ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED_KEY}
+   */
+  String REQUEST_IS_AUTHZ_REJECTED = org.sonatype.nexus.web.Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED;
 }

@@ -74,9 +74,6 @@ public class ArchetypeContentGenerator
   public ContentLocator generateContent(Repository repository, String path, StorageFileItem item)
       throws IllegalOperationException, ItemNotFoundException, LocalStorageException
   {
-    // make length unknown (since it will be known only in the moment of actual content pull)
-    item.setLength(-1);
-
     ArtifactInfoFilter artifactInfoFilter = new ArtifactInfoFilter()
     {
       public boolean accepts(IndexingContext ctx, ArtifactInfo ai) {
@@ -84,7 +81,6 @@ public class ArchetypeContentGenerator
       }
     };
     final String exposedRepositoryContentUrl = repositoryURLBuilder.getExposedRepositoryContentUrl(repository);
-
     return new ArchetypeContentLocator(repository, exposedRepositoryContentUrl, indexerManager, macPlugin,
         artifactInfoFilter);
   }

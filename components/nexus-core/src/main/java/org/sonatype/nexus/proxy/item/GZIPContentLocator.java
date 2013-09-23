@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link ContentLocator} that wraps another content locator that contains GZ compressed content.
- *
+ * 
  * @author cstamas
  * @since 2.4
  */
@@ -32,10 +32,10 @@ public class GZIPContentLocator
 
   /**
    * Constructor.
-   *
+   * 
    * @param gzippedContent the wrapped {@link ContentLocator}.
-   * @param mimeType       the MIME type of the uncompressed content (NOT the gzipped stream, but the uncompressed
-   *                       content!)
+   * @param mimeType the MIME type of the uncompressed content (NOT the gzipped stream, but the uncompressed
+   *          content!)
    */
   public GZIPContentLocator(final ContentLocator gzippedContent, final String mimeType) {
     super(gzippedContent);
@@ -43,10 +43,13 @@ public class GZIPContentLocator
   }
 
   @Override
-  public InputStream getContent()
-      throws IOException
-  {
+  public InputStream getContent() throws IOException {
     return new GZIPInputStream(super.getContent());
+  }
+  
+  @Override
+  public long getLength() {
+    return UNKNOWN_LENGTH;
   }
 
   @Override

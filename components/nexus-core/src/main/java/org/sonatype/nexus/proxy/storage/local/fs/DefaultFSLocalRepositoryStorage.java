@@ -258,7 +258,6 @@ public class DefaultFSLocalRepositoryStorage
           repository.getAttributesHandler().fetchAttributes(file);
           file.setModified(target.lastModified());
           file.setCreated(target.lastModified());
-          file.setLength(target.length());
           result = file;
 
           repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), file);
@@ -363,8 +362,6 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     if (item instanceof StorageFileItem) {
-      ((StorageFileItem) item).setLength(target.length());
-
       // replace content locator transparently, if we just consumed a non-reusable one
       // Hint: in general, those items coming from user uploads or remote proxy caching requests are non
       // reusable ones

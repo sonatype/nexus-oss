@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Attributes are simply a String key-value pairs with some type-safe getters and setters for keys known and used in
  * core.
- *
+ * 
  * @author cstamas
  * @since 2.0
  */
@@ -35,8 +35,8 @@ public interface Attributes
   String get(final String key);
 
   /**
-   * Puts the value for given key, returning any previous values bound. Note: Attributes does not allow {@code null}
-   * for key neither values!
+   * Puts the value for given key, returning any previous values bound. Note: Attributes does not allow {@code null} for
+   * key neither values!
    */
   String put(final String key, final String value);
 
@@ -183,16 +183,6 @@ public interface Attributes
    * Sets the remoteUrl attribute.
    */
   void setRemoteUrl(final String value);
-
-  /**
-   * Returns the length attribute.
-   */
-  long getLength();
-
-  /**
-   * Sets the length attribute.
-   */
-  void setLength(final long value);
 
   // ==
 

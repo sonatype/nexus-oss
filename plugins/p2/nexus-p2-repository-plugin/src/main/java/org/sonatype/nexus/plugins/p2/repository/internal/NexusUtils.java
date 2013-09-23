@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -85,10 +86,10 @@ public class NexusUtils
       throws Exception
   {
     final DefaultStorageFileItem fItem =
-        new DefaultStorageFileItem(repository, request, true, true, new PreparedContentLocator(in, mimeType));
+        new DefaultStorageFileItem(repository, request, true, true, new PreparedContentLocator(in, mimeType, ContentLocator.UNKNOWN_LENGTH));
 
     if (userAttributes != null) {
-      fItem.getAttributes().putAll(userAttributes);
+      fItem.getRepositoryItemAttributes().putAll(userAttributes);
     }
 
     repository.storeItem(false, fItem);

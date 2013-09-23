@@ -18,28 +18,19 @@ import java.util.Collection;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.StorageException;
 
 /**
- * The Interface StorageCollectionItem.
+ * A collection item ("directory").
  */
 public interface StorageCollectionItem
     extends StorageItem
 {
-
   /**
-   * Lists this collection.
-   *
-   * @return the collection< storage item>
+   * Lists the members of this collection.
    */
-  Collection<StorageItem> list()
-      throws AccessDeniedException,
-             NoSuchResourceStoreException,
-             IllegalOperationException,
-             ItemNotFoundException,
-             StorageException;
-
-  ;
-
+  Collection<StorageItem> list() throws AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
+      ItemNotFoundException, StorageException;
 }

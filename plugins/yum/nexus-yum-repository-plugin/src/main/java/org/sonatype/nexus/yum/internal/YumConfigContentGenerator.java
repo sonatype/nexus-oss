@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.proxy.item.AbstractContentLocator;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -59,12 +60,8 @@ public class YumConfigContentGenerator
                                         final String path,
                                         final StorageFileItem item)
   {
-    // make length unknown (since it will be known only in the moment of actual content pull)
-    item.setLength(-1);
-
-    return new ContentLocator()
+    return new AbstractContentLocator("text/plain", true, ContentLocator.UNKNOWN_LENGTH)
     {
-
       private String content;
 
       @Override
@@ -90,17 +87,6 @@ public class YumConfigContentGenerator
         }
         return new ByteArrayInputStream(content.getBytes("UTF-8"));
       }
-
-      @Override
-      public String getMimeType() {
-        return "text/plain";
-      }
-
-      @Override
-      public boolean isReusable() {
-        return true;
-      }
-
     };
   }
 

@@ -107,7 +107,7 @@ public class DefaultAttributeStorageIT
         new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true,
             new StringContentLocator("CONTENT"));
 
-    file.getAttributes().put("kuku", "kuku");
+    file.getRepositoryItemAttributes().put("kuku", "kuku");
 
     attributeStorage.putAttributes(file.getRepositoryItemUid(), file.getRepositoryItemAttributes());
 
@@ -126,7 +126,7 @@ public class DefaultAttributeStorageIT
         new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true,
             new StringContentLocator("CONTENT"));
 
-    file.getAttributes().put("kuku", "kuku");
+    file.getRepositoryItemAttributes().put("kuku", "kuku");
 
     attributeStorage.putAttributes(file.getRepositoryItemUid(), file.getRepositoryItemAttributes());
 
@@ -165,7 +165,7 @@ public class DefaultAttributeStorageIT
         new DefaultStorageFileItem(repository, new ResourceStoreRequest("/b.txt"), true, true,
             new StringContentLocator("CONTENT"));
 
-    file.getAttributes().put("kuku", "kuku");
+    file.getRepositoryItemAttributes().put("kuku", "kuku");
 
     attributeStorage.putAttributes(file.getRepositoryItemUid(), file.getRepositoryItemAttributes());
 

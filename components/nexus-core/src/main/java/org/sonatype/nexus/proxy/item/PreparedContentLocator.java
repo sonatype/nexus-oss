@@ -19,49 +19,34 @@ import java.io.InputStream;
 
 /**
  * A content locator that emits a prepared InputStream. Not reusable.
- *
+ * 
  * @author cstamas
  */
 public class PreparedContentLocator
-    implements ContentLocator, Closeable
+    extends AbstractContentLocator
+    implements Closeable
 {
   private final InputStream content;
 
-  private final String mimeType;
-
-  public PreparedContentLocator(final InputStream content, final String mimeType) {
+  public PreparedContentLocator(final InputStream content, final String mimeType, final long length) {
+    super(mimeType, false, length);
     this.content = content;
-    this.mimeType = mimeType;
   }
 
   @Override
-  public InputStream getContent()
-      throws IOException
-  {
+  public InputStream getContent() throws IOException {
     return content;
-  }
-
-  @Override
-  public String getMimeType() {
-    return mimeType;
-  }
-
-  @Override
-  public boolean isReusable() {
-    return false;
   }
 
   /**
    * Cleans up, closes the underlying prepared content. To be used in cases when you actually don't need the stream
    * (as some error cropped up), and you never requested the stream instance using {@link #getContent()}.
-   *
+   * 
    * @throws IOException if an I/O error occurs.
    * @since 2.5
    */
   @Override
-  public void close()
-      throws IOException
-  {
+  public void close() throws IOException {
     content.close();
   }
 }
