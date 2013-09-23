@@ -42,6 +42,15 @@ import static org.hamcrest.Matchers.is;
 public class DefaultSnapshotRemoverIT
     extends AbstractMavenRepoContentTests
 {
+  private SnapshotRemover snapshotRemover;
+  
+  @Override
+  protected void setUp() throws Exception
+  {
+    super.setUp();
+    snapshotRemover = lookup(SnapshotRemover.class);
+  }
+
   protected void validateResults(MavenRepository repository, Map<String, Boolean> results)
       throws Exception
   {
@@ -87,7 +96,7 @@ public class DefaultSnapshotRemoverIT
 
     assertTrue(itemFile.exists());
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = lookup(SnapshotRemover.class).removeSnapshots(snapshotRemovalRequest);
 
     assertTrue(result.isSuccessful());
 
@@ -105,7 +114,7 @@ public class DefaultSnapshotRemoverIT
 
     repositoryRegistry.getRepository("central").setLocalStatus(LocalStatus.OUT_OF_SERVICE);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     // ---------------------------------
     // make the jar should be deleted, while the pom should be kept
@@ -125,7 +134,7 @@ public class DefaultSnapshotRemoverIT
     SnapshotRemovalRequest snapshotRemovalRequest =
         new SnapshotRemovalRequest(snapshots.getId(), 3, 1, true);
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(snapshotRemovalRequest);
 
     assertTrue(result.isSuccessful());
 
@@ -140,14 +149,14 @@ public class DefaultSnapshotRemoverIT
     // XXX: the test stuff is published on sonatype, so put the real central out of service for test
     repositoryRegistry.getRepository("central").setLocalStatus(LocalStatus.OUT_OF_SERVICE);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     // and now setup the request
     // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists
     SnapshotRemovalRequest snapshotRemovalRequest =
         new SnapshotRemovalRequest(snapshots.getId(), 1, 0, true);
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(snapshotRemovalRequest);
 
     assertEquals(1, result.getProcessedRepositories().size());
 
@@ -236,7 +245,7 @@ public class DefaultSnapshotRemoverIT
     SnapshotRemovalRequest snapshotRemovalRequest =
         new SnapshotRemovalRequest(snapshots.getId(), 2, -1, false);
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(snapshotRemovalRequest);
 
     assertEquals(1, result.getProcessedRepositories().size());
 
@@ -297,13 +306,13 @@ public class DefaultSnapshotRemoverIT
 
     // XXX: the test stuff is published on sonatype, so put the real central out of service for test
     repositoryRegistry.getRepository("central").setLocalStatus(LocalStatus.OUT_OF_SERVICE);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest(
         snapshots.getId(), 1, 0, true, 2, false
     );
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(snapshotRemovalRequest);
 
     assertThat(result.getProcessedRepositories().size(), is(1));
     assertThat(result.isSuccessful(), is(true));
@@ -347,7 +356,7 @@ public class DefaultSnapshotRemoverIT
 
     // XXX: the test stuff is published on sonatype, so put the real central out of service for test
     repositoryRegistry.getRepository("central").setLocalStatus(LocalStatus.OUT_OF_SERVICE);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest(
         snapshots.getId(), 1, 0, true, 2, false
@@ -361,7 +370,7 @@ public class DefaultSnapshotRemoverIT
     // set the creation time 3 days ago, to simulate that grace period had passed
     released.setLastModified(System.currentTimeMillis() - 3 * 86400000L);
 
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(snapshotRemovalRequest);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(snapshotRemovalRequest);
 
     assertThat(result.getProcessedRepositories().size(), is(1));
     assertThat(result.isSuccessful(), is(true));
@@ -409,7 +418,7 @@ public class DefaultSnapshotRemoverIT
         readMavenMetadata(retrieveFile(snapshots, "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/maven-metadata.xml"));
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 1, -1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -435,7 +444,7 @@ public class DefaultSnapshotRemoverIT
     fillInRepo();
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 0, 1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -463,7 +472,7 @@ public class DefaultSnapshotRemoverIT
     fillInRepo();
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 0, -1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -490,7 +499,7 @@ public class DefaultSnapshotRemoverIT
     fillInRepo();
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 2, -1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -520,7 +529,7 @@ public class DefaultSnapshotRemoverIT
     fillInRepo();
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 1, -1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -541,7 +550,7 @@ public class DefaultSnapshotRemoverIT
     fillInRepo();
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 1, 1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -589,7 +598,7 @@ public class DefaultSnapshotRemoverIT
 
     // run on the public group, which contains the snapshot repo
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(null, 1, 1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -641,7 +650,7 @@ public class DefaultSnapshotRemoverIT
 
     // run on the public group, which contains the snapshot repo
     SnapshotRemovalRequest request = new SnapshotRemovalRequest("public", 1, 1, false);
-    SnapshotRemovalResult result = defaultNexus.removeSnapshots(request);
+    SnapshotRemovalResult result = snapshotRemover.removeSnapshots(request);
 
     assertTrue(result.isSuccessful());
 
@@ -689,7 +698,7 @@ public class DefaultSnapshotRemoverIT
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 0, -1, false);
 
-    assertTrue(defaultNexus.removeSnapshots(request).isSuccessful());
+    assertTrue(snapshotRemover.removeSnapshots(request).isSuccessful());
 
     HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
     expecting.put(
@@ -720,7 +729,7 @@ public class DefaultSnapshotRemoverIT
 
     SnapshotRemovalRequest request = new SnapshotRemovalRequest(snapshots.getId(), 0, -1, false);
 
-    assertTrue(defaultNexus.removeSnapshots(request).isSuccessful());
+    assertTrue(snapshotRemover.removeSnapshots(request).isSuccessful());
 
     HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
     expecting.put("/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.064938-1.pom", Boolean.FALSE);

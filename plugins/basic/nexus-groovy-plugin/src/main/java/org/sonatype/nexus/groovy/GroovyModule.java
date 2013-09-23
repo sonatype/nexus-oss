@@ -10,15 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.groovy;
 
-package org.sonatype.nexus.unpack;
+import javax.inject.Named;
+import javax.script.ScriptEngineFactory;
 
-import org.junit.Test;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 
-public class DummyTest
+/**
+ * Groovy plugin Guice module.
+ *
+ * @since 2.7
+ */
+@Named
+public class GroovyModule
+  extends AbstractModule
 {
-  @Test
-  public void dummy() {
-    // FIXMe: This is here to allow build automation configuration to be uniform, really should put some real tests here.
+  @Override
+  protected void configure() {
+    final GroovyScriptEngineFactory factory = new GroovyScriptEngineFactory();
+
+    bind(GroovyScriptEngineFactory.class)
+        .toInstance(factory);
+
+    bind(ScriptEngineFactory.class)
+        .annotatedWith(Names.named("groovy"))
+        .toInstance(factory);
   }
 }

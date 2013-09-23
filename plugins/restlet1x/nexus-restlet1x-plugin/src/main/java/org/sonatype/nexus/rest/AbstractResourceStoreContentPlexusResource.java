@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -108,9 +109,12 @@ public abstract class AbstractResourceStoreContentPlexusResource
   @Requirement
   private SecuritySystem securitySystem;
 
+  @Requirement
+  private ApplicationStatusSource applicationStatusSource;
+
   @Requirement(role = ArtifactViewProvider.class)
   public Map<String, ArtifactViewProvider> viewProviders;
-
+  
   public AbstractResourceStoreContentPlexusResource() {
     super();
 
@@ -121,10 +125,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
   @VisibleForTesting
   AbstractResourceStoreContentPlexusResource(final SecuritySystem securitySystem,
+                                             final ApplicationStatusSource applicationStatusSource,
                                              final Map<String, ArtifactViewProvider> viewProviders)
   {
-    this();
     this.securitySystem = securitySystem;
+    this.applicationStatusSource = applicationStatusSource;
     this.viewProviders = viewProviders;
   }
 
@@ -451,7 +456,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     // we have a link, dereference it
     // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
     try {
-      return renderItem(context, req, res, variant, store, getNexus().dereferenceLinkItem(item));
+      return renderItem(context, req, res, variant, store, getRepositoryRouter().dereferenceLink(item));
     }
     catch (Exception e) {
       handleException(req, res, e);
@@ -527,7 +532,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
       dataModel.put("request", req);
 
-      dataModel.put("nexusVersion", getNexus().getSystemStatus().getVersion());
+      dataModel.put("nexusVersion", applicationStatusSource.getSystemStatus().getVersion());
 
       // getContentRoot(req) always returns Reference with "/" as last character
       String nexusRoot = getContextRoot(req).toString();

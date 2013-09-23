@@ -11,19 +11,21 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.unpack.internal.ui;
+package org.sonatype.nexus.unpack.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 
+/**
+ * Unpack plugin documentation bundle.
+ */
 @Named
 @Singleton
 public class UnpackDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
-
   @Override
   public String getPluginId() {
     return "nexus-unpack-plugin";
@@ -33,5 +35,4 @@ public class UnpackDocumentationResourceBundle
   public String getDescription() {
     return "Unpack Plugin API";
   }
-
 }

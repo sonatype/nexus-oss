@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
@@ -37,16 +38,24 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 /**
  * The main Nexus application interface.
- *
+ * 
  * @author Jason van Zyl
  * @author cstamas
+ * 
+ * @deprecated This god object is being disassembled, and mainly contains single line methods. Please use the needed
+ *             component directly instead, as using this god object might lead to lookup cycles.
  */
+@Deprecated
 public interface Nexus
     extends ApplicationStatusSource
 {
   // ------------------------------------------------------------------
   // Configuration
 
+  /**
+   * @deprecated Inject {@link NexusConfiguration} or {@link ApplicationConfiguration} component instead.
+   */
+  @Deprecated
   NexusConfiguration getNexusConfiguration();
 
   // ----------------------------------------------------------------------------
@@ -63,6 +72,10 @@ public interface Nexus
       throws NoSuchResourceStoreException, ItemNotFoundException, AccessDeniedException, IllegalOperationException,
              StorageException;
 
+  /**
+   * @deprecated Inject {@link RepositoryRouter} component instead.
+   */
+  @Deprecated
   RepositoryRouter getRootRouter();
 
   // ----------------------------------------------------------------------------
@@ -73,7 +86,9 @@ public interface Nexus
    * Delete a user managed repository
    *
    * @see #deleteRepository(String, boolean)
+   * @deprecated Use {@link NexusConfiguration#deleteRepository(String)} component method instead.
    */
+  @Deprecated
   public void deleteRepository(String id)
       throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
 
@@ -81,7 +96,9 @@ public interface Nexus
    * Delete a repository, can only delete user managed repository unless force == true
    *
    * @throws AccessDeniedException when try to delete a non-user-managed repository and without force enabled
+   * @deprecated Use the {@link NexusConfiguration#deleteRepository(String, boolean)} component method instead.
    */
+  @Deprecated
   public void deleteRepository(String id, boolean force)
       throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
 
@@ -89,6 +106,10 @@ public interface Nexus
   // Maintenance
   // ----------------------------------------------------------------------------
 
+  /**
+   * @deprecated Use {@link NexusConfiguration#getConfigurationAsStreamByKey(String)} component method instead.
+   */
+  @Deprecated
   NexusStreamResponse getConfigurationAsStream()
       throws IOException;
 
@@ -117,14 +138,19 @@ public interface Nexus
 
   /**
    * List the names of files in nexus-work/conf
+   * 
+   * @deprecated Use {@link NexusConfiguration#getConfigurationFiles()} component method instead.
    */
+  @Deprecated
   Map<String, String> getConfigurationFiles();
 
   /**
    * Get the content of configuration file based on the key
    *
    * @param key index in configuration file name list
+   * @deprecated Use {@link NexusConfiguration#getConfigurationAsStreamByKey(String)} component method instead.
    */
+  @Deprecated
   NexusStreamResponse getConfigurationAsStreamByKey(String key)
       throws IOException;
 

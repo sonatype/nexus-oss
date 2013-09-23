@@ -21,6 +21,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -133,11 +134,20 @@ public interface MutableConfiguration
       throws ConfigurationException, IOException;
 
   /**
-   * Removes repository from configuration, checks it's dependants too (ie shadows), updates groups and path mappings
-   * (Routes on UI) if needed.
+   * Drops a user managed repository.
+   *
+   * @see #deleteRepository(String, boolean)
    */
-  void deleteRepository(String id)
-      throws NoSuchRepositoryException, IOException, ConfigurationException;
+  public void deleteRepository(String id)
+      throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
+
+  /**
+   * Drops a repository, can only delete user managed repository unless force parameter is {@code true}.
+   *
+   * @throws AccessDeniedException when try to delete a non-user-managed repository and without force enabled
+   */
+  public void deleteRepository(String id, boolean force)
+      throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
 
   // FIXME: This will be removed: NEXUS-2363 vvvvv
   // CRemoteNexusInstance
