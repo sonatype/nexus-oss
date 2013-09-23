@@ -20,9 +20,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
@@ -33,16 +37,13 @@ import org.codehaus.plexus.util.IOUtil;
  *
  * @author cstamas
  */
-@Component(role = ArtifactPackagingMapper.class)
+@Singleton
+@Named
 public class DefaultArtifactPackagingMapper
     extends AbstractLoggingComponent
     implements ArtifactPackagingMapper
 {
   public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
-
-  private File propertiesFile;
-
-  private volatile Map<String, String> packaging2extensionMapping;
 
   private final static Map<String, String> defaults;
 
@@ -65,6 +66,16 @@ public class DefaultArtifactPackagingMapper
     defaults.put("bundle", "jar");
   }
 
+  private volatile File propertiesFile;
+
+  private volatile Map<String, String> packaging2extensionMapping;
+
+  @Inject
+  public DefaultArtifactPackagingMapper(final NexusConfiguration nexusConfiguration) {
+    setPropertiesFile(new File(nexusConfiguration.getConfigurationDirectory(), MAPPING_PROPERTIES_FILE));
+  }
+
+  @Override
   public void setPropertiesFile(File propertiesFile) {
     this.propertiesFile = propertiesFile;
     this.packaging2extensionMapping = null;
@@ -132,6 +143,7 @@ public class DefaultArtifactPackagingMapper
     return defaults;
   }
 
+  @Override
   public String getExtensionForPackaging(String packaging) {
     if (packaging == null) {
       return "jar";

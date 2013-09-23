@@ -17,42 +17,39 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.NxApplication;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 
 /**
  * This J2EE ServletContextListener gets the Plexus from servlet context, and uses it to lookup, hence "boot" the Nexus
- * component. Finally, it will place Nexus instance into servlet context, to make it available for other filters and
- * servlets. Same will happen with NexusConfiguration instance.
- *
- * @author cstamas
+ * component.
  */
 public class NexusBooterListener
     implements ServletContextListener
 {
+  @Override
   public void contextInitialized(ServletContextEvent event) {
-    ServletContext context = event.getServletContext();
+    final ServletContext context = event.getServletContext();
     try {
-      PlexusContainer plexus = (PlexusContainer) context.getAttribute(PlexusConstants.PLEXUS_KEY);
-
-      Nexus nexus = plexus.lookup(Nexus.class);
-      context.setAttribute(Nexus.class.getName(), nexus);
-
-      NexusConfiguration configuration = plexus.lookup(NexusConfiguration.class);
-      context.setAttribute(NexusConfiguration.class.getName(), configuration);
+      final PlexusContainer plexus = (PlexusContainer) context.getAttribute(PlexusConstants.PLEXUS_KEY);
+      plexus.lookup(NxApplication.class).start();
     }
     catch (Exception e) {
-      throw new IllegalStateException("Could not initialize Nexus", e);
+      throw new IllegalStateException("Could not start Nexus", e);
     }
   }
 
+  @Override
   public void contextDestroyed(ServletContextEvent event) {
-    ServletContext context = event.getServletContext();
-
-    context.removeAttribute(Nexus.class.getName());
-    context.removeAttribute(NexusConfiguration.class.getName());
+    final ServletContext context = event.getServletContext();
+    try {
+      final PlexusContainer plexus = (PlexusContainer) context.getAttribute(PlexusConstants.PLEXUS_KEY);
+      plexus.lookup(NxApplication.class).stop();
+    }
+    catch (Exception e) {
+      throw new IllegalStateException("Could not stop Nexus", e);
+    }
   }
 }

@@ -31,8 +31,6 @@ import org.junit.Test;
 public class GroupUpdateTest
     extends NexusAppTestSupport
 {
-  Nexus nexus;
-
   RepositoryRegistry repoRegistry;
 
   RemoteRepositoryStorage remoteRepositoryStorage;
@@ -43,7 +41,7 @@ public class GroupUpdateTest
   {
     super.setUp();
 
-    nexus = lookup(Nexus.class);
+    startNx();
     repoRegistry = lookup(RepositoryRegistry.class);
     remoteRepositoryStorage = lookup(RemoteRepositoryStorage.class,
         lookup(RemoteProviderHintFactory.class).getDefaultHttpRoleHint());
@@ -63,7 +61,7 @@ public class GroupUpdateTest
     assertTrue(group.getMemberRepositoryIds().size() == 3);
 
     // now delete the proxy
-    nexus.deleteRepository("m1p");
+    nexusConfiguration().deleteRepository("m1p");
 
     assertTrue(group.getMemberRepositoryIds().contains("m1h"));
     assertTrue(group.getMemberRepositoryIds().contains("central-m1"));
@@ -74,7 +72,7 @@ public class GroupUpdateTest
       throws Exception
   {
     Maven1HostedRepositoryTemplate template =
-        (Maven1HostedRepositoryTemplate) nexus.getRepositoryTemplates()
+        (Maven1HostedRepositoryTemplate) getRepositoryTemplates()
             .getTemplates(Maven1HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE).pick();
 
     template.getConfigurableRepository().setIndexable(false);
@@ -88,7 +86,7 @@ public class GroupUpdateTest
       throws Exception
   {
     Maven1ProxyRepositoryTemplate template =
-        (Maven1ProxyRepositoryTemplate) nexus.getRepositoryTemplates()
+        (Maven1ProxyRepositoryTemplate) getRepositoryTemplates()
             .getTemplates(Maven1ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE).pick();
 
     template.getConfigurableRepository().setIndexable(false);
@@ -102,7 +100,7 @@ public class GroupUpdateTest
       throws Exception
   {
     Maven1GroupRepositoryTemplate template =
-        (Maven1GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+        (Maven1GroupRepositoryTemplate) getRepositoryTemplates()
             .getTemplates(Maven1GroupRepositoryTemplate.class).pick();
 
     template.getConfigurableRepository().setId(id);

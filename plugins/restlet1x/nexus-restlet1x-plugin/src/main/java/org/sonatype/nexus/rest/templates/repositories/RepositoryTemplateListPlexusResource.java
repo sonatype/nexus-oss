@@ -79,7 +79,7 @@ public class RepositoryTemplateListPlexusResource
 
     RepositoryListResource repoRes;
 
-    TemplateSet repoTemplates = getNexus().getRepositoryTemplates();
+    TemplateSet repoTemplates = getRepositoryTemplates();
 
     for (Template tmp : repoTemplates) {
       RepositoryTemplate template = (RepositoryTemplate) tmp;

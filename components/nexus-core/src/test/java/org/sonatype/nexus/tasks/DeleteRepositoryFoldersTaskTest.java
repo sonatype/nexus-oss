@@ -43,7 +43,7 @@ public class DeleteRepositoryFoldersTaskTest
 
     task.call();
 
-    File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
+    File workDir = nexusConfiguration().getWorkingDirectory();
     File trashDir = new File(workDir, "trash");
 
     assertFalse(new File(new File(workDir, "storage"), repoId).exists());
@@ -71,7 +71,7 @@ public class DeleteRepositoryFoldersTaskTest
 
     task.call();
 
-    File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
+    File workDir = nexusConfiguration().getWorkingDirectory();
     File trashDir = new File(workDir, "trash");
 
     assertFalse(new File(new File(workDir, "storage"), repoId).exists());

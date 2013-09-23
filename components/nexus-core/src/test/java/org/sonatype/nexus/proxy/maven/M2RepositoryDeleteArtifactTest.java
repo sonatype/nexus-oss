@@ -47,7 +47,7 @@ public class M2RepositoryDeleteArtifactTest
   {
     fillInRepo();
     repositoryRegistry.getRepository("central").setLocalStatus(LocalStatus.OUT_OF_SERVICE);
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     releases.recreateMavenMetadata(new ResourceStoreRequest("/"));
     snapshots.recreateMavenMetadata(new ResourceStoreRequest("/"));

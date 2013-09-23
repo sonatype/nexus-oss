@@ -15,10 +15,11 @@ package org.sonatype.nexus.index;
 
 import java.util.Collection;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.templates.TemplateManager;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
 import junit.framework.Assert;
@@ -34,25 +35,11 @@ import org.junit.Test;
 public class DefaultIndexerManagerIT
     extends AbstractIndexerManagerTest
 {
-
-  private Nexus nexus;
-
   @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
-
-    nexus = lookup(Nexus.class);
-  }
-
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-    nexus = null;
-
-    super.tearDown();
   }
 
   @Test
@@ -121,12 +108,12 @@ public class DefaultIndexerManagerIT
       throws Exception
   {
     Maven2ProxyRepositoryTemplate t =
-        (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplateById("default_proxy_snapshot");
+        (Maven2ProxyRepositoryTemplate) lookup(TemplateManager.class).getTemplate(RepositoryTemplate.class, "default_proxy_snapshot");
     t.getConfigurableRepository().setId("invalidUrlRepo");
     ProxyRepository r = t.create().adaptToFacet(ProxyRepository.class);
     r.setRemoteUrl("http://repository.sonatyp.org/content/repositories/snapshots");
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     indexerManager.reindexRepository("/", r.getId(), true);
   }

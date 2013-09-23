@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -55,7 +54,7 @@ public class Nexus2216GroupValidationTest
 
     try {
       // lookup nexus, this will do all sort of things, amongst them validate the config
-      lookup(Nexus.class);
+      startNx();
 
       RepositoryRegistry repositoryRegistry = lookup(RepositoryRegistry.class);
 

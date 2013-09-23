@@ -101,12 +101,12 @@ public class ConfigurationPlexusResource
     try {
       NexusStreamResponse result;
 
-      if (!getNexus().getConfigurationFiles().containsKey(key)) {
+      if (!getNexusConfiguration().getConfigurationFiles().containsKey(key)) {
         throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "No configuration with key '" + key
             + "' found!");
       }
       else {
-        result = getNexus().getConfigurationAsStreamByKey(key);
+        result = getNexusConfiguration().getConfigurationAsStreamByKey(key);
       }
 
       // TODO: make this real resource being able to be polled (ETag and last modified support)

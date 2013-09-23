@@ -97,7 +97,7 @@ public class DownloadRemoteIndexerManagerIT
     central.setRemoteUrl("http://localhost:" + port);
     central.setRepositoryPolicy(RepositoryPolicy.SNAPSHOT);
 
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration().saveConfiguration();
 
     Thread.sleep(100);
 
