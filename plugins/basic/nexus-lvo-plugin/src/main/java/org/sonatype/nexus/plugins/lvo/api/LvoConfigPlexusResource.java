@@ -94,10 +94,7 @@ public class LvoConfigPlexusResource
         config.disable();
       }
     }
-    catch (IOException e) {
-      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Unable to store lvo configuration", e);
-    }
-    catch (ConfigurationException e) {
+    catch (IOException | ConfigurationException e) {
       throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Unable to store lvo configuration", e);
     }
 
