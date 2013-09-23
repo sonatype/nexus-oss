@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -23,9 +22,9 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -196,7 +195,7 @@ public class FilePrefixSource
     checkNotNull(prefixSource);
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     getPrefixSourceMarshaller().write(prefixSource.readEntries(), bos);
-    putFileItem(new PreparedContentLocator(new ByteArrayInputStream(bos.toByteArray()), "text/plain"));
+    putFileItem(new ByteArrayContentLocator(bos.toByteArray(), "text/plain"));
   }
 
   @Override
@@ -316,6 +315,6 @@ public class FilePrefixSource
   {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     getPrefixSourceMarshaller().writeUnsupported(bos);
-    putFileItem(new PreparedContentLocator(new ByteArrayInputStream(bos.toByteArray()), "text/plain"));
+    putFileItem(new ByteArrayContentLocator(bos.toByteArray(), "text/plain"));
   }
 }

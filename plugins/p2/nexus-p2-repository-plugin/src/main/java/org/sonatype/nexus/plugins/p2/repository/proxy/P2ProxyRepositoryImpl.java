@@ -192,10 +192,10 @@ public class P2ProxyRepositoryImpl
           // The remote repository is a SimpleArtifactRepository with mirrors configured
           getLogger().debug(
               "Repository " + getId() + ": configureMirrors: found single mirrors URL=" + mirrorsURL);
-          final AbstractStorageItem remoteMirrorsItem = getMirrorsItemRemote(mirrorsURL);
+          final StorageFileItem remoteMirrorsItem = getMirrorsItemRemote(mirrorsURL);
           final ContentLocator content =
               new PreparedContentLocator(((StorageFileItem) remoteMirrorsItem).getInputStream(),
-                  "text/xml");
+                  "text/xml", remoteMirrorsItem.getLength());
           mirrorsItem =
               new DefaultStorageFileItem(this, new ResourceStoreRequest(PRIVATE_MIRRORS_PATH),
                   true /* isReadable */, false /* isWritable */, content);
@@ -311,7 +311,7 @@ public class P2ProxyRepositoryImpl
         continue;
       }
 
-      final AbstractStorageItem mirrorsItem = getMirrorsItemRemote(mirrorsURL);
+      final StorageFileItem mirrorsItem = getMirrorsItemRemote(mirrorsURL);
       final Xpp3Dom mirrorsDom = getMirrorsDom((StorageFileItem) mirrorsItem);
       for (final Xpp3Dom mirrorDOM : mirrorsDom.getChildren("mirror")) {
         getLogger().debug("getMirrorsItemRemote: mirrorURL=" + mirrorDOM.getAttribute("url"));
@@ -340,7 +340,6 @@ public class P2ProxyRepositoryImpl
       final DefaultStorageFileItem result =
           new DefaultStorageFileItem(this, new ResourceStoreRequest(PRIVATE_MIRRORS_PATH),
               true /* isReadable */, false /* isWritable */, fileContentLocator);
-      result.setLength(fileContentLocator.getLength());
       return doCacheItem(result);
     }
     finally {
@@ -348,14 +347,17 @@ public class P2ProxyRepositoryImpl
     }
   }
 
-  private AbstractStorageItem getMirrorsItemRemote(final String mirrorsURL)
+  private StorageFileItem getMirrorsItemRemote(final String mirrorsURL)
       throws MalformedURLException, RemoteAccessException, RemoteStorageException, ItemNotFoundException
   {
     final URL url = new URL(mirrorsURL);
     final ResourceStoreRequest request = new ResourceStoreRequest(url.getFile());
     final String baseUrl = getBaseMirrorsURL(url);
     final AbstractStorageItem mirrorsItem = getRemoteStorage().retrieveItem(this, request, baseUrl);
-    return mirrorsItem;
+    if (mirrorsItem instanceof StorageFileItem) {
+      return (StorageFileItem) mirrorsItem;
+    }
+    throw new ItemNotFoundException(ItemNotFoundException.reasonFor(request, this, "URL %s does not contain valid mirrors", mirrorsURL));
   }
 
   private String getBaseMirrorsURL(final URL mirrorsURL) {

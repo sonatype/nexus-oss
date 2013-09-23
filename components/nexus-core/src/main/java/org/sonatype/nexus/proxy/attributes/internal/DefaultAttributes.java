@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Default implementation of Attributes.
- *
+ * 
  * @author cstamas
  * @since 2.0
  */
@@ -145,6 +145,7 @@ public class DefaultAttributes
 
   protected void overlayMap(Map<String, String> map) {
     defaults.putAll(map);
+    defaults.remove(getKeyForAttribute("length")); // since 2.7.0 no length!
   }
 
   @Override
@@ -275,16 +276,6 @@ public class DefaultAttributes
   @Override
   public void setRemoteUrl(final String value) {
     setString(getKeyForAttribute("remoteUrl"), value);
-  }
-
-  @Override
-  public long getLength() {
-    return getLong(getKeyForAttribute("length"), 0);
-  }
-
-  @Override
-  public void setLength(final long value) {
-    setLong(getKeyForAttribute("length"), value);
   }
 
   @Override

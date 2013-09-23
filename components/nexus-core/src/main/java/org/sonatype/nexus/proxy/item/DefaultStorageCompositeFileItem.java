@@ -13,47 +13,45 @@
 
 package org.sonatype.nexus.proxy.item;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
-/**
- * The Class DefaultStorageCompositeFileItem.
- */
+import com.google.common.collect.Lists;
+
 public class DefaultStorageCompositeFileItem
     extends DefaultStorageFileItem
     implements StorageCompositeFileItem
 {
-  private transient List<StorageItem> sources;
+  private final transient List<StorageItem> sources;
 
   public DefaultStorageCompositeFileItem(Repository repository, ResourceStoreRequest request, boolean canRead,
                                          boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources)
   {
     super(repository, request, canRead, canWrite, contentLocator);
-
+    final List<StorageItem> src = Lists.newArrayList();
     if (sources != null) {
-      getSources().addAll(sources);
+      src.addAll(sources);
     }
+    this.sources = Collections.unmodifiableList(src);
   }
 
   public DefaultStorageCompositeFileItem(RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
                                          boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources)
   {
     super(router, request, canRead, canWrite, contentLocator);
-
+    final List<StorageItem> src = Lists.newArrayList();
     if (sources != null) {
-      getSources().addAll(sources);
+      src.addAll(sources);
     }
+    this.sources = Collections.unmodifiableList(src);
   }
 
+  @Override
   public List<StorageItem> getSources() {
-    if (sources == null) {
-      sources = new ArrayList<StorageItem>();
-    }
-
     return sources;
   }
 }

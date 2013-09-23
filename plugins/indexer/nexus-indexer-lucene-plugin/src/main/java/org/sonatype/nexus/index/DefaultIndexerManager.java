@@ -14,7 +14,6 @@
 package org.sonatype.nexus.index;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +51,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.FileContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -77,7 +76,6 @@ import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -1548,14 +1546,10 @@ public class DefaultIndexerManager
   protected void storeIndexItem(Repository repository, File file, IndexingContext context) {
     String path = PUBLISHING_PATH_PREFIX + "/" + file.getName();
 
-    FileInputStream fis = null;
-
     try {
-      fis = new FileInputStream(file);
-
       ResourceStoreRequest request = new ResourceStoreRequest(path);
       DefaultStorageFileItem fItem =
-          new DefaultStorageFileItem(repository, request, true, true, new PreparedContentLocator(fis,
+          new DefaultStorageFileItem(repository, request, true, true, new FileContentLocator(file,
               mimeSupport.guessMimeTypeFromPath(repository.getMimeRulesSource(), file.getAbsolutePath())));
 
       if (context.getTimestamp() == null) {
@@ -1580,9 +1574,6 @@ public class DefaultIndexerManager
     }
     catch (Exception e) {
       logger.error("Cannot store index file " + path, e);
-    }
-    finally {
-      IOUtils.closeQuietly(fis);
     }
   }
 

@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.sonatype.nexus.index.DefaultIndexerManager;
-import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.AbstractContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
@@ -34,11 +34,11 @@ import org.slf4j.LoggerFactory;
  * A content locator to generate archetype catalog. This way, the actual work (search, archetype catalog model fillup
  * from results, converting it to string and flushing it as byte array backed stream) is postponed to very last moment,
  * when the content itself is asked for.
- *
+ * 
  * @author cstamas
  */
 public class ArchetypeContentLocator
-    implements ContentLocator
+    extends AbstractContentLocator
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -55,9 +55,9 @@ public class ArchetypeContentLocator
   private volatile String payload;
 
   public ArchetypeContentLocator(final Repository repository, final String repositoryContentUrl,
-                                 final DefaultIndexerManager nexusIndexer, final MacPlugin macPlugin,
-                                 final ArtifactInfoFilter artifactInfoFilter)
+      final DefaultIndexerManager nexusIndexer, final MacPlugin macPlugin, final ArtifactInfoFilter artifactInfoFilter)
   {
+    super("text/xml", true, UNKNOWN_LENGTH);
     this.repository = repository;
     this.repositoryContentUrl = repositoryContentUrl;
     this.nexusIndexer = nexusIndexer;
@@ -65,16 +65,12 @@ public class ArchetypeContentLocator
     this.artifactInfoFilter = artifactInfoFilter;
   }
 
-  protected synchronized String generateCatalogPayload()
-      throws IOException
-  {
+  protected synchronized String generateCatalogPayload() throws IOException {
     if (payload == null) {
       nexusIndexer.shared(repository, new DefaultIndexerManager.Runnable()
       {
         @Override
-        public void run(IndexingContext context)
-            throws IOException
-        {
+        public void run(IndexingContext context) throws IOException {
           // XXX igorf, this is not called when context == null, but we need to generate an empty catalog
 
           payload = generateCatalogPayload(context);
@@ -85,17 +81,15 @@ public class ArchetypeContentLocator
     return payload;
   }
 
-  private String generateCatalogPayload(IndexingContext context)
-      throws IOException
-  {
+  private String generateCatalogPayload(IndexingContext context) throws IOException {
     final MacRequest req = new MacRequest(repository.getId(), repositoryContentUrl, artifactInfoFilter);
 
     // NEXUS-5216: Warn if indexing context is null (indexable=false) for given repository but continue
     // to return the correct empty catalog
     if (context == null) {
-      logger
-          .info("Archetype Catalog for repository {} is not buildable as it lacks IndexingContext (indexable=false?).",
-              RepositoryStringUtils.getHumanizedNameString(repository));
+      logger.info(
+          "Archetype Catalog for repository {} is not buildable as it lacks IndexingContext (indexable=false?).",
+          RepositoryStringUtils.getHumanizedNameString(repository));
     }
 
     // get the catalog
@@ -108,9 +102,7 @@ public class ArchetypeContentLocator
   }
 
   @Override
-  public InputStream getContent()
-      throws IOException
-  {
+  public InputStream getContent() throws IOException {
     final String payload = generateCatalogPayload();
     if (payload != null) {
       return new ByteArrayInputStream(payload.getBytes("UTF-8"));
@@ -123,15 +115,5 @@ public class ArchetypeContentLocator
       // but repo itself does not have context!
       throw new IOException("Catalog could not be generated, no IndexingContext exists!");
     }
-  }
-
-  @Override
-  public String getMimeType() {
-    return "text/xml";
-  }
-
-  @Override
-  public boolean isReusable() {
-    return true;
   }
 }

@@ -28,16 +28,14 @@ import org.codehaus.plexus.util.FileUtils;
 /**
  * A content locator that is backed by a file. It has ability to create a temporary file for you, and to become
  * "non reusable" locator, when it cleans up the file after it.
- *
+ * 
  * @author cstamas
  * @since 2.1
  */
 public class FileContentLocator
-    implements ContentLocator
+    extends AbstractContentLocator
 {
   private final File file;
-
-  private final String mimeType;
 
   private final boolean deleteOnCloseInput;
 
@@ -45,9 +43,7 @@ public class FileContentLocator
    * Creates a temporary file backed instance, that will be not reusable, once file content is consumed (using
    * {@link #getInputStream()} or {@link #getContent()}).
    */
-  public FileContentLocator(final String mimeType)
-      throws IOException
-  {
+  public FileContentLocator(final String mimeType) throws IOException {
     this(File.createTempFile("nx-tmp-content-locator", "tmp"), mimeType, true);
   }
 
@@ -61,24 +57,22 @@ public class FileContentLocator
 
   /**
    * Creates a file backed instance.
-   *
-   * @param file               the file to be used with this instance.
-   * @param mimeType           the mime type of this instance.
+   * 
+   * @param file the file to be used with this instance.
+   * @param mimeType the mime type of this instance.
    * @param deleteOnCloseInput if {@code true}, the passed in file will be deleted upon consumption (when
-   *                           {@link InputStream#close()} is invoked) on {@link InputStream} got by and of the
-   *                           {@link #getInputStream()} or {@link #getContent()} method. Also, this instance will be
-   *                           marked as
-   *                           "non reusable" (method {@link #isReusable()} will return {@code false}).
+   *          {@link InputStream#close()} is invoked) on {@link InputStream} got by and of the {@link #getInputStream()}
+   *          or {@link #getContent()} method. Also, this instance will be
+   *          marked as
+   *          "non reusable" (method {@link #isReusable()} will return {@code false}).
    */
   public FileContentLocator(final File file, final String mimeType, final boolean deleteOnCloseInput) {
+    super(mimeType, !deleteOnCloseInput, file.length());
     this.file = Preconditions.checkNotNull(file);
-    this.mimeType = Preconditions.checkNotNull(mimeType);
     this.deleteOnCloseInput = deleteOnCloseInput;
   }
 
-  public InputStream getInputStream()
-      throws IOException
-  {
+  public InputStream getInputStream() throws IOException {
     if (deleteOnCloseInput) {
       return new DeleteOnCloseFileInputStream(getFile());
     }
@@ -87,12 +81,11 @@ public class FileContentLocator
     }
   }
 
-  public OutputStream getOutputStream()
-      throws IOException
-  {
+  public OutputStream getOutputStream() throws IOException {
     return new FileOutputStream(getFile());
   }
 
+  @Override
   public long getLength() {
     return getFile().length();
   }
@@ -101,29 +94,15 @@ public class FileContentLocator
     return file;
   }
 
-  public void delete()
-      throws IOException
-  {
+  public void delete() throws IOException {
     FileUtils.forceDelete(getFile());
   }
 
   // ==
 
   @Override
-  public InputStream getContent()
-      throws IOException
-  {
+  public InputStream getContent() throws IOException {
     return getInputStream();
-  }
-
-  @Override
-  public String getMimeType() {
-    return mimeType;
-  }
-
-  @Override
-  public boolean isReusable() {
-    return !deleteOnCloseInput;
   }
 
   // ==
@@ -133,16 +112,12 @@ public class FileContentLocator
   {
     private final File file;
 
-    public DeleteOnCloseFileInputStream(final File file)
-        throws IOException
-    {
+    public DeleteOnCloseFileInputStream(final File file) throws IOException {
       super(new FileInputStream(file));
       this.file = file;
     }
 
-    public void close()
-        throws IOException
-    {
+    public void close() throws IOException {
       super.close();
       FileUtils.forceDelete(file);
     }

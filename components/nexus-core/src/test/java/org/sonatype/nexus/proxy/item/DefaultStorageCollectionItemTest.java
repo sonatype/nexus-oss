@@ -42,7 +42,7 @@ public class DefaultStorageCollectionItemTest
       }
     }).when(repository).createUid("/");
 
-    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(repository, "/", true, true);
+    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(repository, new ResourceStoreRequest("/"), true, true);
     checkAbstractStorageItem(repository, coll, false, "", "/", "/");
   }
 
@@ -73,15 +73,15 @@ public class DefaultStorageCollectionItemTest
     doReturn(result).when(repository).list(Matchers.anyBoolean(), Matchers.isA(StorageCollectionItem.class));
 
     // and now fill in result, since repo is active
-    result.add(new DefaultStorageFileItem(repository, "/a/some/dir/coll/A", true, true, new StringContentLocator(
+    result.add(new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a/some/dir/coll/A"), true, true, new StringContentLocator(
         "A")));
-    result.add(new DefaultStorageFileItem(repository, "/a/some/dir/coll/B", true, true, new StringContentLocator(
+    result.add(new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a/some/dir/coll/B"), true, true, new StringContentLocator(
         "B")));
-    result.add(new DefaultStorageFileItem(repository, "/a/some/dir/coll/C", true, true, new StringContentLocator(
+    result.add(new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a/some/dir/coll/C"), true, true, new StringContentLocator(
         "C")));
 
     DefaultStorageCollectionItem coll =
-        new DefaultStorageCollectionItem(repository, "/a/some/dir/coll", true, true);
+        new DefaultStorageCollectionItem(repository, new ResourceStoreRequest("/a/some/dir/coll"), true, true);
     checkAbstractStorageItem(repository, coll, false, "coll", "/a/some/dir/coll", "/a/some/dir");
 
     Collection<StorageItem> resultItems = coll.list();
@@ -90,7 +90,7 @@ public class DefaultStorageCollectionItemTest
 
   @Test
   public void testVirtualCollectionSimple() {
-    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(router, "/", true, true);
+    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(router, new ResourceStoreRequest("/"), true, true);
     checkAbstractStorageItem(router, coll, true, "", "/", "/");
   }
 
@@ -102,12 +102,12 @@ public class DefaultStorageCollectionItemTest
     doReturn(result).when(router).list(Matchers.isA(ResourceStoreRequest.class));
 
     // and now fill in result, since repo is active
-    result.add(new DefaultStorageFileItem(router, "/a/some/dir/coll/A", true, true,
+    result.add(new DefaultStorageFileItem(router, new ResourceStoreRequest("/a/some/dir/coll/A"), true, true,
         new StringContentLocator("A")));
-    result.add(new DefaultStorageFileItem(router, "/a/some/dir/coll/B", true, true,
+    result.add(new DefaultStorageFileItem(router, new ResourceStoreRequest("/a/some/dir/coll/B"), true, true,
         new StringContentLocator("B")));
 
-    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(router, "/and/another/coll", true, true);
+    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(router, new ResourceStoreRequest("/and/another/coll"), true, true);
     checkAbstractStorageItem(router, coll, true, "coll", "/and/another/coll", "/and/another");
 
     Collection<StorageItem> items = coll.list();
