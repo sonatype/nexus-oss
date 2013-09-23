@@ -24,23 +24,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.feeds.record.NexusItemInfo;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.NexusTimeline;
 
 import com.google.common.base.Predicate;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A feed recorder that uses DefaultNexus to record feeds.
- *
- * @author cstamas
  */
-@Component(role = FeedRecorder.class)
+@Named
+@Singleton
 public class DefaultFeedRecorder
     implements FeedRecorder
 {
@@ -108,14 +111,20 @@ public class DefaultFeedRecorder
   /**
    * The timeline for persistent events and feeds.
    */
-  @Requirement
-  private NexusTimeline nexusTimeline;
+  private final NexusTimeline nexusTimeline;
 
   /**
    * The Feed filter (will checks for user access )
    */
-  @Requirement
-  private FeedArtifactEventFilter feedArtifactEventFilter;
+  private final FeedArtifactEventFilter feedArtifactEventFilter;
+
+  @Inject
+  public DefaultFeedRecorder(final NexusTimeline nexusTimeline,
+                             final FeedArtifactEventFilter feedArtifactEventFilter)
+  {
+    this.nexusTimeline = checkNotNull(nexusTimeline);
+    this.feedArtifactEventFilter = checkNotNull(feedArtifactEventFilter);
+  }
 
   protected DateFormat getDateFormat() {
     return new SimpleDateFormat(EVENT_DATE_FORMAT);

@@ -15,19 +15,20 @@ package org.sonatype.nexus.feeds.record;
 
 import java.util.HashSet;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
-
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author Juven Xu
  */
-@Component(role = EventInspector.class, hint = "ConfigurationChangeEvent")
+@Named
+@Singleton
 public class ConfigurationChangeEventInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector

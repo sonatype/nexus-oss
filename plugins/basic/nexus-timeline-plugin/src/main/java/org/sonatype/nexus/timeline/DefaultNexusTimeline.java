@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
@@ -26,16 +30,14 @@ import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
 import com.google.common.base.Predicate;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This is the "real thing": implementation backed by spice Timeline. Until now, it was in Core, but it kept many
@@ -44,34 +46,38 @@ import org.slf4j.LoggerFactory;
  * @author cstamas
  * @since 2.0
  */
-@Component(role = NexusTimeline.class)
+@Named
+@Singleton
 public class DefaultNexusTimeline
-    implements NexusTimeline, Initializable, Startable
+    implements NexusTimeline, Startable
 {
 
   private static final String TIMELINE_BASEDIR = "timeline";
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private Timeline timeline;
+  private final Timeline timeline;
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
-  public void initialize()
-      throws InitializationException
+  @Inject
+  public DefaultNexusTimeline(final Timeline timeline,
+                              final ApplicationConfiguration applicationConfiguration)
   {
+    this.timeline = checkNotNull(timeline);
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+
     try {
       logger.info("Initializing Nexus Timeline...");
 
       moveLegacyTimeline();
     }
     catch (IOException e) {
-      throw new InitializationException("Unable to move legacy Timeline!", e);
+      throw new RuntimeException("Unable to move legacy Timeline!", e);
     }
   }
 
+  // FIXME: Unsure what the proper resolution is for Startable
   public void start()
       throws StartingException
   {

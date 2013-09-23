@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -24,12 +25,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -40,9 +39,9 @@ import org.restlet.data.Request;
  * @author cstamas
  * @author dip
  */
-@Component(role = PlexusResource.class, hint = "feed")
 @Path("/feeds/{" + FeedPlexusResource.FEED_KEY + "}")
 @Produces({"application/rss+xml", "application/atom+xml", "text/xml"})
+@Singleton
 public class FeedPlexusResource
     extends AbstractFeedPlexusResource
 {

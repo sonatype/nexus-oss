@@ -13,10 +13,12 @@
 
 package org.sonatype.nexus.rest.feeds.sources;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -24,7 +26,8 @@ import org.codehaus.plexus.util.StringUtils;
  *
  * @author Juven Xu
  */
-@Component(role = SyndEntryBuilder.class, hint = "artifact")
+@Named("artifact")
+@Singleton
 public class NexusArtifactEventEntryBuilder
     extends AbstractNexusItemEventEntryBuilder
 {

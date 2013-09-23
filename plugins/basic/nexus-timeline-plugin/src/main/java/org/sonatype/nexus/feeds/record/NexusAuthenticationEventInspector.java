@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.feeds.record;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -20,22 +24,26 @@ import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = EventInspector.class, hint = "NexusAuthenticationEventInspector")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class NexusAuthenticationEventInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector
 {
-  @Requirement
-  private NexusConfiguration nexusConfiguration;
+  private final NexusConfiguration nexusConfiguration;
 
   private volatile NexusAuthenticationEvent lastNexusAuthenticationEvent;
+
+  @Inject
+  public NexusAuthenticationEventInspector(final NexusConfiguration nexusConfiguration) {
+    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+  }
 
   @Override
   public boolean accepts(Event<?> evt) {
