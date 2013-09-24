@@ -40,12 +40,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbstractLdapAuthenticatingRealm
     extends AbstractLdapRealm
 {
+  public static final String NAME = "LdapAuthenticatingRealm";
+
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final LdapManager ldapManager;
 
   public AbstractLdapAuthenticatingRealm(final LdapManager ldapManager) {
-    setName("LdapAuthenticatingRealm");
+    setName(NAME);
     this.ldapManager = checkNotNull(ldapManager);
   }
 

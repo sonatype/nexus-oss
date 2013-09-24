@@ -15,18 +15,21 @@ package org.sonatype.security.ldap.realms.persist;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-@Singleton
-@Named("UsersGroupAuthTestLdapConfiguration")
+/**
+ * Must NOT be singleton!
+ */
+@Named(UsersGroupAuthTestLdapConfiguration.NAME)
 public class UsersGroupAuthTestLdapConfiguration
     extends DefaultLdapConfiguration
 {
+  public static final String NAME = "UsersGroupAuthTestLdapConfiguration";
+
   private LdapAuthConfiguration ldapAuthConfiguration;
 
   private CConnectionInfo connectionInfo;

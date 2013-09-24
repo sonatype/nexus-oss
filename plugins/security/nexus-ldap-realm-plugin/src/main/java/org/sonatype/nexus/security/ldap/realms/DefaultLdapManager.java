@@ -19,6 +19,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.ldap.LdapAuthenticator;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
@@ -42,51 +46,56 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = LdapManager.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class DefaultLdapManager
-    implements LdapManager, Initializable, Disposable
+    implements LdapManager
 {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private LdapAuthenticator ldapAuthenticator;
+  private final LdapAuthenticator ldapAuthenticator;
 
-  @Requirement
-  private LdapUserDAO ldapUserManager;
+  private final LdapUserDAO ldapUserManager;
 
-  @Requirement
-  private LdapGroupDAO ldapGroupManager;
+  private final LdapGroupDAO ldapGroupManager;
 
-  @Requirement
-  private LdapConfiguration ldapConfiguration;
-
-  @Requirement
-  private EventBus eventBus;
+  private final LdapConfiguration ldapConfiguration;
 
   private LdapConnector ldapConnector;
 
+  @Inject
+  public DefaultLdapManager(final LdapAuthenticator ldapAuthenticator, final LdapUserDAO ldapUserManager,
+      final LdapGroupDAO ldapGroupManager, final LdapConfiguration ldapConfiguration, final EventBus eventBus)
+  {
+    this.ldapAuthenticator = checkNotNull(ldapAuthenticator);
+    this.ldapUserManager = checkNotNull(ldapUserManager);
+    this.ldapGroupManager = checkNotNull(ldapGroupManager);
+    this.ldapConfiguration = checkNotNull(ldapConfiguration);
+    checkNotNull(eventBus).register(this);
+  }
+
+  @Override
   public SortedSet<String> getAllGroups()
       throws LdapDAOException
   {
     return this.getLdapConnector().getAllGroups();
   }
 
+  @Override
   public SortedSet<LdapUser> getAllUsers()
       throws LdapDAOException
   {
     return this.getLdapConnector().getAllUsers();
   }
 
+  @Override
   public String getGroupName(String groupId)
       throws LdapDAOException,
              NoSuchLdapGroupException
@@ -94,6 +103,7 @@ public class DefaultLdapManager
     return this.getLdapConnector().getGroupName(groupId);
   }
 
+  @Override
   public LdapUser getUser(String username)
       throws NoSuchLdapUserException,
              LdapDAOException
@@ -101,6 +111,7 @@ public class DefaultLdapManager
     return this.getLdapConnector().getUser(username);
   }
 
+  @Override
   public Set<String> getUserRoles(String userId)
       throws LdapDAOException,
              NoLdapUserRolesFoundException
@@ -108,12 +119,14 @@ public class DefaultLdapManager
     return this.getLdapConnector().getUserRoles(userId);
   }
 
+  @Override
   public SortedSet<LdapUser> getUsers(int userCount)
       throws LdapDAOException
   {
     return this.getLdapConnector().getUsers(userCount);
   }
 
+  @Override
   public SortedSet<LdapUser> searchUsers(String username)
       throws LdapDAOException
   {
@@ -181,6 +194,7 @@ public class DefaultLdapManager
     return defaultLdapContextFactory;
   }
 
+  @Override
   public LdapUser authenticateUser(String userId, String password) throws AuthenticationException {
     try {
       LdapUser ldapUser = this.getUser(userId);
@@ -219,15 +233,4 @@ public class DefaultLdapManager
     // clear the connectors
     this.ldapConnector = null;
   }
-
-  public void initialize()
-      throws InitializationException
-  {
-    this.eventBus.register(this);
-  }
-
-  public void dispose() {
-    this.eventBus.unregister(this);
-  }
-
 }
