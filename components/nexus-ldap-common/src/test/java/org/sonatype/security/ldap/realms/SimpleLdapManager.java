@@ -17,6 +17,10 @@ import java.net.MalformedURLException;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.ldap.LdapAuthenticator;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
@@ -34,51 +38,62 @@ import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.tools.LdapURL;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = LdapManager.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class SimpleLdapManager
     implements LdapManager
 {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private LdapAuthenticator ldapAuthenticator;
+  private final LdapAuthenticator ldapAuthenticator;
 
-  @Requirement
-  private LdapUserDAO ldapUserManager;
+  private final LdapUserDAO ldapUserManager;
 
-  @Requirement
-  private LdapGroupDAO ldapGroupManager;
+  private final LdapGroupDAO ldapGroupManager;
 
-  @Requirement
-  private LdapConfiguration ldapConfiguration;
+  private final LdapConfiguration ldapConfiguration;
 
   private LdapConnector ldapManagerStrategy;
 
+  @Inject
+  public SimpleLdapManager(LdapAuthenticator ldapAuthenticator, LdapUserDAO ldapUserManager,
+      LdapGroupDAO ldapGroupManager, LdapConfiguration ldapConfiguration)
+  {
+    this.ldapAuthenticator = checkNotNull(ldapAuthenticator);
+    this.ldapUserManager = checkNotNull(ldapUserManager);
+    this.ldapGroupManager = checkNotNull(ldapGroupManager);
+    this.ldapConfiguration = checkNotNull(ldapConfiguration);
+  }
+
+  @Override
   public SortedSet<String> getAllGroups()
       throws LdapDAOException
   {
     return this.getLdapManagerConnector().getAllGroups();
   }
 
+  @Override
   public SortedSet<LdapUser> getAllUsers()
       throws LdapDAOException
   {
     return this.getLdapManagerConnector().getAllUsers();
   }
 
+  @Override
   public String getGroupName(String groupId)
       throws LdapDAOException, NoSuchLdapGroupException
   {
     return this.getLdapManagerConnector().getGroupName(groupId);
   }
 
+  @Override
   public LdapUser getUser(String username)
       throws NoSuchLdapUserException,
              LdapDAOException
@@ -86,18 +101,21 @@ public class SimpleLdapManager
     return this.getLdapManagerConnector().getUser(username);
   }
 
+  @Override
   public Set<String> getUserRoles(String userId)
       throws LdapDAOException, NoLdapUserRolesFoundException
   {
     return this.getLdapManagerConnector().getUserRoles(userId);
   }
 
+  @Override
   public SortedSet<LdapUser> getUsers(int userCount)
       throws LdapDAOException
   {
     return this.getLdapManagerConnector().getUsers(userCount);
   }
 
+  @Override
   public SortedSet<LdapUser> searchUsers(String username)
       throws LdapDAOException
   {
@@ -158,6 +176,7 @@ public class SimpleLdapManager
     return defaultLdapContextFactory;
   }
 
+  @Override
   public LdapUser authenticateUser(String userId, String password) throws AuthenticationException {
     try {
       LdapUser ldapUser = this.getUser(userId);
