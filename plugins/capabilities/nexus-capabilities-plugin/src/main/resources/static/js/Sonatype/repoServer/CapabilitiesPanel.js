@@ -17,7 +17,7 @@
 /*global Ext, Sonatype, FormFieldGenerator, FormFieldFactory, FormFieldExporter, FormFieldImporter, Nexus*/
 /*jslint newcap:true*/
 
-define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons','nexus/siesta'], function() {
+define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons','Nexus/siesta'], function() {
 
 var CAPABILITIES_SERVICE_PATH = Nexus.siesta.basePath + '/capabilities',
     CAPABILITY_TYPES_SERVICE_PATH = Nexus.siesta.basePath + '/capabilities/types',
