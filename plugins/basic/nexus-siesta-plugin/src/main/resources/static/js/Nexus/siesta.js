@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global NX, Sonatype, Ext*/
+/*global NX, Sonatype*/
 
 NX.define('Nexus.siesta', {
   singleton: true,
