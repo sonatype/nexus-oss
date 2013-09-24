@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.feeds.record;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,7 +24,6 @@ import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -34,7 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
-@Typed(EventInspector.class)
 public class NexusAuthenticationEventInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector
