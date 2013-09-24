@@ -15,6 +15,10 @@ package org.sonatype.nexus.email;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
@@ -35,18 +39,18 @@ import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguratio
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = NexusEmailer.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultNexusEmailer
     extends AbstractConfigurable
     implements NexusEmailer, Startable
 {
-
   private static final Logger LOG = LoggerFactory.getLogger(DefaultNexusEmailer.class);
 
   /**
@@ -59,20 +63,29 @@ public class DefaultNexusEmailer
    */
   private static final String X_MESSAGE_SENDER_HEADER = "X-EMailer-Mail-Sender";
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
-  @Requirement
-  private GlobalRestApiSettings globalRestApiSettings;
+  private final GlobalRestApiSettings globalRestApiSettings;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
-  @Requirement
-  private EMailer eMailer;
+  private final EMailer eMailer;
 
-  @Requirement(role = SmtpSessionParametersCustomizer.class)
-  private List<SmtpSessionParametersCustomizer> customizers;
+  private final List<SmtpSessionParametersCustomizer> customizers;
+
+  @Inject
+  public DefaultNexusEmailer(final ApplicationConfiguration applicationConfiguration,
+                             final GlobalRestApiSettings globalRestApiSettings,
+                             final ApplicationStatusSource applicationStatusSource,
+                             final EMailer eMailer,
+                             final List<SmtpSessionParametersCustomizer> customizers)
+  {
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.eMailer = checkNotNull(eMailer);
+    this.customizers = checkNotNull(customizers);
+  }
 
   // ==
 
