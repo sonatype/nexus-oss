@@ -19,12 +19,12 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.record.NexusAuthenticationEventInspector;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,7 +74,7 @@ public class NexusAuthenticationEventInspectorTest
     underTest.inspect(naeFailed);
 
     // total 11 events "fired", but 3 recorded due to "similarity filtering"
-    MatcherAssert.assertThat(feedRecorder.getReceivedEventCount(), CoreMatchers.equalTo(expected));
+    assertThat(feedRecorder.getReceivedEventCount(), is(expected));
   }
 
   @Test
