@@ -14,6 +14,7 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -372,9 +373,15 @@ public class SearchMessageUtil
     String entityText;
     try {
       response =
-          RequestFacade.sendMessage("content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
+          RequestFacade.sendMessage("service/local/repositories/" + repositoryId + "/content/" + itemPath + "?describe=info",
               Method.GET, new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML));
-      entityText = response.getEntity().getText();
+      entityText = response.getEntity().getText(); // to make Restlet response buffer it
+      if (response.getStatus().getCode() == Status.REDIRECTION_FOUND.getCode()) {
+        // follow redirection but only ONCE
+        RequestFacade.releaseResponse(response);
+        response = RequestFacade.sendMessage(new URL(response.getLocationRef().toString()), Method.GET, new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML));
+        entityText = response.getEntity().getText(); // to make Restlet response buffer it
+      }
       assertThat(response, isSuccessful());
     }
     finally {

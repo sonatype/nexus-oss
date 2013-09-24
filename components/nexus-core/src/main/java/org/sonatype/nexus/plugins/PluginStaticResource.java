@@ -88,6 +88,9 @@ public final class PluginStaticResource
   }
 
   public Long getLastModified() {
+    if (!shouldCache) {
+      return System.currentTimeMillis();
+    }
     try {
       final URLConnection urlConn = resourceURL.openConnection();
       if (urlConn instanceof JarURLConnection) {

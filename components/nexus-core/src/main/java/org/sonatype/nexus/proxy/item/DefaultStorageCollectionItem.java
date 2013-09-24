@@ -25,86 +25,41 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
- * The Class DefaultStorageCollectionItem.
+ * Default implementation of {@link StorageCollectionItem}.
  */
 public class DefaultStorageCollectionItem
     extends AbstractStorageItem
     implements StorageCollectionItem
 {
 
-  /**
-   * The Constant serialVersionUID.
-   */
-  private static final long serialVersionUID = -7329636330511885938L;
-
-  /**
-   * Instantiates a new default storage collection item.
-   *
-   * @param repository the repository
-   * @param path       the path
-   * @param canRead    the can read
-   * @param canWrite   the can write
-   */
   public DefaultStorageCollectionItem(Repository repository, ResourceStoreRequest request, boolean canRead,
-                                      boolean canWrite)
+      boolean canWrite)
   {
     super(repository, request, canRead, canWrite);
   }
 
-  /**
-   * Shotuct method.
-   *
-   * @deprecated supply resourceStoreRequest always
-   */
-  public DefaultStorageCollectionItem(Repository repository, String path, boolean canRead, boolean canWrite) {
-    this(repository, new ResourceStoreRequest(path, true, false), canRead, canWrite);
-  }
-
-  /**
-   * Instantiates a new default storage collection item.
-   *
-   * @param router   the router
-   * @param path     the path
-   * @param virtual  the virtual
-   * @param canRead  the can read
-   * @param canWrite the can write
-   */
   public DefaultStorageCollectionItem(RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-                                      boolean canWrite)
+      boolean canWrite)
   {
     super(router, request, canRead, canWrite);
   }
 
-  /**
-   * Shortcut method.
-   *
-   * @deprecated supply resourceStoreRequest always
-   */
-  public DefaultStorageCollectionItem(RepositoryRouter router, String path, boolean canRead, boolean canWrite) {
-    this(router, new ResourceStoreRequest(path, true, false), canRead, canWrite);
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see org.sonatype.nexus.item.StorageCollectionItem#list()
-   */
-  public Collection<StorageItem> list()
-      throws AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException, ItemNotFoundException,
-             StorageException
+  @Override
+  public Collection<StorageItem> list() throws AccessDeniedException, NoSuchResourceStoreException,
+      IllegalOperationException, ItemNotFoundException, StorageException
   {
     if (isVirtual()) {
       return getStore().list(getResourceStoreRequest());
     }
     else {
       Repository repo = getRepositoryItemUid().getRepository();
-
       Collection<StorageItem> result = repo.list(false, this);
-
       correctPaths(result);
-
       return result;
     }
   }
+
+  // ==
 
   /**
    * This method "normalizes" the paths back to the "level" from where the original item was requested.
@@ -122,8 +77,8 @@ public class DefaultStorageCollectionItem
 
   // --
 
+  @Override
   public String toString() {
     return String.format("%s (coll)", super.toString());
   }
-
 }

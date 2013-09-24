@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 
@@ -71,6 +72,11 @@ public class ValuesCapabilityDescriptor
         validators().value().validUri(TYPE, "uri"),
         validators().value().validUrl(TYPE, "url")
     );
+  }
+
+  @Override
+  public Validator validator(final CapabilityIdentity id) {
+    return validator();
   }
 
 }

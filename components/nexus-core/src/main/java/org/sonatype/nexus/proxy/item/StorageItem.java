@@ -13,11 +13,12 @@
 
 package org.sonatype.nexus.proxy.item;
 
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
  * The Interface StorageItem, a top of the item abstraction.
@@ -25,188 +26,143 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 public interface StorageItem
 {
   /**
-   * The request.
+   * The request used to retrieve this item.
    */
   ResourceStoreRequest getResourceStoreRequest();
 
   /**
-   * Gets the repository item uid from where originates item.
-   *
-   * @return the repository item uid
+   * Gets the repository item UID of this item, pointing to repository and path from where originates this item. Note:
+   * not all items have UID! See {@link #isVirtual()}.
    */
   RepositoryItemUid getRepositoryItemUid();
 
   /**
-   * Set the repository item uid.
+   * Sets the repository item UID.
    */
   void setRepositoryItemUid(RepositoryItemUid repositoryItemUid);
 
   /**
-   * Gets the repository id from where originates item.
-   *
-   * @return the repository id
+   * Gets the repository ID from where originates item. Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   String getRepositoryId();
 
   /**
-   * Gets the creation time.
-   *
-   * @return the created
+   * Gets the item creation timestamp. Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   long getCreated();
 
   /**
-   * Gets the modification time.
-   *
-   * @return the modified
+   * Gets the item modification timestamp. Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   long getModified();
 
   /**
-   * Gets the stored locally time.
-   *
+   * Gets the timestamp when item was stored in local storage. Shortcut method (uses
+   * {@link #getRepositoryItemAttributes()}).
+   * 
    * @return the stored locally
    */
   long getStoredLocally();
 
   /**
-   * Sets the stored locally time.
-   *
-   * @return the stored locally
+   * Sets the timestamp when item was stored in local storage. Shortcut method (uses
+   * {@link #getRepositoryItemAttributes()}).
    */
   void setStoredLocally(long ts);
 
   /**
-   * Gets the remote checked.
-   *
-   * @return the remote checked
+   * Gets the timestamp when item was last remotely checked (remote storage consulted for newer version). Shortcut
+   * method (uses {@link #getRepositoryItemAttributes()}).
    */
   long getRemoteChecked();
 
   /**
-   * Sets the remote checked.
-   *
-   * @return the remote checked
+   * Sets the timestamp when item was last remotely checked. Shortcut method (uses
+   * {@link #getRepositoryItemAttributes()}).
    */
   void setRemoteChecked(long ts);
 
   /**
-   * Gets the last requested.
-   *
-   * @return time when it was last served
+   * Gets the timestamp when item was last requested externally (from a client, not from internal task, see
+   * {@link ResourceStoreRequest#isExternal()}). Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   long getLastRequested();
 
   /**
-   * Sets the last requested.
-   *
-   * @return time when it was last served
+   * Sets the timestamp when item was last requested externally. Shortcut method (uses
+   * {@link #getRepositoryItemAttributes()}).
    */
   void setLastRequested(long ts);
 
   /**
-   * Checks if is virtual.
-   *
-   * @return true, if is virtual
+   * Returns {@code true} if item is "virtual". Virtual items have no backing repository (for example item coming from a
+   * {@link RepositoryRouter}, a path that is not deep enough to dive into any repository), hence, they have no UIDs
+   * either ({@link #getRepositoryItemUid()} returns {@code null}. Still, they have {@link #getPath()} and might even
+   * have content!
    */
   boolean isVirtual();
 
   /**
-   * Checks if is readable.
-   *
-   * @return true, if is readable
+   * Returns {@code true} if item is readable. Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   boolean isReadable();
 
   /**
-   * Checks if is writable.
-   *
-   * @return true, if is writable
+   * Returns {@code true} if item is writable. Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   boolean isWritable();
 
   /**
-   * Returns true if the item is expired.
+   * Returns {@code true} if item is expired. This flag has effect only in {@link ProxyRepository}s, and will make
+   * item's proxy repository to re-check remotely for existence of a newer version when this item is being retrieved
+   * from it. Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   boolean isExpired();
 
   /**
-   * Sets if the item is expired.
+   * Sets expired flag on item, see {@link #isExpired()}. Shortcut method (uses {@link #getRepositoryItemAttributes()}).
    */
   void setExpired(boolean expired);
 
   /**
-   * Gets the path.
-   *
-   * @return the path
+   * Returns the item path, that is <b>not the same as path returned by UID</b> got from {@link #getRepositoryItemUid()}
+   * ! The path depends and changes, depending from where was it retrieved, while {@link RepositoryItemUid#getPath()} is
+   * immutable! If this item was retrieved over {@link RepositoryRouter}, it will contain all the first and second level
+   * selector path elements (for example "/repositories/repo-foo"). In case item is retrieved from {@link Repository}
+   * instance directly, then this method return value usually equals to the UID path, but does not have to. Shortcut
+   * method (uses {@link #getRepositoryItemAttributes()}).
    */
   String getPath();
 
   /**
-   * Gets the name.
-   *
-   * @return the name
+   * Returns the item name (last path element in path returned by {@link #getPath()}).
    */
   String getName();
 
   /**
-   * Gets the parent path.
-   *
-   * @return the parent path
+   * Returns the item parent path (all but last path element in path returned by {@link #getPath()}.
    */
   String getParentPath();
 
   /**
-   * Gets the remote url.
-   *
-   * @return the remote url
+   * Returns this items remote URL (full URL from where this item was proxied), if item originates from a
+   * {@link ProxyRepository}, {@code null} otherwise.
    */
   String getRemoteUrl();
 
   /**
-   * Gets the user attributes. These are saved and persisted.
-   *
-   * @return the attributes
-   * @deprecated Use {@link #getRepositoryItemAttributes()} instead! While this method still returns a mutable map
-   *             (a map "view" of {@link Attributes} returned by {@link #getRepositoryItemAttributes()}), the Map
-   *             mutation
-   *             over iterators (key, value or entry-set) is not implemented and will yield in runtime exception!
-   */
-  @Deprecated
-  Map<String, String> getAttributes();
-
-  /**
-   * Returns the item attributes. They are persisted and share lifecycle together with item.
-   *
-   * @return the item attributes
+   * Returns the item attributes. Item attributes are persisted, and they share same lifecycle as the item's content in
+   * Nexus (they get created when item is deployed, and they are deleted when item is deleted from Nexus).
    */
   Attributes getRepositoryItemAttributes();
 
   /**
-   * Gets the item context. It is living only during item processing, it is not stored.
-   *
-   * @return the attributes
+   * Gets the item context. Item context, similarly as request context (see
+   * {@link ResourceStoreRequest#getRequestContext()} is not persisted, and it exists only during existence of the item
+   * instance. This item's context has parent set to request's context used to retrieve it, meaning in the moment of
+   * creation of this instance those share same content, but some code might modify this context, as multiple items
+   * might share same request context (like dereferencing links, where one request generates a series of retrievals to
+   * find the non-link target).
    */
   RequestContext getItemContext();
-
-  /**
-   * Overlay.
-   *
-   * @param item the item
-   * @deprecated This method is for internal use only. You really don't want to use this method, but to
-   *             modify Attributes with {@link Attributes#get(String)} and {@link Attributes#put(String, String)}
-   *             instead. See {@link Attributes}.
-   */
-  @Deprecated
-  void overlay(StorageItem item);
-
-  /**
-   * Returns the generation of the attributes. For Nexus internal use only!
-   */
-  int getGeneration();
-
-  /**
-   * Increments the generation of the attributes. For Nexus internal use only!
-   */
-  void incrementGeneration();
 }

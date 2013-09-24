@@ -61,6 +61,7 @@ import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.NotFoundReasoning;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
+import org.sonatype.nexus.web.Constants;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.security.SecuritySystem;
 
@@ -99,7 +100,7 @@ import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 public abstract class AbstractResourceStoreContentPlexusResource
     extends AbstractNexusPlexusResource
 {
-  public static final String IS_DESCRIBE_PARAMETER = "describe";
+  public static final String IS_DESCRIBE_PARAMETER = Constants.REQ_QP_IS_DESCRIBE_PARAMETER;
 
   public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
 

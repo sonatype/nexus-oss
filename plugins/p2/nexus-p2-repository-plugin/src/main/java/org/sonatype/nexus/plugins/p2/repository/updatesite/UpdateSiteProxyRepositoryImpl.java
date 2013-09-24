@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.FileContentLocator;
@@ -165,8 +164,8 @@ public class UpdateSiteProxyRepositoryImpl
 
       try {
         oldSha1 =
-            getLocalStorage().retrieveItem(this, request).getAttributes().get(
-                DigestCalculatingInspector.DIGEST_SHA1_KEY);
+            getLocalStorage().retrieveItem(this, request).getRepositoryItemAttributes().get(
+                StorageFileItem.DIGEST_SHA1_KEY);
       }
       catch (final ItemNotFoundException e) {
         // it's okay
@@ -175,7 +174,7 @@ public class UpdateSiteProxyRepositoryImpl
       final StorageFileItem siteItem = (StorageFileItem) doRetrieveRemoteItem(request);
 
       if (!force && oldSha1 != null
-          && oldSha1.equals(siteItem.getAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY))) {
+          && oldSha1.equals(siteItem.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY))) {
         return;
       }
       site = UpdateSite.read(siteItem.getInputStream());
@@ -256,7 +255,6 @@ public class UpdateSiteProxyRepositoryImpl
             source, getMimeSupport().guessMimeTypeFromPath(source.getName())));
     file.setModified(source.lastModified());
     file.setCreated(source.lastModified());
-    file.setLength(source.length());
 
     storeItem(false, file);
   }

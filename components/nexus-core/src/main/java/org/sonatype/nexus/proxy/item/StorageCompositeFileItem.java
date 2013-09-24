@@ -14,7 +14,7 @@
 package org.sonatype.nexus.proxy.item;
 
 /**
- * The Interface StorageFileItem.
+ * A file item (have content) that is composed from multiple other items.
  */
 public interface StorageCompositeFileItem
     extends StorageFileItem, StorageCompositeItem

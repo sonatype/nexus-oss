@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreUpdate;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageNotFoundItem;
@@ -654,7 +655,7 @@ public abstract class AbstractRepository
 
     DefaultStorageFileItem fItem =
         new DefaultStorageFileItem(this, request, true, true, new PreparedContentLocator(is,
-            getMimeSupport().guessMimeTypeFromPath(getMimeRulesSource(), request.getRequestPath())));
+            getMimeSupport().guessMimeTypeFromPath(getMimeRulesSource(), request.getRequestPath()), ContentLocator.UNKNOWN_LENGTH));
 
     if (userAttributes != null) {
       fItem.getRepositoryItemAttributes().putAll(userAttributes);
@@ -837,8 +838,7 @@ public abstract class AbstractRepository
       if (StorageFileItem.class.isAssignableFrom(item.getClass())) {
         try {
           DefaultStorageFileItem target =
-              new DefaultStorageFileItem(this, to, true, true, new PreparedContentLocator(
-                  ((StorageFileItem) item).getInputStream(), ((StorageFileItem) item).getMimeType()));
+              new DefaultStorageFileItem(this, to, true, true, ((StorageFileItem) item).getContentLocator());
 
           target.getItemContext().putAll(item.getItemContext());
 
