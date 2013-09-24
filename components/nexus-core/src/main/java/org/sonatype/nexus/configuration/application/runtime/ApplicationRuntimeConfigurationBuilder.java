@@ -19,15 +19,12 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * A component to be slimmed! Actually, it is a "factory" (backed by Plexus) that creates repo and other instances. It
- * should realy onto plexus as much can.
- *
- * @author cstamas
+ * A factory component for {@link Repository} instances.
  */
 public interface ApplicationRuntimeConfigurationBuilder
 {
-  Repository createRepositoryFromModel(Configuration configuration, CRepository repoConf)
-      throws ConfigurationException;
+  Repository createRepositoryFromModel(Configuration configuration, Class<? extends Repository> type, String name,
+      CRepository repoConf) throws ConfigurationException;
 
   void releaseRepository(Repository repository, Configuration configuration, CRepository repoConf)
       throws ConfigurationException;

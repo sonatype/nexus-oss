@@ -491,14 +491,6 @@ public class DefaultNexusConfiguration
   }
 
   @Override
-  @Deprecated
-  public Repository createRepositoryFromModel(CRepository repository)
-      throws ConfigurationException
-  {
-    return runtimeConfigurationBuilder.createRepositoryFromModel(getConfigurationModel(), repository);
-  }
-
-  @Override
   public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors() {
     return Collections.unmodifiableList(scheduledTaskDescriptors);
   }
@@ -740,10 +732,24 @@ public class DefaultNexusConfiguration
   protected Repository instantiateRepository(final Configuration configuration, final CRepository repositoryModel)
       throws ConfigurationException
   {
-    checkRepositoryMaxInstanceCountForCreation(repositoryModel);
+    try {
+      // core realm will search child/plugin realms too
+      final Class<Repository> klazz = (Class<Repository>) getClass().forName(repositoryModel.getProviderRole());
+      return instantiateRepository(configuration, klazz, repositoryModel.getProviderHint(), repositoryModel);
+    }
+    catch (Exception e) {
+      throw new ConfigurationException("Cannot instantianate repository " + repositoryModel.getProviderRole() + ":"
+          + repositoryModel.getProviderHint(), e);
+    }
+  }
+
+  protected Repository instantiateRepository(final Configuration configuration, final Class<? extends Repository> klazz, final String name, final CRepository repositoryModel)
+      throws ConfigurationException
+  {
+    checkRepositoryMaxInstanceCountForCreation(klazz, name, repositoryModel);
 
     // create it, will do runtime validation
-    Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel(configuration, repositoryModel);
+    Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel(configuration, klazz, name, repositoryModel);
 
     // register with repoRegistry
     repositoryRegistry.addRepository(repository);
@@ -838,12 +844,11 @@ public class DefaultNexusConfiguration
     }
   }
 
-  protected void checkRepositoryMaxInstanceCountForCreation(CRepository repositoryModel)
+  protected void checkRepositoryMaxInstanceCountForCreation(Class<? extends Repository> klazz, String name, CRepository repositoryModel)
       throws ConfigurationException
   {
     RepositoryTypeDescriptor rtd =
-        repositoryTypeRegistry.getRepositoryTypeDescriptor(repositoryModel.getProviderRole(),
-            repositoryModel.getProviderHint());
+        repositoryTypeRegistry.getRepositoryTypeDescriptor(klazz, name);
 
     int maxCount;
 

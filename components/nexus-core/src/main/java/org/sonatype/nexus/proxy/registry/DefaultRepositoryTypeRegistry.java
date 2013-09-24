@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.util.PlexusUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
@@ -43,7 +44,6 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
@@ -229,6 +229,7 @@ public class DefaultRepositoryTypeRegistry
       try {
         final Repository repository = injector.getProvider(Key.get(role, Names.named(hint))).get();
         result = repository.getRepositoryContentClass();
+        PlexusUtils.release(repository);
         repoCachedContentClasses.put(cacheKey, result);
       }
       catch (Exception e) {

@@ -13,70 +13,77 @@
 
 package org.sonatype.nexus.configuration.application.runtime;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.PlexusUtils;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+import org.sonatype.sisu.goodies.lifecycle.Starter;
+import org.sonatype.sisu.goodies.lifecycle.Stopper;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The Class DefaultRuntimeConfigurationBuilder. Todo: all the bad thing is now concentrated in this class. We are
- * playing container instead of container.
- *
- * @author cstamas
+ * Default implementation of {@link ApplicationRuntimeConfigurationBuilder}.
  */
-@Component(role = ApplicationRuntimeConfigurationBuilder.class)
+@Singleton
+@Named
 public class DefaultApplicationRuntimeConfigurationBuilder
     extends AbstractLoggingComponent
     implements ApplicationRuntimeConfigurationBuilder
 {
-  @Requirement
-  private PlexusContainer plexusContainer;
+  private final Injector injector;
+
+  @Inject
+  public DefaultApplicationRuntimeConfigurationBuilder(final Injector injector) {
+    this.injector = checkNotNull(injector);
+  }
 
   @Override
-  public Repository createRepositoryFromModel(final Configuration configuration, final CRepository repoConf)
+  public Repository createRepositoryFromModel(final Configuration configuration,
+      final Class<? extends Repository> type, final String name, final CRepository repoConf)
       throws ConfigurationException
   {
-    Repository repository = createRepository(repoConf.getProviderRole(), repoConf.getProviderHint());
-
+    final Repository repository = createRepository(type, name);
     repository.configure(repoConf);
-
+    if (repository instanceof Lifecycle) {
+      Starter.start((Lifecycle) repository);
+    }
     return repository;
   }
 
   @Override
   public void releaseRepository(final Repository repository, final Configuration configuration,
-                                final CRepository repoConf)
-      throws ConfigurationException
+      final CRepository repoConf) throws ConfigurationException
   {
-    try {
-      plexusContainer.release(repository);
+    if (repository instanceof Lifecycle) {
+      Stopper.stop((Lifecycle) repository);
     }
-    catch (ComponentLifecycleException e) {
-      getLogger().warn(
-          "Problem while unregistering repository {} from Nexus! This will not affect configuration but might occupy memory, that will be released after next reboot.",
-          RepositoryStringUtils.getHumanizedNameString(repository), e);
-    }
+    // to be here only as far as we transition from Plexus
+    PlexusUtils.release(repository);
   }
 
   // ----------------------------------------
   // private stuff
 
-  private Repository createRepository(final String role, final String hint)
+  private Repository createRepository(final Class<? extends Repository> type, final String name)
       throws InvalidConfigurationException
   {
     try {
-      return Repository.class.cast(plexusContainer.lookup(role, hint));
+      return injector.getProvider(Key.get(type, Names.named(name))).get();
     }
-    catch (ComponentLookupException e) {
+    catch (Exception e) {
       throw new InvalidConfigurationException("Could not lookup a new instance of Repository!", e);
     }
   }
