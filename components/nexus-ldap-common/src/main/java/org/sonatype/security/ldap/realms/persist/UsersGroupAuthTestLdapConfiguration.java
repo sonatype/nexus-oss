@@ -13,45 +13,58 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = LdapConfiguration.class, hint = "UsersGroupAuthTestLdapConfiguration")
+@Singleton
+@Named("UsersGroupAuthTestLdapConfiguration")
 public class UsersGroupAuthTestLdapConfiguration
     extends DefaultLdapConfiguration
 {
-
   private LdapAuthConfiguration ldapAuthConfiguration;
 
   private CConnectionInfo connectionInfo;
 
-  /**
-   * @param ldapAuthConfiguration the ldapAuthConfiguration to set
-   */
-  public void setLdapAuthConfiguration(LdapAuthConfiguration ldapAuthConfiguration) {
-    this.ldapAuthConfiguration = ldapAuthConfiguration;
+  @Inject
+  public UsersGroupAuthTestLdapConfiguration(final ApplicationConfiguration applicationConfiguration,
+      final ConfigurationValidator validator, final PasswordHelper passwordHelper, final EventBus eventBus)
+  {
+    super(applicationConfiguration, validator, passwordHelper, eventBus);
   }
 
-  public LdapAuthConfiguration getLdapAuthConfiguration() {
-    return this.ldapAuthConfiguration;
+  // ==
+  
+  public void setLdapAuthConfiguration(LdapAuthConfiguration ldapAuthConfiguration) {
+    this.ldapAuthConfiguration = ldapAuthConfiguration;
   }
 
   public void setConnectionInfo(CConnectionInfo connectionInfo) {
     this.connectionInfo = connectionInfo;
   }
+  
+  // ==
 
+  @Override
+  public LdapAuthConfiguration getLdapAuthConfiguration() {
+    return this.ldapAuthConfiguration;
+  }
+
+  @Override
   public CConnectionInfo readConnectionInfo() {
     return connectionInfo;
   }
 
+  @Override
   public void clearCache() {
-
   }
 
+  @Override
   public void save() {
-
   }
-
 }

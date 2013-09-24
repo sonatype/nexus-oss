@@ -23,10 +23,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
-import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
@@ -37,49 +40,56 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-@Component(role = LdapConfiguration.class, hint = "default", instantiationStrategy = "singleton")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class DefaultLdapConfiguration
     extends AbstractLoggingComponent
     implements LdapConfiguration
 {
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
-  @Requirement(role = ConfigurationValidator.class)
-  private ConfigurationValidator validator;
+  private final ConfigurationValidator validator;
 
-  @Requirement
-  private PasswordHelper passwordHelper;
+  private final PasswordHelper passwordHelper;
 
-  @Requirement
-  private PasswordEncoderManager passwordEncoderManager;
+  private final EventBus eventBus;
 
-  @Requirement
-  private EventBus eventBus;
+  private final ReentrantLock lock = new ReentrantLock();
 
   private Configuration configuration;
 
-  private ReentrantLock lock = new ReentrantLock();
+  @Inject
+  public DefaultLdapConfiguration(ApplicationConfiguration applicationConfiguration, ConfigurationValidator validator,
+      PasswordHelper passwordHelper, EventBus eventBus)
+  {
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    this.validator = checkNotNull(validator);
+    this.passwordHelper = checkNotNull(passwordHelper);
+    this.eventBus = checkNotNull(eventBus);
+  }
 
   protected File getConfigurationFile() {
     return new File(applicationConfiguration.getConfigurationDirectory(), "ldap.xml");
   }
 
+  @Override
   public CConnectionInfo readConnectionInfo() {
     CConnectionInfo connInfo = getConfiguration().getConnectionInfo();
 
     return connInfo;
   }
 
+  @Override
   public CUserAndGroupAuthConfiguration readUserAndGroupConfiguration() {
     return getConfiguration().getUserAndGroupConfig();
   }
 
+  @Override
   public void updateUserAndGroupConfiguration(CUserAndGroupAuthConfiguration userAndGroupConfig)
       throws InvalidConfigurationException
   {
@@ -99,6 +109,7 @@ public class DefaultLdapConfiguration
     }
   }
 
+  @Override
   public void updateConnectionInfo(CConnectionInfo connectionInfo)
       throws InvalidConfigurationException
   {
@@ -119,85 +130,59 @@ public class DefaultLdapConfiguration
 
   }
 
+  @Override
   public Configuration getConfiguration() {
-    Reader fr = null;
-    FileInputStream is = null;
     lock.lock();
     try {
-      final File configurationFile = getConfigurationFile();
-
       if (configuration != null) {
         return configuration;
       }
+      final File configurationFile = getConfigurationFile();
 
-      is = new FileInputStream(configurationFile);
-
-      LdapConfigurationXpp3Reader reader = new LdapConfigurationXpp3Reader();
-
-      fr = new InputStreamReader(is);
-
-      configuration = reader.read(fr);
-
-      ValidationResponse vr = validator.validateModel(new ValidationRequest(configuration));
-
-      if (vr.getValidationErrors().size() > 0) {
-        // TODO need to code the handling of invalid config
-        configuration = new Configuration();
-      }
-
-      // decrypt the password, if it fails assume the password is clear text.
-      // If the password is wrong the the LDAP Realm will not work, which is no different. If the user typed in
-      // the
-      // password wrong.
-      if (configuration.getConnectionInfo() != null
-          && StringUtils.isNotEmpty(configuration.getConnectionInfo().getSystemPassword())) {
-        try {
-          configuration.getConnectionInfo().setSystemPassword(
-              passwordHelper.decrypt(configuration.getConnectionInfo().getSystemPassword()));
+      try (final Reader fr = new InputStreamReader(new FileInputStream(configurationFile))) {
+        LdapConfigurationXpp3Reader reader = new LdapConfigurationXpp3Reader();
+        configuration = reader.read(fr);
+        ValidationResponse vr = validator.validateModel(new ValidationRequest(configuration));
+        if (vr.getValidationErrors().size() > 0) {
+          // TODO need to code the handling of invalid config
+          configuration = new Configuration();
         }
-        catch (PlexusCipherException e) {
-          this.getLogger().error(
-              "Failed to decrypt password, assuming the password in file: '"
-                  + configurationFile.getAbsolutePath() + "' is clear text.", e);
+        // decrypt the password, if it fails assume the password is clear text.
+        // If the password is wrong the the LDAP Realm will not work, which is no different. If the user typed in
+        // the
+        // password wrong.
+        if (configuration.getConnectionInfo() != null
+            && StringUtils.isNotEmpty(configuration.getConnectionInfo().getSystemPassword())) {
+          try {
+            configuration.getConnectionInfo().setSystemPassword(
+                passwordHelper.decrypt(configuration.getConnectionInfo().getSystemPassword()));
+          }
+          catch (PlexusCipherException e) {
+            this.getLogger().error(
+                "Failed to decrypt password, assuming the password in file: '" + configurationFile.getAbsolutePath()
+                    + "' is clear text.", e);
+          }
         }
       }
-
-    }
-    catch (FileNotFoundException e) {
-      // This is ok, may not exist first time around
-      configuration = this.getDefaultConfiguration();
-    }
-    catch (IOException e) {
-      getLogger().error("IOException while retrieving configuration file", e);
-    }
-    catch (XmlPullParserException e) {
-      getLogger().error("Invalid XML Configuration", e);
+      catch (FileNotFoundException e) {
+        // This is ok, may not exist first time around
+        configuration = this.getDefaultConfiguration();
+      }
+      catch (IOException e) {
+        getLogger().error("IOException while retrieving configuration file", e);
+      }
+      catch (XmlPullParserException e) {
+        getLogger().error("Invalid XML Configuration", e);
+      }
     }
     finally {
-      if (fr != null) {
-        try {
-          fr.close();
-        }
-        catch (IOException e) {
-          // just closing if open
-        }
-      }
-
-      if (is != null) {
-        try {
-          is.close();
-        }
-        catch (IOException e) {
-          // just closing if open
-        }
-      }
-
       lock.unlock();
     }
 
     return configuration;
   }
 
+  @Override
   public void save() {
     lock.lock();
     try {
@@ -254,6 +239,7 @@ public class DefaultLdapConfiguration
     this.eventBus.post(new LdapClearCacheEvent(this));
   }
 
+  @Override
   public void clearCache() {
     configuration = null;
 
@@ -307,6 +293,7 @@ public class DefaultLdapConfiguration
     return defaultConfig;
   }
 
+  @Override
   public LdapAuthConfiguration getLdapAuthConfiguration() {
     CUserAndGroupAuthConfiguration userAndGroupsConf = readUserAndGroupConfiguration();
     LdapAuthConfiguration authConfig = new LdapAuthConfiguration();

@@ -13,22 +13,25 @@
 
 package org.sonatype.security.ldap.dao.password;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author cstamas
  */
-@Component(role = PasswordEncoderManager.class)
+@Singleton
+@Named
 public class DefaultPasswordEncoderManager
     implements PasswordEncoderManager
 {
@@ -37,23 +40,17 @@ public class DefaultPasswordEncoderManager
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  /**
-   */
-  @Requirement(role = PasswordEncoder.class)
-  private List<PasswordEncoder> encoders;
+  private final String preferredEncoding;
 
-  /**
-   */
-  @Configuration(value = "clear")
-  private String preferredEncoding;
+  private final Map<String, PasswordEncoder> encodersMap;
 
-  @Requirement(role = PasswordEncoder.class)
-  private Map<String, PasswordEncoder> encodersMap;
-
-  protected Logger getLogger() {
-    return logger;
+  @Inject
+  public DefaultPasswordEncoderManager( final @Named("${ldap.preferredEncoding:-clear}") String preferredEncoding, final Map<String, PasswordEncoder> encodersMap) {
+    this.preferredEncoding = preferredEncoding;
+    this.encodersMap = checkNotNull(encodersMap);
   }
 
+  @Override
   public String encodePassword(String password, Object salt) {
     PasswordEncoder encoder = getPasswordEncoder(preferredEncoding);
 
@@ -64,6 +61,7 @@ public class DefaultPasswordEncoderManager
     return encoder.encodePassword(password, salt);
   }
 
+  @Override
   public boolean isPasswordValid(String encodedPassword, String password, Object salt) {
     if (encodedPassword == null) {
       return false;
@@ -80,7 +78,7 @@ public class DefaultPasswordEncoderManager
 
     PasswordEncoder encoder = getPasswordEncoder(encoding.toLowerCase());
 
-    getLogger().info("Verifying password with encoding: " + encoding + " (encoder: " + encoder + ").");
+    logger.info("Verifying password with encoding: " + encoding + " (encoder: " + encoder + ").");
 
     if (encoder == null) {
       throw new IllegalStateException("Password encoding: " + encoding + " has no associated PasswordEncoder.");
@@ -89,21 +87,12 @@ public class DefaultPasswordEncoderManager
     return encoder.isPasswordValid(encodedPassword, password, salt);
   }
 
+  @Override
   public String getPreferredEncoding() {
     return preferredEncoding;
   }
 
-  public void setPreferredEncoding(String preferredEncoding) {
-    this.preferredEncoding = preferredEncoding.toLowerCase();
-  }
-
   private PasswordEncoder getPasswordEncoder(String encoding) {
-    if (encodersMap == null) {
-      encodersMap = new HashMap<String, PasswordEncoder>(encoders.size());
-      for (PasswordEncoder encoder : encoders) {
-        encodersMap.put(encoder.getMethod().toLowerCase(), encoder);
-      }
-    }
     if (encodersMap.containsKey(encoding)) {
       return encodersMap.get(encoding);
     }

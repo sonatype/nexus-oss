@@ -15,29 +15,35 @@ package org.sonatype.security.ldap.dao;
 
 import java.util.SortedSet;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = LdapConnectionTester.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class DefaultLdapConnectionTester
     implements LdapConnectionTester
 {
-
-  @Requirement
-  private LdapUserDAO ldapUserDao;
-
-  @Requirement
-  private LdapGroupDAO ldapGroupDAO;
-
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  private final LdapUserDAO ldapUserDao;
+
+  private final LdapGroupDAO ldapGroupDAO;
+
+  public DefaultLdapConnectionTester(final LdapUserDAO ldapUserDao, final LdapGroupDAO ldapGroupDAO) {
+    this.ldapUserDao = checkNotNull(ldapUserDao);
+    this.ldapGroupDAO = checkNotNull(ldapGroupDAO);
+  }
+
+  @Override
   public void testConnection(LdapContextFactory ldapContextFactory)
       throws NamingException
   {
@@ -60,6 +66,7 @@ public class DefaultLdapConnectionTester
 
   }
 
+  @Override
   public SortedSet<LdapUser> testUserAndGroupMapping(LdapContextFactory ldapContextFactory,
                                                      LdapAuthConfiguration ldapAuthConfiguration, int numberOfResults)
       throws LdapDAOException,

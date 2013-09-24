@@ -16,7 +16,6 @@ package org.sonatype.security.ldap.realms;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.naming.NamingException;
 
 import org.sonatype.security.ldap.dao.LdapDAOException;
@@ -33,27 +32,20 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-//@Component( role = AbstractLdapAuthenticatingRealm.class, hint = "ConfigurableLdapRealm" )
 public abstract class AbstractLdapAuthenticatingRealm
     extends AbstractLdapRealm
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private LdapManager ldapManager;
+  private final LdapManager ldapManager;
 
-  protected AbstractLdapAuthenticatingRealm() {
+  public AbstractLdapAuthenticatingRealm(final LdapManager ldapManager) {
     setName("LdapAuthenticatingRealm");
-  }
-
-  @Inject
-  public void setLdapManager(final LdapManager ldapManager) {
     this.ldapManager = checkNotNull(ldapManager);
   }
 

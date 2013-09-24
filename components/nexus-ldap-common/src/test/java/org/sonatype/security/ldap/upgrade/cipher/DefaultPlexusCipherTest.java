@@ -15,6 +15,10 @@ package org.sonatype.security.ldap.upgrade.cipher;
 
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
+import org.codehaus.plexus.PlexusConstants;
+
+import org.codehaus.plexus.ContainerConfiguration;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,16 +37,22 @@ public class DefaultPlexusCipherTest
 
   String encStr = "CFUju8n8eKQHj8u0HI9uQMRmKQALtoXH7lY=";
 
-  TestPlexusCipher pc;
+  PlexusCipher pc;
 
   // -------------------------------------------------------------
+  @Override
+  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
+    super.customizeContainerConfiguration(containerConfiguration);
+    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+  }
+
   @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
 
-    pc = (TestPlexusCipher) lookup(PlexusCipher.class, "test");
+    pc = lookup(PlexusCipher.class);
   }
 
   // -------------------------------------------------------------
@@ -57,7 +67,7 @@ public class DefaultPlexusCipherTest
     for (String provider : CryptoUtils.getCryptoImpls("Cipher")) {
       try {
         System.out.print(provider);
-        pc.algorithm = provider;
+        pc = new DefaultPlexusCipher(new BouncyCastleProvider(), provider, 23);
         pc.encrypt(str, passPhrase);
         System.out.println("------------------> Success !!!!!!");
       }

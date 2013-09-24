@@ -17,8 +17,6 @@ package org.sonatype.security.ldap.dao.password;
 public interface PasswordEncoder
 {
 
-  String ROLE = PasswordEncoder.class.getName();
-
   String getMethod();
 
   String encodePassword(String password, Object salt);

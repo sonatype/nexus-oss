@@ -19,24 +19,29 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.codec.Base64;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author bdemers
  */
-@Component(role = PasswordEncoder.class, hint = "ssha")
+@Singleton
+@Named("ssha")
 public class SSHAPasswordEncoder
     implements PasswordEncoder
 {
   private static final String SSHA_PREFIX = "{SSHA}";
 
-  private Random random = new Random();
+  private final Random random = new Random();
 
+  @Override
   public String getMethod() {
     return "SSHA";
   }
 
+  @Override
   public String encodePassword(String password, Object salt) {
     try {
       byte[] saltBytes = null;
@@ -81,6 +86,7 @@ public class SSHAPasswordEncoder
     }
   }
 
+  @Override
   public boolean isPasswordValid(String encPassword, String inputPassword, Object salt) {
     // check for null
     if (inputPassword == null) {
