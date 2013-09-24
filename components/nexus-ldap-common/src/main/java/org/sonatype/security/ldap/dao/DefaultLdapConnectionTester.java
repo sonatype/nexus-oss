@@ -15,6 +15,7 @@ package org.sonatype.security.ldap.dao;
 
 import java.util.SortedSet;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.naming.NamingException;
@@ -24,7 +25,6 @@ import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
@@ -38,6 +38,7 @@ public class DefaultLdapConnectionTester
 
   private final LdapGroupDAO ldapGroupDAO;
 
+  @Inject
   public DefaultLdapConnectionTester(final LdapUserDAO ldapUserDao, final LdapGroupDAO ldapGroupDAO) {
     this.ldapUserDao = checkNotNull(ldapUserDao);
     this.ldapGroupDAO = checkNotNull(ldapGroupDAO);

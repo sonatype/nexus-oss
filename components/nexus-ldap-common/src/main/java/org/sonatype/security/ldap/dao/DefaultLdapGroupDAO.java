@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.naming.InvalidNameException;
@@ -33,7 +34,6 @@ import javax.naming.ldap.LdapName;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -48,6 +48,7 @@ public class DefaultLdapGroupDAO
 
   private final LdapUserDAO ldapUserManager;
 
+  @Inject
   public DefaultLdapGroupDAO(final LdapUserDAO ldapUserManager) {
     this.ldapUserManager = checkNotNull(ldapUserManager);
   }

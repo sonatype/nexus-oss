@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.naming.InvalidNameException;
@@ -35,7 +36,6 @@ import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 
@@ -51,6 +51,7 @@ public class DefaultLdapUserDAO
 
   private final PasswordEncoderManager passwordEncoderManager;
   
+  @Inject
   public DefaultLdapUserDAO(final PasswordEncoderManager passwordEncoderManager) {
     this.passwordEncoderManager = checkNotNull(passwordEncoderManager);
   }
