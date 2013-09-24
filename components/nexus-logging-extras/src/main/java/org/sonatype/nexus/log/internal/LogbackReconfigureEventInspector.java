@@ -13,32 +13,37 @@
 
 package org.sonatype.nexus.log.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-@Component(role = EventInspector.class, hint = "LogbackReconfigureEventInspector")
+@Singleton
+@Named
 public class LogbackReconfigureEventInspector
     extends AbstractEventInspector
 {
 
-  @Requirement
-  private LogManager logManager;
+  private final LogManager logManager;
 
-  public boolean accepts(Event<?> evt) {
+  @Inject
+  public LogbackReconfigureEventInspector(final LogManager logManager) {
+    this.logManager = checkNotNull(logManager);
+  }
+
+  @Override
+  public boolean accepts(final Event<?> evt) {
     return evt instanceof NexusInitializedEvent;
   }
 
-  public void inspect(Event<?> evt) {
-    if (!accepts(evt)) {
-      return;
-    }
-
+  @Override
+  public void inspect(final Event<?> evt) {
     logManager.configure();
   }
 }

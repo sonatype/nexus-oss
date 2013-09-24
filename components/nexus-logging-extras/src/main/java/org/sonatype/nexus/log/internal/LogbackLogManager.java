@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
@@ -54,14 +57,13 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 //TODO configuration operations should be locking
 
@@ -70,9 +72,10 @@ import org.slf4j.LoggerFactory;
  * @author juven
  * @author adreghiciu@gmail.com
  */
-@Component(role = LogManager.class)
+@Singleton
+@Named
 public class LogbackLogManager
-    implements LogManager, Disposable
+    implements LogManager
 {
   private static final String JMX_DOMAIN = "org.sonatype.nexus.log";
 
@@ -92,18 +95,19 @@ public class LogbackLogManager
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement(role = LogConfigurationParticipant.class)
-  private List<LogConfigurationParticipant> logConfigurationParticipants;
+  private final Injector injector;
 
-  @Requirement
-  private Injector injector;
+  private final ApplicationConfiguration applicationConfiguration;
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final List<LogConfigurationParticipant> logConfigurationParticipants;
 
   private ObjectName jmxName;
 
-  public LogbackLogManager() {
+  @Inject
+  public LogbackLogManager(final Injector injector, final ApplicationConfiguration applicationConfiguration, final List<LogConfigurationParticipant> logConfigurationParticipants) {
+    this.injector = checkNotNull(injector);
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    this.logConfigurationParticipants = checkNotNull(logConfigurationParticipants);
     try {
       jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", LogManager.class.getSimpleName());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -111,14 +115,19 @@ public class LogbackLogManager
     }
     catch (Exception e) {
       jmxName = null;
-      // FIXME: when switched over SISU, this will be a non issue
-      // sadly, plexus does field injection and logger not yet avail
-      // getLogger().warn( "Problem registering MBean for: " + getClass().getName(), e );
+      logger.warn("Problem registering MBean for: " + getClass().getName(), e);
     }
   }
 
   @Override
-  public void dispose() {
+  public void configure() {
+    // TODO maybe do some optimization that if participants does not change, do not reconfigure
+    prepareConfigurationFiles();
+    reconfigure();
+  }
+
+  @Override
+  public void shutdown() {
     if (null != jmxName) {
       try {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(jmxName);
@@ -129,6 +138,7 @@ public class LogbackLogManager
     }
   }
 
+  @Override
   public Set<File> getLogFiles() {
     HashSet<File> files = new HashSet<File>();
 
@@ -152,6 +162,7 @@ public class LogbackLogManager
     return files;
   }
 
+  @Override
   public File getLogFile(String filename) {
     Set<File> logFiles = getLogFiles();
 
@@ -164,6 +175,7 @@ public class LogbackLogManager
     return null;
   }
 
+  @Override
   public LogConfiguration getConfiguration()
       throws IOException
   {
@@ -179,6 +191,7 @@ public class LogbackLogManager
     return configuration;
   }
 
+  @Override
   public void setConfiguration(LogConfiguration configuration)
       throws IOException
   {
@@ -212,6 +225,7 @@ public class LogbackLogManager
     return properties;
   }
 
+  @Override
   public Collection<NexusStreamResponse> getApplicationLogFiles()
       throws IOException
   {
@@ -246,6 +260,7 @@ public class LogbackLogManager
    * @param logFile path of the file to retrieve
    * @returns InputStream to the file or null if the file is not allowed or doesn't exist.
    */
+  @Override
   public NexusStreamResponse getApplicationLogAsStream(String logFile, long from, long count)
       throws IOException
   {
@@ -282,13 +297,6 @@ public class LogbackLogManager
     response.setInputStream(new LimitedInputStream(new FileInputStream(log), from, count));
 
     return response;
-  }
-
-  @Override
-  public void configure() {
-    // TODO maybe do some optimization that if participants does not change, do not reconfigure
-    prepareConfigurationFiles();
-    reconfigure();
   }
 
   private Properties loadConfigurationProperties()
