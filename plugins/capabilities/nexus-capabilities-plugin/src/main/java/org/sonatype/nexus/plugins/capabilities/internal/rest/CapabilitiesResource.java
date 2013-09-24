@@ -297,7 +297,7 @@ public class CapabilitiesResource
     if (active != null) {
       filter = filter.active(active);
     }
-    if (includeNotExposed == null || includeNotExposed) {
+    if (includeNotExposed != null && includeNotExposed) {
       filter = filter.includeNotExposed();
     }
     if (properties != null) {
