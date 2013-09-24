@@ -10,17 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Sonatype, Ext*/
+/*global NX, Sonatype, Ext*/
 
-define('nexus/siesta', [], function ()
-{
-    Ext.namespace('Nexus.siesta');
+NX.define('Nexus.siesta', {
+  singleton: true,
 
-    /**
-     * Base path for all siesta-based REST resources.
-     *
-     * @type {string}
-     * @static
-     */
-    Nexus.siesta.basePath = Sonatype.config.contextPath + '/service/siesta';
+  requirejs: [ 'Nexus/config' ], // Sonatype.config comes from this module
+
+  /**
+   * The base-path of siesta-based (JAX-RS) REST resources.
+   *
+   * @public
+   * @type {string}
+   */
+  basePath: Sonatype.config.contextPath + '/service/siesta'
 });
