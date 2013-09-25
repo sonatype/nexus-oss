@@ -464,10 +464,8 @@ public class DefaultNexusPluginManager
       if (exists(sisuIndexUrl)) {
         return true;
       }
-      final URL plexusComponents = url.toURI().resolve("META-INF/plexus/components.xml").toURL();
-      if (exists(plexusComponents)) {
-        return true;
-      }
+      // no need for plx XML discovery, as that will be picked up
+      // even without scanning
     }
     catch (Exception e) {
       // just neglect any URISyntaxEx or MalformedUrlEx
