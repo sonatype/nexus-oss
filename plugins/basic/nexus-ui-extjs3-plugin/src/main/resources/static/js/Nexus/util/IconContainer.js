@@ -391,7 +391,7 @@ NX.define('Nexus.util.IconContainer', {
      * @public
      *
      * @param name      The name of the icon.
-     * @param variant   Optional icon variant name.
+     * @param [variant] Optional icon variant name.
      * @return {*}      Icon; never null/undefined.
      */
     get: function (name, variant) {
