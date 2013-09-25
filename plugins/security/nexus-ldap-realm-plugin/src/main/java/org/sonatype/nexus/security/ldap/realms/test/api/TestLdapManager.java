@@ -16,19 +16,18 @@ package org.sonatype.nexus.security.ldap.realms.test.api;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.security.ldap.realms.DefaultLdapManager;
+import org.sonatype.nexus.security.ldap.realms.AbstractLdapManager;
 import org.sonatype.security.ldap.LdapAuthenticator;
 import org.sonatype.security.ldap.dao.LdapGroupDAO;
 import org.sonatype.security.ldap.dao.LdapUserDAO;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * Must NOT be singleton!
  */
 @Named(TestLdapManager.NAME)
 public class TestLdapManager
-    extends DefaultLdapManager
+    extends AbstractLdapManager
 {
   public static final String NAME = "TestLdapManager";
 
@@ -36,9 +35,9 @@ public class TestLdapManager
 
   @Inject
   public TestLdapManager(LdapAuthenticator ldapAuthenticator, LdapUserDAO ldapUserManager,
-      LdapGroupDAO ldapGroupManager, LdapConfiguration ldapConfiguration, EventBus eventBus)
+      LdapGroupDAO ldapGroupManager, LdapConfiguration ldapConfiguration)
   {
-    super(ldapAuthenticator, ldapUserManager, ldapGroupManager, ldapConfiguration, eventBus);
+    super(ldapAuthenticator, ldapUserManager, ldapGroupManager, ldapConfiguration);
   }
 
   @Override

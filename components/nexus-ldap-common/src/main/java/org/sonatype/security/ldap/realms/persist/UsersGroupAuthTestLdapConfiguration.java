@@ -19,14 +19,13 @@ import javax.inject.Named;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * Must NOT be singleton!
  */
 @Named(UsersGroupAuthTestLdapConfiguration.NAME)
 public class UsersGroupAuthTestLdapConfiguration
-    extends DefaultLdapConfiguration
+    extends AbstractLdapConfiguration
 {
   public static final String NAME = "UsersGroupAuthTestLdapConfiguration";
 
@@ -36,9 +35,9 @@ public class UsersGroupAuthTestLdapConfiguration
 
   @Inject
   public UsersGroupAuthTestLdapConfiguration(final ApplicationConfiguration applicationConfiguration,
-      final ConfigurationValidator validator, final PasswordHelper passwordHelper, final EventBus eventBus)
+      final ConfigurationValidator validator, final PasswordHelper passwordHelper)
   {
-    super(applicationConfiguration, validator, passwordHelper, eventBus);
+    super(applicationConfiguration, validator, passwordHelper);
   }
 
   // ==
