@@ -357,7 +357,7 @@ the integration tests. Just do a
 
 to run all tests and create a plugin bundle.
 
-[1]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/NeuxsYumPlugin.png
+[1]: https://raw.github.com/sonatype/nexus-oss/master/plugins/yum/nexus-yum-repository-plugin/docs/images/NeuxsYumPlugin.png
 [2]: http://nexus.sonatype.org
 [3]: http://maven.apache.org
 [4]: http://www.immobilienscout24.de
@@ -372,8 +372,8 @@ to run all tests and create a plugin bundle.
 [13]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-intro.html
 [14]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-prepare-nexus.html
 [15]: http://linux.die.net/man/1/mergerepo
-[16]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/Config-NexusCapabilities.png
-[17]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/Config-3rdPartyCapability.png
-[18]: https://raw.github.com/sonatype/nexus-yum-repository-plugin/master/docs/images/Config-GroupRepo.png
+[16]: https://raw.github.com/sonatype/nexus-oss/master/plugins/yum/nexus-yum-repository-plugin/docs/images/Config-NexusCapabilities.png
+[17]: https://raw.github.com/sonatype/nexus-oss/master/plugins/yum/nexus-yum-repository-plugin/docs/images/Config-3rdPartyCapability.png
+[18]: https://raw.github.com/sonatype/nexus-oss/master/plugins/yum/nexus-yum-repository-plugin/docs/images/Config-GroupRepo.png
 
 
