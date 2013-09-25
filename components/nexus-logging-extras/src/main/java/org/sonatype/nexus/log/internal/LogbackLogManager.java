@@ -44,8 +44,10 @@ import org.sonatype.nexus.log.DefaultLogManagerMBean;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -55,6 +57,7 @@ import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
 import org.codehaus.plexus.util.FileUtils;
@@ -100,14 +103,19 @@ public class LogbackLogManager
   private final ApplicationConfiguration applicationConfiguration;
 
   private final List<LogConfigurationParticipant> logConfigurationParticipants;
+  
+  private final EventBus eventBus;
 
   private ObjectName jmxName;
 
   @Inject
-  public LogbackLogManager(final Injector injector, final ApplicationConfiguration applicationConfiguration, final List<LogConfigurationParticipant> logConfigurationParticipants) {
+  public LogbackLogManager(final Injector injector, final ApplicationConfiguration applicationConfiguration,
+      final List<LogConfigurationParticipant> logConfigurationParticipants, final EventBus eventBus)
+  {
     this.injector = checkNotNull(injector);
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
     this.logConfigurationParticipants = checkNotNull(logConfigurationParticipants);
+    this.eventBus = checkNotNull(eventBus);
     try {
       jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", LogManager.class.getSimpleName());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -117,17 +125,28 @@ public class LogbackLogManager
       jmxName = null;
       logger.warn("Problem registering MBean for: " + getClass().getName(), e);
     }
+    eventBus.register(this);
+  }
+  
+  // ==
+
+  @Subscribe
+  public void on(final NexusInitializedEvent evt)
+  {
+    configure();
   }
 
+  // ==
+
   @Override
-  public void configure() {
+  public synchronized void configure() {
     // TODO maybe do some optimization that if participants does not change, do not reconfigure
     prepareConfigurationFiles();
     reconfigure();
   }
 
   @Override
-  public void shutdown() {
+  public synchronized void shutdown() {
     if (null != jmxName) {
       try {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(jmxName);
@@ -136,6 +155,7 @@ public class LogbackLogManager
         logger.warn("Problem unregistering MBean for: " + getClass().getName(), e);
       }
     }
+    eventBus.unregister(this);
   }
 
   @Override
