@@ -62,7 +62,7 @@ import org.restlet.resource.ResourceException;
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
 @Singleton
-@Named
+@Named("LdapUserAndGroupConfigTestPlexusResource")
 @Typed(PlexusResource.class)
 public class LdapUserAndGroupConfigTestPlexusResource
     extends AbstractLdapRealmPlexusResource

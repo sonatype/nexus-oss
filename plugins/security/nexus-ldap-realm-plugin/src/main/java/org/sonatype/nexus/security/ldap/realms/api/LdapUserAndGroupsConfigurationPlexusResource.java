@@ -40,7 +40,7 @@ import org.restlet.resource.Variant;
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
 @Singleton
-@Named
+@Named("LdapUserAndGroupsConfigurationPlexusResource")
 @Typed(PlexusResource.class)
 public class LdapUserAndGroupsConfigurationPlexusResource
     extends AbstractLdapRealmPlexusResource
