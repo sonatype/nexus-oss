@@ -86,6 +86,11 @@
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependency>org.sonatype.nexus:nexus-ldap-common</sharedDependency>
+          </sharedDependencies>
+        </configuration>
       </plugin>
 
       <plugin>
