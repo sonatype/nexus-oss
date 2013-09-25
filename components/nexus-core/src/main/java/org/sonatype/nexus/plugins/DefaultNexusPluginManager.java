@@ -14,6 +14,7 @@
 package org.sonatype.nexus.plugins;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -375,7 +376,7 @@ public class DefaultNexusPluginManager
       final URL url = toURL(repositoryManager.resolveDependencyArtifact(plugin, gav));
       if (null != url) {
         pluginRealm.addURL(url);
-        if (d.isHasComponents() || d.isShared()) {
+        if (d.isHasComponents() || d.isShared() || hasComponents(url)) {
           scanList.add(url);
         }
       }
@@ -452,6 +453,34 @@ public class DefaultNexusPluginManager
     }
     catch (final MalformedURLException e) {
       return null; // should never happen
+    }
+  }
+
+  private boolean hasComponents(final URL url) {
+    // this has to happen in generic way, as for example Nexus IDE may provide
+    // various URLs using XmlNexusPluginRepository for example
+    try {
+      final URL sisuIndexUrl = url.toURI().resolve("META-INF/sisu/" + Named.class.getName()).toURL();
+      if (exists(sisuIndexUrl)) {
+        return true;
+      }
+      final URL plexusComponents = url.toURI().resolve("META-INF/plexus/components.xml").toURL();
+      if (exists(plexusComponents)) {
+        return true;
+      }
+    }
+    catch (Exception e) {
+      // just neglect any URISyntaxEx or MalformedUrlEx
+    }
+    return false;
+  }
+
+  private boolean exists(final URL url) {
+    try (final InputStream content = url.openStream()) {
+      return true;
+    }
+    catch (IOException e) {
+      return false;
     }
   }
 
