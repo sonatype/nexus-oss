@@ -17,10 +17,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +46,8 @@ public class DefaultPasswordEncoderManager
   private final Map<String, PasswordEncoder> encodersMap;
 
   @Inject
-  public DefaultPasswordEncoderManager( final @Named("${ldap.preferredEncoding:-clear}") String preferredEncoding, final Map<String, PasswordEncoder> encodersMap) {
-    this.preferredEncoding = preferredEncoding;
+  public DefaultPasswordEncoderManager( final Map<String, PasswordEncoder> encodersMap) {
+    this.preferredEncoding = SystemPropertiesHelper.getString("ldap.preferredEncoding", "clear");
     this.encodersMap = checkNotNull(encodersMap);
   }
 
