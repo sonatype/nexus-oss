@@ -15,10 +15,12 @@ package org.sonatype.nexus.configuration.application.runtime;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -28,7 +30,6 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.goodies.lifecycle.Starter;
 import org.sonatype.sisu.goodies.lifecycle.Stopper;
 
-import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
@@ -43,11 +44,11 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     extends AbstractLoggingComponent
     implements ApplicationRuntimeConfigurationBuilder
 {
-  private final Injector injector;
+  private final BeanLocator beanLocator;
 
   @Inject
-  public DefaultApplicationRuntimeConfigurationBuilder(final Injector injector) {
-    this.injector = checkNotNull(injector);
+  public DefaultApplicationRuntimeConfigurationBuilder(final BeanLocator beanLocator) {
+    this.beanLocator = checkNotNull(beanLocator);
   }
 
   @Override
@@ -81,7 +82,9 @@ public class DefaultApplicationRuntimeConfigurationBuilder
       throws InvalidConfigurationException
   {
     try {
-      return injector.getProvider(Key.get(type, Names.named(name))).get();
+      final Provider<? extends Repository> rp = beanLocator.locate(Key.get(type, Names.named(name))).iterator().next()
+          .getProvider();
+      return rp.get();
     }
     catch (Exception e) {
       throw new InvalidConfigurationException("Could not lookup a new instance of Repository!", e);
