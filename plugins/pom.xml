@@ -576,6 +576,7 @@
           <version>1.0.0</version>
           <configuration>
             <!--
+            FIXME: Sort this out, jslint is *very helpful*
             yuicompressor warns when code is not in a shape that's optimized for minifying.
             ATM this only pollutes the log (~9400 warnings)
             -->
@@ -585,6 +586,10 @@
             <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
             <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
             <sourceDirectory>${project.build.sourceDirectory}/../resources/static</sourceDirectory>
+            <jslintOptions>
+              <white>true</white>
+              <sloppy>true</sloppy>
+            </jslintOptions>
           </configuration>
           <executions>
             <execution>
