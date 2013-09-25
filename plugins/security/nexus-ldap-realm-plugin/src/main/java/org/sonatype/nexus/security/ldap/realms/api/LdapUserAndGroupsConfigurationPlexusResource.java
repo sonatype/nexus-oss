@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.security.ldap.realms.api;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -23,6 +24,7 @@ import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 
@@ -39,6 +41,7 @@ import org.restlet.resource.Variant;
 @Consumes({"application/xml", "application/json"})
 @Singleton
 @Named
+@Typed(PlexusResource.class)
 public class LdapUserAndGroupsConfigurationPlexusResource
     extends AbstractLdapRealmPlexusResource
 {

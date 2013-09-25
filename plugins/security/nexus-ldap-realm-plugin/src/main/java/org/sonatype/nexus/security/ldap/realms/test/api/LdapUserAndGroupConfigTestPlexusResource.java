@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -36,6 +37,7 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.dao.LdapConnectionTester;
 import org.sonatype.security.ldap.dao.LdapDAOException;
@@ -61,6 +63,7 @@ import org.restlet.resource.ResourceException;
 @Consumes({"application/xml", "application/json"})
 @Singleton
 @Named
+@Typed(PlexusResource.class)
 public class LdapUserAndGroupConfigTestPlexusResource
     extends AbstractLdapRealmPlexusResource
 {

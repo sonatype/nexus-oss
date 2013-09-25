@@ -15,6 +15,7 @@ package org.sonatype.nexus.security.ldap.realms.test.api;
 
 import java.net.MalformedURLException;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,6 +27,7 @@ import javax.ws.rs.Produces;
 import org.sonatype.nexus.security.ldap.realms.api.AbstractLdapRealmPlexusResource;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.ldap.dao.LdapConnectionTester;
 import org.sonatype.security.ldap.realms.DefaultLdapContextFactory;
 import org.sonatype.security.ldap.realms.persist.ConfigurationValidator;
@@ -47,6 +49,7 @@ import org.restlet.resource.ResourceException;
 @Consumes({"application/xml", "application/json"})
 @Singleton
 @Named
+@Typed(PlexusResource.class)
 public class LdapTestAuthenticationPlexusResource
     extends AbstractLdapRealmPlexusResource
 {
