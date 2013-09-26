@@ -43,7 +43,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(RepositoryComboCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class RepositoryComboCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends TestCapabilityDescriptor
 {
 
   static final String TYPE_ID = "[repositoryCombo]";

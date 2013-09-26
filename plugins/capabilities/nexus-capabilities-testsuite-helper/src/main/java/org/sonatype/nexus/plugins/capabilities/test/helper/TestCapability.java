@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.Date;
+
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -74,7 +76,7 @@ public abstract class TestCapability
 
   @Override
   public String status() {
-    return "<h3>I'm well. Thanx!</h3>";
+    return "<h3>I'm well. Thanx! " + new Date().toString() + "</h3>";
   }
 
   @Override

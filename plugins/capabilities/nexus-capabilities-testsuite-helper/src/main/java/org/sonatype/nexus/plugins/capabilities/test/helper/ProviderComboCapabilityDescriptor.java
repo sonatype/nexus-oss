@@ -35,7 +35,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(ProviderComboCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class ProviderComboCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends TestCapabilityDescriptor
 {
 
   static final String TYPE_ID = "[namedProviders]";

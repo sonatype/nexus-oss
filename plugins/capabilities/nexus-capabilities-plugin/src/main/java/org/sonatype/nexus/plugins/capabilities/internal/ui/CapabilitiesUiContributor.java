@@ -31,8 +31,16 @@ public class CapabilitiesUiContributor
     implements UiContributor
 {
 
+  private static final String CAPABILITIES_CSS = "static/css/capabilities.css";
+
   @Override
   public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, CapabilitiesPlugin.GROUP_ID, CapabilitiesPlugin.ARTIFACT_ID).build(debug);
+    UiContributionBuilder builder = new UiContributionBuilder(
+        this, CapabilitiesPlugin.GROUP_ID, CapabilitiesPlugin.ARTIFACT_ID
+    );
+    if (debug) {
+      builder.withDependency("css!" + CAPABILITIES_CSS + builder.getCacheBuster(CAPABILITIES_CSS));
+    }
+    return builder.build(debug);
   }
 }

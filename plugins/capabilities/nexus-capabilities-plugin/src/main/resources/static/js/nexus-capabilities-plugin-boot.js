@@ -10,7 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, Sonatype, Nexus*/
+/*global define,NX*/
 define('nexus-capabilities-plugin-boot', [
-    'Sonatype/repoServer/CapabilitiesPanel'
-]);
+  'Nexus/capabilities/CapabilitiesView'
+], function () {
+  NX.log.debug('Main nexus-capabilities-plugin modules loaded');
+});
