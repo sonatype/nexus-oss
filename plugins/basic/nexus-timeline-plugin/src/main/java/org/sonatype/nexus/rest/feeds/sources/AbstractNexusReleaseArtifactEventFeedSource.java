@@ -18,18 +18,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-
 public abstract class AbstractNexusReleaseArtifactEventFeedSource
     extends AbstractNexusItemEventFeedSource
 {
-  @Requirement(hint = "artifact")
   private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
+
+  @Inject
+  public void setEntryBuilder(final @Named("artifact") SyndEntryBuilder<NexusArtifactEvent> entryBuilder) {
+    this.entryBuilder = entryBuilder;
+  }
 
   @Override
   public SyndEntryBuilder<NexusArtifactEvent> getSyndEntryBuilder(NexusArtifactEvent event) {

@@ -13,19 +13,20 @@
 
 package org.sonatype.nexus.feeds.record;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-
 /**
  * @author Juven Xu
  */
-@Component(role = EventInspector.class, hint = "RepositoryEventLocalStatusChanged")
+@Named
+@Singleton
 public class RepositoryEventLocalStatusChangedInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector

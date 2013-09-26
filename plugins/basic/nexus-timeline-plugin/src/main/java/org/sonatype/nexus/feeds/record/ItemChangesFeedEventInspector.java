@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.feeds.record;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -30,15 +32,14 @@ import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-
 /**
  * Event inspector that persists item events into Timeline.
  *
  * @author Juven Xu
  * @author cstamas
  */
-@Component(role = EventInspector.class, hint = "ItemChangesFeedEventInspector")
+@Named
+@Singleton
 public class ItemChangesFeedEventInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector
