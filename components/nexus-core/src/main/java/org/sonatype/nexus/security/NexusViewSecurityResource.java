@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -39,28 +43,31 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.interpolation.util.StringUtils;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = DynamicSecurityResource.class, hint = "NexusViewSecurityResource")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named("NexusViewSecurityResource")
 public class NexusViewSecurityResource
     extends AbstractDynamicSecurityResource
-    implements Initializable, DynamicSecurityResource
+    implements DynamicSecurityResource
 {
-  @Requirement
-  private RepositoryRegistry repoRegistry;
+  private final RepositoryRegistry repoRegistry;
 
-  @Requirement
-  private EventBus eventBus;
+  private final RepositoryTypeRegistry repoTypeRegistry;
 
-  @Requirement
-  private RepositoryTypeRegistry repoTypeRegistry;
+  private final ConfigurationManager configManager;
 
-  @Requirement(hint = "default")
-  private ConfigurationManager configManager;
+  @Inject
+  public NexusViewSecurityResource(final EventBus eventBus, final RepositoryRegistry repoRegistry,
+      final RepositoryTypeRegistry repoTypeRegistry, final @Named("default") ConfigurationManager configManager)
+  {
+    this.repoRegistry = checkNotNull(repoRegistry);
+    this.repoTypeRegistry = checkNotNull(repoTypeRegistry);
+    this.configManager = checkNotNull(configManager);
+    eventBus.register(this);
+  }
 
   @Override
   public Configuration doGetConfiguration() {
@@ -169,11 +176,4 @@ public class NexusViewSecurityResource
       throw Throwables.propagate(e);
     }
   }
-
-  public void initialize()
-      throws InitializationException
-  {
-    this.eventBus.register(this);
-  }
-
 }
