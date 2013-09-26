@@ -89,20 +89,17 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
       },
 
       view: NX.create('Ext.grid.GroupingView', {
-        forceFit: true,
-        groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Capabilities" : "Capability"]})'
-      }),
-
-      viewConfig: {
         emptyText: 'Click "Add" to configure a capability.',
         deferEmptyText: false,
-        getRowClass: function (record, index) {
+        getRowClass: function (record) {
           var capability = record.data;
           if (capability.enabled && !capability.active) {
             return 'red-flag';
           }
-        }
-      },
+        },
+        forceFit: true,
+        groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Capabilities" : "Capability"]})'
+      }),
 
       sm: NX.create('Ext.grid.RowSelectionModel', {
         singleSelect: true,
