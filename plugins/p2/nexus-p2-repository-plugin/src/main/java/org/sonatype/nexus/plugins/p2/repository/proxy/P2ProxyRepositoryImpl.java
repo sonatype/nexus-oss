@@ -23,6 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -64,8 +68,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -75,8 +77,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import static org.sonatype.nexus.util.DigesterUtils.getSha1Digest;
 
-@Component(role = Repository.class, hint = P2ProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup",
-    description = "Eclipse P2 Proxy Repository")
+@Named(P2ProxyRepositoryImpl.ROLE_HINT)
+@Description("Eclipse P2 Proxy Repository")
 public class P2ProxyRepositoryImpl
     extends AbstractProxyRepository
     implements P2ProxyRepository, Repository
@@ -85,14 +87,11 @@ public class P2ProxyRepositoryImpl
 
   private static final String PRIVATE_MIRRORS_PATH = P2Constants.PRIVATE_ROOT + "/mirrors.xml";
 
-  @Requirement(hint = P2ContentClass.ID)
-  private ContentClass contentClass;
+  private final ContentClass contentClass;
 
-  @Requirement(role = P2MetadataSource.class, hint = "proxy")
-  private P2MetadataSource<P2ProxyRepository> metadataSource;
+  private final P2MetadataSource<P2ProxyRepository> metadataSource;
 
-  @Requirement(role = P2ProxyRepositoryConfigurator.class)
-  private P2ProxyRepositoryConfigurator p2ProxyRepositoryConfigurator;
+  private final P2ProxyRepositoryConfigurator p2ProxyRepositoryConfigurator;
 
   private volatile boolean mirrorsConfigured;
 
@@ -100,7 +99,15 @@ public class P2ProxyRepositoryImpl
 
   private final Map<String, Mirror> mirrorMap = new LinkedHashMap<>();
 
-  public P2ProxyRepositoryImpl() {
+  @Inject
+  public P2ProxyRepositoryImpl(final @Named(P2ContentClass.ID) ContentClass contentClass,
+                               final @Named("proxy") P2MetadataSource<P2ProxyRepository> metadataSource,
+                               final P2ProxyRepositoryConfigurator p2ProxyRepositoryConfigurator)
+  {
+    this.contentClass = contentClass;
+    this.metadataSource = metadataSource;
+    this.p2ProxyRepositoryConfigurator = p2ProxyRepositoryConfigurator;
+
     initArtifactMappingsAndMirrors();
   }
 

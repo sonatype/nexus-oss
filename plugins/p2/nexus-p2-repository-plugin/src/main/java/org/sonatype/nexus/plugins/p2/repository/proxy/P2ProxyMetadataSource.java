@@ -20,12 +20,15 @@ import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.metadata.AbstractP2MetadataSource;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
-import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -43,28 +46,34 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.p2.bridge.ArtifactRepository;
 import org.sonatype.p2.bridge.MetadataRepository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-@Component(role = P2MetadataSource.class, hint = "proxy")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named("proxy")
+@Singleton
 public class P2ProxyMetadataSource
     extends AbstractP2MetadataSource<P2ProxyRepository>
 {
-
-  @Requirement
-  private ArtifactRepository artifactRepository;
-
-  @Requirement
-  private MetadataRepository metadataRepository;
-
   public static final String ATTR_MIRRORS_URL = P2Constants.PROP_MIRRORS_URL;
 
   public static final String CTX_MIRRORS_URL = P2Constants.PROP_MIRRORS_URL;
+
+  private final ArtifactRepository artifactRepository;
+
+  private final MetadataRepository metadataRepository;
+
+  @Inject
+  public P2ProxyMetadataSource(final ArtifactRepository artifactRepository,
+                               final MetadataRepository metadataRepository)
+  {
+    this.artifactRepository = checkNotNull(artifactRepository);
+    this.metadataRepository = checkNotNull(metadataRepository);
+  }
 
   @Override
   protected Map<String, StorageFileItem> doRetrieveArtifactsFileItems(final Map<String, Object> context,
