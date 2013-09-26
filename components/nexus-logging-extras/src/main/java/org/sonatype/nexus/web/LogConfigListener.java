@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.web;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -36,25 +35,32 @@ import static com.google.common.base.Preconditions.checkState;
 public class LogConfigListener
     implements ServletContextListener
 {
+  @Override
   public void contextInitialized(ServletContextEvent event) {
     // FIXME: JUL handler should be handled by container or bootstrap
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
 
-    configureLogManager(event.getServletContext());
-  }
-
-  public void contextDestroyed(ServletContextEvent event) {
-    // ignore
-  }
-
-  private void configureLogManager(ServletContext context) {
     try {
       // FIXME: Replace with Guice-based lookup of component
-      PlexusContainer container = (PlexusContainer) context.getAttribute(PlexusConstants.PLEXUS_KEY);
+      PlexusContainer container = (PlexusContainer) event.getServletContext().getAttribute(PlexusConstants.PLEXUS_KEY);
       checkState(container != null, "Could not find Plexus container in servlet context");
       LogManager logManager = container.lookup(LogManager.class);
       logManager.configure();
+    }
+    catch (ComponentLookupException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public void contextDestroyed(ServletContextEvent event) {
+    try {
+      // FIXME: Replace with Guice-based lookup of component
+      PlexusContainer container = (PlexusContainer) event.getServletContext().getAttribute(PlexusConstants.PLEXUS_KEY);
+      checkState(container != null, "Could not find Plexus container in servlet context");
+      LogManager logManager = container.lookup(LogManager.class);
+      logManager.shutdown();
     }
     catch (ComponentLookupException e) {
       throw Throwables.propagate(e);

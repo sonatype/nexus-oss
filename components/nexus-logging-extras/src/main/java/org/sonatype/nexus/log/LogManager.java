@@ -46,4 +46,6 @@ public interface LogManager
       throws IOException;
 
   void configure();
+  
+  void shutdown();
 }
