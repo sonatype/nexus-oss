@@ -14,8 +14,6 @@
 package org.sonatype.nexus.configuration.application.runtime;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -23,9 +21,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface ApplicationRuntimeConfigurationBuilder
 {
-  Repository createRepositoryFromModel(Configuration configuration, Class<? extends Repository> type, String name,
-      CRepository repoConf) throws ConfigurationException;
+  Repository createRepository(Class<? extends Repository> type, String name) throws ConfigurationException;
 
-  void releaseRepository(Repository repository, Configuration configuration, CRepository repoConf)
+  void releaseRepository(Repository repository)
       throws ConfigurationException;
 }
