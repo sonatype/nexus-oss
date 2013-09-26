@@ -141,7 +141,8 @@ NX.define('Nexus.capabilities.CapabilitiesGridStore', {
           width: 250,
           header: 'Description',
           dataIndex: 'description',
-          sortable: true
+          sortable: true,
+          menuDisabled: true
         },
         {
           id: 'notes',
