@@ -27,6 +27,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
 
   requires: [
     'Nexus.capabilities.Icons',
+    'Nexus.capabilities.CapabilitiesGridStore',
     'Nexus.capabilities.CreateCapabilityWindow'
   ],
 
@@ -73,14 +74,25 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
       disabled: true
     });
 
+    self.gridStore = NX.create('Nexus.capabilities.CapabilitiesGridStore', {
+      capabilityStore: self.mediator().capabilityStore
+    });
+
     Ext.apply(self, {
       cls: 'nx-capabilities-CapabilityGrid',
-      ds: self.mediator().capabilityStore,
+      ds: self.gridStore,
       stripeRows: true,
+
       loadMask: {
         msg: 'Loading...',
         msgCls: 'loading-indicator'
       },
+
+      view: NX.create('Ext.grid.GroupingView', {
+        forceFit: true,
+        groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Capabilities" : "Capability"]})'
+      }),
+
       viewConfig: {
         emptyText: 'Click "Add" to configure a capability.',
         deferEmptyText: false,
@@ -91,6 +103,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
           }
         }
       },
+
       sm: NX.create('Ext.grid.RowSelectionModel', {
         singleSelect: true,
         listeners: {
@@ -101,40 +114,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         }
       }),
 
-      columns: [
-        {
-          width: 30,
-          resizable: false,
-          sortable: false,
-          fixed: true,
-          hideable: false,
-          menuDisabled: true,
-          renderer: function (value, metaData, record) {
-            return icons.iconFor(record.data).img;
-          }
-        },
-        {
-          id: 'typeName',
-          width: 175,
-          header: 'Type',
-          dataIndex: 'typeName',
-          sortable: true
-        },
-        {
-          id: 'description',
-          width: 250,
-          header: 'Description',
-          dataIndex: 'description',
-          sortable: true
-        },
-        {
-          id: 'notes',
-          width: 175,
-          header: 'Notes',
-          dataIndex: 'notes',
-          sortable: true
-        }
-      ],
+      colModel: self.gridStore.getColumnsModel(),
       autoExpandColumn: 'notes',
 
       tbar: [
@@ -164,7 +144,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         render: {
           fn: function () {
             self.mediator().capabilityStore.on('beforeload', self.rememberSelection, self);
-            self.mediator().capabilityStore.on('load', self.recallSelection, self);
+            self.mediator().capabilityStore.on('load', self.reconfigureGrid, self);
 
             self.mediator().capabilityTypeStore.on('beforeload', self.disableAddButton, self);
             self.mediator().capabilityTypeStore.on('load', self.maybeEnableAddButton, self);
@@ -255,6 +235,26 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         },
         self, {single: true}
     );
+  },
+
+  /**
+   * Reconfigures the grid based on information available is grid store.
+   * @private
+   */
+  reconfigureGrid: function () {
+    var self = this;
+
+    if (!self.mediator().capabilityStore.sameTagKeysAs(self.gridStore.tagKeys)) {
+      self.gridStore = NX.create('Nexus.capabilities.CapabilitiesGridStore', {
+        capabilityStore: self.mediator().capabilityStore
+      });
+      self.gridStore.on('load', self.recallSelection, self);
+
+      self.reconfigure(self.gridStore, self.gridStore.getColumnsModel());
+    }
+    else {
+      self.gridStore.loadCapabilities();
+    }
   },
 
   /**
