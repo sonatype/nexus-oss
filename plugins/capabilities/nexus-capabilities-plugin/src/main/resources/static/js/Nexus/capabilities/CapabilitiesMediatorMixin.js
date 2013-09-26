@@ -10,28 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-package org.sonatype.nexus.plugins.capabilities.test.helper;
-
-import javax.inject.Named;
-
-import org.sonatype.nexus.formfields.RepositoryCombobox;
-import org.sonatype.nexus.plugins.capabilities.Capability;
+/*global NX, Ext, Sonatype, Nexus*/
 
 /**
- * A test/demo capability for using {@link RepositoryCombobox}.
+ * Capabilities Mediator mixin.
  *
  * @since 2.7
  */
-@Named(RepositoryComboCapabilityDescriptor.TYPE_ID)
-public class RepositoryComboCapability
-    extends TestCapability
-    implements Capability
-{
+NX.define('Nexus.capabilities.CapabilitiesMediatorMixin', {
 
-  @Override
-  public String status() {
-    return null;
+  requires: [
+    'Nexus.capabilities.CapabilitiesMediator'
+  ],
+
+  mediator: function () {
+    return Nexus.capabilities.CapabilitiesMediator;
   }
 
-}
+});

@@ -30,7 +30,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(RepositoryIsInServiceCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class RepositoryIsInServiceCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends TestCapabilityDescriptor
 {
 
   static final String TYPE_ID = "[repositoryIsInService]";

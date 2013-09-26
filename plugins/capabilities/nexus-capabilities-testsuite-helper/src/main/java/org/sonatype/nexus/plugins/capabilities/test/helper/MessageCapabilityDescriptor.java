@@ -32,7 +32,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(MessageCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class MessageCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends TestCapabilityDescriptor
 {
 
   static final String TYPE_ID = "[message]";

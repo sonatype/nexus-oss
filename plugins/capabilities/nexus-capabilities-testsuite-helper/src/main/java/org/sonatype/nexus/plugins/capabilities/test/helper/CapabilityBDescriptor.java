@@ -30,7 +30,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(CapabilityBDescriptor.TYPE_ID)
 @Singleton
 public class CapabilityBDescriptor
-    extends CapabilityDescriptorSupport
+    extends TestCapabilityDescriptor
 {
 
   static final String TYPE_ID = "[b]";
