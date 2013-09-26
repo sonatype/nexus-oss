@@ -232,13 +232,13 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
         values = form.getFieldValues(),
         capability = Ext.apply(self.currentRecord.$capability, {notes: values.notes});
 
-     self.mediator().updateCapability(capability,
+    self.mediator().updateCapability(capability,
         function () {
-           self.mediator().showMessage('Capability saved',  self.mediator().describeCapability(self.currentRecord));
-           self.mediator().refresh();
+          self.mediator().showMessage('Capability saved', self.mediator().describeCapability(self.currentRecord));
+          self.mediator().refresh();
         },
         function (response, options) {
-           self.mediator().handleError(response, options, 'Capability could not be saved', form);
+          self.mediator().handleError(response, options, 'Capability could not be saved', form);
         }
     );
   }

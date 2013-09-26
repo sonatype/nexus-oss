@@ -48,7 +48,7 @@ NX.define('Nexus.capabilities.CapabilityAbout', {
   setCapability: function (capability) {
     var self = this,
         about = '',
-        capabilityType =  self.mediator().capabilityTypeStore.getTypeById(capability.typeId);
+        capabilityType = self.mediator().capabilityTypeStore.getTypeById(capability.typeId);
 
     if (capabilityType) {
       about = capabilityType.about;
