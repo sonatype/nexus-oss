@@ -17,25 +17,31 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.codec.Hex;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author cstamas
  */
-@Component(role = PasswordEncoder.class, hint = "md5")
+@Singleton
+@Named("md5")
 public class MD5PasswordEncoder
     implements PasswordEncoder
 {
 
+  @Override
   public String getMethod() {
     return "MD5";
   }
 
+  @Override
   public String encodePassword(String password, Object salt) {
     return "{MD5}" + encodeString(password);
   }
 
+  @Override
   public boolean isPasswordValid(String encPassword, String inputPassword, Object salt) {
     String encryptedPassword = this.stripHeader(encPassword);
     String check = this.stripHeader(encodePassword(inputPassword, salt));

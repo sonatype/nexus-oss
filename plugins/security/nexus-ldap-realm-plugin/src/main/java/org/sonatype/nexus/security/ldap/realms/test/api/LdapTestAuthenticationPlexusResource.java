@@ -15,6 +15,10 @@ package org.sonatype.nexus.security.ldap.realms.test.api;
 
 import java.net.MalformedURLException;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -31,8 +35,6 @@ import org.sonatype.security.ldap.realms.persist.ValidationResponse;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -42,18 +44,20 @@ import org.restlet.resource.ResourceException;
 /**
  * Resource for connection info validation and testing.
  */
-@Component(role = PlexusResource.class, hint = "LdapTestAuthenticationPlexusResource")
 @Path("/ldap/test_auth")
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
+@Singleton
+@Named("LdapTestAuthenticationPlexusResource")
+@Typed(PlexusResource.class)
 public class LdapTestAuthenticationPlexusResource
     extends AbstractLdapRealmPlexusResource
 {
 
-  @Requirement
+  @Inject
   private LdapConnectionTester ldapConnectionTester;
 
-  @Requirement
+  @Inject
   private ConfigurationValidator configurationValidator;
 
   public LdapTestAuthenticationPlexusResource() {

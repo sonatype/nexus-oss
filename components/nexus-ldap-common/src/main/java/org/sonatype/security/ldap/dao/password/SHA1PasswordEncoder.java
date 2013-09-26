@@ -17,25 +17,31 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.codec.Base64;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author cstamas
  */
-@Component(role = PasswordEncoder.class, hint = "sha")
+@Singleton
+@Named("sha")
 public class SHA1PasswordEncoder
     implements PasswordEncoder
 {
 
+  @Named
   public String getMethod() {
     return "SHA";
   }
 
+  @Named
   public String encodePassword(String password, Object salt) {
     return "{SHA}" + encodeString(password);
   }
 
+  @Named
   public boolean isPasswordValid(String encPassword, String inputPassword, Object salt) {
     String encryptedPassword = encPassword;
     if (encryptedPassword.startsWith("{SHA}") || encryptedPassword.startsWith("{sha}")) {

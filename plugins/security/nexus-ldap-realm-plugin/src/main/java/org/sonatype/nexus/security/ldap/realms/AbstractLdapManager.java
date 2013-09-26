@@ -11,15 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.security.ldap.realms;
+package org.sonatype.nexus.security.ldap.realms;
 
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.ldap.LdapAuthenticator;
@@ -31,6 +29,8 @@ import org.sonatype.security.ldap.dao.LdapUserDAO;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
+import org.sonatype.security.ldap.realms.DefaultLdapContextFactory;
+import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.security.ldap.realms.connector.DefaultLdapConnector;
 import org.sonatype.security.ldap.realms.connector.LdapConnector;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
@@ -44,9 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Singleton
-@Named
-public class SimpleLdapManager
+public abstract class AbstractLdapManager
     implements LdapManager
 {
 
@@ -60,11 +58,10 @@ public class SimpleLdapManager
 
   private final LdapConfiguration ldapConfiguration;
 
-  private LdapConnector ldapManagerStrategy;
+  private LdapConnector ldapConnector;
 
-  @Inject
-  public SimpleLdapManager(LdapAuthenticator ldapAuthenticator, LdapUserDAO ldapUserManager,
-      LdapGroupDAO ldapGroupManager, LdapConfiguration ldapConfiguration)
+  public AbstractLdapManager(final LdapAuthenticator ldapAuthenticator, final LdapUserDAO ldapUserManager,
+      final LdapGroupDAO ldapGroupManager, final LdapConfiguration ldapConfiguration)
   {
     this.ldapAuthenticator = checkNotNull(ldapAuthenticator);
     this.ldapUserManager = checkNotNull(ldapUserManager);
@@ -76,21 +73,22 @@ public class SimpleLdapManager
   public SortedSet<String> getAllGroups()
       throws LdapDAOException
   {
-    return this.getLdapManagerConnector().getAllGroups();
+    return this.getLdapConnector().getAllGroups();
   }
 
   @Override
   public SortedSet<LdapUser> getAllUsers()
       throws LdapDAOException
   {
-    return this.getLdapManagerConnector().getAllUsers();
+    return this.getLdapConnector().getAllUsers();
   }
 
   @Override
   public String getGroupName(String groupId)
-      throws LdapDAOException, NoSuchLdapGroupException
+      throws LdapDAOException,
+             NoSuchLdapGroupException
   {
-    return this.getLdapManagerConnector().getGroupName(groupId);
+    return this.getLdapConnector().getGroupName(groupId);
   }
 
   @Override
@@ -98,42 +96,47 @@ public class SimpleLdapManager
       throws NoSuchLdapUserException,
              LdapDAOException
   {
-    return this.getLdapManagerConnector().getUser(username);
+    return this.getLdapConnector().getUser(username);
   }
 
   @Override
   public Set<String> getUserRoles(String userId)
-      throws LdapDAOException, NoLdapUserRolesFoundException
+      throws LdapDAOException,
+             NoLdapUserRolesFoundException
   {
-    return this.getLdapManagerConnector().getUserRoles(userId);
+    return this.getLdapConnector().getUserRoles(userId);
   }
 
   @Override
   public SortedSet<LdapUser> getUsers(int userCount)
       throws LdapDAOException
   {
-    return this.getLdapManagerConnector().getUsers(userCount);
+    return this.getLdapConnector().getUsers(userCount);
   }
 
   @Override
   public SortedSet<LdapUser> searchUsers(String username)
       throws LdapDAOException
   {
-    return this.getLdapManagerConnector().searchUsers(username);
+    return this.getLdapConnector().searchUsers(username);
   }
 
-  private LdapConnector getLdapManagerConnector()
+  private LdapConnector getLdapConnector()
       throws LdapDAOException
   {
-    if (this.ldapManagerStrategy == null) {
-      this.ldapManagerStrategy = new DefaultLdapConnector(
-          "test",
+    if (this.ldapConnector == null) {
+      this.ldapConnector = new DefaultLdapConnector(
+          "default",
           this.ldapUserManager,
           this.ldapGroupManager,
           this.getLdapContextFactory(),
           this.getLdapAuthConfiguration());
     }
-    return this.ldapManagerStrategy;
+    return this.ldapConnector;
+  }
+  
+  protected void resetLdapConnector() {
+    this.ldapConnector = null;
   }
 
   protected LdapConfiguration getLdapConfiguration() {
@@ -173,6 +176,13 @@ public class SimpleLdapManager
     defaultLdapContextFactory.setSearchBase(connInfo.getSearchBase());
     defaultLdapContextFactory.setAuthentication(connInfo.getAuthScheme());
 
+    Map<String, String> connectionProperties = new HashMap<String, String>();
+    // set the realm
+    if (connInfo.getRealm() != null) {
+      connectionProperties.put("java.naming.security.sasl.realm", connInfo.getRealm());
+    }
+    defaultLdapContextFactory.setAdditionalEnvironment(connectionProperties);
+
     return defaultLdapContextFactory;
   }
 
@@ -208,5 +218,4 @@ public class SimpleLdapManager
     }
     throw new AuthenticationException("User: " + userId + " could not be authenticated.");
   }
-
 }
