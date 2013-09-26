@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.obr.proxy;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
@@ -21,9 +24,8 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = ObrRepositoryConfigurator.class)
+@Named
+@Singleton
 public class ObrRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {

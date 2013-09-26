@@ -16,6 +16,10 @@ package org.sonatype.nexus.obr.proxy;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -50,35 +54,43 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.osgi.service.obr.Resource;
 
-@Component(role = Repository.class, hint = ObrRepository.ROLE_HINT, instantiationStrategy = "per-lookup",
-    description = "OBR")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named(ObrRepository.ROLE_HINT)
+@Description("OBR")
 public class ObrRepository
     extends AbstractProxyRepository
     implements ObrProxyRepository, ObrHostedRepository, Repository
 {
   public static final String ROLE_HINT = "obr-proxy";
 
-  @Requirement(hint = ObrContentClass.ID)
-  private ContentClass obrContentClass;
+  private final ContentClass obrContentClass;
 
-  @Requirement
-  private ObrRepositoryConfigurator obrRepositoryConfigurator;
+  private final ObrRepositoryConfigurator obrRepositoryConfigurator;
+
+  private final ObrPluginConfiguration obrConfiguration;
+
+  private final ObrMetadataSource obrMetadataSource;
 
   private final RepositoryKind obrRepositoryKind =
       new MutableProxyRepositoryKind(this, null, new DefaultRepositoryKind(ObrHostedRepository.class, null),
           new DefaultRepositoryKind(ObrProxyRepository.class, null));
 
-  @Requirement
-  private ObrPluginConfiguration obrConfiguration;
-
-  @Requirement(hint = "obr-bindex")
-  private ObrMetadataSource obrMetadataSource;
+  @Inject
+  public ObrRepository(final @Named(ObrContentClass.ID) ContentClass obrContentClass,
+                       final ObrRepositoryConfigurator obrRepositoryConfigurator,
+                       final ObrPluginConfiguration obrConfiguration,
+                       final @Named("obr-bindex") ObrMetadataSource obrMetadataSource)
+  {
+    this.obrContentClass = checkNotNull(obrContentClass);
+    this.obrRepositoryConfigurator = checkNotNull(obrRepositoryConfigurator);
+    this.obrConfiguration = checkNotNull(obrConfiguration);
+    this.obrMetadataSource = checkNotNull(obrMetadataSource);
+  }
 
   public ContentClass getRepositoryContentClass() {
     return obrContentClass;
