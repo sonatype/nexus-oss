@@ -30,7 +30,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(RepositoryIsNotBlockedCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class RepositoryIsNotBlockedCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends TestCapabilityDescriptor
 {
 
   static final String TYPE_ID = "[repositoryIsNotBlocked]";

@@ -13,25 +13,17 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.formfields.RepositoryCombobox;
-import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 
 /**
- * A test/demo capability for using {@link RepositoryCombobox}.
- *
  * @since 2.7
  */
-@Named(RepositoryComboCapabilityDescriptor.TYPE_ID)
-public class RepositoryComboCapability
-    extends TestCapability
-    implements Capability
+public abstract class TestCapabilityDescriptor
+    extends CapabilityDescriptorSupport
 {
 
   @Override
-  public String status() {
-    return null;
+  protected String renderAbout() throws Exception {
+    return "<b>" + this.getClass().getName() + "</b>";
   }
-
 }
