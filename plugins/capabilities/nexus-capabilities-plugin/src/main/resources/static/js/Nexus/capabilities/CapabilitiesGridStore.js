@@ -111,6 +111,13 @@ NX.define('Nexus.capabilities.CapabilitiesGridStore', {
           renderer: function (value, metaData, record) {
             return icons.iconFor(record.data).img;
           }
+        },
+        {
+          id: 'typeName',
+          width: 175,
+          header: 'Type',
+          dataIndex: 'typeName',
+          sortable: true
         }
     );
 
@@ -129,13 +136,6 @@ NX.define('Nexus.capabilities.CapabilitiesGridStore', {
     }
 
     columns.push(
-        {
-          id: 'typeName',
-          width: 175,
-          header: 'Type',
-          dataIndex: 'typeName',
-          sortable: true
-        },
         {
           id: 'description',
           width: 250,
