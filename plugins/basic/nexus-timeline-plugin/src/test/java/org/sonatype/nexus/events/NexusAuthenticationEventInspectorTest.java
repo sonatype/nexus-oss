@@ -20,7 +20,7 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.record.NexusAuthenticationEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.hamcrest.CoreMatchers;
@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class NexusAuthenticationEventInspectorTest
-    extends PlexusTestCaseSupport
+    extends NexusTestSupport
 {
   @Before
   public void manglePlexus()
