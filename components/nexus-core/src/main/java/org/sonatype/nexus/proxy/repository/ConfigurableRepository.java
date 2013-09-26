@@ -20,7 +20,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.mirror.DefaultPublishedMirrors;
 import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
@@ -138,7 +138,7 @@ public class ConfigurableRepository
   }
 
   public void setLocalUrl(String localUrl)
-      throws StorageException
+      throws LocalStorageException
   {
     String newLocalUrl = null;
 
