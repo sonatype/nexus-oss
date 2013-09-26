@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
@@ -34,16 +35,13 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.util.PlexusUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
@@ -53,18 +51,18 @@ public class DefaultRepositoryTypeRegistry
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final Injector injector;
-
   private final Map<String, ContentClass> contentClasses;
+
+  private final ApplicationRuntimeConfigurationBuilder applicationRuntimeConfigurationBuilder;
 
   private ConcurrentMap<String, ContentClass> repoCachedContentClasses;
 
   private Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
 
   @Inject
-  public DefaultRepositoryTypeRegistry(final Injector injector, final Map<String, ContentClass> contentClasses) {
-    this.injector = checkNotNull(injector);
+  public DefaultRepositoryTypeRegistry(final Map<String, ContentClass> contentClasses, final ApplicationRuntimeConfigurationBuilder applicationRuntimeConfigurationBuilder) {
     this.contentClasses = checkNotNull(contentClasses);
+    this.applicationRuntimeConfigurationBuilder = checkNotNull(applicationRuntimeConfigurationBuilder);
     this.repoCachedContentClasses = Maps.newConcurrentMap();
 
     Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> result = ArrayListMultimap.create();
@@ -226,11 +224,18 @@ public class DefaultRepositoryTypeRegistry
       result = repoCachedContentClasses.get(cacheKey);
     }
     else {
+      // TODO: My assumption is that this code is never called
+      // or, it get
       try {
-        final Repository repository = injector.getProvider(Key.get(role, Names.named(hint))).get();
-        result = repository.getRepositoryContentClass();
-        PlexusUtils.release(repository);
-        repoCachedContentClasses.put(cacheKey, result);
+        Repository repository = null;
+        try {
+          repository = applicationRuntimeConfigurationBuilder.createRepository(role, hint);
+          result = repository.getRepositoryContentClass();
+          repoCachedContentClasses.put(cacheKey, result);
+        }
+        finally {
+          applicationRuntimeConfigurationBuilder.releaseRepository(repository);
+        }
       }
       catch (Exception e) {
         logger.warn("Container lookup failed", e);
