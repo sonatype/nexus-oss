@@ -15,6 +15,8 @@ package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Date;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -28,7 +30,6 @@ import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.MediaType;
 
 /**
@@ -38,8 +39,12 @@ abstract public class AbstractNexusItemEventEntryBuilder
     extends AbstractLoggingComponent
     implements SyndEntryBuilder<NexusArtifactEvent>
 {
-  @Requirement
   private RepositoryRegistry repositoryRegistry;
+
+  @Inject
+  public void setRepositoryRegistry(final RepositoryRegistry repositoryRegistry) {
+    this.repositoryRegistry = repositoryRegistry;
+  }
 
   protected RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;

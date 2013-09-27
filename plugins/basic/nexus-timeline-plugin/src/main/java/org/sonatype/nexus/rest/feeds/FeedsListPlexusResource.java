@@ -15,6 +15,9 @@ package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -24,16 +27,15 @@ import org.sonatype.nexus.rest.feeds.sources.FeedSource;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A resource that lists existing feeds.
@@ -41,16 +43,21 @@ import org.restlet.resource.Variant;
  * @author cstamas
  * @author dip
  */
-@Component(role = PlexusResource.class, hint = "FeedsListPlexusResource")
 @Path(FeedsListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
+@Named
+@Singleton
 public class FeedsListPlexusResource
     extends AbstractNexusPlexusResource
 {
   public static final String RESOURCE_URI = "/feeds";
 
-  @Requirement(role = FeedSource.class)
-  private List<FeedSource> feeds;
+  private final List<FeedSource> feeds;
+
+  @Inject
+  public FeedsListPlexusResource(final List<FeedSource> feeds) {
+    this.feeds = checkNotNull(feeds);
+  }
 
   @Override
   public Object getPayloadInstance() {

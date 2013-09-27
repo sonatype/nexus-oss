@@ -13,11 +13,11 @@
 
 package org.sonatype.nexus.feeds.record;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-
-import org.codehaus.plexus.component.annotations.Requirement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,13 +27,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbstractFeedRecorderEventInspector
     extends AbstractEventInspector
 {
-  @Requirement
   private FeedRecorder feedRecorder;
 
-  @Requirement
   private ApplicationStatusSource applicationStatusSource;
 
   public AbstractFeedRecorderEventInspector() {
+    // empty
   }
 
   // for now used just for UTs
@@ -44,8 +43,18 @@ public abstract class AbstractFeedRecorderEventInspector
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
   }
 
+  @Inject
+  public void setFeedRecorder(final FeedRecorder feedRecorder) {
+    this.feedRecorder = feedRecorder;
+  }
+
   protected FeedRecorder getFeedRecorder() {
     return feedRecorder;
+  }
+
+  @Inject
+  public void setApplicationStatusSource(final ApplicationStatusSource applicationStatusSource) {
+    this.applicationStatusSource = applicationStatusSource;
   }
 
   protected ApplicationStatusSource getApplicationStatusSource() {

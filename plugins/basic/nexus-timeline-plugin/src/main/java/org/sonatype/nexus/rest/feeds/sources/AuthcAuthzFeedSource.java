@@ -19,6 +19,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 
@@ -28,14 +31,13 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.MediaType;
 
-@Component(role = FeedSource.class, hint = "authcAuthz")
+@Named(AuthcAuthzFeedSource.CHANNEL_KEY)
+@Singleton
 public class AuthcAuthzFeedSource
     extends AbstractFeedSource
 {
-
   public static final String CHANNEL_KEY = "authcAuthz";
 
   public String getFeedKey() {

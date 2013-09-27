@@ -17,11 +17,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.feeds.sources.FeedSource;
 
 import com.sun.syndication.feed.synd.SyndFeed;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -46,8 +47,12 @@ public abstract class AbstractFeedPlexusResource
 
   private static final String ATOM_1_0 = "atom_1.0";
 
-  @Requirement(role = FeedSource.class)
   private Map<String, FeedSource> feeds;
+
+  @Inject
+  public void setFeeds(final Map<String, FeedSource> feeds) {
+    this.feeds = feeds;
+  }
 
   public List<Variant> getVariants() {
     List<Variant> result = super.getVariants();
