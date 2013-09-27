@@ -47,7 +47,15 @@ NX.define('Nexus.grid.GridFilterBox', {
             }
           },
           scope: self
-        },
+        }
+      }
+    });
+
+    Ext.apply(self, {
+      items: [
+        self.filterField
+      ],
+      listeners: {
         render: {
           fn: function () {
             self.grid.on('reconfigure', self.onGridReconfigured, self);
@@ -56,12 +64,6 @@ NX.define('Nexus.grid.GridFilterBox', {
           scope: self
         }
       }
-    });
-
-    Ext.apply(self, {
-      items: [
-        self.filterField
-      ]
     });
 
     self.constructor.superclass.initComponent.apply(self, arguments);
