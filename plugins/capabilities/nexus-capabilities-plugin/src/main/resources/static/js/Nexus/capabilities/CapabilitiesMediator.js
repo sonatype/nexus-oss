@@ -190,7 +190,8 @@ NX.define('Nexus.capabilities.CapabilitiesMediator', {
    */
   handleError: function (response, options, title, form) {
     var handled = false,
-        remainingMessages = [];
+        remainingMessages = [],
+        message;
 
     if (response.siestaValidationError) {
       handled = true;
@@ -218,8 +219,6 @@ NX.define('Nexus.capabilities.CapabilitiesMediator', {
       remainingMessages.push(response.siestaError.message);
     }
     if (!handled) {
-      var message;
-
       if (response.responseText) {
         message = Sonatype.utils.parseHTMLErrorMessage(response.responseText);
       }

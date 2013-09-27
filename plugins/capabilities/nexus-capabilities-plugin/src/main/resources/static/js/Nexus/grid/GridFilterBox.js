@@ -36,13 +36,13 @@ NX.define('Nexus.grid.GridFilterBox', {
   initComponent: function () {
     var self = this;
 
-    self.filterField = NX.create('Ext.form.TextField',{
+    self.filterField = NX.create('Ext.form.TextField', {
       enableKeyEvents: true,
 
       listeners: {
         keyup: {
           fn: function (x, e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
               self.filterGrid();
             }
           },
@@ -59,8 +59,8 @@ NX.define('Nexus.grid.GridFilterBox', {
     });
 
     Ext.apply(self, {
-      items : [
-         self.filterField
+      items: [
+        self.filterField
       ]
     });
 
@@ -101,14 +101,15 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = false;
 
         self.grid.getStore().filterBy(function (record) {
-          for (var idx in filterFields) {
-            if (filterFields[idx]) {
-              if (self.matches(regexp, record, filterFields[idx], self.extractValue(record, filterFields[idx]))) {
-                return true;
+          var shouldBeIncluded = false;
+          Ext.each(filterFields, function (field) {
+            if (field) {
+              if (self.matches(regexp, record, field, self.extractValue(record, field))) {
+                shouldBeIncluded = true;
               }
             }
-          }
-          return false;
+          });
+          return shouldBeIncluded;
         }, self);
       }
     }
@@ -152,7 +153,7 @@ NX.define('Nexus.grid.GridFilterBox', {
 
     if (columnModel) {
       columns = columnModel.getColumnsBy(function () {
-        return true
+        return true;
       });
       if (columns) {
         Ext.each(columns, function (column) {

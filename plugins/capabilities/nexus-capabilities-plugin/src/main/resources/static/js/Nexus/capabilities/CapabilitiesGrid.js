@@ -152,7 +152,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         self.buttonDelete,
         '->',
         NX.create('Nexus.grid.GridFilterBox', {
-          grid: self,
+          grid: self
         })
       ],
 
