@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -60,8 +64,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.p2.bridge.Publisher;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -74,8 +76,10 @@ import org.eclipse.tycho.model.PluginRef;
 import org.eclipse.tycho.model.UpdateSite;
 import org.eclipse.tycho.model.UpdateSite.SiteFeatureRef;
 
-@Component(role = Repository.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT,
-    instantiationStrategy = "per-lookup", description = "Eclipse Update Site")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named(UpdateSiteProxyRepositoryImpl.ROLE_HINT)
+@Description("Eclipse Update Site")
 public class UpdateSiteProxyRepositoryImpl
     extends AbstractProxyRepository
     implements UpdateSiteProxyRepository, Repository, Initializable
@@ -86,21 +90,29 @@ public class UpdateSiteProxyRepositoryImpl
 
   public static final String ROLE_HINT = "eclipse-update-site";
 
-  @Requirement(hint = P2ContentClass.ID)
-  private ContentClass contentClass;
+  private final ContentClass contentClass;
 
-  @Requirement
-  private NexusScheduler scheduler;
+  private final NexusScheduler scheduler;
 
-  @Requirement(role = UpdateSiteRepositoryConfigurator.class)
-  private UpdateSiteRepositoryConfigurator updateSiteRepositoryConfigurator;
+  private final UpdateSiteRepositoryConfigurator updateSiteRepositoryConfigurator;
 
-  @Requirement
-  private Publisher publisher;
+  private final Publisher publisher;
 
   private MutableProxyRepositoryKind repositoryKind;
 
   private String overwriteRemoteUrl;
+
+  @Inject
+  public UpdateSiteProxyRepositoryImpl(final @Named(P2ContentClass.ID) ContentClass contentClass,
+                                       final NexusScheduler scheduler,
+                                       final UpdateSiteRepositoryConfigurator updateSiteRepositoryConfigurator,
+                                       final Publisher publisher)
+  {
+    this.contentClass = checkNotNull(contentClass);
+    this.scheduler = checkNotNull(scheduler);
+    this.updateSiteRepositoryConfigurator = checkNotNull(updateSiteRepositoryConfigurator);
+    this.publisher = checkNotNull(publisher);
+  }
 
   private static final WalkerFilter filter = new WalkerFilter()
   {
@@ -310,19 +322,6 @@ public class UpdateSiteProxyRepositoryImpl
    * data Instead we must use remote storage to go off to the arbitrary url listed. Also, note that the file name
    * stored remotely may not be named to our standard ${id}_${version}.jar so we need to cache locally as that instead
    * of what is named remotely
-   *
-   * @param absoluteUrl
-   * @param featureRef
-   * @param request
-   * @param mirrored
-   * @return
-   */
-  /**
-   * @param absoluteUrl
-   * @param featureRef
-   * @param request
-   * @param mirrored
-   * @return
    */
   private Feature mirrorAbsoluteFeature(final String absoluteUrl, final FeatureRef featureRef,
                                         final ResourceStoreRequest request, final Set<String> mirrored)

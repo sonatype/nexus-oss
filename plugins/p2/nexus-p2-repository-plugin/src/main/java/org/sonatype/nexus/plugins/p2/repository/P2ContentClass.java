@@ -13,16 +13,16 @@
 
 package org.sonatype.nexus.plugins.p2.repository;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
-import org.sonatype.nexus.proxy.registry.ContentClass;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = ContentClass.class, hint = P2ContentClass.ID)
+@Named(P2ContentClass.ID)
+@Singleton
 public class P2ContentClass
     extends AbstractIdContentClass
 {
-
   public static final String ID = "p2";
 
   public static final String NAME = "P2";

@@ -16,6 +16,10 @@ package org.sonatype.nexus.plugins.p2.repository.group;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -40,28 +44,35 @@ import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-@Component(role = GroupRepository.class, hint = P2GroupRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup",
-    description = "Eclipse P2 Artifacts")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named(P2GroupRepositoryImpl.ROLE_HINT)
+@Description("Eclipse P2 Artifaxcts")
 public class P2GroupRepositoryImpl
     extends AbstractGroupRepository
     implements P2GroupRepository, GroupRepository
 {
   public static final String ROLE_HINT = "p2";
 
-  @Requirement(hint = P2ContentClass.ID)
-  private ContentClass contentClass;
+  private final ContentClass contentClass;
 
-  @Requirement(role = P2MetadataSource.class, hint = "group")
-  private P2MetadataSource<P2GroupRepository> metadataSource;
+  private final P2MetadataSource<P2GroupRepository> metadataSource;
 
-  @Requirement
-  private P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator;
+  private final P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator;
 
   private RepositoryKind repositoryKind;
+
+  @Inject
+  public P2GroupRepositoryImpl(final @Named(P2ContentClass.ID) ContentClass contentClass,
+                               final P2MetadataSource<P2GroupRepository> metadataSource,
+                               final P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator)
+  {
+    this.contentClass = checkNotNull(contentClass);
+    this.metadataSource = checkNotNull(metadataSource);
+    this.p2GroupRepositoryConfigurator = checkNotNull(p2GroupRepositoryConfigurator);
+  }
 
   @Override
   public ContentClass getRepositoryContentClass() {

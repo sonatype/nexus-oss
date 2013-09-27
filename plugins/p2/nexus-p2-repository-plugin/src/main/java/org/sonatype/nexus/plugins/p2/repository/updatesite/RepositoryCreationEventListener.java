@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
@@ -22,19 +26,25 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.ScheduledTask;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-@Component(role = EventInspector.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT)
+@Named
+@Singleton
 public class RepositoryCreationEventListener
     extends AbstractEventInspector
     implements EventInspector
 {
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
-  @Requirement
-  private NexusScheduler scheduler;
+  private final NexusScheduler scheduler;
+
+  @Inject
+  public RepositoryCreationEventListener(final ApplicationStatusSource applicationStatusSource,
+                                         final NexusScheduler scheduler)
+  {
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.scheduler = checkNotNull(scheduler);
+  }
 
   @Override
   public boolean accepts(final Event<?> evt) {

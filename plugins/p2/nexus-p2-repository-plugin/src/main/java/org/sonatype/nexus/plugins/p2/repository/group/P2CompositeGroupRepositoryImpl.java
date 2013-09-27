@@ -20,6 +20,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -49,11 +53,10 @@ import org.sonatype.p2.bridge.CompositeRepository;
 
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.COMPOSITE_ARTIFACTS_XML;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.COMPOSITE_CONTENT_XML;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_INDEX;
@@ -64,28 +67,35 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.creat
  *
  * @since 2.6
  */
-@Component(role = GroupRepository.class, hint = P2CompositeGroupRepositoryImpl.ROLE_HINT,
-    instantiationStrategy = "per-lookup", description = "Eclipse P2 Composite")
+@Named(P2CompositeGroupRepositoryImpl.ROLE_HINT)
+@Description("Eclipse P2 Composite")
 public class P2CompositeGroupRepositoryImpl
     extends AbstractGroupRepository
     implements P2CompositeGroupRepository, GroupRepository
 {
-
   public static final String ROLE_HINT = "p2-composite";
 
-  @Requirement(hint = P2ContentClass.ID)
-  private ContentClass contentClass;
+  private final ContentClass contentClass;
 
-  @Requirement
-  private P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator;
+  private final P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator;
 
-  @Requirement
-  private CompositeRepository compositeRepository;
+  private final CompositeRepository compositeRepository;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
   private RepositoryKind repositoryKind;
+
+  @Inject
+  public P2CompositeGroupRepositoryImpl(final @Named(P2ContentClass.ID) ContentClass contentClass,
+                                        final P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator,
+                                        final CompositeRepository compositeRepository,
+                                        final ApplicationStatusSource applicationStatusSource)
+  {
+    this.contentClass = checkNotNull(contentClass);
+    this.p2GroupRepositoryConfigurator = checkNotNull(p2GroupRepositoryConfigurator);
+    this.compositeRepository = checkNotNull(compositeRepository);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+  }
 
   @Override
   protected Configurator getConfigurator() {

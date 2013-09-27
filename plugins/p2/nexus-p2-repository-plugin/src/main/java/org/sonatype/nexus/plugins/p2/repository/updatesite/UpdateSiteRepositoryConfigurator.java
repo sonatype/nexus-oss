@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = UpdateSiteRepositoryConfigurator.class)
+@Named
+@Singleton
 public class UpdateSiteRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
