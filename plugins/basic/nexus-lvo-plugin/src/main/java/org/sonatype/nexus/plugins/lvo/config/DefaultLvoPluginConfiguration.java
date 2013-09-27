@@ -22,8 +22,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -33,18 +36,24 @@ import org.sonatype.nexus.plugins.lvo.config.model.Configuration;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Writer;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-@Component(role = LvoPluginConfiguration.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultLvoPluginConfiguration
     extends AbstractLoggingComponent
     implements LvoPluginConfiguration
 {
-  @org.codehaus.plexus.component.annotations.Configuration(value = "${nexus-work}/conf/lvo-plugin.xml")
-  private File configurationFile;
+  private final File configurationFile;
+
+  @Inject
+  public DefaultLvoPluginConfiguration(final @Named("${nexus-work}/conf/lvo-plugin.xml") File configurationFile) {
+    this.configurationFile = checkNotNull(configurationFile);
+  }
 
   private Configuration configuration;
 
@@ -60,7 +69,7 @@ public class DefaultLvoPluginConfiguration
     try {
       Configuration c = getConfiguration();
 
-      for (CLvoKey lvoKey : (List<CLvoKey>) c.getLvoKeys()) {
+      for (CLvoKey lvoKey : c.getLvoKeys()) {
         if (key.equals(lvoKey.getKey())) {
           return lvoKey;
         }
@@ -77,36 +86,24 @@ public class DefaultLvoPluginConfiguration
     try {
       return getConfiguration().isEnabled();
     }
-    catch (ConfigurationException e) {
-      getLogger().error("Unable to read configuration", e);
-    }
-    catch (IOException e) {
+    catch (ConfigurationException | IOException e) {
       getLogger().error("Unable to read configuration", e);
     }
 
     return false;
   }
 
-  public void enable()
-      throws ConfigurationException,
-             IOException
-  {
+  public void enable() throws ConfigurationException, IOException {
     getConfiguration().setEnabled(true);
     save();
   }
 
-  public void disable()
-      throws ConfigurationException,
-             IOException
-  {
+  public void disable() throws ConfigurationException, IOException {
     getConfiguration().setEnabled(false);
     save();
   }
 
-  protected Configuration getConfiguration()
-      throws ConfigurationException,
-             IOException
-  {
+  protected Configuration getConfiguration() throws ConfigurationException, IOException {
     if (configuration != null) {
       return configuration;
     }
@@ -170,9 +167,7 @@ public class DefaultLvoPluginConfiguration
     return configuration;
   }
 
-  protected void save()
-      throws IOException
-  {
+  protected void save() throws IOException {
     lock.lock();
 
     configurationFile.getParentFile().mkdirs();

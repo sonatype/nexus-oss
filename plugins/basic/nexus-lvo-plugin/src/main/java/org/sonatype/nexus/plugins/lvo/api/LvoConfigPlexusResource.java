@@ -15,6 +15,10 @@ package org.sonatype.nexus.plugins.lvo.api;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.plugins.lvo.api.dto.LvoConfigDTO;
 import org.sonatype.nexus.plugins.lvo.api.dto.LvoConfigRequest;
@@ -22,10 +26,7 @@ import org.sonatype.nexus.plugins.lvo.api.dto.LvoConfigResponse;
 import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -33,14 +34,18 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "LvoConfigPlexusResource")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class LvoConfigPlexusResource
     extends AbstractPlexusResource
 {
-  @Requirement
-  LvoPluginConfiguration config;
+  private final LvoPluginConfiguration config;
 
-  public LvoConfigPlexusResource() {
+  @Inject
+  public LvoConfigPlexusResource(final LvoPluginConfiguration config) {
+    this.config = checkNotNull(config);
     this.setModifiable(true);
   }
 
@@ -89,10 +94,7 @@ public class LvoConfigPlexusResource
         config.disable();
       }
     }
-    catch (IOException e) {
-      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Unable to store lvo configuration", e);
-    }
-    catch (ConfigurationException e) {
+    catch (IOException | ConfigurationException e) {
       throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Unable to store lvo configuration", e);
     }
 

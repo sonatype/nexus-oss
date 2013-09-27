@@ -16,6 +16,10 @@ package org.sonatype.nexus.plugins.lvo;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
@@ -25,36 +29,28 @@ import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = LvoPlugin.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultLvoPlugin
     extends AbstractLoggingComponent
     implements LvoPlugin
 {
+  private final LvoPluginConfiguration lvoPluginConfiguration;
+
+  private final Map<String, DiscoveryStrategy> strategies;
+
   private final VersionScheme versionScheme = new GenericVersionScheme();
 
-  @Requirement
-  private LvoPluginConfiguration lvoPluginConfiguration;
-
-  @Requirement(role = DiscoveryStrategy.class)
-  private Map<String, DiscoveryStrategy> strategies;
-
-  /**
-   * For plexus injection.
-   */
-  public DefaultLvoPlugin() {
-  }
-
-  @VisibleForTesting
-  DefaultLvoPlugin(final LvoPluginConfiguration lvoPluginConfiguration,
-                   final Map<String, DiscoveryStrategy> strategies)
+  @Inject
+  public DefaultLvoPlugin(final LvoPluginConfiguration lvoPluginConfiguration,
+                          final Map<String, DiscoveryStrategy> strategies)
   {
-    this.lvoPluginConfiguration = lvoPluginConfiguration;
-    this.strategies = strategies;
+    this.lvoPluginConfiguration = checkNotNull(lvoPluginConfiguration);
+    this.strategies = checkNotNull(strategies);
   }
 
   public DiscoveryResponse getLatestVersionForKey(String key)
