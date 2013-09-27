@@ -111,7 +111,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         }
       }),
 
-      colModel: self.gridStore.getColumnsModel(),
+      colModel: self.gridStore.getColumnModel(),
       autoExpandColumn: 'notes',
 
       tbar: [
@@ -247,7 +247,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
       });
       self.gridStore.on('load', self.recallSelection, self);
 
-      self.reconfigure(self.gridStore, self.gridStore.getColumnsModel());
+      self.reconfigure(self.gridStore, self.gridStore.getColumnModel());
     }
     else {
       self.gridStore.loadCapabilities();

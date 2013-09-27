@@ -74,6 +74,9 @@ NX.define('Nexus.capabilities.CapabilitiesGridStore', {
     self.loadCapabilities();
   },
 
+  /**
+   * Loads all capabilities from configured capability store into this store.
+   */
   loadCapabilities: function () {
     var self = this,
         recordType = this.recordType,
@@ -95,7 +98,10 @@ NX.define('Nexus.capabilities.CapabilitiesGridStore', {
     self.loadRecords({records: newRecords}, {});
   },
 
-  getColumnsModel: function () {
+  /**
+   * Returns the column model based on discovered tags.
+   */
+  getColumnModel: function () {
     var self = this,
         icons = Nexus.capabilities.Icons,
         columns = [];
@@ -153,6 +159,15 @@ NX.define('Nexus.capabilities.CapabilitiesGridStore', {
     );
 
     return NX.create('Ext.grid.ColumnModel', {columns: columns});
+  },
+
+  /**
+   * Extract tag key from name. Returns null if name is not a tag name.
+   */
+  getTagKeyFrom: function (name) {
+    if (name.startsWith('tag$')) {
+      return name.substring('tag$'.length);
+    }
   }
 
 });
