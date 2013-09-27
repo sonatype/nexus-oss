@@ -16,12 +16,15 @@ package org.sonatype.nexus.security;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.plexus.appevents.Event;
@@ -34,23 +37,30 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role = EventInspector.class, hint = "SecurityCleanupEventInspector")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class SecurityCleanupEventInspector
     extends AbstractEventInspector
 {
-  @Requirement(hint = "default")
-  private ConfigurationManager configManager;
+  private final ConfigurationManager configManager;
 
-  @Requirement
-  private SecuritySystem security;
+  private final SecuritySystem security;
 
+  @Inject
+  public SecurityCleanupEventInspector(ConfigurationManager configManager, SecuritySystem security) {
+    this.configManager = checkNotNull(configManager);
+    this.security = checkNotNull(security);
+  }
+
+  @Override
   public boolean accepts(Event<?> evt) {
     return evt instanceof RepositoryRegistryEventRemove || evt instanceof TargetRegistryEventRemove;
   }
 
+  @Override
   public void inspect(Event<?> evt) {
     if (evt instanceof RepositoryRegistryEventRemove) {
       RepositoryRegistryEventRemove rEvt = (RepositoryRegistryEventRemove) evt;
