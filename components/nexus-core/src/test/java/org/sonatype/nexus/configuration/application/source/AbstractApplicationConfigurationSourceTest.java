@@ -16,14 +16,14 @@ package org.sonatype.nexus.configuration.application.source;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.test.NexusTestSupport;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
 
 public abstract class AbstractApplicationConfigurationSourceTest
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
   protected ApplicationConfigurationSource configurationSource;
 
@@ -32,6 +32,11 @@ public abstract class AbstractApplicationConfigurationSourceTest
 
   protected abstract InputStream getOriginatingConfigurationInputStream()
       throws IOException;
+
+  @Override
+  protected boolean loadConfigurationAtSetUp() {
+    return false;
+  }
 
   @Test
   public void testConfigStream()
