@@ -17,11 +17,12 @@ import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.record.NexusAuthenticationEventInspector;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link NexusAuthenticationEventInspector}.
  */
 public class NexusAuthenticationEventInspectorTest
-   extends TestSupport
+    extends NexusTestSupport
 {
   private NexusAuthenticationEventInspector underTest;
 
@@ -42,6 +43,7 @@ public class NexusAuthenticationEventInspectorTest
 
   @Before
   public void setUp() throws Exception {
+    MockitoAnnotations.initMocks( this );
     feedRecorder = new DummyFeedRecorder();
 
     underTest = new NexusAuthenticationEventInspector(nexusConfiguration);

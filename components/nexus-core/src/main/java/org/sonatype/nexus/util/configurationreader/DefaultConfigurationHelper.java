@@ -25,6 +25,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.locks.Lock;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.ConfigurationUpgrader;
 import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
@@ -33,19 +36,20 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @SuppressWarnings("deprecation")
-@Component(role = ConfigurationHelper.class)
+@Singleton
+@Named
 public class DefaultConfigurationHelper
     extends AbstractLoggingComponent
     implements ConfigurationHelper
 {
 
+  @Override
   public <E extends org.sonatype.configuration.Configuration> E load(E baseConfiguration, String modelVersion,
                                                                      File configurationFile, Lock lock,
                                                                      ConfigurationReader<E> reader,
@@ -129,6 +133,7 @@ public class DefaultConfigurationHelper
     return configuration;
   }
 
+  @Override
   public <E> void save(E configuration, File configurationFile, ConfigurationWritter<E> writer, Lock lock) {
     lock.lock();
 

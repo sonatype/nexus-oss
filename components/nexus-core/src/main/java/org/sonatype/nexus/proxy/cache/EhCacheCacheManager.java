@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.proxy.cache;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 
 /**
@@ -25,15 +27,20 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
  *
  * @author cstamas
  */
-@Component(role = CacheManager.class)
+@Named
+@Singleton
 public class EhCacheCacheManager
     extends AbstractLoggingComponent
     implements CacheManager, Disposable
 {
-  @Requirement
-  private CacheManagerComponent cacheManagerComponent;
+  private final CacheManagerComponent cacheManagerComponent;
 
   public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
+
+  @Inject
+  public EhCacheCacheManager(final CacheManagerComponent cacheManagerComponent) {
+    this.cacheManagerComponent = cacheManagerComponent;
+  }
 
   public PathCache getPathCache(String cache) {
     final net.sf.ehcache.CacheManager ehCacheManager = cacheManagerComponent.getCacheManager();

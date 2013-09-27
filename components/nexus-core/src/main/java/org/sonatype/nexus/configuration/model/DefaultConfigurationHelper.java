@@ -15,22 +15,26 @@ package org.sonatype.nexus.configuration.model;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.PasswordHelper;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
 
 import com.thoughtworks.xstream.XStream;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = ConfigurationHelper.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class DefaultConfigurationHelper
     extends AbstractLoggingComponent
     implements ConfigurationHelper
 {
-  @Requirement
-  private PasswordHelper passwordHelper;
+  private final PasswordHelper passwordHelper;
 
   private static final String PASSWORD_MASK = "*****";
 
@@ -39,6 +43,12 @@ public class DefaultConfigurationHelper
    */
   private static XStream xstream = new XStream();
 
+  @Inject
+  public DefaultConfigurationHelper(PasswordHelper passwordHelper) {
+    this.passwordHelper = checkNotNull(passwordHelper);
+  }
+
+  @Override
   public Configuration encryptDecryptPasswords(final Configuration config, final boolean encrypt) {
     if (null == config) {
       return null;
@@ -51,6 +61,7 @@ public class DefaultConfigurationHelper
     return copy;
   }
 
+  @Override
   public Configuration maskPasswords(final Configuration config) {
     if (null == config) {
       return null;

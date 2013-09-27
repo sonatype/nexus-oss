@@ -13,27 +13,25 @@
 
 package org.sonatype.nexus.configuration;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.plexus.components.cipher.PlexusCipher;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
 
 import com.google.common.base.Preconditions;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role = PasswordHelper.class)
+@Singleton
+@Named
 public class PasswordHelper
 {
 
   private static final String ENC = "CMMDwoV";
 
-  @Requirement
-  private PlexusCipher plexusCipher;
+  private final PlexusCipher plexusCipher;
 
-  public PasswordHelper() {}
-
-  /**
-   * @since 2.7
-   */
+  @Inject
   public PasswordHelper(final PlexusCipher plexusCipher) {
     this.plexusCipher = Preconditions.checkNotNull(plexusCipher, "plexusCipher");
   }

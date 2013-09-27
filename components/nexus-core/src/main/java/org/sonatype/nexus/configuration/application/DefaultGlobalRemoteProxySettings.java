@@ -19,6 +19,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
@@ -30,22 +34,28 @@ import org.sonatype.nexus.configuration.model.CRemoteProxySettingsCoreConfigurat
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @since 2.6
  */
-@Component(role = GlobalRemoteProxySettings.class)
+@Singleton
+@Named
 public class DefaultGlobalRemoteProxySettings
     extends AbstractConfigurable
     implements GlobalRemoteProxySettings
 {
 
-  @Requirement
-  private AuthenticationInfoConverter authenticationInfoConverter;
+  private final AuthenticationInfoConverter authenticationInfoConverter;
+
+  @Inject
+  public DefaultGlobalRemoteProxySettings(final EventBus eventBus, final AuthenticationInfoConverter authenticationInfoConverter) {
+    super(eventBus);
+    this.authenticationInfoConverter = checkNotNull(authenticationInfoConverter);
+  }
 
   @Override
   protected ApplicationConfiguration getApplicationConfiguration() {

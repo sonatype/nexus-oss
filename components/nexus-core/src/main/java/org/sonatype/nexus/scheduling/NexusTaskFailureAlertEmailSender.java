@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.scheduling;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.email.NexusPostOffice;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
@@ -20,22 +24,26 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link EventInspector} that will send alert email (if necessary) in case of a failing {@link NexusTask}.
  *
  * @author Alin Dreghiciu
  */
-@Component(role = EventInspector.class, hint = "nexusTaskFailureAlertEmailSender")
+@Singleton
+@Named
 public class NexusTaskFailureAlertEmailSender
     extends AbstractEventInspector
     implements AsynchronousEventInspector
 {
 
-  @Requirement
-  private NexusPostOffice m_postOffice;
+  private final NexusPostOffice m_postOffice;
+
+  @Inject
+  public NexusTaskFailureAlertEmailSender(final NexusPostOffice m_postOffice) {
+    this.m_postOffice = checkNotNull(m_postOffice);
+  }
 
   /**
    * Accepts events of type {@link NexusTaskFailureEvent}. {@inheritDoc}

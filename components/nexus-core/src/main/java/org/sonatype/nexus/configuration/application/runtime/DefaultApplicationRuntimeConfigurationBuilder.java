@@ -13,71 +13,55 @@
 
 package org.sonatype.nexus.configuration.application.runtime;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The Class DefaultRuntimeConfigurationBuilder. Todo: all the bad thing is now concentrated in this class. We are
- * playing container instead of container.
- *
- * @author cstamas
+ * Default implementation of {@link ApplicationRuntimeConfigurationBuilder}.
  */
-@Component(role = ApplicationRuntimeConfigurationBuilder.class)
+@Singleton
+@Named
 public class DefaultApplicationRuntimeConfigurationBuilder
     extends AbstractLoggingComponent
     implements ApplicationRuntimeConfigurationBuilder
 {
-  @Requirement
-  private PlexusContainer plexusContainer;
+  private final BeanLocator beanLocator;
 
-  @Override
-  public Repository createRepositoryFromModel(final Configuration configuration, final CRepository repoConf)
-      throws ConfigurationException
-  {
-    Repository repository = createRepository(repoConf.getProviderRole(), repoConf.getProviderHint());
-
-    repository.configure(repoConf);
-
-    return repository;
+  @Inject
+  public DefaultApplicationRuntimeConfigurationBuilder(final BeanLocator beanLocator) {
+    this.beanLocator = checkNotNull(beanLocator);
   }
 
   @Override
-  public void releaseRepository(final Repository repository, final Configuration configuration,
-                                final CRepository repoConf)
-      throws ConfigurationException
-  {
+  public Repository createRepository(Class<? extends Repository> type, String name) throws ConfigurationException {
     try {
-      plexusContainer.release(repository);
+      final Provider<? extends Repository> rp = beanLocator.locate(Key.get(type, Names.named(name))).iterator().next()
+          .getProvider();
+      return rp.get();
     }
-    catch (ComponentLifecycleException e) {
-      getLogger().warn(
-          "Problem while unregistering repository {} from Nexus! This will not affect configuration but might occupy memory, that will be released after next reboot.",
-          RepositoryStringUtils.getHumanizedNameString(repository), e);
-    }
-  }
-
-  // ----------------------------------------
-  // private stuff
-
-  private Repository createRepository(final String role, final String hint)
-      throws InvalidConfigurationException
-  {
-    try {
-      return Repository.class.cast(plexusContainer.lookup(role, hint));
-    }
-    catch (ComponentLookupException e) {
+    catch (Exception e) {
       throw new InvalidConfigurationException("Could not lookup a new instance of Repository!", e);
     }
+  }
+
+  @Override
+  public void releaseRepository(final Repository repository) throws ConfigurationException {
+    if (repository == null) {
+      return;
+    }
+    repository.dispose();
   }
 }

@@ -198,7 +198,7 @@ public class NexusTypeVisitorTest
 
     // nexus-core: squash of modules causes to have more than 11
     // TODO: review this to somehow isolate this
-    Assert.assertEquals(18, components.size());
+    Assert.assertEquals(16, components.size());
 
     // non-extension so no automatic hinting...
     Assert.assertEquals(BeanA.class,

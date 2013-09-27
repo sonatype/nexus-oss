@@ -18,9 +18,7 @@ import java.util.Map;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.NexusStreamResponse;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * A component responsible for configuration management.
@@ -49,15 +47,6 @@ public interface NexusConfiguration
   boolean isConfigurationUpgraded();
 
   boolean isConfigurationDefaulted();
-
-  /**
-   * Creates a repository from the CRepository model. Do not use this method!
-   *
-   * @deprecated Do NOT use this method! The MutableConfiguration.createRepository( CRepository settings ) should be
-   *             used instead.
-   */
-  Repository createRepositoryFromModel(CRepository repository)
-      throws ConfigurationException;
 
   // ------------------------------------------------------------------
   // Booting

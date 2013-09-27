@@ -24,10 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -49,7 +54,6 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -79,12 +83,10 @@ import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -93,27 +95,41 @@ import org.codehaus.plexus.util.StringUtils;
  *
  * @author cstamas
  */
-@Component(role = NexusConfiguration.class)
+@Singleton
+@Named
 public class DefaultNexusConfiguration
     extends AbstractLoggingComponent
-    implements NexusConfiguration, Initializable
+    implements NexusConfiguration
 {
-  @Requirement
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
-  /**
-   * The path cache is referenced here only for UTs sake. At deploy/runtime, this does not matter, as CacheManager is
-   * already part of component dependency graph. This reference here is merely for UTs, as almost all of them (from
-   * nexus-app module onwards) does "awake" this component, and hence, by having this reference here, we actually
-   * pull
-   * and have Plexus manage the "lifecycle" of CacheManager component (and indirectly, EhCacheManager lifecycle).
-   */
-  @Requirement
-  @SuppressWarnings("unused")
-  private CacheManager pathCache;
+  private final ApplicationConfigurationSource configurationSource;
 
-  @Requirement(hint = "file")
-  private ApplicationConfigurationSource configurationSource;
+  private final GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
+
+  private final GlobalRemoteProxySettings globalRemoteProxySettings;
+
+  private final ApplicationConfigurationValidator configurationValidator;
+
+  private final ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder;
+
+  private final RepositoryTypeRegistry repositoryTypeRegistry;
+
+  private final RepositoryRegistry repositoryRegistry;
+
+  private final List<ScheduledTaskDescriptor> scheduledTaskDescriptors;
+
+  private final SecuritySystem securitySystem;
+
+  private final VetoFormatter vetoFormatter;
+
+  private final List<ConfigurationModifier> configurationModifiers;
+  
+  private final ClassLoader uberClassLoader; 
+
+  private final File workingDirectory;
+
+  // ===
 
   /**
    * The global local storage context.
@@ -124,42 +140,6 @@ public class DefaultNexusConfiguration
    * The global remote storage context.
    */
   private RemoteStorageContext globalRemoteStorageContext;
-
-  @Requirement
-  private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
-
-  @Requirement
-  private GlobalRemoteProxySettings globalRemoteProxySettings;
-
-  /**
-   * The config validator.
-   */
-  @Requirement
-  private ApplicationConfigurationValidator configurationValidator;
-
-  /**
-   * The runtime configuration builder.
-   */
-  @Requirement
-  private ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder;
-
-  @Requirement
-  private RepositoryTypeRegistry repositoryTypeRegistry;
-
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
-
-  @Requirement(role = ScheduledTaskDescriptor.class)
-  private List<ScheduledTaskDescriptor> scheduledTaskDescriptors;
-
-  @Requirement
-  private SecuritySystem securitySystem;
-
-  @org.codehaus.plexus.component.annotations.Configuration(value = "${nexus-work}")
-  private File workingDirectory;
-
-  @Requirement
-  private VetoFormatter vetoFormatter;
 
   /**
    * The config dir
@@ -186,10 +166,55 @@ public class DefaultNexusConfiguration
    */
   private Map<RepositoryTypeDescriptor, Integer> repositoryMaxInstanceCountLimits;
 
-  @Requirement
-  private List<ConfigurationModifier> configurationModifiers;
-
   // ==
+
+  @Inject
+  public DefaultNexusConfiguration(EventBus eventBus,
+      @Named("file") ApplicationConfigurationSource configurationSource,
+      GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
+      GlobalRemoteProxySettings globalRemoteProxySettings, ApplicationConfigurationValidator configurationValidator,
+      ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
+      RepositoryTypeRegistry repositoryTypeRegistry, RepositoryRegistry repositoryRegistry,
+      List<ScheduledTaskDescriptor> scheduledTaskDescriptors, SecuritySystem securitySystem,
+      @Parameters Map<String, String> parameters, VetoFormatter vetoFormatter,
+      List<ConfigurationModifier> configurationModifiers, @Named("nexus-uber") ClassLoader uberClassLoader)
+  {
+    this.eventBus = checkNotNull(eventBus);
+    this.configurationSource = checkNotNull(configurationSource);
+    this.globalRemoteConnectionSettings = checkNotNull(globalRemoteConnectionSettings);
+    this.globalRemoteProxySettings = checkNotNull(globalRemoteProxySettings);
+    this.configurationValidator = checkNotNull(configurationValidator);
+    this.runtimeConfigurationBuilder = checkNotNull(runtimeConfigurationBuilder);
+    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.scheduledTaskDescriptors = checkNotNull(scheduledTaskDescriptors);
+    this.securitySystem = checkNotNull(securitySystem);
+    this.vetoFormatter = checkNotNull(vetoFormatter);
+    this.configurationModifiers = checkNotNull(configurationModifiers);
+    this.uberClassLoader = checkNotNull(uberClassLoader);
+    
+    // init
+    try {
+      final File workingDirectory = new File(parameters.get("nexus-work"));
+      this.workingDirectory = canonicalize(workingDirectory);
+      if (!workingDirectory.isDirectory()) {
+        forceMkdir(workingDirectory);
+      }
+
+      this.temporaryDirectory = canonicalize(new File(System.getProperty("java.io.tmpdir")));
+      if (!temporaryDirectory.isDirectory()) {
+        forceMkdir(temporaryDirectory);
+      }
+
+      this.configurationDirectory = canonicalize(new File(getWorkingDirectory(), "conf"));
+      if (!configurationDirectory.isDirectory()) {
+        forceMkdir(configurationDirectory);
+      }
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
+  }
 
   private File canonicalize(final File file) {
     try {
@@ -223,26 +248,6 @@ public class DefaultNexusConfiguration
               + "******************************************************************************";
       getLogger().error(message);
       throw Throwables.propagate(e);
-    }
-  }
-
-  @Override
-  public void initialize()
-      throws InitializationException
-  {
-    workingDirectory = canonicalize(workingDirectory);
-    if (!workingDirectory.isDirectory()) {
-      forceMkdir(workingDirectory);
-    }
-
-    temporaryDirectory = canonicalize(new File(System.getProperty("java.io.tmpdir")));
-    if (!temporaryDirectory.isDirectory()) {
-      forceMkdir(temporaryDirectory);
-    }
-
-    configurationDirectory = canonicalize(new File(getWorkingDirectory(), "conf"));
-    if (!configurationDirectory.isDirectory()) {
-      forceMkdir(configurationDirectory);
     }
   }
 
@@ -491,14 +496,6 @@ public class DefaultNexusConfiguration
   }
 
   @Override
-  @Deprecated
-  public Repository createRepositoryFromModel(CRepository repository)
-      throws ConfigurationException
-  {
-    return runtimeConfigurationBuilder.createRepositoryFromModel(getConfigurationModel(), repository);
-  }
-
-  @Override
   public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors() {
     return Collections.unmodifiableList(scheduledTaskDescriptors);
   }
@@ -740,10 +737,25 @@ public class DefaultNexusConfiguration
   protected Repository instantiateRepository(final Configuration configuration, final CRepository repositoryModel)
       throws ConfigurationException
   {
-    checkRepositoryMaxInstanceCountForCreation(repositoryModel);
+    try {
+      // core realm will search child/plugin realms too
+      final Class<Repository> klazz = (Class<Repository>) Class.forName(repositoryModel.getProviderRole(), true, uberClassLoader);
+      return instantiateRepository(configuration, klazz, repositoryModel.getProviderHint(), repositoryModel);
+    }
+    catch (Exception e) {
+      throw new ConfigurationException("Cannot instantianate repository " + repositoryModel.getProviderRole() + ":"
+          + repositoryModel.getProviderHint(), e);
+    }
+  }
+
+  protected Repository instantiateRepository(final Configuration configuration, final Class<? extends Repository> klazz, final String name, final CRepository repositoryModel)
+      throws ConfigurationException
+  {
+    checkRepositoryMaxInstanceCountForCreation(klazz, name, repositoryModel);
 
     // create it, will do runtime validation
-    Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel(configuration, repositoryModel);
+    Repository repository = runtimeConfigurationBuilder.createRepository(klazz, name);
+    repository.configure(repositoryModel);
 
     // register with repoRegistry
     repositoryRegistry.addRepository(repository);
@@ -757,7 +769,7 @@ public class DefaultNexusConfiguration
       throws ConfigurationException
   {
     // release it
-    runtimeConfigurationBuilder.releaseRepository(repository, configuration, repositoryModel);
+    runtimeConfigurationBuilder.releaseRepository(repository);
   }
 
   // ------------------------------------------------------------------
@@ -838,12 +850,11 @@ public class DefaultNexusConfiguration
     }
   }
 
-  protected void checkRepositoryMaxInstanceCountForCreation(CRepository repositoryModel)
+  protected void checkRepositoryMaxInstanceCountForCreation(Class<? extends Repository> klazz, String name, CRepository repositoryModel)
       throws ConfigurationException
   {
     RepositoryTypeDescriptor rtd =
-        repositoryTypeRegistry.getRepositoryTypeDescriptor(repositoryModel.getProviderRole(),
-            repositoryModel.getProviderHint());
+        repositoryTypeRegistry.getRepositoryTypeDescriptor(klazz, name);
 
     int maxCount;
 

@@ -352,7 +352,7 @@ public abstract class AbstractRepository
 
   @Override
   public void setLocalUrl(String localUrl)
-      throws StorageException
+      throws LocalStorageException
   {
     String newLocalUrl = null;
 
@@ -1276,4 +1276,8 @@ public abstract class AbstractRepository
     return !request.isRequestLocalOnly() && !request.isRequestRemoteOnly();
   }
 
+  @Override
+  public void dispose() {
+    unregisterFromEventBus();
+  }
 }

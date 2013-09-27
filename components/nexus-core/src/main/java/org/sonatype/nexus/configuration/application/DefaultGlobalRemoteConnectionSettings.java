@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.configuration.application;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
@@ -22,14 +26,19 @@ import org.sonatype.nexus.configuration.model.CGlobalRemoteConnectionSettingsCor
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = GlobalRemoteConnectionSettings.class)
+@Singleton
+@Named
 public class DefaultGlobalRemoteConnectionSettings
     extends AbstractConfigurable
     implements GlobalRemoteConnectionSettings
 {
+  @Inject
+  public DefaultGlobalRemoteConnectionSettings(final EventBus eventBus) {
+    super(eventBus);
+  }
+
   @Override
   protected ApplicationConfiguration getApplicationConfiguration() {
     return null;
@@ -62,40 +71,49 @@ public class DefaultGlobalRemoteConnectionSettings
 
   // ==
 
+  @Override 
   public int getConnectionTimeout() {
     return getCurrentConfiguration(false).getConnectionTimeout();
   }
 
+  @Override 
   public void setConnectionTimeout(int connectionTimeout) {
     getCurrentConfiguration(true).setConnectionTimeout(connectionTimeout);
   }
 
+  @Override 
   public String getQueryString() {
     return getCurrentConfiguration(false).getQueryString();
   }
 
+  @Override 
   public void setQueryString(String queryString) {
     getCurrentConfiguration(true).setQueryString(queryString);
   }
 
+  @Override 
   public int getRetrievalRetryCount() {
     return getCurrentConfiguration(false).getRetrievalRetryCount();
   }
 
+  @Override 
   public void setRetrievalRetryCount(int retrievalRetryCount) {
     getCurrentConfiguration(true).setRetrievalRetryCount(retrievalRetryCount);
   }
 
+  @Override 
   public String getUserAgentCustomizationString() {
     return getCurrentConfiguration(false).getUserAgentCustomizationString();
   }
 
+  @Override 
   public void setUserAgentCustomizationString(String userAgentCustomizationString) {
     getCurrentConfiguration(true).setUserAgentCustomizationString(userAgentCustomizationString);
   }
 
   // ==
 
+  @Override 
   public RemoteConnectionSettings convertAndValidateFromModel(CRemoteConnectionSettings model)
       throws ConfigurationException
   {
@@ -119,6 +137,7 @@ public class DefaultGlobalRemoteConnectionSettings
     }
   }
 
+  @Override 
   public CRemoteConnectionSettings convertToModel(RemoteConnectionSettings settings) {
     if (settings == null) {
       return null;
@@ -138,6 +157,7 @@ public class DefaultGlobalRemoteConnectionSettings
     }
   }
 
+  @Override 
   public String getName() {
     return "Global Remote Connection Settings";
   }

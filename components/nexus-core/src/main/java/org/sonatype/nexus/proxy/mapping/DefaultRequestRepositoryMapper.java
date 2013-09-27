@@ -23,6 +23,10 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -41,6 +45,7 @@ import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.ResourceStoreUtils;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.component.annotations.Component;
@@ -65,21 +70,19 @@ import org.slf4j.LoggerFactory;
  *
  * @author cstamas
  */
-@Component(role = RequestRepositoryMapper.class)
+@Singleton
+@Named
 public class DefaultRequestRepositoryMapper
     extends AbstractConfigurable
     implements RequestRepositoryMapper
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-  @Requirement
-  private ApplicationConfigurationValidator validator;
+  private final ApplicationConfigurationValidator validator;
 
   /**
    * The compiled flag.
@@ -91,6 +94,16 @@ public class DefaultRequestRepositoryMapper
   private volatile List<RepositoryPathMapping> inclusions = new CopyOnWriteArrayList<RepositoryPathMapping>();
 
   private volatile List<RepositoryPathMapping> exclusions = new CopyOnWriteArrayList<RepositoryPathMapping>();
+
+  @Inject
+  public DefaultRequestRepositoryMapper(EventBus eventBus, ApplicationConfiguration applicationConfiguration,
+      RepositoryRegistry repositoryRegistry, ApplicationConfigurationValidator validator)
+  {
+    super(eventBus);
+    this.applicationConfiguration = applicationConfiguration;
+    this.repositoryRegistry = repositoryRegistry;
+    this.validator = validator;
+  }
 
   // ==
 

@@ -15,6 +15,10 @@ package org.sonatype.nexus.proxy.utils;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -23,19 +27,16 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = UserAgentBuilder.class)
+@Named
+@Singleton
 public class DefaultUserAgentBuilder
     implements UserAgentBuilder
 {
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
-  @Requirement
-  private List<UserAgentContributor> contributors;
+  private final List<UserAgentContributor> contributors;
 
   /**
    * The edition, that will tell us is there some change happened with installation.
@@ -47,18 +48,9 @@ public class DefaultUserAgentBuilder
    */
   private String userAgentPlatformInfo;
 
-  /**
-   * For plexus injection.
-   */
-  public DefaultUserAgentBuilder() {
-  }
-
-  /**
-   * For unit tests.
-   */
-  @VisibleForTesting
-  DefaultUserAgentBuilder(final ApplicationStatusSource applicationStatusSource,
-                          final List<UserAgentContributor> contributors)
+  @Inject
+  public DefaultUserAgentBuilder(final ApplicationStatusSource applicationStatusSource,
+                                 final List<UserAgentContributor> contributors)
   {
     this.applicationStatusSource = applicationStatusSource;
     this.contributors = contributors;

@@ -13,7 +13,9 @@
 
 package org.sonatype.nexus.util;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -28,15 +30,14 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  *
  * @author cstamas
  */
-@Component(role = ApplicationInterpolatorProvider.class)
+@Named
+@Singleton
 public class DefaultApplicationInterpolatorProvider
     implements ApplicationInterpolatorProvider, Contextualizable
 {
   private RegexBasedInterpolator regexBasedInterpolator;
 
   public DefaultApplicationInterpolatorProvider() {
-    super();
-
     regexBasedInterpolator = new RegexBasedInterpolator();
   }
 

@@ -13,15 +13,18 @@
 
 package org.sonatype.nexus.events;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.events.Veto;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.util.StringDigester;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.ExceptionUtils;
 
-@Component(role = VetoFormatter.class)
+@Named
+@Singleton
 public class DefaultVetoFormatter
     implements VetoFormatter
 {

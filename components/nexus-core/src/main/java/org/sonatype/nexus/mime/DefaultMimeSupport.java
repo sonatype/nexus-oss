@@ -22,6 +22,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.mime.detectors.NexusExtensionMimeDetector;
 import org.sonatype.nexus.mime.detectors.NexusMagicMimeMimeDetector;
@@ -37,7 +40,6 @@ import com.google.common.cache.LoadingCache;
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.MimeDetector;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
@@ -45,7 +47,8 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @since 2.0
  */
-@Component(role = MimeSupport.class)
+@Named
+@Singleton
 public class DefaultMimeSupport
     extends AbstractLoggingComponent
     implements MimeSupport
