@@ -32,7 +32,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(CapabilityWithActivationErrorDescriptor.TYPE_ID)
 @Singleton
 public class CapabilityWithActivationErrorDescriptor
-    extends CapabilityDescriptorSupport
+    extends TestCapabilityDescriptor
 {
 
   static final String TYPE_ID = "[withActivationError]";
