@@ -16,8 +16,11 @@ package org.sonatype.security.ldap.authorization;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
-import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
@@ -26,21 +29,27 @@ import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.realms.LdapManager;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = AuthorizationManager.class, hint = "LDAP")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named("LDAP")
 public class LdapAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
 
-  @Requirement
-  private LdapManager ldapManager;
-
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  private final LdapManager ldapManager;
+
+  @Inject
+  public LdapAuthorizationManager(final LdapManager ldapManager) {
+    this.ldapManager = checkNotNull(ldapManager);
+  }
+
+  @Override
   public String getSource() {
     return "LDAP";
   }
@@ -56,6 +65,7 @@ public class LdapAuthorizationManager
     return result;
   }
 
+  @Override
   public Set<Role> listRoles() {
     Set<Role> result = new TreeSet<Role>();
     try {
@@ -74,6 +84,7 @@ public class LdapAuthorizationManager
 
   }
 
+  @Override
   public Role getRole(String roleId)
       throws NoSuchRoleException
   {
@@ -99,10 +110,12 @@ public class LdapAuthorizationManager
     }
   }
 
+  @Override
   public Set<Privilege> listPrivileges() {
     return null;
   }
 
+  @Override
   public Privilege getPrivilege(String privilegeId)
       throws NoSuchPrivilegeException
   {

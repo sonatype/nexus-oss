@@ -59,7 +59,7 @@ public class LdapNexusIT
     security.start();
 
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
+    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
 
     Assert.assertTrue(security.hasRole(principals, "developer"));
     Assert.assertFalse(security.hasRole(principals, "JUNK"));
@@ -73,7 +73,7 @@ public class LdapNexusIT
     security.start();
 
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
+    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
 
     Assert.assertTrue(security.isPermitted(principals, "security:usersforgotpw:create"));
     Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:delete"));

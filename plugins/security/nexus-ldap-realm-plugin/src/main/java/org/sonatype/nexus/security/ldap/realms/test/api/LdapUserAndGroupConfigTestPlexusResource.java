@@ -19,6 +19,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
@@ -39,47 +44,43 @@ import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.security.ldap.realms.persist.ConfigurationValidator;
-import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.UsersGroupAuthTestLdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.ValidationResponse;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Resource for user and group mapping testing.
  */
-@Component(role = PlexusResource.class, hint = "LdapUserAndGroupConfigTestPlexusResource")
 @Path("/ldap/test_user_conf")
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
+@Singleton
+@Named("LdapUserAndGroupConfigTestPlexusResource")
+@Typed(PlexusResource.class)
 public class LdapUserAndGroupConfigTestPlexusResource
     extends AbstractLdapRealmPlexusResource
-    implements Contextualizable
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  @Requirement
+  @Inject
   private LdapConnectionTester ldapConnectionTester;
 
-  @Requirement
+  @Inject
   private ConfigurationValidator configurationValidator;
+  
+  @Inject
+  @Named(UsersGroupAuthTestLdapConfiguration.NAME)
+  private Provider<UsersGroupAuthTestLdapConfiguration> usersGroupAuthTestLdapConfigurationProvider;
+  
+  @Inject
+  @Named(TestLdapManager.NAME)
+  private Provider<TestLdapManager> testLdapManagerProvider;
 
-  private PlexusContainer container;
 
   public LdapUserAndGroupConfigTestPlexusResource() {
     this.setModifiable(true);
@@ -195,23 +196,13 @@ public class LdapUserAndGroupConfigTestPlexusResource
   {
     // the component we need to replace is nested 2 layers deep, and we need to do this per request
     // which is why I am monkeying around with the container. Its not exactly 'clean'....
+    // get the ldapConfig
+    final UsersGroupAuthTestLdapConfiguration ldapConfiguration = usersGroupAuthTestLdapConfigurationProvider.get();
+    ldapConfiguration.setLdapAuthConfiguration(ldapAuthConfiguration);
+    ldapConfiguration.setConnectionInfo(connectionInfo);
 
-    TestLdapManager ldapManager;
-    try {
-      // get the ldapConfig
-      UsersGroupAuthTestLdapConfiguration ldapConfiguration =
-          (UsersGroupAuthTestLdapConfiguration) this.container.lookup(LdapConfiguration.class,
-              "UsersGroupAuthTestLdapConfiguration");
-      ldapConfiguration.setLdapAuthConfiguration(ldapAuthConfiguration);
-      ldapConfiguration.setConnectionInfo(connectionInfo);
-
-      ldapManager = (TestLdapManager) this.container.lookup(LdapManager.class, "TestLdapManager");
-      ldapManager.setLdapConfiguration(ldapConfiguration);
-    }
-    catch (ComponentLookupException e) {
-      logger.error(e.getMessage(), e);
-      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
-    }
+    final TestLdapManager ldapManager = testLdapManagerProvider.get();
+    ldapManager.setLdapConfiguration(ldapConfiguration);
 
     return ldapManager;
   }
@@ -248,11 +239,4 @@ public class LdapUserAndGroupConfigTestPlexusResource
     }
     return dto;
   }
-
-  public void contextualize(org.codehaus.plexus.context.Context context)
-      throws ContextException
-  {
-    this.container = (PlexusContainer) context.get(PlexusConstants.PLEXUS_KEY);
-  }
-
 }

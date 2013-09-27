@@ -13,22 +13,30 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipher;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
-@Component(role = PasswordHelper.class)
+@Singleton
+@Named
 public class DefaultPasswordHelper
     implements PasswordHelper
 {
 
   private static final String ENC = "CMMDwoV";
 
-  @Requirement
-  private PlexusCipher plexusCipher;
+  private final PlexusCipher plexusCipher;
+
+  @Inject
+  public DefaultPasswordHelper(final PlexusCipher plexusCipher) {
+    this.plexusCipher = checkNotNull(plexusCipher);
+  }
 
   public String encrypt(String password)
       throws PlexusCipherException

@@ -18,6 +18,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.naming.InvalidNameException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -30,41 +33,39 @@ import javax.naming.ldap.LdapName;
 
 import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
  * @author cstamas
  */
-@Component(role = LdapUserDAO.class)
+@Singleton
+@Named
 public class DefaultLdapUserDAO
     implements LdapUserDAO
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private PasswordEncoderManager passwordEncoderManager;
-
-  protected Logger getLogger() {
-    return logger;
+  private final PasswordEncoderManager passwordEncoderManager;
+  
+  @Inject
+  public DefaultLdapUserDAO(final PasswordEncoderManager passwordEncoderManager) {
+    this.passwordEncoderManager = checkNotNull(passwordEncoderManager);
   }
 
+  @Override
   public PasswordEncoderManager getPasswordEncoderManager() {
     return passwordEncoderManager;
   }
 
-  public void setPasswordEncoderManager(PasswordEncoderManager passwordEncoder) {
-    this.passwordEncoderManager = passwordEncoder;
-  }
-
+  @Override
   public void removeUser(String username, LdapContext context, LdapAuthConfiguration configuration)
       throws NoSuchLdapUserException, LdapDAOException
   {
-    getLogger().info("Searching for user: " + username);
+    logger.info("Remove user: " + username);
 
     try {
       context = (LdapContext) context.lookup(StringUtils.defaultString(configuration.getUserBaseDn(), ""));
@@ -78,6 +79,7 @@ public class DefaultLdapUserDAO
     }
   }
 
+  @Override
   public void updateUser(LdapUser user, LdapContext context, LdapAuthConfiguration configuration)
       throws NoSuchLdapUserException, LdapDAOException
   {
@@ -166,6 +168,7 @@ public class DefaultLdapUserDAO
 
   }
 
+  @Override
   public void changePassword(String username, String password, LdapContext context,
                              LdapAuthConfiguration configuration)
       throws NoSuchLdapUserException, LdapDAOException
@@ -216,6 +219,7 @@ public class DefaultLdapUserDAO
     }
   }
 
+  @Override
   public NamingEnumeration<SearchResult> searchUsers(String username, LdapContext context,
                                                      LdapAuthConfiguration configuration, long limitCount)
       throws NamingException
@@ -223,6 +227,7 @@ public class DefaultLdapUserDAO
     return searchUsers(username, context, null, configuration, limitCount);
   }
 
+  @Override
   public NamingEnumeration<SearchResult> searchUsers(LdapContext context, LdapAuthConfiguration configuration,
                                                      long limitCount)
       throws NamingException
@@ -230,6 +235,7 @@ public class DefaultLdapUserDAO
     return searchUsers(null, context, null, configuration, limitCount);
   }
 
+  @Override
   public NamingEnumeration<SearchResult> searchUsers(LdapContext context, String[] returnAttributes,
                                                      LdapAuthConfiguration configuration, long limitCount)
       throws NamingException
@@ -237,6 +243,7 @@ public class DefaultLdapUserDAO
     return searchUsers(null, context, returnAttributes, configuration, limitCount);
   }
 
+  @Override
   public NamingEnumeration<SearchResult> searchUsers(String username, LdapContext context,
                                                      String[] returnAttributes, LdapAuthConfiguration configuration,
                                                      long limitCount)
@@ -259,23 +266,25 @@ public class DefaultLdapUserDAO
     }
 
     String f = configuration.getLdapFilter();
-    getLogger().debug("Specific filter rule: \"" + (f != null ? f : "none") + "\"");
+    logger.debug("Specific filter rule: \"" + (f != null ? f : "none") + "\"");
     String filter =
         "(&(objectClass=" + configuration.getUserObjectClass() + ")(" + configuration.getUserIdAttribute() + "="
             + (username != null ? username : "*") + ")" + (f != null && !f.isEmpty() ? "(" + f + ")" : "") + ")";
-    getLogger().debug("Searching for users with filter: \'" + filter + "\'");
+    logger.debug("Searching for users with filter: \'" + filter + "\'");
 
     String baseDN = StringUtils.defaultString(configuration.getUserBaseDn(), "");
 
     return context.search(baseDN, filter, ctls);
   }
 
+  @Override
   public SortedSet<LdapUser> getUsers(LdapContext context, LdapAuthConfiguration configuration, long limitCount)
       throws LdapDAOException
   {
     return this.getUsers(null, context, configuration, limitCount);
   }
 
+  @Override
   public SortedSet<LdapUser> getUsers(String username, LdapContext context, LdapAuthConfiguration configuration,
                                       long limitCount)
       throws LdapDAOException
@@ -301,6 +310,7 @@ public class DefaultLdapUserDAO
     }
   }
 
+  @Override
   public void createUser(LdapUser user, LdapContext context, LdapAuthConfiguration configuration)
       throws LdapDAOException
   {
@@ -371,10 +381,11 @@ public class DefaultLdapUserDAO
     }
   }
 
+  @Override
   public LdapUser getUser(String username, LdapContext context, LdapAuthConfiguration configuration)
       throws NoSuchLdapUserException, LdapDAOException
   {
-    getLogger().debug("Searching for user: " + username);
+    logger.debug("Searching for user: " + username);
 
     try {
       NamingEnumeration<SearchResult> result = searchUsers(username, context, null, configuration, 1);
@@ -447,7 +458,7 @@ public class DefaultLdapUserDAO
       result = String.valueOf(dn.getRdn(dn.size() - 1).getValue());
     }
     catch (InvalidNameException e) {
-      this.getLogger().debug("Expected a Group DN but found: " + dnString);
+      logger.debug("Expected a Group DN but found: " + dnString);
     }
     return result;
   }

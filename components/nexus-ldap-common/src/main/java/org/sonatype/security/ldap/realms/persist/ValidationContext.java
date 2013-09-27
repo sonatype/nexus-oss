@@ -13,6 +13,9 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
+/**
+ * ???
+ */
 public class ValidationContext
 {
 

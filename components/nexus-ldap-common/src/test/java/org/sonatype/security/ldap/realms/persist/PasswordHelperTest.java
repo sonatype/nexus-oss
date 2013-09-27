@@ -16,12 +16,21 @@ package org.sonatype.security.ldap.realms.persist;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
+
 import junit.framework.Assert;
 import org.junit.Test;
 
 public class PasswordHelperTest
     extends PlexusTestCaseSupport
 {
+
+  @Override
+  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
+    super.customizeContainerConfiguration(containerConfiguration);
+    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+  }
 
   public PasswordHelper getPasswordHelper()
       throws Exception

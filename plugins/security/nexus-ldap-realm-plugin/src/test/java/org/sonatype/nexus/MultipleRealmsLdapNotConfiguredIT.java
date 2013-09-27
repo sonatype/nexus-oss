@@ -64,7 +64,7 @@ public class MultipleRealmsLdapNotConfiguredIT
 
     // LDAP should fail
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
+    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
 
     // if realm is not configured, the user should not be able to be authorized
     Assert.assertFalse(security.hasRole(principals, "nx-developer"));
@@ -89,7 +89,7 @@ public class MultipleRealmsLdapNotConfiguredIT
 
     // LDAP
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
+    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
 
     // if realm is not configured, the user should not be able to be authorized
     Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:create"));

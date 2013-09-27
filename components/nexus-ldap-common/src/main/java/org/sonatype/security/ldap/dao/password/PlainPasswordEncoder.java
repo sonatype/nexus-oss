@@ -13,24 +13,29 @@
 
 package org.sonatype.security.ldap.dao.password;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author cstamas
  */
-@Component(role = PasswordEncoder.class, hint = "plain")
+@Singleton
+@Named("plain")
 public class PlainPasswordEncoder
     implements PasswordEncoder
 {
 
+  @Override
   public String getMethod() {
     return "PLAIN";
   }
 
+  @Override
   public String encodePassword(String password, Object salt) {
     return "{PLAIN}" + password;
   }
 
+  @Override
   public boolean isPasswordValid(String encPassword, String inputPassword, Object salt) {
     String encryptedPassword = encPassword;
     if (encryptedPassword.startsWith("{PLAIN}") || encryptedPassword.startsWith("{plain}")) {

@@ -26,6 +26,4 @@ public interface PasswordEncoderManager
 
   public String getPreferredEncoding();
 
-  public void setPreferredEncoding(String preferredEncoding);
-
 }

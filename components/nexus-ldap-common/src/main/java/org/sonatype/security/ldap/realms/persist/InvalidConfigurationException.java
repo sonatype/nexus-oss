@@ -45,6 +45,7 @@ public class InvalidConfigurationException
     return validationResponse;
   }
 
+  @Override
   public String getMessage() {
     StringWriter sw = new StringWriter();
 

@@ -20,6 +20,7 @@ import java.io.Writer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
@@ -30,32 +31,34 @@ import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 
 /**
  * Load LDAP configuration from disk and mask passwords.
- *
+ * 
  * @since 2.2
  */
+@Singleton
 @Named
 public class LdapXmlBundleAssembler
     implements BundleAssembler
 {
 
-  private ApplicationConfiguration cfg;
+  private final ApplicationConfiguration cfg;
 
-  private LdapConfiguration source;
+  private final LdapConfiguration source;
 
   private final StorageManager storage;
 
   @Inject
   public LdapXmlBundleAssembler(final ApplicationConfiguration cfg, final LdapConfiguration source,
-                                final StorageManager storage)
+      final StorageManager storage)
   {
-    this.cfg = cfg;
-    this.source = source;
-    this.storage = storage;
+    this.cfg = checkNotNull(cfg);
+    this.source = checkNotNull(source);
+    this.storage = checkNotNull(storage);
   }
 
   @Override
@@ -65,9 +68,7 @@ public class LdapXmlBundleAssembler
   }
 
   @Override
-  public Bundle assemble(final IssueSubmissionRequest issueSubmissionRequest)
-      throws IssueSubmissionException
-  {
+  public Bundle assemble(final IssueSubmissionRequest issueSubmissionRequest) throws IssueSubmissionException {
     ManagedBundle bundle;
     try {
       bundle = storage.createBundle("ldap.xml", "application/xml");
@@ -75,39 +76,22 @@ public class LdapXmlBundleAssembler
       final Configuration configuration = source.getConfiguration();
 
       if (configuration == null) {
-        final OutputStream outputStream = bundle.getOutputStream();
-        try {
+        try (final OutputStream outputStream = bundle.getOutputStream()) {
           outputStream.write("No ldap configuration".getBytes("us-ascii"));
-        }
-        finally {
-          outputStream.close();
         }
       }
       else {
-        Writer fw = null;
-        try {
-          fw = new OutputStreamWriter(bundle.getOutputStream());
-
+        try (final Writer fw = new OutputStreamWriter(bundle.getOutputStream())) {
           LdapConfigurationXpp3Writer writer = new LdapConfigurationXpp3Writer();
-
           configuration.getConnectionInfo().setSystemPassword("***");
-
           writer.write(fw, configuration);
-        }
-        finally {
-          if (fw != null) {
-            fw.flush();
-
-            fw.close();
-          }
+          fw.flush();
         }
       }
-
       return bundle;
     }
     catch (Exception e) {
       throw new IssueSubmissionException("Could not create ldap.xml to PR bundle", e);
     }
-
   }
 }
