@@ -16,8 +16,10 @@
 
 define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
 Sonatype.repoServer.RoutesEditPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+  var config = config || {},
+      defaultConfig = {},
+      gridFilterBox = NX.create('Nexus.grid.GridFilterBox');
+
   Ext.apply(this, config, defaultConfig);
 
   this.repoDataStore = new Ext.data.JsonStore({
@@ -270,7 +272,10 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
               scope : this,
               handler : this.deleteResourceHandler,
               disabled : !this.sp.checkPermission('nexus:routes', this.sp.DELETE)
-            }],
+            },
+            '->',
+            gridFilterBox
+        ],
 
         // grid view options
         ds : this.routesDataStore,
@@ -305,6 +310,9 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
         }
       });
   this.routesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
+
+  gridFilterBox.grid = this.routesGridPanel;
+
   // END: Repo List ******************************************************
   // *********************************************************************
 

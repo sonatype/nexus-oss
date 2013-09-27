@@ -16,8 +16,10 @@
 define('repoServer/RepoTargetEditPanel',['Sonatype/all'], function(){
 
 Sonatype.repoServer.RepoTargetEditPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+  var config = config || {},
+      defaultConfig = {},
+      gridFilterBox = NX.create('Nexus.grid.GridFilterBox');
+
   Ext.apply(this, config, defaultConfig);
 
   var ht = Sonatype.repoServer.resources.help.repoTargets;
@@ -279,7 +281,10 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
               scope : this,
               handler : this.deleteHandler,
               disabled : !this.sp.checkPermission('nexus:targets', this.sp.DELETE)
-            }],
+            },
+            '->',
+            gridFilterBox
+        ],
 
         // grid view options
         ds : this.repoTargetsDataStore,
@@ -311,6 +316,8 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
       });
   this.repoTargetsGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
   this.repoTargetsGridPanel.on('rowcontextmenu', this.contextClick, this);
+
+  gridFilterBox.grid = this.repoTargetsGridPanel;
 
   Sonatype.repoServer.RepoTargetEditPanel.superclass.constructor.call(this, {
         layout : 'border',
