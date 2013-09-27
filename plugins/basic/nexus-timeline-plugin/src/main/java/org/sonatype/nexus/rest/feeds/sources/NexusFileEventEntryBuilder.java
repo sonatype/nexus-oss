@@ -13,17 +13,19 @@
 
 package org.sonatype.nexus.rest.feeds.sources;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
-
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Build feeds entry based on files
  *
  * @author Juven Xu
  */
-@Component(role = SyndEntryBuilder.class, hint = "file")
+@Named("file")
+@Singleton
 public class NexusFileEventEntryBuilder
     extends AbstractNexusItemEventEntryBuilder
 {

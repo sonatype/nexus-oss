@@ -16,6 +16,10 @@ package org.sonatype.nexus.feeds;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -24,19 +28,25 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-@Component(role = FeedArtifactEventFilter.class)
+@Named
+@Singleton
 public class DefaultFeedArtifactEventFilter
     extends AbstractLoggingComponent
     implements FeedArtifactEventFilter
 {
-  @Requirement
-  private NexusItemAuthorizer nexusItemAuthorizer;
+  private final NexusItemAuthorizer nexusItemAuthorizer;
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
+
+  @Inject
+  public DefaultFeedArtifactEventFilter(final NexusItemAuthorizer nexusItemAuthorizer,
+                                        final RepositoryRegistry repositoryRegistry)
+  {
+    this.nexusItemAuthorizer = checkNotNull(nexusItemAuthorizer);
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+  }
 
   public List<NexusArtifactEvent> filterArtifactEventList(List<NexusArtifactEvent> artifactEvents) {
     // make sure we have something to filter

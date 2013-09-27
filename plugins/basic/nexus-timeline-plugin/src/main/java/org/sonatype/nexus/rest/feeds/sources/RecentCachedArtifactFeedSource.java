@@ -19,25 +19,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.Entry;
 
 import com.google.common.base.Predicate;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Juven Xu
  */
-@Component(role = FeedSource.class, hint = "recentlyCachedArtifacts")
+@Named(RecentCachedArtifactFeedSource.CHANNEL_KEY)
+@Singleton
 public class RecentCachedArtifactFeedSource
     extends AbstractNexusItemEventFeedSource
 {
-  @Requirement(hint = "artifact")
-  private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
+  private final SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
 
   public static final String CHANNEL_KEY = "recentlyCachedArtifacts";
+
+  @Inject
+  public RecentCachedArtifactFeedSource(final @Named("artifact") SyndEntryBuilder<NexusArtifactEvent> entryBuilder) {
+    this.entryBuilder = checkNotNull(entryBuilder);
+  }
 
   public String getFeedKey() {
     return CHANNEL_KEY;

@@ -18,17 +18,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemEvent;
-
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * The system changes feed.
  *
  * @author cstamas
  */
-@Component(role = FeedSource.class, hint = "systemRepositoryStatusChanges")
+@Named(SystemRepositoryStatusChangesFeedSource.CHANNEL_KEY)
+@Singleton
 public class SystemRepositoryStatusChangesFeedSource
     extends AbstractSystemFeedSource
 {

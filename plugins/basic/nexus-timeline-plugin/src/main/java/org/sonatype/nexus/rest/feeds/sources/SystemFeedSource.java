@@ -16,16 +16,18 @@ package org.sonatype.nexus.rest.feeds.sources;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.feeds.SystemEvent;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.feeds.SystemEvent;
 
 /**
  * The system changes feed.
  *
  * @author cstamas
  */
-@Component(role = FeedSource.class, hint = "systemChanges")
+@Named(SystemFeedSource.CHANNEL_KEY)
+@Singleton
 public class SystemFeedSource
     extends AbstractSystemFeedSource
 {
