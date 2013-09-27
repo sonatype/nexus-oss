@@ -33,7 +33,6 @@ public class JerseySecurity
   @Override
   protected SecuritySettings getSettingsFrom(final GlobalConfigurationResource configuration) {
     final SecuritySettings settings = new SecuritySettings();
-    settings.setEnabled(configuration.isSecurityEnabled());
     settings.setAnonymousAccessEnabled(configuration.isSecurityAnonymousAccessEnabled());
     settings.setAnonymousPassword(configuration.getSecurityAnonymousPassword());
     settings.setAnonymousUsername(configuration.getSecurityAnonymousUsername());
@@ -45,7 +44,6 @@ public class JerseySecurity
   protected void setSettingsIn(final SecuritySettings settings,
                                final GlobalConfigurationResource configuration)
   {
-    configuration.setSecurityEnabled(settings.isEnabled());
     configuration.setSecurityAnonymousAccessEnabled(settings.isAnonymousAccessEnabled());
     configuration.setSecurityAnonymousPassword(settings.getAnonymousPassword());
     configuration.setSecurityAnonymousUsername(settings.getAnonymousUsername());

@@ -42,9 +42,11 @@ import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.nexus.test.utils.WagonDeployer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 
 import com.google.common.base.Throwables;
@@ -67,6 +69,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
@@ -105,6 +108,8 @@ public abstract class AbstractNexusIntegrationTest
   public static final String REPO_RELEASE_PROXY_REPO1 = "release-proxy-repo-1";
 
   public static final String REPO_TEST_HARNESS_SHADOW = "nexus-test-harness-shadow";
+
+  public static final String ADMIN_ROLE = "nx-admin";
 
   protected static boolean NEEDS_INIT = false;
 
@@ -337,18 +342,7 @@ public abstract class AbstractNexusIntegrationTest
                 || Boolean.valueOf(System.getProperty("secure.test"));
 
         // set security enabled/disabled as expected by current IT
-        TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
-        {
-          @Override
-          public Object call()
-              throws Exception
-          {
-            final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-            globalConfig.setSecurityEnabled(testRequiresSecurityEnabled);
-            SettingsMessageUtil.save(globalConfig);
-            return null;
-          }
-        });
+        makeAnonymousAdministrator(!testRequiresSecurityEnabled);
 
         // deploy artifacts
         deployArtifacts();
@@ -361,6 +355,54 @@ public abstract class AbstractNexusIntegrationTest
 
       getEventInspectorsUtil().waitForCalmPeriod();
     }
+  }
+
+  protected void makeAnonymousAdministrator(final boolean shouldBeAdmin) throws Exception {
+    TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
+    {
+      @Override
+      public Object call()
+          throws Exception
+      {
+        final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
+        if (shouldBeAdmin) {
+          globalConfig.setSecurityAnonymousAccessEnabled(true);
+          SettingsMessageUtil.save(globalConfig);
+        }
+
+        UserMessageUtil userUtil = new UserMessageUtil(
+            AbstractNexusIntegrationTest.this, getXMLXStream(), MediaType.APPLICATION_XML
+        );
+        UserResource user = userUtil.getUser(globalConfig.getSecurityAnonymousUsername());
+
+        if (shouldBeAdmin) {
+          user.addRole(ADMIN_ROLE);
+        }
+        else {
+          user.removeRole(ADMIN_ROLE);
+        }
+
+        userUtil.updateUser(user);
+
+        return null;
+      }
+    });
+  }
+
+  protected boolean isAnonymousAdministrator() throws Exception {
+    return TestContainer.getInstance().invokeAsAdministrator(new Callable<Boolean>()
+    {
+      @Override
+      public Boolean call()
+          throws Exception
+      {
+        final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
+        UserMessageUtil userUtil = new UserMessageUtil(
+            AbstractNexusIntegrationTest.this, getXMLXStream(), MediaType.APPLICATION_XML
+        );
+        return userUtil.getUser(globalConfig.getSecurityAnonymousUsername()).getRoles().contains(ADMIN_ROLE);
+      }
+    });
   }
 
   @After
