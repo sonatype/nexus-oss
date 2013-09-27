@@ -13,14 +13,17 @@
 
 package com.sonatype.nexus.oss;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.AbstractApplicationStatusSource;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = ApplicationStatusSource.class)
+@Singleton
+@Named
 public class OSSApplicationStatusSource
     extends AbstractApplicationStatusSource
     implements ApplicationStatusSource
@@ -29,11 +32,8 @@ public class OSSApplicationStatusSource
 
   public OSSApplicationStatusSource() {
     super();
-
     getSystemStatusInternal().setVersion(discoverApplicationVersion());
-
     getSystemStatusInternal().setApiVersion(getSystemStatusInternal().getVersion());
-
     getSystemStatusInternal().setFormattedAppName(
         FORMATTED_APP_NAME_BASE + " "
             + (StringUtils.isEmpty(getSystemStatusInternal().getEditionLong())

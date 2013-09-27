@@ -16,7 +16,8 @@ package org.sonatype.nexus.proxy.maven.gav;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * An M2 <code>GavCalculator</code>.
@@ -24,7 +25,8 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author Jason van Zyl
  * @author Tamas Cservenak
  */
-@Component(role = GavCalculator.class, hint = "maven2")
+@Named("maven2")
+@Singleton
 public class M2GavCalculator
     implements GavCalculator
 {

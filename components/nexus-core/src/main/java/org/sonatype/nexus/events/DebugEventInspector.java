@@ -15,6 +15,8 @@ package org.sonatype.nexus.events;
 
 import java.lang.management.ManagementFactory;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
@@ -22,9 +24,6 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
-
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 
 /**
  * A simple "debug" event inspector that grabs all events sent to {@link EventInspector}s and simply dumps them as
@@ -35,10 +34,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
  * @author cstamas
  * @since 2.1
  */
-@Component(role = EventInspector.class, hint = "DebugEventInspector")
+@Named
+@Singleton
 public class DebugEventInspector
     extends AbstractLoggingComponent
-    implements EventInspector, Disposable
+    implements EventInspector
 {
   private static final String JMX_DOMAIN = "org.sonatype.nexus.events";
 
@@ -64,21 +64,6 @@ public class DebugEventInspector
     catch (Exception e) {
       jmxName = null;
       getLogger().warn("Problem registering MBean for: " + getClass().getName(), e);
-    }
-  }
-
-  @Override
-  public void dispose() {
-    if (null != jmxName) {
-      try {
-        final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        if (server.isRegistered(jmxName)) {
-          server.unregisterMBean(jmxName);
-        }
-      }
-      catch (final Exception e) {
-        getLogger().warn("Problem unregistering MBean for: " + getClass().getName(), e);
-      }
     }
   }
 
