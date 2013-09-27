@@ -30,6 +30,7 @@ import java.util.zip.GZIPInputStream;
 import javax.inject.Inject;
 
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.DefaultGlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.RequestContext;
@@ -38,15 +39,10 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.routing.Config;
-import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.nexus.yum.internal.RepoMD;
-import org.sonatype.nexus.yum.internal.task.CommandLineExecutor;
-import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
@@ -56,9 +52,6 @@ import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
-import com.google.common.collect.ObjectArrays;
-import com.google.inject.Binder;
-import com.google.inject.Module;
 import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
@@ -88,7 +81,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class YumNexusTestSupport
-    extends NexusTestSupport
+    extends NexusAppTestSupport
 {
 
   private static final Logger LOG = LoggerFactory.getLogger(YumNexusTestSupport.class);
@@ -225,35 +218,6 @@ public class YumNexusTestSupport
   protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
     super.customizeContainerConfiguration(configuration);
     configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
-  }
-
-  @Override
-  protected Module[] getTestCustomModules() {
-    Module[] modules = super.getTestCustomModules();
-    if (modules == null) {
-      modules = new Module[0];
-    }
-    modules = ObjectArrays.concat(modules, new SecurityModule());
-    modules = ObjectArrays.concat(modules, new Module()
-    {
-      @Override
-      public void configure(final Binder binder) {
-        binder.bind(Config.class).toInstance(new ConfigImpl(enableAutomaticRoutingFeature()));
-        binder.bind(CommandLineExecutor.class).toInstance(new CommandLineExecutor()
-        {
-          @Override
-          public int exec(final String command) throws IOException {
-            // do nothing
-            return 0;
-          }
-        });
-      }
-    });
-    return modules;
-  }
-
-  protected boolean enableAutomaticRoutingFeature() {
-    return false;
   }
 
   @Override
