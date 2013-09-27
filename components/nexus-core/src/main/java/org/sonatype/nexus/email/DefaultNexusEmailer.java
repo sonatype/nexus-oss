@@ -29,8 +29,7 @@ import org.sonatype.micromailer.MailType;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
@@ -50,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultNexusEmailer
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<CSmtpConfiguration>
     implements NexusEmailer
 {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultNexusEmailer.class);
@@ -64,8 +63,6 @@ public class DefaultNexusEmailer
    * Custom header to deisgnate Nexus instance as sender
    */
   private static final String X_MESSAGE_SENDER_HEADER = "X-EMailer-Mail-Sender";
-
-  private final ApplicationConfiguration applicationConfiguration;
 
   private final GlobalRestApiSettings globalRestApiSettings;
 
@@ -83,8 +80,7 @@ public class DefaultNexusEmailer
                              final EMailer eMailer,
                              final List<SmtpSessionParametersCustomizer> customizers)
   {
-    super(eventBus);
-    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    super("SMTP Client", eventBus, applicationConfiguration);
     this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.eMailer = checkNotNull(eMailer);
@@ -199,24 +195,8 @@ public class DefaultNexusEmailer
     }
   }
 
-
   @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return applicationConfiguration;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected CSmtpConfiguration getCurrentConfiguration(boolean forWrite) {
-    return ((CSmtpConfigurationCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
+  protected CoreConfiguration<CSmtpConfiguration> wrapConfiguration(Object configuration)
       throws ConfigurationException
   {
     if (configuration instanceof ApplicationConfiguration) {
@@ -374,10 +354,5 @@ public class DefaultNexusEmailer
     }
 
     return userAgentPlatformInfo;
-  }
-
-  @Override
-  public String getName() {
-    return "SMTP Settings";
   }
 }

@@ -22,12 +22,11 @@ import java.net.URL;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.v1_4_4.upgrade.BasicVersionConverter;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -41,8 +40,8 @@ public class Upgrade143to144
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  @Configuration(value="${nexus-work}")
+  private File nexusWorkdir;
 
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
@@ -185,7 +184,7 @@ public class Upgrade143to144
   {
     if (StringUtils.isBlank(urlStr)) {
       // the  factory default
-      return new File(applicationConfiguration.getWorkingDirectory("storage"), repositoryId);
+      return new File(new File( nexusWorkdir, "storage"), repositoryId);
     }
     else {
       // do the same as DefaultFSLocalRepositoryStorage does to interpret string url

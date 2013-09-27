@@ -11,31 +11,38 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.configuration.model;
+package org.sonatype.nexus.configuration;
+
+import javax.inject.Inject;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-public class CErrorReportingCoreConfiguration
-    extends AbstractCoreConfiguration<CErrorReporting>
+/**
+ * A removable or late created component, participant of configuration framework.
+ *
+ * @since 2.7.0
+ */
+public abstract class AbstractRemovableConfigurable<C>
+    extends AbstractConfigurable<C>
+    implements Configurable<C>
 {
-  public CErrorReportingCoreConfiguration(ApplicationConfiguration configuration) {
-    super(configuration);
+  /**
+   * Just an empty constructor, to mark that ctor injection is explicitly disabled. All the classes extending this one should populate/inject all the fields on their own, most probably 
+   */
+  public AbstractRemovableConfigurable() {
   }
 
   @Override
-  protected CErrorReporting extractConfiguration(Configuration configuration) {
-    return configuration.getErrorReporting();
+  @Inject
+  public void setEventBus(final EventBus eventBus) {
+    super.setEventBus(eventBus);
   }
-
+  
   @Override
-  protected void copyTransients(CErrorReporting source, CErrorReporting destination) {
-    super.copyTransients(source, destination);
-
-    if (((CErrorReporting) source).getJiraPassword() == null) {
-      ((CErrorReporting) destination).setJiraPassword(null);
-    }
-    if (((CErrorReporting) source).getJiraUsername() == null) {
-      ((CErrorReporting) destination).setJiraUsername(null);
-    }
+  @Inject
+  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    super.setApplicationConfiguration(applicationConfiguration);
   }
+
 }

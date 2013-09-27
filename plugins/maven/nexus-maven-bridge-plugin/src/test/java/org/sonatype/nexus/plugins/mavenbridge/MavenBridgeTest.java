@@ -21,6 +21,7 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.plugins.mavenbridge.internal.FileItemModelSource;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -57,7 +58,7 @@ public class MavenBridgeTest
 
     for (MavenProxyRepository repo : repositoryRegistry.getRepositoriesWithFacet(MavenProxyRepository.class)) {
       repo.setRemoteUrl(server.getUrl().toExternalForm());
-      repo.commitChanges();
+      ((AbstractMavenRepository)repo).commitChanges();
     }
   }
 

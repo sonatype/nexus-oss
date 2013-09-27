@@ -15,62 +15,66 @@ package org.sonatype.nexus.configuration;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Abstract class to implement configurable components to "click" them in into generic configuration environment.
- * <p/>
- * NOTE: Don't convert AbstractConfigurable plexus components to sisu, they will be initialized BEFORE configuration is
- * loaded.
- *
+ * This class is a special in configuration framework, extended by other framework classes. You do not want to extend
+ * this class (most probably), but rather go for {@link AbstractLastingConfigurable} or
+ * {@link AbstractRemovableConfigurable} class.
+ * 
  * @author cstamas
  */
-public abstract class AbstractConfigurable
-    implements Configurable, Initializable, Disposable
+public abstract class AbstractConfigurable<C>
+    extends AbstractLoggingComponent
+    implements Configurable<C>
 {
 
+  private EventBus eventBus;
+  
+  private ApplicationConfiguration applicationConfiguration;
+  
   /**
    * The configuration
    */
-  private CoreConfiguration coreConfiguration;
-
-  @Requirement
-  private EventBus eventBus;
+  private CoreConfiguration<C> coreConfiguration;
 
   /**
    * True as long as this is registered with event bus.
    */
   private boolean registeredWithEventBus;
 
+  /**
+   * Constructor used by {@link AbstractRemovableConfigurable}.
+   */
   public AbstractConfigurable() {
-
   }
-
-  public AbstractConfigurable(final EventBus eventBus) {
-    this.eventBus = eventBus;
+  
+  /**
+   * Constructor used by {@link AbstractLastingConfigurable}.
+   */
+  public AbstractConfigurable(final EventBus eventBus, final ApplicationConfiguration applicationConfiguration) {
+    setEventBus(eventBus);
+    setApplicationConfiguration(applicationConfiguration);
+    
+    // init
+    registerWithEventBus();
+  }
+  
+  protected void setEventBus(final EventBus eventBus) {
+    this.eventBus = checkNotNull(eventBus);
+  }
+  
+  protected void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
   }
 
   protected boolean isConfigured() {
-    return coreConfiguration != null;
-  }
-
-  public void initialize()
-      throws InitializationException
-  {
-    registerWithEventBus();
-
-    try {
-      initializeConfiguration();
-    }
-    catch (ConfigurationException e) {
-      throw new InitializationException("Cannot configure the component!", e);
-    }
+    return coreConfiguration != null && coreConfiguration.getConfiguration(false) != null;
   }
 
   protected void initializeConfiguration()
@@ -80,10 +84,6 @@ public abstract class AbstractConfigurable
     // for example, whoever is configured using framework, will not need this,
     // but we still have components on their own, like DefaultTaskConfigManager
     // that are driven by spice Scheduler
-  }
-
-  public void dispose() {
-    unregisterFromEventBus();
   }
 
   @Subscribe
@@ -143,14 +143,19 @@ public abstract class AbstractConfigurable
     rollbackChanges();
   }
 
-  protected abstract ApplicationConfiguration getApplicationConfiguration();
+  // TODO: not final only during refactoring!
+  protected final ApplicationConfiguration getApplicationConfiguration() {
+    return applicationConfiguration;
+  }
 
   // Configurable iface
-
-  public final CoreConfiguration getCurrentCoreConfiguration() {
+  
+  @Override
+  public CoreConfiguration<C> getCurrentCoreConfiguration() {
     return coreConfiguration;
   }
 
+  @Override
   public final void configure(Object config)
       throws ConfigurationException
   {
@@ -163,8 +168,9 @@ public abstract class AbstractConfigurable
     doConfigure();
   }
 
+  @Override
   public boolean isDirty() {
-    final CoreConfiguration cc = getCurrentCoreConfiguration();
+    final CoreConfiguration<C> cc = getCurrentCoreConfiguration();
     return cc != null && cc.isDirty();
   }
 
@@ -181,12 +187,12 @@ public abstract class AbstractConfigurable
     }
   }
 
+  @Override
   public boolean commitChanges()
       throws ConfigurationException
   {
     if (isDirty()) {
       doConfigure();
-
       return true;
     }
     else {
@@ -194,6 +200,7 @@ public abstract class AbstractConfigurable
     }
   }
 
+  @Override
   public boolean rollbackChanges() {
     if (isDirty()) {
       getCurrentCoreConfiguration().rollbackChanges();
@@ -244,11 +251,16 @@ public abstract class AbstractConfigurable
     }
   }
 
-  protected abstract Configurator getConfigurator();
+  protected Configurator getConfigurator() {
+    // override to return instance if needed
+    return null;
+  }
 
-  protected abstract Object getCurrentConfiguration(boolean forWrite);
+  public C getCurrentConfiguration(boolean forWrite) {
+    return getCurrentCoreConfiguration().getConfiguration(forWrite);
+  }
 
-  protected abstract CoreConfiguration wrapConfiguration(Object configuration)
+  protected abstract CoreConfiguration<C> wrapConfiguration(Object configuration)
       throws ConfigurationException;
 
 }

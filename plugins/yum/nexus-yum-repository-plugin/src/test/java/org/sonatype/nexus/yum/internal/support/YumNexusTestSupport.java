@@ -30,7 +30,7 @@ import java.util.zip.GZIPInputStream;
 import javax.inject.Inject;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.application.DefaultGlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -118,7 +118,7 @@ public class YumNexusTestSupport
   public final TestName testName = new TestName();
 
   @Inject
-  private GlobalRestApiSettings globalRestApiSettings;
+  private DefaultGlobalRestApiSettings globalRestApiSettings;
 
   protected File rpmsDir() {
     return testData.resolveFile("rpms");

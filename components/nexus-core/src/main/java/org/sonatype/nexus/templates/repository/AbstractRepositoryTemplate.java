@@ -76,7 +76,7 @@ public abstract class AbstractRepositoryTemplate
 
   public ConfigurableRepository getConfigurableRepository() {
     if (configurableRepository == null) {
-      configurableRepository = new ConfigurableRepository();
+      configurableRepository = new ConfigurableRepository(getTemplateProvider().getApplicationConfiguration());
 
       try {
         configurableRepository.configure(getCoreConfiguration());

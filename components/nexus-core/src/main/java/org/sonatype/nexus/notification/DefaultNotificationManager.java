@@ -21,44 +21,33 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CNotification;
 import org.sonatype.nexus.configuration.model.CNotificationConfiguration;
 import org.sonatype.nexus.configuration.model.CNotificationTarget;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Named
 @Singleton
+@Named
 public class DefaultNotificationManager
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<CNotification>
     implements NotificationManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  private final NexusConfiguration nexusConfig;
 
   private final Map<String, Carrier> carriers;
 
-  @Inject
-  public DefaultNotificationManager(final NexusConfiguration nexusConfig,
-                                    final Map<String, Carrier> carriers)
-  {
-    this.nexusConfig = checkNotNull(nexusConfig);
-    this.carriers = checkNotNull(carriers);
-  }
-
   // ==
 
-  public String getName() {
-    return "Notification configuration";
+  @Inject
+  public DefaultNotificationManager(EventBus eventBus, ApplicationConfiguration applicationConfiguration,
+      Map<String, Carrier> carriers)
+  {
+    super("Notification Manager", eventBus, applicationConfiguration);
+    this.carriers = checkNotNull(carriers);
   }
 
   @Override
@@ -71,28 +60,7 @@ public class DefaultNotificationManager
   }
 
   @Override
-  protected boolean isConfigured() {
-    return super.isConfigured() && getCurrentConfiguration(false) != null;
-  }
-
-  @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return nexusConfig;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    // not custom configurators needed
-    return null;
-  }
-
-  @Override
-  protected CNotification getCurrentConfiguration(boolean forWrite) {
-    return ((CNotificationConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
+  protected CoreConfiguration<CNotification> wrapConfiguration(Object configuration)
       throws ConfigurationException
   {
     if (configuration instanceof ApplicationConfiguration) {
@@ -106,6 +74,8 @@ public class DefaultNotificationManager
   }
 
   // ==
+
+  @Override
   public boolean isEnabled() {
     // TODO: this is needed, since events are happening even before configuration is loaded
     // And the NotificationEventInspector will start relaying even before we know our config!
@@ -114,10 +84,12 @@ public class DefaultNotificationManager
     return isConfigured() && getCurrentConfiguration(false).isEnabled();
   }
 
+  @Override
   public void setEnabled(boolean val) {
     getCurrentConfiguration(true).setEnabled(val);
   }
 
+  @Override
   public NotificationTarget readNotificationTarget(String targetId) {
     if (targetId == null) {
       throw new NullPointerException("Notification target ID can't be null!");
@@ -147,6 +119,7 @@ public class DefaultNotificationManager
     return null;
   }
 
+  @Override
   public void updateNotificationTarget(NotificationTarget target) {
     if (target == null) {
       throw new NullPointerException("Notification target can't be null!");
@@ -169,6 +142,7 @@ public class DefaultNotificationManager
     targets.add(ctarget);
   }
 
+  @Override
   public void notifyTargets(NotificationRequest request) {
     if (!isEnabled()) {
       return;
@@ -186,11 +160,11 @@ public class DefaultNotificationManager
           carrier.notifyTarget(target, request.getMessage());
         }
         catch (NotificationException e) {
-          logger.warn("Could not send out notification over carrier \"{}\".", carrierKey, e);
+          getLogger().warn("Could not send out notification over carrier \"{}\".", carrierKey, e);
         }
       }
       else {
-        logger.info("Notification carrier \"{}\" is unknown!", carrierKey);
+        getLogger().info("Notification carrier \"{}\" is unknown!", carrierKey);
       }
     }
   }

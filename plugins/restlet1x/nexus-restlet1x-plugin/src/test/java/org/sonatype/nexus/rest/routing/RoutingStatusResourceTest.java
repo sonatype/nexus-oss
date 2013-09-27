@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.routing;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.SystemState;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.maven.routing.internal.ManagerImpl;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -31,7 +32,6 @@ import org.junit.Test;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -93,7 +93,7 @@ public class RoutingStatusResourceTest
     request.getAttributes().put(RoutingResourceSupport.REPOSITORY_ID_KEY, REPO_ID);
     Response.setCurrent(new Response(request));
     try {
-      final Repository repository = lookup(RepositoryRegistry.class).getRepository(REPO_ID);
+      final M2Repository repository = (M2Repository) lookup(RepositoryRegistry.class).getRepository(REPO_ID);
 
       {
         final RoutingStatusMessageWrapper payload = wlStatusResource.get(null, request, null, null);

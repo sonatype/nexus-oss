@@ -28,6 +28,8 @@ import javax.ws.rs.Produces;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.micromailer.Address;
+import org.sonatype.nexus.configuration.application.DefaultGlobalRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.application.DefaultGlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
@@ -360,9 +362,9 @@ public class GlobalConfigurationPlexusResource
           // repositories) about the change, but only if config is saved okay
           // TODO: this is wrong, the config framework should "tell" this changed, but we have some
           // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are
-          boolean remoteConnectionSettingsIsDirty = getGlobalRemoteConnectionSettings().isDirty();
+          boolean remoteConnectionSettingsIsDirty = ((DefaultGlobalRemoteConnectionSettings)getGlobalRemoteConnectionSettings()).isDirty();
 
-          boolean remoteProxySettingsIsDirty = getGlobalRemoteProxySettings().isDirty();
+          boolean remoteProxySettingsIsDirty = ((DefaultGlobalRemoteProxySettings)getGlobalRemoteProxySettings()).isDirty();
 
           getNexusConfiguration().saveConfiguration();
 

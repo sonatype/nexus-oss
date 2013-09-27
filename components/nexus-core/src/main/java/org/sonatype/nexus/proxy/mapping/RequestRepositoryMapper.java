@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -27,7 +26,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * repositories using some technique.
  */
 public interface RequestRepositoryMapper
-    extends Configurable
 {
   /**
    * Returns an unmodifiable Map of mappings.
