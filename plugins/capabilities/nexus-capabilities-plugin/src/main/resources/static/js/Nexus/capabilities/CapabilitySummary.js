@@ -134,15 +134,8 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
             });
           },
 
-          message: function (capability) {
-            if (capability.enabled && !capability.active) {
-              return self.messageTpl.apply({
-                icon: icons.get('warning').img,
-                html: '<b>' + capability.stateDescription + '</b>.'
-              });
-            }
-            return '';
-          }
+          message: self.messageTpl.message.createDelegate(self.messageTpl)
+
         });
 
     self.statusTpl = NX.create('Ext.XTemplate',
@@ -196,13 +189,6 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
           compiled: true
         });
 
-    self.messageTpl = NX.create('Ext.XTemplate',
-        '<div class="nx-capabilities-CapabilitySummary-message">',
-        '  <span>{icon}{html}</span>',
-        '</div>',
-        {
-          compiled: true
-        });
   },
 
   /**

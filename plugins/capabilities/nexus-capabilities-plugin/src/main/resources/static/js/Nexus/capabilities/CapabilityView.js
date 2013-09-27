@@ -38,10 +38,30 @@ NX.define('Nexus.capabilities.CapabilityView', {
    */
   initComponent: function () {
     var self = this,
-        icons = Nexus.capabilities.Icons;
+        icons = Nexus.capabilities.Icons,
+        messageTpl = NX.create('Ext.XTemplate',
+        '<div class="nx-capabilities-CapabilitySummary-message">',
+        '  <span>{icon}{html}</span>',
+        '</div>',
+        {
+          compiled: true,
 
-    self.summaryView = NX.create('Nexus.capabilities.CapabilitySummary');
-    self.settingsView = NX.create('Nexus.capabilities.CapabilitySettings');
+          message: function (capability) {
+            var self = this,
+                icons = Nexus.capabilities.Icons;
+
+            if (capability.enabled && !capability.active) {
+              return self.apply({
+                icon: icons.get('warning').img,
+                html: '<b>' + capability.stateDescription + '</b>.'
+              });
+            }
+            return '';
+          }
+        });
+
+    self.summaryView = NX.create('Nexus.capabilities.CapabilitySummary', {messageTpl: messageTpl});
+    self.settingsView = NX.create('Nexus.capabilities.CapabilitySettings', {messageTpl: messageTpl});
     self.statusView = NX.create('Nexus.capabilities.CapabilityStatus');
     self.aboutView = NX.create('Nexus.capabilities.CapabilityAbout');
 
