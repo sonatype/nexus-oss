@@ -17,6 +17,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -24,17 +28,24 @@ import org.sonatype.nexus.plugins.plugin.console.PluginConsoleManager;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 
 import com.thoughtworks.xstream.XStream;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role = ErrorReportBundleContentContributor.class, hint = "pluginList")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Plugin-list {@link ErrorReportBundleContentContributor}.
+ */
+@Named
+@Singleton
 public class PluginListErrorReportBundleContentContributor
     extends AbstractLoggingComponent
     implements ErrorReportBundleContentContributor
 {
+  private final PluginConsoleManager pluginConsoleManager;
 
-  @Requirement
-  private PluginConsoleManager pluginConsoleManager;
+  @Inject
+  public PluginListErrorReportBundleContentContributor(final PluginConsoleManager pluginConsoleManager) {
+    this.pluginConsoleManager = checkNotNull(pluginConsoleManager);
+  }
 
   public ErrorReportBundleEntry[] getEntries() {
     List<PluginInfo> l = pluginConsoleManager.listPluginInfo();
@@ -45,9 +56,8 @@ public class PluginListErrorReportBundleContentContributor
     xs.alias("PluginInfo", PluginInfo.class);
     xs.toXML(l, bos);
 
-    return new ErrorReportBundleEntry[]{//
-                                        new ErrorReportBundleEntry("PluginsInfo.xml",
-                                            new ByteArrayInputStream(bos.toByteArray())) //
+    return new ErrorReportBundleEntry[]{
+        new ErrorReportBundleEntry("PluginsInfo.xml", new ByteArrayInputStream(bos.toByteArray()))
     };
   }
 }
