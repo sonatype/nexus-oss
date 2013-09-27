@@ -18,7 +18,7 @@
  * @since 2.7
  */
 NX.define('Nexus.grid.GridFilterBox', {
-  extend: 'Ext.form.TextField',
+  extend: 'Ext.Container',
 
   /**
    * @cfg {String} regexp modifiers (defaults to 'i' = case insensitive).
@@ -36,12 +36,12 @@ NX.define('Nexus.grid.GridFilterBox', {
   initComponent: function () {
     var self = this;
 
-    Ext.apply(self, {
+    self.filterField = NX.create('Ext.form.TextField',{
       enableKeyEvents: true,
 
       listeners: {
         keyup: {
-          fn: function (self, e) {
+          fn: function (x, e) {
             if (e.keyCode == 13) {
               self.filterGrid();
             }
@@ -56,6 +56,12 @@ NX.define('Nexus.grid.GridFilterBox', {
           scope: self
         }
       }
+    });
+
+    Ext.apply(self, {
+      items : [
+         self.filterField
+      ]
     });
 
     self.constructor.superclass.initComponent.apply(self, arguments);
@@ -75,7 +81,7 @@ NX.define('Nexus.grid.GridFilterBox', {
    */
   clearFilter: function () {
     var self = this;
-    self.setValue(undefined);
+    self.filterField.setValue(undefined);
     self.filterGrid();
   },
 
@@ -87,8 +93,8 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = true,
         regexp, filterFields;
 
-    if (self.getValue() && self.getValue().length > 0) {
-      regexp = new RegExp(self.getValue(), self.modifiers);
+    if (self.filterField.getValue() && self.filterField.getValue().length > 0) {
+      regexp = new RegExp(self.filterField.getValue(), self.modifiers);
       filterFields = self.filterFieldNames();
 
       if (filterFields && filterFields.length > 0) {
