@@ -25,6 +25,9 @@ import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
+
 import junit.framework.Assert;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -33,6 +36,11 @@ import org.junit.Test;
 public class DefaultLdapConfigurationValidatorTest
     extends PlexusTestCaseSupport
 {
+  @Override
+  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
+    super.customizeContainerConfiguration(containerConfiguration);
+    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+  }
 
   @Override
   protected void customizeContext(Context context) {

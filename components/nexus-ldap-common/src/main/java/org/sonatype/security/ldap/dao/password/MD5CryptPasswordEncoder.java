@@ -15,24 +15,28 @@ package org.sonatype.security.ldap.dao.password;
 
 import java.security.NoSuchAlgorithmException;
 
-import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
 
 
 /**
  * @author cstamas
  */
-@Component(role = PasswordEncoder.class, hint = "crypt")
+@Singleton
+@Named("crypt")
 public class MD5CryptPasswordEncoder
     implements PasswordEncoder
 {
   final private MD5Crypt md5Crypt = new MD5Crypt();
 
+  @Override
   public String getMethod() {
     return "CRYPT";
   }
 
+  @Override
   public String encodePassword(String password, Object salt) {
     try {
       return "{CRYPT}" + md5Crypt.crypt(password);
@@ -42,6 +46,7 @@ public class MD5CryptPasswordEncoder
     }
   }
 
+  @Override
   public boolean isPasswordValid(String encPassword, String inputPassword, Object salt) {
     try {
       String encryptedPassword = encPassword;

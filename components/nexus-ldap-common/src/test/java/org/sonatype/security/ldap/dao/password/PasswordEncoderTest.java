@@ -15,13 +15,22 @@ package org.sonatype.security.ldap.dao.password;
 
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
+
 import junit.framework.Assert;
 import org.junit.Test;
 
-public class PasswordEcoderTest
+public class PasswordEncoderTest
     extends PlexusTestCaseSupport
 {
   private PasswordEncoderManager passwordEncoderManager;
+
+  @Override
+  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
+    super.customizeContainerConfiguration(containerConfiguration);
+    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+  }
 
   @Override
   protected void setUp()
