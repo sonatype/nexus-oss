@@ -15,6 +15,10 @@ package org.sonatype.nexus.email;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
@@ -32,21 +36,23 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguration;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = NexusEmailer.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultNexusEmailer
     extends AbstractConfigurable
-    implements NexusEmailer, Startable
+    implements NexusEmailer
 {
-
   private static final Logger LOG = LoggerFactory.getLogger(DefaultNexusEmailer.class);
 
   /**
@@ -59,41 +65,52 @@ public class DefaultNexusEmailer
    */
   private static final String X_MESSAGE_SENDER_HEADER = "X-EMailer-Mail-Sender";
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
-  @Requirement
-  private GlobalRestApiSettings globalRestApiSettings;
+  private final GlobalRestApiSettings globalRestApiSettings;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
-  @Requirement
-  private EMailer eMailer;
+  private final EMailer eMailer;
 
-  @Requirement(role = SmtpSessionParametersCustomizer.class)
-  private List<SmtpSessionParametersCustomizer> customizers;
+  private final List<SmtpSessionParametersCustomizer> customizers;
 
-  // ==
-
-  public void start() {
-    // nop
+  @Inject
+  public DefaultNexusEmailer(final EventBus eventBus,
+                             final ApplicationConfiguration applicationConfiguration,
+                             final GlobalRestApiSettings globalRestApiSettings,
+                             final ApplicationStatusSource applicationStatusSource,
+                             final EMailer eMailer,
+                             final List<SmtpSessionParametersCustomizer> customizers)
+  {
+    super(eventBus);
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.eMailer = checkNotNull(eMailer);
+    this.customizers = checkNotNull(customizers);
   }
 
-  public void stop() {
+  // ==
+  
+  @Subscribe
+  public void on(final NexusStoppedEvent evt) {
     getEMailer().shutdown();
   }
 
   // ==
 
+  @Override
   public EMailer getEMailer() {
     return eMailer;
   }
 
+  @Override
   public String getDefaultMailTypeId() {
     return DefaultMailType.DEFAULT_TYPE_ID;
   }
 
+  @Override
   public MailRequest getDefaultMailRequest(String subject, String body) {
     MailRequest request = new MailRequest(getMailId(), getDefaultMailTypeId());
 
@@ -108,6 +125,7 @@ public class DefaultNexusEmailer
     return request;
   }
 
+  @Override
   public MailRequestStatus sendMail(MailRequest request) {
     if (request.getFrom() == null) {
       request.setFrom(getSMTPSystemEmailAddress());
@@ -116,7 +134,7 @@ public class DefaultNexusEmailer
     prependNexusBaseUrl(request);
 
     if (emailSettingsConfigured()) {
-      return eMailer.sendMail(request);
+      return getEMailer().sendMail(request);
     }
 
     final String message = SimpleFormat.format(
@@ -135,7 +153,7 @@ public class DefaultNexusEmailer
    */
   private void prependNexusBaseUrl(final MailRequest request) {
     final String baseNexusUrl = globalRestApiSettings.getBaseUrl();
-    final MailType mailType = eMailer.getMailTypeSource().getMailType(request.getMailTypeId());
+    final MailType mailType = getEMailer().getMailTypeSource().getMailType(request.getMailTypeId());
 
     final StringBuilder messageBody = new StringBuilder().append("Message from: ");
 
@@ -230,71 +248,87 @@ public class DefaultNexusEmailer
     config.setUsername(getSMTPUsername());
     config.setPassword(getSMTPPassword());
 
-    eMailer.configure(config);
+    getEMailer().configure(config);
   }
 
   // ==
 
+  @Override
   public String getSMTPHostname() {
     return getCurrentConfiguration(false).getHostname();
   }
 
+  @Override
   public void setSMTPHostname(String host) {
     getCurrentConfiguration(true).setHostname(host);
   }
 
+  @Override
   public int getSMTPPort() {
     return getCurrentConfiguration(false).getPort();
   }
 
+  @Override
   public void setSMTPPort(int port) {
     getCurrentConfiguration(true).setPort(port);
   }
 
+  @Override
   public String getSMTPUsername() {
     return getCurrentConfiguration(false).getUsername();
   }
 
+  @Override
   public void setSMTPUsername(String username) {
     getCurrentConfiguration(true).setUsername(username);
   }
 
+  @Override
   public String getSMTPPassword() {
     return getCurrentConfiguration(false).getPassword();
   }
 
+  @Override
   public void setSMTPPassword(String password) {
     getCurrentConfiguration(true).setPassword(password);
   }
 
+  @Override
   public Address getSMTPSystemEmailAddress() {
     return new Address(getCurrentConfiguration(false).getSystemEmailAddress(), NEXUS_SENDER_NAME);
   }
 
+  @Override
   public void setSMTPSystemEmailAddress(Address adr) {
     getCurrentConfiguration(true).setSystemEmailAddress(adr.getMailAddress());
   }
 
+  @Override
   public boolean isSMTPDebug() {
     return getCurrentConfiguration(false).isDebugMode();
   }
 
+  @Override
   public void setSMTPDebug(boolean val) {
     getCurrentConfiguration(true).setDebugMode(val);
   }
 
+  @Override
   public boolean isSMTPSslEnabled() {
     return getCurrentConfiguration(false).isSslEnabled();
   }
 
+  @Override
   public void setSMTPSslEnabled(boolean val) {
     getCurrentConfiguration(true).setSslEnabled(val);
   }
 
+  @Override
   public boolean isSMTPTlsEnabled() {
     return getCurrentConfiguration(false).isTlsEnabled();
   }
 
+  @Override
   public void setSMTPTlsEnabled(boolean val) {
     getCurrentConfiguration(true).setTlsEnabled(val);
   }
@@ -342,6 +376,7 @@ public class DefaultNexusEmailer
     return userAgentPlatformInfo;
   }
 
+  @Override
   public String getName() {
     return "SMTP Settings";
   }

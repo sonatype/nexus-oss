@@ -16,6 +16,10 @@ package org.sonatype.nexus.notification;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
@@ -26,23 +30,30 @@ import org.sonatype.nexus.configuration.model.CNotification;
 import org.sonatype.nexus.configuration.model.CNotificationConfiguration;
 import org.sonatype.nexus.configuration.model.CNotificationTarget;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = NotificationManager.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultNotificationManager
     extends AbstractConfigurable
     implements NotificationManager
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private NexusConfiguration nexusConfig;
+  private final NexusConfiguration nexusConfig;
 
-  @Requirement(role = Carrier.class)
-  private Map<String, Carrier> carriers;
+  private final Map<String, Carrier> carriers;
+
+  @Inject
+  public DefaultNotificationManager(final NexusConfiguration nexusConfig,
+                                    final Map<String, Carrier> carriers)
+  {
+    this.nexusConfig = checkNotNull(nexusConfig);
+    this.carriers = checkNotNull(carriers);
+  }
 
   // ==
 
