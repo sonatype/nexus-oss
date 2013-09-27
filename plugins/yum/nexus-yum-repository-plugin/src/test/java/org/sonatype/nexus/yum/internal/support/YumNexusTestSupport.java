@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.yum.internal.RepoMD;
+import org.sonatype.nexus.yum.internal.task.CommandLineExecutor;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
@@ -52,6 +53,9 @@ import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
@@ -220,6 +224,29 @@ public class YumNexusTestSupport
     configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
   }
 
+  @Override
+  protected Module[] getTestCustomModules() {
+    Module[] modules = super.getTestCustomModules();
+    if (modules == null) {
+      modules = new Module[0];
+    }
+    modules = ObjectArrays.concat(modules, new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(CommandLineExecutor.class).toInstance(new CommandLineExecutor()
+        {
+          @Override
+          public int exec(final String command) throws IOException {
+            // do nothing
+            return 0;
+          }
+        });
+      }
+    });
+    return modules;
+  }
+  
   @Override
   protected void setUp()
       throws Exception
