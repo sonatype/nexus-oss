@@ -150,7 +150,7 @@ public class GenerateMetadataCapabilityDescriptor
 
   @Override
   public Set<Tag> getTags() {
-    return tags(categoryTag(Tag.REPOSITORY));
+    return tags(categoryTag("Yum"));
   }
 
 }
