@@ -118,7 +118,7 @@ public class P2RepositoryAggregatorCapabilityDescriptor
 
   @Override
   public Set<Tag> getTags() {
-    return tags(categoryTag(Tag.REPOSITORY));
+    return tags(categoryTag("P2"));
   }
 
 }
