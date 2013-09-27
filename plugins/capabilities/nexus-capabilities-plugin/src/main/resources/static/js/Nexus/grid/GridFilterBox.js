@@ -101,15 +101,14 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = false;
 
         self.grid.getStore().filterBy(function (record) {
-          var shouldBeIncluded = false;
-          Ext.each(filterFields, function (field) {
-            if (field) {
-              if (self.matches(regexp, record, field, self.extractValue(record, field))) {
-                shouldBeIncluded = true;
+          for (var i = 0; i < filterFields.length; i++) {
+            if (filterFields[i]) {
+              if (self.matches(regexp, record, filterFields[i], self.extractValue(record, filterFields[i]))) {
+                return true;
               }
             }
-          });
-          return shouldBeIncluded;
+          }
+          return false;
         }, self);
       }
     }
