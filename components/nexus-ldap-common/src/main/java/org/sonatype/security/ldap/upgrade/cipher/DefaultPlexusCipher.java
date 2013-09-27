@@ -24,19 +24,22 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64Encoder;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
-@Component(role = PlexusCipher.class)
+@Singleton
+@Named
 public class DefaultPlexusCipher
     implements PlexusCipher
 {
@@ -44,30 +47,28 @@ public class DefaultPlexusCipher
 
   private static final String STRING_ENCODING = "UTF8";
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   /**
    * Encryption algorithm to use by this instance. Needs protected scope for tests
    */
-  @Configuration(value = "PBEWithSHAAnd128BitRC4")
-  protected String algorithm = "PBEWithSHAAnd128BitRC4";
+  private final String algorithm;
 
   /**
-   * Number of iterations when generationg the key
-   *
-   * @plexus.configuration default-value="23"
+   * Number of iterations when generating the key
    */
-  @Configuration(value = "23")
-  protected int iterationCount = 23;
+  private final int iterationCount;
 
   private final BouncyCastleProvider bouncyCastleProvider;
 
-  protected Logger getLogger() {
-    return logger;
+  public DefaultPlexusCipher() {
+    this( new BouncyCastleProvider(),
+    SystemPropertiesHelper.getString("plexusCipher.algorithm", "PBEWithSHAAnd128BitRC4"),
+    SystemPropertiesHelper.getInteger("plexusCipher.iterationCount", 23));
   }
 
-  public DefaultPlexusCipher() {
-    this.bouncyCastleProvider = new BouncyCastleProvider();
+  public DefaultPlexusCipher(final BouncyCastleProvider bouncyCastleProvider, final String algorithm, final int iterationCount) {
+    this.bouncyCastleProvider = checkNotNull(bouncyCastleProvider);
+    this.algorithm = checkNotNull(algorithm);
+    this.iterationCount = iterationCount;
   }
 
   // /**

@@ -13,20 +13,23 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CUserRoleMapping;
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = ConfigurationValidator.class)
+@Singleton
+@Named
 public class DefaultLdapConfigurationValidator
     implements ConfigurationValidator
 {
 
-  @SuppressWarnings("unchecked")
+  @Override
   public ValidationResponse validateModel(ValidationRequest request) {
     ValidationResponse response = new ValidationResponse();
 
@@ -59,6 +62,7 @@ public class DefaultLdapConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateConnectionInfo(ValidationContext ctx, CConnectionInfo connectionInfo) {
     ValidationResponse response = new ValidationResponse();
 
@@ -105,6 +109,7 @@ public class DefaultLdapConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateUserAndGroupAuthConfiguration(ValidationContext ctx,
                                                                   CUserAndGroupAuthConfiguration userAndGroupAuthConf)
   {

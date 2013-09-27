@@ -28,7 +28,8 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
   requires: [
     'Nexus.capabilities.Icons',
     'Nexus.capabilities.CapabilitiesGridStore',
-    'Nexus.capabilities.CreateCapabilityWindow'
+    'Nexus.capabilities.CreateCapabilityWindow',
+    'Nexus.grid.GridFilterBox'
   ],
 
   /**
@@ -125,7 +126,11 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         },
         self.buttonAdd,
         self.buttonDuplicate,
-        self.buttonDelete
+        self.buttonDelete,
+        '->',
+        NX.create('Nexus.grid.GridFilterBox', {
+          grid: self
+        })
       ],
 
       listeners: {

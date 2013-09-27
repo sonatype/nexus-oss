@@ -17,6 +17,10 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
@@ -25,20 +29,18 @@ import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = UserManager.class, hint = "LDAP")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named("LDAP")
 public class LdapUserManager
     extends AbstractReadOnlyUserManager
 {
@@ -49,21 +51,14 @@ public class LdapUserManager
 
   private static final String USER_SOURCE = "LDAP";
 
-  @Requirement
-  private LdapManager ldapManager;
+  private final LdapManager ldapManager;
 
-  /**
-   * Default constructor for plexus injection.
-   */
-  public LdapUserManager() {
-    // plexus injection only
+  @Inject
+  public LdapUserManager(final LdapManager ldapManager) {
+    this.ldapManager = checkNotNull(ldapManager);
   }
 
-  @VisibleForTesting
-  LdapUserManager(final LdapManager ldapManager) {
-    this.ldapManager = Preconditions.checkNotNull(ldapManager);
-  }
-
+  @Override
   public User getUser(String userId)
       throws UserNotFoundException
   {
@@ -72,10 +67,10 @@ public class LdapUserManager
         return toPlexusUser(this.ldapManager.getUser(userId));
       }
       catch (NoSuchLdapUserException e) {
-        this.logger.debug("User: " + userId + " not found.", e);
+        logger.debug("User: " + userId + " not found.", e);
       }
       catch (LdapDAOException e) {
-        this.logger.debug("User: " + userId + " not found, cause: " + e.getMessage(), e);
+        logger.debug("User: " + userId + " not found, cause: " + e.getMessage(), e);
         throw new UserNotFoundTransientException(userId, e.getMessage(), e);
       }
     }
@@ -83,6 +78,7 @@ public class LdapUserManager
   }
 
 
+  @Override
   public Set<String> listUserIds() {
     Set<String> userIds = new TreeSet<String>();
     for (User User : this.listUsers()) {
@@ -91,6 +87,7 @@ public class LdapUserManager
     return userIds;
   }
 
+  @Override
   public Set<User> listUsers() {
     Set<User> users = new TreeSet<User>();
     if (this.isEnabled()) {
@@ -101,7 +98,7 @@ public class LdapUserManager
         }
       }
       catch (LdapDAOException e) {
-        this.logger.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
+        logger.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
       }
     }
     return users;
@@ -135,10 +132,12 @@ public class LdapUserManager
     //        return this.securitySystem.getRealms().contains( "LDAP" );
   }
 
+  @Override
   public String getSource() {
     return USER_SOURCE;
   }
 
+  @Override
   public Set<User> searchUsers(UserSearchCriteria criteria) {
     //TODO, rename method, we are doing a starts with search, but thats not what this signature implies,
     // but I don't have a better idea right now.
@@ -153,7 +152,7 @@ public class LdapUserManager
         }
       }
       catch (LdapDAOException e) {
-        this.logger.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
+        logger.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
       }
     }
 
@@ -164,6 +163,7 @@ public class LdapUserManager
   }
 
 
+  @Override
   public String getAuthenticationRealmName() {
     return LDAP_REALM_KEY;
   }

@@ -42,8 +42,6 @@ public interface LdapUserDAO
 
   public PasswordEncoderManager getPasswordEncoderManager();
 
-  public void setPasswordEncoderManager(PasswordEncoderManager passwordEncoder);
-
   public void removeUser(String username, LdapContext context, LdapAuthConfiguration configuration)
       throws NoSuchLdapUserException, LdapDAOException;
 

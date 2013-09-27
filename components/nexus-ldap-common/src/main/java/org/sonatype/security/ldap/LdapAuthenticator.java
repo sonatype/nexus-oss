@@ -13,6 +13,9 @@
 
 package org.sonatype.security.ldap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
@@ -22,14 +25,19 @@ import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role = LdapAuthenticator.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class LdapAuthenticator
 {
-  @Requirement
-  private PasswordEncoderManager passwordManager;
+  private final PasswordEncoderManager passwordManager;
+
+  @Inject
+  public LdapAuthenticator(final PasswordEncoderManager passwordManager) {
+    this.passwordManager = checkNotNull(passwordManager);
+  }
 
   public void authenticateUserWithPassword(LdapUser ldapUser, String password) throws AuthenticationException {
     // use the passwordmanager

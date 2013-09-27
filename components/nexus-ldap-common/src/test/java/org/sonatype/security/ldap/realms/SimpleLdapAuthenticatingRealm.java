@@ -13,16 +13,25 @@
 
 package org.sonatype.security.ldap.realms;
 
-import org.apache.shiro.realm.Realm;
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component(role = Realm.class, hint = SimpleLdapAuthenticatingRealm.ROLE,
-    description = "Test Authentication LDAP Realm")
+import org.sonatype.inject.Description;
+
+@Singleton
+@Named(SimpleLdapAuthenticatingRealm.ROLE)
+@Description("Test Authentication LDAP Realm")
 public class SimpleLdapAuthenticatingRealm
     extends AbstractLdapAuthenticatingRealm
 {
 
   public static final String ROLE = "LdapAuthenticatingRealm";
+
+  @Inject
+  public SimpleLdapAuthenticatingRealm(final LdapManager ldapManager) {
+    super(ldapManager);
+  }
 
   @Override
   public String getName() {
