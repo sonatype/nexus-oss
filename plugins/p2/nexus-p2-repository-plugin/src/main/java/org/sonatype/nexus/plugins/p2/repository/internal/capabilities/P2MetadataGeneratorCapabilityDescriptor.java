@@ -14,6 +14,7 @@
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,6 +25,8 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.sisu.goodies.i18n.I18N;
@@ -32,6 +35,9 @@ import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.domainTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 import static org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration.REPOSITORY;
 import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapabilityDescriptor.TYPE_ID;
 
@@ -39,6 +45,7 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2M
 @Named(TYPE_ID)
 public class P2MetadataGeneratorCapabilityDescriptor
     extends CapabilityDescriptorSupport
+    implements Taggable
 {
 
   public static final String TYPE_ID = "p2.repository.metadata.generator";
@@ -108,6 +115,11 @@ public class P2MetadataGeneratorCapabilityDescriptor
   @Override
   protected String renderAbout() throws Exception {
     return render(TYPE_ID + "-about.vm");
+  }
+
+  @Override
+  public Set<Tag> getTags() {
+    return tags(categoryTag("Repository Type"), domainTag("P2"));
   }
 
 }
