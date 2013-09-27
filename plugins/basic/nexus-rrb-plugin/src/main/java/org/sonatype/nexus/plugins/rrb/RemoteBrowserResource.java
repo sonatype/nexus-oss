@@ -16,6 +16,9 @@ package org.sonatype.nexus.plugins.rrb;
 import java.net.URLDecoder;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,8 +39,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.thoughtworks.xstream.XStream;
 import org.apache.http.client.HttpClient;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -48,13 +49,16 @@ import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A REST resource for retrieving directories from a remote repository.
  */
 @Path(RemoteBrowserResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
-@Component(role = PlexusResource.class, hint = "org.sonatype.nexus.plugins.rrb.RemoteBrowserResource")
+@Named
+@Singleton
 public class RemoteBrowserResource
     extends AbstractResourceStoreContentPlexusResource
     implements PlexusResource
@@ -62,13 +66,19 @@ public class RemoteBrowserResource
   public static final String RESOURCE_URI = "/repositories/{" +
       AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser";
 
-  @Requirement
-  private QueryStringBuilder queryStringBuilder;
-
-  @Requirement
-  private Hc4Provider httpClientProvider;
-
   private final Logger logger = LoggerFactory.getLogger(RemoteBrowserResource.class);
+
+  private final QueryStringBuilder queryStringBuilder;
+
+  private final Hc4Provider httpClientProvider;
+
+  @Inject
+  public RemoteBrowserResource(final QueryStringBuilder queryStringBuilder,
+                               final Hc4Provider httpClientProvider)
+  {
+    this.queryStringBuilder = checkNotNull(queryStringBuilder);
+    this.httpClientProvider = checkNotNull(httpClientProvider);
+  }
 
   @Override
   public Object getPayloadInstance() {
