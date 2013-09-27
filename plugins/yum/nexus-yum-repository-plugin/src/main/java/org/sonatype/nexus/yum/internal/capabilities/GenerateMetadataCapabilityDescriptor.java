@@ -40,7 +40,6 @@ import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
-import static org.sonatype.nexus.plugins.capabilities.Tag.domainTag;
 import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.ALIASES;
 import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.REPOSITORY_ID;
@@ -151,7 +150,7 @@ public class GenerateMetadataCapabilityDescriptor
 
   @Override
   public Set<Tag> getTags() {
-    return tags(categoryTag("Repository Type"), domainTag("Yum"));
+    return tags(categoryTag(Tag.REPOSITORY));
   }
 
 }

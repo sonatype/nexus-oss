@@ -33,11 +33,6 @@ public class Tag
   public static String CATEGORY = "Category";
 
   /**
-   * Key of domain tag.
-   */
-  public static String DOMAIN = "Domain";
-
-  /**
    * Key of repository tag.
    */
   public static String REPOSITORY = "Repository";
@@ -94,13 +89,6 @@ public class Tag
    */
   public static Tag categoryTag(final String category) {
     return new Tag(CATEGORY, category);
-  }
-
-  /**
-   * Convenience method for a domain tag.
-   */
-  public static Tag domainTag(final String domain) {
-    return new Tag(DOMAIN, domain);
   }
 
   /**

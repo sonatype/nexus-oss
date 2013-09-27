@@ -36,7 +36,6 @@ import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
-import static org.sonatype.nexus.plugins.capabilities.Tag.domainTag;
 import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 import static org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration.REPOSITORY;
 import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID;
@@ -119,7 +118,7 @@ public class P2RepositoryAggregatorCapabilityDescriptor
 
   @Override
   public Set<Tag> getTags() {
-    return tags(categoryTag("Repository Type"), domainTag("P2"));
+    return tags(categoryTag(Tag.REPOSITORY));
   }
 
 }
