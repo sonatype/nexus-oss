@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.plugins.p2.repository.group;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = P2GroupRepositoryConfigurator.class)
+@Named
+@Singleton
 public class P2GroupRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator
 {
