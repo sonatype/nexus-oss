@@ -15,15 +15,23 @@ package org.sonatype.nexus.templates;
 
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component(role = TemplateManager.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named
+@Singleton
 public class DefaultTemplateManager
     implements TemplateManager
 {
-  @Requirement(role = TemplateProvider.class)
-  private List<TemplateProvider> providers;
+  private final List<TemplateProvider> providers;
+
+  @Inject
+  public DefaultTemplateManager(final List<TemplateProvider> providers) {
+    this.providers = checkNotNull(providers);
+  }
 
   public TemplateSet getTemplates() {
     return getTemplates(null);
