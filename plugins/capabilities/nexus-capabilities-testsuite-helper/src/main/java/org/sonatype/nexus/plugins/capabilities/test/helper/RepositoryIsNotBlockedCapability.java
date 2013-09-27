@@ -13,20 +13,26 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 
+import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 import static org.sonatype.nexus.plugins.capabilities.test.helper.MessageCapabilityDescriptor.REPOSITORY;
 
 @Named(RepositoryIsNotBlockedCapabilityDescriptor.TYPE_ID)
 public class RepositoryIsNotBlockedCapability
     extends TestCapability
-    implements Capability
+    implements Capability, Taggable
 {
 
   private final Conditions conditions;
@@ -60,6 +66,11 @@ public class RepositoryIsNotBlockedCapability
       }
     }
     );
+  }
+
+  @Override
+  public Set<Tag> getTags() {
+    return tags(repositoryTag(context().properties().get(REPOSITORY)));
   }
 
 }

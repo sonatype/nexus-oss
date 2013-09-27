@@ -51,7 +51,12 @@ NX.define('Nexus.capabilities.CapabilityStore', {
         { name: 'stateDescription' },
         { name: 'status' },
         { name: 'properties', mapping: 'capability.properties' },
-        { name: '$capability', mapping: 'capability' }
+        { name: '$capability', mapping: 'capability' },
+        { name: '$tags',
+          convert: function (newValue, record) {
+            return self.convertTags(record.tags);
+          }
+        }
       ],
 
       sortInfo: {
@@ -62,6 +67,7 @@ NX.define('Nexus.capabilities.CapabilityStore', {
       listeners: {
         load: {
           fn: function () {
+            self.tagKeys = self.calculateTagKeys();
             this.logDebug('Loaded ' + self.getCount() + ' capabilities');
           },
           scope: self
@@ -77,6 +83,46 @@ NX.define('Nexus.capabilities.CapabilityStore', {
    */
   urlOf: function (id) {
     return this.url + '/' + id;
+  },
+
+  /**
+   * Calculates an array of all available tag keys.
+   * @private
+   */
+  calculateTagKeys: function () {
+    var self = this,
+        allTagKeys = [];
+
+    self.each(function (record) {
+      if (record.data.$tags) {
+        for (var key in record.data.$tags) {
+          if (allTagKeys.indexOf(key) < 0) {
+            allTagKeys.push(key);
+          }
+        }
+      }
+    });
+
+    return allTagKeys.sort();
+  },
+
+  /**
+   * Converts tags collection to an map like object.
+   * @private
+   */
+  convertTags: function (recordTags) {
+    var tags = {};
+
+    if (recordTags) {
+      Ext.each(recordTags, function (tag) {
+        tags[tag.key] = tag.value;
+      });
+      return tags;
+    }
+  },
+
+  sameTagKeysAs: function (another) {
+    return JSON.stringify(this.tagKeys) === JSON.stringify(another);
   }
 
 });

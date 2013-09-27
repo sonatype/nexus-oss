@@ -14,14 +14,16 @@
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
@@ -34,6 +36,8 @@ import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 
 /**
  * A test/demo capability descriptor for using {@link RepositoryCombobox}.
@@ -44,6 +48,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Singleton
 public class RepositoryComboCapabilityDescriptor
     extends TestCapabilityDescriptor
+    implements Taggable
 {
 
   static final String TYPE_ID = "[repositoryCombo]";
@@ -97,6 +102,11 @@ public class RepositoryComboCapabilityDescriptor
   @Override
   public List<FormField> formFields() {
     return formFields;
+  }
+
+  @Override
+  public Set<Tag> getTags() {
+    return tags(categoryTag(Tag.REPOSITORY));
   }
 
 }

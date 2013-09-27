@@ -14,11 +14,14 @@
 package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.io.InputStream;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -36,6 +39,8 @@ import com.google.common.io.Closeables;
 import org.apache.commons.io.IOUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 import static org.sonatype.nexus.yum.internal.capabilities.MetadataCapabilityConfigurationSupport.REPOSITORY_ID;
 
 /**
@@ -43,6 +48,7 @@ import static org.sonatype.nexus.yum.internal.capabilities.MetadataCapabilityCon
  */
 public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConfigurationSupport>
     extends CapabilitySupport<C>
+    implements Taggable
 {
 
   private final YumRegistry yumRegistry;
@@ -162,6 +168,11 @@ public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConf
   public String toString() {
     return this.getClass().getSimpleName()
         + (isConfigured() ? "{repository=" + getConfig().repository() + "}" : "");
+  }
+
+  @Override
+  public Set<Tag> getTags() {
+    return tags(repositoryTag(renderDescription()));
   }
 
 }

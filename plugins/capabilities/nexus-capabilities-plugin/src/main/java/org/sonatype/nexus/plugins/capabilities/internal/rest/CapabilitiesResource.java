@@ -16,6 +16,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.rest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -34,19 +35,29 @@ import javax.ws.rs.QueryParam;
 import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.capabilities.model.CapabilityXO;
 import org.sonatype.nexus.capabilities.model.PropertyXO;
+import org.sonatype.nexus.capabilities.model.TagXO;
 import org.sonatype.nexus.capability.CapabilitiesPlugin;
+import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -79,6 +90,8 @@ public class CapabilitiesResource
   private static final String $ACTIVE = "$active";
 
   private static final String $INCLUDE_NOT_EXPOSED = "$includeNotExposed";
+
+  private static final Logger log = LoggerFactory.getLogger(CapabilitiesResource.class);
 
   private final CapabilityRegistry capabilityRegistry;
 
@@ -242,25 +255,75 @@ public class CapabilitiesResource
   static CapabilityStatusXO asCapabilityStatus(final CapabilityReference reference) {
     checkNotNull(reference);
 
+    CapabilityDescriptor descriptor = reference.context().descriptor();
+    Capability capability = reference.capability();
+
     final CapabilityStatusXO capabilityStatus = new CapabilityStatusXO()
         .withCapability(asCapability(reference))
-        .withTypeName(reference.context().descriptor().name())
+        .withTypeName(descriptor.name())
         .withActive(reference.context().isActive())
         .withError(reference.context().hasFailure());
 
     try {
-      capabilityStatus.setDescription(reference.capability().description());
+      capabilityStatus.setDescription(capability.description());
     }
     catch (Exception ignore) {
       capabilityStatus.setDescription(null);
     }
+
     try {
-      capabilityStatus.setStatus(reference.capability().status());
+      capabilityStatus.setStatus(capability.status());
     }
     catch (Exception ignore) {
       capabilityStatus.setStatus(null);
     }
     capabilityStatus.setStateDescription(reference.context().stateDescription());
+
+    Set<Tag> tags = Sets.newHashSet();
+
+    try {
+      if (descriptor instanceof Taggable) {
+        Set<Tag> tagSet = ((Taggable) descriptor).getTags();
+        if (tagSet != null) {
+          tags.addAll(tagSet);
+        }
+      }
+    }
+    catch (Exception e) {
+      log.warn(
+          "Failed to retrieve tags from capability descriptor '{}' due to {}/{}",
+          descriptor, e.getClass(), e.getMessage(), log.isDebugEnabled() ? e : null
+      );
+    }
+    try {
+      if (capability instanceof Taggable) {
+        Set<Tag> tagSet = ((Taggable) capability).getTags();
+        if (tagSet != null) {
+          tags.addAll(tagSet);
+        }
+      }
+    }
+    catch (Exception e) {
+      log.warn(
+          "Failed to retrieve tags from capability '{}' due to {}/{}",
+          descriptor, e.getClass(), e.getMessage(), log.isDebugEnabled() ? e : null
+      );
+    }
+
+    List<TagXO> tagXOs = Lists.transform(
+        Lists.newArrayList(Collections2.filter(tags, Predicates.<Tag>notNull())),
+        new Function<Tag, TagXO>()
+        {
+          @Override
+          public TagXO apply(final Tag input) {
+            return new TagXO().withKey(input.key()).withValue(input.value());
+          }
+        }
+    );
+
+    if (!tagXOs.isEmpty()) {
+      capabilityStatus.setTags(tagXOs);
+    }
 
     return capabilityStatus;
   }

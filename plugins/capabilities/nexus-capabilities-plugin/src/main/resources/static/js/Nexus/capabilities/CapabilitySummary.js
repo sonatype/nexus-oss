@@ -125,8 +125,15 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
             properties = [
               { name: 'Type', value: capability.typeName }
             ];
+
             if (capability.description) {
               properties.push({ name: 'Description', value: capability.description });
+            }
+
+            if (capability.$tags) {
+              for (var key in capability.$tags) {
+                properties.push({ name: key, value: capability.$tags[key] });
+              }
             }
 
             return self.propertiesTpl.apply({

@@ -13,10 +13,17 @@
 
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import java.util.Set;
+
 import javax.inject.Named;
 
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
+
+import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 
 /**
  * A test/demo capability for using {@link RepositoryCombobox}.
@@ -26,12 +33,17 @@ import org.sonatype.nexus.plugins.capabilities.Capability;
 @Named(RepositoryComboCapabilityDescriptor.TYPE_ID)
 public class RepositoryComboCapability
     extends TestCapability
-    implements Capability
+    implements Capability, Taggable
 {
 
   @Override
   public String status() {
     return null;
+  }
+
+  @Override
+  public Set<Tag> getTags() {
+    return tags(repositoryTag(context().properties().get("all")));
   }
 
 }
