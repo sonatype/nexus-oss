@@ -18,9 +18,6 @@ package org.sonatype.security.ldap.upgrade.cipher;
  */
 public interface PlexusCipher
 {
-  public static String ROLE = PlexusCipher.class
-      .getName();
-
   public static final char ENCRYPTED_STRING_DECORATION_START = '{';
 
   public static final char ENCRYPTED_STRING_DECORATION_STOP = '}';

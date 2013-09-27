@@ -13,19 +13,34 @@
 
 package org.sonatype.nexus.security.ldap.realms.test.api;
 
-import org.sonatype.nexus.security.ldap.realms.DefaultLdapManager;
-import org.sonatype.security.ldap.realms.LdapManager;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.nexus.security.ldap.realms.AbstractLdapManager;
+import org.sonatype.security.ldap.LdapAuthenticator;
+import org.sonatype.security.ldap.dao.LdapGroupDAO;
+import org.sonatype.security.ldap.dao.LdapUserDAO;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = LdapManager.class, hint = "TestLdapManager")
+/**
+ * Must NOT be singleton!
+ */
+@Named(TestLdapManager.NAME)
 public class TestLdapManager
-    extends DefaultLdapManager
+    extends AbstractLdapManager
 {
+  public static final String NAME = "TestLdapManager";
 
   private LdapConfiguration ldapConfiguration;
 
+  @Inject
+  public TestLdapManager(LdapAuthenticator ldapAuthenticator, LdapUserDAO ldapUserManager,
+      LdapGroupDAO ldapGroupManager, LdapConfiguration ldapConfiguration)
+  {
+    super(ldapAuthenticator, ldapUserManager, ldapGroupManager, ldapConfiguration);
+  }
+
+  @Override
   public LdapConfiguration getLdapConfiguration() {
     return ldapConfiguration;
   }
@@ -33,6 +48,5 @@ public class TestLdapManager
   public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
     this.ldapConfiguration = ldapConfiguration;
   }
-
 
 }

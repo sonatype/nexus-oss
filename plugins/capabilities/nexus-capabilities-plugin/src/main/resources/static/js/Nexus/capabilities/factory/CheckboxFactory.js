@@ -10,21 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global NX*/
 
-package org.sonatype.security.ldap.upgrade.cipher;
+/**
+ * 'checkbox' factory.
+ *
+ * @since 2.7
+ */
+NX.define('Nexus.capabilities.factory.CheckboxFactory', {
 
-import org.codehaus.plexus.component.annotations.Component;
+  singleton: true,
 
-@Component(role = PlexusCipher.class, hint = "test")
-public class TestPlexusCipher
-    extends DefaultPlexusCipher
-{
+  supports: ['checkbox'],
 
-  public String getAlgorithm() {
-    return super.algorithm;
+  /**
+   * Creates a checkbox.
+   * @param formField capability type form field to create checkbox for
+   * @returns {*} created checkbox (never null)
+   */
+  create: function (formField) {
+    var item = {
+      xtype: 'checkbox',
+      fieldLabel: formField.label,
+      helpText: formField.helpText
+    };
+    if (formField.initialValue) {
+      item.checked = Boolean('true' === formField.initialValue);
+    }
+    return item;
   }
 
-  public int getIterationCount() {
-    return super.iterationCount;
-  }
-}
+});

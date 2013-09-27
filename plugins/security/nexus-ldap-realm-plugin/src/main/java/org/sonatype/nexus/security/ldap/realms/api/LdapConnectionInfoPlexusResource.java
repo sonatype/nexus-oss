@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.security.ldap.realms.api;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -26,7 +29,6 @@ import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -37,10 +39,12 @@ import org.restlet.resource.Variant;
 /**
  * Resource for managing LDAP connection settings.
  */
-@Component(role = PlexusResource.class, hint = "LdapConnectionInfoPlexusResource")
 @Path("/ldap/conn_info")
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
+@Singleton
+@Named("LdapConnectionInfoPlexusResource")
+@Typed(PlexusResource.class)
 public class LdapConnectionInfoPlexusResource
     extends AbstractLdapRealmPlexusResource
 {

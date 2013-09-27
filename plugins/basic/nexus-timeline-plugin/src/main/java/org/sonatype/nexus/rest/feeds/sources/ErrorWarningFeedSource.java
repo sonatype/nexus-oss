@@ -22,6 +22,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.log.LogManager;
 
 import com.google.common.base.Splitter;
@@ -35,16 +39,17 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.MediaType;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Show Nexus ERROR and WARN log lines from last log file.
  *
  * @author cstamas
  */
-@Component(role = FeedSource.class, hint = "errorWarning")
+@Named(ErrorWarningFeedSource.CHANNEL_KEY)
+@Singleton
 public class ErrorWarningFeedSource
     extends AbstractFeedSource
 {
@@ -52,8 +57,12 @@ public class ErrorWarningFeedSource
 
   private static final List<String> LOGFILENAMES_TO_SCAN = Arrays.asList("nexus.log", "nexus.log.1");
 
-  @Requirement
-  private LogManager logManager;
+  private final LogManager logManager;
+
+  @Inject
+  public ErrorWarningFeedSource(final LogManager logManager) {
+    this.logManager = checkNotNull(logManager);
+  }
 
   public String getFeedKey() {
     return CHANNEL_KEY;

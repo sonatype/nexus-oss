@@ -52,7 +52,6 @@ public class DefaultLdapConnector
   public DefaultLdapConnector(String identifier, LdapUserDAO ldapUserManager, LdapGroupDAO ldapGroupManager,
                               LdapContextFactory ldapContextFactory, LdapAuthConfiguration ldapAuthConfiguration)
   {
-    super();
     this.identifier = identifier;
     this.ldapUserManager = ldapUserManager;
     this.ldapGroupManager = ldapGroupManager;

@@ -16,16 +16,16 @@ package org.sonatype.nexus.plugins.p2.repository.updatesite;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = ScheduledTaskDescriptor.class, hint = UpdateSiteMirrorTask.ROLE_HINT,
-    description = "Mirror Eclipse Update Site")
+@Named(UpdateSiteMirrorTask.ROLE_HINT)
+@Singleton
 public class UpdateSiteMirrorTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {

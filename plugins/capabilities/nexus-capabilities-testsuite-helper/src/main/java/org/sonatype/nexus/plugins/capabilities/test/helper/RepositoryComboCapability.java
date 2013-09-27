@@ -29,4 +29,9 @@ public class RepositoryComboCapability
     implements Capability
 {
 
+  @Override
+  public String status() {
+    return null;
+  }
+
 }

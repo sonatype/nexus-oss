@@ -13,12 +13,13 @@
 
 package org.sonatype.nexus.plugins.plugin.console.security;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = StaticSecurityResource.class, hint = "PluginConsoleSecurityResource")
+@Named
+@Singleton
 public class PluginConsoleSecurityResource
     extends AbstractStaticSecurityResource
 {
@@ -26,5 +27,4 @@ public class PluginConsoleSecurityResource
   protected String getResourcePath() {
     return "/META-INF/nexus-plugin-console-plugin-security.xml";
   }
-
 }

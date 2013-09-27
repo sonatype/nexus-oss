@@ -13,50 +13,46 @@
 
 package org.sonatype.nexus.events;
 
-import org.sonatype.guice.plexus.config.Hints;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.record.NexusAuthenticationEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.test.NexusTestSupport;
 
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.when;
+
+/**
+ * Tests for {@link NexusAuthenticationEventInspector}.
+ */
 public class NexusAuthenticationEventInspectorTest
     extends NexusTestSupport
 {
-  @Before
-  public void manglePlexus()
-      throws Exception
-  {
-    // this is "our" feed recorder
-    final ComponentDescriptor<DummyFeedRecorder> fakeFeedRecorder =
-        new ComponentDescriptor<DummyFeedRecorder>(DummyFeedRecorder.class, getContainer().getLookupRealm());
-    fakeFeedRecorder.setRoleClass(FeedRecorder.class);
-    getContainer().addComponentDescriptor(fakeFeedRecorder);
+  private NexusAuthenticationEventInspector underTest;
 
-    // mocking configuration
-    final NexusConfiguration fakeNexusConfiguration = Mockito.mock(NexusConfiguration.class);
-    Mockito.when(fakeNexusConfiguration.getAnonymousUsername()).thenReturn("anonymous");
-    getContainer().addComponent(fakeNexusConfiguration, NexusConfiguration.class, Hints.DEFAULT_HINT);
+  private DummyFeedRecorder feedRecorder;
+
+  @Mock
+  private NexusConfiguration nexusConfiguration;
+
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks( this );
+    feedRecorder = new DummyFeedRecorder();
+
+    underTest = new NexusAuthenticationEventInspector(nexusConfiguration);
+    underTest.setFeedRecorder(feedRecorder);
+
+    when(nexusConfiguration.getAnonymousUsername()).thenReturn("anonymous");
   }
 
-  public void perform(final String username, final int expected)
-      throws Exception
-  {
-    final DummyFeedRecorder feedRecorder = (DummyFeedRecorder) lookup(FeedRecorder.class);
-
-    final NexusAuthenticationEventInspector naei =
-        (NexusAuthenticationEventInspector) lookup(EventInspector.class,
-            NexusAuthenticationEventInspector.class.getSimpleName());
-
+  public void perform(final String username, final int expected) throws Exception {
     final ClientInfo authSuccess = new ClientInfo(username, "192.168.0.1", "Foo/Bar");
     final ClientInfo authFailed = new ClientInfo(username, "192.168.0.1", "Foo/Bar");
 
@@ -66,34 +62,30 @@ public class NexusAuthenticationEventInspectorTest
     // we send same event 5 times, but only one of them should be recorded since the rest 4 are "similar" and within
     // 2 sec
     for (int i = 0; i < 5; i++) {
-      naei.inspect(naeSuccess);
+      underTest.inspect(naeSuccess);
     }
     // we send another event 5 times, but only one of them should be recorded since it is not "similar" to previous
     // sent ones, but the rest 4 are "similar" and within 2 sec
     for (int i = 0; i < 5; i++) {
-      naei.inspect(naeFailed);
+      underTest.inspect(naeFailed);
     }
     // we sleep a bit over two seconds
     Thread.sleep(2100L);
     // and we send again the second event, but this one should be recorded, since the gap between last sent and this
     // is more than 2 seconds
-    naei.inspect(naeFailed);
+    underTest.inspect(naeFailed);
 
     // total 11 events "fired", but 3 recorded due to "similarity filtering"
-    MatcherAssert.assertThat(feedRecorder.getReceivedEventCount(), CoreMatchers.equalTo(expected));
+    assertThat(feedRecorder.getReceivedEventCount(), is(expected));
   }
 
   @Test
-  public void testNonAnon()
-      throws Exception
-  {
+  public void testNonAnon() throws Exception {
     perform("test", 3);
   }
 
   @Test
-  public void testAnon()
-      throws Exception
-  {
+  public void testAnon() throws Exception {
     perform("anonymous", 0);
   }
 }

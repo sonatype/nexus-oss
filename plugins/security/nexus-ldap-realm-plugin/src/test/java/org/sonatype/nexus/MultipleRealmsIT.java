@@ -53,7 +53,7 @@ public class MultipleRealmsIT
 
     // LDAP user
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
+    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
 
     Assert.assertTrue(security.hasRole(principals, "nx-developer"));
     Assert.assertFalse(security.hasRole(principals, "JUNK"));
@@ -79,7 +79,7 @@ public class MultipleRealmsIT
 
     // LDAP
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", new NexusLdapAuthenticationRealm().getName());
+    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
 
     Assert.assertTrue(security.isPermitted(principals, "security:usersforgotpw:create"));
     Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:delete"));
