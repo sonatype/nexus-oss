@@ -49,8 +49,7 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
 
     self.templatePanel = NX.create('Ext.Panel', {
       cls: 'nx-capabilities-CapabilitySummary-template',
-      border: false,
-      html: '<div>Alin</div>'
+      border: false
     });
 
     self.settings = NX.create('Nexus.capabilities.CapabilitySettingsFieldSet', {
