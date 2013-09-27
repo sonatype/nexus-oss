@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -45,31 +49,38 @@ import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.osgi.service.obr.Resource;
 
-@Component(role = GroupRepository.class, hint = ObrGroupRepository.ROLE_HINT, instantiationStrategy = "per-lookup",
-    description = "OBR Group")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named(ObrGroupRepository.ROLE_HINT)
+@Description("OBR Group")
 public class ObrGroupRepository
     extends AbstractGroupRepository
     implements GroupRepository
 {
   public static final String ROLE_HINT = "obr-group";
 
-  @Requirement(hint = ObrContentClass.ID)
-  private ContentClass obrContentClass;
+  private final ContentClass obrContentClass;
 
-  @Requirement
-  private ObrGroupRepositoryConfigurator obrGroupRepositoryConfigurator;
+  private final ObrGroupRepositoryConfigurator obrGroupRepositoryConfigurator;
+
+  private final ObrMetadataSource obrMetadataSource;
 
   private final RepositoryKind obrGroupRepositoryKind = new DefaultRepositoryKind(GroupRepository.class, null);
 
-  @Requirement(hint = "obr-bindex")
-  private ObrMetadataSource obrMetadataSource;
-
   private long lastModified = Long.MIN_VALUE;
+
+  @Inject
+  public ObrGroupRepository(final @Named(ObrContentClass.ID) ContentClass obrContentClass,
+                            final ObrGroupRepositoryConfigurator obrGroupRepositoryConfigurator,
+                            final @Named("obr-bindex") ObrMetadataSource obrMetadataSource)
+  {
+    this.obrContentClass = checkNotNull(obrContentClass);
+    this.obrGroupRepositoryConfigurator = checkNotNull(obrGroupRepositoryConfigurator);
+    this.obrMetadataSource = checkNotNull(obrMetadataSource);
+  }
 
   public ContentClass getRepositoryContentClass() {
     return obrContentClass;

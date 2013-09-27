@@ -15,6 +15,10 @@ package org.sonatype.nexus.obr.shadow;
 
 import java.util.Collection;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -37,31 +41,38 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.osgi.service.obr.Resource;
 
-@Component(role = ShadowRepository.class, hint = ObrShadowRepository.ROLE_HINT, instantiationStrategy = "per-lookup",
-    description = "OBR")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named(ObrShadowRepository.ROLE_HINT)
+@Description("OBR")
 public class ObrShadowRepository
     extends AbstractShadowRepository
     implements ShadowRepository
 {
   public static final String ROLE_HINT = "obr-shadow";
 
-  @Requirement(hint = ObrContentClass.ID)
-  private ContentClass obrContentClass;
+  private final ContentClass obrContentClass;
 
-  @Requirement
-  private ObrShadowRepositoryConfigurator obrShadowRepositoryConfigurator;
+  private final ObrShadowRepositoryConfigurator obrShadowRepositoryConfigurator;
+
+  private final ObrMetadataSource obrMetadataSource;
 
   private final RepositoryKind obrShadowRepositoryKind = new DefaultRepositoryKind(ShadowRepository.class, null);
 
   private ContentClass masterContentClass;
 
-  @Requirement(hint = "obr-bindex")
-  private ObrMetadataSource obrMetadataSource;
+  @Inject
+  public ObrShadowRepository(final @Named(ObrContentClass.ID) ContentClass obrContentClass,
+                             final ObrShadowRepositoryConfigurator obrShadowRepositoryConfigurator,
+                             final @Named("obr-bindex") ObrMetadataSource obrMetadataSource)
+  {
+    this.obrContentClass = checkNotNull(obrContentClass);
+    this.obrShadowRepositoryConfigurator = checkNotNull(obrShadowRepositoryConfigurator);
+    this.obrMetadataSource = checkNotNull(obrMetadataSource);
+  }
 
   public ContentClass getRepositoryContentClass() {
     return obrContentClass;

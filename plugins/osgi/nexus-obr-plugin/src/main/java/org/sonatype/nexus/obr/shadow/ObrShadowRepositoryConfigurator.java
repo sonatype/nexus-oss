@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.obr.shadow;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfigurator;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = ObrShadowRepositoryConfigurator.class)
+@Named
+@Singleton
 public class ObrShadowRepositoryConfigurator
     extends AbstractShadowRepositoryConfigurator
 {

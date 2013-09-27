@@ -13,15 +13,17 @@
 
 package org.sonatype.nexus.obr;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * {@link ContentClass} representing OBR content.
  */
-@Component(role = ContentClass.class, hint = ObrContentClass.ID)
+@Named(ObrContentClass.ID)
+@Singleton
 public class ObrContentClass
     extends AbstractIdContentClass
 {
