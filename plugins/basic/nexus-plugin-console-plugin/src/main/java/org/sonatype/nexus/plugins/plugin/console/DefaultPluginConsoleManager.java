@@ -18,6 +18,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginResponse;
@@ -29,36 +33,32 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @author juven
+ * Default {@link PluginConsoleManager} implementation.
  */
-@Component(role = PluginConsoleManager.class)
+@Named
+@Singleton
 public class DefaultPluginConsoleManager
     extends AbstractLoggingComponent
-    implements PluginConsoleManager, Initializable
+    implements PluginConsoleManager
 {
-  @Requirement
-  private NexusPluginManager pluginManager;
+  private final NexusPluginManager pluginManager;
 
-  @Requirement
-  private PlexusContainer plexusContainer;
+  private final List<NexusResourceBundle> resourceBundles;
 
-  @Requirement(role = NexusResourceBundle.class)
-  private List<NexusResourceBundle> resourceBundles;
+  private final Multimap<String, NexusDocumentationBundle> docBundles;
 
-  private Multimap<String, NexusDocumentationBundle> docBundles;
-
-  public void initialize()
-      throws InitializationException
+  @Inject
+  public DefaultPluginConsoleManager(final NexusPluginManager pluginManager,
+                                     final List<NexusResourceBundle> resourceBundles)
   {
-    docBundles = LinkedHashMultimap.create();
+    this.pluginManager = checkNotNull(pluginManager);
+    this.resourceBundles = checkNotNull(resourceBundles);
 
+    this.docBundles = LinkedHashMultimap.create();
     for (NexusResourceBundle rb : resourceBundles) {
       if (rb instanceof NexusDocumentationBundle) {
         NexusDocumentationBundle doc = (NexusDocumentationBundle) rb;

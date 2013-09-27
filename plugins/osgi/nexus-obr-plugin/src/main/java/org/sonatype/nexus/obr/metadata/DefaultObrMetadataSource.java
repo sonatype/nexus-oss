@@ -16,6 +16,10 @@ package org.sonatype.nexus.obr.metadata;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.obr.ObrPluginConfiguration;
@@ -24,29 +28,39 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.osgi.impl.bundle.obr.resource.BundleInfo;
 import org.osgi.service.obr.Resource;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Bindex based {@link ObrMetadataSource} component.
  */
-@Component(role = ObrMetadataSource.class, hint = "obr-bindex", description = "bindex")
+@Named(DefaultObrMetadataSource.NAME)
+@Singleton
 public class DefaultObrMetadataSource
     extends AbstractLogEnabled
     implements ObrMetadataSource
 {
-  @Requirement
-  private ObrPluginConfiguration obrConfiguration;
+  public static final String NAME = "obr-bindex";
 
-  @Requirement
-  private NexusConfiguration nexusConfiguration;
+  private final ObrPluginConfiguration obrConfiguration;
 
-  @Requirement
-  private MimeSupport mimeSupport;
+  private final NexusConfiguration nexusConfiguration;
+
+  private final MimeSupport mimeSupport;
+
+  @Inject
+  public DefaultObrMetadataSource(final ObrPluginConfiguration obrConfiguration,
+                                  final NexusConfiguration nexusConfiguration,
+                                  final MimeSupport mimeSupport)
+  {
+    this.obrConfiguration = checkNotNull(obrConfiguration);
+    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+    this.mimeSupport = checkNotNull(mimeSupport);
+  }
 
   public ObrResourceReader getReader(final ObrSite site)
       throws StorageException

@@ -47,6 +47,12 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
   initComponent: function () {
     var self = this;
 
+    self.templatePanel = NX.create('Ext.Panel', {
+      cls: 'nx-capabilities-CapabilitySummary-template',
+      border: false,
+      html: '<div>Alin</div>'
+    });
+
     self.settings = NX.create('Nexus.capabilities.CapabilitySettingsFieldSet', {
       border: false,
       parentPanel: self
@@ -81,7 +87,10 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
       cls: 'nx-capabilities-CapabilitySettings',
       title: 'Settings',
       autoScroll: true,
-      items: self.formPanel,
+      items: [
+        self.templatePanel,
+        self.formPanel
+      ],
       listeners: {
         activate: {
           fn: function () {
@@ -102,9 +111,16 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
   setCapability: function (capability) {
     var self = this,
         sp = Sonatype.lib.Permissions,
-        editable = sp.checkPermission('nexus:capabilities', sp.EDIT);
+        editable = sp.checkPermission('nexus:capabilities', sp.EDIT),
+        message = self.messageTpl.message(capability);
 
     self.currentRecord = capability;
+
+    self.templatePanel.html = message;
+    if (self.templatePanel.body) {
+      self.templatePanel.body.update(message);
+    }
+
     self.settings.importCapability(self.formPanel.getForm(), capability);
 
     self.doLayout();
