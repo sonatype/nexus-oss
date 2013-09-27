@@ -1267,9 +1267,4 @@ public abstract class AbstractRepository
     // if not local/remote only, add it to NFC
     return !request.isRequestLocalOnly() && !request.isRequestRemoteOnly();
   }
-
-  @Override
-  public void dispose() {
-    unregisterFromEventBus();
-  }
 }

@@ -37,6 +37,7 @@ public abstract class AbstractRemovableConfigurable<C>
   @Inject
   public void setEventBus(final EventBus eventBus) {
     super.setEventBus(eventBus);
+    registerWithEventBus();
   }
   
   @Override
@@ -45,4 +46,7 @@ public abstract class AbstractRemovableConfigurable<C>
     super.setApplicationConfiguration(applicationConfiguration);
   }
 
+  public void dispose() {
+    unregisterFromEventBus();
+  }
 }
