@@ -16,6 +16,9 @@ package org.sonatype.nexus.plugins.plugin.console.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,12 +33,9 @@ import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -43,20 +43,24 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Resource publishing Nexus plugin details.
  */
-@Component(role = PlexusResource.class, hint = "PluginInfoListPlexusResource")
 @Path("/plugin_console/plugin_infos")
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
+@Named
+@Singleton
 public class PluginInfoListPlexusResource
     extends AbstractNexusPlexusResource
 {
-  @Requirement
-  private PluginConsoleManager pluginConsoleManager;
+  private final PluginConsoleManager pluginConsoleManager;
 
-  public PluginInfoListPlexusResource() {
+  @Inject
+  public PluginInfoListPlexusResource(final PluginConsoleManager pluginConsoleManager) {
+    this.pluginConsoleManager = checkNotNull(pluginConsoleManager);
     this.setReadable(true);
     this.setModifiable(false);
   }
