@@ -66,7 +66,7 @@ NX.define('Nexus.grid.GridFilterBox', {
       }
     });
 
-    self.constructor.superclass.initComponent.apply(self, arguments);
+    Nexus.grid.GridFilterBox.superclass.initComponent.call(self, arguments);
   },
 
   /**
