@@ -41,10 +41,8 @@ NX.define('Nexus.grid.GridFilterBox', {
 
       listeners: {
         keyup: {
-          fn: function (x, e) {
-            if (e.keyCode === 13) {
-              self.filterGrid();
-            }
+          fn: function () {
+            self.filterGrid();
           },
           scope: self
         }
