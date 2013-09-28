@@ -18,7 +18,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
@@ -31,81 +37,66 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = RepositoryTypeRegistry.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class DefaultRepositoryTypeRegistry
     implements RepositoryTypeRegistry
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private PlexusContainer container;
+  private final Map<String, ContentClass> contentClasses;
 
-  @Requirement(role = ContentClass.class)
-  private Map<String, ContentClass> contentClasses;
+  private final ApplicationRuntimeConfigurationBuilder applicationRuntimeConfigurationBuilder;
 
-  private Map<String, ContentClass> repoCachedContentClasses = new HashMap<String, ContentClass>();
+  private ConcurrentMap<String, ContentClass> repoCachedContentClasses;
 
   private Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
 
+  @Inject
+  public DefaultRepositoryTypeRegistry(final Map<String, ContentClass> contentClasses, final ApplicationRuntimeConfigurationBuilder applicationRuntimeConfigurationBuilder) {
+    this.contentClasses = checkNotNull(contentClasses);
+    this.applicationRuntimeConfigurationBuilder = checkNotNull(applicationRuntimeConfigurationBuilder);
+    this.repoCachedContentClasses = Maps.newConcurrentMap();
+
+    Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> result = ArrayListMultimap.create();
+    // fill in the defaults
+    Class<? extends Repository> role = null;
+    role = Repository.class;
+    result.put(role, new RepositoryTypeDescriptor(role, M1Repository.ID, "repositories",
+        RepositoryType.UNLIMITED_INSTANCES));
+    result.put(role, new RepositoryTypeDescriptor(role, M2Repository.ID, "repositories",
+        RepositoryType.UNLIMITED_INSTANCES));
+    role = ShadowRepository.class;
+    result.put(role, new RepositoryTypeDescriptor(role, M1LayoutedM2ShadowRepository.ID, "shadows",
+        RepositoryType.UNLIMITED_INSTANCES));
+    result.put(role, new RepositoryTypeDescriptor(role, M2LayoutedM1ShadowRepository.ID, "shadows",
+        RepositoryType.UNLIMITED_INSTANCES));
+    role = GroupRepository.class;
+    result.put(role, new RepositoryTypeDescriptor(role, M1GroupRepository.ID, "groups",
+        RepositoryType.UNLIMITED_INSTANCES));
+    result.put(role, new RepositoryTypeDescriptor(role, M2GroupRepository.ID, "groups",
+        RepositoryType.UNLIMITED_INSTANCES));
+    logger.info("Registered default repository types.");
+    this.repositoryTypeDescriptorsMap = result;
+  }
+
   protected Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> getRepositoryTypeDescriptors() {
-    synchronized (this) {
-      // maybe the previous who was blocking us already did the job
-      if (repositoryTypeDescriptorsMap == null) {
-        Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> result =
-            ArrayListMultimap.create();
-
-        // fill in the defaults
-        Class<? extends Repository> role = null;
-
-        role = Repository.class;
-
-        result.put(role, new RepositoryTypeDescriptor(role, M1Repository.ID, "repositories",
-            RepositoryType.UNLIMITED_INSTANCES));
-        result.put(role, new RepositoryTypeDescriptor(role, M2Repository.ID, "repositories",
-            RepositoryType.UNLIMITED_INSTANCES));
-
-        role = ShadowRepository.class;
-
-        result.put(role, new RepositoryTypeDescriptor(role, M1LayoutedM2ShadowRepository.ID, "shadows",
-            RepositoryType.UNLIMITED_INSTANCES));
-        result.put(role, new RepositoryTypeDescriptor(role, M2LayoutedM1ShadowRepository.ID, "shadows",
-            RepositoryType.UNLIMITED_INSTANCES));
-
-        role = GroupRepository.class;
-
-        result.put(role, new RepositoryTypeDescriptor(role, M1GroupRepository.ID, "groups",
-            RepositoryType.UNLIMITED_INSTANCES));
-        result.put(role, new RepositoryTypeDescriptor(role, M2GroupRepository.ID, "groups",
-            RepositoryType.UNLIMITED_INSTANCES));
-
-        // No implementation exists in core!
-        // role = WebSiteRepository.class.getName();
-
-        // result.put( role, new RepositoryTypeDescriptor( role, XXX, "sites" ) );
-
-        logger.info("Registered default repository types.");
-
-        this.repositoryTypeDescriptorsMap = result;
-      }
-
-      return repositoryTypeDescriptorsMap;
-    }
+    return repositoryTypeDescriptorsMap;
   }
 
+  @Override
   public Set<RepositoryTypeDescriptor> getRegisteredRepositoryTypeDescriptors() {
-    return Collections.unmodifiableSet(new HashSet<RepositoryTypeDescriptor>(
-        getRepositoryTypeDescriptors().values()));
+    return Collections.unmodifiableSet(new HashSet<RepositoryTypeDescriptor>(getRepositoryTypeDescriptors().values()));
   }
 
+  @Override
   public boolean registerRepositoryTypeDescriptors(RepositoryTypeDescriptor d) {
     boolean added = getRepositoryTypeDescriptors().put(d.getRole(), d);
 
@@ -114,15 +105,15 @@ public class DefaultRepositoryTypeRegistry
         logger.info("Registered Repository type " + d.toString() + ".");
       }
       else {
-        logger.info(
-            "Registered Repository type " + d.toString() + " with maximal instance limit set to "
-                + d.getRepositoryMaxInstanceCount() + ".");
+        logger.info("Registered Repository type " + d.toString() + " with maximal instance limit set to "
+            + d.getRepositoryMaxInstanceCount() + ".");
       }
     }
 
     return added;
   }
 
+  @Override
   public boolean unregisterRepositoryTypeDescriptors(RepositoryTypeDescriptor d) {
     boolean removed = getRepositoryTypeDescriptors().remove(d.getRole(), d);
 
@@ -133,10 +124,12 @@ public class DefaultRepositoryTypeRegistry
     return removed;
   }
 
+  @Override
   public Map<String, ContentClass> getContentClasses() {
     return Collections.unmodifiableMap(new HashMap<String, ContentClass>(contentClasses));
   }
 
+  @Override
   public Set<String> getCompatibleContentClasses(ContentClass contentClass) {
     Set<String> compatibles = new HashSet<String>();
 
@@ -149,6 +142,7 @@ public class DefaultRepositoryTypeRegistry
     return compatibles;
   }
 
+  @Override
   public Set<Class<? extends Repository>> getRepositoryRoles() {
     Set<RepositoryTypeDescriptor> rtds = getRegisteredRepositoryTypeDescriptors();
 
@@ -161,6 +155,7 @@ public class DefaultRepositoryTypeRegistry
     return Collections.unmodifiableSet(result);
   }
 
+  @Override
   public Set<String> getExistingRepositoryHints(Class<? extends Repository> role) {
     if (!getRepositoryTypeDescriptors().containsKey(role)) {
       return Collections.emptySet();
@@ -175,6 +170,7 @@ public class DefaultRepositoryTypeRegistry
     return result;
   }
 
+  @Override
   public RepositoryTypeDescriptor getRepositoryTypeDescriptor(Class<? extends Repository> role, String hint) {
     if (!getRepositoryTypeDescriptors().containsKey(role)) {
       return null;
@@ -189,6 +185,7 @@ public class DefaultRepositoryTypeRegistry
     return null;
   }
 
+  @Override
   @Deprecated
   public RepositoryTypeDescriptor getRepositoryTypeDescriptor(String role, String hint) {
     Class<? extends Repository> roleClass = null;
@@ -214,42 +211,37 @@ public class DefaultRepositoryTypeRegistry
     return null;
   }
 
-  // TODO: solve this single place to cease the requirement for PlexusContainer!
+  @Override
   public ContentClass getRepositoryContentClass(Class<? extends Repository> role, String hint) {
     if (!getRepositoryRoles().contains(role)) {
       return null;
     }
 
     ContentClass result = null;
-
-    String cacheKey = role + ":" + hint;
+    final String cacheKey = role + ":" + hint;
 
     if (repoCachedContentClasses.containsKey(cacheKey)) {
       result = repoCachedContentClasses.get(cacheKey);
     }
     else {
-      if (container.hasComponent(role, hint)) {
+      // TODO: My assumption is that this code is never called
+      // or, it get
+      try {
+        Repository repository = null;
         try {
-          Repository repository = container.lookup(role, hint);
-
+          repository = applicationRuntimeConfigurationBuilder.createRepository(role, hint);
           result = repository.getRepositoryContentClass();
-
-          container.release(repository);
-
           repoCachedContentClasses.put(cacheKey, result);
         }
-        catch (ComponentLookupException e) {
-          logger.warn("Container contains a component but lookup failed!", e);
-        }
-        catch (ComponentLifecycleException e) {
-          logger.warn("Could not release the component! Possible leak here.", e);
+        finally {
+          applicationRuntimeConfigurationBuilder.releaseRepository(repository);
         }
       }
-      else {
-        return null;
+      catch (Exception e) {
+        logger.warn("Container lookup failed", e);
+        result = null;
       }
     }
-
     return result;
   }
 }

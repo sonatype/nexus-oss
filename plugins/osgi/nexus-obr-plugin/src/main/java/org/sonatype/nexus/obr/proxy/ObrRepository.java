@@ -32,6 +32,7 @@ import org.sonatype.nexus.obr.metadata.ObrResourceWriter;
 import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -121,7 +122,7 @@ public class ObrRepository
 
   @Override
   public void setLocalUrl(final String localUrl)
-      throws StorageException
+      throws LocalStorageException
   {
     super.setLocalUrl(localUrl);
   }

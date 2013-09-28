@@ -13,28 +13,33 @@
 
 package org.sonatype.nexus.events;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
 /**
  * Event inspector listening for configuration changes to expire caches when Local or Remote URL changed of the
  * repository.
  */
-@Component(role = EventInspector.class, hint = "RepositoryConfigurationUpdatedEventInspector")
+@Named
+@Singleton
 public class RepositoryConfigurationUpdatedEventInspector
     extends AbstractEventInspector
     implements AsynchronousEventInspector
 {
-  @Requirement
-  private NexusScheduler nexusScheduler;
+  private final NexusScheduler nexusScheduler;
+
+  @Inject
+  public RepositoryConfigurationUpdatedEventInspector(final NexusScheduler nexusScheduler) {
+    this.nexusScheduler = nexusScheduler;
+  }
 
   public boolean accepts(Event<?> evt) {
     return evt instanceof RepositoryConfigurationUpdatedEvent;

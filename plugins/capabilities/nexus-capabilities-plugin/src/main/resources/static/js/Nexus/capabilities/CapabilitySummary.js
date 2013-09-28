@@ -110,7 +110,6 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
         '<div class="nx-capabilities-CapabilitySummary-body">',
         '{[ this.status(values) ]}',
         '{[ this.properties(values) ]}',
-        '{[ this.message(values) ]}',
         '</div>',
         {
           compiled: true,
@@ -125,16 +124,21 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
             properties = [
               { name: 'Type', value: capability.typeName }
             ];
+
             if (capability.description) {
               properties.push({ name: 'Description', value: capability.description });
+            }
+
+            if (capability.$tags) {
+              for (var key in capability.$tags) {
+                properties.push({ name: key, value: capability.$tags[key] });
+              }
             }
 
             return self.propertiesTpl.apply({
               properties: properties
             });
-          },
-
-          message: self.messageTpl.message.createDelegate(self.messageTpl)
+          }
 
         });
 
@@ -154,23 +158,7 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
             return icons.iconFor(capability).variant('x32').img;
           },
 
-          statusLabel: function (capability) {
-            var enabled = capability.enabled,
-                active = capability.active,
-                error = capability.error;
-
-            if (enabled && error) {
-              return 'Error';
-            }
-            if (enabled && active) {
-              return 'Active';
-            }
-            if (enabled && !active) {
-              return 'Passive';
-            }
-
-            return 'Disabled';
-          }
+          statusLabel: self.mediator().getStatusLabel.createDelegate(self.mediator())
         });
 
     self.propertiesTpl = NX.create('Ext.XTemplate',

@@ -16,6 +16,10 @@ package org.sonatype.nexus.security;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.security.model.CPrivilege;
@@ -24,24 +28,33 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = PrivilegeDescriptor.class, hint = "RepositoryViewPrivilegeDescriptor")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named("RepositoryViewPrivilegeDescriptor")
 public class RepositoryViewPrivilegeDescriptor
     extends AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
   public static final String TYPE = "repository";
 
-  @Requirement(role = PrivilegePropertyDescriptor.class, hint = "RepositoryPropertyDescriptor")
-  private PrivilegePropertyDescriptor repoProperty;
+  private final PrivilegePropertyDescriptor repoProperty;
 
+  @Inject
+  public RepositoryViewPrivilegeDescriptor(
+      @Named("RepositoryPropertyDescriptor") PrivilegePropertyDescriptor repoProperty)
+  {
+    this.repoProperty = checkNotNull(repoProperty);
+  }
+
+  @Override
   public String getName() {
     return "Repository View";
   }
 
+  @Override
   public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
     List<PrivilegePropertyDescriptor> propertyDescriptors = new ArrayList<PrivilegePropertyDescriptor>();
 
@@ -50,10 +63,12 @@ public class RepositoryViewPrivilegeDescriptor
     return propertyDescriptors;
   }
 
+  @Override
   public String getType() {
     return TYPE;
   }
 
+  @Override
   public String buildPermission(CPrivilege privilege) {
     if (!TYPE.equals(privilege.getType())) {
       return null;
@@ -69,9 +84,7 @@ public class RepositoryViewPrivilegeDescriptor
   }
 
   @Override
-  public ValidationResponse validatePrivilege(CPrivilege privilege,
-                                              SecurityValidationContext ctx, boolean update)
-  {
+  public ValidationResponse validatePrivilege(CPrivilege privilege, SecurityValidationContext ctx, boolean update) {
     ValidationResponse response = super.validatePrivilege(privilege, ctx, update);
 
     if (!TYPE.equals(privilege.getType())) {

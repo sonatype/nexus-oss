@@ -15,17 +15,19 @@ package org.sonatype.nexus.timeline;
 
 import java.io.File;
 
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -54,6 +56,17 @@ public class LegacyNexusTimelineTest
       }
     });
     return modules;
+  }
+
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    // FIXME: This needs to be fired as many component relies on this to cleanup (like EHCache)
+    lookup(EventBus.class).post(new NexusStoppedEvent(null));
+    super.tearDown();
+    // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
+    ThreadContext.remove();
   }
 
   protected boolean enableAutomaticRoutingFeature() {

@@ -14,6 +14,7 @@
 package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +29,8 @@ import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.formfields.TextAreaFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.sisu.goodies.i18n.I18N;
@@ -36,6 +39,8 @@ import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.ALIASES;
 import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.REPOSITORY_ID;
 
@@ -46,6 +51,7 @@ import static org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapab
 @Named(GenerateMetadataCapabilityDescriptor.TYPE_ID)
 public class GenerateMetadataCapabilityDescriptor
     extends CapabilityDescriptorSupport
+    implements Taggable
 {
 
   public static final String TYPE_ID = "yum.generate";
@@ -142,5 +148,9 @@ public class GenerateMetadataCapabilityDescriptor
     return render(TYPE_ID + "-about.vm");
   }
 
+  @Override
+  public Set<Tag> getTags() {
+    return tags(categoryTag("Yum"));
+  }
 
 }

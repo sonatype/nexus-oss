@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.yum.internal.capabilities;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,11 +24,15 @@ import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 
 /**
  * @since yum 3.0
@@ -35,7 +41,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Named(YumCapabilityDescriptor.TYPE_ID)
 public class YumCapabilityDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
+    implements CapabilityDescriptor, Taggable
 {
 
   public static final String TYPE_ID = "yum";
@@ -73,6 +79,11 @@ public class YumCapabilityDescriptor
     return validators.logical().and(
         validators.capability().uniquePerExcluding(id, TYPE)
     );
+  }
+
+  @Override
+  public Set<Tag> getTags() {
+    return tags(categoryTag("Yum"));
   }
 
 }
