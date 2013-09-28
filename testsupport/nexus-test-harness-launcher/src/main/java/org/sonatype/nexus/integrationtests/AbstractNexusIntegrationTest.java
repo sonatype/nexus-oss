@@ -376,13 +376,17 @@ public abstract class AbstractNexusIntegrationTest
         UserResource user = userUtil.getUser(globalConfig.getSecurityAnonymousUsername());
 
         if (shouldBeAdmin) {
-          user.addRole(ADMIN_ROLE);
+          if (!user.getRoles().contains(ADMIN_ROLE)) {
+            user.addRole(ADMIN_ROLE);
+            userUtil.updateUser(user);
+          }
         }
         else {
-          user.removeRole(ADMIN_ROLE);
+          if (user.getRoles().contains(ADMIN_ROLE)) {
+            user.removeRole(ADMIN_ROLE);
+            userUtil.updateUser(user);
+          }
         }
-
-        userUtil.updateUser(user);
 
         return null;
       }
