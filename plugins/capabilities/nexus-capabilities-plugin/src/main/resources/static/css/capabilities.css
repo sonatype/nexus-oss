@@ -121,8 +121,6 @@
 
 .nx-capabilities-CapabilitySummary-message {
   padding-top: 10px;
-  padding-bottom: 20px;
-  text-align: center;
 }
 
 .nx-capabilities-CapabilitySummary-message img {
@@ -130,7 +128,7 @@
   padding-right: 5px;
 }
 
-.nx-capabilities-CapabilitySummary-message span {
+.nx-capabilities-CapabilitySummary-message div {
   padding: 8px;
 
   background-color: #FFF8F7;

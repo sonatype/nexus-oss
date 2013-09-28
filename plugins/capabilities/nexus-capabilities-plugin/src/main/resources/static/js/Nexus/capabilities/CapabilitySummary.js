@@ -110,7 +110,6 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
         '<div class="nx-capabilities-CapabilitySummary-body">',
         '{[ this.status(values) ]}',
         '{[ this.properties(values) ]}',
-        '{[ this.message(values) ]}',
         '</div>',
         {
           compiled: true,
@@ -139,9 +138,7 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
             return self.propertiesTpl.apply({
               properties: properties
             });
-          },
-
-          message: self.messageTpl.message.createDelegate(self.messageTpl)
+          }
 
         });
 
@@ -206,7 +203,6 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
     var self = this;
 
     self.currentRecord = capability;
-    self.mainTpl.overwrite(self.templatePanel.body, capability);
     self.notesPanel.getForm().setValues(capability);
   },
 

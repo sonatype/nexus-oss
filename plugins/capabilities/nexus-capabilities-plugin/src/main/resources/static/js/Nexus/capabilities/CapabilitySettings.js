@@ -47,11 +47,6 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
   initComponent: function () {
     var self = this;
 
-    self.templatePanel = NX.create('Ext.Panel', {
-      cls: 'nx-capabilities-CapabilitySummary-template',
-      border: false
-    });
-
     self.settings = NX.create('Nexus.capabilities.CapabilitySettingsFieldSet', {
       border: false,
       parentPanel: self
@@ -59,10 +54,7 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
 
     self.formPanel = NX.create('Ext.FormPanel', {
       border: false,
-      items: [
-        self.settings,
-        self.templatePanel
-      ],
+      items: self.settings,
       buttonAlign: 'left',
       buttons: [
         {
@@ -112,15 +104,9 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
   setCapability: function (capability) {
     var self = this,
         sp = Sonatype.lib.Permissions,
-        editable = sp.checkPermission('nexus:capabilities', sp.EDIT),
-        message = self.messageTpl.message(capability);
+        editable = sp.checkPermission('nexus:capabilities', sp.EDIT);
 
     self.currentRecord = capability;
-
-    self.templatePanel.html = message;
-    if (self.templatePanel.body) {
-      self.templatePanel.body.update(message);
-    }
 
     self.settings.importCapability(self.formPanel.getForm(), capability);
 
