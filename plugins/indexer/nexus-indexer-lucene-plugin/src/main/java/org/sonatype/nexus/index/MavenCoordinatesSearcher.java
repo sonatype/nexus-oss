@@ -17,6 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,15 +31,14 @@ import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.UniqueArtifactFilterPostprocessor;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Searches Lucene index for artifacts based on maven artifact coordinates.
  *
  * @author Alin Dreghiciu
  */
-@Component(role = Searcher.class, hint = "mavenCoordinates")
+@Named("mavenCoordinates")
+@Singleton
 public class MavenCoordinatesSearcher
     implements Searcher
 {
@@ -65,8 +68,12 @@ public class MavenCoordinatesSearcher
    */
   public static final String TERM_CLASSIFIER = "c";
 
-  @Requirement
-  private IndexerManager m_lucene;
+  private final IndexerManager m_lucene;
+
+  @Inject
+  public MavenCoordinatesSearcher(final IndexerManager m_lucene) {
+    this.m_lucene = m_lucene;
+  }
 
   /**
    * Map should contain a term with key {@link #TERM_GROUP} or {@link #TERM_ARTIFACT} or {@link #TERM_VERSION} or

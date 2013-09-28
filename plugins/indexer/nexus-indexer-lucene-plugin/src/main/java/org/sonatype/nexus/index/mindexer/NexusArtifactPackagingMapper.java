@@ -15,9 +15,11 @@ package org.sonatype.nexus.index.mindexer;
 
 import java.io.File;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Component that redirects default MI implementation to the one in Nexus Maven support.
@@ -25,12 +27,18 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author cstamas
  * @since 2.4
  */
-@Component(role = ArtifactPackagingMapper.class)
+@Named
+@Singleton
 public class NexusArtifactPackagingMapper
     implements ArtifactPackagingMapper
 {
-  @Requirement
-  private org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper nexusMapper;
+  private final org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper nexusMapper;
+
+  @Inject
+  public NexusArtifactPackagingMapper(final org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper nexusMapper)
+  {
+    this.nexusMapper = nexusMapper;
+  }
 
   @Override
   public String getExtensionForPackaging(final String packaging) {
