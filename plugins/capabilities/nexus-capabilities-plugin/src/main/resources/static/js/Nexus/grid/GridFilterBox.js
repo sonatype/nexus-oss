@@ -112,9 +112,6 @@ NX.define('Nexus.grid.GridFilterBox', {
 
     self.filterField.setValue(undefined);
     self.filterGrid();
-
-    // reset clear button to grey on clear filter
-    self.clearButton.setIconClass(Nexus.capabilities.Icons.get('cross_grey').cls);
   },
 
   /**
@@ -164,6 +161,9 @@ NX.define('Nexus.grid.GridFilterBox', {
         self.grid.view.emptyText = self.grid.view.emptyTextBackup;
       }
       self.grid.getStore().clearFilter();
+
+      // reset clear button to grey on clear filter
+      self.clearButton.setIconClass(Nexus.capabilities.Icons.get('cross_grey').cls);
     }
   },
 
