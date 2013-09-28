@@ -140,7 +140,10 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
           xtype: 'image',
           src: icons.get('magnifier_grey').path,
           height: 12,
-          width: 12
+          width: 12,
+          style: {
+            marginRight: '4px'
+          }
         },
         self.filterBox,
         self.filterBox.createClearButton()
