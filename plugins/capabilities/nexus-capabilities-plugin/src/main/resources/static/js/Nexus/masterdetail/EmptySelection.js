@@ -32,7 +32,7 @@ NX.define('Nexus.masterdetail.EmptySelection', {
         text = self.emptyText;
 
     if (!text) {
-      text = 'Please select a ' + self.entityType;
+      text = 'Please select a ' + self.entityType + ' or create a new capability';
     }
 
     Ext.apply(self, {

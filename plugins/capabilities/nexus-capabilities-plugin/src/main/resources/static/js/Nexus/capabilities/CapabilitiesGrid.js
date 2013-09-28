@@ -96,7 +96,8 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
       },
 
       view: NX.create('Ext.grid.GroupingView', {
-        emptyText: 'Click "Add" to configure a capability.',
+        emptyText: 'Click "New" to configure a capability.',
+        emptyTextWhileFiltering: 'No capabilities found; [clear filter criteria].',
         deferEmptyText: false,
         getRowClass: function (record) {
           var capability = record.data;

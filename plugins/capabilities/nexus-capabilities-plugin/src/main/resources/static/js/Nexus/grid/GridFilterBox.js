@@ -116,6 +116,14 @@ NX.define('Nexus.grid.GridFilterBox', {
         regexp, filterFields;
 
     if (self.filterField.getValue() && self.filterField.getValue().length > 0) {
+
+      if (self.grid.getStore().getCount() > 0 && self.grid.view.emptyTextWhileFiltering) {
+        if (!self.grid.view.emptyTextBackup) {
+          self.grid.view.emptyTextBackup = self.grid.view.emptyText;
+        }
+        self.grid.view.emptyText = self.grid.view.emptyTextWhileFiltering;
+      }
+
       regexp = new RegExp(self.filterField.getValue(), self.modifiers);
       filterFields = self.filterFieldNames();
 
@@ -136,6 +144,9 @@ NX.define('Nexus.grid.GridFilterBox', {
     }
 
     if (shouldClearFilter) {
+      if (self.grid.view.emptyTextBackup) {
+        self.grid.view.emptyText = self.grid.view.emptyTextBackup;
+      }
       self.grid.getStore().clearFilter();
     }
   },
