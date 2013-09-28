@@ -16,24 +16,29 @@ package org.sonatype.nexus.proxy.registry;
 public abstract class AbstractIdContentClass
     implements ContentClass
 {
+  @Override
   public String getName() {
     return getId();
   }
 
+  @Override
   public boolean isCompatible(ContentClass contentClass) {
     return getId().equals(contentClass.getId());
   }
 
+  @Override
   public boolean isGroupable() {
     return true;
   }
 
   // ==
 
+  @Override
   public int hashCode() {
     return getId().hashCode();
   }
 
+  @Override
   public boolean equals(Object o) {
     if (o == null) {
       return false;

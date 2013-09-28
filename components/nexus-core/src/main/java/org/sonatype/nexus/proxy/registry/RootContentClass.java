@@ -13,9 +13,11 @@
 
 package org.sonatype.nexus.proxy.registry;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component(role = ContentClass.class, hint = RootContentClass.ID)
+@Singleton
+@Named(RootContentClass.ID)
 public class RootContentClass
     extends AbstractIdContentClass
 {
@@ -23,6 +25,7 @@ public class RootContentClass
 
   public static final String NAME = "Any Content";
 
+  @Override
   public String getId() {
     return ID;
   }
