@@ -115,13 +115,16 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = true,
         regexp, filterFields;
 
+    self.grid.getStore().clearFilter();
     if (self.filterField.getValue() && self.filterField.getValue().length > 0) {
 
       if (self.grid.getStore().getCount() > 0 && self.grid.view.emptyTextWhileFiltering) {
         if (!self.grid.view.emptyTextBackup) {
           self.grid.view.emptyTextBackup = self.grid.view.emptyText;
         }
-        self.grid.view.emptyText = self.grid.view.emptyTextWhileFiltering;
+        self.grid.view.emptyText = self.grid.view.emptyTextWhileFiltering.replaceAll(
+            '{criteria}',self.filterField.getValue()
+        );
       }
 
       regexp = new RegExp(self.filterField.getValue(), self.modifiers);
