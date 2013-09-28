@@ -90,7 +90,9 @@ public class DefaultEventInspectorHost
 
   // == EventInspectorHost iface
 
+  @Override
   public void shutdown() {
+    eventBus.unregister(this);
     // we need clean shutdown, wait all background event inspectors to finish to have consistent state
     hostThreadPool.shutdown();
     try {
@@ -99,13 +101,13 @@ public class DefaultEventInspectorHost
     catch (InterruptedException e) {
       getLogger().debug("Interrupted while waiting for termination", e);
     }
-    eventBus.unregister(this);
   }
 
   /**
    * Used by UTs and ITs only, to "wait for calm period", when all the async event inspectors finished.
    */
   @VisibleForTesting
+  @Override
   public boolean isCalmPeriod() {
     // "calm period" is when we have no queued nor active threads
     return ((ThreadPoolExecutor) hostThreadPool.getTargetExecutorService()).getQueue().isEmpty()
@@ -152,7 +154,6 @@ public class DefaultEventInspectorHost
         try {
           if (ei.accepts(evt)) {
             final EventInspectorHandler handler = new EventInspectorHandler(getLogger(), ei, evt);
-
             hostThreadPool.execute(handler);
           }
         }
