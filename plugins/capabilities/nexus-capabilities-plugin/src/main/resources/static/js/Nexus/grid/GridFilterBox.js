@@ -31,6 +31,11 @@ NX.define('Nexus.grid.GridFilterBox', {
   grid: undefined,
 
   /**
+   * @cfg {Number} delay between keystrokes and actual filtering (defaults to 50).
+   */
+  filterDelay: 100,
+
+  /**
    * @override
    */
   initComponent: function () {
@@ -42,7 +47,8 @@ NX.define('Nexus.grid.GridFilterBox', {
       listeners: {
         keyup: {
           fn: function () {
-            self.filterGrid();
+            clearTimeout(self.searchTimeout);
+            self.searchTimeout = self.filterGrid.defer(self.filterDelay, self);
           },
           scope: self
         }
