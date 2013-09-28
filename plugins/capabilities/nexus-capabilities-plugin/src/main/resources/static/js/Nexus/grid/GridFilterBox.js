@@ -177,7 +177,7 @@ NX.define('Nexus.grid.GridFilterBox', {
   },
 
   /**
-   * Returns teh dataIndex property of all grid columns.
+   * Returns the dataIndex property of all grid columns.
    * @returns {Array} of fields names to be matched
    */
   filterFieldNames: function () {
@@ -202,6 +202,7 @@ NX.define('Nexus.grid.GridFilterBox', {
     if (filterFieldNames.length > 0) {
       return filterFieldNames;
     }
+    return [];
   },
 
   /**
