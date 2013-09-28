@@ -110,10 +110,6 @@ public class GlobalConfigurationPlexusResource
   // Default Configuration
   // ----------------------------------------------------------------------------
 
-  public boolean isDefaultSecurityEnabled() {
-    return this.defaultSecurityConfigurationSource.getConfiguration().isEnabled();
-  }
-
   public boolean isDefaultAnonymousAccessEnabled() {
     return this.defaultSecurityConfigurationSource.getConfiguration().isAnonymousAccessEnabled();
   }

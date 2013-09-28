@@ -41,11 +41,12 @@ public class EvictUnusedProxiedItemsTaskTest
   {
     super.setUp();
 
-    nexusConfiguration().setSecurityEnabled(false);
-
-    nexusConfiguration().saveConfiguration();
-
     scheduler = (NexusScheduler) lookup(NexusScheduler.class);
+  }
+
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return true;
   }
 
   @Test

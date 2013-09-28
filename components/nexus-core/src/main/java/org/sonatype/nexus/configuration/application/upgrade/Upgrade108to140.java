@@ -261,7 +261,6 @@ public class Upgrade108to140
         getLogger().error(
             "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e);
       }
-      securityConfig.setEnabled(oldsecurity.isEnabled());
       securityConfig.setHashIterations(1024);
 
       List<String> realms = oldsecurity.getRealms();
