@@ -59,7 +59,10 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
 
     self.formPanel = NX.create('Ext.FormPanel', {
       border: false,
-      items: self.settings,
+      items: [
+        self.settings,
+        self.templatePanel
+      ],
       buttonAlign: 'left',
       buttons: [
         {
@@ -87,7 +90,6 @@ NX.define('Nexus.capabilities.CapabilitySettings', {
       title: 'Settings',
       autoScroll: true,
       items: [
-        self.templatePanel,
         self.formPanel
       ],
       listeners: {
