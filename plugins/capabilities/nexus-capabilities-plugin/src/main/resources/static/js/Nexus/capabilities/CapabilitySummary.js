@@ -203,6 +203,7 @@ NX.define('Nexus.capabilities.CapabilitySummary', {
     var self = this;
 
     self.currentRecord = capability;
+    self.mainTpl.overwrite(self.templatePanel.body, capability);
     self.notesPanel.getForm().setValues(capability);
   },
 
