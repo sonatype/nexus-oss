@@ -119,7 +119,7 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = true,
         regexp, filterFields;
 
-    //  when filtering set the icon to color
+    // when filtering set the icon to color
     self.clearButton.setIconClass(Nexus.capabilities.Icons.get('cross').cls);
 
     self.grid.getStore().clearFilter();
