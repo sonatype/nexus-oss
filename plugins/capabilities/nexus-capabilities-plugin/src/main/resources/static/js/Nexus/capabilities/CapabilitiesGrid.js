@@ -88,6 +88,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
       cls: 'nx-capabilities-CapabilityGrid',
       ds: self.gridStore,
       stripeRows: true,
+      border: false,
 
       loadMask: {
         msg: 'Loading...',
