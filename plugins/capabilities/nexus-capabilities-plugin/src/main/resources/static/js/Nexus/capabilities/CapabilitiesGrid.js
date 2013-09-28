@@ -137,7 +137,9 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         // FIXME: ... but its being a bitch ATM to get to layout properly
         {
           xtype: 'image',
-          src: icons.get('magnifier_grey').path
+          src: icons.get('magnifier_grey').path,
+          height: 12,
+          width: 12
         },
         self.filterBox,
         self.filterBox.createClearButton()
