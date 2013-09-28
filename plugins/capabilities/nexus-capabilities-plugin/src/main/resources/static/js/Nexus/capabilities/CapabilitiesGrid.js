@@ -135,11 +135,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         self.buttonDuplicate,
         self.buttonDelete,
         '->',
-        // FIXME: Really would like the image and button to be part of filterBox,
-        // FIXME: ... but its being a bitch ATM to get to layout properly
-        self.filterBox.icon,
-        self.filterBox,
-        self.filterBox.clearButton
+        self.filterBox
       ],
 
       listeners: {

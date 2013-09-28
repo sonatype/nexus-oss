@@ -44,6 +44,10 @@ NX.define('Nexus.grid.GridFilterBox', {
 
     self.filterField = NX.create('Ext.form.TextField', {
       enableKeyEvents: true,
+      style: {
+        paddingLeft: '22px',
+        paddingRight: '22px'
+      },
       listeners: {
         keyup: {
           fn: function () {
@@ -55,10 +59,36 @@ NX.define('Nexus.grid.GridFilterBox', {
       }
     });
 
+    self.clearButton = NX.create('Ext.Button', {
+      xtype: 'button',
+      iconCls: icons.get('cross').cls,
+      scope: self,
+      handleMouseEvents: false,
+      hidden: true,
+      handler: self.clearFilter,
+      style: {
+        position: 'absolute',
+        top: '3px',
+        right: '3px'
+      }
+    });
+
     Ext.apply(self, {
       layout: 'fit',
       items: [
-        self.filterField
+        self.filterField,
+        self.clearButton,
+        {
+          xtype: 'button',
+          iconCls: icons.get('magnifier_grey').cls,
+          disabled: true,
+          scope: self,
+          style: {
+            position: 'absolute',
+            top: '3px',
+            right: (self.width - 20) + 'px'
+          }
+        }
       ],
       listeners: {
         render: {
@@ -69,27 +99,6 @@ NX.define('Nexus.grid.GridFilterBox', {
           scope: self
         }
       }
-    });
-
-    /**
-     * @property
-     */
-    self.icon = NX.create('Nexus.Image', {
-      src: icons.get('magnifier_grey').path,
-      height: 12,
-      width: 12,
-      style: {
-        marginRight: '4px'
-      }
-    });
-
-    /**
-     * @property
-     */
-    self.clearButton = NX.create('Ext.Button', {
-      iconCls: icons.get('cross_grey').cls,
-      scope: self,
-      handler: self.clearFilter
     });
 
     Nexus.grid.GridFilterBox.superclass.initComponent.call(self, arguments);
@@ -122,11 +131,11 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = true,
         regexp, filterFields;
 
-    // when filtering set the icon to color
-    self.clearButton.setIconClass(Nexus.capabilities.Icons.get('cross').cls);
+    self.clearButton.hide();
 
     self.grid.getStore().clearFilter();
     if (self.filterField.getValue() && self.filterField.getValue().length > 0) {
+      self.clearButton.show();
 
       if (self.grid.getStore().getCount() > 0 && self.grid.view.emptyTextWhileFiltering) {
         if (!self.grid.view.emptyTextBackup) {
@@ -160,10 +169,8 @@ NX.define('Nexus.grid.GridFilterBox', {
       if (self.grid.view.emptyTextBackup) {
         self.grid.view.emptyText = self.grid.view.emptyTextBackup;
       }
+      self.clearButton.hide();
       self.grid.getStore().clearFilter();
-
-      // reset clear button to grey on clear filter
-      self.clearButton.setIconClass(Nexus.capabilities.Icons.get('cross_grey').cls);
     }
   },
 
