@@ -148,26 +148,6 @@ public class CRepositoryCoreConfiguration
       response.addValidationError(new ValidationMessage("id", "Repository ID can't be 'all', reserved word"));
     }
 
-    // ID uniqueness
-    /*
-     * This is totally flawed, but this is NOT THE ONLY ONE of the places we did uniqueness check!
-     * But this one in certainly not the place to do this.
-     * List<CRepository> repositories = getApplicationConfiguration().getConfigurationModel().getRepositories();
-     * 
-     * for ( CRepository other : repositories )
-     * {
-     * // skip ourselves
-     * if ( other != getOriginalConfiguration() )
-     * {
-     * if ( StringUtils.equals( cfg.getId(), other.getId() ) )
-     * {
-     * response.addValidationError( new ValidationMessage( "id", "Repository with ID=\"" + cfg.getId()
-     * + "\" already exists (name of the existing repository: \"" + other.getName() + "\")" ) );
-     * }
-     * }
-     * }
-     */
-
     // Name
     if (StringUtils.isBlank(cfg.getName())) {
       response.addValidationWarning(new ValidationMessage("id", "Repository with ID='" + cfg.getId()
