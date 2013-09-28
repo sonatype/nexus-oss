@@ -24,8 +24,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.security.configuration.model.v2_0_4.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.configuration.model.v2_0_5.upgrade.BasicVersionUpgrade;
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -33,7 +31,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * {@link SecurityConfigurationVersionUpgrader} step for security configuration version 2.0.4 > 2.0.5 upgrade.
  *
- * @since 2.7.0
+ * @since 2.6.3
  */
 @Singleton
 @Typed(SecurityConfigurationVersionUpgrader.class)
@@ -46,7 +44,7 @@ public class Upgrade204to205
   {
     try (Reader r = new BufferedReader(ReaderFactory.newXmlReader(file))) {
       // reading without interpolation to preserve user settings as variables
-      return new SecurityConfigurationXpp3Reader().read(r);
+      return new org.sonatype.security.configuration.model.v2_0_4.io.xpp3.SecurityConfigurationXpp3Reader().read(r);
     }
     catch (XmlPullParserException e) {
       throw new ConfigurationIsCorruptedException(file.getAbsolutePath(), e);
@@ -59,14 +57,15 @@ public class Upgrade204to205
     org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration oldc =
         (org.sonatype.security.configuration.model.v2_0_4.SecurityConfiguration) message.getConfiguration();
 
-    org.sonatype.security.configuration.model.SecurityConfiguration newc = new BasicVersionUpgrade()
-        .upgradeSecurityConfiguration(oldc);
+    org.sonatype.security.configuration.model.v2_0_5.SecurityConfiguration newc =
+        new org.sonatype.security.configuration.model.v2_0_5.upgrade.BasicVersionUpgrade()
+            .upgradeSecurityConfiguration(oldc);
 
-    newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    newc.setVersion(org.sonatype.security.configuration.model.v2_0_5.SecurityConfiguration.MODEL_VERSION);
 
     // NEXUS-5828: Security Manager field is gone!
 
-    message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    message.setModelVersion(org.sonatype.security.configuration.model.v2_0_5.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);
   }
 
