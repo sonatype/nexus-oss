@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
@@ -37,7 +38,6 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -57,17 +57,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EventBus.Managed
 public class DefaultEventInspectorHost
     extends AbstractLoggingComponent
-    implements EventInspectorHost, Disposable
+    implements EventInspectorHost
 {
   private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
       "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500);
 
-  private final NexusExecutorService hostThreadPool;
-
+  private final EventBus eventBus;
+  
   private final Map<String, EventInspector> eventInspectors;
 
+  private final NexusExecutorService hostThreadPool;
+
   @Inject
-  public DefaultEventInspectorHost(final Map<String, EventInspector> eventInspectors) {
+  public DefaultEventInspectorHost(final EventBus eventBus, final Map<String, EventInspector> eventInspectors) {
+    this.eventBus = checkNotNull(eventBus);
     this.eventInspectors = checkNotNull(eventInspectors);
 
     // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
@@ -75,11 +78,13 @@ public class DefaultEventInspectorHost
         new ThreadPoolExecutor(0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
             new NexusThreadFactory("nxevthost", "Event Inspector Host"), new CallerRunsPolicy());
     this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
+    eventBus.register(this);
   }
 
-  // == Disposable iface, to manage ExecutorService lifecycle
+  // == Stop
 
-  public void dispose() {
+  @Subscribe
+  public void on(NexusStoppedEvent e) {
     shutdown();
   }
 
@@ -88,6 +93,13 @@ public class DefaultEventInspectorHost
   public void shutdown() {
     // we need clean shutdown, wait all background event inspectors to finish to have consistent state
     hostThreadPool.shutdown();
+    try {
+      hostThreadPool.awaitTermination(5L, TimeUnit.SECONDS);
+    }
+    catch (InterruptedException e) {
+      getLogger().debug("Interrupted while waiting for termination", e);
+    }
+    eventBus.unregister(this);
   }
 
   /**
