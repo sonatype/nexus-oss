@@ -237,6 +237,27 @@ NX.define('Nexus.capabilities.CapabilitiesMediator', {
         closeable: false
       });
     }
+  },
+
+  /**
+   * Calculates status label of a capability.
+   */
+  getStatusLabel: function (capability) {
+    var enabled = capability.enabled,
+        active = capability.active,
+        error = capability.error;
+
+    if (enabled && error) {
+      return 'Error';
+    }
+    if (enabled && active) {
+      return 'Active';
+    }
+    if (enabled && !active) {
+      return 'Passive';
+    }
+
+    return 'Disabled';
   }
 
 });

@@ -21,13 +21,18 @@
 NX.define('Nexus.capabilities.CapabilitiesGridFilterBox', {
   extend: 'Nexus.grid.GridFilterBox',
 
+  mixins: [
+    'Nexus.capabilities.CapabilitiesMediatorMixin'
+  ],
+
   /**
    * @override
    */
   matches: function (regexp, record, fieldName, fieldValue) {
     var self = this;
     return (self.grid.gridStore.getTagKeyFrom(fieldName) && regexp.test(fieldName) && fieldValue)
-        || Nexus.capabilities.CapabilitiesGridFilterBox.superclass.matches(regexp, record, fieldName, fieldValue);
+        || Nexus.capabilities.CapabilitiesGridFilterBox.superclass.matches(regexp, record, fieldName, fieldValue)
+        || regexp.test(self.mediator().getStatusLabel(record.data));
   }
 
 });
