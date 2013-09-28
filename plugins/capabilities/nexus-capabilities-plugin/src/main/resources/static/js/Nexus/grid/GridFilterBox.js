@@ -71,6 +71,9 @@ NX.define('Nexus.grid.GridFilterBox', {
       }
     });
 
+    /**
+     * @property
+     */
     self.icon = NX.create('Nexus.Image', {
       src: icons.get('magnifier_grey').path,
       height: 12,
@@ -80,6 +83,9 @@ NX.define('Nexus.grid.GridFilterBox', {
       }
     });
 
+    /**
+     * @property
+     */
     self.clearButton = NX.create('Ext.Button', {
       iconCls: icons.get('cross_grey').cls,
       scope: self,
