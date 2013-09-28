@@ -51,8 +51,12 @@ NX.define('Nexus.capabilities.Icons', {
         capability_passive:   iconConfig('brick_error.png'),
         capability_disabled:  iconConfig('brick_grey.png'),
         capability_error:     iconConfig('brick_error.png'),
+        cross:                'cross.png',
+        cross_grey:           'cross_grey.png',
         warning:              'error.png',
         refresh:              'arrow_refresh.png',
+        magnifier:            'magnifier.png',
+        magnifier_grey:       'magnifier_grey.png',
         selectionEmpty:       '@warning',
         enable:               '@capability_active',
         disable:              '@capability_disabled'

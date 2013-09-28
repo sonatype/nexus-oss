@@ -10,31 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global NX, Ext, Nexus*/
+
 /**
- * A simple component to display an image.
+ * A grid filter box that will also search tag keys for matches.
+ * A tag will be a match if matches teh search string and tag has a value.
  *
- * @class Ext.Image
- * @extends Ext.BoxComponent
- * @namespace Ext
+ * @since 2.7
  */
-Ext.define('Nexus.Image', {
-    extend: 'Ext.BoxComponent',
-    xtype: 'image',
+NX.define('Nexus.capabilities.CapabilitiesGridFilterBox', {
+  extend: 'Nexus.grid.GridFilterBox',
 
-    /**
-     * @cfg {String} src Image source
-     */
-    constructor: function (config) {
-        var self = this;
+  mixins: [
+    'Nexus.capabilities.CapabilitiesMediatorMixin'
+  ],
 
-        Ext.apply(self, {
-            autoEl: {
-                tag: 'img',
-                src: config.src
-            }
-        });
+  /**
+   * @override
+   */
+  matches: function (regexp, record, fieldName, fieldValue) {
+    var self = this;
+    return (self.grid.gridStore.getTagKeyFrom(fieldName) && regexp.test(fieldName) && fieldValue)
+        || Nexus.capabilities.CapabilitiesGridFilterBox.superclass.matches(regexp, record, fieldName, fieldValue)
+        || regexp.test(self.mediator().getStatusLabel(record.data));
+  }
 
-        // Call super constructor
-        self.constructor.superclass.constructor.apply(self, arguments);
-    }
 });

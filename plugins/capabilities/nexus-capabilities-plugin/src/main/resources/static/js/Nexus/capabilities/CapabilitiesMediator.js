@@ -190,7 +190,8 @@ NX.define('Nexus.capabilities.CapabilitiesMediator', {
    */
   handleError: function (response, options, title, form) {
     var handled = false,
-        remainingMessages = [];
+        remainingMessages = [],
+        message;
 
     if (response.siestaValidationError) {
       handled = true;
@@ -218,8 +219,6 @@ NX.define('Nexus.capabilities.CapabilitiesMediator', {
       remainingMessages.push(response.siestaError.message);
     }
     if (!handled) {
-      var message;
-
       if (response.responseText) {
         message = Sonatype.utils.parseHTMLErrorMessage(response.responseText);
       }
@@ -238,6 +237,27 @@ NX.define('Nexus.capabilities.CapabilitiesMediator', {
         closeable: false
       });
     }
+  },
+
+  /**
+   * Calculates status label of a capability.
+   */
+  getStatusLabel: function (capability) {
+    var enabled = capability.enabled,
+        active = capability.active,
+        error = capability.error;
+
+    if (enabled && error) {
+      return 'Error';
+    }
+    if (enabled && active) {
+      return 'Active';
+    }
+    if (enabled && !active) {
+      return 'Passive';
+    }
+
+    return 'Disabled';
   }
 
 });

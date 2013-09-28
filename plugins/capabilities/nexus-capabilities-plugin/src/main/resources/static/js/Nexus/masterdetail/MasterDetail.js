@@ -91,6 +91,8 @@ NX.define('Nexus.masterdetail.MasterDetail', {
     Ext.apply(self, {
       cls: 'nx-masterdetail-MasterDetail',
       layout: 'border',
+      border: false,
+
       items: [
         self.master,
         self.detailPanel

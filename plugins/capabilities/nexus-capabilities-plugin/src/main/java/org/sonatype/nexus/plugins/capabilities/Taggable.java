@@ -10,31 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+package org.sonatype.nexus.plugins.capabilities;
+
+import java.util.Set;
+
 /**
- * A simple component to display an image.
+ * Implemented by {@link Capability} or {@link CapabilityDescriptor} that supports tagging.
  *
- * @class Ext.Image
- * @extends Ext.BoxComponent
- * @namespace Ext
+ * @since 2.7
  */
-Ext.define('Nexus.Image', {
-    extend: 'Ext.BoxComponent',
-    xtype: 'image',
+public interface Taggable
+{
 
-    /**
-     * @cfg {String} src Image source
-     */
-    constructor: function (config) {
-        var self = this;
+  /**
+   * Returns the tags that this capability is tagged with (could be null).
+   */
+  Set<Tag> getTags();
 
-        Ext.apply(self, {
-            autoEl: {
-                tag: 'img',
-                src: config.src
-            }
-        });
-
-        // Call super constructor
-        self.constructor.superclass.constructor.apply(self, arguments);
-    }
-});
+}

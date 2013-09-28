@@ -14,12 +14,15 @@
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.Tag;
+import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
@@ -27,11 +30,14 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
+import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID;
 
 @Named(TYPE_ID)
 public class P2RepositoryAggregatorCapability
     extends CapabilitySupport<P2RepositoryAggregatorConfiguration>
+    implements Taggable
 {
 
   private final P2RepositoryAggregator service;
@@ -52,7 +58,7 @@ public class P2RepositoryAggregatorCapability
   }
 
   @Override
-  protected String renderDescription() throws Exception {
+  protected String renderDescription() {
     if (isConfigured()) {
       try {
         return repositoryRegistry.getRepository(getConfig().repositoryId()).getName();
@@ -113,6 +119,11 @@ public class P2RepositoryAggregatorCapability
         return isConfigured() ? getConfig().repositoryId() : null;
       }
     });
+  }
+
+  @Override
+  public Set<Tag> getTags() {
+    return tags(repositoryTag(renderDescription()));
   }
 
 }
