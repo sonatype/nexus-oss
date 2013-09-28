@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
@@ -26,11 +30,11 @@ import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default configuration updater, using versioned Modello models. It tried to detect version signature from existing
@@ -38,18 +42,24 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author cstamas
  */
-@Component(role = ApplicationConfigurationUpgrader.class)
+@Singleton
+@Named
 public class DefaultApplicationConfigurationUpgrader
     extends AbstractLoggingComponent
     implements ApplicationConfigurationUpgrader
 {
-  @Requirement(role = SingleVersionUpgrader.class)
-  private Map<String, SingleVersionUpgrader> upgraders;
+  private final Map<String, SingleVersionUpgrader> upgraders;
+
+  @Inject
+  public DefaultApplicationConfigurationUpgrader(final Map<String, SingleVersionUpgrader> upgraders) {
+    this.upgraders = checkNotNull(upgraders);
+  }
 
   /**
    * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
    * the needed (current) model version.
    */
+  @Override
   public Configuration loadOldConfiguration(File file)
       throws IOException,
              ConfigurationIsCorruptedException,

@@ -19,30 +19,40 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.v1_4_4.upgrade.BasicVersionConverter;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Upgrades configuration model from version 1.4.3 to 1.4.4.
  *
  * @author bdemers
  */
-@Component(role = SingleVersionUpgrader.class, hint = "1.4.3")
+@Singleton
+@Named("1.4.3")
 public class Upgrade143to144
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
-  @Configuration(value="${nexus-work}")
-  private File nexusWorkdir;
+  private final File nexusWorkdir;
 
+  @Inject
+  public Upgrade143to144(final @Named("${nexus-work}") File nexusWorkdir) {
+    this.nexusWorkdir = checkNotNull(nexusWorkdir);
+  }
+
+  @Override
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
@@ -71,6 +81,7 @@ public class Upgrade143to144
     return conf;
   }
 
+  @Override
   public void upgrade(UpgradeMessage message)
       throws ConfigurationIsCorruptedException
   {

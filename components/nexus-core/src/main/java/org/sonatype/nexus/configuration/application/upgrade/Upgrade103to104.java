@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -59,7 +62,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -68,7 +70,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author cstamas
  */
-@Component(role = SingleVersionUpgrader.class, hint = "1.0.3")
+@Singleton
+@Named("1.0.3")
 public class Upgrade103to104
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
@@ -77,6 +80,7 @@ public class Upgrade103to104
 
   private CTaskConfiguration tasksConfig;
 
+  @Override
   public Object loadConfiguration(File file)
       throws IOException,
              ConfigurationIsCorruptedException
@@ -157,6 +161,7 @@ public class Upgrade103to104
     return conf;
   }
 
+  @Override
   public void upgrade(UpgradeMessage message)
       throws ConfigurationIsCorruptedException
   {

@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -42,7 +45,6 @@ import org.sonatype.nexus.configuration.model.v1_0_1.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.v1_0_1.CRouting;
 import org.sonatype.nexus.configuration.model.v1_0_1.CSecurity;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -50,10 +52,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author cstamas
  */
-@Component(role = SingleVersionUpgrader.class, hint = "1.0.0")
+@Singleton
+@Named("1.0.0")
 public class Upgrade100to101
     implements SingleVersionUpgrader
 {
+  @Override
   public Object loadConfiguration(File file)
       throws IOException,
              ConfigurationIsCorruptedException
@@ -78,6 +82,7 @@ public class Upgrade100to101
     }
   }
 
+  @Override
   public void upgrade(UpgradeMessage message) {
     Configuration oldc = (Configuration) message.getConfiguration();
 
