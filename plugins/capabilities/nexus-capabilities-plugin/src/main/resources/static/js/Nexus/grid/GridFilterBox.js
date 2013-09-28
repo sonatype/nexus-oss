@@ -71,6 +71,21 @@ NX.define('Nexus.grid.GridFilterBox', {
       }
     });
 
+    self.icon = NX.create('Nexus.Image', {
+      src: icons.get('magnifier_grey').path,
+      height: 12,
+      width: 12,
+      style: {
+        marginRight: '4px'
+      }
+    });
+
+    self.clearButton = NX.create('Ext.Button', {
+      iconCls: icons.get('cross_grey').cls,
+      scope: self,
+      handler: self.clearFilter
+    });
+
     Nexus.grid.GridFilterBox.superclass.initComponent.call(self, arguments);
   },
 
@@ -88,23 +103,12 @@ NX.define('Nexus.grid.GridFilterBox', {
    */
   clearFilter: function () {
     var self = this;
+
     self.filterField.setValue(undefined);
     self.filterGrid();
-  },
 
-  /**
-   * Create a clear button.
-   *
-   * @returns {Ext.Button}
-   */
-  createClearButton: function () {
-    var self = this;
-
-    return NX.create('Ext.Button', {
-      iconCls: Nexus.capabilities.Icons.get('cross_grey').cls,
-      scope: self,
-      handler: self.clearFilter
-    });
+    // reset clear button to grey on clear filter
+    self.clearButton.setIconClass(Nexus.capabilities.Icons.get('cross_grey').cls);
   },
 
   /**
@@ -115,6 +119,9 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = true,
         regexp, filterFields;
 
+    //  when filtering set the icon to color
+    self.clearButton.setIconClass(Nexus.capabilities.Icons.get('cross').cls);
+
     self.grid.getStore().clearFilter();
     if (self.filterField.getValue() && self.filterField.getValue().length > 0) {
 
@@ -123,7 +130,7 @@ NX.define('Nexus.grid.GridFilterBox', {
           self.grid.view.emptyTextBackup = self.grid.view.emptyText;
         }
         self.grid.view.emptyText = self.grid.view.emptyTextWhileFiltering.replaceAll(
-            '{criteria}',self.filterField.getValue()
+            '{criteria}', self.filterField.getValue()
         );
       }
 
