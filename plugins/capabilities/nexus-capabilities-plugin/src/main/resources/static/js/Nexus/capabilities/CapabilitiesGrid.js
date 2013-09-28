@@ -79,6 +79,11 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
       capabilityStore: self.mediator().capabilityStore
     });
 
+    self.filterBox = NX.create('Nexus.capabilities.CapabilitiesGridFilterBox', {
+      grid: self,
+      width: 200
+    });
+
     Ext.apply(self, {
       cls: 'nx-capabilities-CapabilityGrid',
       ds: self.gridStore,
@@ -128,9 +133,14 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         self.buttonDuplicate,
         self.buttonDelete,
         '->',
-        NX.create('Nexus.capabilities.CapabilitiesGridFilterBox', {
-          grid: self
-        })
+        // FIXME: Really would like the image and button to be part of filterBox,
+        // FIXME: ... but its being a bitch ATM to get to layout properly
+        {
+          xtype: 'image',
+          src: icons.get('magnifier_grey').path
+        },
+        self.filterBox,
+        self.filterBox.createClearButton()
       ],
 
       listeners: {

@@ -34,11 +34,11 @@ NX.define('Nexus.grid.GridFilterBox', {
    * @override
    */
   initComponent: function () {
-    var self = this;
+    var self = this,
+        icons = Nexus.capabilities.Icons;
 
     self.filterField = NX.create('Ext.form.TextField', {
       enableKeyEvents: true,
-
       listeners: {
         keyup: {
           fn: function () {
@@ -50,6 +50,7 @@ NX.define('Nexus.grid.GridFilterBox', {
     });
 
     Ext.apply(self, {
+      layout: 'fit',
       items: [
         self.filterField
       ],
@@ -83,6 +84,21 @@ NX.define('Nexus.grid.GridFilterBox', {
     var self = this;
     self.filterField.setValue(undefined);
     self.filterGrid();
+  },
+
+  /**
+   * Create a clear button.
+   *
+   * @returns {Ext.Button}
+   */
+  createClearButton: function () {
+    var self = this;
+
+    return NX.create('Ext.Button', {
+      iconCls: Nexus.capabilities.Icons.get('cross_grey').cls,
+      scope: self,
+      handler: self.clearFilter
+    });
   },
 
   /**
