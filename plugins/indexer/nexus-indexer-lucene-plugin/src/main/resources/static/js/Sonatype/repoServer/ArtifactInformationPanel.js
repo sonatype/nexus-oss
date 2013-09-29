@@ -303,6 +303,7 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
                         this.clearNonLocalView(infoResp.data.canDelete);
                         this.form.setValues(infoResp.data);
                       }
+                      artifactContainer.showTab(this);
                     }
                     else
                     {
