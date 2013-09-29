@@ -81,7 +81,7 @@ public class RepositoryListPlexusResource
 
   @Inject
   public RepositoryListPlexusResource(final RemoteProviderHintFactory remoteProviderHintFactory,
-                                      final @Named(DefaultRepositoryTemplateProvider.PROVIDER_ID) DefaultRepositoryTemplateProvider repositoryTemplateProvider)
+                                      final DefaultRepositoryTemplateProvider repositoryTemplateProvider)
   {
     this.remoteProviderHintFactory = remoteProviderHintFactory;
     this.repositoryTemplateProvider = repositoryTemplateProvider;

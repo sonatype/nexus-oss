@@ -110,6 +110,8 @@ public class GlobalConfigurationPlexusResource
     this.notificationManager = notificationManager;
     this.defaultSecurityConfigurationSource = defaultSecurityConfigurationSource;
     this.configurationSource = configurationSource;
+
+    this.setModifiable(true);
   }
 
   // ----------------------------------------------------------------------------
@@ -153,10 +155,6 @@ public class GlobalConfigurationPlexusResource
   }
 
   // ==
-
-  public GlobalConfigurationPlexusResource() {
-    this.setModifiable(true);
-  }
 
   @Override
   public Object getPayloadInstance() {
