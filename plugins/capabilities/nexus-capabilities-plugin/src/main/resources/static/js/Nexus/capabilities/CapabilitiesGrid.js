@@ -27,8 +27,9 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
 
   requires: [
     'Nexus.capabilities.Icons',
+    'Nexus.capabilities.CapabilitiesGridStore',
     'Nexus.capabilities.CreateCapabilityWindow',
-    'Nexus.grid.GridFilterBox'
+    'Nexus.capabilities.CapabilitiesGridFilterBox'
   ],
 
   /**
@@ -74,24 +75,40 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
       disabled: true
     });
 
+    self.gridStore = NX.create('Nexus.capabilities.CapabilitiesGridStore', {
+      capabilityStore: self.mediator().capabilityStore
+    });
+
+    self.filterBox = NX.create('Nexus.capabilities.CapabilitiesGridFilterBox', {
+      grid: self,
+      width: 200
+    });
+
     Ext.apply(self, {
       cls: 'nx-capabilities-CapabilityGrid',
-      ds: self.mediator().capabilityStore,
+      ds: self.gridStore,
       stripeRows: true,
+      border: false,
+
       loadMask: {
         msg: 'Loading...',
         msgCls: 'loading-indicator'
       },
-      viewConfig: {
-        emptyText: 'Click "Add" to configure a capability.',
+
+      view: NX.create('Ext.grid.GroupingView', {
+        emptyText: 'No capabilities defined',
+        emptyTextWhileFiltering: 'No capabilities matched criteria: {criteria}',
         deferEmptyText: false,
-        getRowClass: function (record, index) {
+        getRowClass: function (record) {
           var capability = record.data;
           if (capability.enabled && !capability.active) {
             return 'red-flag';
           }
-        }
-      },
+        },
+        forceFit: true,
+        groupTextTpl: '{text}'
+      }),
+
       sm: NX.create('Ext.grid.RowSelectionModel', {
         singleSelect: true,
         listeners: {
@@ -102,40 +119,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         }
       }),
 
-      columns: [
-        {
-          width: 30,
-          resizable: false,
-          sortable: false,
-          fixed: true,
-          hideable: false,
-          menuDisabled: true,
-          renderer: function (value, metaData, record) {
-            return icons.iconFor(record.data).img;
-          }
-        },
-        {
-          id: 'typeName',
-          width: 175,
-          header: 'Type',
-          dataIndex: 'typeName',
-          sortable: true
-        },
-        {
-          id: 'description',
-          width: 250,
-          header: 'Description',
-          dataIndex: 'description',
-          sortable: true
-        },
-        {
-          id: 'notes',
-          width: 175,
-          header: 'Notes',
-          dataIndex: 'notes',
-          sortable: true
-        }
-      ],
+      colModel: self.gridStore.getColumnModel(),
       autoExpandColumn: 'notes',
 
       tbar: [
@@ -151,9 +135,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         self.buttonDuplicate,
         self.buttonDelete,
         '->',
-        NX.create('Nexus.grid.GridFilterBox', {
-          grid: self,
-        })
+        self.filterBox
       ],
 
       listeners: {
@@ -169,7 +151,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         render: {
           fn: function () {
             self.mediator().capabilityStore.on('beforeload', self.rememberSelection, self);
-            self.mediator().capabilityStore.on('load', self.recallSelection, self);
+            self.mediator().capabilityStore.on('load', self.reconfigureGrid, self);
 
             self.mediator().capabilityTypeStore.on('beforeload', self.disableAddButton, self);
             self.mediator().capabilityTypeStore.on('load', self.maybeEnableAddButton, self);
@@ -260,6 +242,26 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         },
         self, {single: true}
     );
+  },
+
+  /**
+   * Reconfigures the grid based on information available is grid store.
+   * @private
+   */
+  reconfigureGrid: function () {
+    var self = this;
+
+    if (!self.mediator().capabilityStore.sameTagKeysAs(self.gridStore.tagKeys)) {
+      self.gridStore = NX.create('Nexus.capabilities.CapabilitiesGridStore', {
+        capabilityStore: self.mediator().capabilityStore
+      });
+      self.gridStore.on('load', self.recallSelection, self);
+
+      self.reconfigure(self.gridStore, self.gridStore.getColumnModel());
+    }
+    else {
+      self.gridStore.loadCapabilities();
+    }
   },
 
   /**

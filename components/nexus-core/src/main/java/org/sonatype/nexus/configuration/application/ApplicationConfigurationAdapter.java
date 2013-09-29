@@ -16,64 +16,82 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Adapter for NexusConfiguration.
  *
  * @author cstamas
  */
-@Component(role = ApplicationConfiguration.class)
+@Singleton
+@Named
 public class ApplicationConfigurationAdapter
     implements ApplicationConfiguration
 {
-  @Requirement
-  private NexusConfiguration nexusConfiguration;
+  private final NexusConfiguration nexusConfiguration;
+
+  @Inject
+  public ApplicationConfigurationAdapter(final NexusConfiguration nexusConfiguration) {
+    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+  }
 
   @Deprecated
+  @Override 
   public Configuration getConfigurationModel() {
     return nexusConfiguration.getConfigurationModel();
   }
 
+  @Override 
   public File getWorkingDirectory() {
     return nexusConfiguration.getWorkingDirectory();
   }
 
+  @Override 
   public File getWorkingDirectory(final String key) {
     return nexusConfiguration.getWorkingDirectory(key);
   }
 
+  @Override 
   public File getWorkingDirectory(final String key, final boolean createIfNeeded) {
     return nexusConfiguration.getWorkingDirectory(key, createIfNeeded);
   }
 
+  @Override 
   public File getTemporaryDirectory() {
     return nexusConfiguration.getTemporaryDirectory();
   }
 
+  @Override 
   public File getConfigurationDirectory() {
     return nexusConfiguration.getConfigurationDirectory();
   }
 
+  @Override 
   public void saveConfiguration()
       throws IOException
   {
     nexusConfiguration.saveConfiguration();
   }
 
+  @Override 
   public boolean isSecurityEnabled() {
     return nexusConfiguration.isSecurityEnabled();
   }
 
+  @Override 
   public LocalStorageContext getGlobalLocalStorageContext() {
     return nexusConfiguration.getGlobalLocalStorageContext();
   }
 
+  @Override 
   public RemoteStorageContext getGlobalRemoteStorageContext() {
     return nexusConfiguration.getGlobalRemoteStorageContext();
   }

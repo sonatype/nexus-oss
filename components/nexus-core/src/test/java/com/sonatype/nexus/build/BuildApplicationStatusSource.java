@@ -13,18 +13,21 @@
 
 package com.sonatype.nexus.build;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.AbstractApplicationStatusSource;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * ApplicationStatusSource used in nexus-core UTs only. Basically equivalent to OSS edition one,
  * even reporting the same (to not screw existing UTs), but the real thing is in nexus-oss-edition module.
  */
-@Component(role = ApplicationStatusSource.class)
+@Singleton
+@Named
 public class BuildApplicationStatusSource
     extends AbstractApplicationStatusSource
     implements ApplicationStatusSource

@@ -13,11 +13,13 @@
 
 package com.sonatype.nexus.oss.error.reporting;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.error.report.ErrorReportComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = ErrorReportComponent.class)
+@Singleton
+@Named
 public class OSSErrorReportComponent
     implements ErrorReportComponent
 {

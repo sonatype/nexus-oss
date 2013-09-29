@@ -38,10 +38,11 @@ NX.define('Nexus.capabilities.CapabilityView', {
    */
   initComponent: function () {
     var self = this,
-        icons = Nexus.capabilities.Icons,
-        messageTpl = NX.create('Ext.XTemplate',
+        icons = Nexus.capabilities.Icons;
+
+    self.messageTpl = NX.create('Ext.XTemplate',
         '<div class="nx-capabilities-CapabilitySummary-message">',
-        '  <span>{icon}{html}</span>',
+        '  <div>{icon}{html}</div>',
         '</div>',
         {
           compiled: true,
@@ -60,8 +61,8 @@ NX.define('Nexus.capabilities.CapabilityView', {
           }
         });
 
-    self.summaryView = NX.create('Nexus.capabilities.CapabilitySummary', {messageTpl: messageTpl});
-    self.settingsView = NX.create('Nexus.capabilities.CapabilitySettings', {messageTpl: messageTpl});
+    self.summaryView = NX.create('Nexus.capabilities.CapabilitySummary');
+    self.settingsView = NX.create('Nexus.capabilities.CapabilitySettings');
     self.statusView = NX.create('Nexus.capabilities.CapabilityStatus');
     self.aboutView = NX.create('Nexus.capabilities.CapabilityAbout');
 
@@ -96,7 +97,9 @@ NX.define('Nexus.capabilities.CapabilityView', {
     var self = this,
         icons = Nexus.capabilities.Icons;
 
-    self.setTitle(self.mediator().describeCapability(capability), icons.iconFor(capability).cls);
+    self.setTitle(
+        self.mediator().describeCapability(capability) + self.messageTpl.message(capability),
+        icons.iconFor(capability).cls);
 
     self.summaryView.setCapability(capability);
     self.settingsView.setCapability(capability);

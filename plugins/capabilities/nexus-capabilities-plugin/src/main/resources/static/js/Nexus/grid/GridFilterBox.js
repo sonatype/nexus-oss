@@ -18,7 +18,7 @@
  * @since 2.7
  */
 NX.define('Nexus.grid.GridFilterBox', {
-  extend: 'Ext.form.TextField',
+  extend: 'Ext.Container',
 
   /**
    * @cfg {String} regexp modifiers (defaults to 'i' = case insensitive).
@@ -31,23 +31,70 @@ NX.define('Nexus.grid.GridFilterBox', {
   grid: undefined,
 
   /**
+   * @cfg {Number} delay between keystrokes and actual filtering (defaults to 50).
+   */
+  filterDelay: 100,
+
+  /**
    * @override
    */
   initComponent: function () {
-    var self = this;
+    var self = this,
+        icons = Nexus.capabilities.Icons;
 
-    Ext.apply(self, {
+    self.filterField = NX.create('Ext.form.TextField', {
       enableKeyEvents: true,
-
+      style: {
+        paddingLeft: '22px',
+        paddingRight: '22px'
+      },
       listeners: {
         keyup: {
-          fn: function (self, e) {
-            if (e.keyCode == 13) {
-              self.filterGrid();
-            }
+          fn: function () {
+            clearTimeout(self.searchTimeout);
+            self.searchTimeout = self.filterGrid.defer(self.filterDelay, self);
           },
           scope: self
-        },
+        }
+      }
+    });
+
+    self.clearButton = NX.create('Ext.Button', {
+      xtype: 'button',
+      iconCls: icons.get('glyph_circle_remove').cls,
+      scope: self,
+      handleMouseEvents: false,
+      hidden: true,
+      handler: self.clearFilter,
+      style: {
+        position: 'absolute',
+        top: '3px',
+        right: '3px',
+        opacity: 0.5
+      }
+    });
+
+    Ext.apply(self, {
+      layout: 'fit',
+      items: [
+        self.filterField,
+        self.clearButton,
+        {
+          xtype: 'button',
+          // FIXME: Pick one of these icons
+          //iconCls: icons.get('glyph_filter').cls,
+          iconCls: icons.get('glyph_search').cls,
+          disabled: true,
+          scope: self,
+          style: {
+            position: 'absolute',
+            top: '3px',
+            right: (self.width - 20) + 'px',
+            opacity: 0.25
+          }
+        }
+      ],
+      listeners: {
         render: {
           fn: function () {
             self.grid.on('reconfigure', self.onGridReconfigured, self);
@@ -58,7 +105,7 @@ NX.define('Nexus.grid.GridFilterBox', {
       }
     });
 
-    self.constructor.superclass.initComponent.apply(self, arguments);
+    Nexus.grid.GridFilterBox.superclass.initComponent.call(self, arguments);
   },
 
   /**
@@ -75,7 +122,8 @@ NX.define('Nexus.grid.GridFilterBox', {
    */
   clearFilter: function () {
     var self = this;
-    self.setValue(undefined);
+
+    self.filterField.setValue(undefined);
     self.filterGrid();
   },
 
@@ -87,17 +135,31 @@ NX.define('Nexus.grid.GridFilterBox', {
         shouldClearFilter = true,
         regexp, filterFields;
 
-    if (self.getValue() && self.getValue().length > 0) {
-      regexp = new RegExp(self.getValue(), self.modifiers);
+    self.clearButton.hide();
+
+    self.grid.getStore().clearFilter();
+    if (self.filterField.getValue() && self.filterField.getValue().length > 0) {
+      self.clearButton.show();
+
+      if (self.grid.getStore().getCount() > 0 && self.grid.view.emptyTextWhileFiltering) {
+        if (!self.grid.view.emptyTextBackup) {
+          self.grid.view.emptyTextBackup = self.grid.view.emptyText;
+        }
+        self.grid.view.emptyText = self.grid.view.emptyTextWhileFiltering.replaceAll(
+            '{criteria}', self.filterField.getValue()
+        );
+      }
+
+      regexp = new RegExp(self.filterField.getValue(), self.modifiers);
       filterFields = self.filterFieldNames();
 
       if (filterFields && filterFields.length > 0) {
         shouldClearFilter = false;
 
         self.grid.getStore().filterBy(function (record) {
-          for (var idx in filterFields) {
-            if (filterFields[idx]) {
-              if (self.matches(regexp, record, filterFields[idx], self.extractValue(record, filterFields[idx]))) {
+          for (var i = 0; i < filterFields.length; i++) {
+            if (filterFields[i]) {
+              if (self.matches(regexp, record, filterFields[i], self.extractValue(record, filterFields[i]))) {
                 return true;
               }
             }
@@ -108,6 +170,10 @@ NX.define('Nexus.grid.GridFilterBox', {
     }
 
     if (shouldClearFilter) {
+      if (self.grid.view.emptyTextBackup) {
+        self.grid.view.emptyText = self.grid.view.emptyTextBackup;
+      }
+      self.clearButton.hide();
       self.grid.getStore().clearFilter();
     }
   },
@@ -135,7 +201,7 @@ NX.define('Nexus.grid.GridFilterBox', {
   },
 
   /**
-   * Returns teh dataIndex property of all grid columns.
+   * Returns the dataIndex property of all grid columns.
    * @returns {Array} of fields names to be matched
    */
   filterFieldNames: function () {
@@ -146,7 +212,7 @@ NX.define('Nexus.grid.GridFilterBox', {
 
     if (columnModel) {
       columns = columnModel.getColumnsBy(function () {
-        return true
+        return true;
       });
       if (columns) {
         Ext.each(columns, function (column) {
@@ -160,6 +226,7 @@ NX.define('Nexus.grid.GridFilterBox', {
     if (filterFieldNames.length > 0) {
       return filterFieldNames;
     }
+    return [];
   },
 
   /**

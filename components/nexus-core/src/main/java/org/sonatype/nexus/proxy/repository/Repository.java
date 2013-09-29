@@ -53,6 +53,15 @@ public interface Repository
     extends ResourceStore, Configurable
 {
   /**
+   * Disposes this repository, frees it's resources and unhooks it, allowing the instance to be GCed. Typically when a
+   * repository is removed from Nx instance. "User" code should never invoke this method, as it's typically handled
+   * by Nexus core.
+   * 
+   * @since 2.7.0
+   */
+  void dispose();
+
+  /**
    * Returns the repository's "provider" role. These are getters only, and application is NOT able to change these
    * values runtime! Note: this is a FQN of a class, that is used to "register" the component with container, and the
    * class might reside in core but also in a plugin (separate child classloader!).

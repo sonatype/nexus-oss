@@ -13,15 +13,17 @@
 
 package com.sonatype.nexus.build.error.reporting;
 
-import org.sonatype.nexus.error.report.ErrorReportComponent;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.error.report.ErrorReportComponent;
 
 /**
  * Error report component used in nexus-core UTs only. Basically equivalent to OSS edition one,
  * even reporting the same (to not screw existing UTs), but the real thing is in nexus-oss-edition module.
  */
-@Component(role = ErrorReportComponent.class)
+@Singleton
+@Named
 public class BuildErrorReportComponent
     implements ErrorReportComponent
 {

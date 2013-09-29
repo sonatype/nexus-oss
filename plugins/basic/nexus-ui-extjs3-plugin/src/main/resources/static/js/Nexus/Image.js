@@ -19,6 +19,7 @@
  */
 Ext.define('Nexus.Image', {
     extend: 'Ext.BoxComponent',
+    xtype: 'image',
 
     /**
      * @cfg {String} src Image source
@@ -36,9 +37,4 @@ Ext.define('Nexus.Image', {
         // Call super constructor
         self.constructor.superclass.constructor.apply(self, arguments);
     }
-},
-
-function () {
-    var type = this;
-    Ext.ComponentMgr.registerType('image', type);
 });
