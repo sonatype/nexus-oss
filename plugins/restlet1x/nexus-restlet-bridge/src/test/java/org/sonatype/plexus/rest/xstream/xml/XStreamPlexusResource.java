@@ -13,12 +13,13 @@
 
 package org.sonatype.plexus.rest.xstream.xml;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.thoughtworks.xstream.XStream;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -31,7 +32,8 @@ import org.restlet.resource.ResourceException;
  *
  * @author cstamas
  */
-@Component(role = PlexusResource.class, hint = "XStreamPlexusResource")
+@Named
+@Singleton
 public class XStreamPlexusResource
     extends AbstractPlexusResource
 {

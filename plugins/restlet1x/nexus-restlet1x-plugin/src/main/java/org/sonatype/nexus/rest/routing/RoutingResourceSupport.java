@@ -13,13 +13,14 @@
 
 package org.sonatype.nexus.rest.routing;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -35,7 +36,6 @@ public abstract class RoutingResourceSupport
 {
   protected static final String REPOSITORY_ID_KEY = "repositoryId";
 
-  @Requirement
   private Manager manager;
 
   /**
@@ -43,6 +43,11 @@ public abstract class RoutingResourceSupport
    */
   public RoutingResourceSupport() {
     setModifiable(true);
+  }
+
+  @Inject
+  public void setManager(final Manager manager) {
+    this.manager = manager;
   }
 
   protected Manager getManager() {

@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.rest.wastebasket;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,11 +28,8 @@ import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -43,7 +43,8 @@ import org.restlet.resource.Variant;
  * @author cstamas
  * @author tstevens
  */
-@Component(role = PlexusResource.class, hint = "wastebasket")
+@Named
+@Singleton
 @Path(WastebasketPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class WastebasketPlexusResource
@@ -51,11 +52,15 @@ public class WastebasketPlexusResource
 {
   public static final String RESOURCE_URI = "/wastebasket";
 
-  @Requirement
-  private Wastebasket wastebasket;
+  private final Wastebasket wastebasket;
 
-  @Requirement
-  private NexusScheduler nexusScheduler;
+  private final NexusScheduler nexusScheduler;
+
+  @Inject
+  public WastebasketPlexusResource(final Wastebasket wastebasket, final NexusScheduler nexusScheduler) {
+    this.wastebasket = wastebasket;
+    this.nexusScheduler = nexusScheduler;
+  }
 
   @Override
   public Object getPayloadInstance() {

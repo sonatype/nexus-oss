@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.rest.contentclasses;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -23,18 +26,16 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "ContentClassComponentListPlexusResource")
+@Named
+@Singleton
 @Path(ContentClassComponentListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class ContentClassComponentListPlexusResource
@@ -42,8 +43,12 @@ public class ContentClassComponentListPlexusResource
 {
   public static final String RESOURCE_URI = "/components/repo_content_classes";
 
-  @Requirement
-  private RepositoryTypeRegistry repoTypeRegistry;
+  private final RepositoryTypeRegistry repoTypeRegistry;
+
+  @Inject
+  public ContentClassComponentListPlexusResource(final RepositoryTypeRegistry repoTypeRegistry) {
+    this.repoTypeRegistry = repoTypeRegistry;
+  }
 
   @Override
   public String getResourceUri() {

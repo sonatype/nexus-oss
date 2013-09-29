@@ -15,6 +15,9 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -41,17 +44,13 @@ import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.util.EnumUtil;
-import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.ManuallyConfiguredRepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -65,7 +64,8 @@ import org.restlet.resource.Variant;
  *
  * @author cstamas
  */
-@Component(role = PlexusResource.class, hint = "RepositoryListPlexusResource")
+@Named
+@Singleton
 @Path(RepositoryListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
@@ -74,14 +74,17 @@ public class RepositoryListPlexusResource
 {
   public static final String RESOURCE_URI = "/repositories";
 
-  @Requirement
-  private RemoteProviderHintFactory remoteProviderHintFactory;
+  private final RemoteProviderHintFactory remoteProviderHintFactory;
 
   // UGLY HACK, SEE BELOW
-  @Requirement(role = TemplateProvider.class, hint = DefaultRepositoryTemplateProvider.PROVIDER_ID)
-  private DefaultRepositoryTemplateProvider repositoryTemplateProvider;
+  private final DefaultRepositoryTemplateProvider repositoryTemplateProvider;
 
-  public RepositoryListPlexusResource() {
+  @Inject
+  public RepositoryListPlexusResource(final RemoteProviderHintFactory remoteProviderHintFactory,
+                                      final @Named(DefaultRepositoryTemplateProvider.PROVIDER_ID) DefaultRepositoryTemplateProvider repositoryTemplateProvider)
+  {
+    this.remoteProviderHintFactory = remoteProviderHintFactory;
+    this.repositoryTemplateProvider = repositoryTemplateProvider;
     this.setModifiable(true);
   }
 

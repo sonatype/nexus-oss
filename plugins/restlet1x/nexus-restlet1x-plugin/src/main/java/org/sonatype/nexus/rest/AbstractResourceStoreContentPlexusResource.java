@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.ApplicationStatusSource;
@@ -73,7 +74,6 @@ import com.noelios.restlet.http.HttpResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -106,13 +106,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
   public static final String OVERRIDE_FILENAME_KEY = "override-filename";
 
-  @Requirement
   private SecuritySystem securitySystem;
 
-  @Requirement
   private ApplicationStatusSource applicationStatusSource;
 
-  @Requirement(role = ArtifactViewProvider.class)
   public Map<String, ArtifactViewProvider> viewProviders;
   
   public AbstractResourceStoreContentPlexusResource() {
@@ -130,6 +127,21 @@ public abstract class AbstractResourceStoreContentPlexusResource
   {
     this.securitySystem = securitySystem;
     this.applicationStatusSource = applicationStatusSource;
+    this.viewProviders = viewProviders;
+  }
+
+  @Inject
+  public void setSecuritySystem(final SecuritySystem securitySystem) {
+    this.securitySystem = securitySystem;
+  }
+
+  @Inject
+  public void setApplicationStatusSource(final ApplicationStatusSource applicationStatusSource) {
+    this.applicationStatusSource = applicationStatusSource;
+  }
+
+  @Inject
+  public void setViewProviders(final Map<String, ArtifactViewProvider> viewProviders) {
     this.viewProviders = viewProviders;
   }
 
