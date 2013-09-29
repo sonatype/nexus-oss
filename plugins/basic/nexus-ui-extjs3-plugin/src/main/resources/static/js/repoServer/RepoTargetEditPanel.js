@@ -13,7 +13,7 @@
 /*
  * Target Edit/Create panel layout and controller
  */
-define('repoServer/RepoTargetEditPanel',['Sonatype/all'], function(){
+define('repoServer/RepoTargetEditPanel',['Sonatype/all','Nexus/grid/GridFilterBox'], function(){
 
 Sonatype.repoServer.RepoTargetEditPanel = function(config) {
   var config = config || {},
