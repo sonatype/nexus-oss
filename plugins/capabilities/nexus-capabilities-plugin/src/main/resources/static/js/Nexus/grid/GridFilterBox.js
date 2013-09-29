@@ -61,7 +61,7 @@ NX.define('Nexus.grid.GridFilterBox', {
 
     self.clearButton = NX.create('Ext.Button', {
       xtype: 'button',
-      iconCls: icons.get('cross').cls,
+      iconCls: icons.get('glyph_circle_remove').cls,
       scope: self,
       handleMouseEvents: false,
       hidden: true,
@@ -69,7 +69,8 @@ NX.define('Nexus.grid.GridFilterBox', {
       style: {
         position: 'absolute',
         top: '3px',
-        right: '3px'
+        right: '3px',
+        opacity: 0.5
       }
     });
 
@@ -80,13 +81,16 @@ NX.define('Nexus.grid.GridFilterBox', {
         self.clearButton,
         {
           xtype: 'button',
-          iconCls: icons.get('magnifier_grey').cls,
+          // FIXME: Pick one of these icons
+          //iconCls: icons.get('glyph_filter').cls,
+          iconCls: icons.get('glyph_search').cls,
           disabled: true,
           scope: self,
           style: {
             position: 'absolute',
             top: '3px',
-            right: (self.width - 20) + 'px'
+            right: (self.width - 20) + 'px',
+            opacity: 0.25
           }
         }
       ],
