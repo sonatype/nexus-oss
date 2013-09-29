@@ -14,10 +14,12 @@
  * Service Schedule Edit/Create panel layout and controller
  */
 
-define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
+define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/grid/GridFilterBox'], function(Sonatype, Strings){
 Sonatype.repoServer.SchedulesEditPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+  var config = config || {},
+      defaultConfig = {},
+      gridFilterBox = NX.create('Nexus.grid.GridFilterBox');
+
   Ext.apply(this, config, defaultConfig);
 
   var ht = Sonatype.repoServer.resources.help.schedules;
@@ -896,7 +898,13 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               scope : this,
               handler : this.addResourceHandler,
               disabled : !this.sp.checkPermission('nexus:tasks', this.sp.CREATE)
-            }, this.runButton, this.stopButton, this.deleteButton],
+            },
+            this.runButton,
+            this.stopButton,
+            this.deleteButton,
+            '->',
+            gridFilterBox
+        ],
 
         // grid view options
         ds : this.schedulesDataStore,
@@ -954,6 +962,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         }
       });
   this.schedulesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
+
+  gridFilterBox.grid = this.schedulesGridPanel;
 
   Sonatype.repoServer.SchedulesEditPanel.superclass.constructor.call(this, {
         layout : 'border',
