@@ -71,6 +71,7 @@ public class DefaultRepositoryRegistry
   public DefaultRepositoryRegistry(final EventBus eventBus, final RepositoryTypeRegistry repositoryTypeRegistry) {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
+    eventBus.register(this);
   }
 
   @Override

@@ -59,7 +59,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author cstamas
  */
 @Singleton
-@Named
+@Named("1.0.5")
 public class Upgrade105to106
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
