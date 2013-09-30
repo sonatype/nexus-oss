@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
@@ -51,9 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author cstamas
  */
-@Named
-@Singleton
-public class PlexusRestletApplicationBridge
+public abstract class PlexusRestletApplicationBridge
     extends Application
 {
   /**
