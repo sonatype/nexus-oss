@@ -381,16 +381,6 @@ public interface SecuritySystem
       throws InvalidConfigurationException;
 
   /**
-   * Returns true if security is enabled.
-   */
-  boolean isSecurityEnabled();
-
-  /**
-   * Enables/Disables security.
-   */
-  void setSecurityEnabled(boolean enabled);
-
-  /**
    * Returns the configured shiro SecurityManager
    */
   public RealmSecurityManager getSecurityManager();

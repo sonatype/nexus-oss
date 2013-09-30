@@ -61,6 +61,11 @@ public class UserPrincipalsHelperTest
   private SecuritySystem securitySystem = null;
 
   @Override
+  protected boolean runWithSecurityDisabled() {
+    return false;
+  }
+
+  @Override
   protected Module[] getTestCustomModules() {
     Module[] modules = super.getTestCustomModules();
     modules = ObjectArrays.concat(modules, new AbstractModule()

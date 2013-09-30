@@ -81,12 +81,7 @@ public class ApplicationConfigurationAdapter
     nexusConfiguration.saveConfiguration();
   }
 
-  @Override 
-  public boolean isSecurityEnabled() {
-    return nexusConfiguration.isSecurityEnabled();
-  }
-
-  @Override 
+  @Override
   public LocalStorageContext getGlobalLocalStorageContext() {
     return nexusConfiguration.getGlobalLocalStorageContext();
   }

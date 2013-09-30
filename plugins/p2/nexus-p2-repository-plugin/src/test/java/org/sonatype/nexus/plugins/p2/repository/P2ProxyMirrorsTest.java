@@ -70,8 +70,6 @@ public class P2ProxyMirrorsTest
     final MockRemoteStorage mockStorage = (MockRemoteStorage) this.lookup(RemoteRepositoryStorage.class, "mock");
     repository.setRemoteUrl(remoteUrl);
     repository.setRemoteStorage(mockStorage);
-
-    this.lookup(SecuritySystem.class).setSecurityEnabled(false);
   }
 
   private void copyFileToDotNexus(final String fileName, final String targetFileName)

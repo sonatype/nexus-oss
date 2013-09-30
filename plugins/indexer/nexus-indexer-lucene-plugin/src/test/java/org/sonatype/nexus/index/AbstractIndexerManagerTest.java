@@ -43,13 +43,14 @@ public abstract class AbstractIndexerManagerTest
   {
     super.setUp();
 
-    nexusConfiguration().setSecurityEnabled(false);
-
-    nexusConfiguration().saveConfiguration();
-
     indexerManager = (DefaultIndexerManager) lookup(IndexerManager.class);
 
     nexusScheduler = lookup(NexusScheduler.class);
+  }
+
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return true;
   }
 
   protected void searchFor(String groupId, int expected)

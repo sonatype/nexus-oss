@@ -27,12 +27,14 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.MimeUtil2;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 
-public class Nexus5772MimeTest
+// This test is an IT because after it runs tests keep on spitting out all sort of warnings related to magic file format")
+public class Nexus5772MimeIT
     extends TestSupport
 {
   public static final String CLASSIC_MAGIC_FILE_PATH = "src/test/resources/mime/mime.magic";
@@ -43,6 +45,8 @@ public class Nexus5772MimeTest
   public void cleanUp()
       throws Exception
   {
+    logger.info("Cleaning up!");
+
     // properties
     System.clearProperty(DefaultMimeSupport.MIME_MAGIC_OPENDESKTOP_KEY);
     System.clearProperty(DefaultMimeSupport.MIME_MAGIC_FILE_KEY);

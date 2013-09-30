@@ -106,7 +106,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
           }
         },
         forceFit: true,
-        groupTextTpl: '{text}'
+        groupTextTpl: '{[values.text.replace("undefined","(none)").replace("null","(none)")]}'
       }),
 
       sm: NX.create('Ext.grid.RowSelectionModel', {

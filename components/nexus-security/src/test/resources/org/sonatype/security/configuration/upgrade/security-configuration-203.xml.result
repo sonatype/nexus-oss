@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <security-configuration>
-  <version>2.0.5</version>
-  <enabled>true</enabled>
+  <version>2.0.7</version>
   <anonymousAccessEnabled>true</anonymousAccessEnabled>
   <anonymousUsername>anonymous-user</anonymousUsername>
   <anonymousPassword>anonymous-pass</anonymousPassword>
