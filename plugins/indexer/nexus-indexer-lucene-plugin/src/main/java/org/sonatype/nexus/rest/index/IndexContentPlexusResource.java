@@ -13,21 +13,22 @@
 
 package org.sonatype.nexus.rest.index;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 
-@Component(role = PlexusResource.class, hint = "IndexContentPlexusResource")
+@Named("IndexContentPlexusResource")
+@Singleton
 @Path(IndexContentPlexusResource.RESOURCE_URI)
 public class IndexContentPlexusResource
     extends AbstractIndexPlexusResource

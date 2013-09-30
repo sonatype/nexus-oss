@@ -35,6 +35,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
+import com.google.common.collect.Lists;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.maven.index.SearchType;
 import org.junit.Assert;
@@ -72,7 +73,7 @@ public class SearchNGIndexPlexusResourceTest
   public void testPlexusResourceException()
       throws Exception
   {
-    SearchNGIndexPlexusResource resource = new SearchNGIndexPlexusResource();
+    SearchNGIndexPlexusResource resource = new SearchNGIndexPlexusResource(Lists.<Searcher>newArrayList());
     Map<String, String> terms = new HashMap<String, String>(4);
     terms.put("q", "!");
     Searcher searcher = mock(Searcher.class);

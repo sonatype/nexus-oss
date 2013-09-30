@@ -19,6 +19,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -33,7 +37,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractArtifactViewProvider;
-import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
@@ -42,8 +45,6 @@ import org.sonatype.plexus.rest.ReferenceFactory;
 
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 
 /**
@@ -52,24 +53,34 @@ import org.restlet.data.Request;
  * @author Velo
  * @author cstamas
  */
-@Component(role = ArtifactViewProvider.class, hint = "info")
+@Named("info")
+@Singleton
 public class InfoArtifactViewProvider
     extends AbstractArtifactViewProvider
 {
-  @Requirement
-  private IndexerManager indexerManager;
+  private final IndexerManager indexerManager;
 
-  @Requirement(hint = "protected")
-  private RepositoryRegistry protectedRepositoryRegistry;
+  private final RepositoryRegistry protectedRepositoryRegistry;
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-  @Requirement
-  private ReferenceFactory referenceFactory;
+  private final ReferenceFactory referenceFactory;
 
-  @Requirement
-  private AccessManager accessManager;
+  private final AccessManager accessManager;
+
+  @Inject
+  public InfoArtifactViewProvider(final IndexerManager indexerManager,
+                                  final @Named("protected") RepositoryRegistry protectedRepositoryRegistry,
+                                  final RepositoryRegistry repositoryRegistry,
+                                  final ReferenceFactory referenceFactory,
+                                  final AccessManager accessManager)
+  {
+    this.indexerManager = indexerManager;
+    this.protectedRepositoryRegistry = protectedRepositoryRegistry;
+    this.repositoryRegistry = repositoryRegistry;
+    this.referenceFactory = referenceFactory;
+    this.accessManager = accessManager;
+  }
 
   @Override
   protected Object retrieveView(ResourceStoreRequest request, RepositoryItemUid itemUid, StorageItem item,

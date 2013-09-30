@@ -16,14 +16,15 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.wastebasket.AbstractRepositoryFolderCleaner;
-import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderCleaner;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = RepositoryFolderCleaner.class, hint = "indexer-lucene")
+@Named("indexer-lucene")
+@Singleton
 public class IndexRepositoryFolderCleaner
     extends AbstractRepositoryFolderCleaner
 {

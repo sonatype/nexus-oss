@@ -15,26 +15,31 @@ package org.sonatype.nexus.events;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.plexus.appevents.Event;
-
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Catches Nexus shutdown event and cleanly stops the IndexManager
  *
  * @author bdemers
  */
-@Component(role = EventInspector.class, hint = "LuceneIndexerNexusStoppedEventInspector")
+@Named
+@Singleton
 public class IndexerNexusStoppedEventInspector
     extends AbstractEventInspector
 {
-  @Requirement
-  private IndexerManager indexerManager;
+  private final IndexerManager indexerManager;
+
+  @Inject
+  public IndexerNexusStoppedEventInspector(final IndexerManager indexerManager) {
+    this.indexerManager = indexerManager;
+  }
 
   protected IndexerManager getIndexerManager() {
     return indexerManager;

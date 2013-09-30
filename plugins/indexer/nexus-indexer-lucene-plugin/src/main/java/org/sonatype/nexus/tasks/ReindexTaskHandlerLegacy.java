@@ -13,10 +13,11 @@
 
 package org.sonatype.nexus.tasks;
 
-import org.sonatype.nexus.index.IndexerManager;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.index.IndexerManager;
 
 /**
  * Reindex task.
@@ -24,12 +25,17 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author cstamas
  * @author Alin Dreghiciu
  */
-@Component(role = ReindexTaskHandler.class, hint = "legacy")
+@Named("legacy")
+@Singleton
 public class ReindexTaskHandlerLegacy
     implements ReindexTaskHandler
 {
-  @Requirement
-  private IndexerManager indexerManager;
+  private final IndexerManager indexerManager;
+
+  @Inject
+  public ReindexTaskHandlerLegacy(final IndexerManager indexerManager) {
+    this.indexerManager = indexerManager;
+  }
 
   /**
    * Delegates to indexer manager.

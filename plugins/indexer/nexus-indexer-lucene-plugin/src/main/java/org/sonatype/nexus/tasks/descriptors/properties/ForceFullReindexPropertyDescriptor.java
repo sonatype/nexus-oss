@@ -13,13 +13,12 @@
 
 package org.sonatype.nexus.tasks.descriptors.properties;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
 
 /**
  * @author Marvin Froeder
  */
-@Component(role = ScheduledTaskPropertyDescriptor.class, hint = ForceFullReindexPropertyDescriptor.ID,
-    instantiationStrategy = "per-lookup")
+@Named(ForceFullReindexPropertyDescriptor.ID)
 public class ForceFullReindexPropertyDescriptor
     extends AbstractBooleanPropertyDescriptor
 {

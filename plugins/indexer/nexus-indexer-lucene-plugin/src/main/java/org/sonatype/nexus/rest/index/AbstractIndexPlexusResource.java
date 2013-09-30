@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.index.KeywordSearcher;
 import org.sonatype.nexus.index.MavenCoordinatesSearcher;
 import org.sonatype.nexus.index.Searcher;
@@ -42,7 +44,6 @@ import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.UniqueArtifactFilterPostprocessor;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
@@ -67,14 +68,22 @@ public abstract class AbstractIndexPlexusResource
 
   public static final String TARGET_ID = "target";
 
-  @Requirement
   private NexusScheduler nexusScheduler;
 
-  @Requirement(role = Searcher.class)
-  private List<Searcher> m_searchers;
+  private List<Searcher> searchers;
 
   public AbstractIndexPlexusResource() {
     this.setModifiable(true);
+  }
+
+  @Inject
+  public void setNexusScheduler(final NexusScheduler nexusScheduler) {
+    this.nexusScheduler = nexusScheduler;
+  }
+
+  @Inject
+  public void setSearchers(final List<Searcher> searchers) {
+    this.searchers = searchers;
   }
 
   @Override
@@ -194,7 +203,7 @@ public abstract class AbstractIndexPlexusResource
                                                final Boolean expandClassifier, final Boolean collapseResults)
       throws NoSuchRepositoryException, ResourceException, IOException
   {
-    for (Searcher searcher : m_searchers) {
+    for (Searcher searcher : searchers) {
       if (searcher.canHandle(terms)) {
         SearchType searchType = searcher.getDefaultSearchType();
 

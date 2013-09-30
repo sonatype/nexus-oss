@@ -21,6 +21,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -42,16 +45,14 @@ import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.SearchType;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
@@ -63,7 +64,8 @@ import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = PlexusResource.class, hint = SearchNGIndexPlexusResource.ROLE_HINT)
+@Named(SearchNGIndexPlexusResource.ROLE_HINT)
+@Singleton
 @Path(SearchNGIndexPlexusResource.RESOURCE_URI)
 public class SearchNGIndexPlexusResource
     extends AbstractIndexerNexusPlexusResource
@@ -139,8 +141,12 @@ public class SearchNGIndexPlexusResource
 
   private Logger searchDiagnosticLogger = LoggerFactory.getLogger("search.ng.diagnostic");
 
-  @Requirement(role = Searcher.class)
-  private List<Searcher> searchers;
+  private final List<Searcher> searchers;
+
+  @Inject
+  public SearchNGIndexPlexusResource(final List<Searcher> searchers) {
+    this.searchers = searchers;
+  }
 
   @Override
   public String getResourceUri() {
@@ -272,6 +278,7 @@ public class SearchNGIndexPlexusResource
     return searchDiagnosticLogger;
   }
 
+  @VisibleForTesting
   /* UT */IteratorSearchResponse searchByTerms(final Map<String, String> terms, final String repositoryId,
                                                final Integer from, final int count, final Boolean exact,
                                                final List<Searcher> searchers)

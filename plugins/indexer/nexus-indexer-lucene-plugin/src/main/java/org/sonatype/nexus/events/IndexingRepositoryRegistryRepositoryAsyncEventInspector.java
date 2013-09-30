@@ -13,11 +13,14 @@
 
 package org.sonatype.nexus.events;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
@@ -31,8 +34,6 @@ import org.sonatype.nexus.tasks.UpdateIndexTask;
 import org.sonatype.plexus.appevents.Event;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Listens for events and manages indexes by doing reindexes when needed (on repository configuration updates).
@@ -42,19 +43,27 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author Toni Menzel
  * @author cstamas
  */
-@Component(role = EventInspector.class, hint = "IndexingRepositoryRegistryRepositoryAsyncEventInspector")
+@Named
+@Singleton
 public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
     extends AbstractEventInspector
     implements AsynchronousEventInspector
 {
-  @Requirement
-  private RepositoryRegistry repoRegistry;
+  private final RepositoryRegistry repoRegistry;
 
-  @Requirement
-  private NexusScheduler nexusScheduler;
+  private final NexusScheduler nexusScheduler;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
+
+  @Inject
+  public IndexingRepositoryRegistryRepositoryAsyncEventInspector(final RepositoryRegistry repoRegistry,
+                                                                 final NexusScheduler nexusScheduler,
+                                                                 final ApplicationStatusSource applicationStatusSource)
+  {
+    this.repoRegistry = repoRegistry;
+    this.nexusScheduler = nexusScheduler;
+    this.applicationStatusSource = applicationStatusSource;
+  }
 
   public boolean accepts(Event<?> evt) {
     return ((evt instanceof RepositoryRegistryRepositoryEvent) || (evt instanceof RepositoryConfigurationUpdatedEvent))
