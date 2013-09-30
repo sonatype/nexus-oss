@@ -52,6 +52,9 @@ NX.define('Nexus.ext.GridFilterBox', {
       self.filteredGrid.removeListener('reconfigure', self.onGridReconfigured, self);
     });
     self.on('beforeFiltering', function () {
+      if (self.filteredGrid.view.emptyTextBackup) {
+        self.filteredGrid.view.emptyText = self.filteredGrid.view.emptyTextBackup;
+      }
       if (self.filteredGrid.view.emptyTextWhileFiltering && self.filteredStore.getCount() > 0) {
         if (!self.filteredGrid.view.emptyTextBackup) {
           self.filteredGrid.view.emptyTextBackup = self.filteredGrid.view.emptyText;
