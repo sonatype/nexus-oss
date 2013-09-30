@@ -13,72 +13,31 @@
 
 package org.sonatype.nexus.proxy.item;
 
-import java.lang.ref.WeakReference;
-import java.util.WeakHashMap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
-import org.sonatype.sisu.locks.ResourceLockFactory;
 
-import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.util.StringUtils;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * A default factory for UIDs.
- * 
+ *
  * @author cstamas
  */
-@Singleton
-@Named
+@Component(role = RepositoryItemUidFactory.class)
 public class DefaultRepositoryItemUidFactory
-    implements RepositoryItemUidFactory
+    extends AbstractRepositoryItemUidFactory
 {
-  private final EventBus eventBus;
-  
-  private final RepositoryRegistry repositoryRegistry;
-
-  private final ResourceLockFactory sisuLockFactory;
-
-  private final WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>> locks =
-      new WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>>();
-
-  @Inject
-  public DefaultRepositoryItemUidFactory(final EventBus eventBus, final RepositoryRegistry repositoryRegistry,
-      final @Named("${sisu-resource-locks:-local}") ResourceLockFactory sisuLockFactory)
-  {
-    this.eventBus = checkNotNull(eventBus);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
-    this.sisuLockFactory = checkNotNull(sisuLockFactory);
-    eventBus.register(this);
-  }
+  /**
+   * The registry.
+   */
+  @Requirement
+  private RepositoryRegistry repositoryRegistry;
 
   @Override
-  public DefaultRepositoryItemUid createUid(final Repository repository, String path) {
-    // path corrections
-    if (!StringUtils.isEmpty(path)) {
-      if (!path.startsWith(RepositoryItemUid.PATH_ROOT)) {
-        path = RepositoryItemUid.PATH_ROOT + path;
-      }
-    }
-    else {
-      path = RepositoryItemUid.PATH_ROOT;
-    }
-
-    return new DefaultRepositoryItemUid(this, repository, path);
-  }
-
-  @Override
-  public DefaultRepositoryItemUid createUid(final String uidStr) throws IllegalArgumentException,
-      NoSuchRepositoryException
+  public DefaultRepositoryItemUid createUid(final String uidStr)
+      throws IllegalArgumentException, NoSuchRepositoryException
   {
     if (uidStr.indexOf(":") > -1) {
       String[] parts = uidStr.split(":");
@@ -98,42 +57,4 @@ public class DefaultRepositoryItemUidFactory
           + " is malformed RepositoryItemUid! The proper format is '<repoId>:/path/to/something'.");
     }
   }
-  
-  @Override
-  public DefaultRepositoryItemUidLock createUidLock(final RepositoryItemUid uid) {
-    final String key = new String(uid.getKey());
-
-    return doCreateUidLockForKey(key);
-  }
-
-  protected synchronized DefaultRepositoryItemUidLock doCreateUidLockForKey(final String key) {
-    final LockResource lockResource = new SisuLockResource(sisuLockFactory.getResourceLock(key));
-    final DefaultRepositoryItemUidLock newLock = new DefaultRepositoryItemUidLock(key, lockResource);
-    final WeakReference<DefaultRepositoryItemUidLock> oldLockRef = locks.get(newLock);
-    if (oldLockRef != null) {
-      final RepositoryItemUidLock oldLock = oldLockRef.get();
-
-      if (oldLock != null) {
-        return oldLockRef.get();
-      }
-    }
-    locks.put(newLock, new WeakReference<DefaultRepositoryItemUidLock>(newLock));
-    return newLock;
-  }
-
-  /**
-   * For UTs, not to be used in production code!
-   */
-  protected int locksInMap() {
-    return locks.size();
-  }
-
-  @Subscribe
-  public void on(final NexusStoppedEvent e) {
-    eventBus.unregister(this);
-    if (sisuLockFactory != null) {
-      sisuLockFactory.shutdown();
-    }
-  }
-
 }
