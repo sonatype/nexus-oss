@@ -269,12 +269,20 @@ public class NexusHttpAuthenticationFilter
   }
 
   @Override
-  protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
-                                   ServletResponse response)
+  protected boolean onLoginSuccess(final AuthenticationToken token,
+                                   final Subject subject,
+                                   final ServletRequest request,
+                                   final ServletResponse response)
   {
-    // TODO: consider moving this to a new filter, and chain them together
-    postAuthcEvent(request, token.getPrincipal().toString(), getUserAgent(request), true);
-
+    // Prefer the subject principal over the token's, as these could be different for token-based authentication
+    String userId;
+    if (subject.getPrincipal() != null) {
+      userId = subject.getPrincipal().toString();
+    }
+    else {
+      userId = token.getPrincipal().toString();
+    }
+    postAuthcEvent(request, userId, getUserAgent(request), true);
     return true;
   }
 
