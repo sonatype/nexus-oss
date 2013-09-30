@@ -65,17 +65,29 @@ public class DevModeResources
    * null otherwise
    */
   public static URL getResourceIfOnFileSystem(final String path) {
-    if (resourceLocations != null) {
-      try {
-        for (File dir : resourceLocations) {
-          File file = new File(dir, path);
-          if (file.exists()) {
-            return file.getAbsoluteFile().toURI().toURL();
-          }
-        }
+    try {
+      File file = getFileIfOnFileSystem(path);
+      if (file != null) {
+        return file.getAbsoluteFile().toURI().toURL();
       }
-      catch (MalformedURLException e) {
-        // ignore
+    }
+    catch (MalformedURLException e) {
+      // ignore
+    }
+    return null;
+  }
+
+  /**
+   * Searches the path in directories specified by "NEXUS_RESOURCE_DIRS" and returns a file to specified path if found,
+   * null otherwise
+   */
+  public static File getFileIfOnFileSystem(final String path) {
+    if (resourceLocations != null) {
+      for (File dir : resourceLocations) {
+        File file = new File(dir, path);
+        if (file.exists()) {
+          return file;
+        }
       }
     }
     return null;

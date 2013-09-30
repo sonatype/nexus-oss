@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.rest.internal;
 
-import java.net.URL;
+import java.io.File;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -28,7 +28,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
 
 /**
- * A {@link Finder} that will lookup files via {@link DevModeResources#getResourceIfOnFileSystem(String)}.
+ * A {@link Finder} that will lookup files via {@link DevModeResources#getFileIfOnFileSystem(String)}.
  *
  * @since 2.7
  */
@@ -60,10 +60,10 @@ public class DevModeResourceFinder
       @Override
       public void handleGet() {
         String path = basePath + request.getResourceRef().getRemainingPart(true, false);
-        URL url = DevModeResources.getResourceIfOnFileSystem(path);
-        if (url != null) {
+        File file = DevModeResources.getFileIfOnFileSystem(path);
+        if (file != null) {
           FileRepresentation representation = new FileRepresentation(
-              url.toExternalForm(),
+              file,
               MediaType.valueOf(mimeSupport.guessMimeTypeFromPath(path)),
               0 // always fresh content
           );
