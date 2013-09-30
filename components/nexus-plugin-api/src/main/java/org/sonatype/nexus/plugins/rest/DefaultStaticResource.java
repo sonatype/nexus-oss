@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import static org.sonatype.nexus.plugins.PluginStaticResource.getResourceIfOnFileSystem;
+import org.sonatype.nexus.internal.DevModeResources;
 
 public class DefaultStaticResource
     implements StaticResource, CacheControl
@@ -34,7 +34,7 @@ public class DefaultStaticResource
   private final boolean shouldCache;
 
   public DefaultStaticResource(URL url, String path, String contentType) {
-    URL overrideUrl = getResourceIfOnFileSystem(path);
+    URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(path);
     this.resourceURL = overrideUrl != null ? overrideUrl : url;
     this.path = path;
     this.contentType = contentType;

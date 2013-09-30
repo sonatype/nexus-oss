@@ -17,10 +17,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.rest.internal.DevModeResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RetargetableRestlet;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
@@ -199,6 +201,12 @@ public class NexusApplication
           }
         }
       }
+    }
+
+    // Attach to "/static" in case that dev mode is on
+    // The finder will only be called if the path under static is not found (as those are more specific)
+    if (DevModeResources.hasResourceLocations()) {
+      attach(root, false, "/static", new DevModeResourceFinder(getContext(), "/static"));
     }
 
     // =======
