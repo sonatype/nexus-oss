@@ -18,7 +18,6 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
-import org.sonatype.security.SecuritySystem;
 
 public abstract class AbstractNexusTestEnvironment
     extends NexusAppTestSupport
@@ -45,8 +44,6 @@ public abstract class AbstractNexusTestEnvironment
     lookup(RepositoryItemUidAttributeManager.class).reset();
 
     mimeSupport = lookup(MimeSupport.class);
-
-    this.lookup(SecuritySystem.class).setSecurityEnabled(false);
   }
 
   /**

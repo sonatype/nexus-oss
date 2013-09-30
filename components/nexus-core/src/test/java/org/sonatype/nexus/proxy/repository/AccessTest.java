@@ -73,7 +73,11 @@ public class AccessTest
     // setup security
     final SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
     securitySystem.setRealms(Collections.singletonList("default"));
-    securitySystem.setSecurityEnabled(true);
+  }
+
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return false;
   }
 
   @Override

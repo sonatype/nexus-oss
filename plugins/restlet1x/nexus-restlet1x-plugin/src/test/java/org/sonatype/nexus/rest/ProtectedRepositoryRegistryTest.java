@@ -57,7 +57,7 @@ public class ProtectedRepositoryRegistryTest
   private SecuritySystem securitySystem = null;
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

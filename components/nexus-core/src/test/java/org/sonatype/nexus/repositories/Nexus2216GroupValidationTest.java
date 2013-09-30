@@ -39,7 +39,7 @@ public class Nexus2216GroupValidationTest
     extends NexusAppTestSupport
 {
   // we need some stuff to prepare
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

@@ -595,10 +595,6 @@ public class DefaultSecuritySystem
     return this.securityConfiguration.isAnonymousAccessEnabled();
   }
 
-  public boolean isSecurityEnabled() {
-    return this.securityConfiguration.isEnabled();
-  }
-
   public void changePassword(String userId, String oldPassword, String newPassword)
       throws UserNotFoundException, InvalidCredentialsException, InvalidConfigurationException
   {
@@ -743,11 +739,6 @@ public class DefaultSecuritySystem
       throws InvalidConfigurationException
   {
     this.securityConfiguration.setAnonymousUsername(anonymousUsername);
-    this.securityConfiguration.save();
-  }
-
-  public void setSecurityEnabled(boolean enabled) {
-    this.securityConfiguration.setEnabled(enabled);
     this.securityConfiguration.save();
   }
 

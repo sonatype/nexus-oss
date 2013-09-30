@@ -29,7 +29,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
     });
 
     var   self = this,
-          securityConfigField,
           ht = Sonatype.repoServer.resources.help.server,
           formId = Ext.id(),
           tfStore = new Ext.data.SimpleStore({
@@ -37,13 +36,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
             data : [
               ['True'],
               ['False']
-            ]
-          }),
-          securityConfigStore = new Ext.data.SimpleStore({
-            fields : ['value', 'display'],
-            data : [
-              [false, 'Off'],
-              [true, 'On']
             ]
           }),
           smtpConnectionSettings = new Ext.data.SimpleStore({
@@ -250,24 +242,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
             labelSeparator : ''
           },
           items : [
-            {
-              xtype : 'combo',
-              fieldLabel : 'Security',
-              itemCls : 'required-field',
-              helpText : ht.security,
-              name : 'securityEnabled',
-              width : 150,
-              store : securityConfigStore,
-              valueField : 'value',
-              displayField : 'display',
-              editable : false,
-              forceSelection : true,
-              mode : 'local',
-              triggerAction : 'all',
-              emptyText : 'Select...',
-              selectOnFocus : true,
-              allowBlank : false
-            },
             {
               xtype : 'twinpanelchooser',
               titleLeft : 'Selected Realms',
@@ -833,9 +807,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
     this.formPanel.form.on('actioncomplete', this.actionCompleteHandler, this.formPanel);
     this.formPanel.form.on('actionfailed', this.actionFailedHandler, this.formPanel);
 
-    securityConfigField = this.formPanel.find('name', 'securityEnabled')[0];
-    securityConfigField.on('select', this.securitySelectHandler, securityConfigField);
-
     Sonatype.Events.fireEvent('serverConfigViewPostInit', this.formPanel);
   },
 
@@ -1125,8 +1096,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
             'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
     }
   },
-
-  securitySelectHandler : function(combo, record, index) {},
 
   anonymousCheckHandler : function(checkbox, checked) {
     this.ownerCt.find('name', 'securityAnonymousUsername')[0].setDisabled(!checked);

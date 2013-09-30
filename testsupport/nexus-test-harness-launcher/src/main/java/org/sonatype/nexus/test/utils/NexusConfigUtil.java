@@ -184,17 +184,6 @@ public class NexusConfigUtil
     return null;
   }
 
-  public void enableSecurity(boolean enabled)
-      throws IOException
-  {
-    SecurityConfiguration config = loadSecurityConfig();
-
-    if (enabled != config.isEnabled()) {
-      config.setEnabled(enabled);
-      saveSecurityConfig(config);
-    }
-  }
-
   public CRepository getRepo(String repoId)
       throws IOException
   {

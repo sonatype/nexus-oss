@@ -23,24 +23,20 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.AbstractShiroFilter;
 import org.apache.shiro.web.servlet.ShiroFilter;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Injected {@link ShiroFilter} that only applies when {@link SecuritySystem#isSecurityEnabled()} is {@code true}.
+ * Injected {@link ShiroFilter}.
  */
 @Singleton
 public class SecurityWebFilter
     extends AbstractShiroFilter
 {
-  private final SecuritySystem securitySystem;
 
   @Inject
   protected SecurityWebFilter(SecuritySystem securitySystem, FilterChainResolver filterChainResolver) {
-    this.securitySystem = securitySystem;
-    this.setSecurityManager((WebSecurityManager) securitySystem.getSecurityManager());
-    this.setFilterChainResolver(filterChainResolver);
+    this.setSecurityManager((WebSecurityManager) checkNotNull(securitySystem.getSecurityManager(), "securityManager"));
+    this.setFilterChainResolver(checkNotNull(filterChainResolver, "filterChainResolver"));
   }
 
-  @Override
-  public boolean isEnabled() {
-    return securitySystem.isSecurityEnabled();
-  }
 }

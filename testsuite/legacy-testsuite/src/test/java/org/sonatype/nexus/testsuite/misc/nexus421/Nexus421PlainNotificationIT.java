@@ -19,6 +19,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -29,13 +30,20 @@ import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 
 public class Nexus421PlainNotificationIT
     extends AbstractEmailServerNexusIT
 {
+
   protected RepositoryMessageUtil repoMessageUtil;
+
+  @BeforeClass
+  public static void setSecureTest() {
+    TestContainer.getInstance().getTestContext().setSecureTest(true);
+  }
 
   @Test
   public void testAutoBlockNotification()

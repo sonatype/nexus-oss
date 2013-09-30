@@ -386,13 +386,6 @@
       </annotations>
       <fields>
         <field>
-          <name>securityEnabled</name>
-          <version>1.0.0+</version>
-          <type>boolean</type>
-          <required>true</required>
-          <description>Flag that determines if security is enabled, if false, there will be no authc/authz checks performed on any requests to the systme.</description>
-        </field>
-        <field>
           <name>securityAnonymousAccessEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>

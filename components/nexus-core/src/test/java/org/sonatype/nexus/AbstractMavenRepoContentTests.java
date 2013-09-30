@@ -75,7 +75,8 @@ public abstract class AbstractMavenRepoContentTests
     central = (MavenProxyRepository) repositoryRegistry.getRepository("central");
   }
 
-  protected boolean loadConfigurationAtSetUp() {
+  @Override
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

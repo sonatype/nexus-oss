@@ -36,7 +36,7 @@ public class IndexableRepositoryTest
   }
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

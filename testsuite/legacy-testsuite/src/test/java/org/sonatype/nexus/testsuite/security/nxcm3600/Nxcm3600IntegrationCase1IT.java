@@ -39,12 +39,11 @@ public class Nxcm3600IntegrationCase1IT
    */
   @Test
   public void testCase1()
-      throws IOException
+      throws Exception
   {
     // disable anonymous access
     GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
     settings.setSecurityAnonymousAccessEnabled(false);
-    settings.setSecurityEnabled(true);
     SettingsMessageUtil.save(settings);
 
     Status responseStatus;

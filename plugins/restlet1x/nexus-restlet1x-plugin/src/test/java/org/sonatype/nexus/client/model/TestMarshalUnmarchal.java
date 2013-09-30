@@ -721,7 +721,6 @@ public class TestMarshalUnmarchal
     resource.setSecurityAnonymousAccessEnabled(true);
     resource.setSecurityAnonymousPassword("anonPass");
     resource.setSecurityAnonymousUsername("anonUser");
-    resource.setSecurityEnabled(true);
     // TODO: Figure out why this is causing test to fail...
     // resource.setSecurityRealms( Arrays.asList( "realm1", "realm2" ) );
 

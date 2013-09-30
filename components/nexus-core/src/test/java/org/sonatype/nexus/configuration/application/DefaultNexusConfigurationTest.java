@@ -65,7 +65,7 @@ public class DefaultNexusConfigurationTest
     super.tearDown();
   }
 
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 
@@ -73,19 +73,13 @@ public class DefaultNexusConfigurationTest
   public void testSaveConfiguration()
       throws Exception
   {
-    Configuration config = nexusConfiguration.getConfigurationModel();
-
-    assertEquals(true, this.securitySystem.isSecurityEnabled());
-
-    this.securitySystem.setSecurityEnabled(false);
+    nexusConfiguration.getConfigurationModel();
 
     nexusConfiguration.saveConfiguration();
 
     nexusConfiguration.loadConfiguration();
 
-    config = nexusConfiguration.getConfigurationModel();
-
-    assertEquals(false, this.securitySystem.isSecurityEnabled());
+    nexusConfiguration.getConfigurationModel();
   }
 
   @Test

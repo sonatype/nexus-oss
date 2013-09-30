@@ -110,10 +110,6 @@ public class GlobalConfigurationPlexusResource
   // Default Configuration
   // ----------------------------------------------------------------------------
 
-  public boolean isDefaultSecurityEnabled() {
-    return this.defaultSecurityConfigurationSource.getConfiguration().isEnabled();
-  }
-
   public boolean isDefaultAnonymousAccessEnabled() {
     return this.defaultSecurityConfigurationSource.getConfiguration().isAnonymousAccessEnabled();
   }
@@ -288,7 +284,6 @@ public class GlobalConfigurationPlexusResource
           setGlobalProxySettings(resource.getRemoteProxySettings(), getGlobalRemoteProxySettings());
 
           getNexusConfiguration().setRealms(resource.getSecurityRealms());
-          getNexusConfiguration().setSecurityEnabled(resource.isSecurityEnabled());
 
           final String anonymousUsername = resource.getSecurityAnonymousUsername();
           final String anonymousPassword =
@@ -462,7 +457,6 @@ public class GlobalConfigurationPlexusResource
    * Externalized Nexus object to DTO's conversion, using default Nexus configuration.
    */
   protected void fillDefaultConfiguration(Request request, GlobalConfigurationResource resource) {
-    resource.setSecurityEnabled(isDefaultSecurityEnabled());
 
     resource.setSecurityAnonymousAccessEnabled(isDefaultAnonymousAccessEnabled());
 
@@ -489,7 +483,6 @@ public class GlobalConfigurationPlexusResource
    * Externalized Nexus object to DTO's conversion, using current Nexus configuration.
    */
   protected void fillCurrentConfiguration(Request request, GlobalConfigurationResource resource) {
-    resource.setSecurityEnabled(getNexusConfiguration().isSecurityEnabled());
 
     resource.setSecurityAnonymousAccessEnabled(getNexusConfiguration().isAnonymousAccessEnabled());
 

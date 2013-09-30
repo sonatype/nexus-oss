@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -77,8 +76,6 @@ public class RequestFlagsTest
   public void prepare()
       throws Exception
   {
-    HttpServletResponse resp;
-
     recordedRequestsBehaviour = new Record();
     // somewhere in near past
     lastModifiedSender =
@@ -89,11 +86,6 @@ public class RequestFlagsTest
             content(CONTENT)).start();
     startNx();
     proxyRepository = createProxyRepository();
-
-    // disable security
-    final NexusConfiguration nexusConfiguration = lookup(NexusConfiguration.class);
-    nexusConfiguration.setSecurityEnabled(false);
-    nexusConfiguration.saveConfiguration();
   }
 
   @After

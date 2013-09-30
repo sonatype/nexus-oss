@@ -20,10 +20,6 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 public interface SecurityConfigurationManager
 {
 
-  void setEnabled(boolean enabled);
-
-  boolean isEnabled();
-
   void setAnonymousAccessEnabled(boolean anonymousAccessEnabled);
 
   boolean isAnonymousAccessEnabled();

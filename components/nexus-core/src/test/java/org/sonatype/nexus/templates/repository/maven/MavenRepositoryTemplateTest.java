@@ -30,7 +30,7 @@ public class MavenRepositoryTemplateTest
     extends NexusAppTestSupport
 {
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

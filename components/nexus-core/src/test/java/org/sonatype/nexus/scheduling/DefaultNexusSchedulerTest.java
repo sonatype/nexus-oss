@@ -28,7 +28,7 @@ public class DefaultNexusSchedulerTest
   private NexusScheduler nexusScheduler;
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     // IT IS NEEDED FROM NOW ON!
     return true;
   }

@@ -63,8 +63,7 @@ public class DefaultSecurityConfigurationValidator
     ValidationResponse validationResponse = new ValidationResponse();
     validationResponse.setContext(context);
 
-    if ((context.getSecurityConfiguration() != null && context.getSecurityConfiguration().isEnabled())
-        || context.getSecurityConfiguration() == null) {
+    if (context.getSecurityConfiguration() == null) {
       if (realms.size() < 1) {
         validationResponse.addValidationError("Security is enabled, You must have at least one realm enabled.");
       }

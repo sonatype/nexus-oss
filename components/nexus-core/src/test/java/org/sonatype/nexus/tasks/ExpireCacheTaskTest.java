@@ -32,11 +32,12 @@ public class ExpireCacheTaskTest
   {
     super.setUp();
 
-    nexusConfiguration().setSecurityEnabled(false);
-
-    nexusConfiguration().saveConfiguration();
-
     scheduler = lookup(NexusScheduler.class);
+  }
+
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return true;
   }
 
   @Test

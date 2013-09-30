@@ -31,7 +31,7 @@ public class LimitedCountCreateRepositoryTest
   private RepositoryTypeRegistry repositoryTypeRegistry;
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

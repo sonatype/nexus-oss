@@ -59,7 +59,6 @@ public class Nexus652Beta5To10UpgradeIT
     Assert.assertEquals("Security anon username:", "User3", securityConfig.getAnonymousUsername());
     Assert.assertEquals("Security anon password:", "y6i0t9q1e3", securityConfig.getAnonymousPassword());
     Assert.assertEquals("Security anon access:", true, securityConfig.isAnonymousAccessEnabled());
-    Assert.assertEquals("Security enabled:", true, securityConfig.isEnabled());
     Assert.assertEquals("Security realm size:", 2, securityConfig.getRealms().size());
     Assert.assertEquals("Security realm:", "XmlAuthenticatingRealm", securityConfig.getRealms().get(0));
     Assert.assertEquals("Security realm:", "XmlAuthorizingRealm", securityConfig.getRealms().get(1));

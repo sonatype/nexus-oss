@@ -72,7 +72,6 @@ public class SecurityConfigurationManagerTest
     Assert.assertEquals("anonymous-user", config.getAnonymousUsername());
 
     Assert.assertEquals(false, config.isAnonymousAccessEnabled());
-    Assert.assertEquals(true, config.isEnabled());
 
     List<String> realms = config.getRealms();
     assertThat(realms, containsInAnyOrder(
@@ -86,7 +85,6 @@ public class SecurityConfigurationManagerTest
     SecurityConfigurationManager config = this.lookup(SecurityConfigurationManager.class);
 
     config.setAnonymousAccessEnabled(true);
-    config.setEnabled(false);
     config.setAnonymousPassword("new-pass");
     config.setAnonymousUsername("new-user");
 
@@ -101,7 +99,6 @@ public class SecurityConfigurationManagerTest
     Assert.assertEquals("new-user", config.getAnonymousUsername());
 
     Assert.assertEquals(true, config.isAnonymousAccessEnabled());
-    Assert.assertEquals(false, config.isEnabled());
 
     realms = config.getRealms();
     Assert.assertEquals(1, realms.size());

@@ -28,7 +28,7 @@ public class KenaiRealmTest
     extends AbstractKenaiRealmTest
 {
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

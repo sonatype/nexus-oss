@@ -61,14 +61,6 @@ public class DefaultSecurityConfigurationManager
     this.validator = validator;
   }
 
-  public boolean isEnabled() {
-    return this.getConfiguration().isEnabled();
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.getConfiguration().setEnabled(enabled);
-  }
-
   public boolean isAnonymousAccessEnabled() {
     return this.getConfiguration().isAnonymousAccessEnabled();
   }

@@ -132,7 +132,7 @@ public class DefaultRepositoryRouterTest
     }
   }
 
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 
