@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest;
 
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -32,6 +33,7 @@ import org.restlet.resource.Variant;
 
 @Named("content")
 @Singleton
+@Typed(ManagedPlexusResource.class)
 public class ContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
     implements ManagedPlexusResource

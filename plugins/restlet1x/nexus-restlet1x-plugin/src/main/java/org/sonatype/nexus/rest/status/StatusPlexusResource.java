@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.status;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -43,8 +44,9 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Named
+@Named("StatusPlexusResource")
 @Singleton
+@Typed(ManagedPlexusResource.class)
 @Path(StatusPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class StatusPlexusResource
