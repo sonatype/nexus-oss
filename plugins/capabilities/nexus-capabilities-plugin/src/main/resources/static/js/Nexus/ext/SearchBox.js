@@ -21,9 +21,9 @@ NX.define('Nexus.ext.SearchBox', {
   extend: 'Ext.Container',
 
   /**
-   * @cfg {Number} delay between keystrokes and actual filtering (defaults to 50).
+   * @cfg {Number} delay between keystrokes and actual filtering (defaults to 200).
    */
-  filterDelay: 200,
+  searchDelay: 200,
 
   /**
    * @override
@@ -53,7 +53,7 @@ NX.define('Nexus.ext.SearchBox', {
                 else {
                   self.fireEvent('searchcleared');
                 }
-              }.defer(self.filterDelay, self);
+              }.defer(self.searchDelay, self);
             }
           },
           scope: self
