@@ -19,7 +19,7 @@
  * @since 2.7
  */
 NX.define('Nexus.capabilities.CapabilitiesGridFilterBox', {
-  extend: 'Nexus.grid.GridFilterBox',
+  extend: 'Nexus.ext.GridFilterBox',
 
   mixins: [
     'Nexus.capabilities.CapabilitiesMediatorMixin'
@@ -28,11 +28,11 @@ NX.define('Nexus.capabilities.CapabilitiesGridFilterBox', {
   /**
    * @override
    */
-  matches: function (regexp, record, fieldName, fieldValue) {
+  matches: function (filterValue, record, fieldName, fieldValue) {
     var self = this;
-    return (self.grid.gridStore.getTagKeyFrom(fieldName) && regexp.test(fieldName) && fieldValue)
-        || Nexus.capabilities.CapabilitiesGridFilterBox.superclass.matches(regexp, record, fieldName, fieldValue)
-        || regexp.test(self.mediator().getStatusLabel(record.data));
+    return (fieldValue && self.filteredStore.getTagKeyFrom(fieldName) && self.filterFn(fieldName, filterValue) )
+        || Nexus.capabilities.CapabilitiesGridFilterBox.superclass.matches(filterValue, record, fieldName, fieldValue)
+        || self.filterFn(self.mediator().getStatusLabel(record.data), filterValue);
   }
 
 });

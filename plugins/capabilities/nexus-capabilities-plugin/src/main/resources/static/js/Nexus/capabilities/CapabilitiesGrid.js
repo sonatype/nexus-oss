@@ -80,7 +80,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
     });
 
     self.filterBox = NX.create('Nexus.capabilities.CapabilitiesGridFilterBox', {
-      grid: self,
+      filteredGrid: self,
       width: 200
     });
 
