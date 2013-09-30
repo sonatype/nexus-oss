@@ -13,25 +13,15 @@
 
 package org.sonatype.nexus.proxy.maven;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
-import org.sonatype.nexus.plugins.RepositoryCustomizer;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeItemContentValidator;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

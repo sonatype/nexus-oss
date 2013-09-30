@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Named("M1GroupRepository.ID")
+@Named(M1GroupRepository.ID)
 @Typed(GroupRepository.class)
 @Description("Maven1 Repository Group")
 public class M1GroupRepository
