@@ -143,6 +143,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
           fn: function () {
             self.mediator().capabilityStore.removeListener('beforeload', self.rememberSelection, self);
             self.mediator().capabilityStore.removeListener('load', self.recallSelection, self);
+            self.mediator().capabilityStore.removeListener('load', self.reconfigureGrid, self);
             self.mediator().capabilityTypeStore.removeListener('beforeload', self.disableAddButton, self);
             self.mediator().capabilityTypeStore.removeListener('load', self.maybeEnableAddButton, self);
           },
