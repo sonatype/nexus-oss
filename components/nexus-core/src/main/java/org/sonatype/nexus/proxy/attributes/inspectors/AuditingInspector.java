@@ -17,23 +17,25 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.AbstractStorageFileItemInspector;
-import org.sonatype.nexus.proxy.attributes.StorageFileItemInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * The Class AuditingInspector simply records the auth stuff from Item Context to attributes..
  *
  * @author cstamas
  */
-@Component(role = StorageFileItemInspector.class, hint = "AuditingInspector")
+@Singleton
+@Named
 public class AuditingInspector
     extends AbstractStorageFileItemInspector
 {
+  @Override
   public Set<String> getIndexableKeywords() {
     Set<String> result = new HashSet<String>(2);
     result.add(AccessManager.REQUEST_USER);
@@ -42,6 +44,7 @@ public class AuditingInspector
     return result;
   }
 
+  @Override
   public boolean isHandled(StorageItem item) {
     if (item instanceof StorageFileItem) {
       final StorageFileItem fitem = (StorageFileItem) item;
@@ -57,6 +60,7 @@ public class AuditingInspector
     return false;
   }
 
+  @Override
   public void processStorageFileItem(StorageFileItem item, File file)
       throws Exception
   {
