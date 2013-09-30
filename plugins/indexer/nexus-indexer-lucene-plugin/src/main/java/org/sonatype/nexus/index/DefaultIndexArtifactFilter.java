@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -28,24 +32,29 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import org.apache.maven.index.ArtifactInfo;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Filters artifact info collection, based on user permissions.
  *
  * @author cstamas
  */
-@Component(role = IndexArtifactFilter.class)
+@Named
+@Singleton
 public class DefaultIndexArtifactFilter
     extends AbstractLoggingComponent
     implements IndexArtifactFilter
 {
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-  @Requirement
-  private NexusItemAuthorizer nexusItemAuthorizer;
+  private final NexusItemAuthorizer nexusItemAuthorizer;
+
+  @Inject
+  public DefaultIndexArtifactFilter(final RepositoryRegistry repositoryRegistry,
+                                    final NexusItemAuthorizer nexusItemAuthorizer)
+  {
+    this.repositoryRegistry = repositoryRegistry;
+    this.nexusItemAuthorizer = nexusItemAuthorizer;
+  }
 
   public Collection<ArtifactInfo> filterArtifactInfos(Collection<ArtifactInfo> artifactInfos) {
     if (artifactInfos == null) {

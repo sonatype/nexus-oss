@@ -15,6 +15,9 @@ package org.sonatype.nexus.rest.routing;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,13 +38,10 @@ import org.sonatype.nexus.rest.model.RoutingDiscoveryStatusMessage;
 import org.sonatype.nexus.rest.model.RoutingStatusMessage;
 import org.sonatype.nexus.rest.model.RoutingStatusMessageWrapper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -55,7 +55,8 @@ import org.restlet.resource.Variant;
  * @author cstamas
  * @since 2.4
  */
-@Component(role = PlexusResource.class, hint = "RoutingStatusResource")
+@Named
+@Singleton
 @Path(RoutingStatusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class RoutingStatusResource
@@ -66,8 +67,12 @@ public class RoutingStatusResource
    */
   public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/routing";
 
-  @Requirement(hint = "RestletRepositoryUrlBuilder")
   private RepositoryURLBuilder repositoryURLBuilder;
+
+  @Inject
+  public void setRepositoryURLBuilder(final RepositoryURLBuilder repositoryURLBuilder) {
+    this.repositoryURLBuilder = repositoryURLBuilder;
+  }
 
   @Override
   public Object getPayloadInstance() {

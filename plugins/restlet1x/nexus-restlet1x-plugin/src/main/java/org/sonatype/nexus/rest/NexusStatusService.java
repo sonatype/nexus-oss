@@ -15,6 +15,10 @@ package org.sonatype.nexus.rest;
 
 import java.util.HashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.plexus.rest.ReferenceFactory;
@@ -22,8 +26,6 @@ import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -38,15 +40,22 @@ import org.restlet.service.StatusService;
  *
  * @author cstamas
  */
-@Component(role = StatusService.class)
+@Named
+@Singleton
 public class NexusStatusService
     extends StatusService
 {
-  @Requirement
-  private ReferenceFactory referenceFactory;
+  private final ReferenceFactory referenceFactory;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
+
+  @Inject
+  public NexusStatusService(final ReferenceFactory referenceFactory,
+                            final ApplicationStatusSource applicationStatusSource)
+  {
+    this.referenceFactory = referenceFactory;
+    this.applicationStatusSource = applicationStatusSource;
+  }
 
   public Representation getRepresentation(final Status status, final Request request, final Response response) {
     final HashMap<String, Object> dataModel = new HashMap<String, Object>();

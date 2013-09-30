@@ -13,22 +13,28 @@
 
 package org.sonatype.nexus.rest;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.plexus.rest.DefaultReferenceFactory;
-import org.sonatype.plexus.rest.ReferenceFactory;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 
-@Component(role = ReferenceFactory.class)
+@Named
+@Singleton
 public class NexusReferenceFactory
     extends DefaultReferenceFactory
 {
-  @Requirement
-  private GlobalRestApiSettings globalRestApiSettings;
+  private final GlobalRestApiSettings globalRestApiSettings;
+
+  @Inject
+  public NexusReferenceFactory(final GlobalRestApiSettings globalRestApiSettings) {
+    this.globalRestApiSettings = globalRestApiSettings;
+  }
 
   @Override
   public Reference getContextRoot(Request request) {

@@ -18,8 +18,8 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.web.ProtectedPathManager;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -32,8 +32,26 @@ public class NexusApplicationHandlePlexusResourceSecurityTest
   @Mock(name = "protectedPathManager")
   private ProtectedPathManager mockProtectedPathManager;
 
-  @InjectMocks
-  private NexusApplication nexusApplication = new NexusApplication();
+  private NexusApplication nexusApplication;
+
+  @Before
+  public void setUp() throws Exception {
+    // HACK: we only need the protected path manager for this test
+    nexusApplication = new NexusApplication(
+        null,
+        mockProtectedPathManager,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+  }
 
   @Test(expected = IllegalStateException.class)
   public void handlePlexusResourceSecurityWithMismatch() {

@@ -524,18 +524,6 @@ public class DefaultNexusConfiguration
   // Security
 
   @Override
-  public boolean isSecurityEnabled() {
-    return getSecuritySystem() != null && getSecuritySystem().isSecurityEnabled();
-  }
-
-  @Override
-  public void setSecurityEnabled(boolean enabled)
-      throws IOException
-  {
-    getSecuritySystem().setSecurityEnabled(enabled);
-  }
-
-  @Override
   public void setRealms(List<String> realms)
       throws org.sonatype.configuration.validation.InvalidConfigurationException
   {

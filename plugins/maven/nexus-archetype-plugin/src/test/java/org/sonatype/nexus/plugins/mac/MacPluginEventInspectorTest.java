@@ -53,7 +53,7 @@ public class MacPluginEventInspectorTest
   protected M2Repository repository;
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

@@ -26,8 +26,6 @@ import com.google.common.collect.Lists;
 public class SecuritySettings
 {
 
-  private boolean enabled;
-
   private boolean anonymousAccessEnabled;
 
   private String anonymousUsername;
@@ -35,20 +33,6 @@ public class SecuritySettings
   private String anonymousPassword;
 
   private java.util.List<String> realms;
-
-  public boolean isEnabled() {
-
-    return enabled;
-  }
-
-  public void setEnabled(final boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  public SecuritySettings withEnabled(final boolean enabled) {
-    setEnabled(enabled);
-    return this;
-  }
 
   public boolean isAnonymousAccessEnabled() {
     return anonymousAccessEnabled;

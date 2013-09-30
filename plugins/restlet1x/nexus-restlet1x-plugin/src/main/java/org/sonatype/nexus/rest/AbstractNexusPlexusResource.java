@@ -27,12 +27,12 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.web.Constants;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -44,11 +44,11 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractNexusPlexusResource
@@ -65,25 +65,18 @@ public abstract class AbstractNexusPlexusResource
 
   public static final String AS_EXPIRED_PARAMETER = Constants.REQ_QP_AS_EXPIRED_PARAMETER;
 
-  @Requirement
   private NexusConfiguration nexusConfiguration;
 
-  @Requirement(hint = "protected")
   private RepositoryRegistry repositoryRegistry;
 
-  @Requirement(hint = "default")
   private RepositoryRegistry defaultRepositoryRegistry;
 
-  @Requirement
   private RepositoryTypeRegistry repoTypeRegistry;
 
-  @Requirement
   private ReferenceFactory referenceFactory;
-  
-  @Requirement
+
   private TemplateManager templateManager;
-  
-  @Requirement
+
   private RepositoryRouter repositoryRouter;
 
   @Inject

@@ -29,6 +29,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import junit.framework.Assert;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -37,17 +38,12 @@ import org.restlet.data.Response;
 public class RepositoryCreateUpdateTest
     extends NexusAppTestSupport
 {
-  @Override
-  protected boolean loadConfigurationAtSetUp() {
-    return false;
-  }
 
-  protected void setUp()
+  @Before
+  public void prepare()
       throws Exception
   {
-    super.setUp();
     startNx();
-    lookup(NexusConfiguration.class).setSecurityEnabled(false);
   }
 
   @Test
@@ -123,7 +119,7 @@ public class RepositoryCreateUpdateTest
     connectionSettings.setUserAgentString("userAgentString-new");
 
     RepositoryPlexusResource plexusResource =
-        (RepositoryPlexusResource) this.lookup(PlexusResource.class, "RepositoryPlexusResource");
+        (RepositoryPlexusResource) this.lookup(PlexusResource.class, RepositoryPlexusResource.class.getName());
 
     Request request = buildRequest();
     Response response = new Response(request);
@@ -229,7 +225,7 @@ public class RepositoryCreateUpdateTest
     connectionSettings.setUserAgentString("userAgentString");
 
     RepositoryListPlexusResource plexusResource =
-        (RepositoryListPlexusResource) this.lookup(PlexusResource.class, "RepositoryListPlexusResource");
+        (RepositoryListPlexusResource) this.lookup(PlexusResource.class, RepositoryListPlexusResource.class.getName());
 
     Request request = buildRequest();
     Response response = new Response(request);
@@ -282,7 +278,7 @@ public class RepositoryCreateUpdateTest
     authSettings.setUsername("username");
 
     RepositoryListPlexusResource plexusResource =
-        (RepositoryListPlexusResource) this.lookup(PlexusResource.class, "RepositoryListPlexusResource");
+        (RepositoryListPlexusResource) this.lookup(PlexusResource.class, RepositoryListPlexusResource.class.getName());
 
     Request request = buildRequest();
     Response response = new Response(request);
@@ -293,7 +289,7 @@ public class RepositoryCreateUpdateTest
 
     // now do an update and test again
     RepositoryPlexusResource updateResource =
-        (RepositoryPlexusResource) this.lookup(PlexusResource.class, "RepositoryPlexusResource");
+        (RepositoryPlexusResource) this.lookup(PlexusResource.class, RepositoryPlexusResource.class.getName());
 
     request.getAttributes().put(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, result.getId());
 
@@ -316,7 +312,7 @@ public class RepositoryCreateUpdateTest
     originalResource.setOverrideLocalStorageUrl(newlocalStorage);
 
     RepositoryPlexusResource plexusResource =
-        (RepositoryPlexusResource) this.lookup(PlexusResource.class, "RepositoryPlexusResource");
+        (RepositoryPlexusResource) this.lookup(PlexusResource.class, RepositoryPlexusResource.class.getName());
 
     Request request = buildRequest();
     Response response = new Response(request);

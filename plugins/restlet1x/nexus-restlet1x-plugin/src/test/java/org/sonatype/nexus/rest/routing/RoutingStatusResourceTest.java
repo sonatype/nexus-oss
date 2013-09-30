@@ -24,9 +24,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.RoutingStatusMessageWrapper;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Reference;
@@ -44,19 +41,11 @@ public class RoutingStatusResourceTest
   private final String REPO_ID = "releases";
 
   @Before
-  public void login()
+  public void prepare()
       throws Exception
   {
     startNx();
     lookup(ApplicationStatusSource.class).setState(SystemState.STARTED);
-    ThreadContext.bind(new Subject.Builder().buildSubject());
-  }
-
-  @After
-  public void logout()
-      throws Exception
-  {
-    ThreadContext.remove();
   }
 
   @Override
@@ -85,7 +74,7 @@ public class RoutingStatusResourceTest
       throws Exception
   {
     final RoutingStatusResource wlStatusResource = (RoutingStatusResource) lookup(PlexusResource.class,
-        "RoutingStatusResource");
+        RoutingStatusResource.class.getName());
     waitForRoutingBackgroundUpdates();
 
     final Request request = new Request();

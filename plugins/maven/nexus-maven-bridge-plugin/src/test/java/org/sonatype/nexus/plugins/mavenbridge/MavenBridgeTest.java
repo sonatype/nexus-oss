@@ -51,8 +51,6 @@ public class MavenBridgeTest
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
 
-    shutDownSecurity();
-
     server = Server.withPort(0).serve("/*").withBehaviours(Behaviours.get(
         new File(getBasedir(), "src/test/resources/test-repo"))).start();
 
@@ -60,6 +58,11 @@ public class MavenBridgeTest
       repo.setRemoteUrl(server.getUrl().toExternalForm());
       ((AbstractMavenRepository)repo).commitChanges();
     }
+  }
+
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return true;
   }
 
   @Override

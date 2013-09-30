@@ -77,7 +77,8 @@ public abstract class AbstractMavenRepoContentTests
     central = (M2Repository) repositoryRegistry.getRepository("central");
   }
 
-  protected boolean loadConfigurationAtSetUp() {
+  @Override
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 
