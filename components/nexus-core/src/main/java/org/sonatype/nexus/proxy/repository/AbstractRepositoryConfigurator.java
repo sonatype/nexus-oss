@@ -17,62 +17,71 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.plugins.RepositoryCustomizer;
-import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 
-public abstract class AbstractRepositoryConfigurator
-    implements Configurator
-{
-  @Requirement
-  private PlexusContainer plexusContainer;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-  @Requirement
+public abstract class AbstractRepositoryConfigurator
+    implements Configurator<Repository, CRepositoryCoreConfiguration>
+{
   private RepositoryRegistry repositoryRegistry;
 
-  @Requirement
   private RepositoryTypeRegistry repositoryTypeRegistry;
+  
+  private Map<String, LocalRepositoryStorage> localRepositoryStorages;
 
-  @Requirement(role = RepositoryCustomizer.class)
   private Map<String, RepositoryCustomizer> pluginRepositoryConfigurators;
 
-  public final void applyConfiguration(Object target, ApplicationConfiguration configuration,
-                                       CoreConfiguration config)
+  @Inject
+  public void populateAbstractRepositoryConfigurator(final RepositoryRegistry repositoryRegistry,
+                                        final RepositoryTypeRegistry repositoryTypeRegistry,
+                                        final Map<String, LocalRepositoryStorage> localRepositoryStorages,
+                                        final Map<String, RepositoryCustomizer> pluginRepositoryConfigurators)
+  {
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
+    this.localRepositoryStorages = checkNotNull(localRepositoryStorages);
+    this.pluginRepositoryConfigurators = checkNotNull(pluginRepositoryConfigurators);
+  }
+
+  @Override
+  public final void applyConfiguration(final Repository target, 
+                                       final ApplicationConfiguration configuration,
+                                       final CRepositoryCoreConfiguration config)
       throws ConfigurationException
   {
-    doApplyConfiguration((Repository) target, configuration, (CRepositoryCoreConfiguration) config);
+    doApplyConfiguration(target, configuration, config);
 
     // config done, apply customizations
     for (RepositoryCustomizer configurator : pluginRepositoryConfigurators.values()) {
-      if (configurator.isHandledRepository((Repository) target)) {
-        configurator.configureRepository((Repository) target);
+      if (configurator.isHandledRepository(target)) {
+        configurator.configureRepository(target);
       }
     }
   }
 
-  public final void prepareForSave(Object target, ApplicationConfiguration configuration, CoreConfiguration config) {
+  public final void prepareForSave(Repository target, ApplicationConfiguration configuration, CRepositoryCoreConfiguration config) {
     // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
     // later we will see about it
-    doPrepareForSave((Repository) target, configuration, (CRepositoryCoreConfiguration) config);
+    doPrepareForSave(target, configuration, config);
   }
 
   protected void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
@@ -126,7 +135,7 @@ public abstract class AbstractRepositoryConfigurator
 
       repository.setLocalStorage(ls);
     }
-    catch (StorageException e) {
+    catch (LocalStorageException e) {
       ValidationResponse response = new ApplicationValidationResponse();
 
       ValidationMessage error =
@@ -152,10 +161,6 @@ public abstract class AbstractRepositoryConfigurator
 
   // ==
 
-  protected PlexusContainer getPlexusContainer() {
-    return plexusContainer;
-  }
-
   protected RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;
   }
@@ -164,38 +169,15 @@ public abstract class AbstractRepositoryConfigurator
     return repositoryTypeRegistry;
   }
 
-  protected boolean existsRepositoryType(Class<?> role, String hint)
-      throws InvalidConfigurationException
-  {
-    return componentExists(role, hint);
-  }
-
-  protected boolean existsLocalRepositoryStorage(String repoId, String provider)
-      throws InvalidConfigurationException
-  {
-    return componentExists(LocalRepositoryStorage.class, provider);
-  }
-
-  protected boolean existsRemoteRepositoryStorage(String repoId, String provider)
-      throws InvalidConfigurationException
-  {
-    return componentExists(RemoteRepositoryStorage.class, provider);
-  }
-
-  protected boolean componentExists(Class<?> role, String hint) {
-    return getPlexusContainer().hasComponent(role, hint);
-  }
-
   protected LocalRepositoryStorage getLocalRepositoryStorage(String repoId, String provider)
       throws InvalidConfigurationException
   {
-    try {
-      return getPlexusContainer().lookup(LocalRepositoryStorage.class, provider);
+    final LocalRepositoryStorage result = localRepositoryStorages.get(provider);
+    if (result != null) {
+      return result;
     }
-    catch (ComponentLookupException e) {
-      throw new InvalidConfigurationException("Repository " + repoId
-          + " have local storage with unsupported provider: " + provider, e);
-    }
+    throw new InvalidConfigurationException("Repository " + repoId
+        + " have local storage with unsupported provider: " + provider);
   }
 
 }

@@ -13,15 +13,22 @@
 
 package org.sonatype.nexus.proxy.maven;
 
+import java.util.Map;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.plugins.RepositoryCustomizer;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 public abstract class AbstractMavenGroupRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator
 {
+  @Override
   protected void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
                                       CRepositoryCoreConfiguration coreConfiguration)
       throws ConfigurationException
