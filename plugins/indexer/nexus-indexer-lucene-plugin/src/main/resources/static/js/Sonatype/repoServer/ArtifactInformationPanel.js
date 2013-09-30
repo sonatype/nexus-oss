@@ -10,7 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('Sonatype/repoServer/ArtifactInformationPanel', function() {
+/*global NX, Ext, Sonatype*/
+
+define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'], function() {
 
   Ext.form.RepositoryUrlDisplayField = Ext.extend(Ext.form.DisplayField, {
         setValue : function(repositories) {
@@ -66,12 +68,10 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
           scope : this
         });
 
-    this.downloadButton = new Ext.Button({
-          xtype : 'button',
-          text : 'Download',
-          handler : this.artifactDownload,
-          scope : this
-        });
+    this.downloadButton = NX.create('Nexus.ext.LinkButton', {
+      text: 'Download',
+      target: '_blank'
+    });
 
     Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
           title : 'Artifact',
@@ -178,13 +178,6 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
   };
 
   Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
-
-        artifactDownload : function() {
-          if (this.data)
-          {
-            Sonatype.utils.openWindow(this.data.resourceURI);
-          }
-        },
 
         artifactDelete : function() {
           if (this.data)
@@ -303,6 +296,9 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
                         this.clearNonLocalView(infoResp.data.canDelete);
                         this.form.setValues(infoResp.data);
                       }
+                      this.downloadButton.href = this.data.resourceURI;
+                      this.downloadButton.setParams({});
+                      artifactContainer.showTab(this);
                     }
                     else
                     {

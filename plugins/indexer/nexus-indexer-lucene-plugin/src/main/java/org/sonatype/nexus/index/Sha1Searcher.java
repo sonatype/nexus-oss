@@ -17,6 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,17 +29,20 @@ import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.FlatSearchResponse;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.SearchType;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role = Searcher.class, hint = "sha1")
+@Named("sha1")
+@Singleton
 public class Sha1Searcher
     implements Searcher
 {
   public static final String TERM_SHA1 = "sha1";
 
-  @Requirement
-  private IndexerManager indexerManager;
+  private final IndexerManager indexerManager;
+
+  @Inject
+  public Sha1Searcher(final IndexerManager indexerManager) {
+    this.indexerManager = indexerManager;
+  }
 
   public boolean canHandle(Map<String, String> terms) {
     return (terms.containsKey(TERM_SHA1) && !StringUtils.isEmpty(terms.get(TERM_SHA1)));

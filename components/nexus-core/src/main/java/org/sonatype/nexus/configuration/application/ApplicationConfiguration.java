@@ -55,11 +55,6 @@ public interface ApplicationConfiguration
   File getTemporaryDirectory();
 
   /**
-   * Is security enabled?
-   */
-  boolean isSecurityEnabled();
-
-  /**
    * Gets the top level local storage context.
    */
   LocalStorageContext getGlobalLocalStorageContext();

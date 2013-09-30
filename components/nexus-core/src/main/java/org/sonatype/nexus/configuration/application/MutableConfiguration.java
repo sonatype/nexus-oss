@@ -33,11 +33,6 @@ public interface MutableConfiguration
   // Security (TODO: this should be removed, security has to be completely "paralell" and not interleaved!)
   // ----------------------------------------------------------------------------------------------------------
 
-  boolean isSecurityEnabled();
-
-  void setSecurityEnabled(boolean enabled)
-      throws IOException;
-
   boolean isAnonymousAccessEnabled();
 
   /**

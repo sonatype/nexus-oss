@@ -30,7 +30,7 @@ public class CreateGroupRepositoryTest
   private NexusConfiguration nexusConfiguration;
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

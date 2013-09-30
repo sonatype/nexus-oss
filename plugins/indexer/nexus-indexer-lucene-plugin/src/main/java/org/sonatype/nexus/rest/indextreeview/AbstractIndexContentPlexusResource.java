@@ -16,6 +16,8 @@ package org.sonatype.nexus.rest.indextreeview;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -30,7 +32,6 @@ import org.apache.maven.index.Field;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -53,8 +54,12 @@ public abstract class AbstractIndexContentPlexusResource
 
   private static final String HINT_VERSION = "versionHint";
 
-  @Requirement
   protected IndexerManager indexerManager;
+
+  @Inject
+  public void setIndexerManager(final IndexerManager indexerManager) {
+    this.indexerManager = indexerManager;
+  }
 
   @Override
   public Object getPayloadInstance() {
