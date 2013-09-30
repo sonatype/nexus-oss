@@ -18,7 +18,7 @@ define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexu
 Sonatype.repoServer.SchedulesEditPanel = function(config) {
   var config = config || {},
       defaultConfig = {},
-      gridFilterBox = NX.create('Nexus.grid.GridFilterBox');
+      gridFilterBox = NX.create('Nexus.ext.GridFilterBox');
 
   Ext.apply(this, config, defaultConfig);
 
@@ -963,7 +963,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
       });
   this.schedulesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
 
-  gridFilterBox.grid = this.schedulesGridPanel;
+  gridFilterBox.filteredGrid = this.schedulesGridPanel;
 
   Sonatype.repoServer.SchedulesEditPanel.superclass.constructor.call(this, {
         layout : 'border',

@@ -18,7 +18,7 @@ define('repoServer/RepoTargetEditPanel',['Sonatype/all','Nexus/grid/GridFilterBo
 Sonatype.repoServer.RepoTargetEditPanel = function(config) {
   var config = config || {},
       defaultConfig = {},
-      gridFilterBox = NX.create('Nexus.grid.GridFilterBox');
+      gridFilterBox = NX.create('Nexus.ext.GridFilterBox');
 
   Ext.apply(this, config, defaultConfig);
 
@@ -317,7 +317,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
   this.repoTargetsGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
   this.repoTargetsGridPanel.on('rowcontextmenu', this.contextClick, this);
 
-  gridFilterBox.grid = this.repoTargetsGridPanel;
+  gridFilterBox.filteredGrid = this.repoTargetsGridPanel;
 
   Sonatype.repoServer.RepoTargetEditPanel.superclass.constructor.call(this, {
         layout : 'border',

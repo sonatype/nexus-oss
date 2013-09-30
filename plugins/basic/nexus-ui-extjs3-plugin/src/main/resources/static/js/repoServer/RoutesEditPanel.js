@@ -18,7 +18,7 @@ define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/g
 Sonatype.repoServer.RoutesEditPanel = function(config) {
   var config = config || {},
       defaultConfig = {},
-      gridFilterBox = NX.create('Nexus.grid.GridFilterBox');
+      gridFilterBox = NX.create('Nexus.ext.GridFilterBox');
 
   Ext.apply(this, config, defaultConfig);
 
@@ -311,7 +311,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
       });
   this.routesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
 
-  gridFilterBox.grid = this.routesGridPanel;
+  gridFilterBox.filteredGrid = this.routesGridPanel;
 
   // END: Repo List ******************************************************
   // *********************************************************************
