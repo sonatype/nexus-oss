@@ -29,6 +29,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import junit.framework.Assert;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -37,17 +38,12 @@ import org.restlet.data.Response;
 public class RepositoryCreateUpdateTest
     extends NexusAppTestSupport
 {
-  @Override
-  protected boolean loadConfigurationAtSetUp() {
-    return false;
-  }
 
-  protected void setUp()
+  @Before
+  public void prepare()
       throws Exception
   {
-    super.setUp();
     startNx();
-    lookup(NexusConfiguration.class).setSecurityEnabled(false);
   }
 
   @Test

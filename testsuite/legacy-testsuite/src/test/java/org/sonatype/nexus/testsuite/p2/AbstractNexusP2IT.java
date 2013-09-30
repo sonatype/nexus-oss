@@ -16,12 +16,8 @@ package org.sonatype.nexus.testsuite.p2;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.Verifier;
@@ -55,22 +51,10 @@ public abstract class AbstractNexusP2IT
                                 final Map<String, String> sysProps)
       throws Exception
   {
-    final boolean wasSecurityEnabled = SettingsMessageUtil.getCurrentSettings().isSecurityEnabled();
+    boolean wasAnonymousAdministrator = isAnonymousAdministrator();
 
     try {
-      // put security off so repository content can be accessed easy from maven
-      TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
-      {
-        @Override
-        public Object call()
-            throws Exception
-        {
-          final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-          globalConfig.setSecurityEnabled(false);
-          SettingsMessageUtil.save(globalConfig);
-          return null;
-        }
-      });
+      makeAnonymousAdministrator(true);
 
       FileUtils.deleteDirectory(new File(destination));
 
@@ -107,20 +91,7 @@ public abstract class AbstractNexusP2IT
       FileUtils.deleteDirectory(testDir);
     }
     finally {
-      TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
-      {
-        @Override
-        public Object call()
-            throws Exception
-        {
-          final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-          if (wasSecurityEnabled != globalConfig.isSecurityEnabled()) {
-            globalConfig.setSecurityEnabled(wasSecurityEnabled);
-            SettingsMessageUtil.save(globalConfig);
-          }
-          return null;
-        }
-      });
+      makeAnonymousAdministrator(wasAnonymousAdministrator);
     }
   }
 

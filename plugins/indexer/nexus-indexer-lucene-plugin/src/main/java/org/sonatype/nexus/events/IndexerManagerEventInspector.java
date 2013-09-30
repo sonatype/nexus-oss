@@ -13,10 +13,13 @@
 
 package org.sonatype.nexus.events;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -25,15 +28,13 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
 /**
  * Event inspector that maintains indexes.
  *
  * @author cstamas
  */
-@Component(role = EventInspector.class, hint = "LuceneIndexerManagerEventInspector")
+@Named
+@Singleton
 public class IndexerManagerEventInspector
     extends AbstractEventInspector
     implements AsynchronousEventInspector
@@ -44,8 +45,12 @@ public class IndexerManagerEventInspector
   private final boolean async =
       SystemPropertiesHelper.getBoolean("org.sonatype.nexus.events.IndexerManagerEventInspector.async", true);
 
-  @Requirement
-  private IndexerManager indexerManager;
+  private final IndexerManager indexerManager;
+
+  @Inject
+  public IndexerManagerEventInspector(final IndexerManager indexerManager) {
+    this.indexerManager = indexerManager;
+  }
 
   protected IndexerManager getIndexerManager() {
     return indexerManager;

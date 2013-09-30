@@ -42,7 +42,7 @@ public class RebuildAttributesTest
   }
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

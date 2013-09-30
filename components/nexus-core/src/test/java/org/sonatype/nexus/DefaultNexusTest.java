@@ -178,7 +178,7 @@ public class DefaultNexusTest
   }
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

@@ -63,10 +63,6 @@ public class DefaultUserAccountManager
   protected void checkPermission(String userId)
       throws AuthorizationException
   {
-    if (!securitySystem.isSecurityEnabled()) {
-      return;
-    }
-
     if (securitySystem.getSubject().getPrincipal().equals(userId)) {
       return;
     }
