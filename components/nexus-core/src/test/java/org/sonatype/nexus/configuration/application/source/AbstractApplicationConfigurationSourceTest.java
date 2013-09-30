@@ -33,11 +33,6 @@ public abstract class AbstractApplicationConfigurationSourceTest
   protected abstract InputStream getOriginatingConfigurationInputStream()
       throws IOException;
 
-  @Override
-  protected boolean loadConfigurationAtSetUp() {
-    return false;
-  }
-
   @Test
   public void testConfigStream()
       throws Exception
