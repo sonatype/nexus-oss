@@ -61,7 +61,7 @@ public class DevModeResourceFinder
 
       @Override
       public void handleGet() {
-        String path = basePath + request.getResourceRef().getRemainingPart();
+        String path = basePath + request.getResourceRef().getRemainingPart(true, false);
         URL url = DevModeResources.getResourceIfOnFileSystem(path);
         if (url != null) {
           try {
