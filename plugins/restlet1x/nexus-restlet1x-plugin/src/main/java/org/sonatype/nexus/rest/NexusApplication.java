@@ -85,6 +85,8 @@ public class NexusApplication
 
   private final StatusService statusService;
 
+  private final MimeSupport mimeSupport;
+
   @Inject
   public NexusApplication(final EventBus eventBus,
                           final ProtectedPathManager protectedPathManager,
@@ -96,7 +98,8 @@ public class NexusApplication
                           final List<NexusResourceBundle> nexusResourceBundles,
                           final List<NexusApplicationCustomizer> customizers,
                           final ErrorReportingManager errorManager,
-                          final StatusService statusService)
+                          final StatusService statusService,
+                          final MimeSupport mimeSupport)
   {
     this.eventBus = eventBus;
     this.protectedPathManager = protectedPathManager;
@@ -109,6 +112,7 @@ public class NexusApplication
     this.customizers = customizers;
     this.errorManager = errorManager;
     this.statusService = statusService;
+    this.mimeSupport = mimeSupport;
   }
 
   // HACK: Too many places were using new NexusApplication() ... fuck it
@@ -125,12 +129,10 @@ public class NexusApplication
         null,
         null,
         null,
+        null,
         null
     );
   }
-
-  @Requirement(role = MimeSupport.class)
-  private MimeSupport mimeSupport;
 
   @Subscribe
   public void onEvent(final NexusStartedEvent evt) {
