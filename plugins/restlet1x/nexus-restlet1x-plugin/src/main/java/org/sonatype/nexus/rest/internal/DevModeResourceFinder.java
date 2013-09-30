@@ -13,11 +13,10 @@
 
 package org.sonatype.nexus.rest.internal;
 
-import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 
 import org.sonatype.nexus.internal.DevModeResources;
+import org.sonatype.nexus.mime.MimeSupport;
 
 import org.restlet.Context;
 import org.restlet.Finder;
@@ -27,8 +26,6 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link Finder} that will lookup files via {@link DevModeResources#getResourceIfOnFileSystem(String)}.
@@ -39,13 +36,14 @@ public class DevModeResourceFinder
     extends Finder
 {
 
-  private static Logger log = LoggerFactory.getLogger(DevModeResourceFinder.class);
+  private final MimeSupport mimeSupport;
 
   private final Context context;
 
   private final String basePath;
 
-  public DevModeResourceFinder(final Context context, final String basePath) {
+  public DevModeResourceFinder(final MimeSupport mimeSupport, final Context context, final String basePath) {
+    this.mimeSupport = mimeSupport;
     this.context = context;
     this.basePath = basePath;
   }
@@ -64,20 +62,13 @@ public class DevModeResourceFinder
         String path = basePath + request.getResourceRef().getRemainingPart(true, false);
         URL url = DevModeResources.getResourceIfOnFileSystem(path);
         if (url != null) {
-          try {
-            URLConnection urlConnection = url.openConnection();
-            FileRepresentation representation = new FileRepresentation(
-                url.toExternalForm(),
-                MediaType.valueOf(urlConnection.getContentType()),
-                0 // always fresh content
-            );
-            response.setEntity(representation);
-            return;
-          }
-          catch (IOException e) {
-            log.warn("Could not handle request for '{}'", path, e);
-            response.setStatus(Status.SERVER_ERROR_INTERNAL);
-          }
+          FileRepresentation representation = new FileRepresentation(
+              url.toExternalForm(),
+              MediaType.valueOf(mimeSupport.guessMimeTypeFromPath(path)),
+              0 // always fresh content
+          );
+          response.setEntity(representation);
+          return;
         }
         response.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
       }

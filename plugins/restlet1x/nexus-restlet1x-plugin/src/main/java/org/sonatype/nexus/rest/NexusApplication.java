@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.internal.DevModeResources;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -90,6 +91,9 @@ public class NexusApplication
 
   @Requirement(role = StatusService.class)
   private StatusService statusService;
+
+  @Requirement(role = MimeSupport.class)
+  private MimeSupport mimeSupport;
 
   @Subscribe
   public void onEvent(final NexusStartedEvent evt) {
@@ -206,7 +210,7 @@ public class NexusApplication
     // Attach to "/static" in case that dev mode is on
     // The finder will only be called if the path under static is not found (as those are more specific)
     if (DevModeResources.hasResourceLocations()) {
-      attach(root, false, "/static", new DevModeResourceFinder(getContext(), "/static"));
+      attach(root, false, "/static", new DevModeResourceFinder(mimeSupport, getContext(), "/static"));
     }
 
     // =======
