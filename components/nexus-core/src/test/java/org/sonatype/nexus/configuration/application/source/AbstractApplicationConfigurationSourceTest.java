@@ -33,6 +33,14 @@ public abstract class AbstractApplicationConfigurationSourceTest
   protected abstract InputStream getOriginatingConfigurationInputStream()
       throws IOException;
 
+  /**
+   * Disabling security will force configuration to load, we are testing configuration loading here so leave it alone.
+   */
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return false;
+  }
+
   @Test
   public void testConfigStream()
       throws Exception
