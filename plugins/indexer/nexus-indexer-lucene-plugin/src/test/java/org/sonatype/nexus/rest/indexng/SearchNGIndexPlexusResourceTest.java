@@ -69,6 +69,11 @@ public class SearchNGIndexPlexusResourceTest
     extends AbstractMavenRepoContentTests
 {
 
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return true;
+  }
+
   @Test
   public void testPlexusResourceException()
       throws Exception
@@ -106,9 +111,6 @@ public class SearchNGIndexPlexusResourceTest
   public void uncollapse()
       throws Exception
   {
-    // disable security completely, as it just interferes with test
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -122,9 +124,6 @@ public class SearchNGIndexPlexusResourceTest
   public void collapse()
       throws Exception
   {
-    // disable security completely, as it just interferes with test
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -138,9 +137,6 @@ public class SearchNGIndexPlexusResourceTest
   public void uncollapseMixed()
       throws Exception
   {
-    // disable security completely, as it just interferes with test
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -154,9 +150,6 @@ public class SearchNGIndexPlexusResourceTest
   public void collapseMixed()
       throws Exception
   {
-    // disable security completely, as it just interferes with test
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -248,9 +241,6 @@ public class SearchNGIndexPlexusResourceTest
   public void versionCollation()
       throws Exception
   {
-    // disable security completely, as it just interferes with test
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -276,9 +266,6 @@ public class SearchNGIndexPlexusResourceTest
   public void multipleRepositories()
       throws Exception
   {
-    // disable security completely, as it just interferes with test
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -321,9 +308,6 @@ public class SearchNGIndexPlexusResourceTest
   public void emptyResult()
       throws Exception
   {
-    // disable security completely, as it just interferes with test
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
@@ -339,8 +323,6 @@ public class SearchNGIndexPlexusResourceTest
       throws Exception
   {
     fillInRepo();
-    nexusConfiguration().setSecurityEnabled(false);
-    nexusConfiguration().saveConfiguration();
     wairForAsyncEventsToCalmDown();
     waitForTasksToStop();
 

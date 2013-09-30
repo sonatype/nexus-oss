@@ -29,7 +29,7 @@ public class KenaiClearCacheTest
   protected SecuritySystem securitySystem;
 
   @Override
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return false;
   }
 

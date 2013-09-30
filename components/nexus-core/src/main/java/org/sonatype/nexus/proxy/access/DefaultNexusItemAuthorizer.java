@@ -127,11 +127,6 @@ public class DefaultNexusItemAuthorizer
   }
 
   protected boolean isPermitted(final List<String> perms) {
-    // If security is disabled, then anything is permitted
-    if (!securitySystem.isSecurityEnabled()) {
-      return true;
-    }
-
     boolean trace = getLogger().isTraceEnabled();
 
     Subject subject = securitySystem.getSubject();
