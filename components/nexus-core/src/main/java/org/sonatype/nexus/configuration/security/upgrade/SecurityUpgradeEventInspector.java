@@ -39,7 +39,7 @@ import org.codehaus.plexus.util.StringUtils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
-@Named
+@Named("SecurityUpgradeEventInspector")
 public class SecurityUpgradeEventInspector
     extends AbstractEventInspector
 {
