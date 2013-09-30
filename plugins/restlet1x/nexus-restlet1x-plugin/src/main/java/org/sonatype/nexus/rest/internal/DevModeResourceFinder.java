@@ -68,7 +68,8 @@ public class DevModeResourceFinder
             URLConnection urlConnection = url.openConnection();
             FileRepresentation representation = new FileRepresentation(
                 url.toExternalForm(),
-                MediaType.valueOf(urlConnection.getContentType())
+                MediaType.valueOf(urlConnection.getContentType()),
+                0 // always fresh content
             );
             response.setEntity(representation);
             return;
