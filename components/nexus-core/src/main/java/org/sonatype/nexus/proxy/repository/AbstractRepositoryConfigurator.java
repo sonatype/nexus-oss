@@ -17,6 +17,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -36,7 +37,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 import org.codehaus.plexus.util.StringUtils;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractRepositoryConfigurator
@@ -54,12 +54,12 @@ public abstract class AbstractRepositoryConfigurator
   public void populateAbstractRepositoryConfigurator(final RepositoryRegistry repositoryRegistry,
                                         final RepositoryTypeRegistry repositoryTypeRegistry,
                                         final Map<String, LocalRepositoryStorage> localRepositoryStorages,
-                                        final Map<String, RepositoryCustomizer> pluginRepositoryConfigurators)
+                                        final @Nullable Map<String, RepositoryCustomizer> pluginRepositoryConfigurators)
   {
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
     this.localRepositoryStorages = checkNotNull(localRepositoryStorages);
-    this.pluginRepositoryConfigurators = checkNotNull(pluginRepositoryConfigurators);
+    this.pluginRepositoryConfigurators = pluginRepositoryConfigurators;
   }
 
   @Override
@@ -70,10 +70,12 @@ public abstract class AbstractRepositoryConfigurator
   {
     doApplyConfiguration(target, configuration, config);
 
-    // config done, apply customizations
-    for (RepositoryCustomizer configurator : pluginRepositoryConfigurators.values()) {
-      if (configurator.isHandledRepository(target)) {
-        configurator.configureRepository(target);
+    // config done, apply customizations if needed
+    if (pluginRepositoryConfigurators != null) {
+      for (RepositoryCustomizer configurator : pluginRepositoryConfigurators.values()) {
+        if (configurator.isHandledRepository(target)) {
+          configurator.configureRepository(target);
+        }
       }
     }
   }
