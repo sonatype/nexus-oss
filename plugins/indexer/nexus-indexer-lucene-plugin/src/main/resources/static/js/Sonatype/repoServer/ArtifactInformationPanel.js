@@ -10,9 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global NX, Ext, Sonatype*/
-
-define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'], function() {
+define('Sonatype/repoServer/ArtifactInformationPanel', function() {
 
   Ext.form.RepositoryUrlDisplayField = Ext.extend(Ext.form.DisplayField, {
         setValue : function(repositories) {
@@ -54,6 +52,23 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
 
   Ext.reg('repositoryUrlDisplayField', Ext.form.RepositoryUrlDisplayField);
 
+  Ext.form.RepositoryPathDisplayField = Ext.extend(Ext.form.DisplayField, {
+    setValue : function(repositoryPath) {
+      if (repositoryPath) {
+        if (typeof repositoryPath === 'string'
+            || !repositoryPath.path || !repositoryPath.href) {
+          this.setRawValue(repositoryPath);
+        }
+        else {
+          this.setRawValue('<a href="' + repositoryPath.href + '" target="_blank">' + repositoryPath.path + '</a>');
+        }
+      }
+      return this;
+    }
+  });
+
+  Ext.reg('repositoryPathDisplayField', Ext.form.RepositoryPathDisplayField);
+
   Sonatype.repoServer.ArtifactInformationPanel = function(config) {
     var config = config || {};
     var defaultConfig = {};
@@ -68,10 +83,12 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
           scope : this
         });
 
-    this.downloadButton = NX.create('Nexus.ext.LinkButton', {
-      text: 'Download',
-      target: '_blank'
-    });
+    this.downloadButton = new Ext.Button({
+          xtype : 'button',
+          text : 'Download',
+          handler : this.artifactDownload,
+          scope : this
+        });
 
     Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
           title : 'Artifact',
@@ -81,7 +98,7 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
           collapsible : false,
           collapsed : false,
           items : [{
-                xtype : 'displayfield',
+                xtype : 'repositoryPathDisplayField',
                 fieldLabel : 'Repository Path',
                 name : 'repositoryPath',
                 anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
@@ -178,6 +195,13 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
   };
 
   Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
+
+        artifactDownload : function() {
+          if (this.data)
+          {
+            Sonatype.utils.openWindow(this.data.resourceURI);
+          }
+        },
 
         artifactDelete : function() {
           if (this.data)
@@ -294,10 +318,13 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
                       else
                       {
                         this.clearNonLocalView(infoResp.data.canDelete);
-                        this.form.setValues(infoResp.data);
+                        this.form.setValues(Ext.apply(infoResp.data, {
+                          repositoryPath: {
+                            path: infoResp.data.repositoryPath,
+                            href: this.data.resourceURI
+                          }
+                        }));
                       }
-                      this.downloadButton.href = this.data.resourceURI;
-                      this.downloadButton.setParams({});
                       artifactContainer.showTab(this);
                     }
                     else
