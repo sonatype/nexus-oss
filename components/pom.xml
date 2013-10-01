@@ -39,6 +39,7 @@
     <module>nexus-jetty8</module>
     <module>nexus-launcher</module>
     <module>nexus-ldap-common</module>
+    <module>nexus-locks</module>
     <module>nexus-logging-extras</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
