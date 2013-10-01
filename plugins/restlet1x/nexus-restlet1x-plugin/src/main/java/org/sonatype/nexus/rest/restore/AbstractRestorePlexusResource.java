@@ -15,6 +15,8 @@ package org.sonatype.nexus.rest.restore;
 
 import java.util.concurrent.RejectedExecutionException;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -24,7 +26,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -40,11 +41,15 @@ public abstract class AbstractRestorePlexusResource
 
   public static final String TARGET_ID = "target";
 
-  @Requirement
   private NexusScheduler nexusScheduler;
 
   public AbstractRestorePlexusResource() {
     this.setModifiable(true);
+  }
+
+  @Inject
+  public void setNexusScheduler(final NexusScheduler nexusScheduler) {
+    this.nexusScheduler = nexusScheduler;
   }
 
   protected NexusScheduler getNexusScheduler() {

@@ -13,10 +13,12 @@
 
 package org.sonatype.nexus.proxy.storage.remote;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,8 @@ import org.slf4j.LoggerFactory;
 /**
  * TODO: for now, we have limited the RRS selection, but in future, this should be made dynamic!
  */
-@Component(role = RemoteProviderHintFactory.class)
+@Named
+@Singleton
 public class DefaultRemoteProviderHintFactory
     implements RemoteProviderHintFactory
 {

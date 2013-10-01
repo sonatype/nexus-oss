@@ -17,6 +17,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -67,7 +68,7 @@ public class RepoConversionTest
 
     // do the conversion
     // forcing cast
-    MavenProxyRepository repoToBeTreated = (MavenProxyRepository) patient;
+    M2Repository repoToBeTreated = (M2Repository) patient;
 
     repoToBeTreated.setRemoteStorage(remoteRepositoryStorage);
 
@@ -82,8 +83,8 @@ public class RepoConversionTest
     assertTrue("repo is proxied", patient.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class));
 
     // now we just walk in, like nothing of above happened :)
-    MavenProxyRepository afterTreatment =
-        getRepositoryRegistry().getRepositoryWithFacet(patient.getId(), MavenProxyRepository.class);
+    M2Repository afterTreatment =
+        (M2Repository) getRepositoryRegistry().getRepositoryWithFacet(patient.getId(), MavenProxyRepository.class);
 
     assertNotNull("It should exists (heh, but NoSuchRepo exception should be thrown anyway)", afterTreatment);
 

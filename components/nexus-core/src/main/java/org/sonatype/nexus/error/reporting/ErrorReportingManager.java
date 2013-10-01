@@ -13,15 +13,12 @@
 
 package org.sonatype.nexus.error.reporting;
 
-import org.sonatype.nexus.configuration.Configurable;
-
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 
 /**
  * An error reporting component.
  */
 public interface ErrorReportingManager
-    extends Configurable
 {
   boolean isEnabled();
 

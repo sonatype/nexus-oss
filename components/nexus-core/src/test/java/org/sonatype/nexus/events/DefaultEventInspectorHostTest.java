@@ -21,9 +21,10 @@ import org.sonatype.nexus.proxy.events.AsynchronousEventInspectorWrapper;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import org.mockito.Mockito;
 import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -42,7 +43,7 @@ public class DefaultEventInspectorHostTest
     map.put("sync", syncEI);
     map.put("async", new AsynchronousEventInspectorWrapper(asyncEI));
 
-    final DefaultEventInspectorHost host = new DefaultEventInspectorHost(map);
+    final DefaultEventInspectorHost host = new DefaultEventInspectorHost(Mockito.mock(EventBus.class), map);
 
     host.onEvent(new NexusStartedEvent(this));
 

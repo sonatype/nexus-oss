@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.notification;
 
+
 public interface NotificationManager
 {
   boolean isEnabled();

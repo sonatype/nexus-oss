@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -32,7 +34,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractMavenGroupRepository
     extends AbstractGroupRepository
@@ -41,57 +43,64 @@ public abstract class AbstractMavenGroupRepository
   /**
    * Metadata manager.
    */
-  @Requirement
   private MetadataManager metadataManager;
 
   /**
    * The artifact packaging mapper.
    */
-  @Requirement
   private ArtifactPackagingMapper artifactPackagingMapper;
 
   private ArtifactStoreHelper artifactStoreHelper;
 
   private RepositoryKind repositoryKind;
 
+  @Inject
+  public void populateAbstractMavenGroupRepository(final MetadataManager metadataManager,
+      final ArtifactPackagingMapper artifactPackagingMapper)
+  {
+    this.metadataManager = checkNotNull(metadataManager);
+    this.artifactPackagingMapper = checkNotNull(artifactPackagingMapper);
+    this.artifactStoreHelper = new ArtifactStoreHelper(this);
+    this.repositoryKind = new DefaultRepositoryKind(GroupRepository.class,
+        Arrays.asList(new Class<?>[] { MavenGroupRepository.class }));
+  }
+
   @Override
   protected AbstractMavenGroupRepositoryConfiguration getExternalConfiguration(boolean forWrite) {
     return (AbstractMavenGroupRepositoryConfiguration) super.getExternalConfiguration(forWrite);
   }
-
+  
+  @Override
   public RepositoryKind getRepositoryKind() {
-    if (repositoryKind == null) {
-      repositoryKind =
-          new DefaultRepositoryKind(GroupRepository.class,
-              Arrays.asList(new Class<?>[]{MavenGroupRepository.class}));
-    }
     return repositoryKind;
   }
 
+  @Override
   public boolean isMergeMetadata() {
     return getExternalConfiguration(false).isMergeMetadata();
   }
 
+  @Override
   public void setMergeMetadata(boolean mergeMetadata) {
     getExternalConfiguration(true).setMergeMetadata(mergeMetadata);
   }
 
+  @Override
   public ArtifactPackagingMapper getArtifactPackagingMapper() {
     return artifactPackagingMapper;
   }
 
+  @Override
   public ArtifactStoreHelper getArtifactStoreHelper() {
-    if (artifactStoreHelper == null) {
-      artifactStoreHelper = new ArtifactStoreHelper(this);
-    }
-
     return artifactStoreHelper;
   }
 
+  @Override
   public MetadataManager getMetadataManager() {
     return metadataManager;
   }
 
+  @Override
   public boolean recreateMavenMetadata(ResourceStoreRequest request) {
     if (!getLocalStatus().shouldServiceRequest()) {
       return false;
@@ -108,29 +117,36 @@ public abstract class AbstractMavenGroupRepository
     return result;
   }
 
+  @Override
   public RepositoryPolicy getRepositoryPolicy() {
     return RepositoryPolicy.MIXED;
   }
 
+  @Override
   public void setRepositoryPolicy(RepositoryPolicy repositoryPolicy) {
     throw new UnsupportedOperationException(
         "Setting repository policy on a Maven group repository is not possible!");
   }
 
+  @Override
   public boolean isMavenArtifact(StorageItem item) {
     return isMavenArtifactPath(item.getPath());
   }
 
+  @Override
   public boolean isMavenMetadata(StorageItem item) {
     return isMavenMetadataPath(item.getPath());
   }
 
+  @Override
   public boolean isMavenArtifactPath(String path) {
     return getGavCalculator().pathToGav(path) != null;
   }
 
+  @Override
   public abstract boolean isMavenMetadataPath(String path);
 
+  @Override
   public void storeItemWithChecksums(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
       throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
              StorageException, AccessDeniedException
@@ -138,12 +154,14 @@ public abstract class AbstractMavenGroupRepository
     getArtifactStoreHelper().storeItemWithChecksums(request, is, userAttributes);
   }
 
+  @Override
   public void storeItemWithChecksums(boolean fromTask, AbstractStorageItem item)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
   {
     getArtifactStoreHelper().storeItemWithChecksums(fromTask, item);
   }
 
+  @Override
   public void deleteItemWithChecksums(ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
              StorageException, AccessDeniedException
@@ -151,6 +169,7 @@ public abstract class AbstractMavenGroupRepository
     getArtifactStoreHelper().deleteItemWithChecksums(request);
   }
 
+  @Override
   public void deleteItemWithChecksums(boolean fromTask, ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
   {

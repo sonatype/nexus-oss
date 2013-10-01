@@ -16,6 +16,8 @@ package org.sonatype.nexus.rest.routes;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
@@ -24,7 +26,6 @@ import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 
@@ -38,8 +39,12 @@ public abstract class AbstractRepositoryRoutePlexusResource
 {
   public static final String ROUTE_ID_KEY = "routeId";
 
-  @Requirement
   private RequestRepositoryMapper repositoryMapper;
+
+  @Inject
+  public void setRepositoryMapper(final RequestRepositoryMapper repositoryMapper) {
+    this.repositoryMapper = repositoryMapper;
+  }
 
   protected RequestRepositoryMapper getRepositoryMapper() {
     return repositoryMapper;

@@ -13,30 +13,40 @@
 
 package org.sonatype.nexus.configuration;
 
-import javax.inject.Singleton;
+import javax.inject.Inject;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.plugin.ExtensionPoint;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
- * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps for all those config
- * elements that does not map directly to a model and some extra processing is needed.
+ * A removable or late created component, participant of configuration framework.
  *
- * @author cstamas
+ * @since 2.7.0
  */
-@ExtensionPoint
-@Singleton
-public interface Configurator<T, C extends CoreConfiguration>
+public abstract class AbstractRemovableConfigurable<C>
+    extends AbstractConfigurable<C>
+    implements Configurable<C>
 {
   /**
-   * Will apply the configuration parameters from coreConfiguratuin to the target.
+   * Just an empty constructor, to mark that ctor injection is explicitly disabled. All the classes extending this one should populate/inject all the fields on their own, most probably 
    */
-  void applyConfiguration(T target, ApplicationConfiguration configuration, C coreConfiguration)
-      throws ConfigurationException;
+  public AbstractRemovableConfigurable() {
+  }
 
-  /**
-   * Will prepare model for save, by syncing it with target state (if needed).
-   */
-  void prepareForSave(T target, ApplicationConfiguration configuration, C coreConfiguration);
+  @Override
+  @Inject
+  public void setEventBus(final EventBus eventBus) {
+    super.setEventBus(eventBus);
+    registerWithEventBus();
+  }
+  
+  @Override
+  @Inject
+  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    super.setApplicationConfiguration(applicationConfiguration);
+  }
+
+  public void dispose() {
+    unregisterFromEventBus();
+  }
 }

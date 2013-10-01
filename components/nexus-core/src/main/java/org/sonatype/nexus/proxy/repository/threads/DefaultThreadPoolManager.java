@@ -19,31 +19,43 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import com.google.common.eventbus.Subscribe;
 
-@Component(role = ThreadPoolManager.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class DefaultThreadPoolManager
-    implements ThreadPoolManager, Disposable
+    implements ThreadPoolManager
 {
   private static final int GROUP_REPOSITORY_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
       "nexus.groupRepositoryThreadPoolSize", 200);
 
   private static final int PROXY_REPOSITORY_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
       "nexus.proxyRepositoryThreadPoolSize", 50);
+  
+  private final EventBus eventBus;
 
   private final NexusExecutorService groupRepositoryThreadPool;
 
   private final NexusExecutorService proxyRepositoryThreadPool;
 
-  public DefaultThreadPoolManager() {
+  @Inject
+  public DefaultThreadPoolManager(final EventBus eventBus) {
+    this.eventBus = checkNotNull(eventBus);
     // direct hand-off used! Group pool will use caller thread to execute the task when full!
     final ThreadPoolExecutor gTarget =
         new ThreadPoolExecutor(0, GROUP_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
@@ -58,6 +70,7 @@ public class DefaultThreadPoolManager
 
     this.groupRepositoryThreadPool = NexusExecutorService.forCurrentSubject(gTarget);
     this.proxyRepositoryThreadPool = NexusExecutorService.forCurrentSubject(pTarget);
+    eventBus.register(this);
   }
 
   @Override
@@ -84,12 +97,13 @@ public class DefaultThreadPoolManager
   }
 
   public synchronized void shutdown() {
+    eventBus.unregister(this);
     terminatePool(groupRepositoryThreadPool);
     terminatePool(proxyRepositoryThreadPool);
   }
 
-  @Override
-  public void dispose() {
+  @Subscribe
+  public void on(final NexusStoppedEvent e) {
     shutdown();
   }
 

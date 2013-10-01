@@ -20,20 +20,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
-import org.sonatype.nexus.util.StringDigester;
+import org.sonatype.nexus.util.DigesterUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.issue.IssueRetriever;
 import org.sonatype.sisu.pr.ProjectManager;
@@ -44,8 +44,7 @@ import org.sonatype.sisu.pr.bundle.StorageManager;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import com.google.common.collect.Sets;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.swizzle.IssueSubmissionResult;
@@ -56,71 +55,50 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Project;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@Component(role = ErrorReportingManager.class)
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named
 public class DefaultErrorReportingManager
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<CErrorReporting>
     implements ErrorReportingManager
 {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final IssueSubmitter issueSubmitter;
 
-  @Requirement
-  private NexusConfiguration nexusConfig;
+  private final IssueRetriever issueRetriever;
 
-  @Requirement
-  private IssueSubmitter issueSubmitter;
+  private final Archiver archiver;
 
-  @Requirement
-  private IssueRetriever issueRetriever;
+  private final ProjectManager projectManager;
 
-  @Requirement
-  private Archiver archiver;
-
-  @Requirement
-  private ProjectManager projectManager;
-
-  @Requirement
-  private UserAgentBuilder uaBuilder;
-
-  @Requirement
-  private StorageManager storageManager;
+  private final StorageManager storageManager;
 
   private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
 
   @VisibleForTesting
   static final String ERROR_REPORT_DIR = "error-report-bundles";
 
-  private Set<String> errorHashSet = new HashSet<String>();
+  private Set<String> errorHashSet = Sets.newHashSet();
 
   // ==
 
-  /**
-   * For plexus injection.
-   */
-  public DefaultErrorReportingManager() {
-  }
-
-  @VisibleForTesting
-  DefaultErrorReportingManager(final Archiver archiver,
-                               final IssueRetriever issueRetriever,
-                               final IssueSubmitter issueSubmitter,
-                               final ProjectManager projectManager,
-                               final UserAgentBuilder uaBuilder,
-                               final NexusConfiguration nexusConfig,
-                               final EventBus eventBus,
-                               final StorageManager storageManager)
+  @Inject
+  public DefaultErrorReportingManager(final EventBus eventBus,
+                                      final ApplicationConfiguration applicationConfiguration,
+                                      final Archiver archiver,
+                                      final IssueRetriever issueRetriever,
+                                      final IssueSubmitter issueSubmitter,
+                                      final ProjectManager projectManager,
+                                      final StorageManager storageManager)
   {
-    super(eventBus);
-    this.archiver = archiver;
-    this.issueRetriever = issueRetriever;
-    this.issueSubmitter = issueSubmitter;
-    this.nexusConfig = nexusConfig;
-    this.projectManager = projectManager;
-    this.uaBuilder = uaBuilder;
-    this.storageManager = storageManager;
+    super("Error Reporting", eventBus, applicationConfiguration);
+    this.archiver = checkNotNull(archiver);
+    this.issueRetriever = checkNotNull(issueRetriever);
+    this.issueSubmitter = checkNotNull(issueSubmitter);
+    this.projectManager = checkNotNull(projectManager);
+    this.storageManager = checkNotNull(storageManager);
   }
 
   // ==
@@ -146,22 +124,7 @@ public class DefaultErrorReportingManager
   }
 
   @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return nexusConfig;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected CErrorReporting getCurrentConfiguration(boolean forWrite) {
-    return ((CErrorReportingCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
+  protected CoreConfiguration<CErrorReporting> wrapConfiguration(Object configuration)
       throws ConfigurationException
   {
     if (configuration instanceof ApplicationConfiguration) {
@@ -176,24 +139,29 @@ public class DefaultErrorReportingManager
 
   // ==
 
+  @Override
   public boolean isEnabled() {
     return getCurrentConfiguration(false).isEnabled();
   }
 
+  @Override
   public void setEnabled(boolean value) {
     getCurrentConfiguration(true).setEnabled(value);
   }
 
+  @Override
   public String getJIRAUrl() {
     return getCurrentConfiguration(false).getJiraUrl();
   }
 
+  @Override
   public void setJIRAUrl(String url) {
     getCurrentConfiguration(true).setJiraUrl(url);
     issueSubmitter.setServerUrl(url);
     issueRetriever.setServerUrl(url);
   }
 
+  @Override
   public String getJIRAUsername() {
     return getCurrentConfiguration(false).getJiraUsername();
   }
@@ -208,10 +176,12 @@ public class DefaultErrorReportingManager
     return username;
   }
 
+  @Override
   public void setJIRAUsername(String username) {
     getCurrentConfiguration(true).setJiraUsername(username);
   }
 
+  @Override
   public String getJIRAPassword() {
     return getCurrentConfiguration(false).getJiraPassword();
   }
@@ -226,14 +196,17 @@ public class DefaultErrorReportingManager
     return password;
   }
 
+  @Override
   public void setJIRAPassword(String password) {
     getCurrentConfiguration(true).setJiraPassword(password);
   }
 
+  @Override
   public String getJIRAProject() {
     return getCurrentConfiguration(false).getJiraProject();
   }
 
+  @Override
   public void setJIRAProject(String pkey) {
     getCurrentConfiguration(true).setJiraProject(pkey);
   }
@@ -247,6 +220,7 @@ public class DefaultErrorReportingManager
     return handleError(request, getValidJIRAUsername(), getValidJIRAPassword());
   }
 
+  @Override
   public ErrorReportResponse handleError(ErrorReportRequest request, String username, String password)
       throws IssueSubmissionException
   {
@@ -263,14 +237,14 @@ public class DefaultErrorReportingManager
 
     try {
       if (request.isManual()) {
-        logger.trace("Manual error report: '{}'", request.getTitle());
+        getLogger().trace("Manual error report: '{}'", request.getTitle());
         IssueSubmissionRequest subRequest = buildRequest(request);
 
         submitIssue(auth, response, subRequest);
       }
       else if ((isEnabled() && shouldHandleReport(request)
           && !shouldIgnore(request.getThrowable()))) {
-        logger.info("Detected Error in Nexus: {}. Generating a problem report...",
+        getLogger().info("Detected Error in Nexus: {}. Generating a problem report...",
             getThrowableMessage(request.getThrowable()));
         IssueSubmissionRequest subRequest = buildRequest(request);
 
@@ -282,13 +256,13 @@ public class DefaultErrorReportingManager
         else {
           response.setJiraUrl(existingIssues.get(0).getLink());
           writeArchive(subRequest.getBundles(), existingIssues.get(0).getKey());
-          logger.info(
+          getLogger().info(
               "Not reporting problem as it already exists in database: "
                   + existingIssues.iterator().next().getLink());
         }
       }
       else {
-        if (logger.isInfoEnabled()) {
+        if (getLogger().isInfoEnabled()) {
           String reason = "Nexus ignores this type of error";
           if (!isEnabled()) {
             reason = "reporting is not enabled";
@@ -296,7 +270,7 @@ public class DefaultErrorReportingManager
           else if (!shouldHandleReport(request)) {
             reason = "it has already being reported or it does not have an error message";
           }
-          logger.info(
+          getLogger().info(
               "Detected Error in Nexus: {}. Skipping problem report generation because {}",
               getThrowableMessage(request.getThrowable()), reason
           );
@@ -306,11 +280,11 @@ public class DefaultErrorReportingManager
       response.setSuccess(true);
     }
     catch (Exception e) {
-      if (logger.isDebugEnabled()) {
-        logger.warn("Error while submitting problem report: {}", e.getMessage(), e);
+      if (getLogger().isDebugEnabled()) {
+        getLogger().warn("Error while submitting problem report: {}", e.getMessage(), e);
       }
       else {
-        logger.warn("Error while submitting problem report: {}", e.getMessage());
+        getLogger().warn("Error while submitting problem report: {}", e.getMessage());
       }
 
       Throwables.propagateIfInstanceOf(e, IssueSubmissionException.class);
@@ -340,7 +314,7 @@ public class DefaultErrorReportingManager
       response.setCreated(true);
       response.setJiraUrl(result.getIssueUrl());
       writeArchive(result.getBundles(), result.getKey());
-      logger.info("Problem report ticket " + result.getIssueUrl() + " was created.");
+      getLogger().info("Problem report ticket " + result.getIssueUrl() + " was created.");
     }
     catch (IssueSubmissionException e) {
       writeArchive(subRequest.getBundles(), "NOTSUBMITTED");
@@ -355,10 +329,10 @@ public class DefaultErrorReportingManager
     }
 
     if (request.getThrowable() != null && StringUtils.isNotEmpty(request.getThrowable().getMessage())) {
-      String hash = StringDigester.getSha1Digest(request.getThrowable().getMessage());
+      String hash = DigesterUtils.getSha1Digest(request.getThrowable().getMessage());
 
       if (errorHashSet.contains(hash)) {
-        logger.debug("Received an exception we already processed, ignoring.");
+        getLogger().debug("Received an exception we already processed, ignoring.");
         return false;
       }
       else {
@@ -367,7 +341,7 @@ public class DefaultErrorReportingManager
       }
     }
     else {
-      logger.debug("Received an empty message in exception, will not handle");
+      getLogger().debug("Received an empty message in exception, will not handle");
     }
 
     return false;
@@ -382,7 +356,7 @@ public class DefaultErrorReportingManager
       return issues;
     }
     catch (Exception e) {
-      logger.error("Unable to query JIRA server to find if error report already exists", e);
+      getLogger().error("Unable to query JIRA server to find if error report already exists", e);
       return Collections.emptyList();
     }
 
@@ -409,7 +383,7 @@ public class DefaultErrorReportingManager
       throws IOException
   {
     if (bundles == null || bundles.isEmpty()) {
-      logger.debug("No problem report bundle assembled");
+      getLogger().debug("No problem report bundle assembled");
       return;
     }
 
@@ -420,7 +394,7 @@ public class DefaultErrorReportingManager
     }
 
     File zipFile = getZipFile("nexus-error-bundle-" + suffix, "zip");
-    logger.debug("Writing problem report bundle: '{}'", zipFile);
+    getLogger().debug("Writing problem report bundle: '{}'", zipFile);
 
     OutputStream output = null;
     InputStream input = null;
@@ -440,17 +414,13 @@ public class DefaultErrorReportingManager
 
   @VisibleForTesting
   File getZipFile(String prefix, String suffix) {
-    File zipDir = nexusConfig.getWorkingDirectory(ERROR_REPORT_DIR);
+    File zipDir = getApplicationConfiguration().getWorkingDirectory(ERROR_REPORT_DIR);
 
     if (!zipDir.exists()) {
       zipDir.mkdirs();
     }
 
     return new File(zipDir, prefix + "." + System.currentTimeMillis() + "." + suffix);
-  }
-
-  public String getName() {
-    return "Error Report Settings";
   }
 
   protected boolean shouldIgnore(Throwable throwable) {

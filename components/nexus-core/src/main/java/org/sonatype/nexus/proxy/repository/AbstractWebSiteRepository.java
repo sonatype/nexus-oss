@@ -35,15 +35,18 @@ public abstract class AbstractWebSiteRepository
     extends AbstractRepository
     implements WebSiteRepository
 {
+  
   @Override
   protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration(boolean forModification) {
     return (AbstractWebSiteRepositoryConfiguration) super.getExternalConfiguration(forModification);
   }
 
+  @Override
   public List<String> getWelcomeFiles() {
     return getExternalConfiguration(false).getWelcomeFiles();
   }
 
+  @Override
   public void setWelcomeFiles(List<String> vals) {
     getExternalConfiguration(true).setWelcomeFiles(vals);
   }

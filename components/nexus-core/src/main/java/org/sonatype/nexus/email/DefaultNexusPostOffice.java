@@ -16,23 +16,31 @@ package org.sonatype.nexus.email;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.MailRequest;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The default nexus post office.
  *
  * @author Alin Dreghiciu
  */
-@Component(role = NexusPostOffice.class)
+@Named
+@Singleton
 public class DefaultNexusPostOffice
     implements NexusPostOffice
 {
-  @Requirement
-  private NexusEmailer nexusEmailer;
+  private final NexusEmailer nexusEmailer;
+
+  @Inject
+  public DefaultNexusPostOffice(final NexusEmailer nexusEmailer) {
+    this.nexusEmailer = checkNotNull(nexusEmailer);
+  }
 
   /**
    * {@inheritDoc}

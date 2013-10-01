@@ -16,10 +16,13 @@ package org.sonatype.nexus.configuration.source;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.Configuration;
-
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
 /**
  * A special "static" configuration source, that always return a factory provided defaults for Nexus configuration. It
@@ -27,14 +30,21 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author cstamas
  */
-@Component(role = ApplicationConfigurationSource.class, hint = "static")
+@Singleton
+@Named("static")
 public class StaticConfigurationSource
     extends AbstractApplicationConfigurationSource
 {
 
+  @Inject
+  public StaticConfigurationSource(ApplicationInterpolatorProvider interpolatorProvider) {
+    super(interpolatorProvider);
+  }
+
   /**
    * Gets the configuration using getResourceAsStream from "/META-INF/nexus/nexus.xml".
    */
+  @Override
   public InputStream getConfigurationAsStream()
       throws IOException
   {
@@ -50,6 +60,7 @@ public class StaticConfigurationSource
     }
   }
 
+  @Override
   public Configuration loadConfiguration()
       throws ConfigurationException, IOException
   {
@@ -62,6 +73,7 @@ public class StaticConfigurationSource
    * This method will always throw UnsupportedOperationException, since NexusDefaultsConfigurationSource is read
    * only.
    */
+  @Override
   public void storeConfiguration()
       throws IOException
   {
@@ -71,6 +83,7 @@ public class StaticConfigurationSource
   /**
    * Static configuration has no default source, hence it cannot be defalted. Always returns false.
    */
+  @Override
   public boolean isConfigurationDefaulted() {
     return false;
   }
@@ -78,6 +91,7 @@ public class StaticConfigurationSource
   /**
    * This method will always throw UnsupportedOperationException, since StaticConfigurationSource is read only.
    */
+  @Override
   public void backupConfiguration()
       throws IOException
   {

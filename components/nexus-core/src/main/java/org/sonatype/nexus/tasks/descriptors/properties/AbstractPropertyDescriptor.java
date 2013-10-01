@@ -21,22 +21,27 @@ public abstract class AbstractPropertyDescriptor
 
   private boolean required;
 
+  @Override
   public String getHelpText() {
     return helpText;
   }
 
+  @Override
   public boolean isRequired() {
     return required;
   }
 
+  @Override
   public void setHelpText(String helpText) {
     this.helpText = helpText;
   }
 
+  @Override
   public void setRequired(boolean required) {
     this.required = required;
   }
 
+  @Override
   public String getRegexValidation() {
     return null;
   }

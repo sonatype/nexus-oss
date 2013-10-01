@@ -21,7 +21,7 @@ import org.sonatype.configuration.ConfigurationException;
  *
  * @author cstamas
  */
-public interface RevertableConfiguration
+public interface RevertableConfiguration<C>
 {
   /**
    * Returns true if this configuration holds some changes that are not persisted.
@@ -47,5 +47,5 @@ public interface RevertableConfiguration
 
   // ==
 
-  Object getConfiguration(boolean forWrite);
+  C getConfiguration(boolean forWrite);
 }

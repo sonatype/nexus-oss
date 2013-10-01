@@ -19,6 +19,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -75,7 +76,8 @@ public class GroupingBehaviourTest
       MavenGroupRepository mgr =
           getRepositoryRegistry().getRepositoryWithFacet("test", MavenGroupRepository.class);
       mgr.setMergeMetadata(false);
-      mgr.getCurrentCoreConfiguration().commitChanges();
+      ((AbstractMavenGroupRepository)mgr).commitChanges();
+      // mgr.getCurrentCoreConfiguration().commitChanges();
       eventBus().post(new ConfigurationChangeEvent(getApplicationConfiguration(), null, null));
 
       StorageItem item =
@@ -147,7 +149,8 @@ public class GroupingBehaviourTest
       MavenGroupRepository mgr =
           getRepositoryRegistry().getRepositoryWithFacet("test", MavenGroupRepository.class);
       mgr.setMergeMetadata(false);
-      mgr.getCurrentCoreConfiguration().commitChanges();
+      ((AbstractMavenGroupRepository)mgr).commitChanges();
+      // mgr.getCurrentCoreConfiguration().commitChanges();
       eventBus().post(new ConfigurationChangeEvent(getApplicationConfiguration(), null, null));
 
       item = getRootRouter().retrieveItem(new ResourceStoreRequest("/groups/test" + spoofedPath, false));

@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.rest.user;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -24,7 +26,6 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.rest.model.UserAccount;
 import org.sonatype.nexus.rest.model.UserAccountRequestResponseWrapper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.authorization.AuthorizationException;
@@ -33,7 +34,6 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -46,7 +46,8 @@ import org.restlet.resource.Variant;
  *
  * @since 2.1
  */
-@Component(role = PlexusResource.class, hint = "UserAccountPlexusResource")
+@Named
+@Singleton
 @Path("/user_account/{" + UserAccountPlexusResource.ACCOUNT_ID_KEY + "}")
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
