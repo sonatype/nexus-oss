@@ -16,6 +16,8 @@ package org.sonatype.nexus.rest.configurations;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -26,10 +28,8 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.GlobalConfigurationPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -43,7 +43,8 @@ import org.restlet.resource.Variant;
  *
  * @author cstamas
  */
-@Component(role = PlexusResource.class, hint = "configuration")
+@Named
+@Singleton
 @Path("/configs/{configName}")
 @Produces("text/xml")
 public class ConfigurationPlexusResource

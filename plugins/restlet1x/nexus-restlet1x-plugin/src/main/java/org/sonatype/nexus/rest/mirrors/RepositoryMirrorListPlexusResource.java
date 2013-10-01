@@ -16,6 +16,8 @@ package org.sonatype.nexus.rest.mirrors;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,10 +32,8 @@ import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -41,7 +41,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "RepositoryMirrorListPlexusResource")
+@Named
+@Singleton
 @Path(RepositoryMirrorListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})

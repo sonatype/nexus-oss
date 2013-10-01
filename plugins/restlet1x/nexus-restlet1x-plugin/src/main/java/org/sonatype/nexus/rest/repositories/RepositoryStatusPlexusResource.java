@@ -15,6 +15,8 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -34,10 +36,8 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.nexus.rest.util.EnumUtil;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -45,7 +45,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "RepositoryStatusPlexusResource")
+@Named
+@Singleton
 @Path(RepositoryStatusPlexusResource.RESOURCE_URI)
 @Consumes({"application/xml", "application/json"})
 @Produces({"application/xml", "application/json"})

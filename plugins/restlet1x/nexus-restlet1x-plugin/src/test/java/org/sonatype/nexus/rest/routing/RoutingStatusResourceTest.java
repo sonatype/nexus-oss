@@ -74,7 +74,7 @@ public class RoutingStatusResourceTest
       throws Exception
   {
     final RoutingStatusResource wlStatusResource = (RoutingStatusResource) lookup(PlexusResource.class,
-        "RoutingStatusResource");
+        RoutingStatusResource.class.getName());
     waitForRoutingBackgroundUpdates();
 
     final Request request = new Request();

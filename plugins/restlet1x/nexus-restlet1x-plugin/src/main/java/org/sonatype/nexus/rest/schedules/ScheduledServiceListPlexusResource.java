@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -35,7 +37,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -44,7 +45,6 @@ import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -56,7 +56,8 @@ import org.restlet.resource.Variant;
 /**
  * @author tstevens
  */
-@Component(role = PlexusResource.class, hint = "ScheduledServiceListPlexusResource")
+@Named
+@Singleton
 @Path(ScheduledServiceListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})

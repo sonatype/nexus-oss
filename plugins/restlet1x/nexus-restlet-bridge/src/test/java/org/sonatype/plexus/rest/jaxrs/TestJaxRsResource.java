@@ -15,18 +15,18 @@ package org.sonatype.plexus.rest.jaxrs;
 
 import java.util.Date;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.plexus.rest.jsr311.JsrComponent;
-
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-@Component(role = JsrComponent.class, hint = "test")
+@Named("test")
+@Singleton
 @Path("/test")
 public class TestJaxRsResource
     extends AbstractLogEnabled

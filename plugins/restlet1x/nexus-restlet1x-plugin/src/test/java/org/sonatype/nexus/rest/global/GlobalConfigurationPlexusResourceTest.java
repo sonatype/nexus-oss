@@ -13,7 +13,10 @@
 
 package org.sonatype.nexus.rest.global;
 
+import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
+import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.rest.model.SmtpSettings;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.thoughtworks.xstream.XStream;
@@ -21,6 +24,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link GlobalConfigurationPlexusResource} behavior.
@@ -29,7 +33,12 @@ public class GlobalConfigurationPlexusResourceTest
     extends TestSupport
 {
 
-  private GlobalConfigurationPlexusResource testSubject = new GlobalConfigurationPlexusResource();
+  // FIXME: This should be done in setup
+  private GlobalConfigurationPlexusResource testSubject = new GlobalConfigurationPlexusResource(
+      mock(NotificationManager.class),
+      mock(SecurityConfigurationSource.class),
+      mock(ApplicationConfigurationSource.class)
+  );
 
   @Test
   public void unescapeHTMLInSMTPPassword() {

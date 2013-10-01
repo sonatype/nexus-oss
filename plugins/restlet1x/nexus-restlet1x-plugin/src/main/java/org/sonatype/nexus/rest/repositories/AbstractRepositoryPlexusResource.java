@@ -16,6 +16,8 @@ package org.sonatype.nexus.rest.repositories;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
@@ -52,7 +54,6 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -67,17 +68,33 @@ public abstract class AbstractRepositoryPlexusResource
    */
   public static final String REPOSITORY_ID_KEY = "repositoryId";
 
-  @Requirement
   private AuthenticationInfoConverter authenticationInfoConverter;
 
-  @Requirement
   private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
-  @Requirement
   private ApplicationConfiguration applicationConfiguration;
 
-  @Requirement(hint = "RestletRepositoryUrlBuilder")
   private RepositoryURLBuilder repositoryURLBuilder;
+
+  @Inject
+  public void setAuthenticationInfoConverter(final AuthenticationInfoConverter authenticationInfoConverter) {
+    this.authenticationInfoConverter = authenticationInfoConverter;
+  }
+
+  @Inject
+  public void setGlobalRemoteConnectionSettings(final GlobalRemoteConnectionSettings globalRemoteConnectionSettings) {
+    this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
+  }
+
+  @Inject
+  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = applicationConfiguration;
+  }
+
+  @Inject
+  public void setRepositoryURLBuilder(final RepositoryURLBuilder repositoryURLBuilder) {
+    this.repositoryURLBuilder = repositoryURLBuilder;
+  }
 
   protected AuthenticationInfoConverter getAuthenticationInfoConverter() {
     return authenticationInfoConverter;

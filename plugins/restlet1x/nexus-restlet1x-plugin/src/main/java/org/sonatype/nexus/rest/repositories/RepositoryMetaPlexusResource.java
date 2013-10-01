@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.rest.repositories;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -26,10 +28,8 @@ import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -37,7 +37,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "RepositoryMetaPlexusResource")
+@Named
+@Singleton
 @Path(RepositoryMetaPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class RepositoryMetaPlexusResource

@@ -13,13 +13,15 @@
 
 package org.sonatype.nexus.rest;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.ClientInfoProvider;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 
 /**
@@ -32,7 +34,8 @@ import org.restlet.data.Request;
  * @author cstamas
  * @since 2.1
  */
-@Component(role = ClientInfoProvider.class)
+@Named
+@Singleton
 public class RestletClientInfoProvider
     extends AbstractLoggingComponent
     implements ClientInfoProvider

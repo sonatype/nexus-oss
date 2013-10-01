@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.rest;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -22,35 +26,25 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = RepositoryURLBuilder.class, hint = "RestletRepositoryUrlBuilder")
+@Named
+@Singleton
 public class RestletRepositoryURLBuilder
     implements RepositoryURLBuilder
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-  @Requirement
-  private RepositoryTypeRegistry repositoryTypeRegistry;
+  private final RepositoryTypeRegistry repositoryTypeRegistry;
 
-  @Requirement
-  private GlobalRestApiSettings globalRestApiSettings;
+  private final GlobalRestApiSettings globalRestApiSettings;
 
-  public RestletRepositoryURLBuilder() {
-    // nothing
-  }
-
-  /**
-   * This constructor is used for testing only.
-   */
-  protected RestletRepositoryURLBuilder(final RepositoryRegistry repositoryRegistry,
+  @Inject
+  public RestletRepositoryURLBuilder(final RepositoryRegistry repositoryRegistry,
                                         final RepositoryTypeRegistry repositoryTypeRegistry,
                                         final GlobalRestApiSettings globalRestApiSettings)
   {

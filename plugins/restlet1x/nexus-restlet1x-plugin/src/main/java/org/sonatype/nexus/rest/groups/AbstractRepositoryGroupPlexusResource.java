@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -36,7 +38,6 @@ import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate.Provid
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -46,11 +47,19 @@ public abstract class AbstractRepositoryGroupPlexusResource
 {
   public static final String GROUP_ID_KEY = "groupId";
 
-  @Requirement
   private RepositoryTypeRegistry repositoryTypeRegistry;
 
-  @Requirement(hint = "RestletRepositoryUrlBuilder")
   private RepositoryURLBuilder repositoryURLBuilder;
+
+  @Inject
+  public void setRepositoryTypeRegistry(final RepositoryTypeRegistry repositoryTypeRegistry) {
+    this.repositoryTypeRegistry = repositoryTypeRegistry;
+  }
+
+  @Inject
+  public void setRepositoryURLBuilder(final RepositoryURLBuilder repositoryURLBuilder) {
+    this.repositoryURLBuilder = repositoryURLBuilder;
+  }
 
   protected RepositoryURLBuilder getRepositoryURLBuilder() {
     return repositoryURLBuilder;

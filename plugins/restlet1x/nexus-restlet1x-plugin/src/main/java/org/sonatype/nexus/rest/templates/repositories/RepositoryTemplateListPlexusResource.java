@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.rest.templates.repositories;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -30,10 +32,8 @@ import org.sonatype.nexus.templates.Template;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -43,7 +43,8 @@ import org.restlet.resource.Variant;
 /**
  * @author tstevens
  */
-@Component(role = PlexusResource.class, hint = "RepositoryTemplateListPlexusResource")
+@Named
+@Singleton
 @Path(RepositoryTemplateListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class RepositoryTemplateListPlexusResource
