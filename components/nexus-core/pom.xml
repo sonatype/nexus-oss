@@ -111,6 +111,9 @@
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
+    <!--
+    FIXME: Deprecated, to be removed in future release.
+    -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
