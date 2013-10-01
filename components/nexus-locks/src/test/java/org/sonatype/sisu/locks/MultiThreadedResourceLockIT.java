@@ -25,10 +25,8 @@ import org.sonatype.sisu.litmus.testsupport.group.Slow;
 import com.google.inject.Provides;
 import org.junit.experimental.categories.Category;
 
-// FIXME: Rename -> IT
-
 @Category(Slow.class)
-public class MultiThreadedResourceLockTest
+public class MultiThreadedResourceLockIT
     extends InjectedTestCase
 {
   @Provides
