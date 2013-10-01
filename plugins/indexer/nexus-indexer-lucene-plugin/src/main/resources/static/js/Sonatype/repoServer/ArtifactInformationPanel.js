@@ -250,7 +250,14 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
         },
 
         setupNonLocalView : function(repositoryPath) {
-          this.find('name', 'repositoryPath')[0].setRawValue(repositoryPath + ' (Not Locally Cached)');
+          if (this.data.resourceURI) {
+            this.find('name', 'repositoryPath')[0].setValue({
+              path: repositoryPath + ' (Not Locally Cached)',
+              href: this.data.resourceURI
+            });
+          } else {
+            this.find('name', 'repositoryPath')[0].setRawValue(repositoryPath + ' (Not Locally Cached)');
+          }
           this.find('name', 'uploader')[0].setRawValue(null);
           this.find('name', 'size')[0].setRawValue(null);
           this.find('name', 'uploaded')[0].setRawValue(null);
