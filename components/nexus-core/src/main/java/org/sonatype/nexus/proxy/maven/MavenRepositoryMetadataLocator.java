@@ -19,6 +19,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -37,7 +40,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
@@ -50,14 +52,17 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author cstamas
  */
-@Component(role = MetadataLocator.class)
+@Singleton
+@Named
 public class MavenRepositoryMetadataLocator
     implements MetadataLocator
 {
+  @Override
   public Gav getGavForRequest(ArtifactStoreRequest request) {
     return request.getGav();
   }
 
+  @Override
   public Plugin extractPluginElementFromPom(ArtifactStoreRequest request)
       throws IOException
   {
@@ -101,6 +106,7 @@ public class MavenRepositoryMetadataLocator
     return pomGav;
   }
 
+  @Override
   public String retrievePackagingFromPom(ArtifactStoreRequest request)
       throws IOException
   {
@@ -176,6 +182,7 @@ public class MavenRepositoryMetadataLocator
     return packaging;
   }
 
+  @Override
   public Model retrievePom(ArtifactStoreRequest request)
       throws IOException
   {
@@ -215,6 +222,7 @@ public class MavenRepositoryMetadataLocator
     }
   }
 
+  @Override
   public Metadata retrieveGAVMetadata(ArtifactStoreRequest request)
       throws IOException
   {
@@ -228,6 +236,7 @@ public class MavenRepositoryMetadataLocator
     }
   }
 
+  @Override
   public Metadata retrieveGAMetadata(ArtifactStoreRequest request)
       throws IOException
   {
@@ -241,6 +250,7 @@ public class MavenRepositoryMetadataLocator
     }
   }
 
+  @Override
   public Metadata retrieveGMetadata(ArtifactStoreRequest request)
       throws IOException
   {
@@ -254,6 +264,7 @@ public class MavenRepositoryMetadataLocator
     }
   }
 
+  @Override
   public void storeGAVMetadata(ArtifactStoreRequest request, Metadata metadata)
       throws IOException
   {
@@ -267,6 +278,7 @@ public class MavenRepositoryMetadataLocator
     }
   }
 
+  @Override
   public void storeGAMetadata(ArtifactStoreRequest request, Metadata metadata)
       throws IOException
   {
@@ -280,6 +292,7 @@ public class MavenRepositoryMetadataLocator
     }
   }
 
+  @Override
   public void storeGMetadata(ArtifactStoreRequest request, Metadata metadata)
       throws IOException
   {

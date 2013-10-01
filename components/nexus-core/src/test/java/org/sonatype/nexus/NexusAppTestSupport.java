@@ -126,9 +126,9 @@ public abstract class NexusAppTestSupport
     ThreadContext.remove();
     super.setUp();
 
+    eventBus = lookup(EventBus.class);
     nexusScheduler = lookup(NexusScheduler.class);
     eventInspectorHost = lookup(EventInspectorHost.class);
-    eventBus = lookup(EventBus.class);
     nexusConfiguration = lookup(NexusConfiguration.class);
     templateManager = lookup(TemplateManager.class);
 

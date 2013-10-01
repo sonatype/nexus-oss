@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -54,19 +56,22 @@ import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 
 public abstract class AbstractScheduledServicePlexusResource
     extends AbstractFormFieldResource
 {
-  @Requirement
   private NexusScheduler nexusScheduler;
 
   public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
 
   private DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+  @Inject
+  public void setNexusScheduler(final NexusScheduler nexusScheduler) {
+    this.nexusScheduler = nexusScheduler;
+  }
 
   protected NexusScheduler getNexusScheduler() {
     return nexusScheduler;

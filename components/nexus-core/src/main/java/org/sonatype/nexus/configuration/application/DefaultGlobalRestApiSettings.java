@@ -18,37 +18,21 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.model.CGlobalRestApiCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 @Singleton
 @Named
 public class DefaultGlobalRestApiSettings
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<CRestApiSettings>
     implements GlobalRestApiSettings
 {
-  private final ApplicationConfiguration applicationConfiguration;
-
   @Inject
   public DefaultGlobalRestApiSettings(final EventBus eventBus, final ApplicationConfiguration applicationConfiguration) {
-    super(eventBus);
-    this.applicationConfiguration = checkNotNull(applicationConfiguration);
-  }
-
-  @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return applicationConfiguration;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
+    super("Global Rest Api Settings", eventBus, applicationConfiguration);
   }
 
   @Override
@@ -61,12 +45,7 @@ public class DefaultGlobalRestApiSettings
   }
 
   @Override
-  protected CRestApiSettings getCurrentConfiguration(boolean forWrite) {
-    return ((CGlobalRestApiCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
+  protected CoreConfiguration<CRestApiSettings> wrapConfiguration(Object configuration)
       throws ConfigurationException
   {
     if (configuration instanceof ApplicationConfiguration) {
@@ -81,11 +60,6 @@ public class DefaultGlobalRestApiSettings
 
   protected void initConfig() {
     ((CGlobalRestApiCoreConfiguration) getCurrentCoreConfiguration()).initConfig();
-  }
-
-  @Override
-  public String getName() {
-    return "Global Rest Api Settings";
   }
 
   // ==

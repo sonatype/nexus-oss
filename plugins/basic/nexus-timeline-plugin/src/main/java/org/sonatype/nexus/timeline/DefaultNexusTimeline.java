@@ -30,9 +30,6 @@ import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
 import com.google.common.base.Predicate;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultNexusTimeline
-    implements NexusTimeline, Startable
+    implements NexusTimeline
 {
 
   private static final String TIMELINE_BASEDIR = "timeline";
@@ -75,30 +72,24 @@ public class DefaultNexusTimeline
     catch (IOException e) {
       throw new RuntimeException("Unable to move legacy Timeline!", e);
     }
-  }
-
-  // FIXME: Unsure what the proper resolution is for Startable
-  public void start()
-      throws StartingException
-  {
     try {
       logger.info("Starting Nexus Timeline...");
       updateConfiguration();
     }
     catch (IOException e) {
-      throw new StartingException("Unable to initialize Timeline!", e);
+      throw new RuntimeException("Unable to initialize Timeline!", e);
     }
   }
 
-  public void stop()
-      throws StoppingException
+  @Override
+  public void shutdown()
   {
     try {
       logger.info("Stopping Nexus Timeline...");
       timeline.stop();
     }
     catch (IOException e) {
-      throw new StoppingException("Unable to cleanly stop Timeline!", e);
+      throw new RuntimeException("Unable to cleanly stop Timeline!", e);
     }
   }
 

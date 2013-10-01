@@ -15,6 +15,10 @@ package org.sonatype.nexus.email;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
@@ -24,24 +28,30 @@ import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author velo
  */
-@Component(role = SmtpSettingsValidator.class)
+@Named
+@Singleton
 public class DefaultSmtpSettingsValidator
     extends AbstractLoggingComponent
     implements SmtpSettingsValidator
 {
-  @Requirement
-  private EMailer emailer;
-
-  @Requirement(role = SmtpSessionParametersCustomizer.class)
-  private List<SmtpSessionParametersCustomizer> customizers;
-
   private static final String NEXUS_MAIL_ID = "Nexus";
+
+  private final EMailer emailer;
+
+  private final List<SmtpSessionParametersCustomizer> customizers;
+
+  @Inject
+  public DefaultSmtpSettingsValidator(final EMailer emailer,
+                                      final List<SmtpSessionParametersCustomizer> customizers)
+  {
+    this.emailer = checkNotNull(emailer);
+    this.customizers = checkNotNull(customizers);
+  }
 
   public boolean sendSmtpConfigurationTest(CSmtpConfiguration smtp, String email)
       throws EmailerException

@@ -13,10 +13,8 @@
 
 package org.sonatype.nexus.configuration.application;
 
-import org.sonatype.nexus.configuration.Configurable;
 
 public interface GlobalRestApiSettings
-    extends Configurable
 {
   void disable();
 

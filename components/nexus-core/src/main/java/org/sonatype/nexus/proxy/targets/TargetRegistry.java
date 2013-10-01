@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -27,7 +26,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public interface TargetRegistry
-    extends Configurable
 {
   /**
    * Gets the existing targets. It returns an umodifiable collection. To modify targets, use methods below

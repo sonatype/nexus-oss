@@ -26,7 +26,7 @@ public class DefaultGlobalRestApiConfigurationTest
   public void testNoConfiguration()
       throws Exception
   {
-    final GlobalRestApiSettings settings = lookup(GlobalRestApiSettings.class);
+    final DefaultGlobalRestApiSettings settings = (DefaultGlobalRestApiSettings) lookup(GlobalRestApiSettings.class);
     ApplicationConfiguration cfg = lookup(ApplicationConfiguration.class);
     cfg.getConfigurationModel().setRestApi(null);
     settings.configure(cfg);

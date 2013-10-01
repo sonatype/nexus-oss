@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.FileContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenFileTypeValidator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -54,7 +55,7 @@ public abstract class AbstractFileTypeValidationUtilTest
   private Repository getDummyRepository()
       throws Exception
   {
-    Repository repository = lookup(Repository.class, "maven2");
+    M2Repository repository = (M2Repository) lookup(Repository.class, "maven2");
 
     CRepository cRepo = new DefaultCRepository();
     cRepo.setId("test-repo");

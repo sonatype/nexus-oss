@@ -16,6 +16,9 @@ package org.sonatype.nexus.rest.mirrors;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,11 +32,8 @@ import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -41,7 +41,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "RepositoryPredefinedMirrorListPlexusResource")
+@Named
+@Singleton
 @Path(RepositoryPredefinedMirrorListPlexusResource.RESOURCE_URI)
 @Consumes({"application/xml", "application/json"})
 public class RepositoryPredefinedMirrorListPlexusResource
@@ -49,10 +50,11 @@ public class RepositoryPredefinedMirrorListPlexusResource
 {
   public static final String RESOURCE_URI = "/repository_predefined_mirrors/{" + REPOSITORY_ID_KEY + "}";
 
-  @Requirement
-  private NexusRepositoryMetadataHandler repoMetadata;
+  private final NexusRepositoryMetadataHandler repoMetadata;
 
-  public RepositoryPredefinedMirrorListPlexusResource() {
+  @Inject
+  public RepositoryPredefinedMirrorListPlexusResource(final NexusRepositoryMetadataHandler repoMetadata) {
+    this.repoMetadata = repoMetadata;
     setModifiable(false);
   }
 

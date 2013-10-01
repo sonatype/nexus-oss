@@ -26,6 +26,7 @@ import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
+import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
@@ -42,7 +43,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.mockito.Mock;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -74,15 +74,15 @@ public class PathBasedRequestRepositoryMapperTest
 
   private RepositoryRegistry registry;
 
-  private GroupRepository groupRepo;
+  private AbstractMavenGroupRepository groupRepo;
 
-  private RequestRepositoryMapper requestRepositoryMapper;
+  private DefaultRequestRepositoryMapper requestRepositoryMapper;
 
   protected RequestRepositoryMapper prepare(Map<String, String[]> inclusions, Map<String, String[]> exclusions,
                                             Map<String, String[]> blockings)
       throws Exception
   {
-    requestRepositoryMapper = lookup(RequestRepositoryMapper.class);
+    requestRepositoryMapper = (DefaultRequestRepositoryMapper) lookup(RequestRepositoryMapper.class);
 
     // clear it
     for (String id : requestRepositoryMapper.getMappings().keySet()) {

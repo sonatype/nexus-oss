@@ -17,6 +17,7 @@ package org.sonatype.nexus.tasks.descriptors.properties;
 public abstract class AbstractBooleanPropertyDescriptor
     extends AbstractPropertyDescriptor
 {
+  @Override
   public String getType() {
     return "boolean";
   }

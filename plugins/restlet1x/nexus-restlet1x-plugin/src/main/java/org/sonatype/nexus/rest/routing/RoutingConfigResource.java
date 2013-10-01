@@ -16,6 +16,8 @@ package org.sonatype.nexus.rest.routing;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -27,11 +29,9 @@ import org.sonatype.nexus.proxy.maven.routing.DiscoveryConfig;
 import org.sonatype.nexus.rest.model.RoutingConfigMessage;
 import org.sonatype.nexus.rest.model.RoutingConfigMessageWrapper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.google.common.primitives.Ints;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -45,7 +45,8 @@ import org.restlet.resource.Variant;
  * @author cstamas
  * @since 2.4
  */
-@Component(role = PlexusResource.class, hint = "RoutingConfigResource")
+@Named
+@Singleton
 @Path(RoutingConfigResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class RoutingConfigResource

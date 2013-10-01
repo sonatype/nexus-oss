@@ -13,6 +13,11 @@
 
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -22,12 +27,13 @@ import org.sonatype.nexus.proxy.maven.gav.M1ArtifactRecognizer;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-@Component(role = GroupRepository.class, hint = M1GroupRepository.ID, instantiationStrategy = "per-lookup",
-    description = "Maven1 Repository Group")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Named(M1GroupRepository.ID)
+@Typed(GroupRepository.class)
+@Description("Maven1 Repository Group")
 public class M1GroupRepository
     extends AbstractMavenGroupRepository
 {
@@ -36,14 +42,21 @@ public class M1GroupRepository
    */
   public static final String ID = Maven1ContentClass.ID;
 
-  @Requirement(hint = Maven1ContentClass.ID)
-  private ContentClass contentClass;
+  private final ContentClass contentClass;
 
-  @Requirement(hint = "maven1")
-  private GavCalculator gavCalculator;
+  private final GavCalculator gavCalculator;
 
-  @Requirement
-  private M1GroupRepositoryConfigurator m1GroupRepositoryConfigurator;
+  private final M1GroupRepositoryConfigurator m1GroupRepositoryConfigurator;
+
+  @Inject
+  public M1GroupRepository(final @Named(Maven1ContentClass.ID) ContentClass contentClass, 
+                           final @Named("maven1") GavCalculator gavCalculator,
+                           final M1GroupRepositoryConfigurator m1GroupRepositoryConfigurator)
+  {
+    this.contentClass = checkNotNull(contentClass);
+    this.gavCalculator = checkNotNull(gavCalculator);
+    this.m1GroupRepositoryConfigurator = checkNotNull(m1GroupRepositoryConfigurator);
+  }
 
   @Override
   protected M1GroupRepositoryConfiguration getExternalConfiguration(boolean forWrite) {
@@ -60,10 +73,12 @@ public class M1GroupRepository
     };
   }
 
+  @Override
   public ContentClass getRepositoryContentClass() {
     return contentClass;
   }
 
+  @Override
   public GavCalculator getGavCalculator() {
     return gavCalculator;
   }

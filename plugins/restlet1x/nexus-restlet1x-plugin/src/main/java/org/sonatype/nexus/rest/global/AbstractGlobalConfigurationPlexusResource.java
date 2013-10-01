@@ -15,6 +15,8 @@ package org.sonatype.nexus.rest.global;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
@@ -48,7 +50,6 @@ import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.nexus.rest.model.SystemNotificationSettings;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * The base class for global configuration resources.
@@ -64,23 +65,47 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
   public static final String SECURITY_CUSTOM = "custom";
 
-  @Requirement
   private NexusEmailer nexusEmailer;
 
-  @Requirement
   private GlobalRemoteProxySettings globalRemoteProxySettings;
 
-  @Requirement
   private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
-  @Requirement
   private GlobalRestApiSettings globalRestApiSettings;
 
-  @Requirement
   private AuthenticationInfoConverter authenticationInfoConverter;
 
-  @Requirement
   private ErrorReportingManager errorReportingManager;
+
+  @Inject
+  public void setNexusEmailer(final NexusEmailer nexusEmailer) {
+    this.nexusEmailer = nexusEmailer;
+  }
+
+  @Inject
+  public void setGlobalRemoteProxySettings(final GlobalRemoteProxySettings globalRemoteProxySettings) {
+    this.globalRemoteProxySettings = globalRemoteProxySettings;
+  }
+
+  @Inject
+  public void setGlobalRemoteConnectionSettings(final GlobalRemoteConnectionSettings globalRemoteConnectionSettings) {
+    this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
+  }
+
+  @Inject
+  public void setGlobalRestApiSettings(final GlobalRestApiSettings globalRestApiSettings) {
+    this.globalRestApiSettings = globalRestApiSettings;
+  }
+
+  @Inject
+  public void setAuthenticationInfoConverter(final AuthenticationInfoConverter authenticationInfoConverter) {
+    this.authenticationInfoConverter = authenticationInfoConverter;
+  }
+
+  @Inject
+  public void setErrorReportingManager(final ErrorReportingManager errorReportingManager) {
+    this.errorReportingManager = errorReportingManager;
+  }
 
   protected NexusEmailer getNexusEmailer() {
     return nexusEmailer;

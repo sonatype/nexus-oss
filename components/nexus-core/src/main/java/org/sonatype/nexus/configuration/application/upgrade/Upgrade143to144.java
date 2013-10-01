@@ -19,31 +19,40 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.v1_4_4.upgrade.BasicVersionConverter;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Upgrades configuration model from version 1.4.3 to 1.4.4.
  *
  * @author bdemers
  */
-@Component(role = SingleVersionUpgrader.class, hint = "1.4.3")
+@Singleton
+@Named("1.4.3")
 public class Upgrade143to144
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final File nexusWorkdir;
 
+  @Inject
+  public Upgrade143to144(final @Named("${nexus-work}") File nexusWorkdir) {
+    this.nexusWorkdir = checkNotNull(nexusWorkdir);
+  }
+
+  @Override
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
@@ -72,6 +81,7 @@ public class Upgrade143to144
     return conf;
   }
 
+  @Override
   public void upgrade(UpgradeMessage message)
       throws ConfigurationIsCorruptedException
   {
@@ -87,85 +97,6 @@ public class Upgrade143to144
         task.setType("UpdateIndexTask");
       }
     }
-
-    // DISABLED FOR NOW, WILL DO THIS PROXY ATTRIBUTES MOVE IN SOME POST-1.9 VERSION
-/*
-        // Upgrade for Attributes
-        final File oldAttributesBase = new File( applicationConfiguration.getWorkingDirectory( "proxy" ), "attributes" );
-
-        File sourceDirectory;
-
-        File destinationDirectory;
-
-        for ( CRepository repository : newc.getRepositories() )
-        {
-            // we handle only repositories with "default" storage paths and "file" LS
-            // all other cases should be covered by manual steps performed by Admin!
-            if ( repository.getLocalStorage() != null && "file".equals( repository.getLocalStorage().getProvider() ) )
-            {
-                sourceDirectory = new File( oldAttributesBase, repository.getId() );
-
-                if ( !sourceDirectory.isDirectory() )
-                {
-                    // nothing to upgrade
-                    continue;
-                }
-
-                getLogger().info(
-                    "Upgrading proxy attributes for repository \"" + repository.getName() + "\" (id="
-                        + repository.getId() + ")..." );
-
-                destinationDirectory =
-                    new File( new File( getRepositoryStorageBaseDirectory( repository.getId(),
-                        repository.getLocalStorage().getUrl() ), ".nexus" ), "attributes" );
-
-                try
-                {
-                    FileUtils.copyDirectoryStructure( sourceDirectory, destinationDirectory );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn(
-                        "Could not delete old proxy attributes from " + sourceDirectory
-                            + " but migration did succeed; manual cleanup needed." );
-
-                    throw new IllegalStateException(
-                        "Cannot upgrade proxy attributes! Upgrade stopped and manual intervention needed!", e );
-                }
-                try
-                {
-                    FileUtils.forceDelete( sourceDirectory );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn(
-                        "Could not delete old proxy attributes from " + sourceDirectory
-                            + " but migration did succeed; manual cleanup needed." );
-                }
-            }
-            else
-            {
-                getLogger().info(
-                    "Skipping proxy upgrade for repository \""
-                        + repository.getName()
-                        + "\" (id="
-                        + repository.getId()
-                        + ") since it uses non-default storage provider. Here Nexus assumes manual upgrade steps are performed already!" );
-            }
-        }
-
-        // one more try (in case of some failure above) to get rid of proxy folder
-        try
-        {
-            FileUtils.forceDelete( oldAttributesBase.getParentFile() );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn(
-                "Could not delete old proxy folder from nexus work directory but migration did succeed; manual cleanup needed." );
-        }
-*/
-    // DISABLED FOR NOW, WILL DO THIS PROXY ATTRIBUTES MOVE IN SOME POST-1.9 VERSION
 
     newc.setVersion(org.sonatype.nexus.configuration.model.v1_4_4.Configuration.MODEL_VERSION);
     message.setModelVersion(org.sonatype.nexus.configuration.model.v1_4_4.Configuration.MODEL_VERSION);
@@ -185,7 +116,7 @@ public class Upgrade143to144
   {
     if (StringUtils.isBlank(urlStr)) {
       // the  factory default
-      return new File(applicationConfiguration.getWorkingDirectory("storage"), repositoryId);
+      return new File(new File( nexusWorkdir, "storage"), repositoryId);
     }
     else {
       // do the same as DefaultFSLocalRepositoryStorage does to interpret string url

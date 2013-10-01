@@ -18,6 +18,7 @@ import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -31,7 +32,7 @@ public class DefaultRepositoryConfiguratorTest
   public void testExpireNFCOnUpdate()
       throws Exception
   {
-    Repository oldRepository = this.lookup(Repository.class, "maven2");
+    M2Repository oldRepository = (M2Repository)this.lookup(Repository.class, "maven2");
 
     CRepository cRepo = new DefaultCRepository();
     cRepo.setId("test-repo");
@@ -67,7 +68,7 @@ public class DefaultRepositoryConfiguratorTest
   public void testExpireNFCOnUpdateWithNFCDisabled()
       throws Exception
   {
-    Repository oldRepository = this.lookup(Repository.class, "maven2");
+    M2Repository oldRepository = (M2Repository)this.lookup(Repository.class, "maven2");
 
     CRepository cRepo = new DefaultCRepository();
     cRepo.setId("test-repo");
@@ -102,7 +103,7 @@ public class DefaultRepositoryConfiguratorTest
       throws Exception
   {
 
-    Repository repository = this.lookup(Repository.class, "maven2");
+    M2Repository repository = (M2Repository) this.lookup(Repository.class, "maven2");
 
     CRepository cRepo = new DefaultCRepository();
     cRepo.setId("test-repo");

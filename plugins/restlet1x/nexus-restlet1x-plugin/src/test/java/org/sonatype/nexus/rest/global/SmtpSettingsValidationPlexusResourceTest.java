@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.rest.global;
 
+import org.sonatype.nexus.email.SmtpSettingsValidator;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -22,6 +23,7 @@ import org.restlet.resource.ResourceException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.sonatype.nexus.rest.global.SmtpSettingsValidationPlexusResource.validateEmail;
 
 public class SmtpSettingsValidationPlexusResourceTest
@@ -66,7 +68,7 @@ public class SmtpSettingsValidationPlexusResourceTest
   @Test
   public void unescapeHTMLInSMTPPassword() {
     final SmtpSettingsValidationPlexusResource testSubject =
-        new SmtpSettingsValidationPlexusResource();
+        new SmtpSettingsValidationPlexusResource(mock(SmtpSettingsValidator.class));
 
     // settings object as it would come in via REST, with escaped HTML
     SmtpSettingsResource settings = new SmtpSettingsResource();

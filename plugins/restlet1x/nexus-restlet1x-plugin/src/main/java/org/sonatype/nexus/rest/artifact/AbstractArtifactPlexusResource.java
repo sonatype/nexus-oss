@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -48,7 +50,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
@@ -64,8 +65,12 @@ import org.restlet.resource.Variant;
 public abstract class AbstractArtifactPlexusResource
     extends AbstractNexusPlexusResource
 {
-  @Requirement
   private SecuritySystem securitySystem;
+
+  @Inject
+  public void setSecuritySystem(final SecuritySystem securitySystem) {
+    this.securitySystem = securitySystem;
+  }
 
   /**
    * Centralized way to create ResourceStoreRequests, since we have to fill in various things in Request context,

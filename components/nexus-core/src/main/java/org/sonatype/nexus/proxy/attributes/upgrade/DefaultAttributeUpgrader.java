@@ -17,21 +17,25 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.util.LinearNumberSequence;
 import org.sonatype.nexus.util.LowerLimitNumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Component that handles upgrade of "legacy attribute storage". It does it by detecting it's presence, and firing the
@@ -40,10 +44,11 @@ import org.codehaus.plexus.util.StringUtils;
  *
  * @since 2.0
  */
-@Component(role = AttributeUpgrader.class)
+@Singleton
+@Named
 public class DefaultAttributeUpgrader
     extends AbstractLoggingComponent
-    implements AttributeUpgrader, Disposable
+    implements AttributeUpgrader
 {
   private static final String JMX_DOMAIN = "org.sonatype.nexus.proxy.attributes.upgrade";
 
@@ -66,12 +71,12 @@ public class DefaultAttributeUpgrader
    */
   private final int UPGRADE_THROTTLE_UPS = SystemPropertiesHelper.getInteger(getClass().getName() + ".throttleUps",
       100);
+  
+  private final EventBus eventBus;
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
   private ObjectName jmxName;
 
@@ -81,7 +86,12 @@ public class DefaultAttributeUpgrader
 
   private volatile AttributeUpgraderThread upgraderThread;
 
-  public DefaultAttributeUpgrader() {
+  @Inject
+  public DefaultAttributeUpgrader(final EventBus eventBus, final ApplicationConfiguration applicationConfiguration, final RepositoryRegistry repositoryRegistry) {
+    this.eventBus = checkNotNull(eventBus);
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+
     this.upgradeThrottleTps = UPGRADE_THROTTLE_UPS;
     this.lowerLimitNumberSequence = new LowerLimitNumberSequence(new LinearNumberSequence(0, 1, 1, 0), 0);
 
@@ -98,22 +108,20 @@ public class DefaultAttributeUpgrader
       jmxName = null;
       getLogger().warn("Problem registering MBean for: " + getClass().getName(), e);
     }
+    eventBus.register(this);
   }
 
   // ==
 
-  @Override
-  public void dispose() {
+  @Subscribe
+  public void on(final NexusStoppedEvent e) {
     shutdown();
-    // kill the daemon thread
-    if (isUpgradeRunning()) {
-      upgraderThread.interrupt();
-    }
   }
 
   // ==
 
   public void shutdown() {
+    eventBus.unregister(this);
     if (null != jmxName) {
       try {
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -124,6 +132,10 @@ public class DefaultAttributeUpgrader
       catch (final Exception e) {
         getLogger().warn("Problem unregistering MBean for: " + getClass().getName(), e);
       }
+    }
+    // kill the daemon thread
+    if (isUpgradeRunning()) {
+      upgraderThread.interrupt();
     }
   }
 

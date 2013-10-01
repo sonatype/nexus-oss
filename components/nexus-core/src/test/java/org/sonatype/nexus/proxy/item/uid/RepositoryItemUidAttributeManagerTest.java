@@ -22,6 +22,7 @@ import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
@@ -37,7 +38,7 @@ import org.junit.Test;
 public class RepositoryItemUidAttributeManagerTest
     extends AbstractNexusTestEnvironment
 {
-  protected Repository repository;
+  protected M2Repository repository;
 
   protected RepositoryItemUidAttributeManager repositoryItemUidAttributeManager;
 
@@ -59,7 +60,7 @@ public class RepositoryItemUidAttributeManagerTest
   {
     super.setUp();
 
-    repository = lookup(Repository.class, "maven2");
+    repository = (M2Repository) lookup(Repository.class, "maven2");
 
     CRepository repoConf = new DefaultCRepository();
 

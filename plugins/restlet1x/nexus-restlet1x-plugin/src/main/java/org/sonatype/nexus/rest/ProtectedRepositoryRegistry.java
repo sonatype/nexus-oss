@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
@@ -24,20 +28,23 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
-@Component(role = RepositoryRegistry.class, hint = "protected")
+@Named("protected")
+@Singleton
 public class ProtectedRepositoryRegistry
     extends AbstractLoggingComponent
     implements RepositoryRegistry
 {
+  private final RepositoryRegistry defaultRepositoryRegistry;
 
-  @Requirement
-  private RepositoryRegistry defaultRepositoryRegistry;
+  private final NexusItemAuthorizer nexusItemAuthorizer;
 
-  @Requirement
-  private NexusItemAuthorizer nexusItemAuthorizer;
+  @Inject
+  public ProtectedRepositoryRegistry(final RepositoryRegistry defaultRepositoryRegistry,
+                                     final NexusItemAuthorizer nexusItemAuthorizer)
+  {
+    this.defaultRepositoryRegistry = defaultRepositoryRegistry;
+    this.nexusItemAuthorizer = nexusItemAuthorizer;
+  }
 
   public void addRepository(Repository repository) {
     this.defaultRepositoryRegistry.addRepository(repository);

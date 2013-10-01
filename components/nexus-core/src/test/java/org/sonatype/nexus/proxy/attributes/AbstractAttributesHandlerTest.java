@@ -21,6 +21,7 @@ import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -38,7 +39,7 @@ public class AbstractAttributesHandlerTest
 
   protected DefaultAttributesHandler attributesHandler;
 
-  protected Repository repository;
+  protected M2Repository repository;
 
   public void setUp()
       throws Exception
@@ -50,7 +51,7 @@ public class AbstractAttributesHandlerTest
 
     attributesHandler = (DefaultAttributesHandler) lookup(AttributesHandler.class);
 
-    repository = lookup(Repository.class, "maven2");
+    repository = (M2Repository) lookup(Repository.class, "maven2");
 
     CRepository repoConf = new DefaultCRepository();
 

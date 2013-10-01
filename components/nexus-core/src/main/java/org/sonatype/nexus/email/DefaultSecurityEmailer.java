@@ -15,24 +15,32 @@ package org.sonatype.nexus.email;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.MailRequest;
 import org.sonatype.security.email.SecurityEmailer;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The default emailer that is "stolen" by Security. Look at the NexusEmailer for the real thing.
  *
  * @author cstamas
  */
-@Component(role = SecurityEmailer.class)
+@Named
+@Singleton
 public class DefaultSecurityEmailer
     implements SecurityEmailer
 {
-  @Requirement
-  private NexusEmailer nexusEmailer;
+  private final NexusEmailer nexusEmailer;
+
+  @Inject
+  public DefaultSecurityEmailer(final NexusEmailer nexusEmailer) {
+    this.nexusEmailer = checkNotNull(nexusEmailer);
+  }
 
   public void sendNewUserCreated(String email, String userid, String password) {
     StringBuilder body = new StringBuilder();

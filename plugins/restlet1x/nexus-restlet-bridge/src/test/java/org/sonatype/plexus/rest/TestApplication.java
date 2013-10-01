@@ -13,11 +13,13 @@
 
 package org.sonatype.plexus.rest;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.restlet.Application;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.restlet.Router;
 
-@Component(role = Application.class, hint = "test")
+@Named("test")
+@Singleton
 public class TestApplication
     extends PlexusRestletApplicationBridge
 {

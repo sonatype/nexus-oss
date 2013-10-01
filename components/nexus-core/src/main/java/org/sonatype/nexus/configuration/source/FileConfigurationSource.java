@@ -19,6 +19,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -31,13 +35,12 @@ import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
+import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 import org.sonatype.security.events.SecurityConfigurationChanged;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -48,48 +51,62 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author cstamas
  */
-@Component(role = ApplicationConfigurationSource.class, hint = "file")
+@Singleton
+@Named("file")
 public class FileConfigurationSource
     extends AbstractApplicationConfigurationSource
 {
 
+  private final EventBus eventBus;
+
+  private final ApplicationStatusSource applicationStatusSource;
+
   /**
    * The configuration file.
    */
-  @org.codehaus.plexus.component.annotations.Configuration(value = "${nexus-work}/conf/nexus.xml")
-  private File configurationFile;
+  private final File configurationFile;
 
   /**
    * The configuration validator.
    */
-  @Requirement
-  private ApplicationConfigurationValidator configurationValidator;
+  private final ApplicationConfigurationValidator configurationValidator;
 
   /**
    * The configuration upgrader.
    */
-  @Requirement
-  private ApplicationConfigurationUpgrader configurationUpgrader;
+  private final ApplicationConfigurationUpgrader configurationUpgrader;
 
   /**
    * The nexus defaults configuration source.
    */
-  @Requirement(hint = "static")
-  private ApplicationConfigurationSource nexusDefaults;
+  private final ApplicationConfigurationSource nexusDefaults;
 
-  @Requirement
-  private EventBus eventBus;
-
-  @Requirement
-  private ConfigurationHelper configHelper;
+  private final ConfigurationHelper configHelper;
 
   /**
    * Flag to mark defaulted config
    */
   private boolean configurationDefaulted;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  @Inject
+  public FileConfigurationSource(final ApplicationInterpolatorProvider interpolatorProvider,
+                                 final EventBus eventBus,
+                                 final ApplicationStatusSource applicationStatusSource,
+                                 final @Named("${nexus-work}/conf/nexus.xml") File configurationFile,
+                                 final ApplicationConfigurationValidator configurationValidator,
+                                 final ApplicationConfigurationUpgrader configurationUpgrader,
+                                 final @Named("static") ApplicationConfigurationSource nexusDefaults,
+                                 final ConfigurationHelper configHelper)
+  {
+    super(interpolatorProvider);
+    this.eventBus = checkNotNull(eventBus);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.configurationFile = checkNotNull(configurationFile);
+    this.configurationValidator = checkNotNull(configurationValidator);
+    this.configurationUpgrader = checkNotNull(configurationUpgrader);
+    this.nexusDefaults = checkNotNull(nexusDefaults);
+    this.configHelper = checkNotNull(configHelper);
+  }
 
   /**
    * Gets the configuration validator.
@@ -101,20 +118,6 @@ public class FileConfigurationSource
   }
 
   /**
-   * Sets the configuration validator.
-   *
-   * @param configurationValidator the new configuration validator
-   */
-  public void setConfigurationValidator(ConfigurationValidator configurationValidator) {
-    if (!ApplicationConfigurationValidator.class.isAssignableFrom(configurationValidator.getClass())) {
-      throw new IllegalArgumentException("ConfigurationValidator is invalid type "
-          + configurationValidator.getClass().getName());
-    }
-
-    this.configurationValidator = (ApplicationConfigurationValidator) configurationValidator;
-  }
-
-  /**
    * Gets the configuration file.
    *
    * @return the configuration file
@@ -123,15 +126,7 @@ public class FileConfigurationSource
     return configurationFile;
   }
 
-  /**
-   * Sets the configuration file.
-   *
-   * @param configurationFile the new configuration file
-   */
-  public void setConfigurationFile(File configurationFile) {
-    this.configurationFile = configurationFile;
-  }
-
+  @Override
   public Configuration loadConfiguration()
       throws ConfigurationException, IOException
   {
@@ -253,12 +248,14 @@ public class FileConfigurationSource
 
   }
 
+  @Override
   public void storeConfiguration()
       throws IOException
   {
     saveConfiguration(getConfigurationFile());
   }
 
+  @Override
   public InputStream getConfigurationAsStream()
       throws IOException
   {
@@ -363,10 +360,12 @@ public class FileConfigurationSource
   /**
    * Was the active configuration fetched from config file or from default source? True if it from default source.
    */
+  @Override
   public boolean isConfigurationDefaulted() {
     return configurationDefaulted;
   }
 
+  @Override
   public void backupConfiguration()
       throws IOException
   {

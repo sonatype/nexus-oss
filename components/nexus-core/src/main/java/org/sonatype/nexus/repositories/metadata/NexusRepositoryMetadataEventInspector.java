@@ -18,10 +18,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -43,27 +46,34 @@ import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
-@Component(role = EventInspector.class, hint = "NexusRepositoryMetadataEventInspector")
+@Named
+@Singleton
 public class NexusRepositoryMetadataEventInspector
     extends AbstractEventInspector
 {
-  @Requirement(hint = "maven1")
-  private ContentClass maven1ContentClass;
+  private final ContentClass maven1ContentClass;
 
-  @Requirement(hint = "maven2")
-  private ContentClass maven2ContentClass;
+  private final ContentClass maven2ContentClass;
 
-  @Requirement
-  private RepositoryMetadataHandler repositoryMetadataHandler;
+  private final RepositoryMetadataHandler repositoryMetadataHandler;
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
+
+  @Inject
+  public NexusRepositoryMetadataEventInspector(final @Named("maven1") ContentClass maven1ContentClass,
+                                               final @Named("maven2") ContentClass maven2ContentClass,
+                                               final RepositoryMetadataHandler repositoryMetadataHandler,
+                                               final RepositoryRegistry repositoryRegistry,
+                                               final ApplicationStatusSource applicationStatusSource)
+  {
+    this.maven1ContentClass = maven1ContentClass;
+    this.maven2ContentClass = maven2ContentClass;
+    this.repositoryMetadataHandler = repositoryMetadataHandler;
+    this.repositoryRegistry = repositoryRegistry;
+    this.applicationStatusSource = applicationStatusSource;
+  }
 
   public boolean accepts(Event<?> evt) {
     return (evt instanceof RepositoryRegistryEventAdd) || (evt instanceof RepositoryConfigurationUpdatedEvent)

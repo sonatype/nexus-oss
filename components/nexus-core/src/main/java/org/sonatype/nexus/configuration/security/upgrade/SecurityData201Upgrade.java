@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.security.model.upgrade.AbstractDataUpgrader;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
@@ -32,13 +36,14 @@ import org.sonatype.security.model.v2_0_2.CRole;
 import org.sonatype.security.model.v2_0_2.Configuration;
 import org.sonatype.security.model.v2_0_2.io.xpp3.SecurityConfigurationXpp3Reader;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = SecurityDataUpgrader.class, hint = "2.0.1")
+@Singleton
+@Typed(value = SecurityDataUpgrader.class)
+@Named("2.0.1")
 public class SecurityData201Upgrade
     extends AbstractDataUpgrader<Configuration>
     implements SecurityDataUpgrader

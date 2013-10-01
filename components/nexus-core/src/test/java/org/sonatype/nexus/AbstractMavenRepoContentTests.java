@@ -22,7 +22,9 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.targets.DefaultTargetRegistry;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 
 import org.codehaus.plexus.logging.Logger;
@@ -46,9 +48,9 @@ public abstract class AbstractMavenRepoContentTests
 
   protected MavenRepository apacheSnapshots;
 
-  protected MavenProxyRepository central;
+  protected M2Repository central;
 
-  protected TargetRegistry targetRegistry;
+  protected DefaultTargetRegistry targetRegistry;
 
   @Override
   protected void setUp()
@@ -62,7 +64,7 @@ public abstract class AbstractMavenRepoContentTests
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
 
-    targetRegistry = lookup(TargetRegistry.class);
+    targetRegistry = (DefaultTargetRegistry) lookup(TargetRegistry.class);
 
     // get a snapshots hosted repo
     snapshots = (MavenRepository) repositoryRegistry.getRepository("snapshots");
@@ -72,7 +74,7 @@ public abstract class AbstractMavenRepoContentTests
 
     apacheSnapshots = (MavenRepository) repositoryRegistry.getRepository("apache-snapshots");
 
-    central = (MavenProxyRepository) repositoryRegistry.getRepository("central");
+    central = (M2Repository) repositoryRegistry.getRepository("central");
   }
 
   @Override

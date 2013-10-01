@@ -16,6 +16,8 @@ package org.sonatype.nexus.rest.repositories;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
@@ -29,6 +31,7 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.AbstractRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -52,7 +55,6 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -67,17 +69,33 @@ public abstract class AbstractRepositoryPlexusResource
    */
   public static final String REPOSITORY_ID_KEY = "repositoryId";
 
-  @Requirement
   private AuthenticationInfoConverter authenticationInfoConverter;
 
-  @Requirement
   private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
-  @Requirement
   private ApplicationConfiguration applicationConfiguration;
 
-  @Requirement(hint = "RestletRepositoryUrlBuilder")
   private RepositoryURLBuilder repositoryURLBuilder;
+
+  @Inject
+  public void setAuthenticationInfoConverter(final AuthenticationInfoConverter authenticationInfoConverter) {
+    this.authenticationInfoConverter = authenticationInfoConverter;
+  }
+
+  @Inject
+  public void setGlobalRemoteConnectionSettings(final GlobalRemoteConnectionSettings globalRemoteConnectionSettings) {
+    this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
+  }
+
+  @Inject
+  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = applicationConfiguration;
+  }
+
+  @Inject
+  public void setRepositoryURLBuilder(final RepositoryURLBuilder repositoryURLBuilder) {
+    this.repositoryURLBuilder = repositoryURLBuilder;
+  }
 
   protected AuthenticationInfoConverter getAuthenticationInfoConverter() {
     return authenticationInfoConverter;
@@ -280,13 +298,13 @@ public abstract class AbstractRepositoryPlexusResource
     // apples to apples here, man i hate this section of code!!!!
     // always set to default (see AbstractRepositoryConfigurator)
     String defaultLocalStorageUrl =
-        ((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration())
+        ((AbstractRepository)repository).getCurrentCoreConfiguration()
             .getConfiguration(false).defaultLocalStorageUrl;
     resource.setDefaultLocalStorageUrl(defaultLocalStorageUrl);
 
     // if not user set (but using default), this is null, otherwise it contains user-set value
     String overrideLocalStorageUrl =
-        ((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration()).getConfiguration(false)
+        ((AbstractRepository)repository).getCurrentCoreConfiguration().getConfiguration(false)
             .getLocalStorage().getUrl();
     if (StringUtils.isNotBlank(overrideLocalStorageUrl)) {
       resource.setOverrideLocalStorageUrl(overrideLocalStorageUrl);

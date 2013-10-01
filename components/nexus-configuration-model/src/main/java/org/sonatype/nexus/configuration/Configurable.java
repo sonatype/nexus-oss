@@ -21,12 +21,12 @@ import org.sonatype.configuration.ConfigurationException;
  *
  * @author cstamas
  */
-public interface Configurable
+public interface Configurable<C>
 {
   /**
    * Returns the current core configuration of the component.May return null if there is not config object set.
    */
-  CoreConfiguration getCurrentCoreConfiguration();
+  CoreConfiguration<C> getCurrentCoreConfiguration();
 
   /**
    * Sets the configuration object and calls configure(). A shortcut for setCurrentConfiguration(config) and then

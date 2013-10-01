@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 public abstract class AbstractShadowRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
+
   @Override
   public void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
                                    CRepositoryCoreConfiguration coreConfig)

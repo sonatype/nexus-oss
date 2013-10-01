@@ -14,24 +14,18 @@
 package org.sonatype.nexus.configuration.model;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
  * @since 2.6
  */
 public class CRemoteProxySettingsCoreConfiguration
-    extends AbstractCoreConfiguration
+    extends AbstractCoreConfiguration<CRemoteProxySettings>
 {
   private boolean nullified;
 
   public CRemoteProxySettingsCoreConfiguration(ApplicationConfiguration applicationConfiguration) {
     super(applicationConfiguration);
-  }
-
-  @Override
-  public CRemoteProxySettings getConfiguration(boolean forWrite) {
-    return (CRemoteProxySettings) super.getConfiguration(forWrite);
   }
 
   @Override
@@ -41,23 +35,14 @@ public class CRemoteProxySettingsCoreConfiguration
 
   public void initConfig() {
     CRemoteProxySettings newProxy = new CRemoteProxySettings();
-
     getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings(newProxy);
-
     setOriginalConfiguration(newProxy);
   }
 
   public void nullifyConfig() {
     setChangedConfiguration(null);
-
     setOriginalConfiguration(null);
-
     nullified = true;
-  }
-
-  @Override
-  public ValidationResponse doValidateChanges(Object changedConfiguration) {
-    return new ValidationResponse();
   }
 
   @Override
@@ -76,19 +61,17 @@ public class CRemoteProxySettingsCoreConfiguration
     else {
       super.commitChanges();
     }
-
     nullified = false;
   }
 
   @Override
   public void rollbackChanges() {
     super.rollbackChanges();
-
     nullified = false;
   }
 
   @Override
-  protected void copyTransients(Object source, Object destination) {
+  protected void copyTransients(CRemoteProxySettings source, CRemoteProxySettings destination) {
     super.copyTransients(source, destination);
 
     // we need to manually set the http/https to null here, because of flawed overlay, where null objects do NOT

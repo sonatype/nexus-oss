@@ -16,14 +16,12 @@ package org.sonatype.nexus.repository.site.plugin;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
 
 @Named(SiteRepository.ID)
 @Singleton
 public class DefaultSiteRepositoryConfigurator
     extends AbstractWebSiteRepositoryConfigurator
-    implements Configurator
 {
 
 }

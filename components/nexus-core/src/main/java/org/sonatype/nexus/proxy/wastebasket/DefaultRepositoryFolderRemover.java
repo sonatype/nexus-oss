@@ -16,21 +16,28 @@ package org.sonatype.nexus.proxy.wastebasket;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = RepositoryFolderRemover.class)
+@Named
+@Singleton
 public class DefaultRepositoryFolderRemover
     implements RepositoryFolderRemover
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement(role = RepositoryFolderCleaner.class)
-  private Map<String, RepositoryFolderCleaner> cleaners;
+  private final Map<String, RepositoryFolderCleaner> cleaners;
+
+  @Inject
+  public DefaultRepositoryFolderRemover(final Map<String, RepositoryFolderCleaner> cleaners) {
+    this.cleaners = cleaners;
+  }
 
   public void deleteRepositoryFolders(final Repository repository, final boolean deleteForever)
       throws IOException

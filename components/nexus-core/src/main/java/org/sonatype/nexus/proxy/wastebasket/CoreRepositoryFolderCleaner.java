@@ -16,11 +16,13 @@ package org.sonatype.nexus.proxy.wastebasket;
 import java.io.File;
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = RepositoryFolderCleaner.class, hint = "core-storage")
+@Named("core-storage")
+@Singleton
 public class CoreRepositoryFolderCleaner
     extends AbstractRepositoryFolderCleaner
 {

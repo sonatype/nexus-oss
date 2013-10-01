@@ -17,6 +17,9 @@ import java.net.UnknownHostException;
 import java.security.cert.CertPathBuilderException;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
@@ -29,14 +32,11 @@ import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -48,7 +48,8 @@ import org.restlet.resource.ResourceException;
  *
  * @author velo
  */
-@Component(role = PlexusResource.class, hint = "SmtpSettingsValidation")
+@Named
+@Singleton
 @Path(SmtpSettingsValidationPlexusResource.RESOURCE_URI)
 @Consumes({"application/xml", "application/json"})
 public class SmtpSettingsValidationPlexusResource
@@ -58,10 +59,11 @@ public class SmtpSettingsValidationPlexusResource
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(".+@.+\\.[a-zA-Z]+");
 
-  @Requirement
-  private SmtpSettingsValidator emailer;
+  private final SmtpSettingsValidator emailer;
 
-  public SmtpSettingsValidationPlexusResource() {
+  @Inject
+  public SmtpSettingsValidationPlexusResource(final SmtpSettingsValidator emailer) {
+    this.emailer = emailer;
     this.setModifiable(true);
   }
 

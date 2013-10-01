@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
@@ -28,9 +32,9 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Component responsible for metadata maintenance.
@@ -38,7 +42,8 @@ import org.codehaus.plexus.util.StringUtils;
  * @author cstamas
  * @todo add some unit tests
  */
-@Component(role = MetadataManager.class)
+@Singleton
+@Named
 public class DefaultMetadataManager
     extends AbstractLoggingComponent
     implements MetadataManager
@@ -49,11 +54,16 @@ public class DefaultMetadataManager
 
   static final String RELEASE_VERSION = "RELEASE";
 
-  @Requirement
-  private MetadataUpdater metadataUpdater;
+  private final MetadataUpdater metadataUpdater;
 
-  @Requirement
-  private MetadataLocator metadataLocator;
+  private final MetadataLocator metadataLocator;
+
+  @Inject
+  public DefaultMetadataManager(final MetadataUpdater metadataUpdater, 
+                                final MetadataLocator metadataLocator) {
+    this.metadataUpdater = checkNotNull(metadataUpdater);
+    this.metadataLocator = checkNotNull(metadataLocator);
+  }
 
   @Override
   public void deployArtifact(ArtifactStoreRequest request)

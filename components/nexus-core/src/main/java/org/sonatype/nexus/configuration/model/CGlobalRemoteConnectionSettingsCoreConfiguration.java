@@ -13,11 +13,10 @@
 
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public class CGlobalRemoteConnectionSettingsCoreConfiguration
-    extends AbstractCoreConfiguration
+    extends AbstractCoreConfiguration<CRemoteConnectionSettings>
 {
   public CGlobalRemoteConnectionSettingsCoreConfiguration(ApplicationConfiguration applicationConfiguration) {
     super(applicationConfiguration);
@@ -28,17 +27,12 @@ public class CGlobalRemoteConnectionSettingsCoreConfiguration
     if (getOriginalConfiguration() == null) {
       // create default
       CRemoteConnectionSettings newConn = new CRemoteConnectionSettings();
-
       newConn.setConnectionTimeout(20000);
-
       newConn.setRetrievalRetryCount(3);
-
       getApplicationConfiguration().getConfigurationModel().setGlobalConnectionSettings(newConn);
-
       setOriginalConfiguration(newConn);
     }
-
-    return (CRemoteConnectionSettings) super.getConfiguration(forWrite);
+    return super.getConfiguration(forWrite);
   }
 
   @Override
@@ -47,12 +41,7 @@ public class CGlobalRemoteConnectionSettingsCoreConfiguration
   }
 
   @Override
-  public ValidationResponse doValidateChanges(Object changedConfiguration) {
-    return new ValidationResponse();
-  }
-
-  @Override
-  protected void copyTransients(final Object source, final Object destination) {
+  protected void copyTransients(final CRemoteConnectionSettings source, final CRemoteConnectionSettings destination) {
     super.copyTransients(source, destination);
 
     if (((CRemoteConnectionSettings) source).getQueryString() == null) {

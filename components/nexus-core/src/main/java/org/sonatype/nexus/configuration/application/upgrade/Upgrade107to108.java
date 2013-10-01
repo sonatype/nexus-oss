@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -31,10 +34,10 @@ import org.sonatype.nexus.configuration.model.v1_0_8.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-@Component(role = SingleVersionUpgrader.class, hint = "1.0.7")
+@Singleton
+@Named("1.0.7")
 public class Upgrade107to108
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
@@ -67,6 +70,7 @@ public class Upgrade107to108
     }
   };
 
+  @Override
   public Object loadConfiguration(File file)
       throws IOException,
              ConfigurationIsCorruptedException
@@ -95,6 +99,7 @@ public class Upgrade107to108
     return conf;
   }
 
+  @Override
   public void upgrade(UpgradeMessage message) {
     org.sonatype.nexus.configuration.model.v1_0_7.Configuration oldc = (org.sonatype.nexus.configuration.model.v1_0_7.Configuration) message
         .getConfiguration();
