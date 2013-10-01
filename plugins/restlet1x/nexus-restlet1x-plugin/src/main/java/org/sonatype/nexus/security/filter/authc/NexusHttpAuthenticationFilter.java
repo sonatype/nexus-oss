@@ -58,18 +58,10 @@ public class NexusHttpAuthenticationFilter
   private boolean fakeAuthScheme;
 
   @Inject
-  protected PlexusContainer plexusContainer;
-
-  @Inject
   private SecuritySystem securitySystem;
 
   @Inject
   private EventBus eventBus;
-
-  @Deprecated
-  protected PlexusContainer getPlexusContainer() {
-    return plexusContainer;
-  }
 
   protected SecuritySystem getSecuritySystem() {
     return securitySystem;
