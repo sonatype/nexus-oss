@@ -62,6 +62,13 @@ public interface FeedRecorder
    * System event action: authorization
    */
   public static final String SYSTEM_AUTHZ = "AUTHZ";
+  
+  // cleanup
+  
+  /**
+   * @since 2.7.0
+   */
+  void shutdown();
 
   // creating
 

@@ -18,8 +18,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
 import org.sonatype.nexus.configuration.model.CGlobalRemoteConnectionSettingsCoreConfiguration;
@@ -31,32 +30,16 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 @Singleton
 @Named
 public class DefaultGlobalRemoteConnectionSettings
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<CRemoteConnectionSettings>
     implements GlobalRemoteConnectionSettings
 {
   @Inject
-  public DefaultGlobalRemoteConnectionSettings(final EventBus eventBus) {
-    super(eventBus);
+  public DefaultGlobalRemoteConnectionSettings(final EventBus eventBus, final ApplicationConfiguration applicationConfiguration) {
+    super("Global Remote Connection Settings", eventBus, applicationConfiguration);
   }
 
   @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return null;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected CRemoteConnectionSettings getCurrentConfiguration(boolean forWrite) {
-    return ((CGlobalRemoteConnectionSettingsCoreConfiguration) getCurrentCoreConfiguration())
-        .getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
+  protected CoreConfiguration<CRemoteConnectionSettings> wrapConfiguration(Object configuration)
       throws ConfigurationException
   {
     if (configuration instanceof ApplicationConfiguration) {
@@ -117,19 +100,12 @@ public class DefaultGlobalRemoteConnectionSettings
   public RemoteConnectionSettings convertAndValidateFromModel(CRemoteConnectionSettings model)
       throws ConfigurationException
   {
-    ((CGlobalRemoteConnectionSettingsCoreConfiguration) getCurrentCoreConfiguration()).doValidateChanges(model);
-
     if (model != null) {
       RemoteConnectionSettings remoteConnectionSettings = new DefaultRemoteConnectionSettings();
-
       remoteConnectionSettings.setConnectionTimeout(model.getConnectionTimeout());
-
       remoteConnectionSettings.setQueryString(model.getQueryString());
-
       remoteConnectionSettings.setRetrievalRetryCount(model.getRetrievalRetryCount());
-
       remoteConnectionSettings.setUserAgentCustomizationString(model.getUserAgentCustomizationString());
-
       return remoteConnectionSettings;
     }
     else {
@@ -144,22 +120,12 @@ public class DefaultGlobalRemoteConnectionSettings
     }
     else {
       CRemoteConnectionSettings model = new CRemoteConnectionSettings();
-
       model.setConnectionTimeout(settings.getConnectionTimeout());
-
       model.setQueryString(settings.getQueryString());
-
       model.setRetrievalRetryCount(settings.getRetrievalRetryCount());
-
       model.setUserAgentCustomizationString(settings.getUserAgentCustomizationString());
-
       return model;
     }
-  }
-
-  @Override 
-  public String getName() {
-    return "Global Remote Connection Settings";
   }
 
   @Override
@@ -167,12 +133,9 @@ public class DefaultGlobalRemoteConnectionSettings
       throws ConfigurationException
   {
     boolean wasDirty = super.commitChanges();
-
     if (wasDirty) {
       eventBus().post(new GlobalRemoteConnectionSettingsChangedEvent(this));
     }
-
     return wasDirty;
   }
-
 }

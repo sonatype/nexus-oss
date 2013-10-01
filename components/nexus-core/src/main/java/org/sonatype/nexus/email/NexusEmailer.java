@@ -17,7 +17,6 @@ import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.MailRequestStatus;
-import org.sonatype.nexus.configuration.Configurable;
 
 /**
  * Simple service interface to expose the properly configured MicroMailer and also some helper methods for creating and
@@ -26,7 +25,6 @@ import org.sonatype.nexus.configuration.Configurable;
  * @author cstamas
  */
 public interface NexusEmailer
-    extends Configurable
 {
   /**
    * Gets the preconfigured EMailer instance for prepared for using it.

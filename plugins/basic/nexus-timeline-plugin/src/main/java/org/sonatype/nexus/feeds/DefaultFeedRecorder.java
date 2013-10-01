@@ -125,6 +125,11 @@ public class DefaultFeedRecorder
     this.nexusTimeline = checkNotNull(nexusTimeline);
     this.feedArtifactEventFilter = checkNotNull(feedArtifactEventFilter);
   }
+  
+  @Override
+  public void shutdown() {
+    nexusTimeline.shutdown();
+  }
 
   protected DateFormat getDateFormat() {
     return new SimpleDateFormat(EVENT_DATE_FORMAT);

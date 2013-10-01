@@ -15,6 +15,11 @@ package org.sonatype.nexus.proxy.maven.maven1;
 
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -25,8 +30,8 @@ import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -34,8 +39,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author cstamas
  */
-@Component(role = ShadowRepository.class, hint = M1LayoutedM2ShadowRepository.ID, instantiationStrategy = "per-lookup",
-    description = "Maven2 to Maven1")
+@Named(M1LayoutedM2ShadowRepository.ID)
+@Typed(ShadowRepository.class)
+@Description("Maven2 to Maven1")
 public class M1LayoutedM2ShadowRepository
     extends LayoutConverterShadowRepository
 {
@@ -44,14 +50,21 @@ public class M1LayoutedM2ShadowRepository
    */
   public static final String ID = "m2-m1-shadow";
 
-  @Requirement(hint = Maven1ContentClass.ID)
-  private ContentClass contentClass;
+  private final ContentClass contentClass;
 
-  @Requirement(hint = Maven2ContentClass.ID)
-  private ContentClass masterContentClass;
+  private final ContentClass masterContentClass;
 
-  @Requirement
-  private M1LayoutedM2ShadowRepositoryConfigurator m1LayoutedM2ShadowRepositoryConfigurator;
+  private final M1LayoutedM2ShadowRepositoryConfigurator m1LayoutedM2ShadowRepositoryConfigurator;
+
+  @Inject
+  public M1LayoutedM2ShadowRepository(final @Named(Maven1ContentClass.ID) ContentClass contentClass, 
+                                      final @Named(Maven2ContentClass.ID) ContentClass masterContentClass,
+                                      M1LayoutedM2ShadowRepositoryConfigurator m1LayoutedM2ShadowRepositoryConfigurator)
+  {
+    this.contentClass = checkNotNull(contentClass);
+    this.masterContentClass = checkNotNull(masterContentClass);
+    this.m1LayoutedM2ShadowRepositoryConfigurator = checkNotNull(m1LayoutedM2ShadowRepositoryConfigurator);
+  }
 
   @Override
   public M1LayoutedM2ShadowRepositoryConfiguration getExternalConfiguration(boolean forWrite) {

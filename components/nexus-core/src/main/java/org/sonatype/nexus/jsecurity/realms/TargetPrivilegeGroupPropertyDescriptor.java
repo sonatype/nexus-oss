@@ -13,28 +13,34 @@
 
 package org.sonatype.nexus.jsecurity.realms;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeGroupPropertyDescriptor")
+@Singleton
+@Named("TargetPrivilegeGroupPropertyDescriptor")
 public class TargetPrivilegeGroupPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
   public static final String ID = "repositoryGroupId";
 
+  @Override
   public String getHelpText() {
     return "The repository group associated with this privilege.";
   }
 
+  @Override
   public String getId() {
     return ID;
   }
 
+  @Override
   public String getName() {
     return "Repository Group";
   }
 
+  @Override
   public String getType() {
     return "repogroup";
   }

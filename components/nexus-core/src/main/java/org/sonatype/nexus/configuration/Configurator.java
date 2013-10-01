@@ -27,16 +27,16 @@ import org.sonatype.plugin.ExtensionPoint;
  */
 @ExtensionPoint
 @Singleton
-public interface Configurator
+public interface Configurator<T, C extends CoreConfiguration>
 {
   /**
    * Will apply the configuration parameters from coreConfiguratuin to the target.
    */
-  void applyConfiguration(Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration)
+  void applyConfiguration(T target, ApplicationConfiguration configuration, C coreConfiguration)
       throws ConfigurationException;
 
   /**
    * Will prepare model for save, by syncing it with target state (if needed).
    */
-  void prepareForSave(Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration);
+  void prepareForSave(T target, ApplicationConfiguration configuration, C coreConfiguration);
 }

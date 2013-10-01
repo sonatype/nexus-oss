@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
@@ -56,7 +57,7 @@ public class DefaultAttributeStorageIT
 
   protected RepositoryItemUidFactory repositoryItemUidFactory;
 
-  protected Repository repository;
+  protected M2Repository repository;
 
   protected File localStorageDirectory;
 
@@ -70,7 +71,7 @@ public class DefaultAttributeStorageIT
 
     repositoryItemUidFactory = lookup(RepositoryItemUidFactory.class);
 
-    repository = lookup(Repository.class, "maven2");
+    repository = (M2Repository) lookup(Repository.class, "maven2");
 
     CRepository repoConf = new DefaultCRepository();
 

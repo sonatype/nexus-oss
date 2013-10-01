@@ -17,12 +17,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.threads.FakeAlmightySubject;
 import org.sonatype.nexus.threads.NexusScheduledExecutorService;
 import org.sonatype.scheduling.TaskExecutorProvider;
 import org.sonatype.scheduling.ThreadFactoryImpl;
-
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * {@link TaskExecutorProvider} implementation that provides Shiro specific
@@ -33,7 +34,8 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author cstamas
  * @since 2.6
  */
-@Component(role = TaskExecutorProvider.class)
+@Named
+@Singleton
 public class NexusTaskExecutorServiceProvider
     implements TaskExecutorProvider
 {

@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -27,7 +30,6 @@ import org.sonatype.nexus.configuration.model.v2_5_0.upgrade.BasicVersionUpgrade
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 import com.google.common.io.Closeables;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -35,12 +37,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @since 2.5
  */
-@Component(role = SingleVersionUpgrader.class, hint = "2.2.0")
+@Singleton
+@Named("2.2.0")
 public class Upgrade220to250
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
-
+  @Override
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
@@ -67,6 +70,7 @@ public class Upgrade220to250
     return conf;
   }
 
+  @Override
   public void upgrade(UpgradeMessage message)
       throws ConfigurationIsCorruptedException
   {

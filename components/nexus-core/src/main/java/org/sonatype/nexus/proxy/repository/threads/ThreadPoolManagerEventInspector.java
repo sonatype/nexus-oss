@@ -13,27 +13,34 @@
 
 package org.sonatype.nexus.proxy.repository.threads;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Maintains the ThreadPoolManager based on Nexus events.
  *
  * @author cstamas
  */
-@Component(role = EventInspector.class, hint = "ThreadPoolManagerEventInspector")
+@Singleton
+@Named
 public class ThreadPoolManagerEventInspector
     extends AbstractEventInspector
 {
-  @Requirement
-  private ThreadPoolManager poolManager;
+  private final ThreadPoolManager poolManager;
+
+  @Inject
+  public ThreadPoolManagerEventInspector(final ThreadPoolManager poolManager) {
+    this.poolManager = checkNotNull(poolManager);
+  }
 
   @Override
   public boolean accepts(Event<?> evt) {

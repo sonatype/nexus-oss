@@ -15,6 +15,9 @@ package org.sonatype.security.realms;
 
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
+
 /**
  * Abstract class for "realm" related tests.
  *
@@ -23,5 +26,10 @@ import org.sonatype.nexus.test.PlexusTestCaseSupport;
 public class AbstractRealmTest
     extends PlexusTestCaseSupport
 {
-
+  @Override
+  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
+    super.customizeContainerConfiguration(configuration);
+    configuration.setAutoWiring(true);
+    configuration.setClassPathScanning(PlexusConstants.SCANNING_CACHE);
+  }
 }

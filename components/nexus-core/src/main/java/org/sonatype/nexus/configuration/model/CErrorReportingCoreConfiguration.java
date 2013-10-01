@@ -13,19 +13,13 @@
 
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public class CErrorReportingCoreConfiguration
-    extends AbstractCoreConfiguration
+    extends AbstractCoreConfiguration<CErrorReporting>
 {
   public CErrorReportingCoreConfiguration(ApplicationConfiguration configuration) {
     super(configuration);
-  }
-
-  @Override
-  public CErrorReporting getConfiguration(boolean forWrite) {
-    return (CErrorReporting) super.getConfiguration(forWrite);
   }
 
   @Override
@@ -34,12 +28,7 @@ public class CErrorReportingCoreConfiguration
   }
 
   @Override
-  public ValidationResponse doValidateChanges(Object changedConfiguration) {
-    return new ValidationResponse();
-  }
-
-  @Override
-  protected void copyTransients(Object source, Object destination) {
+  protected void copyTransients(CErrorReporting source, CErrorReporting destination) {
     super.copyTransients(source, destination);
 
     if (((CErrorReporting) source).getJiraPassword() == null) {

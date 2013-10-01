@@ -16,6 +16,10 @@ package org.sonatype.nexus.notification.events;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.notification.NotificationCheat;
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationRequest;
@@ -25,8 +29,7 @@ import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This component routes based on Application event. Currently it is hardwired, but we would have some "mediation"
@@ -35,12 +38,17 @@ import org.codehaus.plexus.component.annotations.Requirement;
  *
  * @author cstamas
  */
-@Component(role = NotificationEventRouter.class)
+@Named
+@Singleton
 public class DefaultNotificationEventRouter
     implements NotificationEventRouter
 {
-  @Requirement
-  private NotificationManager notificationManager;
+  private final NotificationManager notificationManager;
+
+  @Inject
+  public DefaultNotificationEventRouter(final NotificationManager notificationManager) {
+    this.notificationManager = checkNotNull(notificationManager);
+  }
 
   public NotificationRequest getRequestForEvent(Event<?> evt) {
     // this is for notifying about repository being blocked

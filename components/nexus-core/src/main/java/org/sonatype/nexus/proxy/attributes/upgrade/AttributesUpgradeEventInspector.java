@@ -13,27 +13,33 @@
 
 package org.sonatype.nexus.proxy.attributes.upgrade;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
 /**
  * EventInspector that fires upgrade call to upgrader component, does it blindly.
  *
  * @since 2.0
  */
-@Component(role = EventInspector.class, hint = "AttributesUpgradeEventInspector")
+@Singleton
+@Named("AttributesUpgradeEventInspector")
 public class AttributesUpgradeEventInspector
     extends AbstractEventInspector
     implements EventInspector, AsynchronousEventInspector
 {
-  @Requirement
-  private AttributeUpgrader attributeUpgrader;
+  private final AttributeUpgrader attributeUpgrader;
+
+  @Inject
+  public AttributesUpgradeEventInspector(AttributeUpgrader attributeUpgrader) {
+    this.attributeUpgrader = attributeUpgrader;
+  }
 
   @Override
   public boolean accepts(Event<?> evt) {

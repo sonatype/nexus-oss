@@ -29,6 +29,11 @@ import com.google.common.base.Predicate;
 public interface NexusTimeline
 {
   /**
+   * @since 2.7.0
+   */
+  void shutdown();
+
+  /**
    * Adds a record to the timeline.
    *
    * @param timestamp the timestamp of record. Used for ordering.

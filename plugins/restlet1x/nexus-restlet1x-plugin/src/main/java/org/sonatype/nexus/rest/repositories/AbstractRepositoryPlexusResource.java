@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.AbstractRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -280,13 +281,13 @@ public abstract class AbstractRepositoryPlexusResource
     // apples to apples here, man i hate this section of code!!!!
     // always set to default (see AbstractRepositoryConfigurator)
     String defaultLocalStorageUrl =
-        ((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration())
+        ((AbstractRepository)repository).getCurrentCoreConfiguration()
             .getConfiguration(false).defaultLocalStorageUrl;
     resource.setDefaultLocalStorageUrl(defaultLocalStorageUrl);
 
     // if not user set (but using default), this is null, otherwise it contains user-set value
     String overrideLocalStorageUrl =
-        ((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration()).getConfiguration(false)
+        ((AbstractRepository)repository).getCurrentCoreConfiguration().getConfiguration(false)
             .getLocalStorage().getUrl();
     if (StringUtils.isNotBlank(overrideLocalStorageUrl)) {
       resource.setOverrideLocalStorageUrl(overrideLocalStorageUrl);

@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -23,41 +27,34 @@ import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettin
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
-import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractProxyRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
-  @Requirement
   private AuthenticationInfoConverter authenticationInfoConverter;
 
-  @Requirement
   private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
 
-  @Requirement
   private RemoteProviderHintFactory remoteProviderHintFactory;
 
-  /**
-   * For plexus injection.
-   */
-  protected AbstractProxyRepositoryConfigurator() {
-  }
+  private Map<String, RemoteRepositoryStorage> remoteRepositoryStorages;
 
-  @VisibleForTesting
-  AbstractProxyRepositoryConfigurator(final AuthenticationInfoConverter authenticationInfoConverter,
-                                      final GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
-                                      final RemoteProviderHintFactory remoteProviderHintFactory)
+  @Inject
+  public void populateAbstractProxyRepositoryConfigurator(AuthenticationInfoConverter authenticationInfoConverter,
+                                             GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
+                                             RemoteProviderHintFactory remoteProviderHintFactory,
+                                             Map<String, RemoteRepositoryStorage> remoteRepositoryStorages)
   {
-    this.authenticationInfoConverter = authenticationInfoConverter;
-    this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
-    this.remoteProviderHintFactory = remoteProviderHintFactory;
+    this.authenticationInfoConverter = checkNotNull(authenticationInfoConverter);
+    this.globalRemoteConnectionSettings = checkNotNull(globalRemoteConnectionSettings);
+    this.remoteProviderHintFactory = checkNotNull(remoteProviderHintFactory);
+    this.remoteRepositoryStorages = checkNotNull(remoteRepositoryStorages);
   }
 
   @Override
@@ -112,7 +109,7 @@ public abstract class AbstractProxyRepositoryConfigurator
           prepository.setRemoteStorage(null);
         }
       }
-      catch (StorageException e) {
+      catch (RemoteStorageException e) {
         ValidationResponse response = new ApplicationValidationResponse();
 
         ValidationMessage error = new ValidationMessage("remoteStorageUrl", e.getMessage(), e.getMessage());
@@ -165,18 +162,19 @@ public abstract class AbstractProxyRepositoryConfigurator
     }
   }
 
-  protected RemoteRepositoryStorage getRemoteRepositoryStorage(final String repoId, final String remoteUrl,
+  protected RemoteRepositoryStorage getRemoteRepositoryStorage(final String repoId, 
+                                                               final String remoteUrl,
                                                                final String provider)
       throws InvalidConfigurationException
   {
     try {
       final String mungledHint = remoteProviderHintFactory.getRoleHint(remoteUrl, provider);
-
-      return getPlexusContainer().lookup(RemoteRepositoryStorage.class, mungledHint);
-    }
-    catch (ComponentLookupException e) {
+      final RemoteRepositoryStorage result = remoteRepositoryStorages.get(mungledHint);
+      if (result != null) {
+        return result;
+      }
       throw new InvalidConfigurationException("Repository " + repoId
-          + " have remote storage with unsupported provider: " + provider, e);
+          + " have remote storage with unsupported provider: " + provider);
     }
     catch (IllegalArgumentException e) {
       throw new InvalidConfigurationException("Repository " + repoId

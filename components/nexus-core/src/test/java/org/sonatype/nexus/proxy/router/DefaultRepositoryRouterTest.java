@@ -319,7 +319,7 @@ public class DefaultRepositoryRouterTest
     this.securitySystem.logout(subject);
   }
 
-  private Repository buildRepository(String repoId, boolean exposed)
+  private M2Repository buildRepository(String repoId, boolean exposed)
       throws Exception
   {
     M2Repository repo = (M2Repository) this.lookup(Repository.class, "maven2");

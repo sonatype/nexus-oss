@@ -19,11 +19,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -80,10 +81,7 @@ import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
 import com.google.common.collect.Maps;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
@@ -109,37 +107,32 @@ public abstract class AbstractRepository
     extends ConfigurableRepository
     implements Repository
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
-
-  @Requirement
+  
+  // == these below are injected
+  
   private CacheManager cacheManager;
 
-  @Requirement
   private TargetRegistry targetRegistry;
 
-  @Requirement
   private RepositoryItemUidFactory repositoryItemUidFactory;
 
-  @Requirement
   private RepositoryItemUidAttributeManager repositoryItemUidAttributeManager;
 
-  @Requirement
-  private AccessManager accessManager;
-
-  @Requirement
   private Walker walker;
 
-  @Requirement
   private MimeSupport mimeSupport;
 
-  @Requirement(role = ContentGenerator.class)
   private Map<String, ContentGenerator> contentGenerators;
+  
+  // ==
 
-  @Requirement
+  // TODO: setter on Repository iface!
   private AttributesHandler attributesHandler;
+
+  // TODO: setter on Repository iface!
+  private AccessManager accessManager;
+  
+  // ==
 
   /**
    * Local storage context to store storage-wide configs.
@@ -180,8 +173,21 @@ public abstract class AbstractRepository
 
   // --
 
-  protected Logger getLogger() {
-    return logger;
+  @Inject
+  public void populateAbstractRepository(
+      CacheManager cacheManager, TargetRegistry targetRegistry, RepositoryItemUidFactory repositoryItemUidFactory,
+      RepositoryItemUidAttributeManager repositoryItemUidAttributeManager, AccessManager accessManager, Walker walker,
+      MimeSupport mimeSupport, Map<String, ContentGenerator> contentGenerators, AttributesHandler attributesHandler)
+  {
+    this.cacheManager = checkNotNull(cacheManager);
+    this.targetRegistry = checkNotNull(targetRegistry);
+    this.repositoryItemUidFactory = checkNotNull(repositoryItemUidFactory);
+    this.repositoryItemUidAttributeManager = checkNotNull(repositoryItemUidAttributeManager);
+    this.accessManager = checkNotNull(accessManager);
+    this.walker = checkNotNull(walker);
+    this.mimeSupport = checkNotNull(mimeSupport);
+    this.contentGenerators = checkNotNull(contentGenerators);
+    this.attributesHandler = checkNotNull(attributesHandler);
   }
 
   protected MimeSupport getMimeSupport() {
@@ -231,11 +237,6 @@ public abstract class AbstractRepository
     return super.rollbackChanges();
   }
 
-  @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return applicationConfiguration;
-  }
-
   protected RepositoryConfigurationUpdatedEvent getRepositoryConfigurationUpdatedEvent() {
     RepositoryConfigurationUpdatedEvent event = new RepositoryConfigurationUpdatedEvent(this);
 
@@ -247,7 +248,7 @@ public abstract class AbstractRepository
   }
 
   protected AbstractRepositoryConfiguration getExternalConfiguration(boolean forModification) {
-    final CoreConfiguration cc = getCurrentCoreConfiguration();
+    final CRepositoryCoreConfiguration cc = getCurrentCoreConfiguration();
     if (cc != null) {
       ExternalConfiguration<?> ec = cc.getExternalConfiguration();
       if (ec != null) {
@@ -299,15 +300,6 @@ public abstract class AbstractRepository
    */
   protected CacheManager getCacheManager() {
     return cacheManager;
-  }
-
-  /**
-   * Sets the cache manager.
-   *
-   * @param cacheManager the new cache manager
-   */
-  protected void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
   }
 
   /**
@@ -1274,10 +1266,5 @@ public abstract class AbstractRepository
   protected boolean shouldAddToNotFoundCache(final ResourceStoreRequest request) {
     // if not local/remote only, add it to NFC
     return !request.isRequestLocalOnly() && !request.isRequestRemoteOnly();
-  }
-
-  @Override
-  public void dispose() {
-    unregisterFromEventBus();
   }
 }

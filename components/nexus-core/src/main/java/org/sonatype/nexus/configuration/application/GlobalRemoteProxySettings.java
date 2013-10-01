@@ -14,13 +14,14 @@
 package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 
 /**
  * @since 2.6
  */
 public interface GlobalRemoteProxySettings
-    extends Configurable, RemoteProxySettings
+    extends RemoteProxySettings
 {
 
 }

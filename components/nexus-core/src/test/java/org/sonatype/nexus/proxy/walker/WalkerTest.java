@@ -27,9 +27,9 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.google.common.collect.Lists;
 import junit.framework.Assert;
@@ -151,7 +151,7 @@ public class WalkerTest
   {
     // put repo2 out of service
     String repoId = "repo2";
-    Repository repo = repositoryRegistry.getRepository(repoId);
+    M2Repository repo = (M2Repository) repositoryRegistry.getRepository(repoId);
     repo.setLocalStatus(LocalStatus.OUT_OF_SERVICE);
     repo.commitChanges();
 

@@ -13,39 +13,47 @@
 
 package org.sonatype.nexus.proxy.storage.remote;
 
-import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.proxy.storage.remote.DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY;
+import static org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage.PROVIDER_STRING;
+
+/**
+ * Tests for {@link DefaultRemoteProviderHintFactory}.
+ */
 public class RemoteProviderHintFactoryTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
   private static final String FAKE_VALUE = "Foo-Bar";
 
-  protected void tearDown()
-      throws Exception
-  {
-    super.tearDown();
+  private DefaultRemoteProviderHintFactory underTest;
 
+  @Before
+  public void setUp() throws Exception {
+    underTest = new DefaultRemoteProviderHintFactory();
+  }
+
+  @After
+  public void tearDown() throws Exception {
     // clear the property
-    System.clearProperty(DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY);
+    System.clearProperty(DEFAULT_HTTP_PROVIDER_KEY);
   }
 
   @Test
-  public void testIt()
-      throws Exception
-  {
-    RemoteProviderHintFactory hintFactory = this.lookup(RemoteProviderHintFactory.class);
-
+  public void testIt() throws Exception {
     // clear the property
-    System.clearProperty(DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY);
+    System.clearProperty(DEFAULT_HTTP_PROVIDER_KEY);
 
     // nothing set
-    Assert.assertEquals(HttpClientRemoteStorage.PROVIDER_STRING, hintFactory.getDefaultHttpRoleHint());
+    assertThat(underTest.getDefaultHttpRoleHint(), is(PROVIDER_STRING));
 
-    System.setProperty(DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY, FAKE_VALUE);
-    Assert.assertEquals(FAKE_VALUE, hintFactory.getDefaultHttpRoleHint());
+    System.setProperty(DEFAULT_HTTP_PROVIDER_KEY, FAKE_VALUE);
+    assertThat(underTest.getDefaultHttpRoleHint(), is(FAKE_VALUE));
   }
 }

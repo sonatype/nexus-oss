@@ -23,4 +23,5 @@ import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfigurator;
 public abstract class LayoutConverterShadowRepositoryConfigurator
     extends AbstractShadowRepositoryConfigurator
 {
+
 }

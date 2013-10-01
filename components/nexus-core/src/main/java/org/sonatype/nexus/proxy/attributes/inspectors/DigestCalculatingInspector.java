@@ -20,13 +20,14 @@ import java.security.MessageDigest;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.attributes.AbstractStorageFileItemInspector;
-import org.sonatype.nexus.proxy.attributes.StorageFileItemInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 import org.apache.commons.codec.binary.Hex;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * The Class DigestCalculatingInspector calculates MD5 and SHA1 digests of a file and stores them into extended
@@ -34,7 +35,8 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author cstamas
  */
-@Component(role = StorageFileItemInspector.class, hint = "digest")
+@Singleton
+@Named
 public class DigestCalculatingInspector
     extends AbstractStorageFileItemInspector
 {
@@ -50,6 +52,7 @@ public class DigestCalculatingInspector
    */
   public static String DIGEST_SHA1_KEY = StorageFileItem.DIGEST_SHA1_KEY;
 
+  @Override
   public Set<String> getIndexableKeywords() {
     Set<String> result = new HashSet<String>(2);
     result.add(DIGEST_MD5_KEY);
@@ -57,6 +60,7 @@ public class DigestCalculatingInspector
     return result;
   }
 
+  @Override
   public boolean isHandled(StorageItem item) {
     if (item instanceof StorageFileItem) {
       if (item.getItemContext().containsKey(StorageFileItem.DIGEST_SHA1_KEY)) {
@@ -77,6 +81,7 @@ public class DigestCalculatingInspector
     return true;
   }
 
+  @Override
   public void processStorageFileItem(StorageFileItem item, File file)
       throws Exception
   {

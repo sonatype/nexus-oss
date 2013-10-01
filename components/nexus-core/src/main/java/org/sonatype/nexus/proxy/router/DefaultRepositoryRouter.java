@@ -20,9 +20,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRouting;
@@ -52,12 +55,9 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.targets.TargetSet;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
@@ -66,24 +66,28 @@ import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
  *
  * @author cstamas
  */
-@Component(role = RepositoryRouter.class)
+@Singleton
+@Named
 public class DefaultRepositoryRouter
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<CRouting>
     implements RepositoryRouter
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final RepositoryRegistry repositoryRegistry;
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private final RepositoryTypeRegistry repositoryTypeRegistry;
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final NexusItemAuthorizer itemAuthorizer;
 
-  @Requirement
-  private RepositoryTypeRegistry repositoryTypeRegistry;
-
-  @Requirement
-  private NexusItemAuthorizer itemAuthorizer;
+  @Inject
+  public DefaultRepositoryRouter(EventBus eventBus, ApplicationConfiguration applicationConfiguration,
+      RepositoryRegistry repositoryRegistry, RepositoryTypeRegistry repositoryTypeRegistry,
+      NexusItemAuthorizer itemAuthorizer)
+  {
+    super("Repository Router", eventBus, applicationConfiguration);
+    this.repositoryRegistry = repositoryRegistry;
+    this.repositoryTypeRegistry = repositoryTypeRegistry;
+    this.itemAuthorizer = itemAuthorizer;
+  }
 
   public boolean isFollowLinks() {
     return getCurrentConfiguration(false).isResolveLinks();
@@ -104,22 +108,7 @@ public class DefaultRepositoryRouter
   }
 
   @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return applicationConfiguration;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected CRouting getCurrentConfiguration(boolean forWrite) {
-    return ((CRoutingCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
+  protected CoreConfiguration<CRouting> wrapConfiguration(Object configuration)
       throws ConfigurationException
   {
     if (configuration instanceof ApplicationConfiguration) {
@@ -143,7 +132,7 @@ public class DefaultRepositoryRouter
   public StorageItem dereferenceLink(StorageLinkItem link, boolean localOnly, boolean remoteOnly)
       throws AccessDeniedException, ItemNotFoundException, IllegalOperationException, StorageException
   {
-    logger.debug("Dereferencing link {}", link.getTarget());
+    getLogger().debug("Dereferencing link {}", link.getTarget());
 
     ResourceStoreRequest req = new ResourceStoreRequest(link.getTarget().getPath(), localOnly, remoteOnly);
 
@@ -662,9 +651,4 @@ public class DefaultRepositoryRouter
 
     return this.itemAuthorizer.authorizePath(matched, action);
   }
-
-  public String getName() {
-    return "Repository Router Settings";
-  }
-
 }

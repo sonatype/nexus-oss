@@ -15,10 +15,11 @@ package org.sonatype.nexus.configuration;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
-
+import org.mockito.Mock;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -31,39 +32,29 @@ import static org.hamcrest.Matchers.nullValue;
 public class AbstractConfigurableTest
     extends TestSupport
 {
-
-  private AbstractConfigurable configurable = new AbstractConfigurable()
-  {
-    @Override
-    protected ApplicationConfiguration getApplicationConfiguration() {
-      return null;
-    }
-
-    @Override
-    protected Configurator getConfigurator() {
-      return null;
-    }
-
-    @Override
-    protected Object getCurrentConfiguration(final boolean forWrite) {
-      return null;
-    }
-
-    @Override
-    protected CoreConfiguration wrapConfiguration(final Object configuration)
-        throws ConfigurationException
-    {
-      return null;
-    }
-
-    @Override
-    public String getName() {
-      return null;
-    }
-  };
+  @Mock
+  private EventBus eventBus;
+  
+  @Mock
+  private ApplicationConfiguration applicationConfiguration;
 
   @Test
   public void isDirtyNullConfigShouldReturnFalse() {
+    AbstractConfigurable configurable = new AbstractConfigurable(eventBus, applicationConfiguration)
+    {
+      @Override
+      protected CoreConfiguration wrapConfiguration(final Object configuration)
+          throws ConfigurationException
+      {
+        return null;
+      }
+
+      @Override
+      public String getName() {
+        return "name";
+      }
+    };
+
     assertThat(configurable.getCurrentCoreConfiguration(), nullValue());
     assertThat(configurable.isDirty(), is(false));
   }

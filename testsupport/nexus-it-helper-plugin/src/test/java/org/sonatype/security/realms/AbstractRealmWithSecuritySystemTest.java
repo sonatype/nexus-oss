@@ -21,8 +21,6 @@ import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.Module;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
 
 /**
@@ -39,13 +37,6 @@ public abstract class AbstractRealmWithSecuritySystemTest
   private SecuritySystem securitySystem;
 
   private CacheManagerComponent cacheManagerComponent;
-
-  @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
-    super.customizeContainerConfiguration(configuration);
-    configuration.setAutoWiring(true);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
-  }
 
   @Override
   protected void customizeContext(final Context ctx) {

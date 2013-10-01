@@ -18,6 +18,7 @@ import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 public class DefaultRepositoryMetadataValidator
     implements RepositoryMetadataValidator
 {
+  @Override
   public void validate(RepositoryMetadata metadata)
       throws ValidationException
   {

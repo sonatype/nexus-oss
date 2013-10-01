@@ -13,25 +13,32 @@
 
 package org.sonatype.nexus.proxy.maven;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeItemContentValidator;
 
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractMavenRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
-  @Requirement(hint = ChecksumContentValidator.ID)
-  private ItemContentValidator checksumValidator;
+  private ChecksumContentValidator checksumValidator;
 
-  @Requirement(hint = FileTypeItemContentValidator.ID)
-  private ItemContentValidator fileTypeItemContentValidator;
+  private FileTypeItemContentValidator fileTypeItemContentValidator;
+
+  @Inject
+  public void populateAbstractMavenRepositoryConfigurator(final ChecksumContentValidator checksumValidator,
+                                                          final FileTypeItemContentValidator fileTypeItemContentValidator)
+  {
+    this.checksumValidator = checkNotNull(checksumValidator);
+    this.fileTypeItemContentValidator = checkNotNull(fileTypeItemContentValidator);
+  }
 
   @Override
   public void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,

@@ -23,6 +23,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -58,18 +63,19 @@ import org.sonatype.nexus.util.DigesterUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The default M2Repository.
  *
  * @author cstamas
  */
-@Component(role = Repository.class, hint = M2Repository.ID, instantiationStrategy = "per-lookup",
-    description = "Maven2 Repository")
+@Named(M2Repository.ID)
+@Typed(Repository.class)
+@Description("Maven2 Repository")
 public class M2Repository
     extends AbstractMavenRepository
 {
@@ -78,20 +84,27 @@ public class M2Repository
    */
   public static final String ID = Maven2ContentClass.ID;
 
+  private final ContentClass contentClass;
+
   /**
    * The GAV Calculator.
    */
-  @Requirement(hint = "maven2")
-  private GavCalculator gavCalculator;
+  private final GavCalculator gavCalculator;
 
-  @Requirement(hint = Maven2ContentClass.ID)
-  private ContentClass contentClass;
+  private final M2RepositoryConfigurator m2RepositoryConfigurator;
 
-  @Requirement
-  private M2RepositoryConfigurator m2RepositoryConfigurator;
+  private final MavenRepositoryMetadataManager mavenRepositoryMetadataManager;
 
-  private final MavenRepositoryMetadataManager mavenRepositoryMetadataManager = new MavenRepositoryMetadataManager(
-      this);
+  @Inject
+  public M2Repository(final @Named(Maven2ContentClass.ID) ContentClass contentClass,
+                      final @Named("maven2") GavCalculator gavCalculator,
+                      final M2RepositoryConfigurator m2RepositoryConfigurator)
+  {
+    this.contentClass = checkNotNull(contentClass);
+    this.gavCalculator = checkNotNull(gavCalculator);
+    this.m2RepositoryConfigurator = checkNotNull(m2RepositoryConfigurator);
+    this.mavenRepositoryMetadataManager = new MavenRepositoryMetadataManager(this);
+  }
 
   @Override
   public RepositoryMetadataManager getRepositoryMetadataManager() {
@@ -113,10 +126,12 @@ public class M2Repository
     };
   }
 
+  @Override
   public ContentClass getRepositoryContentClass() {
     return contentClass;
   }
 
+  @Override
   public GavCalculator getGavCalculator() {
     return gavCalculator;
   }

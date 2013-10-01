@@ -66,7 +66,6 @@ import org.sonatype.p2.bridge.Publisher;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -82,7 +81,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Description("Eclipse Update Site")
 public class UpdateSiteProxyRepositoryImpl
     extends AbstractProxyRepository
-    implements UpdateSiteProxyRepository, Repository, Initializable
+    implements UpdateSiteProxyRepository, Repository
 {
   private static final String DEFAULT_FEATURES_DIR = "features/";
 

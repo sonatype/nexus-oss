@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -50,7 +49,7 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  */
 @RepositoryType(pathPrefix = "repositories")
 public interface Repository
-    extends ResourceStore, Configurable
+    extends ResourceStore
 {
   /**
    * Disposes this repository, frees it's resources and unhooks it, allowing the instance to be GCed. Typically when a

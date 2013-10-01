@@ -15,6 +15,10 @@ package org.sonatype.nexus.repositories.metadata;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -24,22 +28,27 @@ import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.RepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
-@Component(role = NexusRepositoryMetadataHandler.class)
+@Named
+@Singleton
 public class DefaultNexusRepositoryMetadataHandler
     extends AbstractLoggingComponent
     implements NexusRepositoryMetadataHandler
 {
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+  private final RepositoryRegistry repositoryRegistry;
 
-  @Requirement
-  private RepositoryMetadataHandler repositoryMetadataHandler;
+  private final RepositoryMetadataHandler repositoryMetadataHandler;
 
-  @Requirement
-  private Hc4Provider hc4Provider;
+  private final Hc4Provider hc4Provider;
+
+  @Inject
+  public DefaultNexusRepositoryMetadataHandler(final RepositoryRegistry repositoryRegistry,
+                                               final RepositoryMetadataHandler repositoryMetadataHandler,
+                                               final Hc4Provider hc4Provider)
+  {
+    this.repositoryRegistry = repositoryRegistry;
+    this.repositoryMetadataHandler = repositoryMetadataHandler;
+    this.hc4Provider = hc4Provider;
+  }
 
   public RepositoryMetadata readRemoteRepositoryMetadata(final String url)
       throws MetadataHandlerException,

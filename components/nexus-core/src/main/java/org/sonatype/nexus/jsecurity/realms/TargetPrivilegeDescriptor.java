@@ -16,6 +16,10 @@ package org.sonatype.nexus.jsecurity.realms;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
@@ -26,33 +30,44 @@ import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = PrivilegeDescriptor.class, hint = "TargetPrivilegeDescriptor")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named("TargetPrivilegeDescriptor")
 public class TargetPrivilegeDescriptor
     extends AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
   public static final String TYPE = "target";
 
-  @Requirement(role = PrivilegePropertyDescriptor.class, hint = "ApplicationPrivilegeMethodPropertyDescriptor")
-  private PrivilegePropertyDescriptor methodProperty;
+  private final PrivilegePropertyDescriptor methodProperty;
 
-  @Requirement(role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeRepositoryTargetPropertyDescriptor")
-  private PrivilegePropertyDescriptor targetProperty;
+  private final PrivilegePropertyDescriptor targetProperty;
 
-  @Requirement(role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeRepositoryPropertyDescriptor")
-  private PrivilegePropertyDescriptor repositoryProperty;
+  private final PrivilegePropertyDescriptor repositoryProperty;
 
-  @Requirement(role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeGroupPropertyDescriptor")
-  private PrivilegePropertyDescriptor groupProperty;
+  private final PrivilegePropertyDescriptor groupProperty;
 
+  @Inject
+  public TargetPrivilegeDescriptor(final @Named("ApplicationPrivilegeMethodPropertyDescriptor") PrivilegePropertyDescriptor methodProperty,
+                                   final @Named("TargetPrivilegeRepositoryTargetPropertyDescriptor") PrivilegePropertyDescriptor targetProperty,
+                                   final @Named("TargetPrivilegeRepositoryPropertyDescriptor") PrivilegePropertyDescriptor repositoryProperty,
+                                   final @Named("TargetPrivilegeGroupPropertyDescriptor") PrivilegePropertyDescriptor groupProperty)
+  {
+    this.methodProperty = checkNotNull(methodProperty);
+    this.targetProperty = checkNotNull(targetProperty);
+    this.repositoryProperty = checkNotNull(repositoryProperty);
+    this.groupProperty = checkNotNull(groupProperty);
+  }
+
+  @Override
   public String getName() {
     return "Repository Target";
   }
 
+  @Override
   public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
     List<PrivilegePropertyDescriptor> propertyDescriptors = new ArrayList<PrivilegePropertyDescriptor>();
 
@@ -64,10 +79,12 @@ public class TargetPrivilegeDescriptor
     return propertyDescriptors;
   }
 
+  @Override
   public String getType() {
     return TYPE;
   }
 
+  @Override
   public String buildPermission(CPrivilege privilege) {
     if (!TYPE.equals(privilege.getType())) {
       return null;

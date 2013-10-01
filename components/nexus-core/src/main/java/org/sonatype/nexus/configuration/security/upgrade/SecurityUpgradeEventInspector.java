@@ -15,12 +15,15 @@ package org.sonatype.nexus.configuration.security.upgrade;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
@@ -31,38 +34,49 @@ import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = EventInspector.class, hint = "SecurityUpgradeEventInspector")
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Singleton
+@Named("SecurityUpgradeEventInspector")
 public class SecurityUpgradeEventInspector
     extends AbstractEventInspector
 {
+  private final EventBus eventBus;
 
-  @Requirement
-  private ApplicationStatusSource applicationStatusSource;
+  private final ApplicationStatusSource applicationStatusSource;
 
-  @Requirement(hint = "file")
-  private SecurityModelConfigurationSource realmConfigSource;
+  private final  SecurityModelConfigurationSource realmConfigSource;
 
-  @Requirement
-  private SecurityConfigurationManager systemConfigManager;
+  private final SecurityConfigurationManager systemConfigManager;
 
   /**
    * Reuse the previous versions upgrader, this is normally run after the module upgrade of 2.0.1, so the module is
    * actually 2.0.2.
    */
-  @Requirement(hint = "2.0.1")
   private SecurityDataUpgrader upgrader;
 
-  @Requirement
-  private EventBus eventBus;
+  @Inject
+  public SecurityUpgradeEventInspector(final EventBus eventBus, 
+                                       final ApplicationStatusSource applicationStatusSource,
+                                       final @Named("file") SecurityModelConfigurationSource realmConfigSource,
+                                       final SecurityConfigurationManager systemConfigManager, 
+                                       final @Named("2.0.1") SecurityDataUpgrader upgrader)
+  {
+    this.eventBus = checkNotNull(eventBus);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.realmConfigSource = checkNotNull(realmConfigSource);
+    this.systemConfigManager = checkNotNull(systemConfigManager);
+    this.upgrader = checkNotNull(upgrader);
+  }
 
+  @Override
   public boolean accepts(Event<?> evt) {
     return (evt instanceof NexusStartedEvent);
   }
 
+  @Override
   public void inspect(Event<?> evt) {
     final SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
 

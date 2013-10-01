@@ -14,14 +14,14 @@
 package org.sonatype.nexus.rest;
 
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.AbstractRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class NexusCompat
 {
   public static CRepository getRepositoryRawConfiguration(Repository repository) {
-    return ((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration()).getConfiguration(false);
+    return ((AbstractRepository)repository).getCurrentCoreConfiguration().getConfiguration(false);
   }
 
   /**

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import javax.inject.Inject;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
@@ -69,10 +70,10 @@ import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.collect.Lists;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
@@ -105,8 +106,11 @@ public abstract class AbstractProxyRepository
    */
   private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
 
-  @Requirement
+  // == these below are injected
+
   private ThreadPoolManager poolManager;
+  
+  // ==
 
   /**
    * The remote status checker thread, used in Proxies for handling autoBlocking. Not to go into Pool above, is
@@ -149,6 +153,12 @@ public abstract class AbstractProxyRepository
    * Item content validators
    */
   private Map<String, ItemContentValidator> itemContentValidators;
+
+  @Inject
+  public void populateAbstractProxyRepository(ThreadPoolManager poolManager)
+  {
+    this.poolManager = checkNotNull(poolManager);
+  }
 
   @Override
   protected AbstractProxyRepositoryConfiguration getExternalConfiguration(boolean forModification) {

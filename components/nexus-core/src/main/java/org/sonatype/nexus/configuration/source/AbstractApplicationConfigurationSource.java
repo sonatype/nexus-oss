@@ -23,9 +23,10 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.
@@ -39,8 +40,7 @@ public abstract class AbstractApplicationConfigurationSource
   /**
    * The application interpolation provider.
    */
-  @Requirement
-  private ApplicationInterpolatorProvider interpolatorProvider;
+  private final ApplicationInterpolatorProvider interpolatorProvider;
 
   /**
    * The configuration.
@@ -52,10 +52,16 @@ public abstract class AbstractApplicationConfigurationSource
    */
   private boolean instanceUpgraded;
 
+  public AbstractApplicationConfigurationSource(final ApplicationInterpolatorProvider interpolatorProvider) {
+    this.interpolatorProvider = checkNotNull(interpolatorProvider);
+  }
+
+  @Override
   public Configuration getConfiguration() {
     return configuration;
   }
 
+  @Override
   public void setConfiguration(Configuration configuration) {
     this.configuration = configuration;
   }
@@ -122,6 +128,7 @@ public abstract class AbstractApplicationConfigurationSource
   /**
    * Returns the default source of ConfigurationSource. May be null.
    */
+  @Override
   public ApplicationConfigurationSource getDefaultsSource() {
     return null;
   }
@@ -129,6 +136,7 @@ public abstract class AbstractApplicationConfigurationSource
   /**
    * Is nexus instance upgraded
    */
+  @Override
   public boolean isInstanceUpgraded() {
     return instanceUpgraded;
   }

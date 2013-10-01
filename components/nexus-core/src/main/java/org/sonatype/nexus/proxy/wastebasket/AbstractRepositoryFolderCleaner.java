@@ -16,10 +16,11 @@ package org.sonatype.nexus.proxy.wastebasket;
 import java.io.File;
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.scheduling.TaskUtil;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +32,15 @@ public abstract class AbstractRepositoryFolderCleaner
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
   private ApplicationConfiguration applicationConfiguration;
 
   protected Logger getLogger() {
     return logger;
+  }
+
+  @Inject
+  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = applicationConfiguration;
   }
 
   protected ApplicationConfiguration getApplicationConfiguration() {

@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -152,7 +153,7 @@ public class Nexus5249IndexerManagerIT
         else {
           mavenProxyRepository.setDownloadRemoteIndexes(false);
         }
-        mavenProxyRepository.commitChanges();
+        ((M2Repository)mavenProxyRepository).commitChanges();
       }
     }
 

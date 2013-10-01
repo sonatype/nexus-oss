@@ -79,7 +79,7 @@ public class ArchetypeContentGeneratorTest
     indexerManager.removeRepositoryIndexContext(repository.getId(), true);
   }
 
-  protected Repository createRepository(final String id)
+  protected M2Repository createRepository(final String id)
       throws Exception
   {
     // adding one proxy
@@ -106,7 +106,7 @@ public class ArchetypeContentGeneratorTest
   public void testWithoutPreparedContext()
       throws Exception
   {
-    final Repository repository = createRepository("test");
+    final M2Repository repository = createRepository("test");
     repository.setIndexable(false);
     repository.commitChanges();
     repositoryRegistry.addRepository(repository); // need to be in registry to hand it over to indexerManager

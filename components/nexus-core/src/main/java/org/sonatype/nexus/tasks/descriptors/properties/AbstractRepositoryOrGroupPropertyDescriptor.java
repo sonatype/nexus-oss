@@ -17,6 +17,7 @@ package org.sonatype.nexus.tasks.descriptors.properties;
 public abstract class AbstractRepositoryOrGroupPropertyDescriptor
     extends AbstractPropertyDescriptor
 {
+  @Override
   public String getType() {
     return "repo-or-group";
   }
