@@ -36,7 +36,7 @@ NX.define('Nexus.ext.GridFilterBox', {
     var self = this;
 
     Ext.apply(self, {
-      filteredStore: self.filteredGrid.gridStore,
+      filteredStore: self.filteredGrid.gridStore || self.filteredGrid.store,
       filteredFields: self.extractColumnsWithDataIndex(self.filteredGrid.getColumnModel())
     });
 
