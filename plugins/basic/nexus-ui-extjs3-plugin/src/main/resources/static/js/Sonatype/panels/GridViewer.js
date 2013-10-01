@@ -204,6 +204,12 @@ NX.define('Sonatype.panels.GridViewer', {
       autoExpandColumn : this.autoExpandColumn,
       disableSelection : false,
 
+      viewConfig : {
+        emptyText: this.emptyText,
+        deferEmptyText: false,
+        emptyTextWhileFiltering: this.emptyTextWhileFiltering
+      },
+
       listeners : {
         rowcontextmenu : {
           fn : this.rowContextMenuHandler,
