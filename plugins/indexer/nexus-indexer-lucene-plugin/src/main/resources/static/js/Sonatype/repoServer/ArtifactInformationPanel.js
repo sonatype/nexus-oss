@@ -54,6 +54,23 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
 
   Ext.reg('repositoryUrlDisplayField', Ext.form.RepositoryUrlDisplayField);
 
+  Ext.form.RepositoryPathDisplayField = Ext.extend(Ext.form.DisplayField, {
+    setValue : function(repositoryPath) {
+      if (repositoryPath) {
+        if (typeof repositoryPath === 'string'
+            || !repositoryPath.path || !repositoryPath.href) {
+          this.setRawValue(repositoryPath);
+        }
+        else {
+          this.setRawValue('<a href="' + repositoryPath.href + '" target="_blank">' + repositoryPath.path + '</a>');
+        }
+      }
+      return this;
+    }
+  });
+
+  Ext.reg('repositoryPathDisplayField', Ext.form.RepositoryPathDisplayField);
+
   Sonatype.repoServer.ArtifactInformationPanel = function(config) {
     var config = config || {};
     var defaultConfig = {};
@@ -81,7 +98,7 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
           collapsible : false,
           collapsed : false,
           items : [{
-                xtype : 'displayfield',
+                xtype : 'repositoryPathDisplayField',
                 fieldLabel : 'Repository Path',
                 name : 'repositoryPath',
                 anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
@@ -294,7 +311,12 @@ define('Sonatype/repoServer/ArtifactInformationPanel', ['Nexus/ext/linkbutton'],
                       else
                       {
                         this.clearNonLocalView(infoResp.data.canDelete);
-                        this.form.setValues(infoResp.data);
+                        this.form.setValues(Ext.apply(infoResp.data, {
+                          repositoryPath: {
+                            path: infoResp.data.repositoryPath,
+                            href: this.data.resourceURI
+                          }
+                        }));
                       }
                       this.downloadButton.href = this.data.resourceURI;
                       this.downloadButton.setParams({});
