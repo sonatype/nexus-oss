@@ -13,9 +13,11 @@
 
 package org.sonatype.nexus;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
@@ -53,6 +55,10 @@ public abstract class NexusAppTestSupport
 
   protected boolean runWithSecurityDisabled() {
     return true;
+  }
+
+  protected boolean shouldLoadConfigurationOnStartup() {
+    return false;
   }
 
   // NxApplication
@@ -126,6 +132,10 @@ public abstract class NexusAppTestSupport
     nexusConfiguration = lookup(NexusConfiguration.class);
     templateManager = lookup(TemplateManager.class);
 
+    if (shouldLoadConfigurationOnStartup()) {
+      loadConfiguration();
+    }
+
     if (runWithSecurityDisabled()) {
       shutDownSecurity();
     }
@@ -160,12 +170,16 @@ public abstract class NexusAppTestSupport
   {
     System.out.println("== Shutting down SECURITY!");
 
-    nexusConfiguration.loadConfiguration(false);
-    nexusConfiguration.saveConfiguration();
+    loadConfiguration();
 
     ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
 
     System.out.println("== Shutting down SECURITY!");
+  }
+
+  protected void loadConfiguration() throws ConfigurationException, IOException {
+    nexusConfiguration.loadConfiguration(false);
+    nexusConfiguration.saveConfiguration();
   }
 
   protected void killActiveTasks()
