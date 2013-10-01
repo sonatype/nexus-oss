@@ -219,10 +219,9 @@
       <artifactId>guice-assistedinject</artifactId>
     </dependency>
 
-    <!-- SISU et al -->
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-locks</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-locks</artifactId>
     </dependency>
 
     <dependency>
