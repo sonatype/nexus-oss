@@ -15,13 +15,14 @@ package org.sonatype.nexus.rest.component;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
@@ -36,8 +37,12 @@ public abstract class AbstractComponentListPlexusResource
 {
   public static final String ROLE_ID = "role";
 
-  @Requirement
   private PlexusContainer container;
+
+  @Inject
+  public void setContainer(final PlexusContainer container) {
+    this.container = container;
+  }
 
   @Override
   public Object getPayloadInstance() {

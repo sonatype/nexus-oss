@@ -17,6 +17,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
 
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.junit.Test;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -30,6 +33,7 @@ import org.restlet.resource.Variant;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link ContentPlexusResource}.
@@ -37,6 +41,7 @@ import static org.hamcrest.Matchers.notNullValue;
  * @since 2.0
  */
 public class ContentPlexusResourceTest
+  extends TestSupport
 {
   /**
    * Test the basic content types.
@@ -61,7 +66,7 @@ public class ContentPlexusResourceTest
     Response response = new Response(request);
 
     NexusRestletResource resource =
-        new NexusRestletResource(new Context(), request, response, new ContentPlexusResource());
+        new NexusRestletResource(new Context(), request, response, new ContentPlexusResource(mock(RepositoryRouter.class)));
 
     Variant preferredVariant = resource.getPreferredVariant();
     assertThat("Preferred Variant is null for media type: " + mediaTypeInRequest + " expected: "
@@ -79,7 +84,7 @@ public class ContentPlexusResourceTest
     // as made with http wagon
     final Request encodedRequest = new Request(Method.GET, new Reference(URLEncoder.encode(tilde, "UTF-8")));
 
-    final ContentPlexusResource contentPlexusResource = new ContentPlexusResource();
+    final ContentPlexusResource contentPlexusResource = new ContentPlexusResource(mock(RepositoryRouter.class));
 
     assertThat(contentPlexusResource.getResourceStorePath(nonEncodedRequest), equalTo(tilde));
     assertThat(contentPlexusResource.getResourceStorePath(encodedRequest), equalTo(tilde));

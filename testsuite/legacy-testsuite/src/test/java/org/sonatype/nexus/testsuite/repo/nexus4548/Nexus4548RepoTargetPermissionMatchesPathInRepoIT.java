@@ -68,7 +68,6 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
     // disable anonymous access
     GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
     settings.setSecurityAnonymousAccessEnabled(false);
-    settings.setSecurityEnabled(true);
     SettingsMessageUtil.save(settings);
   }
 

@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.rest.schedules;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,17 +23,16 @@ import org.sonatype.nexus.rest.component.AbstractComponentListPlexusResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "ScheduledTaskTypeComonentListPlexusResource")
+@Named
+@Singleton
 @Path(ScheduledTaskTypeComponentListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class ScheduledTaskTypeComponentListPlexusResource

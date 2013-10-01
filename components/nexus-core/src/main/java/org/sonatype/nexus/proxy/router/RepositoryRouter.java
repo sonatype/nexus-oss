@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.proxy.router;
 
-import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -35,7 +34,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @see RepositoryRegistry
  */
 public interface RepositoryRouter
-    extends ResourceStore, Configurable
+    extends ResourceStore
 {
   boolean isFollowLinks();
 

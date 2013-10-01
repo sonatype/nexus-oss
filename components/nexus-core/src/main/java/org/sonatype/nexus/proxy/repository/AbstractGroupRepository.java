@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -41,12 +43,11 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.component.annotations.Requirement;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
@@ -58,14 +59,21 @@ public abstract class AbstractGroupRepository
     extends AbstractRepository
     implements GroupRepository
 {
-  @Requirement
+  // == these below are injected
+
   private RepositoryRegistry repoRegistry;
 
-  @Requirement
   private RequestRepositoryMapper requestRepositoryMapper;
 
-  @Requirement
-  private ThreadPoolManager poolManager;
+  // ==
+
+  @Inject
+  public void populateAbstractGroupRepository(
+      RepositoryRegistry repoRegistry, RequestRepositoryMapper requestRepositoryMapper)
+  {
+    this.repoRegistry = checkNotNull(repoRegistry);
+    this.requestRepositoryMapper = requestRepositoryMapper;
+  }
 
   @Override
   protected AbstractGroupRepositoryConfiguration getExternalConfiguration(boolean forWrite) {

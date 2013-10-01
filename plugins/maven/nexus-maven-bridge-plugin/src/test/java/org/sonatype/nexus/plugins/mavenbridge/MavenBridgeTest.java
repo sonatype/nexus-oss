@@ -21,6 +21,7 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.plugins.mavenbridge.internal.FileItemModelSource;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -50,15 +51,18 @@ public class MavenBridgeTest
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
 
-    shutDownSecurity();
-
     server = Server.withPort(0).serve("/*").withBehaviours(Behaviours.get(
         new File(getBasedir(), "src/test/resources/test-repo"))).start();
 
     for (MavenProxyRepository repo : repositoryRegistry.getRepositoriesWithFacet(MavenProxyRepository.class)) {
       repo.setRemoteUrl(server.getUrl().toExternalForm());
-      repo.commitChanges();
+      ((AbstractMavenRepository)repo).commitChanges();
     }
+  }
+
+  @Override
+  protected boolean runWithSecurityDisabled() {
+    return true;
   }
 
   @Override

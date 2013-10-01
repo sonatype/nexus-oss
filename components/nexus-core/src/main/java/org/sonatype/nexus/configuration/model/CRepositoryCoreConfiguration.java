@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.configuration.model;
 
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
@@ -21,11 +22,12 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class CRepositoryCoreConfiguration
-    extends AbstractCoreConfiguration
+    extends AbstractCoreConfiguration<CRepository>
 {
   private static final String REPOSITORY_ID_PATTERN = "^[a-zA-Z0-9_\\-\\.]+$";
 
@@ -33,25 +35,19 @@ public class CRepositoryCoreConfiguration
 
   private final CRepositoryExternalConfigurationHolderFactory<?> externalConfigurationFactory;
 
+  private ExternalConfiguration<?> externalConfiguration;
+
   public CRepositoryCoreConfiguration(ApplicationConfiguration configuration, CRepository repositoryModel,
-                                      CRepositoryExternalConfigurationHolderFactory<?> extFactory)
+      CRepositoryExternalConfigurationHolderFactory<?> extFactory)
   {
     super(configuration);
-
     setOriginalConfiguration(repositoryModel);
-
-    this.repositoryModel = repositoryModel;
-
+    this.repositoryModel = checkNotNull(repositoryModel);
     this.externalConfigurationFactory = extFactory;
   }
 
   @Override
-  public CRepository getConfiguration(boolean forWrite) {
-    return (CRepository) super.getConfiguration(forWrite);
-  }
-
-  @Override
-  protected void copyTransients(Object source, Object destination) {
+  protected void copyTransients(CRepository source, CRepository destination) {
     ((CRepository) destination).setExternalConfiguration(((CRepository) source).getExternalConfiguration());
 
     ((CRepository) destination).externalConfigurationImple = ((CRepository) source).externalConfigurationImple;
@@ -65,8 +61,14 @@ public class CRepositoryCoreConfiguration
     }
   }
 
-  @Override
-  protected ExternalConfiguration<?> prepareExternalConfiguration(Object configuration) {
+  public ExternalConfiguration<?> getExternalConfiguration() {
+    if (externalConfiguration == null) {
+      externalConfiguration = prepareExternalConfiguration(getOriginalConfiguration());
+    }
+    return externalConfiguration;
+  }
+
+  protected ExternalConfiguration<?> prepareExternalConfiguration(CRepository configuration) {
     if (externalConfigurationFactory == null) {
       return null;
     }
@@ -74,22 +76,19 @@ public class CRepositoryCoreConfiguration
     // prepare the Xpp3Dom root node
     if (repositoryModel.getExternalConfiguration() == null) {
       // just put an elephant in South Africa to find it for sure ;)
-      repositoryModel
-          .setExternalConfiguration(new Xpp3Dom(DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME));
+      repositoryModel.setExternalConfiguration(new Xpp3Dom(DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME));
     }
 
     // set the holder
     if (repositoryModel.externalConfigurationImple == null) {
       // in 1st round, i intentionally choosed to make our lives bitter, and handle config manually
       // later we will see about it
-      repositoryModel.externalConfigurationImple =
-          externalConfigurationFactory.createExternalConfigurationHolder(repositoryModel);
+      repositoryModel.externalConfigurationImple = externalConfigurationFactory
+          .createExternalConfigurationHolder(repositoryModel);
     }
 
-    return new DefaultExternalConfiguration<AbstractXpp3DomExternalConfigurationHolder>(
-        getApplicationConfiguration(),
-        this,
-        (AbstractXpp3DomExternalConfigurationHolder) repositoryModel.externalConfigurationImple);
+    return new DefaultExternalConfiguration<AbstractXpp3DomExternalConfigurationHolder>(getApplicationConfiguration(),
+        this, (AbstractXpp3DomExternalConfigurationHolder) repositoryModel.externalConfigurationImple);
   }
 
   @Override
@@ -98,10 +97,39 @@ public class CRepositoryCoreConfiguration
     return null;
   }
 
+  @Override
+  public boolean isDirty() {
+    return isThisDirty() || (getExternalConfiguration() != null && getExternalConfiguration().isDirty());
+  }
+
+  @Override
+  public void validateChanges() throws ConfigurationException {
+    super.validateChanges();
+    if (getExternalConfiguration() != null) {
+      getExternalConfiguration().validateChanges();
+    }
+  }
+
+  @Override
+  public void commitChanges() throws ConfigurationException {
+    super.commitChanges();
+    if (getExternalConfiguration() != null) {
+      getExternalConfiguration().commitChanges();
+    }
+  }
+
+  @Override
+  public void rollbackChanges() {
+    super.rollbackChanges();
+    if (getExternalConfiguration() != null) {
+      getExternalConfiguration().rollbackChanges();
+    }
+  }
+
   // ==
 
   @Override
-  public ValidationResponse doValidateChanges(Object changedConfiguration) {
+  public ValidationResponse doValidateChanges(CRepository changedConfiguration) {
     CRepository cfg = (CRepository) changedConfiguration;
 
     ValidationResponse response = new ApplicationValidationResponse();
@@ -111,34 +139,14 @@ public class CRepositoryCoreConfiguration
       response.addValidationError(new ValidationMessage("id", "Repository ID must not be blank!"));
     }
     else if (!cfg.getId().matches(REPOSITORY_ID_PATTERN)) {
-      response
-          .addValidationError(new ValidationMessage("id",
-              "Only letters, digits, underscores, hyphens, and dots are allowed in Repository ID"));
+      response.addValidationError(new ValidationMessage("id",
+          "Only letters, digits, underscores, hyphens, and dots are allowed in Repository ID"));
     }
 
     // ID not 'all'
     if ("all".equals(cfg.getId())) {
       response.addValidationError(new ValidationMessage("id", "Repository ID can't be 'all', reserved word"));
     }
-
-    // ID uniqueness
-        /* This is totally flawed, but this is NOT THE ONLY ONE of the places we did uniqueness check!
-         * But this one in certainly not the place to do this.
-        List<CRepository> repositories = getApplicationConfiguration().getConfigurationModel().getRepositories();
-
-        for ( CRepository other : repositories )
-        {
-            // skip ourselves
-            if ( other != getOriginalConfiguration() )
-            {
-                if ( StringUtils.equals( cfg.getId(), other.getId() ) )
-                {
-                    response.addValidationError( new ValidationMessage( "id", "Repository with ID=\"" + cfg.getId()
-                        + "\" already exists (name of the existing repository: \"" + other.getName() + "\")" ) );
-                }
-            }
-        }
-        */
 
     // Name
     if (StringUtils.isBlank(cfg.getName())) {

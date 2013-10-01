@@ -16,11 +16,19 @@ package org.sonatype.nexus.rest;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.nexus.internal.DevModeResources;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.rest.internal.DevModeResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RetargetableRestlet;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
@@ -29,12 +37,10 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.web.ProtectedPathManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.util.AntPathMatcher;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.restlet.Application;
 import org.restlet.Directory;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
@@ -45,15 +51,14 @@ import org.restlet.service.StatusService;
  *
  * @author cstamas
  */
-@Component(role = Application.class, hint = "nexus")
+@Named("nexus")
+@Singleton
 public class NexusApplication
     extends PlexusRestletApplicationBridge
 {
-  @Requirement
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
-  @Requirement
-  private ProtectedPathManager protectedPathManager;
+  private final ProtectedPathManager protectedPathManager;
 
   /**
    * HACK directly injecting indexTemplate managed resource broke Nexus startup here, wasn't resolvable. It's only
@@ -62,32 +67,72 @@ public class NexusApplication
    * are bound from /,  not /service/local) but we need a little bit of order here to have resources being able to
    * override the default UI. (e.g. licensing)
    */
-  @Requirement
-  private Map<String, ManagedPlexusResource> managedResources;
+  private final Map<String, ManagedPlexusResource> managedResources;
 
-  @Requirement(hint = "licenseTemplate", optional = true)
-  private ManagedPlexusResource licenseTemplateResource;
+  private final ManagedPlexusResource licenseTemplateResource;
 
-  @Requirement(hint = "enterLicenseTemplate", optional = true)
-  private ManagedPlexusResource enterLicenseTemplateResource;
+  private final ManagedPlexusResource enterLicenseTemplateResource;
 
-  @Requirement(hint = "content")
-  private ManagedPlexusResource contentResource;
+  private final ManagedPlexusResource contentResource;
 
-  @Requirement(hint = "StatusPlexusResource")
-  private ManagedPlexusResource statusPlexusResource;
+  private final ManagedPlexusResource statusPlexusResource;
 
-  @Requirement(role = NexusResourceBundle.class)
-  private List<NexusResourceBundle> nexusResourceBundles;
+  private final List<NexusResourceBundle> nexusResourceBundles;
 
-  @Requirement(role = NexusApplicationCustomizer.class)
-  private List<NexusApplicationCustomizer> customizers;
+  private final List<NexusApplicationCustomizer> customizers;
 
-  @Requirement(role = ErrorReportingManager.class)
-  private ErrorReportingManager errorManager;
+  private final ErrorReportingManager errorManager;
 
-  @Requirement(role = StatusService.class)
-  private StatusService statusService;
+  private final StatusService statusService;
+
+  private final MimeSupport mimeSupport;
+
+  @Inject
+  public NexusApplication(final EventBus eventBus,
+                          final ProtectedPathManager protectedPathManager,
+                          final Map<String, ManagedPlexusResource> managedResources,
+                          final @Named("licenseTemplate") @Nullable ManagedPlexusResource licenseTemplateResource,
+                          final @Named("enterLicenseTemplate") @Nullable ManagedPlexusResource enterLicenseTemplateResource,
+                          final @Named("content") ManagedPlexusResource contentResource,
+                          final @Named("StatusPlexusResource") ManagedPlexusResource statusPlexusResource,
+                          final List<NexusResourceBundle> nexusResourceBundles,
+                          final List<NexusApplicationCustomizer> customizers,
+                          final ErrorReportingManager errorManager,
+                          final StatusService statusService,
+                          final MimeSupport mimeSupport)
+  {
+    this.eventBus = eventBus;
+    this.protectedPathManager = protectedPathManager;
+    this.managedResources = managedResources;
+    this.licenseTemplateResource = licenseTemplateResource;
+    this.enterLicenseTemplateResource = enterLicenseTemplateResource;
+    this.contentResource = contentResource;
+    this.statusPlexusResource = statusPlexusResource;
+    this.nexusResourceBundles = nexusResourceBundles;
+    this.customizers = customizers;
+    this.errorManager = errorManager;
+    this.statusService = statusService;
+    this.mimeSupport = mimeSupport;
+  }
+
+  // HACK: Too many places were using new NexusApplication() ... fuck it
+  @VisibleForTesting
+  public NexusApplication() {
+    this(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+  }
 
   @Subscribe
   public void onEvent(final NexusStartedEvent evt) {
@@ -199,6 +244,12 @@ public class NexusApplication
           }
         }
       }
+    }
+
+    // Attach to "/static" in case that dev mode is on
+    // The finder will only be called if the path under static is not found (as those are more specific)
+    if (DevModeResources.hasResourceLocations()) {
+      attach(root, false, "/static", new DevModeResourceFinder(mimeSupport, getContext(), "/static"));
     }
 
     // =======

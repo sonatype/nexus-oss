@@ -16,6 +16,10 @@ package org.sonatype.nexus.proxy.wastebasket;
 import java.io.File;
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -32,10 +36,10 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.sisu.resource.scanner.Listener;
 import org.sonatype.sisu.resource.scanner.Scanner;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import com.google.common.annotations.VisibleForTesting;
 
-@Component(role = Wastebasket.class)
+@Named
+@Singleton
 public class DefaultWastebasket
     extends AbstractLoggingComponent
     implements SmartWastebasket
@@ -44,42 +48,42 @@ public class DefaultWastebasket
 
   protected static final long ALL = -1L;
 
-  // ==
+  private final ApplicationConfiguration applicationConfiguration;
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
+  private Walker walker;
+
+  private final Scanner scanner;
+
+  private final RepositoryRegistry repositoryRegistry;
+
+  @Inject
+  public DefaultWastebasket(final ApplicationConfiguration applicationConfiguration,
+                            final Walker walker,
+                            final @Named("serial") Scanner scanner,
+                            final RepositoryRegistry repositoryRegistry)
+  {
+    this.applicationConfiguration = applicationConfiguration;
+    this.walker = walker;
+    this.scanner = scanner;
+    this.repositoryRegistry = repositoryRegistry;
+  }
 
   protected ApplicationConfiguration getApplicationConfiguration() {
     return applicationConfiguration;
   }
 
-  // ==
-
-  @Requirement
-  private Walker walker;
-
   protected Walker getWalker() {
     return walker;
   }
 
-  // @TestAccessible
+  @VisibleForTesting
   void setWalker(final Walker walker) {
     this.walker = walker;
   }
 
-  // ==
-
-  @Requirement(hint = "serial")
-  private Scanner scanner;
-
   protected Scanner getScanner() {
     return scanner;
   }
-
-  // ==
-
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
 
   protected RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;

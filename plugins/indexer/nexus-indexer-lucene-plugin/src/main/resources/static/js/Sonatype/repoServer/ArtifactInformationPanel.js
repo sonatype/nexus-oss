@@ -52,6 +52,23 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
 
   Ext.reg('repositoryUrlDisplayField', Ext.form.RepositoryUrlDisplayField);
 
+  Ext.form.RepositoryPathDisplayField = Ext.extend(Ext.form.DisplayField, {
+    setValue : function(repositoryPath) {
+      if (repositoryPath) {
+        if (typeof repositoryPath === 'string'
+            || !repositoryPath.path || !repositoryPath.href) {
+          this.setRawValue(repositoryPath);
+        }
+        else {
+          this.setRawValue('<a href="' + repositoryPath.href + '" target="_blank">' + repositoryPath.path + '</a>');
+        }
+      }
+      return this;
+    }
+  });
+
+  Ext.reg('repositoryPathDisplayField', Ext.form.RepositoryPathDisplayField);
+
   Sonatype.repoServer.ArtifactInformationPanel = function(config) {
     var config = config || {};
     var defaultConfig = {};
@@ -81,7 +98,7 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
           collapsible : false,
           collapsed : false,
           items : [{
-                xtype : 'displayfield',
+                xtype : 'repositoryPathDisplayField',
                 fieldLabel : 'Repository Path',
                 name : 'repositoryPath',
                 anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
@@ -233,7 +250,14 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
         },
 
         setupNonLocalView : function(repositoryPath) {
-          this.find('name', 'repositoryPath')[0].setRawValue(repositoryPath + ' (Not Locally Cached)');
+          if (this.data.resourceURI) {
+            this.find('name', 'repositoryPath')[0].setValue({
+              path: repositoryPath + ' (Not Locally Cached)',
+              href: this.data.resourceURI
+            });
+          } else {
+            this.find('name', 'repositoryPath')[0].setRawValue(repositoryPath + ' (Not Locally Cached)');
+          }
           this.find('name', 'uploader')[0].setRawValue(null);
           this.find('name', 'size')[0].setRawValue(null);
           this.find('name', 'uploaded')[0].setRawValue(null);
@@ -301,8 +325,14 @@ define('Sonatype/repoServer/ArtifactInformationPanel', function() {
                       else
                       {
                         this.clearNonLocalView(infoResp.data.canDelete);
-                        this.form.setValues(infoResp.data);
+                        this.form.setValues(Ext.apply(infoResp.data, {
+                          repositoryPath: {
+                            path: infoResp.data.repositoryPath,
+                            href: this.data.resourceURI
+                          }
+                        }));
                       }
+                      artifactContainer.showTab(this);
                     }
                     else
                     {

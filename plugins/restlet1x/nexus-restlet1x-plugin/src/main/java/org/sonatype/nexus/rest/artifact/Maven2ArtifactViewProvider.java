@@ -15,6 +15,9 @@ package org.sonatype.nexus.rest.artifact;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -22,12 +25,10 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractArtifactViewProvider;
-import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 
 /**
@@ -36,7 +37,8 @@ import org.restlet.data.Request;
  * @author Brian Demers
  * @author cstamas
  */
-@Component(role = ArtifactViewProvider.class, hint = "maven2")
+@Named("maven2")
+@Singleton
 public class Maven2ArtifactViewProvider
     extends AbstractArtifactViewProvider
 {

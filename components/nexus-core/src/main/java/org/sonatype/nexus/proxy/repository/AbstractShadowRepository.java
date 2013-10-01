@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.proxy.repository;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -36,8 +38,8 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.component.annotations.Requirement;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
@@ -49,7 +51,6 @@ public abstract class AbstractShadowRepository
     extends AbstractRepository
     implements ShadowRepository
 {
-  @Requirement
   private RepositoryRegistry repositoryRegistry;
 
   /**
@@ -57,6 +58,12 @@ public abstract class AbstractShadowRepository
    * invocation from registry. This instance changes as master ID in configuration changes.
    */
   private volatile Repository masterRepository;
+  
+  @Inject
+  public void populateAbstractShadowRepository(RepositoryRegistry repositoryRegistry)
+  {
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+  }
 
   protected RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;

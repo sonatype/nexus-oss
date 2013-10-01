@@ -80,7 +80,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
     });
 
     self.filterBox = NX.create('Nexus.capabilities.CapabilitiesGridFilterBox', {
-      grid: self,
+      filteredGrid: self,
       width: 200
     });
 
@@ -106,7 +106,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
           }
         },
         forceFit: true,
-        groupTextTpl: '{text}'
+        groupTextTpl: '{[values.text.replace("undefined","(none)").replace("null","(none)")]}'
       }),
 
       sm: NX.create('Ext.grid.RowSelectionModel', {
@@ -142,7 +142,7 @@ NX.define('Nexus.capabilities.CapabilitiesGrid', {
         destroy: {
           fn: function () {
             self.mediator().capabilityStore.removeListener('beforeload', self.rememberSelection, self);
-            self.mediator().capabilityStore.removeListener('load', self.recallSelection, self);
+            self.mediator().capabilityStore.removeListener('load', self.reconfigureGrid, self);
             self.mediator().capabilityTypeStore.removeListener('beforeload', self.disableAddButton, self);
             self.mediator().capabilityTypeStore.removeListener('load', self.maybeEnableAddButton, self);
           },

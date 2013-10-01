@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -54,6 +55,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -85,7 +87,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -101,13 +102,18 @@ public class DefaultNexusConfiguration
     extends AbstractLoggingComponent
     implements NexusConfiguration
 {
+  /**
+   * Only to have UTs work
+   */
+  private final CacheManager cacheManager;
+
   private final EventBus eventBus;
 
   private final ApplicationConfigurationSource configurationSource;
 
-  private final GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
+  private final Provider<GlobalRemoteConnectionSettings> globalRemoteConnectionSettingsProvider;
 
-  private final GlobalRemoteProxySettings globalRemoteProxySettings;
+  private final Provider<GlobalRemoteProxySettings> globalRemoteProxySettingsProvider;
 
   private final ApplicationConfigurationValidator configurationValidator;
 
@@ -134,12 +140,12 @@ public class DefaultNexusConfiguration
   /**
    * The global local storage context.
    */
-  private LocalStorageContext globalLocalStorageContext;
+  private DefaultLocalStorageContext globalLocalStorageContext;
 
   /**
    * The global remote storage context.
    */
-  private RemoteStorageContext globalRemoteStorageContext;
+  private DefaultRemoteStorageContext globalRemoteStorageContext;
 
   /**
    * The config dir
@@ -169,20 +175,21 @@ public class DefaultNexusConfiguration
   // ==
 
   @Inject
-  public DefaultNexusConfiguration(EventBus eventBus,
+  public DefaultNexusConfiguration(final CacheManager cacheManager, EventBus eventBus,
       @Named("file") ApplicationConfigurationSource configurationSource,
-      GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
-      GlobalRemoteProxySettings globalRemoteProxySettings, ApplicationConfigurationValidator configurationValidator,
+      Provider<GlobalRemoteConnectionSettings> globalRemoteConnectionSettingsProvider,
+      Provider<GlobalRemoteProxySettings> globalRemoteProxySettingsProvider, ApplicationConfigurationValidator configurationValidator,
       ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
       RepositoryTypeRegistry repositoryTypeRegistry, RepositoryRegistry repositoryRegistry,
       List<ScheduledTaskDescriptor> scheduledTaskDescriptors, SecuritySystem securitySystem,
       @Parameters Map<String, String> parameters, VetoFormatter vetoFormatter,
       List<ConfigurationModifier> configurationModifiers, @Named("nexus-uber") ClassLoader uberClassLoader)
   {
+    this.cacheManager = checkNotNull(cacheManager);
     this.eventBus = checkNotNull(eventBus);
     this.configurationSource = checkNotNull(configurationSource);
-    this.globalRemoteConnectionSettings = checkNotNull(globalRemoteConnectionSettings);
-    this.globalRemoteProxySettings = checkNotNull(globalRemoteProxySettings);
+    this.globalRemoteConnectionSettingsProvider = checkNotNull(globalRemoteConnectionSettingsProvider);
+    this.globalRemoteProxySettingsProvider = checkNotNull(globalRemoteProxySettingsProvider);
     this.configurationValidator = checkNotNull(configurationValidator);
     this.runtimeConfigurationBuilder = checkNotNull(runtimeConfigurationBuilder);
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
@@ -283,12 +290,14 @@ public class DefaultNexusConfiguration
       // this one has no parent
       globalRemoteStorageContext = new DefaultRemoteStorageContext(null);
 
-      globalRemoteConnectionSettings.configure(this);
-
+      final GlobalRemoteConnectionSettings globalRemoteConnectionSettings = globalRemoteConnectionSettingsProvider.get();
+      // TODO: hack
+      ((DefaultGlobalRemoteConnectionSettings)globalRemoteConnectionSettings).configure(this);
       globalRemoteStorageContext.setRemoteConnectionSettings(globalRemoteConnectionSettings);
 
-      globalRemoteProxySettings.configure(this);
-
+      final GlobalRemoteProxySettings globalRemoteProxySettings = globalRemoteProxySettingsProvider.get();
+      // TODO: hack
+      ((DefaultGlobalRemoteProxySettings)globalRemoteProxySettings).configure(this);
       globalRemoteStorageContext.setRemoteProxySettings(globalRemoteProxySettings);
 
       ConfigurationPrepareForLoadEvent loadEvent = new ConfigurationPrepareForLoadEvent(this);
@@ -513,18 +522,6 @@ public class DefaultNexusConfiguration
 
   // ------------------------------------------------------------------
   // Security
-
-  @Override
-  public boolean isSecurityEnabled() {
-    return getSecuritySystem() != null && getSecuritySystem().isSecurityEnabled();
-  }
-
-  @Override
-  public void setSecurityEnabled(boolean enabled)
-      throws IOException
-  {
-    getSecuritySystem().setSecurityEnabled(enabled);
-  }
 
   @Override
   public void setRealms(List<String> realms)
@@ -755,7 +752,9 @@ public class DefaultNexusConfiguration
 
     // create it, will do runtime validation
     Repository repository = runtimeConfigurationBuilder.createRepository(klazz, name);
-    repository.configure(repositoryModel);
+    if (repository instanceof Configurable) {
+      ((Configurable) repository).configure(repositoryModel);
+    }
 
     // register with repoRegistry
     repositoryRegistry.addRepository(repository);

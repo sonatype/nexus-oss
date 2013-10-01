@@ -26,15 +26,10 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.codehaus.plexus.util.StringUtils;
 
 public class CRepositoryGroupingCoreConfiguration
-    extends AbstractCoreConfiguration
+    extends AbstractCoreConfiguration<CRepositoryGrouping>
 {
   public CRepositoryGroupingCoreConfiguration(ApplicationConfiguration configuration) {
     super(configuration);
-  }
-
-  @Override
-  public CRepositoryGrouping getConfiguration(boolean forWrite) {
-    return (CRepositoryGrouping) super.getConfiguration(forWrite);
   }
 
   @Override
@@ -43,7 +38,7 @@ public class CRepositoryGroupingCoreConfiguration
   }
 
   @Override
-  public ValidationResponse doValidateChanges(Object changedConfiguration) {
+  public ValidationResponse doValidateChanges(CRepositoryGrouping changedConfiguration) {
     CRepositoryGrouping settings = (CRepositoryGrouping) changedConfiguration;
 
     ValidationResponse response = new ApplicationValidationResponse();

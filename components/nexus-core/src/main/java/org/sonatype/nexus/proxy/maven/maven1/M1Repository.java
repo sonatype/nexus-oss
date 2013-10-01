@@ -13,6 +13,11 @@
 
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -28,9 +33,9 @@ import org.sonatype.nexus.proxy.maven.gav.M1ArtifactRecognizer;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The default M1Repository. This class adds snapshot/release sensing and differentiated expiration handling and repo
@@ -38,8 +43,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author cstamas
  */
-@Component(role = Repository.class, hint = M1Repository.ID, instantiationStrategy = "per-lookup",
-    description = "Maven1 Repository")
+@Named(M1Repository.ID)
+@Typed(Repository.class)
+@Description("Maven1 Repository")
 public class M1Repository
     extends AbstractMavenRepository
 {
@@ -48,17 +54,24 @@ public class M1Repository
    */
   public static final String ID = Maven1ContentClass.ID;
 
+  private final ContentClass contentClass;
+
   /**
    * The GAV Calculator.
    */
-  @Requirement(hint = "maven1")
-  private GavCalculator gavCalculator;
+  private final GavCalculator gavCalculator;
 
-  @Requirement(hint = Maven1ContentClass.ID)
-  private ContentClass contentClass;
+  private final M1RepositoryConfigurator m1RepositoryConfigurator;
 
-  @Requirement
-  private M1RepositoryConfigurator m1RepositoryConfigurator;
+  @Inject
+  public M1Repository(final @Named(Maven1ContentClass.ID) ContentClass contentClass,
+                      final @Named("maven1") GavCalculator gavCalculator, 
+                      final M1RepositoryConfigurator m1RepositoryConfigurator)
+  {
+    this.gavCalculator = checkNotNull(gavCalculator);
+    this.contentClass = checkNotNull(contentClass);
+    this.m1RepositoryConfigurator = checkNotNull(m1RepositoryConfigurator);
+  }
 
   @Override
   public M1RepositoryConfiguration getExternalConfiguration(boolean forWrite) {
@@ -75,10 +88,12 @@ public class M1Repository
     };
   }
 
+  @Override
   public ContentClass getRepositoryContentClass() {
     return contentClass;
   }
 
+  @Override
   public GavCalculator getGavCalculator() {
     return gavCalculator;
   }

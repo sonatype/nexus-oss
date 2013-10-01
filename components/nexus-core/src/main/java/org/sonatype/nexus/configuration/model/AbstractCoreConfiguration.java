@@ -13,22 +13,17 @@
 
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
-public abstract class AbstractCoreConfiguration
-    extends AbstractRevertableConfiguration
-    implements CoreConfiguration
+public abstract class AbstractCoreConfiguration<C>
+    extends AbstractRevertableConfiguration<C>
+    implements CoreConfiguration<C>
 {
   private ApplicationConfiguration applicationConfiguration;
 
-  private ExternalConfiguration<?> externalConfiguration;
-
   public AbstractCoreConfiguration(ApplicationConfiguration applicationConfiguration) {
-    final Object extracted = extractConfiguration(applicationConfiguration.getConfigurationModel());
-
+    final C extracted = extractConfiguration(applicationConfiguration.getConfigurationModel());
     if (extracted != null) {
       setOriginalConfiguration(extracted);
     }
@@ -43,60 +38,11 @@ public abstract class AbstractCoreConfiguration
     return applicationConfiguration;
   }
 
-  protected ExternalConfiguration<?> prepareExternalConfiguration(Object configuration) {
-    // usually nothing, but CRepository and CPlugin does have them
+  public C getDefaultConfiguration() {
     return null;
-  }
-
-  public ExternalConfiguration<?> getExternalConfiguration() {
-    if (externalConfiguration == null) {
-      externalConfiguration = prepareExternalConfiguration(getOriginalConfiguration());
-    }
-
-    return externalConfiguration;
-  }
-
-  public Object getDefaultConfiguration() {
-    return null;
-  }
-
-  @Override
-  public boolean isDirty() {
-    return isThisDirty() || (getExternalConfiguration() != null && getExternalConfiguration().isDirty());
-  }
-
-  @Override
-  public void validateChanges()
-      throws ConfigurationException
-  {
-    super.validateChanges();
-
-    if (getExternalConfiguration() != null) {
-      getExternalConfiguration().validateChanges();
-    }
-  }
-
-  @Override
-  public void commitChanges()
-      throws ConfigurationException
-  {
-    super.commitChanges();
-
-    if (getExternalConfiguration() != null) {
-      getExternalConfiguration().commitChanges();
-    }
-  }
-
-  @Override
-  public void rollbackChanges() {
-    super.rollbackChanges();
-
-    if (getExternalConfiguration() != null) {
-      getExternalConfiguration().rollbackChanges();
-    }
   }
 
   // ==
 
-  protected abstract Object extractConfiguration(Configuration configuration);
+  protected abstract C extractConfiguration(Configuration configuration);
 }

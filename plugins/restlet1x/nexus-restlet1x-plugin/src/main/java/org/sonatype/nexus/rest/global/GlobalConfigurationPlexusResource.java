@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -28,6 +31,8 @@ import javax.ws.rs.Produces;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.micromailer.Address;
+import org.sonatype.nexus.configuration.application.DefaultGlobalRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.application.DefaultGlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
@@ -47,15 +52,12 @@ import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -71,7 +73,8 @@ import org.restlet.resource.Variant;
  * @author cstamas
  * @author tstevens
  */
-@Component(role = PlexusResource.class, hint = "GlobalConfigurationPlexusResource")
+@Named
+@Singleton
 @Path(GlobalConfigurationPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
@@ -95,24 +98,27 @@ public class GlobalConfigurationPlexusResource
    */
   public static final String DEFAULT_CONFIG_NAME = "default";
 
-  @Requirement
-  private NotificationManager notificationManager;
+  private final NotificationManager notificationManager;
 
-  // DEFAULT CONFIG
-  // ==
-  @Requirement(hint = "static")
-  private SecurityConfigurationSource defaultSecurityConfigurationSource;
+  private final SecurityConfigurationSource defaultSecurityConfigurationSource;
 
-  @Requirement(hint = "static")
-  private ApplicationConfigurationSource configurationSource;
+  private final ApplicationConfigurationSource configurationSource;
+
+  @Inject
+  public GlobalConfigurationPlexusResource(final NotificationManager notificationManager,
+                                           final @Named("static") SecurityConfigurationSource defaultSecurityConfigurationSource,
+                                           final @Named("static") ApplicationConfigurationSource configurationSource)
+  {
+    this.notificationManager = notificationManager;
+    this.defaultSecurityConfigurationSource = defaultSecurityConfigurationSource;
+    this.configurationSource = configurationSource;
+
+    this.setModifiable(true);
+  }
 
   // ----------------------------------------------------------------------------
   // Default Configuration
   // ----------------------------------------------------------------------------
-
-  public boolean isDefaultSecurityEnabled() {
-    return this.defaultSecurityConfigurationSource.getConfiguration().isEnabled();
-  }
 
   public boolean isDefaultAnonymousAccessEnabled() {
     return this.defaultSecurityConfigurationSource.getConfiguration().isAnonymousAccessEnabled();
@@ -147,10 +153,6 @@ public class GlobalConfigurationPlexusResource
   }
 
   // ==
-
-  public GlobalConfigurationPlexusResource() {
-    this.setModifiable(true);
-  }
 
   @Override
   public Object getPayloadInstance() {
@@ -288,7 +290,6 @@ public class GlobalConfigurationPlexusResource
           setGlobalProxySettings(resource.getRemoteProxySettings(), getGlobalRemoteProxySettings());
 
           getNexusConfiguration().setRealms(resource.getSecurityRealms());
-          getNexusConfiguration().setSecurityEnabled(resource.isSecurityEnabled());
 
           final String anonymousUsername = resource.getSecurityAnonymousUsername();
           final String anonymousPassword =
@@ -360,9 +361,9 @@ public class GlobalConfigurationPlexusResource
           // repositories) about the change, but only if config is saved okay
           // TODO: this is wrong, the config framework should "tell" this changed, but we have some
           // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are
-          boolean remoteConnectionSettingsIsDirty = getGlobalRemoteConnectionSettings().isDirty();
+          boolean remoteConnectionSettingsIsDirty = ((DefaultGlobalRemoteConnectionSettings)getGlobalRemoteConnectionSettings()).isDirty();
 
-          boolean remoteProxySettingsIsDirty = getGlobalRemoteProxySettings().isDirty();
+          boolean remoteProxySettingsIsDirty = ((DefaultGlobalRemoteProxySettings)getGlobalRemoteProxySettings()).isDirty();
 
           getNexusConfiguration().saveConfiguration();
 
@@ -462,7 +463,6 @@ public class GlobalConfigurationPlexusResource
    * Externalized Nexus object to DTO's conversion, using default Nexus configuration.
    */
   protected void fillDefaultConfiguration(Request request, GlobalConfigurationResource resource) {
-    resource.setSecurityEnabled(isDefaultSecurityEnabled());
 
     resource.setSecurityAnonymousAccessEnabled(isDefaultAnonymousAccessEnabled());
 
@@ -489,7 +489,6 @@ public class GlobalConfigurationPlexusResource
    * Externalized Nexus object to DTO's conversion, using current Nexus configuration.
    */
   protected void fillCurrentConfiguration(Request request, GlobalConfigurationResource resource) {
-    resource.setSecurityEnabled(getNexusConfiguration().isSecurityEnabled());
 
     resource.setSecurityAnonymousAccessEnabled(getNexusConfiguration().isAnonymousAccessEnabled());
 

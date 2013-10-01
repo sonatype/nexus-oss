@@ -13,9 +13,11 @@
 
 package org.sonatype.nexus;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
@@ -26,15 +28,16 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.threads.FakeAlmightySubject;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.junit.After;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.apache.shiro.util.ThreadContext;
+import org.junit.After;
 
 public abstract class NexusAppTestSupport
     extends NexusProxyTestSupport
@@ -47,28 +50,32 @@ public abstract class NexusAppTestSupport
   private EventBus eventBus;
 
   private NexusConfiguration nexusConfiguration;
-  
+
   private TemplateManager templateManager;
 
-  protected boolean loadConfigurationAtSetUp() {
+  protected boolean runWithSecurityDisabled() {
     return true;
   }
-  
+
+  protected boolean shouldLoadConfigurationOnStartup() {
+    return false;
+  }
+
   // NxApplication
-  
+
   private boolean nexusStarted = false;
-  
+
   /**
    * Preferred way to "boot" Nexus in unit tests. Previously, UTs were littered with code like this:
-   * 
+   *
    * <pre>
    * lookup(Nexus.class); // boot nexus
    * </pre>
-   * 
+   *
    * This was usually in {@link #setUp()} method override, and then another override was made in {@link #tearDown()}.
    * Using this method you don't have to fiddle with "shutdown" anymore, and also, you can invoke it in some prepare
    * method (like setUp) but also from test at any place. You have to ensure this method is not called multiple times,
-   * as that signals a bad test (start nexus twice?), and exception will be thrown. 
+   * as that signals a bad test (start nexus twice?), and exception will be thrown.
    */
   protected void startNx() throws Exception {
     if (nexusStarted) {
@@ -77,7 +84,7 @@ public abstract class NexusAppTestSupport
     lookup(NxApplication.class).start();
     nexusStarted = true;
   }
-  
+
   /**
    * Shutdown Nexus if started.
    */
@@ -87,7 +94,7 @@ public abstract class NexusAppTestSupport
       lookup(NxApplication.class).stop();
     }
   }
-  
+
   // NxApplication
 
   @Override
@@ -119,13 +126,17 @@ public abstract class NexusAppTestSupport
     ThreadContext.remove();
     super.setUp();
 
+    eventBus = lookup(EventBus.class);
     nexusScheduler = lookup(NexusScheduler.class);
     eventInspectorHost = lookup(EventInspectorHost.class);
-    eventBus = lookup(EventBus.class);
     nexusConfiguration = lookup(NexusConfiguration.class);
     templateManager = lookup(TemplateManager.class);
 
-    if (loadConfigurationAtSetUp()) {
+    if (shouldLoadConfigurationOnStartup()) {
+      loadConfiguration();
+    }
+
+    if (runWithSecurityDisabled()) {
       shutDownSecurity();
     }
   }
@@ -145,11 +156,11 @@ public abstract class NexusAppTestSupport
   protected EventBus eventBus() {
     return eventBus;
   }
-  
+
   protected NexusConfiguration nexusConfiguration() {
     return nexusConfiguration;
   }
-  
+
   protected TemplateSet getRepositoryTemplates() {
     return templateManager.getTemplates().getTemplates(RepositoryTemplate.class);
   }
@@ -159,14 +170,16 @@ public abstract class NexusAppTestSupport
   {
     System.out.println("== Shutting down SECURITY!");
 
-    nexusConfiguration.loadConfiguration(false);
+    loadConfiguration();
 
-    // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
-    nexusConfiguration.setSecurityEnabled(false);
-
-    nexusConfiguration.saveConfiguration();
+    ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
 
     System.out.println("== Shutting down SECURITY!");
+  }
+
+  protected void loadConfiguration() throws ConfigurationException, IOException {
+    nexusConfiguration.loadConfiguration(false);
+    nexusConfiguration.saveConfiguration();
   }
 
   protected void killActiveTasks()

@@ -15,6 +15,8 @@ package org.sonatype.nexus.rest.privileges;
 
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,7 +30,6 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetProper
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Privilege;
@@ -37,7 +38,6 @@ import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.privileges.AbstractPrivilegePlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -49,7 +49,8 @@ import org.restlet.resource.ResourceException;
  *
  * @author tstevens
  */
-@Component(role = PlexusResource.class, hint = "TargetPrivilegeListPlexusResource")
+@Named
+@Singleton
 @Path(TargetPrivilegePlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})

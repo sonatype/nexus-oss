@@ -13,31 +13,40 @@
 
 package org.sonatype.nexus.notification.events;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationRequest;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A "bridge" that funnels events into notifications using the event to notification router.
  *
  * @author cstamas
  */
-@Component(role = EventInspector.class, hint = "NotificationEventInspector")
+@Named
+@Singleton
 public class NotificationEventInspector
     extends AbstractEventInspector
 {
   private static final String NOTIFICATION_ROUTE_KEY = "notificationRoute";
 
-  @Requirement
-  private NotificationEventRouter notificationEventRouter;
+  private final NotificationEventRouter notificationEventRouter;
 
-  @Requirement
-  private NotificationManager notificationManager;
+  private final NotificationManager notificationManager;
+
+  @Inject
+  public NotificationEventInspector(final NotificationEventRouter notificationEventRouter,
+                                    final NotificationManager notificationManager)
+  {
+    this.notificationEventRouter = checkNotNull(notificationEventRouter);
+    this.notificationManager = checkNotNull(notificationManager);
+  }
 
   public boolean accepts(Event<?> evt) {
     if (!notificationManager.isEnabled()) {

@@ -20,6 +20,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 public abstract class AbstractGroupRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
+
   @Override
   protected void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
                                       CRepositoryCoreConfiguration coreConfiguration)
@@ -30,4 +31,5 @@ public abstract class AbstractGroupRepositoryConfigurator
     // Groups are read only
     repository.setWritePolicy(RepositoryWritePolicy.READ_ONLY);
   }
+
 }

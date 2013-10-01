@@ -18,9 +18,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
@@ -31,15 +35,16 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 @Singleton
 public class EhCacheCacheManager
     extends AbstractLoggingComponent
-    implements CacheManager, Disposable
+    implements CacheManager
 {
   private final CacheManagerComponent cacheManagerComponent;
 
   public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
 
   @Inject
-  public EhCacheCacheManager(final CacheManagerComponent cacheManagerComponent) {
-    this.cacheManagerComponent = cacheManagerComponent;
+  public EhCacheCacheManager(final EventBus eventBus, final CacheManagerComponent cacheManagerComponent) {
+    eventBus.register(this);
+    this.cacheManagerComponent = checkNotNull(cacheManagerComponent);
   }
 
   public PathCache getPathCache(String cache) {
@@ -52,8 +57,8 @@ public class EhCacheCacheManager
     return new EhCachePathCache(cache, ehCacheManager.getEhcache(SINGLE_PATH_CACHE_NAME));
   }
 
-  @Override
-  public void dispose() {
+  @Subscribe
+  public void on(final NexusStoppedEvent evt) {
     cacheManagerComponent.shutdown();
   }
 }

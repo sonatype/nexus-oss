@@ -20,6 +20,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.repository.metadata.model.OrderedMirrorMetadata;
 import org.sonatype.nexus.repository.metadata.model.OrderedRepositoryMirrorsMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
@@ -30,21 +33,22 @@ import org.sonatype.nexus.repository.metadata.model.io.xpp3.RepositoryMetadataXp
 import org.sonatype.nexus.repository.metadata.validation.DefaultRepositoryMetadataValidator;
 import org.sonatype.nexus.repository.metadata.validation.RepositoryMetadataValidator;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-@Component(role = RepositoryMetadataHandler.class)
+@Singleton
+@Named
 public class DefaultRepositoryMetadataHandler
     implements RepositoryMetadataHandler
 {
   private static final String REPOSITORY_METADATA_PATH = "/.meta/repository-metadata.xml";
 
-  protected RepositoryMetadataXpp3Reader repositoryMetadataXpp3Reader = new RepositoryMetadataXpp3Reader();
+  protected final RepositoryMetadataXpp3Reader repositoryMetadataXpp3Reader = new RepositoryMetadataXpp3Reader();
 
-  protected RepositoryMetadataXpp3Writer repositoryMetadataXpp3Writer = new RepositoryMetadataXpp3Writer();
+  protected final RepositoryMetadataXpp3Writer repositoryMetadataXpp3Writer = new RepositoryMetadataXpp3Writer();
 
-  protected OrderedRepositoryMirrorsMetadataXpp3Reader orderedRepositoryMirrorsMetadataXpp3Reader = new OrderedRepositoryMirrorsMetadataXpp3Reader();
+  protected final OrderedRepositoryMirrorsMetadataXpp3Reader orderedRepositoryMirrorsMetadataXpp3Reader = new OrderedRepositoryMirrorsMetadataXpp3Reader();
 
+  @Override
   public RepositoryMetadata readRepositoryMetadata(RawTransport transport)
       throws MetadataHandlerException,
              IOException
@@ -52,6 +56,7 @@ public class DefaultRepositoryMetadataHandler
     return readRepositoryMetadata(transport, new DefaultRepositoryMetadataValidator());
   }
 
+  @Override
   public RepositoryMetadata readRepositoryMetadata(RawTransport transport, RepositoryMetadataValidator validator)
       throws MetadataHandlerException,
              IOException
@@ -88,6 +93,7 @@ public class DefaultRepositoryMetadataHandler
     }
   }
 
+  @Override
   public void writeRepositoryMetadata(RepositoryMetadata metadata, RawTransport transport)
       throws MetadataHandlerException,
              IOException
@@ -95,6 +101,7 @@ public class DefaultRepositoryMetadataHandler
     writeRepositoryMetadata(metadata, transport, new DefaultRepositoryMetadataValidator());
   }
 
+  @Override
   public void writeRepositoryMetadata(RepositoryMetadata metadata, RawTransport transport,
                                       RepositoryMetadataValidator validator)
       throws MetadataHandlerException,
@@ -120,7 +127,7 @@ public class DefaultRepositoryMetadataHandler
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public OrderedRepositoryMirrorsMetadata fetchOrderedMirrorMetadata(RepositoryMetadata metadata,
                                                                      RawTransport transport)
       throws MetadataHandlerException,

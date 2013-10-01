@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -48,9 +51,9 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 import com.google.common.collect.Lists;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
@@ -65,37 +68,46 @@ public abstract class LayoutConverterShadowRepository
   /**
    * The GAV Calculator.
    */
-  @Requirement(hint = "maven1")
   private GavCalculator m1GavCalculator;
 
   /**
    * The GAV Calculator.
    */
-  @Requirement(hint = "maven2")
-  private GavCalculator m2GavCalculator;
+  private  GavCalculator m2GavCalculator;
 
   /**
    * Metadata manager.
    */
-  @Requirement
   private MetadataManager metadataManager;
 
   /**
    * The artifact packaging mapper.
    */
-  @Requirement
   private ArtifactPackagingMapper artifactPackagingMapper;
 
   /**
    * Repository kind.
    */
-  private RepositoryKind repositoryKind = new DefaultRepositoryKind(MavenShadowRepository.class,
-      Arrays.asList(new Class<?>[]{MavenRepository.class}));
+  private RepositoryKind repositoryKind;
 
   /**
    * ArtifactStoreHelper.
    */
   private ArtifactStoreHelper artifactStoreHelper;
+  
+  @Inject
+  public void populateLayoutConverterShadowRepository(final @Named("maven1") GavCalculator m1GavCalculator,
+      final @Named("maven2") GavCalculator m2GavCalculator, final MetadataManager metadataManager,
+      final ArtifactPackagingMapper artifactPackagingMapper)
+  {
+    this.m1GavCalculator = checkNotNull(m1GavCalculator);
+    this.m2GavCalculator = checkNotNull(m2GavCalculator);
+    this.metadataManager = checkNotNull(metadataManager);
+    this.artifactPackagingMapper = checkNotNull(artifactPackagingMapper);
+    this.repositoryKind = new DefaultRepositoryKind(MavenShadowRepository.class,
+        Arrays.asList(new Class<?>[] { MavenRepository.class }));
+    this.artifactStoreHelper = new ArtifactStoreHelper(this);
+  }
 
   @Override
   public RepositoryKind getRepositoryKind() {
@@ -347,10 +359,6 @@ public abstract class LayoutConverterShadowRepository
 
   @Override
   public ArtifactStoreHelper getArtifactStoreHelper() {
-    if (artifactStoreHelper == null) {
-      artifactStoreHelper = new ArtifactStoreHelper(this);
-    }
-
     return artifactStoreHelper;
   }
 

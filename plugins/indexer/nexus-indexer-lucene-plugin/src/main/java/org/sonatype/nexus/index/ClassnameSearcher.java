@@ -17,6 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,15 +29,14 @@ import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.FlatSearchResponse;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.SearchType;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Searches Lucene index for artifacts containing classes with a specified name.
  *
  * @author Alin Dreghiciu
  */
-@Component(role = Searcher.class, hint = "classname")
+@Named("classname")
+@Singleton
 public class ClassnameSearcher
     implements Searcher
 {
@@ -43,8 +46,12 @@ public class ClassnameSearcher
    */
   public static final String TERM_CLASSNAME = "cn";
 
-  @Requirement
-  private IndexerManager m_lucene;
+  private final IndexerManager m_lucene;
+
+  @Inject
+  public ClassnameSearcher(final IndexerManager m_lucene) {
+    this.m_lucene = m_lucene;
+  }
 
   /**
    * Map should contain a term with key {@link #TERM_CLASSNAME} which has a non null value. {@inheritDoc}

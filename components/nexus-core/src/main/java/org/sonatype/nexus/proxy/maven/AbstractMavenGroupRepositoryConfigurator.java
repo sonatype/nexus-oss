@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public abstract class AbstractMavenGroupRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator
 {
+  @Override
   protected void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
                                       CRepositoryCoreConfiguration coreConfiguration)
       throws ConfigurationException

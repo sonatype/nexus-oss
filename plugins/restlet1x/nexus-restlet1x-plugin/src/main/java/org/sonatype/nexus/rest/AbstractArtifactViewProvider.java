@@ -15,6 +15,8 @@ package org.sonatype.nexus.rest;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -26,7 +28,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.RequestRoute;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,12 @@ public abstract class AbstractArtifactViewProvider
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
   private RepositoryRouter repositoryRouter;
+
+  @Inject
+  public void setRepositoryRouter(final RepositoryRouter repositoryRouter) {
+    this.repositoryRouter = repositoryRouter;
+  }
 
   protected Logger getLogger() {
     return logger;

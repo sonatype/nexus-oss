@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -29,11 +31,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.ContextException;
 import org.restlet.Application;
-import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Route;
 import org.restlet.Router;
@@ -50,8 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author cstamas
  */
-@Component(role = Application.class)
-public class PlexusRestletApplicationBridge
+public abstract class PlexusRestletApplicationBridge
     extends Application
 {
   /**
@@ -78,16 +76,12 @@ public class PlexusRestletApplicationBridge
 
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Requirement
   private PlexusContainer plexusContainer;
 
-  @Requirement(role = PlexusResource.class)
   private Map<String, PlexusResource> plexusResources;
 
-  @Requirement
   private Velocity velocity;
 
-  @Requirement(hint = "nexus-uber")
   private ClassLoader uberClassLoader;
 
   /**
@@ -110,38 +104,20 @@ public class PlexusRestletApplicationBridge
    */
   private Router applicationRouter;
 
-  /**
-   * Constructor.
-   */
   public PlexusRestletApplicationBridge() {
-    super();
-
     this.createdOn = new Date();
   }
 
-  /**
-   * Constructor.
-   */
-  public PlexusRestletApplicationBridge(Context context) {
-    super(context);
-
-    this.createdOn = new Date();
-  }
-
-  /**
-   * @deprecated Prefer Slf4j {@link #logger} instead.
-   */
-  @Override
-  @Deprecated
-  public java.util.logging.Logger getLogger() {
-    return super.getLogger();
-  }
-
-  /**
-   * Gets you the plexus container.
-   */
-  protected PlexusContainer getPlexusContainer() {
-    return plexusContainer;
+  @Inject
+  public void installComponents(final PlexusContainer plexusContainer,
+                                final Map<String, PlexusResource> plexusResources,
+                                final Velocity velocity,
+                                final ClassLoader uberClassLoader)
+  {
+    this.plexusContainer = plexusContainer;
+    this.plexusResources = plexusResources;
+    this.velocity = velocity;
+    this.uberClassLoader = uberClassLoader;
   }
 
   /**
