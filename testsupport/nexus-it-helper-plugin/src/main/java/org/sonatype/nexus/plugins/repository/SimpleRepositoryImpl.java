@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.plugins.repository;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -21,22 +25,26 @@ import org.sonatype.nexus.proxy.repository.AbstractRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-@Component(role = SimpleRepository.class, hint = "default")
+@Named
+@Typed(SimpleRepository.class)
 public class SimpleRepositoryImpl
     extends AbstractRepository
     implements SimpleRepository
 {
-  @Requirement(hint = SimpleContentClass.ID)
-  private ContentClass contentClass;
+  private final ContentClass contentClass;
 
-  @Requirement
-  private SimpleRepositoryConfigurator simpleRepositoryConfigurator;
+  private final SimpleRepositoryConfigurator simpleRepositoryConfigurator;
 
   private final RepositoryKind repositoryKind = new DefaultRepositoryKind(SimpleRepository.class, null);
+
+  @Inject
+  public SimpleRepositoryImpl(final @Named(SimpleContentClass.ID) ContentClass contentClass,
+                              final SimpleRepositoryConfigurator simpleRepositoryConfigurator) {
+    this.contentClass = contentClass;
+    this.simpleRepositoryConfigurator = simpleRepositoryConfigurator;
+  }
 
   @Override
   public RepositoryKind getRepositoryKind() {
