@@ -57,6 +57,10 @@ public class LockFileTest
 
     // verify who holds the lock
     assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
+
+    // cleanup
+    lf1.release();
+    lf2.release();
   }
 
   /**
@@ -91,6 +95,10 @@ public class LockFileTest
 
     // verify who holds the lock
     assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
+
+    // cleanup
+    lf1.release();
+    lf2.release();
   }
 
   /**
