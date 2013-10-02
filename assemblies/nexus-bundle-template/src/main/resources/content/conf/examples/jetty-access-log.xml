@@ -22,7 +22,6 @@
 <!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
 <!--                                                              -->
 <!-- ============================================================ -->
-
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
   <Set name="threadPool">
