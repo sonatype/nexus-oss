@@ -13,92 +13,90 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
-
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<!-- ============================================================ -->
+<!--                                                              -->
+<!-- For help using this configuration, see:                      -->
+<!--                                                              -->
+<!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
+<!--                                                              -->
+<!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+
   <Set name="threadPool">
-    <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
   </Set>
+
   <Call name="addConnector">
     <Arg>
-      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port}</Set>
+        <Set name="confidentialPort">${application-port-ssl}</Set>
       </New>
     </Arg>
   </Call>
+
   <Call name="addConnector">
     <Arg>
-      <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
+      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSslSelectChannelConnector">
+        <Arg>
+          <New class="org.eclipse.jetty.util.ssl.SslContextFactory">
+            <Set name="keyStore">./conf/ssl/keystore.jks</Set>
+            <Set name="trustStore">./conf/ssl/keystore.jks</Set>
+            <Set name="keyStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <Set name="keyManagerPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <Set name="trustStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+          </New>
+        </Arg>
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port-ssl}</Set>
-        <Set name="maxIdleTime">30000</Set>
-        <Set name="keystore">/etc/ssl/keystore</Set>
-        <Set name="truststore">/etc/ssl/keystore/keystore</Set>
-        <Set name="password">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
-        <Set name="keyPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
-        <Set name="trustPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
       </New>
     </Arg>
   </Call>
 
-  <New id="RewriteHandler" class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
-    <Set name="rules">
-      <Array type="org.eclipse.jetty.rewrite.handler.Rule">
-
-        <Item>
-          <New id="redirecedHttps"
-               class="org.sonatype.sisu.jetty.custom.RedirectToHttpsRule">
-            <Set name="httpsPort">${application-port-ssl}</Set>
-          </New>
-        </Item>
-
-      </Array>
-    </Set>
-  </New>
-
-  <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-    <!-- The following configuration disables JSP taglib support, the validation of which
-         slows down Jetty's startup significantly. -->
-    <Call name="addLifeCycleListener">
-      <Arg>
-        <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener"/>
-      </Arg>
-    </Call>
-  </New>
-
+  <New id="NexusHandler" class="com.yammer.metrics.jetty.InstrumentedHandler">
+  <Arg>
   <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-    <Arg>
-      <Ref id="Contexts"/>
-    </Arg>
     <Arg>${nexus-webapp}</Arg>
     <Arg>${nexus-webapp-context-path}</Arg>
     <Set name="extractWAR">false</Set>
     <Set name="throwUnavailableOnStartupException">true</Set>
+    <!-- enforce use of the confidential port -->
+    <Set name="securityHandler">
+      <New class="org.eclipse.jetty.security.ConstraintSecurityHandler">
+        <Call name="addConstraintMapping">
+          <Arg>
+            <New class="org.eclipse.jetty.security.ConstraintMapping">
+              <Set name="pathSpec">/*</Set>
+              <Set name="constraint">
+                <New class="org.eclipse.jetty.util.security.Constraint">
+                  <!-- 2 means CONFIDENTIAL. 1 means INTEGRITY -->
+                  <Set name="dataConstraint">2</Set>
+                </New>
+              </Set>
+            </New>
+          </Arg>
+        </Call>
+      </New>
+    </Set>
+  </New>
+  </Arg>
   </New>
 
   <Set name="handler">
     <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-      <Set name="handlers">
-        <Array type="org.eclipse.jetty.server.Handler">
-          <Item>
-            <Ref id="RewriteHandler"/>
-          </Item>
-          <Item>
-            <Ref id="Contexts"/>
-          </Item>
-          <Item>
-            <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
-          </Item>
-          <Item>
-            <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
-          </Item>
-        </Array>
-      </Set>
+      <Call name="addHandler">
+        <Arg>
+          <Ref id="NexusHandler" />
+        </Arg>
+      </Call>
     </New>
   </Set>
+
   <Set name="stopAtShutdown">true</Set>
   <Set name="sendServerVersion">true</Set>
   <Set name="sendDateHeader">true</Set>
   <Set name="gracefulShutdown">1000</Set>
+
 </Configure>

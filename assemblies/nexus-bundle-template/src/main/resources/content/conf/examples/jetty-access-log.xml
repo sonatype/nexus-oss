@@ -22,58 +22,34 @@
 <!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
 <!--                                                              -->
 <!-- ============================================================ -->
+
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+
   <Set name="threadPool">
-    <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
   </Set>
+
   <Call name="addConnector">
     <Arg>
-      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port}</Set>
       </New>
     </Arg>
   </Call>
 
-  <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-    <!-- The following configuration disables JSP taglib support, the validation of which
-         slows down Jetty's startup significantly. -->
-    <Call name="addLifeCycleListener">
-      <Arg>
-        <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener"/>
-      </Arg>
-    </Call>
-  </New>
-
-  <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+  <New id="NexusHandler" class="com.yammer.metrics.jetty.InstrumentedHandler">
     <Arg>
-      <Ref id="Contexts"/>
+      <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+        <Arg>${nexus-webapp}</Arg>
+        <Arg>${nexus-webapp-context-path}</Arg>
+        <Set name="extractWAR">false</Set>
+        <Set name="throwUnavailableOnStartupException">true</Set>
+      </New>
     </Arg>
-    <Arg>${nexus-webapp}</Arg>
-    <Arg>${nexus-webapp-context-path}</Arg>
-    <Set name="extractWAR">false</Set>
-    <Set name="throwUnavailableOnStartupException">true</Set>
   </New>
 
-  <Set name="handler">
-    <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-      <Set name="handlers">
-        <Array type="org.eclipse.jetty.server.Handler">
-          <Item>
-            <Ref id="Contexts"/>
-          </Item>
-          <Item>
-            <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
-          </Item>
-          <Item>
-            <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
-          </Item>
-        </Array>
-      </Set>
-    </New>
-  </Set>
-
-  <Ref id="RequestLog">
+  <New id="RequestLogHandler" class="org.eclipse.jetty.server.handler.RequestLogHandler">
     <Set name="requestLog">
       <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
         <Arg>${nexus-work}/logs/yyyy_mm_dd.access.log</Arg>
@@ -83,10 +59,26 @@
         <Set name="LogTimeZone">GMT</Set>
       </New>
     </Set>
-  </Ref>
+  </New>
+
+  <Set name="handler">
+    <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+      <Set name="handlers">
+        <Array type="org.eclipse.jetty.server.Handler">
+          <Item>
+            <Ref id="NexusHandler"/>
+          </Item>
+          <Item>
+            <Ref id="RequestLogHandler"/>
+          </Item>
+        </Array>
+      </Set>
+    </New>
+  </Set>
 
   <Set name="stopAtShutdown">true</Set>
   <Set name="sendServerVersion">true</Set>
   <Set name="sendDateHeader">true</Set>
   <Set name="gracefulShutdown">1000</Set>
+
 </Configure>

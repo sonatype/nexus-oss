@@ -32,78 +32,56 @@
 <!--                                                                                                      -->
 <!-- ==================================================================================================== -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+
   <Set name="threadPool">
-    <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
   </Set>
+
   <Call name="addConnector">
     <Arg>
-      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port}</Set>
       </New>
     </Arg>
   </Call>
 
-  <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-    <!-- The following configuration disables JSP taglib support, the validation of which
-         slows down Jetty's startup significantly. -->
-    <Call name="addLifeCycleListener">
+  <New id="NexusHandler" class="com.yammer.metrics.jetty.InstrumentedHandler">
+    <Arg>
+      <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+        <Arg>${nexus-webapp}</Arg>
+        <Arg>${nexus-webapp-context-path}</Arg>
+        <Set name="extractWAR">false</Set>
+        <Set name="throwUnavailableOnStartupException">true</Set>
+      </New>
+    </Arg>
+  </New>
+
+  <!-- http://wiki.eclipse.org/Jetty/Feature/Rewrite_Handler -->
+  <New id="RewriteHandler" class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
+    <Call name="addRule">
       <Arg>
-        <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener"/>
+        <New id="forwardedHttps" class="org.eclipse.jetty.rewrite.handler.ForwardedSchemeHeaderRule">
+          <!--
+             Use a header that will always come through in some form, and leave off the value so
+             the mere presence of the header will trigger this rule. That way, we ALWAYS use HTTPS.
+          -->
+          <Set name="header">Host</Set>
+        </New>
       </Arg>
     </Call>
   </New>
 
-  <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-    <Arg>
-      <Ref id="Contexts"/>
-    </Arg>
-    <Arg>${nexus-webapp}</Arg>
-    <Arg>${nexus-webapp-context-path}</Arg>
-    <Set name="extractWAR">false</Set>
-    <Set name="throwUnavailableOnStartupException">true</Set>
-  </New>
-
-  <!--
-      Documentation for this found at:
-      http://jetty.mortbay.org/jetty/jetty-6/apidocs/org/mortbay/jetty/handler/rewrite/RewriteHandler.html
-  -->
   <Set name="handler">
-    <New id="Handlers" class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
-      <Set name="rules">
-        <Array type="org.eclipse.jetty.rewrite.handler.Rule">
-          <Item>
-            <New id="forwardedHttps"
-                 class="org.eclipse.jetty.rewrite.handler.ForwardedSchemeHeaderRule">
-
-              <!--
-                 Use a header that will always come through in some form, and leave off the value so
-                 the mere presence of the header will trigger this rule. That way, we ALWAYS use HTTPS.
-              -->
-              <Set name="header">Host</Set>
-              <Set name="scheme">https</Set>
-            </New>
-          </Item>
-        </Array>
-      </Set>
+    <Ref id="RewriteHandler">
       <Set name="handler">
         <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-          <Set name="handlers">
-            <Array type="org.eclipse.jetty.server.Handler">
-              <Item>
-                <Ref id="Contexts"/>
-              </Item>
-              <Item>
-                <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
-              </Item>
-              <Item>
-                <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
-              </Item>
-            </Array>
-          </Set>
+          <Call name="addHandler">
+            <Ref id="NexusHandler"/>
+          </Call>
         </New>
       </Set>
-    </New>
+    </Ref>
   </Set>
 
   <Set name="stopAtShutdown">true</Set>

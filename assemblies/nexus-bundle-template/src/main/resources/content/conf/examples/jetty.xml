@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -14,7 +14,6 @@
 
 -->
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
-
 <!-- ============================================================ -->
 <!--                                                              -->
 <!-- For help using this configuration, see:                      -->
@@ -23,42 +22,42 @@
 <!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+
   <Set name="threadPool">
-    <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
   </Set>
+
   <Call name="addConnector">
     <Arg>
-      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port}</Set>
       </New>
     </Arg>
   </Call>
 
+  <New id="NexusHandler" class="com.yammer.metrics.jetty.InstrumentedHandler">
+    <Arg>
+      <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+        <Arg>${nexus-webapp}</Arg>
+        <Arg>${nexus-webapp-context-path}</Arg>
+        <Set name="extractWAR">false</Set>
+        <Set name="throwUnavailableOnStartupException">true</Set>
+      </New>
+    </Arg>
+  </New>
+
   <Set name="handler">
-    <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-      <!-- The following configuration disables JSP taglib support, the validation of which
-           slows down Jetty's startup significantly. -->
-      <Call name="addLifeCycleListener">
-        <Arg>
-          <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener"/>
-        </Arg>
+    <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+      <Call name="addHandler">
+        <Arg><Ref id="NexusHandler" /></Arg>
       </Call>
     </New>
   </Set>
-
-  <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-    <Arg>
-      <Ref id="Contexts"/>
-    </Arg>
-    <Arg>${nexus-webapp}</Arg>
-    <Arg>${nexus-webapp-context-path}</Arg>
-    <Set name="extractWAR">false</Set>
-    <Set name="throwUnavailableOnStartupException">true</Set>
-  </New>
 
   <Set name="stopAtShutdown">true</Set>
   <Set name="sendServerVersion">true</Set>
   <Set name="sendDateHeader">true</Set>
   <Set name="gracefulShutdown">1000</Set>
+
 </Configure>
