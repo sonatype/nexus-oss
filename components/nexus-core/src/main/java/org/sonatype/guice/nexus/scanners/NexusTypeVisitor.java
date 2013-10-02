@@ -159,12 +159,10 @@ public final class NexusTypeVisitor
     if (clazz != null) {
       // Complain if we see legacy annotations
       if (EXTENSION_POINT_DESC.equals(desc)) {
-        // TODO: Flip this to complain() when aggressively killing legacy component annotations
-        debug("Found legacy @{} annotation: {}", ExtensionPoint.class.getName(), clazz);
+        warn("Found legacy @{} annotation: {}", ExtensionPoint.class.getName(), clazz);
       }
       else if (MANAGED_DESC.equals(desc)) {
-        // TODO: Flip this to complain() when aggressively killing legacy component annotations
-        debug("Found legacy @{} annotation: {}", Managed.class.getName(), clazz);
+        warn("Found legacy @{} annotation: {}", Managed.class.getName(), clazz);
       }
       else if (LEGACY_SINGLETON_DESC.equals(desc)) {
         warn("Found legacy @{} annotation: {}; replace with @{}",

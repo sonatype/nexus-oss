@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractRequestStrategy;
@@ -50,7 +51,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
 import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -405,7 +405,7 @@ public class SimplePullTest
     // now put a hosted repository "inhouse-snapshot" out of service to make output nicer
     final Repository inhouseSnapshot = getRepositoryRegistry().getRepository("inhouse-snapshot");
     inhouseSnapshot.setLocalStatus(LocalStatus.OUT_OF_SERVICE);
-    inhouseSnapshot.commitChanges();
+    ((AbstractMavenRepository)inhouseSnapshot).commitChanges();
 
     // so far, what we did: we had few reposes and a group called "test" (that had all the reposes as members).
     // now, we added test and repo1 reposes ta a newly created group, to have groups of groups.
@@ -556,9 +556,7 @@ public class SimplePullTest
       response.setContentLength(500);
       response.getOutputStream().write("partialcontent".getBytes());
       response.flushBuffer();
-      // this causes noise in log (java.lang.InterruptedException: sleep interrupted) but is only way to make port
-      // get closed, otherwise SocketTimeout happens (not HC4's ConnectionClosedException)
-      server.stop();
+      response.getOutputStream().close();
       return false;
     }
   }

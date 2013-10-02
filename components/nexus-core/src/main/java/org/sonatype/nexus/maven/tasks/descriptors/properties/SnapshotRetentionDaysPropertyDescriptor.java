@@ -13,13 +13,14 @@
 
 package org.sonatype.nexus.maven.tasks.descriptors.properties;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+
 import org.sonatype.nexus.tasks.descriptors.properties.AbstractNumberPropertyDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays",
-    instantiationStrategy = "per-lookup")
+@Named("SnapshotRetentionDays")
+@Typed(ScheduledTaskPropertyDescriptor.class)
 public class SnapshotRetentionDaysPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
@@ -31,11 +32,14 @@ public class SnapshotRetentionDaysPropertyDescriptor
     setRequired(false);
   }
 
+  @Override
   public String getId() {
     return ID;
   }
 
+  @Override
   public String getName() {
     return "Snapshot retention (days)";
   }
+
 }

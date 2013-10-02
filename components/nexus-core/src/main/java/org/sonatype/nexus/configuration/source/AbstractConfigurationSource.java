@@ -37,6 +37,7 @@ public abstract class AbstractConfigurationSource
    */
   private ValidationResponse validationResponse;
 
+  @Override
   public ValidationResponse getValidationResponse() {
     return validationResponse;
   }
@@ -48,6 +49,7 @@ public abstract class AbstractConfigurationSource
   /**
    * Is configuration updated?
    */
+  @Override
   public boolean isConfigurationUpgraded() {
     return configurationUpgraded;
   }
@@ -57,12 +59,5 @@ public abstract class AbstractConfigurationSource
    */
   public void setConfigurationUpgraded(boolean configurationUpgraded) {
     this.configurationUpgraded = configurationUpgraded;
-  }
-
-  /**
-   * Returns the default source of ConfigurationSource. May be null.
-   */
-  public ConfigurationSource<Configuration> getDefaultsSource() {
-    return null;
   }
 }

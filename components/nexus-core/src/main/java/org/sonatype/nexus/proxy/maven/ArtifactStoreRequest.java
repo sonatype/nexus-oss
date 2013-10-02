@@ -24,6 +24,7 @@ public class ArtifactStoreRequest
 
   private final Gav gav;
 
+  @Deprecated
   public ArtifactStoreRequest(MavenRepository repository, String path, boolean localOnly) {
     super(path, localOnly);
 

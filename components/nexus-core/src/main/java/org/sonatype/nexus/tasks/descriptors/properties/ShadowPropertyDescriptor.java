@@ -13,9 +13,11 @@
 
 package org.sonatype.nexus.tasks.descriptors.properties;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
 
-@Component(role = ScheduledTaskPropertyDescriptor.class, hint = "Shadow", instantiationStrategy = "per-lookup")
+@Named("Shadow")
+@Typed(ScheduledTaskPropertyDescriptor.class)
 public class ShadowPropertyDescriptor
     extends AbstractRepositoryPropertyDescriptor
 {
@@ -26,11 +28,14 @@ public class ShadowPropertyDescriptor
     setRequired(true);
   }
 
+  @Override
   public String getId() {
     return ID;
   }
 
+  @Override
   public String getName() {
     return "Shadow Repository";
   }
+
 }

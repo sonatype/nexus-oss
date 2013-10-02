@@ -24,8 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -37,6 +36,7 @@ import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -45,35 +45,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultGlobalRemoteProxySettings
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<CRemoteProxySettings>
     implements GlobalRemoteProxySettings
 {
 
   private final AuthenticationInfoConverter authenticationInfoConverter;
 
   @Inject
-  public DefaultGlobalRemoteProxySettings(final EventBus eventBus, final AuthenticationInfoConverter authenticationInfoConverter) {
-    super(eventBus);
+  public DefaultGlobalRemoteProxySettings(final EventBus eventBus, final ApplicationConfiguration applicationConfiguration, final AuthenticationInfoConverter authenticationInfoConverter) {
+    super("Global HTTP Proxy", eventBus, applicationConfiguration);
     this.authenticationInfoConverter = checkNotNull(authenticationInfoConverter);
   }
 
   @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return null;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected CRemoteProxySettings getCurrentConfiguration(boolean forWrite) {
-    return ((CRemoteProxySettingsCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
+  protected CoreConfiguration<CRemoteProxySettings> wrapConfiguration(Object configuration)
       throws ConfigurationException
   {
     if (configuration instanceof ApplicationConfiguration) {
@@ -214,11 +199,6 @@ public class DefaultGlobalRemoteProxySettings
     }
 
     return wasDirty;
-  }
-
-  @Override
-  public String getName() {
-    return "Global Remote Proxy Settings";
   }
 
 }

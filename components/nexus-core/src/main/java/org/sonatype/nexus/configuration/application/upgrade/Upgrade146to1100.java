@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -27,7 +30,6 @@ import org.sonatype.nexus.configuration.model.v1_10_0.upgrade.BasicVersionUpgrad
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -36,12 +38,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author velo
  */
-@Component(role = SingleVersionUpgrader.class, hint = "1.4.6")
+@Singleton
+@Named("1.4.6")
 public class Upgrade146to1100
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
-
+  @Override
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
@@ -70,6 +73,7 @@ public class Upgrade146to1100
     return conf;
   }
 
+  @Override
   public void upgrade(UpgradeMessage message)
       throws ConfigurationIsCorruptedException
   {

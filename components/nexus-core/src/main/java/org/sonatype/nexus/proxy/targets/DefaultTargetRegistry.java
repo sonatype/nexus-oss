@@ -23,11 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
@@ -38,33 +41,26 @@ import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The default implementation of target registry.
- *
+ * 
  * @author cstamas
  */
-@Component(role = TargetRegistry.class)
+@Singleton
+@Named
 public class DefaultTargetRegistry
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<List<CRepositoryTarget>>
     implements TargetRegistry
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final RepositoryTypeRegistry repositoryTypeRegistry;
 
-  @Requirement
-  private ApplicationConfiguration applicationConfiguration;
-
-  @Requirement
-  private RepositoryTypeRegistry repositoryTypeRegistry;
-
-  @Requirement
-  private ApplicationConfigurationValidator validator;
+  private final ApplicationConfigurationValidator validator;
 
   // a cache view of "live" targets, keyed by target ID
   // eagerly rebuilt on every configuration change
@@ -72,34 +68,24 @@ public class DefaultTargetRegistry
 
   // ==
 
-  @Override
-  protected void initializeConfiguration()
-      throws ConfigurationException
+  @Inject
+  public DefaultTargetRegistry(EventBus eventBus, ApplicationConfiguration applicationConfiguration,
+      RepositoryTypeRegistry repositoryTypeRegistry, ApplicationConfigurationValidator validator)
   {
+    super("Repository Target Registry", eventBus, applicationConfiguration);
+    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
+    this.validator = checkNotNull(validator);
+  }
+
+  @Override
+  protected void initializeConfiguration() throws ConfigurationException {
     if (getApplicationConfiguration().getConfigurationModel() != null) {
       configure(getApplicationConfiguration());
     }
   }
 
   @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return applicationConfiguration;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected List<CRepositoryTarget> getCurrentConfiguration(boolean forWrite) {
-    return ((CRepositoryTargetCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration)
-      throws ConfigurationException
-  {
+  protected CoreConfiguration<List<CRepositoryTarget>> wrapConfiguration(Object configuration) throws ConfigurationException {
     if (configuration instanceof ApplicationConfiguration) {
       return new CRepositoryTargetCoreConfiguration((ApplicationConfiguration) configuration);
     }
@@ -111,9 +97,7 @@ public class DefaultTargetRegistry
   }
 
   @Override
-  protected void doConfigure()
-      throws ConfigurationException
-  {
+  protected void doConfigure() throws ConfigurationException {
     super.doConfigure();
     // rebuild the view
     rebuildView();
@@ -163,9 +147,7 @@ public class DefaultTargetRegistry
     return result;
   }
 
-  protected void validate(CRepositoryTarget target)
-      throws InvalidConfigurationException
-  {
+  protected void validate(CRepositoryTarget target) throws InvalidConfigurationException {
     ValidationResponse response = validator.validateRepositoryTarget(null, target);
     if (!response.isValid()) {
       throw new InvalidConfigurationException(response);
@@ -186,9 +168,7 @@ public class DefaultTargetRegistry
     return targets.get(id);
   }
 
-  public synchronized boolean addRepositoryTarget(Target target)
-      throws ConfigurationException
-  {
+  public synchronized boolean addRepositoryTarget(Target target) throws ConfigurationException {
     CRepositoryTarget cnf = convert(target);
     validate(cnf);
     removeRepositoryTarget(cnf.getId(), true);
@@ -203,7 +183,7 @@ public class DefaultTargetRegistry
 
   protected boolean removeRepositoryTarget(String id, boolean forUpdate) {
     final List<CRepositoryTarget> targets = getCurrentConfiguration(true);
-    for (Iterator<CRepositoryTarget> ti = targets.iterator(); ti.hasNext(); ) {
+    for (Iterator<CRepositoryTarget> ti = targets.iterator(); ti.hasNext();) {
       CRepositoryTarget cTarget = ti.next();
       if (StringUtils.equals(id, cTarget.getId())) {
         Target target = getRepositoryTarget(id);
@@ -219,7 +199,7 @@ public class DefaultTargetRegistry
   }
 
   public Set<Target> getTargetsForContentClass(ContentClass contentClass) {
-    logger.debug("Resolving targets for contentClass='{}'", contentClass.getId());
+    getLogger().debug("Resolving targets for contentClass='{}'", contentClass.getId());
 
     final Set<Target> result = new HashSet<Target>();
     for (Target t : getRepositoryTargets()) {
@@ -231,7 +211,7 @@ public class DefaultTargetRegistry
   }
 
   public Set<Target> getTargetsForContentClassPath(ContentClass contentClass, String path) {
-    logger.debug("Resolving targets for contentClass='{}' for path='{}'", contentClass.getId(), path);
+    getLogger().debug("Resolving targets for contentClass='{}' for path='{}'", contentClass.getId(), path);
 
     final Set<Target> result = new HashSet<Target>();
     for (Target t : getRepositoryTargets()) {
@@ -243,7 +223,7 @@ public class DefaultTargetRegistry
   }
 
   public TargetSet getTargetsForRepositoryPath(Repository repository, String path) {
-    logger.debug("Resolving targets for repository='{}' for path='{}'", repository.getId(), path);
+    getLogger().debug("Resolving targets for repository='{}' for path='{}'", repository.getId(), path);
 
     final TargetSet result = new TargetSet();
     for (Target t : getRepositoryTargets()) {
@@ -255,7 +235,7 @@ public class DefaultTargetRegistry
   }
 
   public boolean hasAnyApplicableTarget(Repository repository) {
-    logger.debug("Looking for any targets for repository='{}'", repository.getId());
+    getLogger().debug("Looking for any targets for repository='{}'", repository.getId());
 
     for (Target t : getRepositoryTargets()) {
       if (t.getContentClass().isCompatible(repository.getRepositoryContentClass())) {
@@ -263,9 +243,5 @@ public class DefaultTargetRegistry
       }
     }
     return false;
-  }
-
-  public String getName() {
-    return "Repository Target Configuration";
   }
 }

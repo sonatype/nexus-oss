@@ -50,7 +50,7 @@ public class MacPluginEventInspectorTest
 
   protected RepositoryRegistry repositoryRegistry;
 
-  protected Repository repository;
+  protected M2Repository repository;
 
   @Override
   protected boolean runWithSecurityDisabled() {
@@ -76,7 +76,7 @@ public class MacPluginEventInspectorTest
     indexerManager.removeRepositoryIndexContext(repository.getId(), true);
   }
 
-  protected Repository createRepository(final String id)
+  protected M2Repository createRepository(final String id)
       throws Exception
   {
     // adding one proxy

@@ -18,6 +18,9 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -41,7 +44,6 @@ import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -50,7 +52,8 @@ import org.codehaus.plexus.util.StringUtils;
  * @author cstamas
  * @deprecated see Configurable
  */
-@Component(role = ApplicationConfigurationValidator.class)
+@Singleton
+@Named
 public class DefaultApplicationConfigurationValidator
     implements ApplicationConfigurationValidator
 {
@@ -176,6 +179,7 @@ public class DefaultApplicationConfigurationValidator
   // ---------------
   // Public
 
+  @Override
   public ValidationResponse validateRepository(ApplicationValidationContext ctx, CRepository repo) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -237,6 +241,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRepositoryGrouping(ApplicationValidationContext ctx, CRepositoryGrouping settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -257,6 +262,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateGroupsSettingPathMappingItem(ApplicationValidationContext ctx,
                                                                  CPathMappingItem item)
   {
@@ -336,6 +342,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateHttpProxySettings(ApplicationValidationContext ctx, CHttpProxySettings settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -361,6 +368,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRemoteAuthentication(ApplicationValidationContext ctx,
                                                          CRemoteAuthentication settings)
   {
@@ -373,6 +381,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRemoteConnectionSettings(ApplicationValidationContext ctx,
                                                              CRemoteConnectionSettings settings)
   {
@@ -385,6 +394,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRemoteHttpProxySettings(ApplicationValidationContext ctx,
                                                             CRemoteHttpProxySettings settings)
   {
@@ -403,6 +413,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRepositoryMirrors(ApplicationValidationContext ctx, List<CMirror> mirrors) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -434,6 +445,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRepositoryTarget(ApplicationValidationContext ctx, CRepositoryTarget settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -483,6 +495,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRestApiSettings(ApplicationValidationContext ctx, CRestApiSettings settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -493,6 +506,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRouting(ApplicationValidationContext ctx, CRouting settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -503,6 +517,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateRemoteNexusInstance(ApplicationValidationContext ctx,
                                                         CRemoteNexusInstance settings)
   {
@@ -515,6 +530,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateScheduledTask(ApplicationValidationContext ctx, CScheduledTask settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -529,6 +545,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateSchedule(ApplicationValidationContext ctx, CScheduleConfig settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -539,6 +556,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateSmtpConfiguration(ApplicationValidationContext ctx, CSmtpConfiguration settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -566,6 +584,7 @@ public class DefaultApplicationConfigurationValidator
     return response;
   }
 
+  @Override
   public ValidationResponse validateErrorReporting(ApplicationValidationContext ctx, CErrorReporting settings) {
     ValidationResponse response = new ApplicationValidationResponse();
 

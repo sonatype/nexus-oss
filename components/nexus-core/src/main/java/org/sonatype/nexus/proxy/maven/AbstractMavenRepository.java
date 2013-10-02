@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.inject.Inject;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -50,9 +52,9 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_MD5;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_SHA1;
@@ -77,17 +79,14 @@ public abstract class AbstractMavenRepository
   /**
    * Metadata manager.
    */
-  @Requirement
   private MetadataManager metadataManager;
 
   /**
    * The artifact packaging mapper.
    */
-  @Requirement
   private ArtifactPackagingMapper artifactPackagingMapper;
 
-  @Requirement
-  protected ProxyRequestFilter proxyRequestFilter;
+  private ProxyRequestFilter proxyRequestFilter;
 
   private MutableProxyRepositoryKind repositoryKind;
 
@@ -97,6 +96,19 @@ public abstract class AbstractMavenRepository
    * if download remote index flag changed, need special handling after save
    */
   private boolean downloadRemoteIndexEnabled = false;
+  
+  @Inject
+  public void populateAbstractMavenRepository(final MetadataManager metadataManager,
+      final ArtifactPackagingMapper artifactPackagingMapper, final ProxyRequestFilter proxyRequestFilter)
+  {
+    this.metadataManager = checkNotNull(metadataManager);
+    this.artifactPackagingMapper = checkNotNull(artifactPackagingMapper);
+    this.proxyRequestFilter = checkNotNull(proxyRequestFilter);
+    this.repositoryKind = new MutableProxyRepositoryKind(this, Arrays.asList(new Class<?>[] { MavenRepository.class }),
+        new DefaultRepositoryKind(MavenHostedRepository.class, null), new DefaultRepositoryKind(
+            MavenProxyRepository.class, null));
+    this.artifactStoreHelper = new ArtifactStoreHelper(this);
+  }
 
   @Override
   protected AbstractMavenRepositoryConfiguration getExternalConfiguration(boolean forModification) {
@@ -132,14 +144,12 @@ public abstract class AbstractMavenRepository
     return event;
   }
 
+  @Override
   public ArtifactStoreHelper getArtifactStoreHelper() {
-    if (artifactStoreHelper == null) {
-      artifactStoreHelper = new ArtifactStoreHelper(this);
-    }
-
     return artifactStoreHelper;
   }
 
+  @Override
   public ArtifactPackagingMapper getArtifactPackagingMapper() {
     return artifactPackagingMapper;
   }
@@ -151,14 +161,8 @@ public abstract class AbstractMavenRepository
   /**
    * Override the "default" kind with Maven specifics.
    */
+  @Override
   public RepositoryKind getRepositoryKind() {
-    if (repositoryKind == null) {
-      repositoryKind =
-          new MutableProxyRepositoryKind(this, Arrays.asList(new Class<?>[]{MavenRepository.class}),
-              new DefaultRepositoryKind(MavenHostedRepository.class, null), new DefaultRepositoryKind(
-              MavenProxyRepository.class, null));
-    }
-
     return repositoryKind;
   }
 
@@ -182,6 +186,7 @@ public abstract class AbstractMavenRepository
     }
   }
 
+  @Override
   public boolean recreateMavenMetadata(ResourceStoreRequest request) {
     if (!getLocalStatus().shouldServiceRequest()) {
       return false;
@@ -240,10 +245,12 @@ public abstract class AbstractMavenRepository
     return !ctx.isStopped();
   }
 
+  @Override
   public boolean isDownloadRemoteIndexes() {
     return getExternalConfiguration(false).isDownloadRemoteIndex();
   }
 
+  @Override
   public void setDownloadRemoteIndexes(boolean downloadRemoteIndexes) {
     boolean oldValue = isDownloadRemoteIndexes();
     boolean newValue = downloadRemoteIndexes;
@@ -255,18 +262,22 @@ public abstract class AbstractMavenRepository
     }
   }
 
+  @Override
   public RepositoryPolicy getRepositoryPolicy() {
     return getExternalConfiguration(false).getRepositoryPolicy();
   }
 
+  @Override
   public void setRepositoryPolicy(RepositoryPolicy repositoryPolicy) {
     getExternalConfiguration(true).setRepositoryPolicy(repositoryPolicy);
   }
 
+  @Override
   public boolean isCleanseRepositoryMetadata() {
     return getExternalConfiguration(false).isCleanseRepositoryMetadata();
   }
 
+  @Override
   public void setCleanseRepositoryMetadata(boolean cleanseRepositoryMetadata) {
     getExternalConfiguration(true).setCleanseRepositoryMetadata(cleanseRepositoryMetadata);
   }
@@ -279,40 +290,49 @@ public abstract class AbstractMavenRepository
     getExternalConfiguration(true).setChecksumPolicy(checksumPolicy);
   }
 
+  @Override
   public int getArtifactMaxAge() {
     return getExternalConfiguration(false).getArtifactMaxAge();
   }
 
+  @Override
   public void setArtifactMaxAge(int maxAge) {
     getExternalConfiguration(true).setArtifactMaxAge(maxAge);
   }
 
+  @Override
   public int getMetadataMaxAge() {
     return getExternalConfiguration(false).getMetadataMaxAge();
   }
 
+  @Override
   public void setMetadataMaxAge(int metadataMaxAge) {
     getExternalConfiguration(true).setMetadataMaxAge(metadataMaxAge);
   }
 
+  @Override
   public boolean isMavenArtifact(StorageItem item) {
     return isMavenArtifactPath(item.getPath());
   }
 
+  @Override
   public boolean isMavenMetadata(StorageItem item) {
     return isMavenMetadataPath(item.getPath());
   }
 
+  @Override
   public boolean isMavenArtifactPath(String path) {
     return getGavCalculator().pathToGav(path) != null;
   }
 
+  @Override
   public abstract boolean isMavenMetadataPath(String path);
 
   public abstract boolean isMavenArtifactChecksumPath(String path);
 
   public abstract boolean shouldServeByPolicies(ResourceStoreRequest request);
 
+  @Override
   public void storeItemWithChecksums(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
   {
@@ -323,6 +343,7 @@ public abstract class AbstractMavenRepository
     getArtifactStoreHelper().storeItemWithChecksums(request, is, userAttributes);
   }
 
+  @Override
   public void deleteItemWithChecksums(ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
              StorageException, AccessDeniedException
@@ -334,6 +355,7 @@ public abstract class AbstractMavenRepository
     getArtifactStoreHelper().deleteItemWithChecksums(request);
   }
 
+  @Override
   public void storeItemWithChecksums(boolean fromTask, AbstractStorageItem item)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
   {
@@ -344,6 +366,7 @@ public abstract class AbstractMavenRepository
     getArtifactStoreHelper().storeItemWithChecksums(fromTask, item);
   }
 
+  @Override
   public void deleteItemWithChecksums(boolean fromTask, ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
   {
@@ -354,6 +377,7 @@ public abstract class AbstractMavenRepository
     getArtifactStoreHelper().deleteItemWithChecksums(fromTask, request);
   }
 
+  @Override
   public MetadataManager getMetadataManager() {
     return metadataManager;
   }

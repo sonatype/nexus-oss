@@ -50,6 +50,7 @@ public class NexusBootEventInspector
           FeedRecorder.SYSTEM_BOOT_ACTION,
           "Stopping Nexus (version " + getApplicationStatusSource().getSystemStatus().getVersion() + " "
               + getApplicationStatusSource().getSystemStatus().getEditionShort() + ")");
+      getFeedRecorder().shutdown();
     }
   }
 

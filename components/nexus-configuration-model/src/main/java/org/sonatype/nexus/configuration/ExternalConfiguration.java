@@ -19,7 +19,7 @@ package org.sonatype.nexus.configuration;
  * @author cstamas
  */
 public interface ExternalConfiguration<T>
-    extends RevertableConfiguration
+    extends RevertableConfiguration<T>
 {
   T getConfiguration(boolean forModification);
 }

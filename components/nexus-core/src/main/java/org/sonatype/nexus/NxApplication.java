@@ -35,18 +35,17 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
+import org.sonatype.nexus.util.LockFile;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This is a component that "boots" Nexus up. See org.sonatype.nexus.web.NexusBooterListener for example. This component
- * replaced {@link Nexus} (and it's implementation {@link DefaultNexus}.
+ * This is a component that "boots" Nexus up. See org.sonatype.nexus.web.NexusBooterListener for example.
  * 
  * @since 2.7.0
  */
@@ -55,6 +54,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NxApplication
     extends LifecycleSupport
 {
+  private final LockFile lockFile;
+
   private final EventBus eventBus;
 
   private final ApplicationStatusSource applicationStatusSource;
@@ -82,6 +83,12 @@ public class NxApplication
     this.securitySystem = checkNotNull(securitySystem);
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
+
+    this.lockFile = new LockFile(new File(nexusConfiguration.getWorkingDirectory(), "nexus.lock"));
+
+    if (!lockFile.lock()) {
+      throw new IllegalStateException("Nexus work directory already in use: " + lockFile.getFile());
+    }
 
     logInitialized();
 
@@ -193,6 +200,7 @@ public class NxApplication
     securitySystem.stop();
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
     log.info("Stopped {}", getNexusNameForLogs());
+    lockFile.release();
   }
 
   private void synchronizeShadowsAtStartup() {

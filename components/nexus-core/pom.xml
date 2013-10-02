@@ -111,6 +111,9 @@
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
+    <!--
+    FIXME: Deprecated, to be removed in future release.
+    -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
@@ -216,10 +219,9 @@
       <artifactId>guice-assistedinject</artifactId>
     </dependency>
 
-    <!-- SISU et al -->
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-locks</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-locks</artifactId>
     </dependency>
 
     <dependency>
@@ -349,14 +351,6 @@
 
   <build>
     <plugins>
-      <!--
-      FIXME: This module uses legacy Plexus components.
-      -->
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-
       <!--
       FIXME: Get rid of test-jar, these artifacts cause problems with transitive dependencies.
       -->

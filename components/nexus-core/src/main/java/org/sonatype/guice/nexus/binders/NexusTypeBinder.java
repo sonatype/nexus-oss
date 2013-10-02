@@ -26,10 +26,14 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.google.inject.Binder;
 import org.codehaus.plexus.component.annotations.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class NexusTypeBinder
     implements NexusTypeListener
 {
+  private static final Logger log = LoggerFactory.getLogger(NexusTypeBinder.class);
+
   // ----------------------------------------------------------------------
   // Implementation fields
   // ----------------------------------------------------------------------
@@ -69,6 +73,8 @@ public final class NexusTypeBinder
 
   @SuppressWarnings("unchecked")
   public void hear(final Component component, final DeferredClass<?> clazz, final Object source) {
+    log.warn("Detected legacy plexus @Component annotation: {} on: {}; replace with JSR-330 annotations", component, clazz);
+
     plexusTypeBinder.hear(component, clazz, source);
     if (null != repositoryType) {
       descriptors.add(new RepositoryTypeDescriptor((Class<? extends Repository>) component.role(), component.hint(),

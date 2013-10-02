@@ -21,6 +21,7 @@ import org.sonatype.aether.collection.DependencyCollectionException;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -61,7 +62,7 @@ public class ResolvingTest
 
     for (MavenProxyRepository repo : repositoryRegistry.getRepositoriesWithFacet(MavenProxyRepository.class)) {
       repo.setRemoteUrl(server.getUrl().toExternalForm());
-      repo.commitChanges();
+      ((AbstractMavenRepository)repo).commitChanges();
     }
   }
 

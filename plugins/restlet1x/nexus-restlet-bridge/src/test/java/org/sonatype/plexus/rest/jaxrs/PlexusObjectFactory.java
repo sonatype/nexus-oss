@@ -17,24 +17,31 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.plexus.rest.jsr311.JsrComponent;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.ext.jaxrs.InstantiateException;
 import org.restlet.ext.jaxrs.ObjectFactory;
 
-@Component(role = PlexusObjectFactory.class)
+@Named
+@Singleton
 public class PlexusObjectFactory
     implements ObjectFactory
 {
-  @Requirement(role = JsrComponent.class)
-  private Map<String, Object> hinstsToresources;
+  private Map<String, JsrComponent> hinstsToresources;
 
   /**
    * A lookup map filled in by getResourceClasses
    */
   private Map<Class<?>, Object> classesToComponents;
+
+  @Inject
+  public PlexusObjectFactory(final Map<String, JsrComponent> hinstsToresources) {
+    this.hinstsToresources = hinstsToresources;
+  }
 
   public Set<Class<?>> getResourceClasses() {
     classesToComponents = new HashMap<Class<?>, Object>(hinstsToresources.size());

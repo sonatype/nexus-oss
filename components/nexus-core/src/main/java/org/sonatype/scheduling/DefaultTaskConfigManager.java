@@ -30,8 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -51,9 +50,6 @@ import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -63,29 +59,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultTaskConfigManager
-    extends AbstractConfigurable
+    extends AbstractLastingConfigurable<List<CScheduledTask>>
     implements TaskConfigManager
 {
-  private static final Logger logger = LoggerFactory.getLogger(DefaultTaskConfigManager.class);
-
-  /**
-   * The application configuration holding tasks.
-   */
-  private final NexusConfiguration nexusConfiguration;
 
   private final Map<String, Provider<SchedulerTask<?>>> tasks;
 
+  // TODO: Nx configuration is used here, as it's used as monitor for synchronization!!!
   @Inject
   public DefaultTaskConfigManager(final EventBus eventBus, final NexusConfiguration nexusConfiguration,
       final Map<String, Provider<SchedulerTask<?>>> tasks)
   {
-    super(eventBus);
-    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+    super("Scheduled Tasks", eventBus, nexusConfiguration);
     this.tasks = checkNotNull(tasks);
   }
 
   // ==
 
+  @Override
   public void initializeConfiguration() throws ConfigurationException {
     if (getApplicationConfiguration() != null && getApplicationConfiguration().getConfigurationModel() != null) {
       configure(getApplicationConfiguration());
@@ -93,22 +84,7 @@ public class DefaultTaskConfigManager
   }
 
   @Override
-  protected NexusConfiguration getApplicationConfiguration() {
-    return nexusConfiguration;
-  }
-
-  @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected List<CScheduledTask> getCurrentConfiguration(boolean forWrite) {
-    return ((CScheduledTaskCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
-  }
-
-  @Override
-  protected CoreConfiguration wrapConfiguration(Object configuration) throws ConfigurationException {
+  protected CoreConfiguration<List<CScheduledTask>> wrapConfiguration(Object configuration) throws ConfigurationException {
     if (configuration instanceof ApplicationConfiguration) {
       return new CScheduledTaskCoreConfiguration((ApplicationConfiguration) configuration);
     }
@@ -121,6 +97,7 @@ public class DefaultTaskConfigManager
 
   // ==
 
+  @Override
   public void initializeTasks(Scheduler scheduler) {
     initializeTasks(scheduler, new ArrayList<CScheduledTask>(getCurrentConfiguration(false)));
   }
@@ -129,10 +106,10 @@ public class DefaultTaskConfigManager
     if (tasks != null) {
       List<CScheduledTask> tempList = new ArrayList<CScheduledTask>(tasks);
 
-      logger.info(tempList.size() + " task(s) to load.");
+      getLogger().info(tempList.size() + " task(s) to load.");
 
       for (CScheduledTask task : tempList) {
-        logger.info("Loading task - " + task.getName());
+        getLogger().info("Loading task - " + task.getName());
 
         try {
           SchedulerTask<?> nexusTask = createTaskInstance(task.getType());
@@ -158,7 +135,7 @@ public class DefaultTaskConfigManager
         catch (IllegalArgumentException e) {
           // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
           // name
-          logger.warn("Unable to initialize task " + task.getName() + ", couldn't load service class " + task.getId(),
+          getLogger().warn("Unable to initialize task " + task.getName() + ", couldn't load service class " + task.getId(),
               e);
         }
       }
@@ -172,7 +149,7 @@ public class DefaultTaskConfigManager
       return;
     }
 
-    synchronized (nexusConfiguration) {
+    synchronized (getApplicationConfiguration()) {
       List<CScheduledTask> tasks = getCurrentConfiguration(true);
 
       CScheduledTask foundTask = findTask(task.getId(), tasks);
@@ -189,22 +166,22 @@ public class DefaultTaskConfigManager
         tasks.add(storeableTask);
       }
 
-      if (logger.isTraceEnabled()) {
-        logger.trace("Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
+      if (getLogger().isTraceEnabled()) {
+        getLogger().trace("Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
             : "is NOT", new Exception("This is an exception only to provide caller backtrace"));
       }
 
       try {
-        nexusConfiguration.saveConfiguration();
+        getApplicationConfiguration().saveConfiguration();
       }
       catch (IOException e) {
-        logger.warn("Could not save task changes!", e);
+        getLogger().warn("Could not save task changes!", e);
       }
     }
   }
 
   public <T> void removeTask(ScheduledTask<T> task) {
-    synchronized (nexusConfiguration) {
+    synchronized (getApplicationConfiguration()) {
       List<CScheduledTask> tasks = getCurrentConfiguration(true);
 
       CScheduledTask foundTask = findTask(task.getId(), tasks);
@@ -213,16 +190,16 @@ public class DefaultTaskConfigManager
         tasks.remove(foundTask);
       }
 
-      if (logger.isTraceEnabled()) {
-        logger.trace("Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS" : "is NOT",
+      if (getLogger().isTraceEnabled()) {
+        getLogger().trace("Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS" : "is NOT",
             new Exception("This is an exception only to provide caller backtrace"));
       }
 
       try {
-        nexusConfiguration.saveConfiguration();
+        getApplicationConfiguration().saveConfiguration();
       }
       catch (IOException e) {
-        logger.warn("Could not save task changes!", e);
+        getLogger().warn("Could not save task changes!", e);
       }
     }
 
@@ -234,7 +211,7 @@ public class DefaultTaskConfigManager
   }
 
   private SchedulerTask<?> lookupTask(final String taskType) {
-    logger.debug("Looking up task for: " + taskType);
+    getLogger().debug("Looking up task for: " + taskType);
     final Provider<SchedulerTask<?>> taskProvider = tasks.get(taskType);
     if (taskProvider == null) {
       throw new IllegalArgumentException("Could not find task of type: " + taskType);
@@ -243,7 +220,7 @@ public class DefaultTaskConfigManager
   }
 
   public <T> T createTaskInstance(final Class<T> taskType) throws IllegalArgumentException {
-    logger.debug("Creating task: {}", taskType);
+    getLogger().debug("Creating task: {}", taskType);
 
     try {
       // first try a full class name lookup (modern sisu-style)
@@ -258,7 +235,7 @@ public class DefaultTaskConfigManager
   // ==
 
   private CScheduledTask findTask(String id, List<CScheduledTask> tasks) {
-    synchronized (nexusConfiguration) {
+    synchronized (getApplicationConfiguration()) {
       for (Iterator<CScheduledTask> iter = tasks.iterator(); iter.hasNext();) {
         CScheduledTask storedTask = iter.next();
 
@@ -315,7 +292,7 @@ public class DefaultTaskConfigManager
           daysToRun.add(Integer.valueOf(day));
         }
         catch (NumberFormatException nfe) {
-          logger.error("Invalid day being added to monthly schedule - " + day + " - skipping.");
+          getLogger().error("Invalid day being added to monthly schedule - " + day + " - skipping.");
         }
       }
 
@@ -331,7 +308,7 @@ public class DefaultTaskConfigManager
           daysToRun.add(Integer.valueOf(day));
         }
         catch (NumberFormatException nfe) {
-          logger.error("Invalid day being added to weekly schedule - " + day + " - skipping.");
+          getLogger().error("Invalid day being added to weekly schedule - " + day + " - skipping.");
         }
       }
 
@@ -481,9 +458,4 @@ public class DefaultTaskConfigManager
 
     return storeableTask;
   }
-
-  public String getName() {
-    return "Scheduled Task Configuration";
-  }
-
 }

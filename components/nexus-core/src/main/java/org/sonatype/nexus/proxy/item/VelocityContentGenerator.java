@@ -16,6 +16,10 @@ package org.sonatype.nexus.proxy.item;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -23,18 +27,21 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.velocity.Velocity;
 
 import org.apache.velocity.VelocityContext;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 
-@Component(role = ContentGenerator.class, hint = VelocityContentGenerator.ID)
+@Named(VelocityContentGenerator.ID)
+@Singleton
 public class VelocityContentGenerator
     implements ContentGenerator
 {
   public static final String ID = "velocity";
 
-  @Requirement
-  private Velocity velocity;
+  private final Velocity velocity;
+
+  @Inject
+  public VelocityContentGenerator(final Velocity velocity) {
+    this.velocity = velocity;
+  }
 
   @Override
   public String getGeneratorId() {
