@@ -92,7 +92,7 @@ public class DefaultEventInspectorHost
 
   @Override
   public void shutdown() {
-    eventBus.unregister(this);
+    // no need to un-register, as this is EventBus.Managed!
     // we need clean shutdown, wait all background event inspectors to finish to have consistent state
     hostThreadPool.shutdown();
     try {
