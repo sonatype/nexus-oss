@@ -16,8 +16,10 @@ package org.sonatype.nexus.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.management.ManagementFactory;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.nio.charset.Charset;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,22 +30,43 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LockFile
 {
+  private static final byte[] DEFAULT_PAYLOAD = ManagementFactory.getRuntimeMXBean().getName().getBytes(
+      Charset.forName("UTF-8"));
+
   private final File lockFile;
   private FileLock fileLock;
   private RandomAccessFile randomAccessFile;
+  private byte[] payload;
 
   public LockFile(final File lockFile) {
-    this.lockFile = checkNotNull(lockFile);
+    this(lockFile, DEFAULT_PAYLOAD);
   }
-  
+
+  public LockFile(final File lockFile, final byte[] payload) {
+    this.lockFile = checkNotNull(lockFile);
+    this.payload = checkNotNull(payload);
+  }
+
   public File getFile() {
     return lockFile;
   }
 
+  public byte[] getPayload() {
+    return payload;
+  }
+
   public synchronized boolean lock() {
+    if (fileLock != null) {
+      return true;
+    }
     try {
-      randomAccessFile = new RandomAccessFile(lockFile, "rw");
+      randomAccessFile = new RandomAccessFile(lockFile, "rws");
       fileLock = randomAccessFile.getChannel().tryLock(0L, 1L, false);
+      if (fileLock != null) {
+        randomAccessFile.setLength(0);
+        randomAccessFile.seek(0);
+        randomAccessFile.write(payload);
+      }
     }
     catch (IOException e) {
       // handle it as null result
@@ -55,8 +78,7 @@ public class LockFile
     }
     finally {
       if (fileLock == null) {
-        close(randomAccessFile);
-        randomAccessFile = null;
+        release();
         return false;
       }
     }
