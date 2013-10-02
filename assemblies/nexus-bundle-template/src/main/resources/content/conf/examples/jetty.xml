@@ -51,7 +51,9 @@
   <Set name="handler">
     <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
       <Call name="addHandler">
-        <Arg><Ref id="NexusHandler" /></Arg>
+        <Arg>
+          <Ref id="NexusHandler"/>
+        </Arg>
       </Call>
     </New>
   </Set>

@@ -79,11 +79,15 @@
   <!-- WARNING defaulting convenience over security; expose JMX to any remote host with no ssl/auth -->
   <Call name="setProperty" class="java.lang.System">
     <Arg>com.sun.management.jmxremote.ssl</Arg>
-    <Arg><SystemProperty name="com.sun.management.jmxremote.ssl" default="false"/></Arg>
+    <Arg>
+      <SystemProperty name="com.sun.management.jmxremote.ssl" default="false"/>
+    </Arg>
   </Call>
   <Call name="setProperty" class="java.lang.System">
     <Arg>com.sun.management.jmxremote.authenticate</Arg>
-    <Arg><SystemProperty name="com.sun.management.jmxremote.authenticate" default="false"/></Arg>
+    <Arg>
+      <SystemProperty name="com.sun.management.jmxremote.authenticate" default="false"/>
+    </Arg>
   </Call>
 
   <Call name="createRegistry" class="java.rmi.registry.LocateRegistry">

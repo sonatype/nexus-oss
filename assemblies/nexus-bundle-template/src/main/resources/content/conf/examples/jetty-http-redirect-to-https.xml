@@ -57,39 +57,39 @@
   </Call>
 
   <New id="NexusHandler" class="com.yammer.metrics.jetty.InstrumentedHandler">
-  <Arg>
-  <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-    <Arg>${nexus-webapp}</Arg>
-    <Arg>${nexus-webapp-context-path}</Arg>
-    <Set name="extractWAR">false</Set>
-    <Set name="throwUnavailableOnStartupException">true</Set>
-    <!-- enforce use of the confidential port -->
-    <Set name="securityHandler">
-      <New class="org.eclipse.jetty.security.ConstraintSecurityHandler">
-        <Call name="addConstraintMapping">
-          <Arg>
-            <New class="org.eclipse.jetty.security.ConstraintMapping">
-              <Set name="pathSpec">/*</Set>
-              <Set name="constraint">
-                <New class="org.eclipse.jetty.util.security.Constraint">
-                  <!-- 2 means CONFIDENTIAL. 1 means INTEGRITY -->
-                  <Set name="dataConstraint">2</Set>
+    <Arg>
+      <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+        <Arg>${nexus-webapp}</Arg>
+        <Arg>${nexus-webapp-context-path}</Arg>
+        <Set name="extractWAR">false</Set>
+        <Set name="throwUnavailableOnStartupException">true</Set>
+        <!-- enforce use of the confidential port -->
+        <Set name="securityHandler">
+          <New class="org.eclipse.jetty.security.ConstraintSecurityHandler">
+            <Call name="addConstraintMapping">
+              <Arg>
+                <New class="org.eclipse.jetty.security.ConstraintMapping">
+                  <Set name="pathSpec">/*</Set>
+                  <Set name="constraint">
+                    <New class="org.eclipse.jetty.util.security.Constraint">
+                      <!-- 2 means CONFIDENTIAL. 1 means INTEGRITY -->
+                      <Set name="dataConstraint">2</Set>
+                    </New>
+                  </Set>
                 </New>
-              </Set>
-            </New>
-          </Arg>
-        </Call>
+              </Arg>
+            </Call>
+          </New>
+        </Set>
       </New>
-    </Set>
-  </New>
-  </Arg>
+    </Arg>
   </New>
 
   <Set name="handler">
     <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
       <Call name="addHandler">
         <Arg>
-          <Ref id="NexusHandler" />
+          <Ref id="NexusHandler"/>
         </Arg>
       </Call>
     </New>
