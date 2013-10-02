@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
+import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.Charset;
@@ -24,8 +25,12 @@ import java.nio.charset.Charset;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * File locker interface, inspired by Eclipse Locker.
- * 
+ * File locker implementation, inspired by Eclipse Locker. It uses Java NIO {@link FileChannel#tryLock(long, long,
+ * boolean)} method to perform locking. As a commodity function, it also writes to a file a payload, making problem
+ * diagnosing a bit easier, as reading (ie. from console) of the lock file content might reveal useful information
+ * about lock owner.
+ * All the limitations mentioned for {@link FileLock} stands.
+ *
  * @since 2.7.0
  */
 public class LockFile
@@ -34,27 +39,46 @@ public class LockFile
       Charset.forName("UTF-8"));
 
   private final File lockFile;
+
   private FileLock fileLock;
+
   private RandomAccessFile randomAccessFile;
+
   private byte[] payload;
 
+  /**
+   * Creates a LockFile with default payload (that contains the JVM name, usually {@code PID@hostname}).
+   */
   public LockFile(final File lockFile) {
     this(lockFile, DEFAULT_PAYLOAD);
   }
 
+  /**
+   * Creates a LockFile with custom payload.
+   */
   public LockFile(final File lockFile, final byte[] payload) {
     this.lockFile = checkNotNull(lockFile);
     this.payload = checkNotNull(payload);
   }
 
+  /**
+   * Returns the file used by this instance.
+   */
   public File getFile() {
     return lockFile;
   }
 
+  /**
+   * Returns the payload used by this instance.
+   */
   public byte[] getPayload() {
     return payload;
   }
 
+  /**
+   * Performs locking. If returns {@code true}, locking was successful and caller holds the lock. Multiple invocations,
+   * after lock is acquired, does not have any effect, locking happens only once.
+   */
   public synchronized boolean lock() {
     if (fileLock != null) {
       return true;
@@ -68,11 +92,7 @@ public class LockFile
         randomAccessFile.write(payload);
       }
     }
-    catch (IOException e) {
-      // handle it as null result
-      fileLock = null;
-    }
-    catch (OverlappingFileLockException e) {
+    catch (IOException | OverlappingFileLockException e) {
       // handle it as null result
       fileLock = null;
     }
@@ -85,6 +105,9 @@ public class LockFile
     return true;
   }
 
+  /**
+   * Releases the lock. Multiple invocations of this file are possible, release will happen only once.
+   */
   public synchronized void release() {
     close(fileLock);
     fileLock = null;
