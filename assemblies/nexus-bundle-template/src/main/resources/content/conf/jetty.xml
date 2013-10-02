@@ -23,40 +23,42 @@
 <!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-    <Set name="threadPool">
-        <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
-    </Set>
-    <Call name="addConnector">
-        <Arg>
-            <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
-              <Set name="host">${application-host}</Set>
-              <Set name="port">${application-port}</Set>
-            </New>
-        </Arg>
-    </Call>
-    
-    <Set name="handler">
-      <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-          <!-- The following configuration disables JSP taglib support, the validation of which
-               slows down Jetty's startup significantly. -->
-          <Call name="addLifeCycleListener">
-              <Arg>
-                <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
-              </Arg>
-          </Call>
+  <Set name="threadPool">
+    <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
+  </Set>
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
+        <Set name="host">${application-host}</Set>
+        <Set name="port">${application-port}</Set>
       </New>
-    </Set>
-    
-    <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-      <Arg><Ref id="Contexts"/></Arg>
-      <Arg>${nexus-webapp}</Arg>
-      <Arg>${nexus-webapp-context-path}</Arg>
-      <Set name="extractWAR">false</Set>
-      <Set name="throwUnavailableOnStartupException">true</Set>
+    </Arg>
+  </Call>
+
+  <Set name="handler">
+    <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+      <!-- The following configuration disables JSP taglib support, the validation of which
+           slows down Jetty's startup significantly. -->
+      <Call name="addLifeCycleListener">
+        <Arg>
+          <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener"/>
+        </Arg>
+      </Call>
     </New>
-    
-    <Set name="stopAtShutdown">true</Set>
-    <Set name="sendServerVersion">true</Set>
-    <Set name="sendDateHeader">true</Set>
-    <Set name="gracefulShutdown">1000</Set>
+  </Set>
+
+  <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+    <Arg>
+      <Ref id="Contexts"/>
+    </Arg>
+    <Arg>${nexus-webapp}</Arg>
+    <Arg>${nexus-webapp-context-path}</Arg>
+    <Set name="extractWAR">false</Set>
+    <Set name="throwUnavailableOnStartupException">true</Set>
+  </New>
+
+  <Set name="stopAtShutdown">true</Set>
+  <Set name="sendServerVersion">true</Set>
+  <Set name="sendDateHeader">true</Set>
+  <Set name="gracefulShutdown">1000</Set>
 </Configure>
