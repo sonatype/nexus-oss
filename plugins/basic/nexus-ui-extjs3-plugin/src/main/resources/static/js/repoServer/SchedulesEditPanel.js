@@ -14,10 +14,11 @@
  * Service Schedule Edit/Create panel layout and controller
  */
 
-define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
+define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/ext/GridFilterBox'], function(Sonatype, Strings){
 Sonatype.repoServer.SchedulesEditPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+  var config = config || {},
+      defaultConfig = {};
+
   Ext.apply(this, config, defaultConfig);
 
   var ht = Sonatype.repoServer.resources.help.schedules;
@@ -896,7 +897,11 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               scope : this,
               handler : this.addResourceHandler,
               disabled : !this.sp.checkPermission('nexus:tasks', this.sp.CREATE)
-            }, this.runButton, this.stopButton, this.deleteButton],
+            },
+            this.runButton,
+            this.stopButton,
+            this.deleteButton
+        ],
 
         // grid view options
         ds : this.schedulesDataStore,
@@ -950,10 +955,18 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         autoExpandColumn : 'schedule-config-service-last-result-col',
         disableSelection : false,
         viewConfig : {
-          emptyText : 'Click "Add" to create a scheduled task.'
+          emptyText: 'No scheduled tasks defined',
+          emptyTextWhileFiltering: 'No scheduled tasks matched criteria: {criteria}'
         }
       });
   this.schedulesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
+
+  this.schedulesGridPanel.getTopToolbar().add([
+    '->',
+    NX.create('Nexus.ext.GridFilterBox', {
+      filteredGrid: this.schedulesGridPanel
+    })
+  ]);
 
   Sonatype.repoServer.SchedulesEditPanel.superclass.constructor.call(this, {
         layout : 'border',

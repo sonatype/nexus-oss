@@ -14,10 +14,11 @@
  * Repository Routes Edit/Creat panel layout and controller
  */
 
-define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
+define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/ext/GridFilterBox'], function(Sonatype, Strings){
 Sonatype.repoServer.RoutesEditPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+  var config = config || {},
+      defaultConfig = {};
+
   Ext.apply(this, config, defaultConfig);
 
   this.repoDataStore = new Ext.data.JsonStore({
@@ -270,7 +271,8 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
               scope : this,
               handler : this.deleteResourceHandler,
               disabled : !this.sp.checkPermission('nexus:routes', this.sp.DELETE)
-            }],
+            }
+        ],
 
         // grid view options
         ds : this.routesDataStore,
@@ -301,10 +303,19 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
         autoExpandColumn : 'routes-config-repos-col',
         disableSelection : false,
         viewConfig : {
-          emptyText : 'Click "Add" to create a Repository Route'
+          emptyText: 'No routes defined',
+          emptyTextWhileFiltering: 'No routes matched criteria: {criteria}'
         }
       });
   this.routesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
+
+  this.routesGridPanel.getTopToolbar().add([
+    '->',
+    NX.create('Nexus.ext.GridFilterBox', {
+      filteredGrid: this.routesGridPanel
+    })
+  ]);
+
   // END: Repo List ******************************************************
   // *********************************************************************
 
