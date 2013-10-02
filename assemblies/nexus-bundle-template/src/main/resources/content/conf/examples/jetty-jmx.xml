@@ -67,7 +67,7 @@
   ==== JMX ====
   Set the following properties inside nexus.properties:
   jmx-host: the remote host name, commonly the IP address, to remotely access Nexus over JMX
-  jmx-port: the port to remotely access Nexus over JMX
+  jmx-port: the port to remotely access Nexus over JMX (1099)
   -->
 
   <!-- explicitly setting rmi server hostname as IP address here can help avoid network routing issues -->
