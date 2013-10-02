@@ -1394,9 +1394,7 @@ public abstract class AbstractProxyRepository
                       remoteUrl, String.valueOf(i + 1), t.getClass().getName(),
                       t.getMessage()));
             }
-
-            // nope, do not switch Mirror yet, obey the retries
-            // continue all_urls; // retry with next url
+            // do not switch url yet, obey the retries
           }
           catch (LocalStorageException e) {
             lastException = e;
@@ -1419,13 +1417,11 @@ public abstract class AbstractProxyRepository
                       RepositoryStringUtils.getHumanizedNameString(this), request.toString(),
                       remoteUrl, t.getClass().getName(), t.getMessage()));
             }
-
-            // This is actually fatal error? LocalStorageException means something like IOException
-            // while writing data to disk, full disk, no perms, etc
-            // currently, we preserve the old -- probably wrong -- behaviour: on IOException Nexus will
-            // log the error
-            // but will respond with 404
-            continue all_urls; // retry with next url
+            // do not switch url yet, obey the retries
+            // TODO: IOException _might_ be actually a fatal error (like Nx process have no perms to write to disk)
+            // but also might come when caching, from inability to READ the HTTP response body (see NEXUS-5898)
+            // Hence, we will retry here too, and in case of first type of IO problems no harm will be done
+            // anyway, but will solve the second type of problems, where retry will be attempted
           }
           catch (RuntimeException e) {
             lastException = e;
