@@ -29,6 +29,10 @@ public class DummyFeedRecorder
     implements FeedRecorder
 {
   int receivedEventCount = 0;
+  
+  public void shutdown() {
+    //
+  }
 
   public int getReceivedEventCount() {
     return receivedEventCount;

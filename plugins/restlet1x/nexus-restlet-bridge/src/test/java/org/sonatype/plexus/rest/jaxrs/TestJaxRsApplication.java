@@ -15,17 +15,22 @@ package org.sonatype.plexus.rest.jaxrs;
 
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Application;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
-@Component(role = Application.class)
+@Named
+@Singleton
 public class TestJaxRsApplication
     extends Application
 {
-  @Requirement
-  private PlexusObjectFactory objectFactory;
+  private final PlexusObjectFactory objectFactory;
+
+  @Inject
+  public TestJaxRsApplication(final PlexusObjectFactory objectFactory) {
+    this.objectFactory = objectFactory;
+  }
 
   @Override
   public Set<Class<?>> getClasses() {

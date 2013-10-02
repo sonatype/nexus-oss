@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import javax.inject.Inject;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
@@ -69,10 +70,10 @@ import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.collect.Lists;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
@@ -105,8 +106,11 @@ public abstract class AbstractProxyRepository
    */
   private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
 
-  @Requirement
+  // == these below are injected
+
   private ThreadPoolManager poolManager;
+  
+  // ==
 
   /**
    * The remote status checker thread, used in Proxies for handling autoBlocking. Not to go into Pool above, is
@@ -149,6 +153,12 @@ public abstract class AbstractProxyRepository
    * Item content validators
    */
   private Map<String, ItemContentValidator> itemContentValidators;
+
+  @Inject
+  public void populateAbstractProxyRepository(ThreadPoolManager poolManager)
+  {
+    this.poolManager = checkNotNull(poolManager);
+  }
 
   @Override
   protected AbstractProxyRepositoryConfiguration getExternalConfiguration(boolean forModification) {
@@ -1384,9 +1394,7 @@ public abstract class AbstractProxyRepository
                       remoteUrl, String.valueOf(i + 1), t.getClass().getName(),
                       t.getMessage()));
             }
-
-            // nope, do not switch Mirror yet, obey the retries
-            // continue all_urls; // retry with next url
+            // do not switch url yet, obey the retries
           }
           catch (LocalStorageException e) {
             lastException = e;
@@ -1409,13 +1417,11 @@ public abstract class AbstractProxyRepository
                       RepositoryStringUtils.getHumanizedNameString(this), request.toString(),
                       remoteUrl, t.getClass().getName(), t.getMessage()));
             }
-
-            // This is actually fatal error? LocalStorageException means something like IOException
-            // while writing data to disk, full disk, no perms, etc
-            // currently, we preserve the old -- probably wrong -- behaviour: on IOException Nexus will
-            // log the error
-            // but will respond with 404
-            continue all_urls; // retry with next url
+            // do not switch url yet, obey the retries
+            // TODO: IOException _might_ be actually a fatal error (like Nx process have no perms to write to disk)
+            // but also might come when caching, from inability to READ the HTTP response body (see NEXUS-5898)
+            // Hence, we will retry here too, and in case of first type of IO problems no harm will be done
+            // anyway, but will solve the second type of problems, where retry will be attempted
           }
           catch (RuntimeException e) {
             lastException = e;

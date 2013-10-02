@@ -13,10 +13,11 @@
 
 package org.sonatype.nexus.tasks.descriptors.properties;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
 
-@Component(role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup",
-    instantiationStrategy = "per-lookup")
+@Named("RepositoryOrGroup")
+@Typed(ScheduledTaskPropertyDescriptor.class)
 public class RepositoryOrGroupPropertyDescriptor
     extends AbstractRepositoryOrGroupPropertyDescriptor
 {
@@ -27,11 +28,14 @@ public class RepositoryOrGroupPropertyDescriptor
     setRequired(true);
   }
 
+  @Override
   public String getId() {
     return ID;
   }
 
+  @Override
   public String getName() {
     return "Repository/Group";
   }
+
 }

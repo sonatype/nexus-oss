@@ -18,11 +18,7 @@ package org.sonatype.nexus.configuration;
  *
  * @author cstamas
  */
-public interface CoreConfiguration
-    extends RevertableConfiguration
+public interface CoreConfiguration<C>
+    extends RevertableConfiguration<C>
 {
-  /**
-   * Returns the external configuration, if any. Null otherwise.
-   */
-  ExternalConfiguration<?> getExternalConfiguration();
 }

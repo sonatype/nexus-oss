@@ -18,7 +18,6 @@ import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.record.NexusAuthenticationEventInspector;
 import org.sonatype.nexus.test.NexusTestSupport;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -45,7 +44,6 @@ public class NexusAuthenticationEventInspectorTest
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks( this );
     feedRecorder = new DummyFeedRecorder();
-
     underTest = new NexusAuthenticationEventInspector(nexusConfiguration);
     underTest.setFeedRecorder(feedRecorder);
 

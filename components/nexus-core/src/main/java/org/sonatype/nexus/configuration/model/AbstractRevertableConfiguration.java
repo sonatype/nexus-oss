@@ -22,21 +22,21 @@ import org.sonatype.nexus.configuration.RevertableConfiguration;
 
 import com.thoughtworks.xstream.XStream;
 
-public abstract class AbstractRevertableConfiguration
-    implements RevertableConfiguration
+public abstract class AbstractRevertableConfiguration<C>
+    implements RevertableConfiguration<C>
 {
   private final XStream xstream = new XStream();
 
-  private volatile Object originalConfiguration;
+  private volatile C originalConfiguration;
 
-  private volatile Object changedConfiguration;
+  private volatile C changedConfiguration;
 
-  public Object getConfiguration(boolean forWrite) {
+  public C getConfiguration(boolean forWrite) {
     if (forWrite) {
       synchronized (this) {
         if (getOriginalConfiguration() != null && getChangedConfiguration() == null) {
           // copy it
-          final Object copy = copyObject(getOriginalConfiguration(), null);
+          final C copy = copyObject(getOriginalConfiguration(), null);
 
           copyTransients(getOriginalConfiguration(), copy);
 
@@ -56,24 +56,24 @@ public abstract class AbstractRevertableConfiguration
     return xstream;
   }
 
-  protected Object getOriginalConfiguration() {
+  protected C getOriginalConfiguration() {
     return originalConfiguration;
   }
 
-  public void setOriginalConfiguration(Object originalConfiguration) {
+  public void setOriginalConfiguration(C originalConfiguration) {
     this.originalConfiguration = originalConfiguration;
   }
 
-  protected Object getChangedConfiguration() {
+  protected C getChangedConfiguration() {
     return changedConfiguration;
   }
 
-  public void setChangedConfiguration(Object changedConfiguration) {
+  public void setChangedConfiguration(C changedConfiguration) {
     this.changedConfiguration = changedConfiguration;
   }
 
   @SuppressWarnings("unchecked")
-  protected Object copyObject(Object source, Object target) {
+  protected C copyObject(C source, C target) {
     if (source == null && target == null) {
       return null;
     }
@@ -87,15 +87,15 @@ public abstract class AbstractRevertableConfiguration
     }
     else if (target == null) {
       // "clean" deep copy
-      return getXStream().fromXML(getXStream().toXML(source));
+      return (C) getXStream().fromXML(getXStream().toXML(source));
     }
     else {
       // "overlay" actually
-      return getXStream().fromXML(getXStream().toXML(source), target);
+      return (C) getXStream().fromXML(getXStream().toXML(source), target);
     }
   }
 
-  protected void copyTransients(Object source, Object destination) {
+  protected void copyTransients(C source, C destination) {
     // usually none, but see CRepository
   }
 
@@ -153,5 +153,8 @@ public abstract class AbstractRevertableConfiguration
     }
   }
 
-  public abstract ValidationResponse doValidateChanges(Object changedConfiguration);
+  protected ValidationResponse doValidateChanges(C changedConfiguration) {
+    // This method should be overridden to perform validation on underlying model
+    return new ValidationResponse();
+  }
 }

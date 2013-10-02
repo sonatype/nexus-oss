@@ -21,6 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -58,26 +62,25 @@ import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 import org.sonatype.security.realms.XmlAuthorizingRealm;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Upgrades configuration model from version 1.0.8 to 1.4.0.
  *
  * @author cstamas
  */
-@Component(role = SingleVersionUpgrader.class, hint = "1.0.8")
+@Singleton
+@Named("1.0.8")
 public class Upgrade108to140
     extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
-  @Requirement(hint = "file")
-  private SecurityConfigurationSource securityConfigurationSource;
+  private final SecurityConfigurationSource securityConfigurationSource;
 
-  @Requirement
-  private PasswordHelper passwordHelper;
+  private final PasswordHelper passwordHelper;
 
   private static final String EXTERNAL_CONFIG = "externalConfiguration";
 
@@ -95,7 +98,11 @@ public class Upgrade108to140
 
   private static final String TASK_EXPIRE_CACHE_OLD = "ClearCacheTask";
 
-  public Upgrade108to140() {
+  @Inject
+  public Upgrade108to140(final @Named("file") SecurityConfigurationSource securityConfigurationSource, final PasswordHelper passwordHelper) {
+    this.securityConfigurationSource = checkNotNull(securityConfigurationSource);
+    this.passwordHelper = checkNotNull(passwordHelper);
+
     // migrate to ENUMS
     this.localStatus.put("inService", "IN_SERVICE");
     this.localStatus.put("outOfService", "OUT_OF_SERVICE");
@@ -112,6 +119,7 @@ public class Upgrade108to140
     this.taskTypes.put(TASK_EXPIRE_CACHE_OLD, "ExpireCacheTask");
   }
 
+  @Override
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
@@ -139,6 +147,7 @@ public class Upgrade108to140
     return conf;
   }
 
+  @Override
   public void upgrade(UpgradeMessage message)
       throws ConfigurationIsCorruptedException
   {

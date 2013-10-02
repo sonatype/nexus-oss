@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;

@@ -13,48 +13,40 @@
 
 package org.sonatype.nexus.util;
 
+import java.util.Map;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
+import org.sonatype.inject.Parameters;
+
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A simple class that holds Regex interpolator and has reference to Plexus context too, to centralize Plexus coupling
- * but make application Plexus interpolation capable too. This interpolator interpolates with Plexus Context,
- * Environment variables and System Properties, in this order.
- *
- * @author cstamas
+ * Default {@link ApplicationInterpolatorProvider}.
  */
 @Named
 @Singleton
 public class DefaultApplicationInterpolatorProvider
-    implements ApplicationInterpolatorProvider, Contextualizable
+    implements ApplicationInterpolatorProvider
 {
-  private RegexBasedInterpolator regexBasedInterpolator;
+  private final RegexBasedInterpolator interpolator;
 
-  public DefaultApplicationInterpolatorProvider() {
-    regexBasedInterpolator = new RegexBasedInterpolator();
+  @Inject
+  public DefaultApplicationInterpolatorProvider(final @Parameters Map<String, String> parameters) {
+    checkNotNull(parameters);
+    interpolator = new RegexBasedInterpolator();
+    interpolator.addValueSource(new MapBasedValueSource(parameters));
+    interpolator.addValueSource(new MapBasedValueSource(System.getenv()));
+    interpolator.addValueSource(new MapBasedValueSource(System.getProperties()));
   }
 
   public Interpolator getInterpolator() {
-    return regexBasedInterpolator;
+    return interpolator;
   }
-
-  public void contextualize(Context context)
-      throws ContextException
-  {
-    regexBasedInterpolator.addValueSource(new MapBasedValueSource(context.getContextData()));
-
-    // FIXME: bad, everything should come from Plexus context
-    regexBasedInterpolator.addValueSource(new MapBasedValueSource(System.getenv()));
-
-    // FIXME: bad, everything should come from Plexus context
-    regexBasedInterpolator.addValueSource(new MapBasedValueSource(System.getProperties()));
-  }
-
 }

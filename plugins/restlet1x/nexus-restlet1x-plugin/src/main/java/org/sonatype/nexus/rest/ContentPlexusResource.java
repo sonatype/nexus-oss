@@ -15,28 +15,36 @@ package org.sonatype.nexus.rest;
 
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = ManagedPlexusResource.class, hint = "content")
+@Named("content")
+@Singleton
+@Typed(ManagedPlexusResource.class)
 public class ContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
     implements ManagedPlexusResource
 {
-  @Requirement
-  private RepositoryRouter repositoryRouter;
-  
+  private final RepositoryRouter repositoryRouter;
+
+  @Inject
+  public ContentPlexusResource(final RepositoryRouter repositoryRouter) {
+    this.repositoryRouter = repositoryRouter;
+  }
+
   @Override
   public Object getPayloadInstance() {
     return null;

@@ -14,8 +14,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.AbstractRemovableConfigurable;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -28,23 +27,23 @@ import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.codehaus.plexus.util.StringUtils;
 
 public class ConfigurableRepository
-    extends AbstractConfigurable
+    extends AbstractRemovableConfigurable<CRepository>
 {
   private PublishedMirrors pMirrors;
-
-  @Override
-  protected CRepository getCurrentConfiguration(boolean forWrite) {
-    return ((CRepositoryCoreConfiguration) getCurrentCoreConfiguration()).getConfiguration(forWrite);
+  
+  public ConfigurableRepository() {
+    // empty for subclasses that are components and will be injected
+  }
+  
+  public ConfigurableRepository(ApplicationConfiguration applicationConfiguration) {
+    // TODO: sort out templates, as this is sub-optimal
+    // constructor for Templates
+    setApplicationConfiguration(applicationConfiguration);
   }
 
   @Override
-  protected Configurator getConfigurator() {
-    return null;
-  }
-
-  @Override
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return null;
+  public CRepositoryCoreConfiguration getCurrentCoreConfiguration() {
+    return (CRepositoryCoreConfiguration)super.getCurrentCoreConfiguration();
   }
 
   protected CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory() {
@@ -85,6 +84,7 @@ public class ConfigurableRepository
     getCurrentConfiguration(true).setId(id);
   }
 
+  @Override
   public String getName() {
     return getCurrentConfiguration(false).getName();
   }

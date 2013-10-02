@@ -16,6 +16,9 @@ package org.sonatype.nexus.rest.logs;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -26,11 +29,8 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -43,7 +43,8 @@ import org.restlet.resource.Variant;
  *
  * @author cstamas
  */
-@Component(role = PlexusResource.class, hint = "logsList")
+@Named
+@Singleton
 @Path(LogsListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
 public class LogsListPlexusResource
@@ -52,10 +53,14 @@ public class LogsListPlexusResource
   /**
    * The LogFile Manager
    */
-  @Requirement
-  private LogManager logManager;
+  private final LogManager logManager;
 
   public static final String RESOURCE_URI = "/logs";
+
+  @Inject
+  public LogsListPlexusResource(final LogManager logManager) {
+    this.logManager = logManager;
+  }
 
   @Override
   public Object getPayloadInstance() {

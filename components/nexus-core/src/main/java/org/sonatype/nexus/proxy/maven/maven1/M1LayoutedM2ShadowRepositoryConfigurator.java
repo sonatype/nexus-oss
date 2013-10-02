@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfigurator;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = M1LayoutedM2ShadowRepositoryConfigurator.class)
+@Singleton
+@Named
 public class M1LayoutedM2ShadowRepositoryConfigurator
     extends AbstractShadowRepositoryConfigurator
 {

@@ -21,6 +21,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -56,15 +61,15 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.DigesterUtils;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
-@Component(role = GroupRepository.class, hint = M2GroupRepository.ID, instantiationStrategy = "per-lookup",
-    description = "Maven2 Repository Group")
+@Named(M2GroupRepository.ID)
+@Typed(GroupRepository.class)
+@Description("Maven2 Repository Group")
 public class M2GroupRepository
     extends AbstractMavenGroupRepository
 {
@@ -73,20 +78,27 @@ public class M2GroupRepository
    */
   public static final String ID = Maven2ContentClass.ID;
 
+  private final ContentClass contentClass;
+
   /**
    * The GAV Calculator.
    */
-  @Requirement(hint = "maven2")
-  private GavCalculator gavCalculator;
+  private final GavCalculator gavCalculator;
 
   /**
    * Content class.
    */
-  @Requirement(hint = Maven2ContentClass.ID)
-  private ContentClass contentClass;
+  private final M2GroupRepositoryConfigurator m2GroupRepositoryConfigurator;
 
-  @Requirement
-  private M2GroupRepositoryConfigurator m2GroupRepositoryConfigurator;
+  @Inject
+  public M2GroupRepository(final @Named(Maven2ContentClass.ID) ContentClass contentClass, 
+                           final @Named("maven2") GavCalculator gavCalculator,
+                           final M2GroupRepositoryConfigurator m2GroupRepositoryConfigurator)
+  {
+    this.contentClass = checkNotNull(contentClass);
+    this.gavCalculator = checkNotNull(gavCalculator);
+    this.m2GroupRepositoryConfigurator = checkNotNull(m2GroupRepositoryConfigurator);
+  }
 
   @Override
   protected M2GroupRepositoryConfiguration getExternalConfiguration(boolean forWrite) {
@@ -103,10 +115,12 @@ public class M2GroupRepository
     };
   }
 
+  @Override
   public ContentClass getRepositoryContentClass() {
     return contentClass;
   }
 
+  @Override
   public GavCalculator getGavCalculator() {
     return gavCalculator;
   }

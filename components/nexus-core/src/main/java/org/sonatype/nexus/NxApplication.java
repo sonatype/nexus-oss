@@ -45,8 +45,7 @@ import com.google.common.base.Throwables;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This is a component that "boots" Nexus up. See org.sonatype.nexus.web.NexusBooterListener for example. This component
- * replaced {@link Nexus} (and it's implementation {@link DefaultNexus}.
+ * This is a component that "boots" Nexus up. See org.sonatype.nexus.web.NexusBooterListener for example.
  * 
  * @since 2.7.0
  */

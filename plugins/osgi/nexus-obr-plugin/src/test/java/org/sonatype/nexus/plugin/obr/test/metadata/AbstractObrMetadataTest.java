@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public abstract class AbstractObrMetadataTest
@@ -38,7 +39,7 @@ public abstract class AbstractObrMetadataTest
 
   protected ObrMetadataSource obrMetadataSource;
 
-  protected Repository testRepository;
+  protected M2Repository testRepository;
 
   protected NexusConfiguration nexusConfig;
 
@@ -52,7 +53,7 @@ public abstract class AbstractObrMetadataTest
 
     obrMetadataSource = lookup(ObrMetadataSource.class, "obr-bindex");
 
-    testRepository = lookup(Repository.class, "maven2");
+    testRepository = (M2Repository) lookup(Repository.class, "maven2");
 
     nexusConfig.loadConfiguration();
 

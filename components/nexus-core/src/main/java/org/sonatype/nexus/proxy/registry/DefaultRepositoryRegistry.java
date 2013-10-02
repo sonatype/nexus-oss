@@ -19,8 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -31,11 +37,10 @@ import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.slf4j.Logger;
+import com.google.common.eventbus.Subscribe;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Repository registry. It holds handles to registered repositories and sorts them properly. This class is used to get
@@ -52,18 +57,24 @@ import org.slf4j.LoggerFactory;
  *
  * @author cstamas
  */
-@Component(role = RepositoryRegistry.class)
+@Singleton
+@Named
 public class DefaultRepositoryRegistry
-    implements RepositoryRegistry, Disposable
+    extends AbstractLoggingComponent
+    implements RepositoryRegistry
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final EventBus eventBus;
 
-  @Requirement
-  private EventBus eventBus;
+  private final RepositoryTypeRegistry repositoryTypeRegistry;
 
-  @Requirement
-  private RepositoryTypeRegistry repositoryTypeRegistry;
+  @Inject
+  public DefaultRepositoryRegistry(final EventBus eventBus, final RepositoryTypeRegistry repositoryTypeRegistry) {
+    this.eventBus = checkNotNull(eventBus);
+    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
+    eventBus.register(this);
+  }
 
+  @Override
   public void addRepository(final Repository repository) {
     final RepositoryTypeDescriptor rtd =
         repositoryTypeRegistry.getRepositoryTypeDescriptor(repository.getProviderRole(),
@@ -71,25 +82,29 @@ public class DefaultRepositoryRegistry
 
     insertRepository(rtd, repository);
 
-    logger.info("Added repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
+    getLogger().info("Added repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
   }
 
+  @Override
   public void removeRepository(final String repoId)
       throws NoSuchRepositoryException
   {
     doRemoveRepository(repoId, false);
   }
 
+  @Override
   public void removeRepositorySilently(final String repoId)
       throws NoSuchRepositoryException
   {
     doRemoveRepository(repoId, true);
   }
 
+  @Override
   public List<Repository> getRepositories() {
     return Collections.unmodifiableList(new ArrayList<Repository>(getRepositoriesMap().values()));
   }
 
+  @Override
   public <T> List<T> getRepositoriesWithFacet(final Class<T> f) {
     final List<Repository> repositories = getRepositories();
 
@@ -104,6 +119,7 @@ public class DefaultRepositoryRegistry
     return Collections.unmodifiableList(result);
   }
 
+  @Override
   public Repository getRepository(final String repoId)
       throws NoSuchRepositoryException
   {
@@ -117,6 +133,7 @@ public class DefaultRepositoryRegistry
     }
   }
 
+  @Override
   public <T> T getRepositoryWithFacet(final String repoId, final Class<T> f)
       throws NoSuchRepositoryException
   {
@@ -130,10 +147,12 @@ public class DefaultRepositoryRegistry
     }
   }
 
+  @Override
   public boolean repositoryIdExists(final String repositoryId) {
     return getRepositoriesMap().containsKey(repositoryId);
   }
 
+  @Override
   public List<String> getGroupsOfRepository(final String repositoryId) {
     final ArrayList<String> result = new ArrayList<String>();
 
@@ -151,6 +170,7 @@ public class DefaultRepositoryRegistry
     return result;
   }
 
+  @Override
   public List<GroupRepository> getGroupsOfRepository(final Repository repository) {
     final ArrayList<GroupRepository> result = new ArrayList<GroupRepository>();
 
@@ -172,9 +192,10 @@ public class DefaultRepositoryRegistry
     return result;
   }
 
-  // Disposable plexus iface
+  // Cleanup
 
-  public void dispose() {
+  @Subscribe
+  public void on(final NexusStoppedEvent evt) {
     // kill the checker daemon threads
     for (Repository repository : getRepositoriesMap().values()) {
       killMonitorThread(repository.adaptToFacet(ProxyRepository.class));
@@ -230,7 +251,7 @@ public class DefaultRepositoryRegistry
     deleteRepository(rtd, repository, silently);
 
     if (!silently) {
-      logger.info("Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
+      getLogger().info("Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
     }
   }
 

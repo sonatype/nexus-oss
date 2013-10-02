@@ -13,10 +13,11 @@
 
 package org.sonatype.nexus.tasks.descriptors.properties;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
 
-@Component(role = ScheduledTaskPropertyDescriptor.class, hint = "PurgeOlderThanDays",
-    instantiationStrategy = "per-lookup")
+@Named("PurgeOlderThanDays")
+@Typed(ScheduledTaskPropertyDescriptor.class)
 public class PurgeOlderThanDaysPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
@@ -27,11 +28,14 @@ public class PurgeOlderThanDaysPropertyDescriptor
     setRequired(true);
   }
 
+  @Override
   public String getId() {
     return ID;
   }
 
+  @Override
   public String getName() {
     return "Purge older items than (days)";
   }
+
 }

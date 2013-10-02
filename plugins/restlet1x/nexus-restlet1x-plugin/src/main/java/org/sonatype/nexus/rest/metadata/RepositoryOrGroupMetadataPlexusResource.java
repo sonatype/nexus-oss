@@ -13,15 +13,15 @@
 
 package org.sonatype.nexus.rest.metadata;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -30,7 +30,8 @@ import org.restlet.resource.ResourceException;
 /**
  * @author Juven Xu
  */
-@Component(role = PlexusResource.class, hint = "RepositoryOrGroupMetadataPlexusResource")
+@Named
+@Singleton
 @Path(RepositoryOrGroupMetadataPlexusResource.RESOURCE_URI)
 public class RepositoryOrGroupMetadataPlexusResource
     extends AbstractMetadataPlexusResource

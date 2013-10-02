@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -82,7 +83,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -792,8 +792,9 @@ public class ManagerImpl
 
   @Override
   public DiscoveryConfig getRemoteDiscoveryConfig(final MavenProxyRepository mavenProxyRepository) {
+    // TODO: hacking external config out of repo!
     final AbstractMavenRepositoryConfiguration configuration =
-        (AbstractMavenRepositoryConfiguration) mavenProxyRepository.getCurrentCoreConfiguration()
+        (AbstractMavenRepositoryConfiguration)((AbstractMavenRepository) mavenProxyRepository).getCurrentCoreConfiguration()
             .getExternalConfiguration().getConfiguration(
                 false);
 
@@ -806,8 +807,9 @@ public class ManagerImpl
                                        final DiscoveryConfig config)
       throws IOException
   {
+    // TODO: hacking external config out of repo!
     final AbstractMavenRepositoryConfiguration configuration =
-        (AbstractMavenRepositoryConfiguration) mavenProxyRepository.getCurrentCoreConfiguration()
+        (AbstractMavenRepositoryConfiguration) ((AbstractMavenRepository) mavenProxyRepository).getCurrentCoreConfiguration()
             .getExternalConfiguration().getConfiguration(
                 false);
 
