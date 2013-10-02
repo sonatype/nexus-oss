@@ -17,8 +17,7 @@
 define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/ext/GridFilterBox'], function(Sonatype, Strings){
 Sonatype.repoServer.RoutesEditPanel = function(config) {
   var config = config || {},
-      defaultConfig = {},
-      gridFilterBox = NX.create('Nexus.ext.GridFilterBox');
+      defaultConfig = {};
 
   Ext.apply(this, config, defaultConfig);
 
@@ -272,9 +271,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
               scope : this,
               handler : this.deleteResourceHandler,
               disabled : !this.sp.checkPermission('nexus:routes', this.sp.DELETE)
-            },
-            '->',
-            gridFilterBox
+            }
         ],
 
         // grid view options
@@ -306,12 +303,18 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
         autoExpandColumn : 'routes-config-repos-col',
         disableSelection : false,
         viewConfig : {
-          emptyText : 'Click "Add" to create a Repository Route'
+          emptyText: 'No routes defined',
+          emptyTextWhileFiltering: 'No routes matched criteria: {criteria}'
         }
       });
   this.routesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
 
-  gridFilterBox.filteredGrid = this.routesGridPanel;
+  this.routesGridPanel.getTopToolbar().add([
+    '->',
+    NX.create('Nexus.ext.GridFilterBox', {
+      filteredGrid: this.routesGridPanel
+    })
+  ]);
 
   // END: Repo List ******************************************************
   // *********************************************************************

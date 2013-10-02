@@ -17,8 +17,7 @@
 define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/ext/GridFilterBox'], function(Sonatype, Strings){
 Sonatype.repoServer.SchedulesEditPanel = function(config) {
   var config = config || {},
-      defaultConfig = {},
-      gridFilterBox = NX.create('Nexus.ext.GridFilterBox');
+      defaultConfig = {};
 
   Ext.apply(this, config, defaultConfig);
 
@@ -901,9 +900,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
             },
             this.runButton,
             this.stopButton,
-            this.deleteButton,
-            '->',
-            gridFilterBox
+            this.deleteButton
         ],
 
         // grid view options
@@ -958,12 +955,18 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         autoExpandColumn : 'schedule-config-service-last-result-col',
         disableSelection : false,
         viewConfig : {
-          emptyText : 'Click "Add" to create a scheduled task.'
+          emptyText: 'No scheduled tasks defined',
+          emptyTextWhileFiltering: 'No scheduled tasks matched criteria: {criteria}'
         }
       });
   this.schedulesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
 
-  gridFilterBox.filteredGrid = this.schedulesGridPanel;
+  this.schedulesGridPanel.getTopToolbar().add([
+    '->',
+    NX.create('Nexus.ext.GridFilterBox', {
+      filteredGrid: this.schedulesGridPanel
+    })
+  ]);
 
   Sonatype.repoServer.SchedulesEditPanel.superclass.constructor.call(this, {
         layout : 'border',
