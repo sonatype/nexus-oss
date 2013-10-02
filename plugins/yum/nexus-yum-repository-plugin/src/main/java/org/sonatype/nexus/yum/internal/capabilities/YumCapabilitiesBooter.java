@@ -13,12 +13,14 @@
 
 package org.sonatype.nexus.yum.internal.capabilities;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
 import org.sonatype.nexus.yum.YumRegistry;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * Automatically create Yum capability.
@@ -26,10 +28,15 @@ import org.sonatype.nexus.yum.YumRegistry;
  * @since yum 3.0
  */
 @Named
-@Singleton
+@EagerSingleton
 public class YumCapabilitiesBooter
     extends CapabilityBooterSupport
 {
+
+  @Inject
+  public YumCapabilitiesBooter(final EventBus eventBus) {
+    super(eventBus);
+  }
 
   @Override
   protected void boot(final CapabilityRegistry registry)

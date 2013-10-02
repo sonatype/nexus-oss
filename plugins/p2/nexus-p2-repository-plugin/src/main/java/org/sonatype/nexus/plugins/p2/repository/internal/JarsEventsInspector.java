@@ -18,8 +18,8 @@ import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -37,8 +37,7 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retri
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.getP2Type;
 
 @Named
-@Singleton
-@EventBus.Managed
+@EagerSingleton
 public class JarsEventsInspector
 {
 
@@ -47,8 +46,11 @@ public class JarsEventsInspector
   private final Provider<P2MetadataGenerator> p2MetadataGenerator;
 
   @Inject
-  public JarsEventsInspector(final Provider<P2MetadataGenerator> p2MetadataGenerator) {
+  public JarsEventsInspector(final Provider<P2MetadataGenerator> p2MetadataGenerator,
+                             final EventBus eventBus)
+  {
     this.p2MetadataGenerator = checkNotNull(p2MetadataGenerator);
+    checkNotNull(eventBus).register(this);
   }
 
   @Subscribe

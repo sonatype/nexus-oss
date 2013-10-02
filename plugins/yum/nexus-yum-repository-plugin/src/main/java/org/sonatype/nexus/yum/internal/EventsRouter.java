@@ -18,8 +18,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -49,8 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since yum 3.0
  */
 @Named
-@Singleton
-@EventBus.Managed
+@EagerSingleton
 public class EventsRouter
 {
 
@@ -66,12 +65,14 @@ public class EventsRouter
   public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistry,
                       final Provider<YumRegistry> yumRegistryProvider,
                       final Provider<NexusScheduler> nexusScheduler,
-                      final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy)
+                      final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy,
+                      final EventBus eventBus)
   {
     this.steadyLinksStrategy = checkNotNull(steadyLinksStrategy);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
     this.nexusScheduler = checkNotNull(nexusScheduler);
+    checkNotNull(eventBus).register(this);
   }
 
   @AllowConcurrentEvents
