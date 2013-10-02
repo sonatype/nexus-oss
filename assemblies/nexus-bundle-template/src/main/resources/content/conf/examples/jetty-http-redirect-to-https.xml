@@ -21,6 +21,9 @@
 <!--                                                              -->
 <!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
 <!--                                                              -->
+<!-- Config that redirects all http requests to https. Expect     -->
+<!-- application-port-ssl to be defined in nexus.properties       -->
+<!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
