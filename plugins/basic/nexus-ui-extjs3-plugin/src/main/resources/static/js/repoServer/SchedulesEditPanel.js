@@ -14,7 +14,7 @@
  * Service Schedule Edit/Create panel layout and controller
  */
 
-define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/grid/GridFilterBox'], function(Sonatype, Strings){
+define('repoServer/SchedulesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/ext/GridFilterBox'], function(Sonatype, Strings){
 Sonatype.repoServer.SchedulesEditPanel = function(config) {
   var config = config || {},
       defaultConfig = {},

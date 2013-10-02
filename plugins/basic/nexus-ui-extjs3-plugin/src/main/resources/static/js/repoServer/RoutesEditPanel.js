@@ -14,7 +14,7 @@
  * Repository Routes Edit/Creat panel layout and controller
  */
 
-define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/grid/GridFilterBox'], function(Sonatype, Strings){
+define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings','Nexus/ext/GridFilterBox'], function(Sonatype, Strings){
 Sonatype.repoServer.RoutesEditPanel = function(config) {
   var config = config || {},
       defaultConfig = {},
