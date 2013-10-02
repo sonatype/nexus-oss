@@ -47,20 +47,23 @@ public class LockFileTest
     final LockFile lf1 = new LockFile(lockFile, "lf1".getBytes());
     final LockFile lf2 = new LockFile(lockFile, "lf2".getBytes());
 
-    // lf1 will obtain lock, lf2 should fail
-    assertThat(lf1.lock(), is(true));
-    assertThat(lf2.lock(), is(false));
+    try {
+      // lf1 will obtain lock, lf2 should fail
+      assertThat(lf1.lock(), is(true));
+      assertThat(lf2.lock(), is(false));
 
-    // repeating same step should be idempotent
-    assertThat(lf1.lock(), is(true));
-    assertThat(lf2.lock(), is(false));
+      // repeating same step should be idempotent
+      assertThat(lf1.lock(), is(true));
+      assertThat(lf2.lock(), is(false));
 
-    // verify who holds the lock
-    assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
-
-    // cleanup
-    lf1.release();
-    lf2.release();
+      // verify who holds the lock
+      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
+    }
+    finally {
+      // cleanup
+      lf1.release();
+      lf2.release();
+    }
   }
 
   /**
@@ -74,31 +77,33 @@ public class LockFileTest
 
     final LockFile lf1 = new LockFile(lockFile, "lf1".getBytes());
     final LockFile lf2 = new LockFile(lockFile, "lf2".getBytes());
+    try {
+      // lf1 will obtain lock, lf2 should fail
+      assertThat(lf1.lock(), is(true));
+      assertThat(lf2.lock(), is(false));
 
-    // lf1 will obtain lock, lf2 should fail
-    assertThat(lf1.lock(), is(true));
-    assertThat(lf2.lock(), is(false));
+      // verify who holds the lock
+      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
 
-    // verify who holds the lock
-    assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
+      // pass over the lock
+      lf1.release();
+      assertThat(lf2.lock(), is(true));
 
-    // pass over the lock
-    lf1.release();
-    assertThat(lf2.lock(), is(true));
+      // verify who holds the lock
+      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
 
-    // verify who holds the lock
-    assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
+      // repeating same step should be idempotent
+      assertThat(lf1.lock(), is(false));
+      assertThat(lf2.lock(), is(true));
 
-    // repeating same step should be idempotent
-    assertThat(lf1.lock(), is(false));
-    assertThat(lf2.lock(), is(true));
-
-    // verify who holds the lock
-    assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
-
-    // cleanup
-    lf1.release();
-    lf2.release();
+      // verify who holds the lock
+      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
+    }
+    finally {
+      // cleanup
+      lf1.release();
+      lf2.release();
+    }
   }
 
   /**
