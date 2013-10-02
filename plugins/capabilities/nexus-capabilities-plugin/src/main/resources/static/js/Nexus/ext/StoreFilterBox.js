@@ -38,7 +38,14 @@ NX.define('Nexus.ext.StoreFilterBox', {
    * @cfg {Function} to be used for filtering (defaults to string contains)
    */
   filterFn: function (valueToBeMatched, filterValue) {
-    return valueToBeMatched && valueToBeMatched.toLowerCase().indexOf(filterValue.toLowerCase()) != -1;
+    var stringValue;
+    if (valueToBeMatched) {
+      stringValue = valueToBeMatched.toString();
+      if (stringValue) {
+        return stringValue.toLowerCase().indexOf(filterValue.toLowerCase()) != -1;
+      }
+    }
+    return false;
   },
 
   /**
