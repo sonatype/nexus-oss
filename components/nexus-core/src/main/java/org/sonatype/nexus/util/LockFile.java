@@ -40,11 +40,11 @@ public class LockFile
 
   private final File lockFile;
 
+  private final byte[] payload;
+
   private FileLock fileLock;
 
   private RandomAccessFile randomAccessFile;
-
-  private byte[] payload;
 
   /**
    * Creates a LockFile with default payload (that contains the JVM name, usually {@code PID@hostname}).
@@ -114,6 +114,8 @@ public class LockFile
     close(randomAccessFile);
     randomAccessFile = null;
   }
+
+  // ==
 
   private void close(AutoCloseable closeable) {
     if (closeable != null) {
