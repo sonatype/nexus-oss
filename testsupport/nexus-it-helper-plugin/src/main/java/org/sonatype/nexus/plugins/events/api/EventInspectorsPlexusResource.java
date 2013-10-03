@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.plugins.events.api;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -36,8 +37,12 @@ public class EventInspectorsPlexusResource
 {
   private static final String RESOURCE_URI = "/eventInspectors/isCalmPeriod";
 
-  @Requirement
-  private EventInspectorHost eventInspectorHost;
+  private final EventInspectorHost eventInspectorHost;
+
+  @Inject
+  public EventInspectorsPlexusResource(final EventInspectorHost eventInspectorHost) {
+    this.eventInspectorHost = eventInspectorHost;
+  }
 
   @Override
   public String getResourceUri() {
