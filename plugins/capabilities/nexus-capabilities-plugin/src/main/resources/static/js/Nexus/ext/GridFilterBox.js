@@ -36,8 +36,8 @@ NX.define('Nexus.ext.GridFilterBox', {
     var self = this;
 
     Ext.apply(self, {
-      filteredStore: self.filteredGrid.gridStore || self.filteredGrid.store,
-      filteredFields: self.extractColumnsWithDataIndex(self.filteredGrid.getColumnModel())
+      filteredStore: self.findGridStore(self.filteredGrid),
+      filteredFields: self.findGridColumns(self.filteredGrid)
     });
 
     Nexus.ext.GridFilterBox.superclass.initComponent.call(self, arguments);
@@ -81,34 +81,75 @@ NX.define('Nexus.ext.GridFilterBox', {
   onGridReconfigured: function (grid, store, columnModel) {
     var self = this;
     self.logDebug('Grid ' + self.filteredGrid + ' reconfigured, binding to new store');
-    self.reconfigureStore(store, self.extractColumnsWithDataIndex(columnModel));
+    self.reconfigureStore(store, self.extractColumnsWithDataIndexFromModel(columnModel));
   },
 
   /**
+   * @private
+   * Finds the data store of a grid.
+   * @param grid to find store of
+   * @returns {Ext.data.Store} store or undefined if store could not be found
+   */
+  findGridStore: function (grid) {
+    return grid.getStore() || grid.gridStore || grid.store || grid.ds;
+  },
+
+  /**
+   * @private
+   * Find the columns of a grid.
+   * @param grid to find columns of
+   * @returns {Array} columns or undefined if columns could not be determined
+   */
+  findGridColumns: function (grid) {
+    var self = this,
+        colModel = grid.getColumnModel() || grid.cm || grid.colModel,
+        columns;
+
+    if (colModel) {
+      columns = self.extractColumnsWithDataIndexFromModel(colModel);
+    }
+    if (!columns) {
+      columns = self.extractColumnsWithDataIndex(grid.columns);
+    }
+    return columns;
+  },
+
+  /**
+   * @private
    * Returns the dataIndex property of all grid columns.
    * @returns {Array} of fields names
    */
-  extractColumnsWithDataIndex: function (columnModel) {
-    var columns,
-        filterFieldNames = [];
+  extractColumnsWithDataIndexFromModel: function (columnModel) {
+    var self = this,
+        columns;
 
     if (columnModel) {
       columns = columnModel.getColumnsBy(function () {
         return true;
       });
-      if (columns) {
-        Ext.each(columns, function (column) {
-          if (column.dataIndex) {
-            filterFieldNames.push(column.dataIndex);
-          }
-        });
-      }
+      return self.extractColumnsWithDataIndex(columns);
+    }
+  },
+
+  /**
+   * @private
+   * Returns the dataIndex property of all grid columns.
+   * @returns {Array} of fields names
+   */
+  extractColumnsWithDataIndex: function (columns) {
+    var filterFieldNames = [];
+
+    if (columns) {
+      Ext.each(columns, function (column) {
+        if (column.dataIndex) {
+          filterFieldNames.push(column.dataIndex);
+        }
+      });
     }
 
     if (filterFieldNames.length > 0) {
       return filterFieldNames;
     }
-    return [];
   }
 
 });
