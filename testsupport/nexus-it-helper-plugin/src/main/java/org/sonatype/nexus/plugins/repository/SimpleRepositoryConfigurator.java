@@ -13,11 +13,13 @@
 
 package org.sonatype.nexus.plugins.repository;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.repository.AbstractRepositoryConfigurator;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = SimpleRepositoryConfigurator.class)
+@Singleton
+@Named
 public class SimpleRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {

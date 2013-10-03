@@ -224,6 +224,8 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
   Sonatype.Events.fireEvent('repositoryGridInit', this, columns, toolbar);
 
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call(this, {
+        emptyText: 'No repositories defined',
+        emptyTextWhileFiltering: 'No repositories matched criteria: {criteria}',
         addMenuInitEvent : 'repositoryAddMenuInit',
         deleteButton : sp.checkPermission('nexus:repositories', sp.DELETE),
         rowClickEvent : 'repositoryViewInit',
@@ -232,9 +234,7 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
         dataAutoLoad : false,
         tabbedChildren : true,
         tbar : toolbar,
-        columns : columns,
-        emptyText: 'No repositories defined',
-        emptyTextWhileFiltering: 'No repositories matched criteria: {criteria}'
+        columns : columns
       });
   
   //allow plugins to access the properly built panel object

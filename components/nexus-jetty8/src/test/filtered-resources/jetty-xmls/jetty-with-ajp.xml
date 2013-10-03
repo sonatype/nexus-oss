@@ -23,53 +23,53 @@
 <!--                                                                 -->
 <!-- =============================================================== -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-    <!--
-        Documentation for this found at:
-        http://docs.codehaus.org/display/JETTY/Configuring+AJP13+Using+mod_jk
-    -->
-    <Call name="addConnector">
-        <Arg>
-            <New class="org.eclipse.jetty.ajp.Ajp13SocketConnector">
-                <Set name="port">${test-ajp-port}</Set>
-            </New>
-        </Arg>
-    </Call>
-    <Set name="handler">
-        <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-            <Set name="handlers">
-                <Array type="org.eclipse.jetty.server.Handler">
-                    <Item>
-                        <New id="Contexts"
-                            class="org.eclipse.jetty.server.handler.ContextHandlerCollection" />
-                    </Item>
-                    <Item>
-                        <New id="DefaultHandler"
-                            class="org.eclipse.jetty.server.handler.DefaultHandler" />
-                    </Item>
-                    <Item>
-                        <New id="RequestLog"
-                            class="org.eclipse.jetty.server.handler.RequestLogHandler" />
-                    </Item>
-                </Array>
-            </Set>
-        </New>
-    </Set>
-    <Call name="addLifeCycle">
-        <Arg>
-            <New class="org.eclipse.jetty.deploy.WebAppDeployer">
-                <Set name="contexts">
-                    <Ref id="Contexts" />
-                </Set>
-                <Set name="webAppDir">${basedir}/src/test/webapps
-                </Set>
-                <Set name="parentLoaderPriority">false</Set>
-                <Set name="extract">true</Set>
-                <Set name="allowDuplicates">false</Set>
-            </New>
-        </Arg>
-    </Call>
-    <Set name="stopAtShutdown">true</Set>
-    <Set name="sendServerVersion">true</Set>
-    <Set name="sendDateHeader">true</Set>
-    <Set name="gracefulShutdown">1000</Set>
+  <!--
+      Documentation for this found at:
+      http://docs.codehaus.org/display/JETTY/Configuring+AJP13+Using+mod_jk
+  -->
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.ajp.Ajp13SocketConnector">
+        <Set name="port">${test-ajp-port}</Set>
+      </New>
+    </Arg>
+  </Call>
+  <Set name="handler">
+    <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+      <Set name="handlers">
+        <Array type="org.eclipse.jetty.server.Handler">
+          <Item>
+            <New id="Contexts"
+                 class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+          </Item>
+          <Item>
+            <New id="DefaultHandler"
+                 class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+          </Item>
+          <Item>
+            <New id="RequestLog"
+                 class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
+          </Item>
+        </Array>
+      </Set>
+    </New>
+  </Set>
+  <Call name="addLifeCycle">
+    <Arg>
+      <New class="org.eclipse.jetty.deploy.WebAppDeployer">
+        <Set name="contexts">
+          <Ref id="Contexts"/>
+        </Set>
+        <Set name="webAppDir">${basedir}/src/test/webapps
+        </Set>
+        <Set name="parentLoaderPriority">false</Set>
+        <Set name="extract">true</Set>
+        <Set name="allowDuplicates">false</Set>
+      </New>
+    </Arg>
+  </Call>
+  <Set name="stopAtShutdown">true</Set>
+  <Set name="sendServerVersion">true</Set>
+  <Set name="sendDateHeader">true</Set>
+  <Set name="gracefulShutdown">1000</Set>
 </Configure>

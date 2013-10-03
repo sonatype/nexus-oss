@@ -955,6 +955,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         autoExpandColumn : 'schedule-config-service-last-result-col',
         disableSelection : false,
         viewConfig : {
+          deferEmptyText: false,
           emptyText: 'No scheduled tasks defined',
           emptyTextWhileFiltering: 'No scheduled tasks matched criteria: {criteria}'
         }

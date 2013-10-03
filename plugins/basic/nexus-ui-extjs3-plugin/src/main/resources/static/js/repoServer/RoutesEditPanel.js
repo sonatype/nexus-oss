@@ -303,6 +303,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
         autoExpandColumn : 'routes-config-repos-col',
         disableSelection : false,
         viewConfig : {
+          deferEmptyText: false,
           emptyText: 'No routes defined',
           emptyTextWhileFiltering: 'No routes matched criteria: {criteria}'
         }

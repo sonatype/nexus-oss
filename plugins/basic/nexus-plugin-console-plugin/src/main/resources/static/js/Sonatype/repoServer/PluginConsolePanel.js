@@ -61,6 +61,8 @@ define('Sonatype/repoServer/PluginConsolePanel', function() {
   };
 
   Ext.extend( Sonatype.repoServer.PluginConsolePanel, Sonatype.panels.GridViewer, {
+    emptyText: 'No plugins available',
+    emptyTextWhileFiltering: 'No plugins matched criteria: {criteria}'
   } );
 
   Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
