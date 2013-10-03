@@ -18,15 +18,13 @@ import java.util.Collection;
 import org.sonatype.plexus.appevents.Event;
 
 /**
- * Created with IntelliJ IDEA.
- * User: cstamas
- * Date: 10/2/13
- * Time: 15:15
- * To change this template use File | Settings | File Templates.
+ * An example component.
  */
 public interface PlexusPlugin
 {
   void newEventReceived(Event<?> evt);
+
+  int getEventReceived();
 
   Collection<String> getRegisteredRepositoryIds();
 

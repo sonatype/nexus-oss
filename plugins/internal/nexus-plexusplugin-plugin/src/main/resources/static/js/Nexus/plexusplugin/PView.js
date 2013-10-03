@@ -17,6 +17,18 @@
  * @since 2.5
  */
 NX.define('Nexus.plexusplugin.PView', {
+  extend : 'Ext.Panel',
+  /*
+   * config object: { feedUrl ; required title }
+   */
+  constructor : function(cfg) {
+    var self = this;
+
+    Ext.apply(self, cfg || {}, {
+      feedUrl : '',
+      title : 'PlexusPlugin Plugin'
+    });
+  }
 }, function() {
   Sonatype.config.repos.urls.feeds = Sonatype.config.servicePath + '/feeds';
   Sonatype.Events.addListener('nexusNavigationInit', function(panel) {
@@ -25,7 +37,7 @@ NX.define('Nexus.plexusplugin.PView', {
       enabled : sp.checkPermission('nexus:status', sp.READ),
       sectionId : 'st-nexus-views',
       title : 'PlexusPlugin Output',
-      tabId : 'plxplg-view-system-changes',
+      tabId : 'plxplg-view',
       tabCode : Nexus.plexusplugin.PView
     });
   });

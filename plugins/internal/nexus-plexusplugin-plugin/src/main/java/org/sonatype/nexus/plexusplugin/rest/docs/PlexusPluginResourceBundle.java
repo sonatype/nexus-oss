@@ -18,13 +18,6 @@ import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-/**
- * Created with IntelliJ IDEA.
- * User: cstamas
- * Date: 10/2/13
- * Time: 16:14
- * To change this template use File | Settings | File Templates.
- */
 @Component(role = NexusResourceBundle.class, hint = "PlexusPluginResourceBundle")
 public class PlexusPluginResourceBundle
     extends AbstractDocumentationNexusResourceBundle

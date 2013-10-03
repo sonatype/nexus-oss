@@ -34,11 +34,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
- * Created with IntelliJ IDEA.
- * User: cstamas
- * Date: 10/2/13
- * Time: 15:15
- * To change this template use File | Settings | File Templates.
+ * Default implementation of {@link PlexusPlugin}.
  */
 @Component(role = PlexusPlugin.class)
 public class DefaultPlexusPlugin
@@ -61,6 +57,11 @@ public class DefaultPlexusPlugin
   @Override
   public void newEventReceived(final Event<?> evt) {
     atomicInteger.incrementAndGet();
+  }
+
+  @Override
+  public int getEventReceived() {
+    return atomicInteger.get();
   }
 
   @Override

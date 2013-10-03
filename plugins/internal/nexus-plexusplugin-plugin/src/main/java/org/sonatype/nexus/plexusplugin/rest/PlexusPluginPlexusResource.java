@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rest.feeds;
+package org.sonatype.nexus.plexusplugin.rest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,6 +33,9 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
+/**
+ * Example resource defined as Plexus component.
+ */
 @Path(PlexusPluginPlexusResource.PLEXUSPLUGIN_PATHPREFIX)
 @Produces("text/xml")
 @Component(role = PlexusResource.class, hint = "PlexusPluginPlexusResource")
@@ -76,7 +79,7 @@ public class PlexusPluginPlexusResource
   public PlexusPluginResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
-    final PlexusPluginResponse plexusPluginResponse = new PlexusPluginResponse();
+    final PlexusPluginResponse plexusPluginResponse = new PlexusPluginResponse(plexusPlugin.getEventReceived());
 
     plexusPluginResponse.getRepositoryIds().addAll(plexusPlugin.getRegisteredRepositoryIds());
     plexusPluginResponse.getRepositoryTypes().addAll(plexusPlugin.getRegisteredRepositoryTypes());

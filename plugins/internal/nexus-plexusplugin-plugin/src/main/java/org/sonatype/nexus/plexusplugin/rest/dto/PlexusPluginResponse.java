@@ -18,13 +18,6 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-/**
- * Created with IntelliJ IDEA.
- * User: cstamas
- * Date: 10/2/13
- * Time: 15:28
- * To change this template use File | Settings | File Templates.
- */
 @XStreamAlias("plexus-plugin-response")
 public class PlexusPluginResponse
 {
@@ -36,11 +29,18 @@ public class PlexusPluginResponse
 
   private final List<String> scheduledTaskNames;
 
-  public PlexusPluginResponse() {
+  private final int eventsReceived;
+
+  public PlexusPluginResponse(final int eventsReceived) {
+    this.eventsReceived = eventsReceived;
     this.repositoryIds = Lists.newArrayList();
     this.repositoryTypes = Lists.newArrayList();
     this.contentClasses = Lists.newArrayList();
     this.scheduledTaskNames = Lists.newArrayList();
+  }
+
+  public int getEventsReceived() {
+    return eventsReceived;
   }
 
   public List<String> getRepositoryIds() {

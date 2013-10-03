@@ -13,26 +13,14 @@
 
 package org.sonatype.nexus.testsuite.plexusplugin;
 
-import java.util.Collection;
-
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 import com.sun.jersey.api.client.ClientResponse;
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
+
 
 /**
  * Support for PlexusPlugin plugin integration tests.
@@ -50,9 +38,9 @@ public class PlexusPluginLives
   @Test
   public void fetchAndValidatePlexusPluginResource() {
     final ClientResponse response =((JerseyNexusClient)client()).serviceResource("plexusplugin").get(ClientResponse.class);
-
+    // this check is completely enough, as if plexus DI would not work, server side components would NPE
+    // and some sort of error (most probably Server Error 500) would be returned.
     assertThat(response.getStatus(), equalTo(200));
-
   }
 
 }

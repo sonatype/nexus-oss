@@ -21,6 +21,9 @@ import org.sonatype.plexus.appevents.Event;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+/**
+ * Simple event inspector that routes all the events to {@link PlexusPlugin}.
+ */
 @Component(role = EventInspector.class, hint = "plexusplugin")
 public class PlexusPluginEventInspector
     extends AbstractEventInspector
