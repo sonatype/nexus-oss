@@ -550,3 +550,9 @@ body.x-body-masked .x-window-plain .x-window-mc {
 .x-linkbtn-mc {
     text-align: center;
 }
+
+/* Remove x from search box on IE 10 */
+.nx-searchbox::-ms-clear {
+  width : 0;
+  height: 0;
+}

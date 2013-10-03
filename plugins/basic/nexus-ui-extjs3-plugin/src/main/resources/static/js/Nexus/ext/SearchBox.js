@@ -34,6 +34,7 @@ NX.define('Nexus.ext.SearchBox', {
 
     self.searchField = NX.create('Ext.form.TextField', {
       enableKeyEvents: true,
+      cls: 'nx-searchbox',
       style: {
         paddingLeft: '22px',
         paddingRight: '22px'
