@@ -16,6 +16,11 @@ package org.sonatype.security.realms.simple;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.inject.Description;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -23,8 +28,6 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
-
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * This is a simple implementation that will expose a custom user store as Users. A UserManager exposes
@@ -35,7 +38,10 @@ import org.codehaus.plexus.component.annotations.Component;
  */
 // This class must have a role of 'UserManager', and the hint, must match the result of getSource() and the hint
 // of the corresponding Realm.
-@Component(role = UserManager.class, hint = "Simple", description = "Simple User Manager")
+@Singleton
+@Named("Simple")
+@Typed(UserManager.class)
+@Description("Simple User Manager")
 public class SimpleUserManager
     extends AbstractReadOnlyUserManager
 {

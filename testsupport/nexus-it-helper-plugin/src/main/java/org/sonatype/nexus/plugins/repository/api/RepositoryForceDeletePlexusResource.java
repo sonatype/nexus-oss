@@ -13,18 +13,20 @@
 
 package org.sonatype.nexus.plugins.repository.api;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
-@Component(role = PlexusResource.class, hint = "RepositoryForceDeletePlexusResource")
+@Singleton
+@Named
 public class RepositoryForceDeletePlexusResource
     extends AbstractNexusPlexusResource
 {

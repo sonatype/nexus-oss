@@ -15,11 +15,12 @@ package org.sonatype.nexus.plugins.ithelper.log;
 
 import java.util.Date;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -30,7 +31,8 @@ import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(role = PlexusResource.class, hint = "LogHelperResource")
+@Singleton
+@Named
 public class LogHelperPlexusResource
     extends AbstractPlexusResource
 {
