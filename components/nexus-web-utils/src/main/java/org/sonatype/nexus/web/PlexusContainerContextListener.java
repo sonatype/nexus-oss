@@ -30,6 +30,7 @@ import org.sonatype.appcontext.Factory;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
+import org.sonatype.nexus.util.LockFile;
 
 import com.google.inject.Module;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -54,6 +55,8 @@ public class PlexusContainerContextListener
 
   private AppContext appContext;
 
+  private LockFile lockFile;
+
   private PlexusContainer plexusContainer;
 
   /**
@@ -69,6 +72,12 @@ public class PlexusContainerContextListener
       try {
         appContext =
             createContainerContext(context, (AppContext) context.getAttribute(AppContext.APPCONTEXT_KEY));
+
+        final File nexusWorkdir = new File(String.valueOf(appContext.get("nexus-work"))).getCanonicalFile();
+        lockFile = new LockFile(new File(nexusWorkdir, "nexus.lock"));
+        if (!lockFile.lock()) {
+          throw new IllegalStateException("Nexus work directory already is use!");
+        }
 
         final ContainerConfiguration plexusConfiguration =
             new DefaultContainerConfiguration().setName(context.getServletContextName()).setContainerConfigurationURL(
@@ -110,6 +119,9 @@ public class PlexusContainerContextListener
   public void contextDestroyed(final ServletContextEvent sce) {
     if (plexusContainer != null) {
       plexusContainer.dispose();
+    }
+    if (lockFile != null) {
+      lockFile.release();
     }
   }
 
