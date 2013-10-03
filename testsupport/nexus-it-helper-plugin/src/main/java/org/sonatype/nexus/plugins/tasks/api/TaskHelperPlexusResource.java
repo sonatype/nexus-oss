@@ -13,13 +13,14 @@
 
 package org.sonatype.nexus.plugins.tasks.api;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.ScheduledTask;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -33,7 +34,8 @@ import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.ge
 import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.isTaskCompleted;
 import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.sleep;
 
-@Component(role = PlexusResource.class, hint = "TaskHelperResource")
+@Singleton
+@Named
 public class TaskHelperPlexusResource
     extends AbstractPlexusResource
 {

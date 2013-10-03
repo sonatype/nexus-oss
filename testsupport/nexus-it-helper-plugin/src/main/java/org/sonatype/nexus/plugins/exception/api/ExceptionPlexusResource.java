@@ -13,13 +13,14 @@
 
 package org.sonatype.nexus.plugins.exception.api;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -27,15 +28,17 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-@Component(role = PlexusResource.class, hint = "ExceptionPlexusResource")
+@Singleton
+@Named
 public class ExceptionPlexusResource
     extends AbstractPlexusResource
 {
-  @Requirement
-  private ErrorReportingManager manager;
+  private final ErrorReportingManager manager;
 
-  public ExceptionPlexusResource() {
+  @Inject
+  public ExceptionPlexusResource(final ErrorReportingManager manager) {
     this.setModifiable(true);
+    this.manager = manager;
   }
 
   @Override
