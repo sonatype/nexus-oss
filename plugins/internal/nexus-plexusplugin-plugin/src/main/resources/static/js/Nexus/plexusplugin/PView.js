@@ -12,9 +12,10 @@
  */
 /*global NX,Nexus,Ext,Sonatype*/
 /**
- * Inner view on selecting one feed.
+ * Example Plexusplugin plugin UI. Only to demonstrate how Plexus plugins work
+ * and can contribute to UI.
  *
- * @since 2.5
+ * @since 2.7
  */
 NX.define('Nexus.plexusplugin.PView', {
   extend : 'Ext.Panel',
