@@ -17,6 +17,7 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -27,8 +28,9 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-@Named
+@Named("default")
 @Typed(SimpleRepository.class)
+@Description("Simple Repository")
 public class SimpleRepositoryImpl
     extends AbstractRepository
     implements SimpleRepository
