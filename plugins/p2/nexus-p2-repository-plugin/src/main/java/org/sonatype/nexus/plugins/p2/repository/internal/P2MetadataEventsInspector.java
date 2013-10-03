@@ -16,8 +16,8 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -32,16 +32,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
 
 @Named
-@Singleton
-@EventBus.Managed
+@EagerSingleton
 public class P2MetadataEventsInspector
 {
 
   private final Provider<P2RepositoryAggregator> p2RepositoryAggregator;
 
   @Inject
-  public P2MetadataEventsInspector(final Provider<P2RepositoryAggregator> p2RepositoryAggregator) {
+  public P2MetadataEventsInspector(final Provider<P2RepositoryAggregator> p2RepositoryAggregator,
+                                   final EventBus eventBus)
+  {
     this.p2RepositoryAggregator = checkNotNull(p2RepositoryAggregator);
+    checkNotNull(eventBus).register(this);
   }
 
   @Subscribe

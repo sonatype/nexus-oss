@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -53,8 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  */
 @Named
-@Singleton
-@EventBus.Managed
+@EagerSingleton
 public class DefaultEventInspectorHost
     extends AbstractLoggingComponent
     implements EventInspectorHost
@@ -62,15 +61,12 @@ public class DefaultEventInspectorHost
   private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
       "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500);
 
-  private final EventBus eventBus;
-  
   private final Map<String, EventInspector> eventInspectors;
 
   private final NexusExecutorService hostThreadPool;
 
   @Inject
   public DefaultEventInspectorHost(final EventBus eventBus, final Map<String, EventInspector> eventInspectors) {
-    this.eventBus = checkNotNull(eventBus);
     this.eventInspectors = checkNotNull(eventInspectors);
 
     // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
@@ -78,7 +74,7 @@ public class DefaultEventInspectorHost
         new ThreadPoolExecutor(0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
             new NexusThreadFactory("nxevthost", "Event Inspector Host"), new CallerRunsPolicy());
     this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
-    eventBus.register(this);
+    checkNotNull(eventBus).register(this);
   }
 
   // == Stop
@@ -92,7 +88,6 @@ public class DefaultEventInspectorHost
 
   @Override
   public void shutdown() {
-    // no need to un-register, as this is EventBus.Managed!
     // we need clean shutdown, wait all background event inspectors to finish to have consistent state
     hostThreadPool.shutdown();
     try {

@@ -16,8 +16,8 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -31,16 +31,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.0
  */
 @Named
-@Singleton
-@EventBus.Managed
+@EagerSingleton
 public class CapabilityRegistryBooter
 {
 
   private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
 
   @Inject
-  public CapabilityRegistryBooter(final Provider<DefaultCapabilityRegistry> capabilityRegistry) {
+  public CapabilityRegistryBooter(final Provider<DefaultCapabilityRegistry> capabilityRegistry,
+                                  final EventBus eventBus)
+  {
     this.capabilityRegistry = checkNotNull(capabilityRegistry);
+    checkNotNull(eventBus).register(this);
   }
 
   @Subscribe

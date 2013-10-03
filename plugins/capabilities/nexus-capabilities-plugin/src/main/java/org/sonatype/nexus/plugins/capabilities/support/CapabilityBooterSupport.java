@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
@@ -28,6 +30,7 @@ import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.capabilities;
 
 /**
@@ -35,22 +38,27 @@ import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenc
  *
  * @since 2.2
  */
-@EventBus.Managed
 public abstract class CapabilityBooterSupport
 {
 
   private static final Logger log = LoggerFactory.getLogger(CapabilityBooterSupport.class);
 
-  @Subscribe
-  public void handle(final CapabilityRegistryEvent.AfterLoad event) {
-    final CapabilityRegistry registry = event.getEventSender();
-
-    try {
-      boot(registry);
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+  @Inject
+  public void installEventBus(final EventBus eventBus) {
+    checkNotNull(eventBus).register(new Object()
+    {
+      @Subscribe
+      public void handle(final CapabilityRegistryEvent.AfterLoad event) {
+        eventBus.unregister(this);
+        final CapabilityRegistry registry = event.getEventSender();
+        try {
+          boot(registry);
+        }
+        catch (Exception e) {
+          throw Throwables.propagate(e);
+        }
+      }
+    });
   }
 
   protected abstract void boot(final CapabilityRegistry registry)
