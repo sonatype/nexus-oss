@@ -39,19 +39,12 @@
   </Call>
 
   <Set name="handler">
-    <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-      <!-- The following configuration disables JSP taglib support, the validation of which slows down Jetty's startup significantly. -->
-      <Call name="addLifeCycleListener">
-        <Arg>
-          <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
-        </Arg>
-      </Call>
-    </New>
+    <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
   </Set>
 
   <New id="ctx1" class="org.eclipse.jetty.webapp.WebAppContext">
     <Arg>
-      <Ref id="Contexts" />
+      <Ref id="Contexts"/>
     </Arg>
     <Arg>${basedir}/src/test/webapps/monkey.war</Arg>
     <Arg>/context1</Arg>
