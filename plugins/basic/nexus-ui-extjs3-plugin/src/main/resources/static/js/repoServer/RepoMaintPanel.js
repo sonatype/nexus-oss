@@ -232,7 +232,9 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
         dataAutoLoad : false,
         tabbedChildren : true,
         tbar : toolbar,
-        columns : columns
+        columns : columns,
+        emptyText: 'No repositories defined',
+        emptyTextWhileFiltering: 'No repositories matched criteria: {criteria}'
       });
   
   //allow plugins to access the properly built panel object

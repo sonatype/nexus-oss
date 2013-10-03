@@ -69,7 +69,7 @@
  * url: the URl to load the data from.
  */
 NX.define('Sonatype.panels.GridViewer', {
-  requires : ['Nexus.panels.AutoTabPanel'],
+  requires : ['Nexus.panels.AutoTabPanel','Nexus.ext.GridFilterBox'],
   requirejs : ['Sonatype/view', 'Nexus/config', 'Nexus/navigation', 'Sonatype/utils'],
   extend : 'Ext.Panel',
 
@@ -204,6 +204,12 @@ NX.define('Sonatype.panels.GridViewer', {
       autoExpandColumn : this.autoExpandColumn,
       disableSelection : false,
 
+      viewConfig : {
+        emptyText: this.emptyText,
+        deferEmptyText: false,
+        emptyTextWhileFiltering: this.emptyTextWhileFiltering
+      },
+
       listeners : {
         rowcontextmenu : {
           fn : this.rowContextMenuHandler,
@@ -250,6 +256,12 @@ NX.define('Sonatype.panels.GridViewer', {
     if (toolbar) {
       this.tbar = this.tbar.concat(toolbar);
     }
+    this.tbar.push(
+        '->',
+        NX.create('Nexus.ext.GridFilterBox', {
+          filteredGrid: this.gridPanel
+        })
+    );
 
     this.cardPanel = new Ext.Panel({
       layout : 'card',
