@@ -15,8 +15,9 @@ package org.sonatype.nexus.repositories.nexus4807;
 
 import org.sonatype.nexus.proxy.repository.AbstractRepositoryConfigurator;
 
-// see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
-//@Component( role = Nexus4807RepositoryConfigurator.class )
+/**
+ * @see Nexus4807RepositoryImpl
+ */
 public class Nexus4807RepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {

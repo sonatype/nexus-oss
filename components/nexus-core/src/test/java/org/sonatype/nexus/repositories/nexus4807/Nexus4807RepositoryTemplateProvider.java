@@ -16,7 +16,9 @@ package org.sonatype.nexus.repositories.nexus4807;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
-// see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
+/**
+ * @see Nexus4807RepositoryImpl
+ */
 public class Nexus4807RepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
 {

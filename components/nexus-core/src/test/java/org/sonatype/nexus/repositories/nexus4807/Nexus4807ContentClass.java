@@ -15,8 +15,9 @@ package org.sonatype.nexus.repositories.nexus4807;
 
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 
-// see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
-//@Component( role = ContentClass.class, hint = Nexus4807ContentClass.ID )
+/**
+ * @see Nexus4807RepositoryImpl
+ */
 public class Nexus4807ContentClass
     extends AbstractIdContentClass
 {

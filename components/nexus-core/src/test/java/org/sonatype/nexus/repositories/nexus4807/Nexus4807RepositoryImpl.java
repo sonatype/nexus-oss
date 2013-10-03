@@ -26,18 +26,19 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-// see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
-//@Component( role = Repository.class, hint = Nexus4807RepositoryImpl.ID, instantiationStrategy = "per-lookup", description = "NEXUS4807 Repository" )
+/**
+ * A test repository component. It is defined as component in
+ * nexus-core/src/test/resources/org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
+ * as it is used in a Plexus Test case.
+ */
 public class Nexus4807RepositoryImpl
     extends AbstractRepository
     implements Nexus4807Repository, Disposable
 {
   public static final String ID = "nexus4807";
 
-  @Requirement(hint = Nexus4807ContentClass.ID)
   private ContentClass contentClass;
 
-  @Requirement
   private Nexus4807RepositoryConfigurator configurator;
 
   private final RepositoryKind repositoryKind;

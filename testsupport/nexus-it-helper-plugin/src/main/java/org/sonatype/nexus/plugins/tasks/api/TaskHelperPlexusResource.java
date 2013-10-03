@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.plugins.tasks.api;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -40,8 +41,12 @@ public class TaskHelperPlexusResource
     extends AbstractPlexusResource
 {
 
-  @Requirement
-  private NexusScheduler nexusScheduler;
+  private final NexusScheduler nexusScheduler;
+
+  @Inject
+  public TaskHelperPlexusResource(final NexusScheduler nexusScheduler) {
+    this.nexusScheduler = nexusScheduler;
+  }
 
   @Override
   public Object getPayloadInstance() {
