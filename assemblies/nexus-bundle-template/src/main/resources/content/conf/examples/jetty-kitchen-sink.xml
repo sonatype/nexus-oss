@@ -21,6 +21,8 @@
 <!--                                                              -->
 <!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
 <!--                                                              -->
+<!-- Combines jmx, https enforcement, and access logging.         -->
+<!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
@@ -28,11 +30,35 @@
     <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
   </Set>
 
+  <!--
+  ==== HTTPS ====
+  Set the following inside nexus.properties:
+  application-port-ssl: the port to listen for https connections
+  -->
   <Call name="addConnector">
     <Arg>
       <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port}</Set>
+        <Set name="confidentialPort">${application-port-ssl}</Set>
+      </New>
+    </Arg>
+  </Call>
+
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSslSelectChannelConnector">
+        <Arg>
+          <New class="org.eclipse.jetty.util.ssl.SslContextFactory">
+            <Set name="keyStore">./conf/ssl/keystore.jks</Set>
+            <Set name="trustStore">./conf/ssl/keystore.jks</Set>
+            <Set name="keyStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <Set name="keyManagerPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <Set name="trustStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+          </New>
+        </Arg>
+        <Set name="host">${application-host}</Set>
+        <Set name="port">${application-port-ssl}</Set>
       </New>
     </Arg>
   </Call>
@@ -44,17 +70,52 @@
         <Arg>${nexus-webapp-context-path}</Arg>
         <Set name="extractWAR">false</Set>
         <Set name="throwUnavailableOnStartupException">true</Set>
+        <!-- enforce use of the confidential port -->
+        <Set name="securityHandler">
+          <New class="org.eclipse.jetty.security.ConstraintSecurityHandler">
+            <Call name="addConstraintMapping">
+              <Arg>
+                <New class="org.eclipse.jetty.security.ConstraintMapping">
+                  <Set name="pathSpec">/*</Set>
+                  <Set name="constraint">
+                    <New class="org.eclipse.jetty.util.security.Constraint">
+                      <!-- 2 means CONFIDENTIAL. 1 means INTEGRITY -->
+                      <Set name="dataConstraint">2</Set>
+                    </New>
+                  </Set>
+                </New>
+              </Arg>
+            </Call>
+          </New>
+        </Set>
       </New>
     </Arg>
   </New>
 
+  <New id="RequestLogHandler" class="org.eclipse.jetty.server.handler.RequestLogHandler">
+    <Set name="requestLog">
+      <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
+        <Arg>${nexus-work}/logs/yyyy_mm_dd.access.log</Arg>
+        <Set name="retainDays">90</Set>
+        <Set name="append">true</Set>
+        <Set name="extended">false</Set>
+        <Set name="LogTimeZone">GMT</Set>
+      </New>
+    </Set>
+  </New>
+
   <Set name="handler">
     <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-      <Call name="addHandler">
-        <Arg>
-          <Ref id="NexusHandler"/>
-        </Arg>
-      </Call>
+      <Set name="handlers">
+        <Array type="org.eclipse.jetty.server.Handler">
+          <Item>
+            <Ref id="NexusHandler"/>
+          </Item>
+          <Item>
+            <Ref id="RequestLogHandler"/>
+          </Item>
+        </Array>
+      </Set>
     </New>
   </Set>
 
@@ -73,7 +134,7 @@
   <!-- explicitly setting rmi server hostname as IP address here can help avoid network routing issues -->
   <Call name="setProperty" class="java.lang.System">
     <Arg>java.rmi.server.hostname</Arg>
-    <Arg>${jmx-host}</Arg>
+    <Arg><SystemProperty name="java.rmi.server.hostname" default="${jmx-host}"/></Arg>
   </Call>
 
   <!-- WARNING defaulting convenience over security; expose JMX to any remote host with no ssl/auth -->
