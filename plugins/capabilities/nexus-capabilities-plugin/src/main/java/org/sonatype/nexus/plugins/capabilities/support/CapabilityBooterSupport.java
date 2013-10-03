@@ -44,20 +44,21 @@ public abstract class CapabilityBooterSupport
   private static final Logger log = LoggerFactory.getLogger(CapabilityBooterSupport.class);
 
   @Inject
-  public CapabilityBooterSupport(final EventBus eventBus) {
-    checkNotNull(eventBus).register(this);
-  }
-
-  @Subscribe
-  public void handle(final CapabilityRegistryEvent.AfterLoad event) {
-    final CapabilityRegistry registry = event.getEventSender();
-
-    try {
-      boot(registry);
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+  public void installEventBus(final EventBus eventBus) {
+    checkNotNull(eventBus).register(new Object()
+    {
+      @Subscribe
+      public void handle(final CapabilityRegistryEvent.AfterLoad event) {
+        eventBus.unregister(this);
+        final CapabilityRegistry registry = event.getEventSender();
+        try {
+          boot(registry);
+        }
+        catch (Exception e) {
+          throw Throwables.propagate(e);
+        }
+      }
+    });
   }
 
   protected abstract void boot(final CapabilityRegistry registry)
