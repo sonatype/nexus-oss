@@ -27,11 +27,11 @@ import static org.hamcrest.Matchers.equalTo;
  *
  * @since 2.7.0
  */
-public class PlexusPluginLives
+public class PlexusPluginLivesIT
     extends PlexusPluginITSupport
 {
 
-  public PlexusPluginLives(final String nexusBundleCoordinates) {
+  public PlexusPluginLivesIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
 
