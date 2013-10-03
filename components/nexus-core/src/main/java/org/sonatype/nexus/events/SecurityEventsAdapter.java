@@ -15,8 +15,8 @@ package org.sonatype.nexus.events;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
 import org.sonatype.security.events.SecurityConfigurationChanged;
@@ -36,8 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.3
  */
 @Named
-@Singleton
-@EventBus.Managed
+@EagerSingleton
 public class SecurityEventsAdapter
 {
 
@@ -45,7 +44,7 @@ public class SecurityEventsAdapter
 
   @Inject
   public SecurityEventsAdapter(final EventBus eventBus) {
-    this.eventBus = checkNotNull(eventBus);
+    this.eventBus = checkNotNull(eventBus).register(this);
   }
 
   @AllowConcurrentEvents

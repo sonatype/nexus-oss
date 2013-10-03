@@ -16,8 +16,8 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -32,8 +32,7 @@ import com.google.common.eventbus.Subscribe;
  * @since 2.0
  */
 @Named
-@Singleton
-@EventBus.Managed
+@EagerSingleton
 public class NexusIsActiveCondition
     extends ConditionSupport
     implements Condition
@@ -62,12 +61,12 @@ public class NexusIsActiveCondition
 
   @Override
   protected void doBind() {
-    // do nothing (EventBus registration already done via @EventBus.Managed)
+    getEventBus().register(this);
   }
 
   @Override
   protected void doRelease() {
-    // do nothing (EventBus un-registration already done via @EventBus.Managed)
+    getEventBus().unregister(this);
   }
 
   @Override
