@@ -124,6 +124,9 @@ Sonatype.repoServer.RoleEditPanel = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.RoleEditPanel, Sonatype.panels.GridViewer, {
+      emptyText: 'No roles defined',
+      emptyTextWhileFiltering: 'No roles matched criteria: {criteria}',
+
       convertMapping : function(value, parent) {
         var mappingRec = this.externalMappingStore.getById(value);
         if (mappingRec)

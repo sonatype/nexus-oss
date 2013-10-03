@@ -118,6 +118,9 @@ NX.define('Sonatype.repoServer.UserEditPanel', {
     Sonatype.Events.on('userMenuInit', this.onUserMenuInit, this);
 
     Sonatype.repoServer.UserEditPanel.superclass.constructor.call(this, {
+      emptyText: 'No users defined',
+      emptyTextWhileFiltering: 'No users matched criteria: {criteria}',
+
       addMenuInitEvent : 'userAddMenuInit',
       deleteButton : this.sp.checkPermission('security:users', this.sp.DELETE),
       rowClickEvent : 'userViewInit',

@@ -172,6 +172,9 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
+      emptyText: 'No privilege defined',
+      emptyTextWhileFiltering: 'No privilege matched criteria: {criteria}',
+
       convertRepository : function(value, parent) {
         var i, targetPriv = false;
         for (i = 0; i < parent.properties.length; i+=1)

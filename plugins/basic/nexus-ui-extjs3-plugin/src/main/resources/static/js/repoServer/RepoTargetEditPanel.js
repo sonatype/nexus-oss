@@ -308,7 +308,9 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
         autoExpandColumn : 'patterns-expandable-col',
         disableSelection : false,
         viewConfig : {
-          emptyText : 'Click "Add" to create a new Repository Target.'
+          deferEmptyText: false,
+          emptyText: 'No repository targets defined',
+          emptyTextWhileFiltering: 'No repository targets matched criteria: {criteria}'
         }
       });
   this.repoTargetsGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
