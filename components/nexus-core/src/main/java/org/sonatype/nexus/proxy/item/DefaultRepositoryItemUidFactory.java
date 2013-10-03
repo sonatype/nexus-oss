@@ -28,15 +28,14 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.locks.ResourceLockFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A default factory for UIDs.
- * 
- * @author cstamas
+ * Default {@link RepositoryItemUidFactory}.
  */
 @Singleton
 @Named
@@ -47,18 +46,20 @@ public class DefaultRepositoryItemUidFactory
   
   private final RepositoryRegistry repositoryRegistry;
 
-  private final ResourceLockFactory sisuLockFactory;
+  private final ResourceLockFactory lockFactory;
 
   private final WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>> locks =
-      new WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>>();
+      new WeakHashMap<>();
 
   @Inject
-  public DefaultRepositoryItemUidFactory(final EventBus eventBus, final RepositoryRegistry repositoryRegistry,
-      final @Nullable @Named("${sisu-resource-locks:-disabled}") ResourceLockFactory sisuLockFactory)
+  public DefaultRepositoryItemUidFactory(final EventBus eventBus,
+                                         final RepositoryRegistry repositoryRegistry,
+                                         final @Named("${sisu-resource-locks:-local}") @Nullable ResourceLockFactory lockFactory)
   {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
-    this.sisuLockFactory = sisuLockFactory;
+    this.lockFactory = checkNotNull(lockFactory);
+
     eventBus.register(this);
   }
 
@@ -81,7 +82,7 @@ public class DefaultRepositoryItemUidFactory
   public DefaultRepositoryItemUid createUid(final String uidStr) throws IllegalArgumentException,
       NoSuchRepositoryException
   {
-    if (uidStr.indexOf(":") > -1) {
+    if (uidStr.contains(":")) {
       String[] parts = uidStr.split(":");
 
       if (parts.length == 2) {
@@ -102,15 +103,14 @@ public class DefaultRepositoryItemUidFactory
   
   @Override
   public DefaultRepositoryItemUidLock createUidLock(final RepositoryItemUid uid) {
-    final String key = new String(uid.getKey());
-
+    final String key = uid.getKey();
     return doCreateUidLockForKey(key);
   }
 
   protected synchronized DefaultRepositoryItemUidLock doCreateUidLockForKey(final String key) {
     final LockResource lockResource;
-    if (sisuLockFactory != null) {
-      lockResource = new SisuLockResource(sisuLockFactory.getResourceLock(key));
+    if (lockFactory != null) {
+      lockResource = new SisuLockResource(lockFactory.getResourceLock(key));
     }
     else {
       lockResource = new SimpleLockResource();
@@ -124,13 +124,14 @@ public class DefaultRepositoryItemUidFactory
         return oldLockRef.get();
       }
     }
-    locks.put(newLock, new WeakReference<DefaultRepositoryItemUidLock>(newLock));
+    locks.put(newLock, new WeakReference<>(newLock));
     return newLock;
   }
 
   /**
    * For UTs, not to be used in production code!
    */
+  @VisibleForTesting
   protected int locksInMap() {
     return locks.size();
   }
@@ -138,8 +139,8 @@ public class DefaultRepositoryItemUidFactory
   @Subscribe
   public void on(final NexusStoppedEvent e) {
     eventBus.unregister(this);
-    if (sisuLockFactory != null) {
-      sisuLockFactory.shutdown();
+    if (lockFactory != null) {
+      lockFactory.shutdown();
     }
   }
 }
