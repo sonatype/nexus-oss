@@ -13,11 +13,8 @@
 
 package org.sonatype.nexus.plugins;
 
-import javax.inject.Singleton;
-
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A component interface that may be implemented by plugins that wants to have some extra configuration capabilities on
@@ -25,8 +22,6 @@ import org.sonatype.plugin.ExtensionPoint;
  *
  * @author cstamas
  */
-@ExtensionPoint
-@Singleton
 public interface RepositoryCustomizer
 {
   boolean isHandledRepository(Repository repository);
