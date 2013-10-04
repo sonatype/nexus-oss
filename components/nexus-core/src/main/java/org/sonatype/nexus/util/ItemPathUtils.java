@@ -101,7 +101,7 @@ public class ItemPathUtils
         return 0;
       }
       else {
-        return 1 + getPathDepth(getParentPath(path));
+        return 1 + getPathDepth(parentPath);
       }
     }
   }
