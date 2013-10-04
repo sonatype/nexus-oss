@@ -73,7 +73,7 @@ public final class NexusTypeBinder
 
   @SuppressWarnings("unchecked")
   public void hear(final Component component, final DeferredClass<?> clazz, final Object source) {
-    log.warn("Detected legacy plexus @Component annotation: {} on: {}; replace with JSR-330 annotations", component, clazz);
+    //log.warn("Detected legacy plexus @Component annotation: {} on: {}; replace with JSR-330 annotations", component, clazz);
 
     plexusTypeBinder.hear(component, clazz, source);
     if (null != repositoryType) {

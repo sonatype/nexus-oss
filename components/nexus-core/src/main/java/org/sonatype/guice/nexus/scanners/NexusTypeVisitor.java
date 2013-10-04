@@ -209,8 +209,7 @@ public final class NexusTypeVisitor
         }
       }
       else {
-        // TODO: Flip this to complain() when aggressively killing plexus components
-        debug("Found legacy plexus component: {}", clazz);
+        warn("Found legacy plexus component: {}", clazz);
       }
     }
 
