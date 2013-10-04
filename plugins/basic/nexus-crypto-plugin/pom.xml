@@ -55,6 +55,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-crypto</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
@@ -71,6 +76,7 @@
             <sharedDependency>org.bouncycastle:bcprov-jdk15on</sharedDependency>
             <sharedDependency>org.bouncycastle:bcpg-jdk15on</sharedDependency>
             <sharedDependency>org.bouncycastle:bcpkix-jdk15on</sharedDependency>
+            <sharedDependency>org.sonatype.sisu.goodies:goodies-crypto</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
