@@ -30,6 +30,8 @@ import org.sonatype.sisu.locks.ResourceLockFactory;
 
 import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,6 +45,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class DefaultRepositoryItemUidFactory
     implements RepositoryItemUidFactory
 {
+  private static final Logger log = LoggerFactory.getLogger(DefaultRepositoryItemUidFactory.class);
+
   private final EventBus eventBus;
   
   private final RepositoryRegistry repositoryRegistry;
@@ -54,11 +58,12 @@ public class DefaultRepositoryItemUidFactory
 
   @Inject
   public DefaultRepositoryItemUidFactory(final EventBus eventBus, final RepositoryRegistry repositoryRegistry,
-      final @Nullable @Named("${sisu-resource-locks:-disabled}") ResourceLockFactory sisuLockFactory)
+      final @Nullable @Named("${sisu-resource-locks:-local}") ResourceLockFactory sisuLockFactory)
   {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.sisuLockFactory = sisuLockFactory;
+    log.debug("Lock factory: {}", sisuLockFactory);
     eventBus.register(this);
   }
 
