@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
@@ -831,7 +832,7 @@ public class ManagerImpl
   // ==
 
   @Override
-  public boolean offerEntry(final MavenHostedRepository mavenHostedRepository, final String entry)
+  public boolean offerEntry(final MavenHostedRepository mavenHostedRepository, final StorageItem item)
       throws IOException
   {
     if (constrainedExecutor.hasRunningWithKey(mavenHostedRepository.getId())) {
@@ -847,6 +848,12 @@ public class ManagerImpl
     try {
       if (!prefixSource.supported()) {
         return false;
+      }
+      final String entry;
+      if (item.getPathDepth() == 0) {
+        entry = item.getPath();
+      } else {
+        entry = item.getParentPath();
       }
       final WritablePrefixSourceModifier wesm =
           new WritablePrefixSourceModifier(prefixSource, config.getLocalScrapeDepth());
@@ -875,7 +882,7 @@ public class ManagerImpl
   }
 
   @Override
-  public boolean revokeEntry(final MavenHostedRepository mavenHostedRepository, final String entry)
+  public boolean revokeEntry(final MavenHostedRepository mavenHostedRepository, final StorageItem item)
       throws IOException
   {
     if (constrainedExecutor.hasRunningWithKey(mavenHostedRepository.getId())) {
@@ -894,13 +901,13 @@ public class ManagerImpl
       }
       final WritablePrefixSourceModifier wesm =
           new WritablePrefixSourceModifier(prefixSource, config.getLocalScrapeDepth());
-      wesm.revokeEntry(entry);
+      wesm.revokeEntry(item.getPath());
       if (wesm.hasChanges()) {
         boolean changed = false;
         lock.lock(Action.update);
         try {
           wesm.reset();
-          wesm.revokeEntry(entry);
+          wesm.revokeEntry(item.getPath());
           changed = wesm.apply();
           if (changed) {
             publish(mavenHostedRepository, prefixSource);

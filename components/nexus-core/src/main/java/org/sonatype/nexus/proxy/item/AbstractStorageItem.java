@@ -360,6 +360,11 @@ public abstract class AbstractStorageItem
   }
 
   @Override
+  public int getPathDepth() {
+    return ItemPathUtils.getPathDepth(getPath());
+  }
+
+  @Override
   public RequestContext getItemContext() {
     return context;
   }
