@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Catches Nexus shutdown event and cleanly stops the IndexManager

@@ -21,6 +21,7 @@ import java.util.Map;
  * The superclass for all events.
  *
  * @author cstamas
+ * @since 2.7.0
  */
 public abstract class AbstractEvent<T>
     implements Event<T>
@@ -44,12 +45,8 @@ public abstract class AbstractEvent<T>
    * Instantiates a new abstract event.
    */
   public AbstractEvent(T component) {
-    super();
-
     this.eventDate = new Date();
-
     this.eventContext = new HashMap<Object, Object>();
-
     this.eventSender = component;
   }
 

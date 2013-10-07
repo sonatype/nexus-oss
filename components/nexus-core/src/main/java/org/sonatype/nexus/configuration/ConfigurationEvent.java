@@ -14,7 +14,7 @@
 package org.sonatype.nexus.configuration;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * The abstract event that is occured when configuration related change had occured.

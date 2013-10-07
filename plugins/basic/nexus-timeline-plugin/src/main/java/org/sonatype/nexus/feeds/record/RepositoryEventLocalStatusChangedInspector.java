@@ -16,11 +16,11 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author Juven Xu

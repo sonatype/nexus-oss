@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.maven.tasks;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.scheduling.TaskUtil;
 
 /**
@@ -41,7 +41,7 @@ public class Nexus4588CancellationEventInspector
 
   @Override
   public boolean accepts(final Event<?> evt) {
-    return isActive() && evt instanceof RepositoryEventExpireCaches;
+    return isActive() && evt instanceof RepositoryEventExpireNotFoundCaches;
   }
 
   @Override

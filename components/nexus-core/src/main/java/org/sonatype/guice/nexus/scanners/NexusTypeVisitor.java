@@ -30,15 +30,13 @@ import org.sonatype.guice.bean.scanners.asm.Type;
 import org.sonatype.guice.plexus.config.Strategies;
 import org.sonatype.guice.plexus.scanners.PlexusTypeVisitor;
 import org.sonatype.nexus.plugins.RepositoryType;
-import org.sonatype.plugin.ExtensionPoint;
-import org.sonatype.plugin.Managed;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link ClassSpaceVisitor} that looks for @{@link ExtensionPoint}, @ {@link RepositoryType}, or @{@link Managed}.
+ * {@link ClassSpaceVisitor} that looks for{@link RepositoryType}.
  */
 public final class NexusTypeVisitor
     extends EmptyClassVisitor
@@ -55,10 +53,6 @@ public final class NexusTypeVisitor
   static final String NAMED_DESC = Type.getDescriptor(Named.class);
 
   static final String SINGLETON_DESC = Type.getDescriptor(Singleton.class);
-
-  static final String EXTENSION_POINT_DESC = Type.getDescriptor(ExtensionPoint.class);
-
-  static final String MANAGED_DESC = Type.getDescriptor(Managed.class);
 
   static final String LEGACY_SINGLETON_DESC = Type.getDescriptor(com.google.inject.Singleton.class);
 
@@ -158,13 +152,7 @@ public final class NexusTypeVisitor
     // If we detected a class, then ...
     if (clazz != null) {
       // Complain if we see legacy annotations
-      if (EXTENSION_POINT_DESC.equals(desc)) {
-        warn("Found legacy @{} annotation: {}", ExtensionPoint.class.getName(), clazz);
-      }
-      else if (MANAGED_DESC.equals(desc)) {
-        warn("Found legacy @{} annotation: {}", Managed.class.getName(), clazz);
-      }
-      else if (LEGACY_SINGLETON_DESC.equals(desc)) {
+      if (LEGACY_SINGLETON_DESC.equals(desc)) {
         warn("Found legacy @{} annotation: {}; replace with @{}",
             com.google.inject.Singleton.class.getName(), clazz, Singleton.class.getName());
       }
@@ -189,26 +177,7 @@ public final class NexusTypeVisitor
     // If we detected a class, then ...
     if (clazz != null) {
       // If not a legacy Plexus component, check if we have "magic" in play...
-      if (!sawComponent) {
-        // Complain if we found a JSR-330 component relying on legacy @ExtensionPoint or @Managed semantics
-        if (nexusType == MarkedNexusTypes.EXTENSION_POINT && !sawNamed) {
-          warn("Found legacy component relying on @{} magic to automatically imply @{}: {}",
-              ExtensionPoint.class.getName(), Named.class.getName(), clazz);
-        }
-        else if (nexusType == MarkedNexusTypes.EXTENSION_POINT_SINGLETON && !(sawNamed && sawSingleton)) {
-          warn("Found legacy component relying on @{} magic to automatically imply @{} @{}: {}",
-              ExtensionPoint.class.getName(), Named.class.getName(), Singleton.class.getName(), clazz);
-        }
-        else if (nexusType == MarkedNexusTypes.MANAGED && !sawNamed) {
-          warn("Found legacy component relying on @{} magic to automatically imply @{}: {}",
-              Managed.class.getName(), Named.class.getName(), clazz);
-        }
-        else if (nexusType == MarkedNexusTypes.MANAGED_SINGLETON && !(sawNamed && sawSingleton)) {
-          warn("Found legacy component relying on @{} magic to automatically imply @{} @{}: {}",
-              Managed.class.getName(), Named.class.getName(), Singleton.class.getName(), clazz);
-        }
-      }
-      else {
+      if (sawComponent) {
         warn("Found legacy plexus component: {}", clazz);
       }
     }

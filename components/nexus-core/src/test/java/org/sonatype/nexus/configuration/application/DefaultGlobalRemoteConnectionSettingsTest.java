@@ -15,7 +15,7 @@ package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.nexus.events.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;

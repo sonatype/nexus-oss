@@ -21,11 +21,11 @@ import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthorizationEvent;
 import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.plexus.appevents.Event;
 
 import org.codehaus.plexus.util.StringUtils;
 

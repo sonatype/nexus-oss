@@ -13,13 +13,12 @@
 
 package org.sonatype.nexus.plugins.events;
 
+import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.plugins.NexusPluginManager;
-import org.sonatype.plexus.appevents.AbstractEvent;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
- * This {@link Event} is triggered when a Nexus plugin fails during activation.
+ * This event is triggered when a Nexus plugin fails during activation.
  */
 public final class PluginRejectedEvent
     extends AbstractEvent<NexusPluginManager>

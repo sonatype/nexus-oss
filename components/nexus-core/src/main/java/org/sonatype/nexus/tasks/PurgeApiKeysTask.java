@@ -17,7 +17,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.tasks.descriptors.PurgeApiKeysTaskDescriptor;
-import org.sonatype.security.events.UserPrincipalsExpiredEvent;
+import org.sonatype.security.events.AuthorizationConfigurationChanged;
 
 @Named(PurgeApiKeysTaskDescriptor.ID)
 public class PurgeApiKeysTask
@@ -31,7 +31,7 @@ public class PurgeApiKeysTask
   @Override
   protected Void doRun() {
     // triggers the expiry of any orphaned cached user principals
-    notifyEventListeners(new UserPrincipalsExpiredEvent(null));
+    notifyEventListeners(new AuthorizationConfigurationChanged());
     return null;
   }
 
