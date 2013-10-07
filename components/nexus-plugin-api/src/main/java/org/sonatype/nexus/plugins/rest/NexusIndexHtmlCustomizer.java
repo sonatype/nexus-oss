@@ -15,10 +15,6 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.Map;
 
-import javax.inject.Singleton;
-
-import org.sonatype.plugin.ExtensionPoint;
-
 /**
  * A Resource bundle meant for extending/contributing/spoofing existing resources (JS, CSS, Images, etc) of the Nexus
  * Web Application. This component is able only to contribute to index.html, if you want to extends REST API, please
@@ -46,8 +42,6 @@ import org.sonatype.plugin.ExtensionPoint;
  * @deprecated since 2.4. Use org.sonatype.nexus.plugins.ui.contribution.UiContributor from nexus-ui-extjs3-plugin
  *             instead.
  */
-@ExtensionPoint
-@Singleton
 @Deprecated
 public interface NexusIndexHtmlCustomizer
 {
