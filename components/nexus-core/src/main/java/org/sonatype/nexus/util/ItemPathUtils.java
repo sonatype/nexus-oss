@@ -15,11 +15,13 @@ package org.sonatype.nexus.util;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * This is NOT FS Path utils! This util uses 'URL'-like paths, hence the separator is always '/' and is not system
- * dependant!
+ * dependant! See {@link RepositoryItemUid} for explanation.
  *
  * @author cstamas
  * @author juven
