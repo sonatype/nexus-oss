@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author Juven Xu

@@ -26,7 +26,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Event inspector that maintains indexes.

@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.plugins.capabilities;
 
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * {@link CapabilityRegistry} related events.

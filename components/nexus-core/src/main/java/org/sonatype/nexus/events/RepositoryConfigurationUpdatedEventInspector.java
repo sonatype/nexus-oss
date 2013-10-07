@@ -22,7 +22,6 @@ import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Event inspector listening for configuration changes to expire caches when Local or Remote URL changed of the

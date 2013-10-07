@@ -13,10 +13,10 @@
 
 package org.sonatype.nexus.plexusplugin.internal;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.plexusplugin.PlexusPlugin;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.plexus.appevents.Event;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;

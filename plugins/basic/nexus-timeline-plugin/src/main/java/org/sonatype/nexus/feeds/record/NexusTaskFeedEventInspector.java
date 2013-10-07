@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
@@ -27,7 +28,6 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Event inspector that creates feeds about tasks. Note: this EventInspector is

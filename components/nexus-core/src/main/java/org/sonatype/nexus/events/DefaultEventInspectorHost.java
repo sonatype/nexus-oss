@@ -32,7 +32,6 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;

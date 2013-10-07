@@ -20,9 +20,9 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author Juven Xu

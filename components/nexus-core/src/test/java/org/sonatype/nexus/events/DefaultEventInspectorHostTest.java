@@ -20,7 +20,6 @@ import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspectorWrapper;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.mockito.Mockito;

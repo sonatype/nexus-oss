@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -35,7 +36,6 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.plexus.appevents.Event;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.maven.artifact.repository.metadata.Metadata;

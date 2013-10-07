@@ -31,7 +31,6 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.RepairIndexTask;
 import org.sonatype.nexus.tasks.UpdateIndexTask;
-import org.sonatype.plexus.appevents.Event;
 
 import org.apache.commons.lang.StringUtils;
 

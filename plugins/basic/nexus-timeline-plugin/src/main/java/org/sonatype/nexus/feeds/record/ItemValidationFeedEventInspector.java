@@ -16,12 +16,12 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailed;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Event inspector that creates feeds about failed item validations.

@@ -26,8 +26,6 @@ import org.sonatype.guice.bean.scanners.asm.AnnotationVisitor;
 import org.sonatype.guice.bean.scanners.asm.ClassVisitor;
 import org.sonatype.guice.bean.scanners.asm.Type;
 import org.sonatype.nexus.plugins.RepositoryType;
-import org.sonatype.plugin.ExtensionPoint;
-import org.sonatype.plugin.Managed;
 
 /**
  * Caching {@link ClassVisitor} that maintains a map of interface names to {@link NexusType}s.
@@ -39,11 +37,7 @@ final class NexusTypeCache
   // Constants
   // ----------------------------------------------------------------------
 
-  private static final String EXTENSION_POINT_DESC = Type.getDescriptor(ExtensionPoint.class);
-
   private static final String REPOSITORY_TYPE_DESC = Type.getDescriptor(RepositoryType.class);
-
-  private static final String MANAGED_DESC = Type.getDescriptor(Managed.class);
 
   private static final String SINGLETON_DESC = Type.getDescriptor(Singleton.class);
 
@@ -67,7 +61,7 @@ final class NexusTypeCache
    * Attempts to find the {@link NexusType} of a given interface.
    *
    * @param space The class space
-   * @param desc  The interface name
+   * @param name  The interface name
    * @return Nexus component type
    */
   public NexusType nexusType(final ClassSpace space, final String name) {
@@ -87,13 +81,7 @@ final class NexusTypeCache
 
   @Override
   public AnnotationVisitor visitAnnotation(final String desc, final boolean visible) {
-    if (EXTENSION_POINT_DESC.equals(desc)) {
-      nexusType = MarkedNexusTypes.EXTENSION_POINT;
-    }
-    else if (MANAGED_DESC.equals(desc)) {
-      nexusType = MarkedNexusTypes.MANAGED;
-    }
-    else if (SINGLETON_DESC.equals(desc)) {
+    if (SINGLETON_DESC.equals(desc)) {
       isSingleton = true;
     }
     else if (REPOSITORY_TYPE_DESC.equals(desc)) {

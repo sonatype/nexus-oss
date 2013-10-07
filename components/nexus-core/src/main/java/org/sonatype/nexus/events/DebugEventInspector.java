@@ -23,7 +23,6 @@ import javax.management.ObjectName;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * A simple "debug" event inspector that grabs all events sent to {@link EventInspector}s and simply dumps them as

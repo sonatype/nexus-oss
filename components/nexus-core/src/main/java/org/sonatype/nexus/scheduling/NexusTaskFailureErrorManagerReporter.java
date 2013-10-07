@@ -19,11 +19,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.plexus.appevents.Event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,7 +47,7 @@ public class NexusTaskFailureErrorManagerReporter
   }
 
   /**
-   * Accepts events of type {@link NexusTaskFailureEvent}. {@inheritDoc}
+   * Accepts events of type {@link NexusTaskEventStoppedFailed}. {@inheritDoc}
    */
   public boolean accepts(final Event<?> evt) {
     return evt != null && evt instanceof NexusTaskEventStoppedFailed<?>;

@@ -17,6 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
@@ -30,7 +31,6 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Event inspector that persists item events into Timeline.

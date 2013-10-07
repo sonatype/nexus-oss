@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
@@ -33,7 +34,6 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.Event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

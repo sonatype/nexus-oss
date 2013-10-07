@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Listens for events and manages IndexerManager by adding and removing indexing contexts.

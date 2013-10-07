@@ -17,11 +17,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Event inspector that listens for repository registry removals, and purges the {@link PathCache} belonging to given

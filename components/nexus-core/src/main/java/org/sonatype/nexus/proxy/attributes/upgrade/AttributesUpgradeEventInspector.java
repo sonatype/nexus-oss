@@ -17,11 +17,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * EventInspector that fires upgrade call to upgrader component, does it blindly.
