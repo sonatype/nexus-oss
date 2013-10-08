@@ -14,7 +14,25 @@
 package org.sonatype.nexus.proxy.events;
 
 /**
- * Marker interface for subscribers wanting to get events from Nexus Event Bus.
+ * Marker interface for subscribers wanting to get events from Nexus Event Bus, aka. the new event inspectors.
+ * Example of event subscriber:
+ * <pre>
+ *   @Singleton
+ *   @Named
+ *   public class MySubscriber
+ *     implements EventSubscriber {
+ *
+ *     @Subscribe
+ *     public void onSomeEvent(final SomeEvent evt) {
+ *       ... do something
+ *     }
+ *   }
+ * </pre>
+ * In short, you code as you would do usually with Google Guava EventBus (so using @Subscribe and
+ * @AllowConcurrentEvents as usually), and to those annotated methods same constrains applies as for
+ * plain event bus subscribers (method should be public, and have one parameter). The "trick" here is
+ * that your component should implement the EventSubscriber interface, and in that case it will get
+ * auto-registered with Nexus EventBus.
  *
  * @since 2.7.0
  */
