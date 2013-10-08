@@ -14,14 +14,10 @@
 package org.sonatype.nexus.proxy.events;
 
 /**
- * A simple async event inspector marker interface. If this interface is present on an EventInspector implementor, it
- * becomes asynchornous, a component that receives events emitted by Nexus and processes them in way they want (async
- * invocation is managed by event inspector host, the implementor does not have to manage it).
+ * Marker interface for subscribers wanting to get events from Nexus Event Bus.
  *
- * @author cstamas
+ * @since 2.7.0
  */
-public interface AsynchronousEventInspector
-    extends Asynchronous
+public interface EventSubscriber
 {
-
 }
