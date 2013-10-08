@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.events;
 
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
@@ -37,6 +38,7 @@ import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.Subscribe;
@@ -47,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A default host for {@link EventSubscriber}.
  *
- * @author cstamas
+ * @since 2.7.0
  */
 @Named
 @EagerSingleton
@@ -100,6 +102,7 @@ public class EventSubscriberHost
     else {
       syncBus.register(object);
     }
+    getLogger().info(" ** registered {}", object);
   }
 
   public void unregister(final Object object) {
@@ -109,6 +112,7 @@ public class EventSubscriberHost
     else {
       syncBus.unregister(object);
     }
+    getLogger().info(" ** unregistered {}", object);
   }
 
   /**
@@ -175,44 +179,75 @@ public class EventSubscriberHost
     }
   }
 
+  private static final ConcurrentMap<String, EventInspectorSubscriberAdapter> adapters = Maps.newConcurrentMap();
+
   public static class EventInspectorMediator
       implements Mediator<Named, EventInspector, EventSubscriberHost>
   {
     @Override
     public void add(final BeanEntry<Named, EventInspector> entry, final EventSubscriberHost watcher) throws Exception {
-      final EventInspector es;
-      try {
-        es = entry.getValue();
+      final EventInspectorSubscriberAdapter adapter;
+      if (Asynchronous.class.isAssignableFrom(entry.getImplementationClass())) {
+        adapter = new AsynchronousEventInspectorSubscriberAdapter(entry);
       }
-      catch (IllegalStateException e) {
-        // NEXUS-4775 guice exception trying to resolve circular dependencies too early
-        return;
+      else {
+        adapter = new EventInspectorSubscriberAdapter(entry);
       }
-      watcher.register(new EventInspectorSubscriberAdapter(es));
+      adapters.put(entry.getKey().value(), adapter);
+      watcher.register(adapter);
     }
 
     @Override
     public void remove(final BeanEntry<Named, EventInspector> entry, final EventSubscriberHost watcher)
         throws Exception
     {
-      // nop for now
+      final EventInspectorSubscriberAdapter adapter = adapters.get(entry.getKey().value());
+      if (adapter != null) {
+        watcher.unregister(adapter);
+      }
     }
   }
 
   public static class EventInspectorSubscriberAdapter
   {
-    private final EventInspector eventInspector;
+    private final BeanEntry<Named, EventInspector> eventInspectorEntry;
 
-    public EventInspectorSubscriberAdapter(final EventInspector eventInspector) {
-      this.eventInspector = checkNotNull(eventInspector);
+    public EventInspectorSubscriberAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry) {
+      this.eventInspectorEntry = checkNotNull(eventInspectorEntry);
     }
 
     @Subscribe
     @AllowConcurrentEvents
     public void on(Event<?> event) {
-      if (eventInspector.accepts(event)) {
-        eventInspector.inspect(event);
+      try {
+        final EventInspector ei = eventInspectorEntry.getValue();
+        if (ei.accepts(event)) {
+          ei.inspect(event);
+        }
+      }
+      catch (Exception e) {
+        // nop, guice might NPE
       }
     }
+
+    @Override
+    public String toString() {
+      return "EIAdapter("+eventInspectorEntry.getImplementationClass()+")";
+    }
   }
+
+  public static class AsynchronousEventInspectorSubscriberAdapter
+      extends EventInspectorSubscriberAdapter
+      implements Asynchronous
+  {
+    public AsynchronousEventInspectorSubscriberAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry) {
+      super(eventInspectorEntry);
+    }
+
+    @Override
+    public String toString() {
+      return super.toString() + " (async)";
+    }
+  }
+
 }
