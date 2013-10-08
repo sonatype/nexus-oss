@@ -101,7 +101,7 @@ public class EventSubscriberHost
     else {
       syncBus.register(object);
     }
-    getLogger().info(" ** registered {}", object);
+    getLogger().trace(" ** registered {}", object);
   }
 
   public void unregister(final Object object) {
@@ -111,7 +111,7 @@ public class EventSubscriberHost
     else {
       syncBus.unregister(object);
     }
-    getLogger().info(" ** unregistered {}", object);
+    getLogger().trace(" ** unregistered {}", object);
   }
 
   /**
@@ -221,7 +221,7 @@ public class EventSubscriberHost
 
     @Override
     public String toString() {
-      return "EIAdapter(" + eventInspectorEntry.getImplementationClass() + ")";
+      return "EIAdapter(" + eventInspectorEntry.getImplementationClass().getName() + ")";
     }
   }
 
