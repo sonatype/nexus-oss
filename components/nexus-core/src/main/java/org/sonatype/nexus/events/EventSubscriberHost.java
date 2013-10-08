@@ -40,7 +40,6 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
-import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Key;
 
@@ -57,7 +56,7 @@ public class EventSubscriberHost
     extends AbstractLoggingComponent
 {
   private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
-      "org.sonatype.nexus.events.EventSubscriberHost.poolSize", 500);
+      EventSubscriberHost.class.getName() + ".poolSize", 500);
 
   private final EventBus eventBus;
 
@@ -76,8 +75,8 @@ public class EventSubscriberHost
         new ThreadPoolExecutor(0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
             new NexusThreadFactory("esh", "Event Subscriber Host"), new CallerRunsPolicy());
     this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
-    this.syncBus = new com.google.common.eventbus.EventBus(EventSubscriberHost.class.getSimpleName());
-    this.asyncBus = new AsyncEventBus(EventSubscriberHost.class.getSimpleName(), hostThreadPool);
+    this.syncBus = new com.google.common.eventbus.EventBus("esh-sync");
+    this.asyncBus = new com.google.common.eventbus.AsyncEventBus("esh-async", hostThreadPool);
     beanLocator.watch(Key.get(EventSubscriber.class), new EventSubscriberMediator(), this);
     beanLocator.watch(Key.get(EventInspector.class), new EventInspectorMediator(), this);
     eventBus.register(this);
@@ -128,24 +127,14 @@ public class EventSubscriberHost
   @Subscribe
   @AllowConcurrentEvents
   public void onEvent(final Event<?> evt) {
-    try {
-      processEvent(evt);
-    }
-    catch (IllegalStateException e) {
-      // NEXUS-4775 guice exception trying to resolve circular dependencies too early
-      getLogger().trace("Event inspectors are not fully initialized, skipping handling of {}", evt, e);
-    }
+    syncBus.post(evt);
+    asyncBus.post(evt);
     if (evt instanceof NexusStoppedEvent) {
       shutdown();
     }
   }
 
   // ==
-
-  protected void processEvent(final Event<?> evt) {
-    syncBus.post(evt);
-    asyncBus.post(evt);
-  }
 
   public static class EventSubscriberMediator
       implements Mediator<Named, EventSubscriber, EventSubscriberHost>
@@ -232,7 +221,7 @@ public class EventSubscriberHost
 
     @Override
     public String toString() {
-      return "EIAdapter("+eventInspectorEntry.getImplementationClass()+")";
+      return "EIAdapter(" + eventInspectorEntry.getImplementationClass() + ")";
     }
   }
 
