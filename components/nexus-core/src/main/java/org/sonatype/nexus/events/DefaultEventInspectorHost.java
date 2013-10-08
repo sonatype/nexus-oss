@@ -34,9 +34,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * same rules to all inspectors.
  *
  * @author cstamas
+ * @deprecated In favor of {@link EventSubscriberHost}.
  */
 @Named
 @EagerSingleton
+@Deprecated
 public class DefaultEventInspectorHost
     extends AbstractLoggingComponent
     implements EventInspectorHost

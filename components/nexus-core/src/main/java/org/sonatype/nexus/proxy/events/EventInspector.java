@@ -22,7 +22,9 @@ import org.sonatype.plugin.ExtensionPoint;
  * A simple event inspector, a component that receives events emitted by Nexus and processes them in way they want.
  *
  * @author cstamas
+ * @deprecated Use {@link EventSubscriber} instead.
  */
+@Deprecated
 @ExtensionPoint
 @Singleton
 public interface EventInspector
