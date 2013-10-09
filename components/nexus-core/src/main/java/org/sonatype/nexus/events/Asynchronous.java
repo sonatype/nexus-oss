@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.proxy.events;
+package org.sonatype.nexus.events;
 
 /**
  * Marker interface to mark an {@link EventSubscriber} as asynchronous.

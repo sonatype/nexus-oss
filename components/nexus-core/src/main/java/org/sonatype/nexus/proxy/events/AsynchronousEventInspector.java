@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
+
 /**
  * A simple async event inspector marker interface. If this interface is present on an EventInspector implementor, it
  * becomes asynchornous, a component that receives events emitted by Nexus and processes them in way they want (async

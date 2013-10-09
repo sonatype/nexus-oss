@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.events;
 
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plugin.ExtensionPoint;
 

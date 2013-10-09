@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.proxy.events;
+package org.sonatype.nexus.events;
 
 /**
  * Marker interface for subscribers wanting to get events from Nexus Event Bus, aka. the new event inspectors.

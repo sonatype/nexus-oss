@@ -27,9 +27,7 @@ import org.sonatype.inject.BeanEntry;
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.inject.Mediator;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.events.Asynchronous;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
@@ -62,8 +60,6 @@ public class EventSubscriberHost
 
   private final NexusExecutorService hostThreadPool;
 
-  private final com.google.common.eventbus.EventBus syncBus;
-
   private final com.google.common.eventbus.AsyncEventBus asyncBus;
 
   @Inject
@@ -75,7 +71,6 @@ public class EventSubscriberHost
         new ThreadPoolExecutor(0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
             new NexusThreadFactory("esh", "Event Subscriber Host"), new CallerRunsPolicy());
     this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
-    this.syncBus = new com.google.common.eventbus.EventBus("esh-sync");
     this.asyncBus = new com.google.common.eventbus.AsyncEventBus("esh-async", hostThreadPool);
     beanLocator.watch(Key.get(EventSubscriber.class), new EventSubscriberMediator(), this);
     beanLocator.watch(Key.get(EventInspector.class), new EventInspectorMediator(), this);
@@ -99,9 +94,9 @@ public class EventSubscriberHost
       asyncBus.register(object);
     }
     else {
-      syncBus.register(object);
+      eventBus.register(object);
     }
-    getLogger().trace(" ** registered {}", object);
+    getLogger().trace("Registered {}", object);
   }
 
   public void unregister(final Object object) {
@@ -109,9 +104,9 @@ public class EventSubscriberHost
       asyncBus.unregister(object);
     }
     else {
-      syncBus.unregister(object);
+      eventBus.unregister(object);
     }
-    getLogger().trace(" ** unregistered {}", object);
+    getLogger().trace("Unregistered {}", object);
   }
 
   /**
@@ -126,47 +121,42 @@ public class EventSubscriberHost
 
   @Subscribe
   @AllowConcurrentEvents
-  public void onEvent(final Event<?> evt) {
-    syncBus.post(evt);
+  public void onEvent(final Object evt) {
     asyncBus.post(evt);
     if (evt instanceof NexusStoppedEvent) {
       shutdown();
     }
   }
 
-  // ==
+  // == EventSubscriber support
 
   public static class EventSubscriberMediator
       implements Mediator<Named, EventSubscriber, EventSubscriberHost>
   {
     @Override
     public void add(final BeanEntry<Named, EventSubscriber> entry, final EventSubscriberHost watcher) throws Exception {
-      final EventSubscriber es;
       try {
-        es = entry.getValue();
+        watcher.register(entry.getValue());
       }
-      catch (IllegalStateException e) {
-        // NEXUS-4775 guice exception trying to resolve circular dependencies too early
-        return;
+      catch (Exception e) {
+        // NEXUS-4775 Guice exception trying to resolve circular dependencies too early
       }
-      watcher.register(es);
     }
 
     @Override
     public void remove(final BeanEntry<Named, EventSubscriber> entry, final EventSubscriberHost watcher)
         throws Exception
     {
-      final EventSubscriber es;
       try {
-        es = entry.getValue();
+        watcher.unregister(entry.getValue());
       }
-      catch (IllegalStateException e) {
-        // NEXUS-4775 guice exception trying to resolve circular dependencies too early
-        return;
+      catch (Exception e) {
+        // NEXUS-4775 Guice exception trying to resolve circular dependencies too early
       }
-      watcher.unregister(es);
     }
   }
+
+  // == Legacy EventInspector support
 
   private static final ConcurrentMap<String, EventInspectorSubscriberAdapter> adapters = Maps.newConcurrentMap();
 

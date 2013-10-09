@@ -17,7 +17,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStateChangeEvent;
 
 import com.google.common.eventbus.Subscribe;
