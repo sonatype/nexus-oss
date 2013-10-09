@@ -33,6 +33,10 @@ package org.sonatype.nexus.events;
  * plain event bus subscribers (method should be public, and have one parameter). The "trick" here is
  * that your component should implement the EventSubscriber interface, and in that case it will get
  * auto-registered with Nexus EventBus.
+ * <p/>
+ * In general, event subscriber should not be event poster, still, there are cases where it post events
+ * implicitly (as when it performs some content manipulation, item related events will be fired). Same
+ * constraints to posting events applies as for Guava EventBus.
  *
  * @since 2.7.0
  */
