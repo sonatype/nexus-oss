@@ -72,8 +72,9 @@ public class EventSubscriberHost
             new NexusThreadFactory("esh", "Event Subscriber Host"), new CallerRunsPolicy());
     this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
     this.asyncBus = new com.google.common.eventbus.AsyncEventBus("esh-async", hostThreadPool);
+
     beanLocator.watch(Key.get(EventSubscriber.class), new EventSubscriberMediator(), this);
-    beanLocator.watch(Key.get(EventInspector.class), new EventInspectorMediator(), this);
+    beanLocator.watch(Key.get(EventInspector.class), new EventInspectorMediator(hostThreadPool), this);
     eventBus.register(this);
   }
 
@@ -158,21 +159,29 @@ public class EventSubscriberHost
 
   // == Legacy EventInspector support
 
-  private static final ConcurrentMap<String, EventInspectorSubscriberAdapter> adapters = Maps.newConcurrentMap();
-
   public static class EventInspectorMediator
       implements Mediator<Named, EventInspector, EventSubscriberHost>
   {
+    private final NexusExecutorService nexusExecutorService;
+
+    private final ConcurrentMap<String, EventInspectorAdapter> eventInspectorAdapters;
+
+    public EventInspectorMediator(final NexusExecutorService nexusExecutorService) {
+      this.nexusExecutorService = checkNotNull(nexusExecutorService);
+      this.eventInspectorAdapters = Maps.newConcurrentMap();
+    }
+
     @Override
     public void add(final BeanEntry<Named, EventInspector> entry, final EventSubscriberHost watcher) throws Exception {
-      final EventInspectorSubscriberAdapter adapter;
+      final EventInspectorAdapter adapter;
       if (Asynchronous.class.isAssignableFrom(entry.getImplementationClass())) {
-        adapter = new AsynchronousEventInspectorSubscriberAdapter(entry);
+        adapter = new AsynchronousEventInspectorAdapter(entry, nexusExecutorService);
       }
       else {
-        adapter = new EventInspectorSubscriberAdapter(entry);
+        adapter = new EventInspectorAdapter(entry);
       }
-      adapters.put(entry.getKey().value(), adapter);
+      eventInspectorAdapters.put(entry.getKey().value(), adapter);
+      // Note: as none of the EI Adapter implement Asynchronous, they all will be registered with "plain" EventBus
       watcher.register(adapter);
     }
 
@@ -180,33 +189,37 @@ public class EventSubscriberHost
     public void remove(final BeanEntry<Named, EventInspector> entry, final EventSubscriberHost watcher)
         throws Exception
     {
-      final EventInspectorSubscriberAdapter adapter = adapters.get(entry.getKey().value());
+      final EventInspectorAdapter adapter = eventInspectorAdapters.get(entry.getKey().value());
       if (adapter != null) {
         watcher.unregister(adapter);
       }
     }
   }
 
-  public static class EventInspectorSubscriberAdapter
+  public static class EventInspectorAdapter
   {
     private final BeanEntry<Named, EventInspector> eventInspectorEntry;
 
-    public EventInspectorSubscriberAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry) {
+    public EventInspectorAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry) {
       this.eventInspectorEntry = checkNotNull(eventInspectorEntry);
     }
 
     @Subscribe
     @AllowConcurrentEvents
-    public void on(Event<?> event) {
+    public void on(final Event<?> event) {
       try {
         final EventInspector ei = eventInspectorEntry.getValue();
         if (ei.accepts(event)) {
-          ei.inspect(event);
+          inspect(ei, event);
         }
       }
       catch (Exception e) {
         // nop, guice might NPE
       }
+    }
+
+    protected void inspect(final EventInspector ei, final Event<?> event) {
+      ei.inspect(event);
     }
 
     @Override
@@ -215,12 +228,30 @@ public class EventSubscriberHost
     }
   }
 
-  public static class AsynchronousEventInspectorSubscriberAdapter
-      extends EventInspectorSubscriberAdapter
-      implements Asynchronous
+  public static class AsynchronousEventInspectorAdapter
+      extends EventInspectorAdapter
   {
-    public AsynchronousEventInspectorSubscriberAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry) {
+    private final NexusExecutorService nexusExecutorService;
+
+    public AsynchronousEventInspectorAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry,
+                                             final NexusExecutorService nexusExecutorService)
+    {
       super(eventInspectorEntry);
+      this.nexusExecutorService = checkNotNull(nexusExecutorService);
+    }
+
+    @Override
+    protected void inspect(final EventInspector ei, final Event<?> event) {
+      // TODO: Runnable creation per-event? This should be improved
+      // Still, as event inspectors are getting removed, their number should shrink not grow
+      nexusExecutorService.execute(
+          new Runnable()
+          {
+            @Override
+            public void run() {
+              ei.inspect(event);
+            }
+          });
     }
 
     @Override
@@ -228,5 +259,4 @@ public class EventSubscriberHost
       return super.toString() + " (async)";
     }
   }
-
 }
