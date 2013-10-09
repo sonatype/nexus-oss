@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
@@ -41,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.1
  */
 @Named
-@Singleton
+@EagerSingleton
 public class DebugEventInspector
     extends AbstractLoggingComponent
 {
