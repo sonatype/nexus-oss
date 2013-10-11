@@ -18,9 +18,9 @@
 //
 //     export NEXUS_RESOURCE_DIRS=`groovy ./buildsupport/scripts/nexusresourcedirs.groovy`
 //
-// Aggregate projects using 'roots' property:
+// Aggregate projects using 'roots' property, from parent of project directories:
 //
-//     export NEXUS_RESOURCE_DIRS=`groovy -Droots=./nexus-oss,./nexus-pro nexus-oss/buildsupport/scripts/nexusresourcedirs.groovy`
+//     export NEXUS_RESOURCE_DIRS=`groovy -Droots=nexus-oss,nexus-pro nexus-oss/buildsupport/scripts/nexusresourcedirs.groovy`
 //
 
 def roots = System.getProperty('roots', '.')
