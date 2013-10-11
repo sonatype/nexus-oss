@@ -18,6 +18,7 @@ import org.sonatype.security.SecuritySystem
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.siesta.common.Resource
 
+import javax.inject.Singleton
 import javax.inject.Inject
 import javax.inject.Named
 import javax.ws.rs.GET
