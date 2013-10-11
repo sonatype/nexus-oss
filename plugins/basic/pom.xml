@@ -41,6 +41,7 @@
     <module>nexus-timeline-plugin</module>
     <module>nexus-ui-extjs3-plugin</module>
     <module>nexus-unpack-plugin</module>
+    <module>nexus-supporttools-plugin</module>
   </modules>
 
 </project>
