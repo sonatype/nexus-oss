@@ -36,12 +36,12 @@ import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
-import org.sonatype.guice.nexus.binders.NexusAnnotatedBeanModule;
 import org.sonatype.guice.plexus.binders.PlexusXmlBeanModule;
 import org.sonatype.guice.plexus.config.PlexusBeanModule;
 import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.guice.AbstractInterceptorModule;
+import org.sonatype.nexus.guice.NexusAnnotatedBeanModule;
 import org.sonatype.nexus.guice.NexusModules.PluginModule;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
@@ -394,17 +394,25 @@ public class DefaultNexusPluginManager
       }
     }
 
-    final List<String> exportedClassNames = new ArrayList<String>();
-    final List<RepositoryTypeDescriptor> repositoryTypes = new ArrayList<RepositoryTypeDescriptor>();
-    final List<StaticResource> staticResources = new ArrayList<StaticResource>();
+    final List<PlexusBeanModule> beanModules = new ArrayList<PlexusBeanModule>();
 
+    // Scan for Plexus XML components
+    final ClassSpace pluginSpace = new URLClassSpace(pluginRealm);
+    beanModules.add(new PlexusXmlBeanModule(pluginSpace, variables));
+
+    // Scan for annotated components
+    final ClassSpace annSpace = new URLClassSpace(pluginRealm, scanList.toArray(new URL[scanList.size()]));
+    final List<RepositoryTypeDescriptor> repositoryTypes = new ArrayList<RepositoryTypeDescriptor>();
+    beanModules.add(new NexusAnnotatedBeanModule(annSpace, variables, repositoryTypes));
+
+    // Find static resources and expose as single resource bundle
+    final List<StaticResource> staticResources = findStaticResources(pluginSpace);
     final NexusResourceBundle resourceBundle = new NexusResourceBundle()
     {
       public List<StaticResource> getContributedResouces() {
         return staticResources;
       }
     };
-
     final Module resourceModule = new AbstractModule()
     {
       @Override
@@ -413,14 +421,7 @@ public class DefaultNexusPluginManager
       }
     };
 
-    final List<PlexusBeanModule> beanModules = new ArrayList<PlexusBeanModule>();
-
-    final ClassSpace pluginSpace = new URLClassSpace(pluginRealm);
-    beanModules.add(new PlexusXmlBeanModule(pluginSpace, variables));
-
-    final ClassSpace annSpace = new URLClassSpace(pluginRealm, scanList.toArray(new URL[scanList.size()]));
-    beanModules.add(new NexusAnnotatedBeanModule(annSpace, variables, exportedClassNames, repositoryTypes));
-
+    // Assemble plugin components and resources
     final List<Module> modules = new ArrayList<Module>();
     modules.add(resourceModule);
     modules.add(new PluginModule());
@@ -432,8 +433,14 @@ public class DefaultNexusPluginManager
       repositoryTypeRegistry.registerRepositoryTypeDescriptors(r);
     }
 
-    final Enumeration<URL> e = pluginSpace.findEntries("static/", null, true);
-    while (e.hasMoreElements()) {
+    descriptor.setExportedClassnames(findExportedClassnames(annSpace));
+    descriptor.setRepositoryTypes(repositoryTypes);
+    descriptor.setStaticResources(staticResources);
+  }
+
+  private List<StaticResource> findStaticResources(final ClassSpace pluginSpace) {
+    final List<StaticResource> staticResources = new ArrayList<StaticResource>();
+    for (Enumeration<URL> e = pluginSpace.findEntries("static/", null, true); e.hasMoreElements();) {
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null) {
@@ -441,10 +448,23 @@ public class DefaultNexusPluginManager
             mimeSupport.guessMimeTypeFromPath(url.getPath())));
       }
     }
+    return staticResources;
+  }
 
-    descriptor.setExportedClassnames(exportedClassNames);
-    descriptor.setRepositoryTypes(repositoryTypes);
-    descriptor.setStaticResources(staticResources);
+  private static List<String> findExportedClassnames(final ClassSpace annSpace) {
+    final List<String> exportedClassNames = new ArrayList<String>();
+    for (Enumeration<URL> e = annSpace.findEntries(null, "*.class", true); e.hasMoreElements();) {
+      String path = e.nextElement().getPath();
+      int index = path.lastIndexOf("jar!/");
+      if (index > 0) {
+        path = path.substring(index + 5);
+      }
+      if (path.startsWith("/")) {
+        path = path.substring(1);
+      }
+      exportedClassNames.add(path.replace(".class", "").replaceAll("[/$]", "."));
+    }
+    return exportedClassNames;
   }
 
   private URL toURL(final PluginRepositoryArtifact artifact) {
