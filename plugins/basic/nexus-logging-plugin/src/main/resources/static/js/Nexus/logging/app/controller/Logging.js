@@ -1,0 +1,108 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2013 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+/*global NX, Ext, Sonatype, Nexus*/
+
+/**
+ * Logging controller.
+ *
+ * @since 2.7
+ */
+NX.define('Nexus.logging.app.controller.Logging', {
+  extends: 'Nexus.app.Controller',
+
+  mixins: [
+    'Nexus.LogAwareMixin'
+  ],
+
+  requires: [
+    'Nexus.logging.app.view.Panel'
+  ],
+
+  init: function () {
+    this.logDebug('init');
+    this.control({
+      '#nx-logging-button-refresh-loggers': {
+        click: this.loadLoggers
+      },
+      '#nx-logging-button-add-logger': {
+        click: this.addLogger
+      },
+      '#nx-logging-button-remove-loggers': {
+        click: this.removeLoggers
+      }
+    });
+  },
+
+  loadLoggers: function (button) {
+    var loggersGrid = button.up('nx-logging-view-loggers'),
+        store = loggersGrid.getStore();
+
+    store.load();
+  },
+
+  addLogger: function (button) {
+    var loggersGrid = button.up('nx-logging-view-loggers'),
+        store = loggersGrid.getStore();
+
+    alert(store);
+  },
+
+  removeLoggers: function (button) {
+    var loggersGrid = button.up('nx-logging-view-loggers'),
+        selections = loggersGrid.getSelectionModel().getSelections(),
+        store = loggersGrid.getStore();
+
+    if (selections.length > 0) {
+      store.remove(selections);
+      store.save();
+    }
+  },
+
+  control: function (control) {
+    var me = this;
+    if (Ext.isDefined(control)) {
+      for (var key in control) {
+        if (key.startsWith('#')) {
+          Ext.ComponentMgr.onAvailable(key.substring(1), function (obj) {
+            var events = control['#' + obj.id];
+            for (var event in events) {
+              obj.on(event, events[event], me);
+              obj.up = function (name) {
+                return me.goUp.call(me, obj.ownerCt, name);
+              }
+              me.logDebug('Registered for event "' + event + '" on ' + obj.id);
+            }
+          }, me);
+        }
+      }
+    }
+  },
+
+  goUp: function (container, name) {
+    var me = this;
+    if (container) {
+      if (name.startsWith('#')) {
+        if (container.id === name.substring(1)) {
+          return container;
+        }
+      }
+      else {
+        if (container.getXType() === name) {
+          return container;
+        }
+      }
+      return me.goUp.call(me, container.ownerCt, name);
+    }
+  }
+
+});

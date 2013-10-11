@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.LoggingPanel', {
+NX.define('Nexus.logging.app.view.Panel', {
   extend: 'Ext.Panel',
 
   mixins: [
@@ -25,33 +25,41 @@ NX.define('Nexus.logging.LoggingPanel', {
   ],
 
   requires: [
+    'Nexus.logging.app.view.Loggers',
+    'Nexus.logging.app.view.Log'
   ],
+
+  title: 'Logging',
+
+  layout: 'vbox',
 
   /**
    * @override
    */
   initComponent: function () {
-    var self = this;
+    var me = this;
 
-    self.constructor.superclass.initComponent.apply(self, arguments);
+    Ext.apply(me, {
+      items: [
+        {
+          xtype: 'panel',
+          layout: 'fit',
+          html: 'Allows changing the logging configuration.'
+        },
+        {
+          xtype: 'tabpanel',
+          items: [
+            { xtype: 'nx-logging-view-loggers' },
+            { xtype: 'nx-logging-view-log' }
+          ],
+          activeItem: 0
+        }
+      ]
+    });
+
+    me.constructor.superclass.initComponent.apply(me, arguments);
   }
 
 }, function () {
-  var type = this,
-      sp = Sonatype.lib.Permissions;
-
-  NX.log.debug('Adding global view: ' + type.$className);
-
-  // install panel into main NX navigation
-  Sonatype.Events.on('nexusNavigationInit', function (panel) {
-    panel.add({
-      enabled: sp.checkPermission('nexus:logging', sp.READ),
-      sectionId: 'st-nexus-config',
-      title: 'Logging',
-      tabId: 'logging',
-      tabCode: type
-    });
-
-    NX.log.debug('Registered global view: ' + type.$className);
-  });
+  Ext.reg('nx-logging-view-panel', Nexus.logging.app.view.Panel);
 });
