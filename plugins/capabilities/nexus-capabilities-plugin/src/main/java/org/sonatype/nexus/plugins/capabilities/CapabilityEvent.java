@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins.capabilities;
 
 import java.util.Map;
 
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.nexus.events.AbstractEvent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

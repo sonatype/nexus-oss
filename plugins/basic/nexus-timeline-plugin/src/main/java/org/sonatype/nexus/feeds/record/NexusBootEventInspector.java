@@ -16,10 +16,10 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Boot listening event inspector. This one is intentionally not async, to mark exact time stamps of Nexus important

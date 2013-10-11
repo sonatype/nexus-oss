@@ -13,17 +13,11 @@
 
 package org.sonatype.nexus.templates;
 
-import javax.inject.Singleton;
-
-import org.sonatype.plugin.ExtensionPoint;
-
 /**
  * A template provider provides a set of templates for one implementation.
  *
  * @author cstamas
  */
-@ExtensionPoint
-@Singleton
 public interface TemplateProvider
 {
   /**

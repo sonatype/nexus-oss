@@ -21,17 +21,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The event fired on Expiring the Not Found cache of the repository.
- * <p>
- * Note: this class subclasses {@link RepositoryEventExpireCaches} only to keep it type-equal in case of legacy code
- * doing {@code instanceof} checks against this instance when fired. In the future, the superclass will be removed and
- * this class will directly extend {@link RepositoryMaintenanceEvent}. Also, even today, it does not share any of the
- * state and member variables with it's (artificially kept for backward compatibility) parent class.
  *
  * @author cstamas
  * @since 2.0
  */
 public class RepositoryEventExpireNotFoundCaches
-    extends RepositoryEventExpireCaches
+    extends RepositoryMaintenanceEvent
 {
   /**
    * From where it happened
@@ -51,7 +46,7 @@ public class RepositoryEventExpireNotFoundCaches
   public RepositoryEventExpireNotFoundCaches(final Repository repository, final String path,
                                              final Map<String, Object> requestContext, final boolean cacheAltered)
   {
-    super(checkNotNull(repository), checkNotNull(path));
+    super(repository);
     this.path = checkNotNull(path);
     this.requestContext = checkNotNull(requestContext);
     this.cacheAltered = cacheAltered;
@@ -60,7 +55,6 @@ public class RepositoryEventExpireNotFoundCaches
   /**
    * Returns the repository path against which expire proxy caches was invoked.
    */
-  @Override
   public String getPath() {
     return path;
   }

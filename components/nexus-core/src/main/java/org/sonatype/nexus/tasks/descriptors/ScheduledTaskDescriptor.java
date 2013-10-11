@@ -15,14 +15,9 @@ package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.List;
 
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
-import org.sonatype.plugin.ExtensionPoint;
 
-@ExtensionPoint
-@Singleton
 public interface ScheduledTaskDescriptor
 {
   String getId();

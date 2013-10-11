@@ -13,7 +13,7 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.nexus.events.AbstractEvent;
 
 public class LdapClearCacheEvent
     extends AbstractEvent<Object>

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.plexusplugin.PlexusPlugin;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -26,7 +27,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.common.collect.Lists;

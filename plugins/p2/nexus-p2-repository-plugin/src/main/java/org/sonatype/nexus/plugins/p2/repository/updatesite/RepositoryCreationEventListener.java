@@ -18,12 +18,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.ScheduledTask;
 
 import static com.google.common.base.Preconditions.checkNotNull;

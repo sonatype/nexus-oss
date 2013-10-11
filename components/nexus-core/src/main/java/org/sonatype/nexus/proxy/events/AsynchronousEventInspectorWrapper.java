@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.nexus.events.Event;
 
 import com.google.common.base.Preconditions;
 

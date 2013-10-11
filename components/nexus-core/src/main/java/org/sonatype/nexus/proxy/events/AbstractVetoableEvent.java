@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.nexus.events.AbstractEvent;
 
 public class AbstractVetoableEvent<T>
     extends AbstractEvent<T>

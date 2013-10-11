@@ -23,7 +23,6 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * Spawns a background task to delete repository folders upon removal.
