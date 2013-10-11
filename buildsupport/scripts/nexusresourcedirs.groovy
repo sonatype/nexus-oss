@@ -14,16 +14,27 @@
 //
 // Helper to generate NEXUS_RESOURCE_DIRS environment variable.
 //
-// Usage (from project root directory):
+// Usage from project directory:
 //
 //     export NEXUS_RESOURCE_DIRS=`groovy ./buildsupport/scripts/nexusresourcedirs.groovy`
 //
+// Aggregate projects using 'roots' property:
+//
+//     export NEXUS_RESOURCE_DIRS=`groovy -Droots=./nexus-oss,./nexus-pro nexus-oss/buildsupport/scripts/nexusresourcedirs.groovy`
+//
 
-def dir = new File('.').canonicalFile
+def roots = System.getProperty('roots', '.')
 def dirs = []
-dir.eachDirRecurse {
-  if (it.path.endsWith('src/main/resources/static')) {
-    dirs << it.parentFile.path
+
+roots.split(',').each { root ->
+  def dir = new File(root)
+  if (dir.exists()) {
+    dir = dir.canonicalFile
+    dir.eachDirRecurse {
+      if (it.path.endsWith('src/main/resources/static')) {
+        dirs << it.parentFile.path
+      }
+    }
   }
 }
 
