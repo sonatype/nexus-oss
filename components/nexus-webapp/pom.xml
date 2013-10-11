@@ -237,7 +237,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-supporttools-plugin</artifactId>
+      <artifactId>nexus-atlas-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>

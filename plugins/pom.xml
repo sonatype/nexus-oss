@@ -506,18 +506,18 @@
         <version>2.7.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- supporttools -->
+      <!-- atlas -->
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-supporttools-plugin</artifactId>
+        <artifactId>nexus-atlas-plugin</artifactId>
         <type>nexus-plugin</type>
         <version>2.7.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-supporttools-plugin</artifactId>
+        <artifactId>nexus-atlas-plugin</artifactId>
         <type>jar</type>
         <version>2.7.0-SNAPSHOT</version>
       </dependency>

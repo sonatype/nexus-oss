@@ -10,3 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+/*global define,NX*/
+define('nexus-atlas-plugin-boot',
+function () {
+  NX.log.debug('Module loaded: nexus-atlas-plugin-boot');
+});

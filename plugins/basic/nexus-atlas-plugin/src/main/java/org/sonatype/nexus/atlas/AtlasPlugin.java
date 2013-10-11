@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.support;
+package org.sonatype.nexus.atlas;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,20 +21,20 @@ import org.sonatype.nexus.plugin.PluginIdentity;
 import org.jetbrains.annotations.NonNls;
 
 /**
- * Support plugin.
+ * Atlas (support) plugin.
  *
  * @since 2.7
  */
 @Named
 @EagerSingleton
-public class SupportPlugin
+public class AtlasPlugin
     extends PluginIdentity
 {
   /**
    * Prefix for ID-like things.
    */
   @NonNls
-  public static final String ID_PREFIX = "supporttools";
+  public static final String ID_PREFIX = "atlas";
 
   /**
    * Expected groupId for plugin artifact.
@@ -64,7 +64,7 @@ public class SupportPlugin
   public static final String PERMISSION_PREFIX = "nexus:" + ID_PREFIX + ":";
 
   @Inject
-  public SupportPlugin() throws Exception {
+  public AtlasPlugin() throws Exception {
     super(GROUP_ID, ARTIFACT_ID);
   }
 }

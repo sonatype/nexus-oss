@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.support.rest
+package org.sonatype.nexus.atlas.rest
 
 import org.apache.shiro.authz.annotation.RequiresRoles
 import org.sonatype.security.SecuritySystem
@@ -42,7 +42,7 @@ class SecurityDiagnosticResource
   extends ComponentSupport
   implements Resource
 {
-  static final String RESOURCE_URI = '/supporttools/security-diagnostic'
+  static final String RESOURCE_URI = '/atlas/security-diagnostic'
 
   private final SecuritySystem securitySystem
 

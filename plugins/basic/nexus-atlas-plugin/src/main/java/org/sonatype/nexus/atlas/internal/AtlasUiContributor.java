@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,3 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+package org.sonatype.nexus.atlas.internal;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+
+import static org.sonatype.nexus.atlas.AtlasPlugin.ARTIFACT_ID;
+import static org.sonatype.nexus.atlas.AtlasPlugin.GROUP_ID;
+
+/**
+ * Atlas {@link UiContributor}.
+ *
+ * @since 2.7
+ */
+@Named
+@Singleton
+public class AtlasUiContributor
+    implements UiContributor
+{
+  @Override
+  public UiContribution contribute(final boolean debug) {
+    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
+  }
+}
