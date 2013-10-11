@@ -29,10 +29,9 @@ def dirs = []
 roots.split(',').each { root ->
   def dir = new File(root)
   if (dir.exists()) {
-    dir = dir.canonicalFile
     dir.eachDirRecurse {
       if (it.path.endsWith('src/main/resources/static')) {
-        dirs << it.parentFile.path
+        dirs << it.parentFile.canonicalPath
       }
     }
   }
