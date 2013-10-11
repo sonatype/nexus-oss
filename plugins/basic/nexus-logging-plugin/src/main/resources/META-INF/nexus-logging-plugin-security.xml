@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<security>
+  <version>2.0.5</version>
+  <roles>
+    <role>
+      <id>ui-logging-admin</id>
+      <name>UI: Logging Administration</name>
+      <description>Gives access to Logging Administration screen in Nexus UI</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>logging-read</privilege>
+        <privilege>logging-update</privilege>
+      </privileges>
+    </role>
+  </roles>
+  <privileges>
+    <privilege>
+      <id>logging-read</id>
+      <type>method</type>
+      <name>Logging - (read)</name>
+      <description>Give permission to read existing logging configuration.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:logging</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>logging-update</id>
+      <type>method</type>
+      <name>Logging - (update,read)</name>
+      <description>Give permission to read and modify logging configuration.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>update,read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:logging</value>
+        </property>
+      </properties>
+    </privilege>
+  </privileges>
+</security>
