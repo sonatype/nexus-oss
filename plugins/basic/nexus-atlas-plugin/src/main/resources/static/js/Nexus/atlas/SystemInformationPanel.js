@@ -11,10 +11,31 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global define,NX*/
-define('nexus-atlas-plugin-boot', [
-  'Nexus/atlas/SupportToolsView'
-],
-function () {
-  NX.log.debug('Module loaded: nexus-atlas-plugin-boot');
+/**
+ * System information panel.
+ *
+ * @since 2.7
+ */
+NX.define('Nexus.atlas.SystemInformationPanel', {
+  extend: 'Ext.Container',
+
+  mixins: [
+    'Nexus.LogAwareMixin'
+  ],
+
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var self = this;
+
+    Ext.apply(self, {
+      cls: 'nx-atlas-SystemInformationPanel',
+      title: 'System Information',
+      html: 'TODO'
+    });
+
+    self.constructor.superclass.initComponent.apply(self, arguments);
+  }
+
 });

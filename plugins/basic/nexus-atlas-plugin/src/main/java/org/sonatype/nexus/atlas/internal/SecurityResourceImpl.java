@@ -11,10 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global define,NX*/
-define('nexus-atlas-plugin-boot', [
-  'Nexus/atlas/SupportToolsView'
-],
-function () {
-  NX.log.debug('Module loaded: nexus-atlas-plugin-boot');
-});
+package org.sonatype.nexus.atlas.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.atlas.AtlasPlugin;
+import org.sonatype.nexus.plugin.support.StaticSecurityResourceSupport;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
+
+/**
+ * Atlas {@link StaticSecurityResource}.
+ *
+ * @since 2.7
+ */
+@Named
+@Singleton
+public class SecurityResourceImpl
+    extends StaticSecurityResourceSupport
+{
+  @Inject
+  public SecurityResourceImpl(final AtlasPlugin plugin) {
+    super(plugin);
+  }
+}

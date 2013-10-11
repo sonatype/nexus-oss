@@ -13,14 +13,16 @@
 
 package org.sonatype.nexus.atlas.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.atlas.AtlasPlugin;
+import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 
-import static org.sonatype.nexus.atlas.AtlasPlugin.ARTIFACT_ID;
-import static org.sonatype.nexus.atlas.AtlasPlugin.GROUP_ID;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Atlas {@link UiContributor}.
@@ -29,11 +31,21 @@ import static org.sonatype.nexus.atlas.AtlasPlugin.GROUP_ID;
  */
 @Named
 @Singleton
-public class AtlasUiContributor
+public class UiContributorImpl
     implements UiContributor
 {
+  private final PluginIdentity owner;
+
+  @Inject
+  public UiContributorImpl(final AtlasPlugin owner) {
+    this.owner = checkNotNull(owner);
+  }
+
   @Override
   public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
+    return new UiContributionBuilder(this,
+        owner.getCoordinates().getGroupId(),
+        owner.getCoordinates().getArtifactId())
+        .build(debug);
   }
 }
