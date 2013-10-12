@@ -18,18 +18,21 @@
  * @since 2.7
  */
 NX.define('Nexus.app.Controller', {
-
-  mixins: [
-    'Nexus.LogAwareMixin'
-  ],
-
   control: function (control) {
     var me = this;
-    if(Ext.isDefined(control)){
-      Ext.Object.each(control, function(key){
-         me.logDebug(key);
-      });
+    if (Ext.isDefined(control)) {
+      for (var key in control) {
+        if (key.startsWith('#')) {
+          Ext.ComponentMgr.onAvailable(key.substring(1), function (obj) {
+            var events = control['#' + obj.id];
+            for (var event in events) {
+              obj.on(event, events[event], me);
+              //obj.up = obj.findParentByType
+              me.logDebug('Registered for event "' + event + '" on ' + obj.id);
+            }
+          }, me);
+        }
+      }
     }
   }
-
 });

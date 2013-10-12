@@ -18,7 +18,7 @@
  * @since 2.7
  */
 NX.define('Nexus.logging.app.view.Loggers', {
-  extend: 'Ext.grid.GridPanel',
+  extend: 'Ext.grid.EditorGridPanel',
 
   mixins: [
     'Nexus.LogAwareMixin'
@@ -33,6 +33,12 @@ NX.define('Nexus.logging.app.view.Loggers', {
 
   stripeRows: true,
   border: false,
+  autoHeight: true,
+  clicksToEdit: 1,
+
+  viewConfig: {
+
+  },
 
   loadMask: {
     msg: 'Loading...',
@@ -50,7 +56,31 @@ NX.define('Nexus.logging.app.view.Loggers', {
       id: 'level',
       header: 'Level',
       dataIndex: 'level',
-      sortable: true
+      sortable: true,
+      width: 200,
+      tooltip: 'Double click to edit',
+      editor: NX.create('Ext.form.ComboBox', {
+        typeAhead: true,
+        forceSelection: true,
+        triggerAction: 'all',
+        lazyRender: true,
+        mode: 'local',
+        store: NX.create('Ext.data.ArrayStore', {
+          id: 0,
+          fields: [
+            'level'
+          ],
+          data: [
+            ['TRACE'],
+            ['DEBUG'],
+            ['INFO'],
+            ['WARN'],
+            ['ERROR']
+          ]
+        }),
+        valueField: 'level',
+        displayField: 'level'
+      })
     }
   ],
 

@@ -18,7 +18,7 @@
  * @since 2.7
  */
 NX.define('Nexus.logging.app.controller.Logging', {
-  extends: 'Nexus.app.Controller',
+  extend: 'Nexus.app.Controller',
 
   mixins: [
     'Nexus.LogAwareMixin'
@@ -29,7 +29,6 @@ NX.define('Nexus.logging.app.controller.Logging', {
   ],
 
   init: function () {
-    this.logDebug('init');
     this.control({
       '#nx-logging-button-refresh-loggers': {
         click: this.loadLoggers
@@ -59,49 +58,11 @@ NX.define('Nexus.logging.app.controller.Logging', {
 
   removeLoggers: function (button) {
     var loggersGrid = button.up('nx-logging-view-loggers'),
-        selections = loggersGrid.getSelectionModel().getSelections(),
+        sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore();
 
-    if (selections.length > 0) {
-      store.remove(selections);
-      store.save();
-    }
-  },
-
-  control: function (control) {
-    var me = this;
-    if (Ext.isDefined(control)) {
-      for (var key in control) {
-        if (key.startsWith('#')) {
-          Ext.ComponentMgr.onAvailable(key.substring(1), function (obj) {
-            var events = control['#' + obj.id];
-            for (var event in events) {
-              obj.on(event, events[event], me);
-              obj.up = function (name) {
-                return me.goUp.call(me, obj.ownerCt, name);
-              }
-              me.logDebug('Registered for event "' + event + '" on ' + obj.id);
-            }
-          }, me);
-        }
-      }
-    }
-  },
-
-  goUp: function (container, name) {
-    var me = this;
-    if (container) {
-      if (name.startsWith('#')) {
-        if (container.id === name.substring(1)) {
-          return container;
-        }
-      }
-      else {
-        if (container.getXType() === name) {
-          return container;
-        }
-      }
-      return me.goUp.call(me, container.ownerCt, name);
+    if (sm.hasSelection()) {
+      store.remove(sm.selection.record);
     }
   }
 

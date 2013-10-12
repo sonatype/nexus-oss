@@ -31,7 +31,7 @@ NX.define('Nexus.logging.app.view.Panel', {
 
   title: 'Logging',
 
-  layout: 'vbox',
+  border: false,
 
   /**
    * @override
@@ -48,6 +48,8 @@ NX.define('Nexus.logging.app.view.Panel', {
         },
         {
           xtype: 'tabpanel',
+          border: false,
+          layoutOnTabChange: true,
           items: [
             { xtype: 'nx-logging-view-loggers' },
             { xtype: 'nx-logging-view-log' }

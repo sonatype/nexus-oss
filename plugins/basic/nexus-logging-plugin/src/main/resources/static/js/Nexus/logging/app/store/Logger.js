@@ -18,7 +18,7 @@
  * @since 2.7
  */
 NX.define('Nexus.logging.app.store.Logger', {
-  extend: 'Ext.data.JsonStore',
+  extend: 'Ext.data.Store',
 
   mixins: [
     'Nexus.LogAwareMixin'
@@ -26,19 +26,50 @@ NX.define('Nexus.logging.app.store.Logger', {
 
   requires: ['Nexus.siesta'],
 
-  autoDestroy: true,
   storeId: 'nx-logging-store-logger',
-
+  autoLoad: true,
   restful: true,
+
   proxy: new Ext.data.HttpProxy({
-    url: Nexus.siesta.basePath + '/logging/loggers'
+    url: Nexus.siesta.basePath + '/logging/loggers',
+    listeners: {
+      load: {
+        fn: function (proxy, o, options){
+          console.log(o);
+        },
+        scope: this
+      },
+      write: {
+        fn: function (proxy, action, data, response, rs, options){
+          console.log(data);
+        },
+        scope: this
+      },
+      exception: {
+        fn: function (proxy, type, action, options, response, arg){
+          console.log(response);
+        },
+        scope: this
+      }
+    }
   }),
 
-  idProperty: 'name',
+  reader: NX.create('Ext.data.JsonReader', {
+    root: '',
+    idProperty: 'name',
+    fields: [
+      'name',
+      'level'
+    ]
+  }),
 
-  fields: [
-    'name',
-    'level'
-  ]
+  writer: NX.create('Ext.data.JsonWriter', {
+    encode: false,
+    render : function(params, baseParams, data) {
+      params.jsonData = data;
+    }
+  }),
+
+  sortInfo: { field: 'name', direction: 'ASC' }
 
 });
