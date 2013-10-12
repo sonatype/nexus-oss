@@ -14,6 +14,7 @@
 package org.sonatype.nexus.atlas.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.sonatype.appcontext.AppContext
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
 import org.sonatype.nexus.plugins.NexusPluginManager
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -53,15 +54,19 @@ implements Resource
 
   final File installDirectory
 
+  final AppContext appContext
+
   final NexusPluginManager pluginManager
 
   @Inject
   SystemInformationResource(final ApplicationConfiguration applicationConfiguration,
                             final @Named('${bundleBasedir}') @Nullable File installDirectory,
+                            final AppContext appContext,
                             final NexusPluginManager pluginManager)
   {
     this.applicationConfiguration = checkNotNull(applicationConfiguration)
     this.installDirectory = installDirectory
+    this.appContext = checkNotNull(appContext)
     this.pluginManager = checkNotNull(pluginManager)
   }
 
@@ -148,6 +153,7 @@ implements Resource
         'system-runtime': reportRuntime(),
         'system-threads': reportThreads(),
         'system-filestores': reportFileStores(),
+        'nexus-properties': appContext.flatten().sort(),
         'nexus-configuration': reportNexusConfiguration(),
         'nexus-plugins': reportNexusPlugins()
     ]
