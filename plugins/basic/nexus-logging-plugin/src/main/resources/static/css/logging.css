@@ -17,26 +17,34 @@
 
 .nx-logging-view-add,
 .nx-logging-view-add .x-form-item,
-.nx-logging-view-add .x-form-field {
+.nx-logging-view-add .x-form-field,
+.nx-logging-view-panel-description {
   font: normal 11px arial, tahoma, verdana, helvetica;
 }
 
-.nx-logging-view-add .x-panel {
+.nx-logging-view-panel-tabs ul.x-tab-strip-top {
+  border-bottom-color: white;
+  background: white none;
+}
+
+.nx-logging-view-add .x-form {
   padding-right: 10px;
   padding-left: 10px;
 }
 
-.nx-logging-view-add-description {
-  padding-top: 10px;
-  padding-bottom: 10px;
+.nx-logging-view-add-description,
+.nx-logging-view-panel-description {
+  padding: 10px;
   vertical-align: middle;
 }
 
-.nx-logging-view-add-description img {
+.nx-logging-view-add-description img,
+.nx-logging-view-panel-description img {
   float: left;
 }
 
-.nx-logging-view-add-description span {
+.nx-logging-view-add-description span,
+.nx-logging-view-panel-description span {
   display: inline-block;
   padding-left: 10px;
 }

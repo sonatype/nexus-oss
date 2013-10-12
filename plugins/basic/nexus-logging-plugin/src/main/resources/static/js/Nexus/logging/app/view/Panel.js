@@ -43,12 +43,14 @@ NX.define('Nexus.logging.app.view.Panel', {
       items: [
         {
           xtype: 'panel',
-          layout: 'fit',
-          html: 'Allows changing the logging configuration.'
+          border: false,
+          cls: 'nx-logging-view-panel-description',
+          html: '<img src="images/instructions.png"/><span><br/>Allows changing the logging configuration. For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a>.</span>'
         },
         {
           xtype: 'tabpanel',
           border: false,
+          cls: 'nx-logging-view-panel-tabs',
           layoutOnTabChange: true,
           items: [
             { xtype: 'nx-logging-view-loggers' },
