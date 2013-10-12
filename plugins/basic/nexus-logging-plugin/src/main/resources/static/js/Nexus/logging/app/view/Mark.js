@@ -13,25 +13,25 @@
 /*global NX, Ext, Nexus, Sonatype*/
 
 /**
- * Add new logger window.
+ * Mark Nexus log window.
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.view.Add', {
+NX.define('Nexus.logging.app.view.Mark', {
   extend: 'Ext.Window',
 
   mixins: [
     'Nexus.LogAwareMixin'
   ],
 
-  title: 'Add logger',
+  title: 'Mark log',
 
   autoShow: true,
   constrain: true,
   resizable: false,
   width: 500,
   border: false,
-  cls: 'nx-logging-view-add',
+  cls: 'nx-logging-view-mark',
 
   /**
    * @override
@@ -44,8 +44,8 @@ NX.define('Nexus.logging.app.view.Add', {
         {
           xtype: 'panel',
           border: false,
-          cls: 'nx-logging-view-add-description',
-          html: '<img src="images/instructions.png"/><span><br/>Add a logger with a specific level.</span>'
+          cls: 'nx-logging-view-mark-description',
+          html: '<img src="images/instructions.png"/><span><br/>Mark the log with a unique message for reference.</span>'
         },
         {
           xtype: 'form',
@@ -54,28 +54,19 @@ NX.define('Nexus.logging.app.view.Add', {
           items: [
             {
               xtype: 'textfield',
-              fieldLabel: 'Logger',
+              fieldLabel: 'Message',
               itemCls: 'required-field',
-              helpText: "Enter a logger name",
-              name: 'name',
+              helpText: "Message to be included in the log",
+              name: 'message',
               allowBlank: false,
               anchor: '96%'
-            },
-            {
-              xtype: 'nx-logging-combo-logger-level',
-              fieldLabel: 'Level',
-              itemCls: 'required-field',
-              //helpText: "Select logger level",
-              name: 'level',
-              value: 'INFO',
-              width: 80
             }
           ],
 
           buttonAlign: 'right',
           buttons: [
             { text: 'Discard', xtype: 'link-button', handler: this.close, scope: me },
-            { text: 'Save', formBind: true, id: 'nx-logging-button-add-save' }
+            { text: 'Save', formBind: true, id: 'nx-logging-button-mark-save' }
           ]
         }
       ],
@@ -89,5 +80,5 @@ NX.define('Nexus.logging.app.view.Add', {
   }
 
 }, function () {
-  Ext.reg('nx-logging-view-add', Nexus.logging.app.view.Add);
+  Ext.reg('nx-logging-view-mark', Nexus.logging.app.view.Mark);
 });

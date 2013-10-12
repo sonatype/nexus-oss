@@ -71,7 +71,8 @@ NX.define('Nexus.logging.app.view.Loggers', {
    * @override
    */
   initComponent: function () {
-    var me = this;
+    var me = this,
+        icons = Nexus.logging.app.Icons;
 
     Ext.apply(me, {
       store: NX.create('Nexus.logging.app.store.Logger'),
@@ -80,19 +81,25 @@ NX.define('Nexus.logging.app.view.Loggers', {
           id: 'nx-logging-button-refresh-loggers',
           text: 'Refresh',
           tooltip: 'Refresh loggers',
-          iconCls: Nexus.logging.app.Icons.get('loggers_refresh').cls
+          iconCls: icons.get('loggers_refresh').cls
         },
         {
           id: 'nx-logging-button-add-logger',
           text: 'Add',
           tooltip: 'Add new logger',
-          iconCls: Nexus.logging.app.Icons.get('loggers_add').cls
+          iconCls: icons.get('loggers_add').cls
         },
         {
           id: 'nx-logging-button-remove-loggers',
           text: 'Remove',
           tooltip: 'Remove selected logger',
-          iconCls: Nexus.logging.app.Icons.get('loggers_remove').cls
+          iconCls: icons.get('loggers_remove').cls
+        },
+        {
+          id: 'nx-logging-button-mark',
+          text: 'Mark',
+          tooltip: 'Add a mark in Nexus log file',
+          iconCls: icons.get('loggers_mark').cls
         }
       ]
     });

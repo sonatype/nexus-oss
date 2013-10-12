@@ -26,7 +26,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
 
   requires: [
     'Nexus.logging.app.view.Panel',
-    'Nexus.logging.app.view.Add'
+    'Nexus.logging.app.view.Add',
+    'Nexus.logging.app.view.Mark'
   ],
 
   init: function () {
@@ -35,13 +36,19 @@ NX.define('Nexus.logging.app.controller.Logging', {
         click: this.loadLoggers
       },
       '#nx-logging-button-add-logger': {
-        click: this.addLogger
+        click: this.showAddLogger
       },
       '#nx-logging-button-remove-loggers': {
         click: this.removeLoggers
       },
-      '#nx-logging-button-save': {
-        click: this.saveLogger
+      '#nx-logging-button-mark': {
+        click: this.showMarkLog
+      },
+      '#nx-logging-button-add-save': {
+        click: this.addLogger
+      },
+      '#nx-logging-button-mark-save': {
+        click: this.markLog
       }
     });
   },
@@ -53,7 +60,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
     store.load();
   },
 
-  addLogger: function (button) {
+  showAddLogger: function (button) {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         win = Ext.create({xtype: 'nx-logging-view-add'});
 
@@ -61,7 +68,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
     win.show();
   },
 
-  saveLogger: function (button) {
+  addLogger: function (button) {
     var win = button.up('nx-logging-view-add'),
         store = win.grid.getStore(),
         form = win.down('form')[0].getForm(),
@@ -103,6 +110,19 @@ NX.define('Nexus.logging.app.controller.Logging', {
     if (sm.hasSelection()) {
       store.remove(sm.selection.record);
     }
+  },
+
+  showMarkLog: function () {
+    Ext.create({xtype: 'nx-logging-view-mark'}).show();
+  },
+
+  markLog: function (button) {
+    var win = button.up('nx-logging-view-mark'),
+        form = win.down('form')[0].getForm(),
+        values = form.getFieldValues();
+
+    win.close();
+    alert(values.message);
   }
 
 });

@@ -11,13 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-.nx-logging-view-add .x-window-ml div {
+.nx-logging-view-add .x-window-ml div,
+.nx-logging-view-mark .x-window-ml div {
   background-color: white;
 }
 
 .nx-logging-view-add,
 .nx-logging-view-add .x-form-item,
 .nx-logging-view-add .x-form-field,
+.nx-logging-view-mark,
+.nx-logging-view-mark .x-form-item,
+.nx-logging-view-mark .x-form-field,
 .nx-logging-view-panel-description {
   font: normal 11px arial, tahoma, verdana, helvetica;
 }
@@ -27,29 +31,34 @@
   background: white none;
 }
 
-.nx-logging-view-add .x-form {
+.nx-logging-view-add .x-form,
+.nx-logging-view-mark .x-form {
   padding-right: 10px;
   padding-left: 10px;
 }
 
 .nx-logging-view-add-description,
+.nx-logging-view-mark-description,
 .nx-logging-view-panel-description {
   padding: 10px;
   vertical-align: middle;
 }
 
 .nx-logging-view-add-description img,
+.nx-logging-view-mark-description img,
 .nx-logging-view-panel-description img {
   float: left;
 }
 
 .nx-logging-view-add-description span,
+.nx-logging-view-mark-description span,
 .nx-logging-view-panel-description span {
   display: inline-block;
   padding-left: 10px;
 }
 
-.nx-logging-view-add .x-form-item-label {
+.nx-logging-view-add .x-form-item-label,
+.nx-logging-view-mark .x-form-item-label{
   font-weight: bold;
 }
 

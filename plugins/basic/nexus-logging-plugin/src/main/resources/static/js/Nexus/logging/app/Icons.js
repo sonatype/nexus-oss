@@ -33,7 +33,8 @@ NX.define('Nexus.logging.app.Icons', {
       icons: {
         loggers_add:      'loggers_add.png',
         loggers_refresh:  'loggers_refresh.png',
-        loggers_remove:   'loggers_remove.png'
+        loggers_remove:   'loggers_remove.png',
+        loggers_mark:     'loggers_mark.gif'
       }
     });
   }
