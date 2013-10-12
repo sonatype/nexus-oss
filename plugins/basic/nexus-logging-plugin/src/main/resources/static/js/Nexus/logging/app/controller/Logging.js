@@ -177,8 +177,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
         'accept': 'text/plain'
       },
       params: {
-        from: 0,
-        count: 1024
+        count: -10240
       },
       scope: me,
       suppressStatus: true,
