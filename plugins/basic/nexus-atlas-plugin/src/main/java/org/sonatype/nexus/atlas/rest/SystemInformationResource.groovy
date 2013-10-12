@@ -143,8 +143,8 @@ implements Resource
 
     def sections = [
         'system-time': reportTime(),
-        'system-properties': System.properties,
-        'system-environment': System.getenv(),
+        'system-properties': System.properties.sort(),
+        'system-environment': System.getenv().sort(),
         'system-runtime': reportRuntime(),
         'system-threads': reportThreads(),
         'system-filestores': reportFileStores(),
