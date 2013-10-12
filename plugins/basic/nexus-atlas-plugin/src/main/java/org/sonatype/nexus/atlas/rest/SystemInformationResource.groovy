@@ -138,6 +138,8 @@ implements Resource
       return data
     }
 
+    // TODO: Report license (if we can resolve the components)
+
     def sections = [
         'system-time': reportTime(),
         'system-properties': System.properties,
