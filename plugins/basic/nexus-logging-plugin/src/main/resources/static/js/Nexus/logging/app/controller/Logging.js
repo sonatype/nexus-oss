@@ -32,7 +32,9 @@ NX.define('Nexus.logging.app.controller.Logging', {
   ],
 
   init: function () {
-    this.control({
+    var me = this;
+
+    me.control({
       '#nx-logging-button-refresh-loggers': {
         click: this.loadLoggers
       },
@@ -50,8 +52,20 @@ NX.define('Nexus.logging.app.controller.Logging', {
       },
       '#nx-logging-button-mark-save': {
         click: this.markLog
+      },
+      '#nx-logging-button-refresh-log': {
+        click: this.refreshLog
       }
     });
+
+    me.getLogTask = {
+      run: function () {
+        this.loadTail();
+      },
+      interval: 10000,
+      scope: me,
+      started: false
+    };
   },
 
   loadLoggers: function (button) {
@@ -145,6 +159,34 @@ NX.define('Nexus.logging.app.controller.Logging', {
           message = response.statusText;
         }
         Nexus.messages.show('Failed to mark log file', message);
+      }
+    });
+  },
+
+  refreshLog: function (button) {
+    this.retrieveLog(button.up('nx-logging-view-log'));
+  },
+
+  retrieveLog: function (logPanel) {
+    var me = this;
+
+    Ext.Ajax.request({
+      url: Sonatype.config.repos.urls.logs + "/nexus.log",
+      method: 'GET',
+      headers: {
+        'accept': 'text/plain'
+      },
+      params: {
+        from: 0,
+        count: 1024
+      },
+      scope: me,
+      suppressStatus: true,
+      success: function (response) {
+        logPanel.showLog(response.responseText);
+      },
+      failure: function (response) {
+        logPanel.showLog(response.responseText);
       }
     });
   }

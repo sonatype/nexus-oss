@@ -58,7 +58,12 @@
 }
 
 .nx-logging-view-add .x-form-item-label,
-.nx-logging-view-mark .x-form-item-label{
+.nx-logging-view-mark .x-form-item-label {
   font-weight: bold;
+}
+
+.nx-logging-view-log textarea {
+  font-family: monospace;
+  font-size: 10px;
 }
 

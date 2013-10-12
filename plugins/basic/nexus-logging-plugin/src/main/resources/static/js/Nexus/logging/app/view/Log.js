@@ -25,17 +25,40 @@ NX.define('Nexus.logging.app.view.Log', {
   ],
 
   title: 'Log',
+  cls: 'nx-logging-view-log',
+  layout: 'fit',
 
   /**
    * @override
    */
   initComponent: function () {
-    var me = this;
+    var me = this,
+        icons = Nexus.logging.app.Icons;
 
     Ext.apply(me, {
+      items: {
+        xtype: 'textarea',
+        readOnly: true,
+        hideLabel: true,
+        emptyText: 'Log not loaded',
+        anchor: '100% 100%'
+      },
+
+      tbar: [
+        {
+          id: 'nx-logging-button-refresh-log',
+          text: 'Refresh',
+          tooltip: 'Refresh loggers',
+          iconCls: icons.get('loggers_refresh').cls
+        }
+      ]
     });
 
     me.constructor.superclass.initComponent.apply(me, arguments);
+  },
+
+  showLog: function (text) {
+    this.down('textarea')[0].setValue(text);
   }
 
 }, function () {

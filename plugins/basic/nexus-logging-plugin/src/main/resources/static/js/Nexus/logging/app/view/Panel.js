@@ -32,6 +32,10 @@ NX.define('Nexus.logging.app.view.Panel', {
   title: 'Logging',
 
   border: false,
+  layout: {
+    type: 'vbox',
+    align: 'stretch'
+  },
 
   /**
    * @override
@@ -45,9 +49,12 @@ NX.define('Nexus.logging.app.view.Panel', {
           xtype: 'panel',
           border: false,
           cls: 'nx-logging-view-panel-description',
-          html: '<img src="images/instructions.png"/><span><br/>Allows changing the logging configuration. For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a>.</span>'
+          html: '<img src="images/instructions.png"/><span><br/>Allows changing the logging configuration. For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></span>',
+          height: 65,
+          flex: 0
         },
         {
+          flex: 1,
           xtype: 'tabpanel',
           border: false,
           cls: 'nx-logging-view-panel-tabs',
