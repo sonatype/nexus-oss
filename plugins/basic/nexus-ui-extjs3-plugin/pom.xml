@@ -85,6 +85,7 @@
                 <include>string.js</include>
                 <include>require-*.js</include>
                 <include>requirejs-css-plugin-*.js</include>
+                <include>up-and-down.js</include>
               </includes>
             </configuration>
           </execution>
