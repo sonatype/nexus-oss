@@ -31,27 +31,7 @@ NX.define('Nexus.logging.app.store.Logger', {
   restful: true,
 
   proxy: new Ext.data.HttpProxy({
-    url: Nexus.siesta.basePath + '/logging/loggers',
-    listeners: {
-      load: {
-        fn: function (proxy, o, options){
-          console.log(o);
-        },
-        scope: this
-      },
-      write: {
-        fn: function (proxy, action, data, response, rs, options){
-          console.log(data);
-        },
-        scope: this
-      },
-      exception: {
-        fn: function (proxy, type, action, options, response, arg){
-          console.log(response);
-        },
-        scope: this
-      }
-    }
+    url: Nexus.siesta.basePath + '/logging/loggers'
   }),
 
   reader: NX.create('Ext.data.JsonReader', {
