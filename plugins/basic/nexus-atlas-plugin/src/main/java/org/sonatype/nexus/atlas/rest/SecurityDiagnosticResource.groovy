@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.atlas.rest
 
+import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresRoles
 import org.sonatype.security.SecuritySystem
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -56,7 +57,7 @@ class SecurityDiagnosticResource
    */
   @GET
   @Path('user/{userId}')
-  @RequiresRoles('nx-admin')
+  @RequiresPermissions('nexus:atlas')
   Map userDiagnostic(final @PathParam('userId') String userId) {
     log.info 'Generating security diagnostics for user: {}', userId
 

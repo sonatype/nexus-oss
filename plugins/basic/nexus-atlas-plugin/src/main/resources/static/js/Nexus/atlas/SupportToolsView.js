@@ -69,7 +69,7 @@ NX.define('Nexus.atlas.SupportToolsView', {
   // install panel into main NX navigation
   Sonatype.Events.on('nexusNavigationInit', function (panel) {
     panel.add({
-      enabled: sp.checkPermission('nexus:supporttools', sp.READ),
+      enabled: sp.checkPermission('nexus:atlas', sp.READ),
 
       sectionId: 'st-nexus-config',
       title: 'Support Tools',
