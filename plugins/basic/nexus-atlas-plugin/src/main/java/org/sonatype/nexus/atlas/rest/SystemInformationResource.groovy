@@ -129,11 +129,12 @@ implements Resource
     def reportNexusPlugins = {
       def data = [:]
       pluginManager.pluginResponses.each { gav, response ->
-        data[gav.toString()] = [
-            'successful': response.successful,
-            'throwable': response.throwable,
-            'importedPlugins': response.pluginDescriptor.importedPlugins.collect { it.toString() }
+        def item = data[gav.toString()] = [
+            'successful': response.successful
         ]
+        if (response.throwable) {
+          item.throwable = response.throwable.toString()
+        }
       }
       return data
     }
