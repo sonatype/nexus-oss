@@ -32,6 +32,13 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <xsd:complexType name="marker">
+    <xsd:sequence>
+      <xsd:element name="message" type="xsd:string" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
   <xsd:element name="logger" type="model:logger"/>
+  <xsd:element name="marker" type="model:marker"/>
 
 </xsd:schema>

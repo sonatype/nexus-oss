@@ -25,6 +25,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
   ],
 
   requires: [
+    'Nexus.siesta',
     'Nexus.logging.app.view.Panel',
     'Nexus.logging.app.view.Add',
     'Nexus.logging.app.view.Mark'
@@ -122,7 +123,30 @@ NX.define('Nexus.logging.app.controller.Logging', {
         values = form.getFieldValues();
 
     win.close();
-    alert(values.message);
+
+    Ext.Ajax.request({
+      url: Nexus.siesta.basePath + "/logging/log/mark",
+      method: 'PUT',
+      suppressStatus: true,
+      jsonData: values,
+      success: function () {
+        Nexus.messages.show('Confirmation', 'Log has been marked with "' + values.message + '"');
+      },
+      failure: function (response) {
+        // TODO shall we show a message and ask user to retry?
+        var message;
+        if (response.siestaError) {
+          message = response.siestaError.message;
+        }
+        if (!message && response.responseText) {
+          message = Sonatype.utils.parseHTMLErrorMessage(response.responseText);
+        }
+        if (!message) {
+          message = response.statusText;
+        }
+        Nexus.messages.show('Failed to mark log file', message);
+      }
+    });
   }
 
 });
