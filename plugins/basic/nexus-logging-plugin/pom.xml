@@ -56,6 +56,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
@@ -71,6 +77,26 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <args>
+                <arg>-Xsetters</arg>
+                <arg>-Xfluent-api</arg>
+                <arg>-Xgenerated</arg>
+                <arg>-Xannotate</arg>
+                <arg>-XjsonProperty</arg>
+              </args>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
