@@ -56,7 +56,7 @@ NX.define('Nexus.logging.app.view.Mark', {
               xtype: 'textfield',
               fieldLabel: 'Message',
               itemCls: 'required-field',
-              helpText: "Message to be included in the log",
+              helpText: 'Message to be included in the log',
               name: 'message',
               allowBlank: false,
               anchor: '96%'

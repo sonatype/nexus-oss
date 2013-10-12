@@ -56,7 +56,7 @@ NX.define('Nexus.logging.app.view.Add', {
               xtype: 'textfield',
               fieldLabel: 'Logger',
               itemCls: 'required-field',
-              helpText: "Enter a logger name",
+              helpText: 'Enter a logger name',
               name: 'name',
               allowBlank: false,
               anchor: '96%'
