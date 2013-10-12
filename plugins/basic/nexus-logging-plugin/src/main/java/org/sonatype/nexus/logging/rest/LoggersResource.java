@@ -85,10 +85,11 @@ public class LoggersResource
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
-  public void post(final LoggerXO logger)
+  public LoggerXO post(final LoggerXO logger)
       throws Exception
   {
     loggers.put(logger.getName(), logger);
+    return logger;
   }
 
   @PUT
@@ -96,11 +97,12 @@ public class LoggersResource
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_XML, APPLICATION_JSON})
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
-  public void put(final @PathParam("id") String id,
-                  final LoggerXO logger)
+  public LoggerXO put(final @PathParam("id") String id,
+                      final LoggerXO logger)
       throws Exception
   {
     loggers.put(id, logger);
+    return logger;
   }
 
   @DELETE

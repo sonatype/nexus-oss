@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,28 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global NX, Ext, Sonatype, Nexus*/
 
-/**
- * Controller.
- *
- * @since 2.7
- */
-NX.define('Nexus.app.Controller', {
-  control: function (control) {
-    var me = this;
-    if (Ext.isDefined(control)) {
-      for (var key in control) {
-        if (key.startsWith('#')) {
-          Ext.ComponentMgr.onAvailable(key.substring(1), function (obj) {
-            var events = control['#' + obj.id];
-            for (var event in events) {
-              obj.on(event, events[event], me);
-              me.logDebug('Registered for event "' + event + '" on ' + obj.id);
-            }
-          }, me);
-        }
-      }
-    }
-  }
-});
+.nx-logging-view-add .x-window-ml div {
+  background-color: white;
+}
+
+.nx-logging-view-add,
+.nx-logging-view-add .x-form-item,
+.nx-logging-view-add .x-form-field {
+  font: normal 11px arial, tahoma, verdana, helvetica;
+}
+
+.nx-logging-view-add .x-panel {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.nx-logging-view-add-description {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  vertical-align: middle;
+}
+
+.nx-logging-view-add-description img {
+  float: left;
+}
+
+.nx-logging-view-add-description span {
+  display: inline-block;
+  padding-left: 10px;
+}
+
+.nx-logging-view-add .x-form-item-label {
+  font-weight: bold;
+}
+

@@ -31,9 +31,15 @@ public class LoggingUiContributor
     implements UiContributor
 {
 
+  private static final String CSS = "static/css/logging.css";
+
   @Override
   public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, LoggingPlugin.GROUP_ID, LoggingPlugin.ARTIFACT_ID).build(debug);
+    UiContributionBuilder builder = new UiContributionBuilder(this, LoggingPlugin.GROUP_ID, LoggingPlugin.ARTIFACT_ID);
+    if (debug) {
+      builder.withDependency("css!" + CSS + builder.getCacheBuster(CSS));
+    }
+    return builder.build(debug);
   }
 
 }

@@ -10,28 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global NX, Ext, Sonatype, Nexus*/
+/*global NX, Ext, Nexus, Sonatype*/
 
 /**
- * Controller.
+ * Logger level combo.
  *
  * @since 2.7
  */
-NX.define('Nexus.app.Controller', {
-  control: function (control) {
-    var me = this;
-    if (Ext.isDefined(control)) {
-      for (var key in control) {
-        if (key.startsWith('#')) {
-          Ext.ComponentMgr.onAvailable(key.substring(1), function (obj) {
-            var events = control['#' + obj.id];
-            for (var event in events) {
-              obj.on(event, events[event], me);
-              me.logDebug('Registered for event "' + event + '" on ' + obj.id);
-            }
-          }, me);
-        }
-      }
-    }
-  }
+NX.define('Nexus.logging.app.view.LoggerLevel', {
+  extend: 'Ext.form.ComboBox',
+
+  typeAhead: true,
+  forceSelection: true,
+  triggerAction: 'all',
+  lazyRender: true,
+  mode: 'local',
+  emptyText: 'Select...',
+  store: NX.create('Ext.data.ArrayStore', {
+    id: 0,
+    fields: [
+      'level'
+    ],
+    data: [
+      ['TRACE'],
+      ['DEBUG'],
+      ['INFO'],
+      ['WARN'],
+      ['ERROR'],
+      ['FATAL'],
+      ['DISABLE']
+    ]
+  }),
+  valueField: 'level',
+  displayField: 'level'
+
+}, function () {
+  Ext.reg('nx-logging-combo-logger-level', Nexus.logging.app.view.LoggerLevel);
 });

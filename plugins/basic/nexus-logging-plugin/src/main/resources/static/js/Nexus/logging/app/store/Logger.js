@@ -45,11 +45,21 @@ NX.define('Nexus.logging.app.store.Logger', {
 
   writer: NX.create('Ext.data.JsonWriter', {
     encode: false,
-    render : function(params, baseParams, data) {
+    render: function (params, baseParams, data) {
       params.jsonData = data;
     }
   }),
 
-  sortInfo: { field: 'name', direction: 'ASC' }
+  sortInfo: { field: 'name', direction: 'ASC' },
+
+  constructor: function () {
+    this.constructor.superclass.constructor.call(this);
+    Ext.apply(this.reader, {
+      // HACK: without this create will fail as it will look for a successProperty in response
+      getSuccess: function (obj) {
+        return Ext.isDefined(obj);
+      }
+    });
+  }
 
 });

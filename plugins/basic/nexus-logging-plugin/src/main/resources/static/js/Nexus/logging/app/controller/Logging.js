@@ -25,7 +25,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
   ],
 
   requires: [
-    'Nexus.logging.app.view.Panel'
+    'Nexus.logging.app.view.Panel',
+    'Nexus.logging.app.view.Add'
   ],
 
   init: function () {
@@ -38,6 +39,9 @@ NX.define('Nexus.logging.app.controller.Logging', {
       },
       '#nx-logging-button-remove-loggers': {
         click: this.removeLoggers
+      },
+      '#nx-logging-button-save': {
+        click: this.saveLogger
       }
     });
   },
@@ -51,9 +55,44 @@ NX.define('Nexus.logging.app.controller.Logging', {
 
   addLogger: function (button) {
     var loggersGrid = button.up('nx-logging-view-loggers'),
-        store = loggersGrid.getStore();
+        win = Ext.create({xtype: 'nx-logging-view-add'});
 
-    alert(store);
+    win.grid = loggersGrid;
+    win.show();
+  },
+
+  saveLogger: function (button) {
+    var win = button.up('nx-logging-view-add'),
+        store = win.grid.getStore(),
+        form = win.down('form')[0].getForm(),
+        values = form.getFieldValues(),
+        record = store.getById(values.name);
+
+    if (Ext.isDefined(record)) {
+      Ext.Msg.show({
+        title: 'Confirm',
+        msg: 'Logger "' + values.name
+            + '" is already configured. Would you like to update its level to "' + values.level + '"?',
+        buttons: Ext.Msg.YESNO,
+        icon: Ext.MessageBox.QUESTION,
+        closeable: false,
+        scope: self,
+        fn: function (buttonName) {
+          if (buttonName == 'yes' || buttonName == 'ok') {
+            record.set('level', values.level);
+            store.save();
+            win.grid.getSelectionModel().select(store.indexOf(record), 0);
+            win.close();
+          }
+        }
+      });
+    }
+    else {
+      record = new store.recordType(values);
+      store.add(record);
+      win.grid.getSelectionModel().select(store.indexOf(record), 0);
+      win.close();
+    }
   },
 
   removeLoggers: function (button) {

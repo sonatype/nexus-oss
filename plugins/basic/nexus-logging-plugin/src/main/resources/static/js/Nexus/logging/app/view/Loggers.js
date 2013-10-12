@@ -26,7 +26,8 @@ NX.define('Nexus.logging.app.view.Loggers', {
 
   requires: [
     'Nexus.logging.app.Icons',
-    'Nexus.logging.app.store.Logger'
+    'Nexus.logging.app.store.Logger',
+    'Nexus.logging.app.view.LoggerLevel'
   ],
 
   title: 'Logging',
@@ -57,30 +58,9 @@ NX.define('Nexus.logging.app.view.Loggers', {
       header: 'Level',
       dataIndex: 'level',
       sortable: true,
-      width: 200,
+      width: 80,
       tooltip: 'Double click to edit',
-      editor: NX.create('Ext.form.ComboBox', {
-        typeAhead: true,
-        forceSelection: true,
-        triggerAction: 'all',
-        lazyRender: true,
-        mode: 'local',
-        store: NX.create('Ext.data.ArrayStore', {
-          id: 0,
-          fields: [
-            'level'
-          ],
-          data: [
-            ['TRACE'],
-            ['DEBUG'],
-            ['INFO'],
-            ['WARN'],
-            ['ERROR']
-          ]
-        }),
-        valueField: 'level',
-        displayField: 'level'
-      })
+      editor: {xtype: 'nx-logging-combo-logger-level'}
     }
   ],
 
