@@ -75,8 +75,21 @@ NX.define('Nexus.logging.app.view.Mark', {
       ],
 
       keys: [
-        // TODO: submit form on enter
-        { key: Ext.EventObject.ESC, fn: this.close, scope: me }
+        {
+          // Save on ENTER
+          key: Ext.EventObject.ENTER,
+          scope: me,
+          fn: function() {
+            var btn = Ext.getCmp('nx-logging-button-mark-save');
+            btn.fireEvent('click', btn);
+          }
+        },
+        {
+          // Close on ESC
+          key: Ext.EventObject.ESC,
+          fn: this.close,
+          scope: me
+        }
       ],
 
       listeners: {
