@@ -61,6 +61,7 @@ NX.define('Nexus.logging.app.view.Add', {
               helpText: 'Enter a logger name',
               name: 'name',
               allowBlank: false,
+              validateOnBlur: false, // allow cancel to be clicked w/o validating this to be non-blank
               anchor: '96%'
             },
             {
@@ -76,7 +77,7 @@ NX.define('Nexus.logging.app.view.Add', {
 
           buttonAlign: 'right',
           buttons: [
-            { text: 'Discard', xtype: 'link-button', handler: this.close, scope: me },
+            { text: 'Cancel', xtype: 'link-button', handler: me.close, scope: me },
             { text: 'Save', formBind: true, id: 'nx-logging-button-add-save' }
           ]
         }

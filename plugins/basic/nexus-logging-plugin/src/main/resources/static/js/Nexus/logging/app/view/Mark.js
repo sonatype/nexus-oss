@@ -61,13 +61,14 @@ NX.define('Nexus.logging.app.view.Mark', {
               helpText: 'Message to be included in the log',
               name: 'message',
               allowBlank: false,
+              validateOnBlur: false, // allow cancel to be clicked w/o validating this to be non-blank
               anchor: '96%'
             }
           ],
 
           buttonAlign: 'right',
           buttons: [
-            { text: 'Discard', xtype: 'link-button', formBind: false, handler: this.close, scope: me },
+            { text: 'Cancel', xtype: 'link-button', formBind: false, handler: me.close, scope: me },
             { text: 'Save', formBind: true, id: 'nx-logging-button-mark-save' }
           ]
         }

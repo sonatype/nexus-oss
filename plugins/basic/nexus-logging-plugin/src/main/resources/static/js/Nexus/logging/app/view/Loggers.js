@@ -97,6 +97,8 @@ NX.define('Nexus.logging.app.view.Loggers', {
           tooltip: 'Remove selected logger',
           iconCls: icons.get('loggers_remove').cls
         },
+        // FIXME: Move mark to log tab
+        '-',
         {
           id: 'nx-logging-button-mark',
           text: 'Mark',
