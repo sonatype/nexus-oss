@@ -75,7 +75,7 @@ public class LoggersResource
   }
 
   @GET
-  @Produces({APPLICATION_XML, APPLICATION_JSON})
+  @Produces({APPLICATION_JSON, APPLICATION_XML})
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "read")
   public List<LoggerXO> get() {
     return Lists.newArrayList(loggers.values());
@@ -95,7 +95,7 @@ public class LoggersResource
   @PUT
   @Path("/{id}")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
-  @Produces({APPLICATION_XML, APPLICATION_JSON})
+  @Produces({APPLICATION_JSON, APPLICATION_XML})
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
   public LoggerXO put(final @PathParam("id") String id,
                       final LoggerXO logger)
