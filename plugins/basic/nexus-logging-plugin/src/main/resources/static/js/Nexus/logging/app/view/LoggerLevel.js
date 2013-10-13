@@ -21,8 +21,6 @@ NX.define('Nexus.logging.app.view.LoggerLevel', {
   extend: 'Ext.form.ComboBox',
   xtype: 'nx-logging-combo-logger-level',
 
-  typeAhead: true,
-  forceSelection: true,
   triggerAction: 'all',
   lazyRender: true,
   mode: 'local',
