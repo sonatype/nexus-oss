@@ -51,6 +51,7 @@ NX.define('Nexus.logging.app.view.Add', {
         },
         {
           xtype: 'form',
+          itemId: 'form',
           border: false,
           monitorValid: true,
           items: [
@@ -89,8 +90,11 @@ NX.define('Nexus.logging.app.view.Add', {
           key: Ext.EventObject.ENTER,
           scope: me,
           fn: function() {
-            var btn = Ext.getCmp('nx-logging-button-add-save');
-            btn.fireEvent('click', btn);
+            // fire event only if form is valid
+            if (me.getComponent('form').getForm().isValid()) {
+              var btn = Ext.getCmp('nx-logging-button-add-save');
+              btn.fireEvent('click', btn);
+            }
           }
         },
         {
