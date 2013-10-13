@@ -118,10 +118,15 @@ NX.define('Nexus.logging.app.controller.Logging', {
         sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore();
 
-    // FIXME: Show confirmation before removing
-
+    // if we have a logger selected, confirm before removal
     if (sm.hasSelection()) {
-      store.remove(sm.selection.record);
+      Ext.Msg.confirm('Remove logger?',
+        'Remove logger: ' + sm.selection.record.get('name'),
+        function(btn) {
+          if (btn === 'yes') {
+            store.remove(sm.selection.record);
+          }
+      });
     }
   },
 
