@@ -27,6 +27,7 @@ NX.define('Nexus.logging.app.view.LoggerLevel', {
   lazyRender: true,
   mode: 'local',
   emptyText: 'Select...',
+  editable: false,
   store: NX.create('Ext.data.ArrayStore', {
     id: 0,
     fields: [
