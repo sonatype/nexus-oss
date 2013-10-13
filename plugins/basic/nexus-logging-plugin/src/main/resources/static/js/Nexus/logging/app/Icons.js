@@ -27,16 +27,36 @@ NX.define('Nexus.logging.app.Icons', {
   constructor: function () {
     var self = this;
 
+    // helper to build an icon config with variants, where variants live in directories, foo.png x16 -> x16/foo.png
+    function iconConfig(fileName, variants) {
+      var config = {};
+      if (variants === undefined) {
+        variants = [ 'x32', 'x16' ]
+      }
+      Ext.each(variants, function(variant) {
+        config[variant] = variant + '/' + fileName;
+      });
+      return config;
+    }
+
     self.constructor.superclass.constructor.call(self, {
       stylePrefix: 'nx-logging-icon-',
 
       icons: {
-        loggers_add: 'loggers_add.png',
-        loggers_refresh: 'loggers_refresh.png',
-        loggers_remove: 'loggers_remove.png',
-        loggers_mark: 'loggers_mark.gif',
+        arrow_refresh:    'arrow_refresh.png',
+        book:             iconConfig('book.png'),
+        book_add:         iconConfig('book_add.png'),
+        book_delete:      iconConfig('book_delete.png'),
+        bookmark_red:     iconConfig('bookmark_red.png'),
 
-        log_refresh: '@loggers_refresh'
+        logging:          '@book',
+
+        loggers_refresh:  '@arrow_refresh',
+        loggers_add:      '@book_add',
+        loggers_remove:   '@book_delete',
+
+        log_refresh:      '@arrow_refresh',
+        log_mark:         '@bookmark_red'
       }
     });
   }

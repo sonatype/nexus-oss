@@ -24,6 +24,10 @@ NX.define('Nexus.logging.app.view.Mark', {
     'Nexus.LogAwareMixin'
   ],
 
+  requires: [
+    'Nexus.logging.app.Icons'
+  ],
+
   xtype: 'nx-logging-view-mark',
 
   title: 'Mark log',
@@ -39,7 +43,8 @@ NX.define('Nexus.logging.app.view.Mark', {
    * @override
    */
   initComponent: function () {
-    var me = this;
+    var me = this,
+        icons = Nexus.logging.app.Icons;
 
     Ext.apply(me, {
       items: [
@@ -47,7 +52,7 @@ NX.define('Nexus.logging.app.view.Mark', {
           xtype: 'panel',
           border: false,
           cls: 'nx-logging-view-mark-description',
-          html: '<img src="images/instructions.png"/><span><br/>Mark the log with a unique message for reference.</span>'
+          html: icons.get('log_mark').variant('x32').img + '<span><br/>Mark the log with a unique message for reference.</span>'
         },
         {
           xtype: 'form',

@@ -24,6 +24,10 @@ NX.define('Nexus.logging.app.view.Add', {
     'Nexus.LogAwareMixin'
   ],
 
+  requires: [
+      'Nexus.logging.app.Icons'
+  ],
+
   xtype: 'nx-logging-view-add',
 
   title: 'Add logger',
@@ -39,7 +43,8 @@ NX.define('Nexus.logging.app.view.Add', {
    * @override
    */
   initComponent: function () {
-    var me = this;
+    var me = this,
+        icons = Nexus.logging.app.Icons;
 
     Ext.apply(me, {
       items: [
@@ -47,7 +52,7 @@ NX.define('Nexus.logging.app.view.Add', {
           xtype: 'panel',
           border: false,
           cls: 'nx-logging-view-add-description',
-          html: '<img src="images/instructions.png"/><span><br/>Add a logger with a specific level.</span>'
+          html: icons.get('loggers_add').variant('x32').img + '<span><br/>Add a logger with a specific level.</span>'
         },
         {
           xtype: 'form',
