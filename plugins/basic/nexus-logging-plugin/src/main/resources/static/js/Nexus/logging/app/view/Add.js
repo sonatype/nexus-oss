@@ -96,8 +96,8 @@ NX.define('Nexus.logging.app.view.Add', {
         {
           // Close on ESC
           key: Ext.EventObject.ESC,
-          fn: this.close,
-          scope: me
+          scope: me,
+          fn: me.close
         }
       ],
 
