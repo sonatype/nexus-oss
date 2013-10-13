@@ -42,7 +42,7 @@ NX.define('Nexus.logging.app.view.Log', {
         xtype: 'textarea',
         readOnly: true,
         hideLabel: true,
-        emptyText: 'Log not loaded',
+        emptyText: 'Refresh to display log',
         anchor: '100% 100%'
       },
 
@@ -67,6 +67,9 @@ NX.define('Nexus.logging.app.view.Log', {
   },
 
   showLog: function (text) {
-    this.down('textarea')[0].setValue(text);
+    var textarea = this.down('textarea')[0];
+    textarea.setValue(text);
+    // scroll to the bottom
+    textarea.getEl().dom.scrollTop = 1000000;
   }
 });
