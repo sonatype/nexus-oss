@@ -122,6 +122,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
         sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore();
 
+    // FIXME: Show confirmation before removing
+
     if (sm.hasSelection()) {
       store.remove(sm.selection.record);
     }
