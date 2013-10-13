@@ -24,6 +24,8 @@ NX.define('Nexus.logging.app.view.Mark', {
     'Nexus.LogAwareMixin'
   ],
 
+  xtype: 'nx-logging-view-mark',
+
   title: 'Mark log',
 
   autoShow: true,
@@ -65,20 +67,24 @@ NX.define('Nexus.logging.app.view.Mark', {
 
           buttonAlign: 'right',
           buttons: [
-            { text: 'Discard', xtype: 'link-button', handler: this.close, scope: me },
+            { text: 'Discard', xtype: 'link-button', formBind: false, handler: this.close, scope: me },
             { text: 'Save', formBind: true, id: 'nx-logging-button-mark-save' }
           ]
         }
       ],
 
       keys: [
+        // TODO: submit form on enter
         { key: Ext.EventObject.ESC, fn: this.close, scope: me }
-      ]
+      ],
+
+      listeners: {
+        show: function (component) {
+          component.find('name', 'message')[0].focus(false, 100);
+        }
+      }
     });
 
     me.constructor.superclass.initComponent.apply(me, arguments);
   }
-
-}, function () {
-  Ext.reg('nx-logging-view-mark', Nexus.logging.app.view.Mark);
 });

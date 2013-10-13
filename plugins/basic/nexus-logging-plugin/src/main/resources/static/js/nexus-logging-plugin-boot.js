@@ -15,22 +15,7 @@ define('nexus-logging-plugin-boot', [
   'Nexus/logging/app/controller/Logging'
 ], function () {
   NX.log.debug('Main nexus-logging-plugin modules loaded');
-  var sp = Sonatype.lib.Permissions;
-  // install panel into main NX navigation
-  Sonatype.Events.on('nexusNavigationInit', function (panel) {
-    panel.add({
-      enabled: sp.checkPermission('nexus:logging', sp.READ),
-      sectionId: 'st-nexus-config',
-      title: 'Logging',
-      tabId: 'logging',
-      tabCode: function () {
-        var controller = NX.create('Nexus.logging.app.controller.Logging');
-        controller.init();
-        var panel = NX.create('Nexus.logging.app.view.Panel', {
-          id: 'logging'
-        });
-        return panel;
-      }
-    });
-  });
+
+  var controller = NX.create('Nexus.logging.app.controller.Logging');
+  controller.init();
 });

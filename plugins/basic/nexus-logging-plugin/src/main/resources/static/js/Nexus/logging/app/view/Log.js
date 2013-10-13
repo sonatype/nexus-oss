@@ -24,6 +24,8 @@ NX.define('Nexus.logging.app.view.Log', {
     'Nexus.LogAwareMixin'
   ],
 
+  xtype: 'nx-logging-view-log',
+
   title: 'Log',
   cls: 'nx-logging-view-log',
   layout: 'fit',
@@ -60,7 +62,4 @@ NX.define('Nexus.logging.app.view.Log', {
   showLog: function (text) {
     this.down('textarea')[0].setValue(text);
   }
-
-}, function () {
-  Ext.reg('nx-logging-view-log', Nexus.logging.app.view.Log);
 });

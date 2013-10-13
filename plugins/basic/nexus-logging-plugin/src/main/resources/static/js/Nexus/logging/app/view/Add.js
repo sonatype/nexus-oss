@@ -24,6 +24,8 @@ NX.define('Nexus.logging.app.view.Add', {
     'Nexus.LogAwareMixin'
   ],
 
+  xtype: 'nx-logging-view-add',
+
   title: 'Add logger',
 
   autoShow: true,
@@ -81,13 +83,17 @@ NX.define('Nexus.logging.app.view.Add', {
       ],
 
       keys: [
+        // TODO: submit form on enter
         { key: Ext.EventObject.ESC, fn: this.close, scope: me }
-      ]
+      ],
+
+      listeners: {
+        show: function (component) {
+          component.find('name', 'name')[0].focus(false, 100);
+        }
+      }
     });
 
     me.constructor.superclass.initComponent.apply(me, arguments);
   }
-
-}, function () {
-  Ext.reg('nx-logging-view-add', Nexus.logging.app.view.Add);
 });

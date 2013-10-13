@@ -29,6 +29,8 @@ NX.define('Nexus.logging.app.view.Panel', {
     'Nexus.logging.app.view.Log'
   ],
 
+  xtyle: 'nx-logging-view-panel',
+
   title: 'Logging',
 
   border: false,
@@ -70,7 +72,18 @@ NX.define('Nexus.logging.app.view.Panel', {
 
     me.constructor.superclass.initComponent.apply(me, arguments);
   }
-
 }, function () {
-  Ext.reg('nx-logging-view-panel', Nexus.logging.app.view.Panel);
+  var type = this,
+      sp = Sonatype.lib.Permissions;
+
+  // install panel into main NX navigation
+  Sonatype.Events.on('nexusNavigationInit', function (panel) {
+    panel.add({
+      enabled: sp.checkPermission('nexus:logging', sp.READ),
+      sectionId: 'st-nexus-config',
+      title: 'Logging',
+      tabId: 'logging',
+      tabCode: type
+    });
+  });
 });

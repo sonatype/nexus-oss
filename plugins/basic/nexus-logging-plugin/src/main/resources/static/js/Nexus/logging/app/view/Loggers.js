@@ -30,7 +30,9 @@ NX.define('Nexus.logging.app.view.Loggers', {
     'Nexus.logging.app.view.LoggerLevel'
   ],
 
-  title: 'Logging',
+  xtype: 'nx-logging-view-loggers',
+
+  title: 'Loggers',
 
   stripeRows: true,
   border: false,
@@ -106,7 +108,4 @@ NX.define('Nexus.logging.app.view.Loggers', {
 
     me.constructor.superclass.initComponent.apply(me, arguments);
   }
-
-}, function () {
-  Ext.reg('nx-logging-view-loggers', Nexus.logging.app.view.Loggers);
 });

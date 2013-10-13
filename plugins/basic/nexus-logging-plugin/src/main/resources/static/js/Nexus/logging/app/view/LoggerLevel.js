@@ -19,6 +19,7 @@
  */
 NX.define('Nexus.logging.app.view.LoggerLevel', {
   extend: 'Ext.form.ComboBox',
+  xtype: 'nx-logging-combo-logger-level',
 
   typeAhead: true,
   forceSelection: true,
@@ -44,6 +45,4 @@ NX.define('Nexus.logging.app.view.LoggerLevel', {
   valueField: 'level',
   displayField: 'level'
 
-}, function () {
-  Ext.reg('nx-logging-combo-logger-level', Nexus.logging.app.view.LoggerLevel);
 });

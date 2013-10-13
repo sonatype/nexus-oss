@@ -24,7 +24,9 @@ NX.define('Nexus.logging.app.store.Logger', {
     'Nexus.LogAwareMixin'
   ],
 
-  requires: ['Nexus.siesta'],
+  requires: [
+    'Nexus.siesta'
+  ],
 
   storeId: 'nx-logging-store-logger',
   autoLoad: true,
