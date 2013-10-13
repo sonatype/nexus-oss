@@ -171,7 +171,14 @@ NX.define('Nexus.logging.app.controller.Logging', {
   },
 
   retrieveLog: function (logPanel) {
-    var me = this;
+    var me = this,
+        mask;
+
+    mask = NX.create('Ext.LoadMask', logPanel.body, {
+      msg: 'Loading...'
+    });
+
+    mask.show();
 
     Ext.Ajax.request({
       url: Sonatype.config.repos.urls.logs + '/nexus.log',
@@ -184,10 +191,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
       },
       scope: me,
       suppressStatus: true,
-      success: function (response) {
-        logPanel.showLog(response.responseText);
-      },
-      failure: function (response) {
+      callback: function (options, success, response) {
+        mask.hide();
         logPanel.showLog(response.responseText);
       }
     });
