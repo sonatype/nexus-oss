@@ -41,20 +41,19 @@
 .nx-logging-view-mark-description,
 .nx-logging-view-panel-description {
   padding: 10px;
-  vertical-align: middle;
 }
 
 .nx-logging-view-add-description img,
 .nx-logging-view-mark-description img,
 .nx-logging-view-panel-description img {
   float: left;
+  padding-right: 10px;
 }
 
 .nx-logging-view-add-description span,
 .nx-logging-view-mark-description span,
 .nx-logging-view-panel-description span {
-  display: inline-block;
-  padding-left: 10px;
+  vertical-align: middle;
 }
 
 .nx-logging-view-add .x-form-item-label,

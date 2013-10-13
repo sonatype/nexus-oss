@@ -52,13 +52,16 @@ NX.define('Nexus.logging.app.view.Add', {
           xtype: 'panel',
           border: false,
           cls: 'nx-logging-view-add-description',
-          html: icons.get('loggers_add').variant('x32').img + '<span><br/>Add a logger with a specific level.</span>'
+          html: icons.get('loggers_add').variant('x32').img + '<div>Add a logger with a specific level.</div>'
         },
         {
           xtype: 'form',
           itemId: 'form',
           border: false,
           monitorValid: true,
+          layoutConfig: {
+            labelSeparator: ''
+          },
           items: [
             {
               xtype: 'textfield',

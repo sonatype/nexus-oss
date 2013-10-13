@@ -52,13 +52,16 @@ NX.define('Nexus.logging.app.view.Mark', {
           xtype: 'panel',
           border: false,
           cls: 'nx-logging-view-mark-description',
-          html: icons.get('log_mark').variant('x32').img + '<span><br/>Mark the log with a unique message for reference.</span>'
+          html: icons.get('log_mark').variant('x32').img + '<div>Mark the log with a unique message for reference.</div>'
         },
         {
           xtype: 'form',
           itemId: 'form',
           border: false,
           monitorValid: true,
+          layoutConfig: {
+            labelSeparator: ''
+          },
           items: [
             {
               xtype: 'textfield',
