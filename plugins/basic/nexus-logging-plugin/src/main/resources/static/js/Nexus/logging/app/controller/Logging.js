@@ -20,10 +20,6 @@
 NX.define('Nexus.logging.app.controller.Logging', {
   extend: 'Nexus.app.Controller',
 
-  mixins: [
-    'Nexus.LogAwareMixin'
-  ],
-
   requires: [
     'Nexus.siesta',
     'Nexus.logging.app.view.Panel',
@@ -141,7 +137,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
     win.close();
 
     Ext.Ajax.request({
-      url: Nexus.siesta.basePath + "/logging/log/mark",
+      url: Nexus.siesta.basePath + '/logging/log/mark',
       method: 'PUT',
       suppressStatus: true,
       jsonData: values,
@@ -173,7 +169,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
     var me = this;
 
     Ext.Ajax.request({
-      url: Sonatype.config.repos.urls.logs + "/nexus.log",
+      url: Sonatype.config.repos.urls.logs + '/nexus.log',
       method: 'GET',
       headers: {
         'accept': 'text/plain'

@@ -40,7 +40,7 @@ NX.define('Nexus.logging.app.view.Loggers', {
   clicksToEdit: 1,
 
   viewConfig: {
-    emptyText: "No loggers defined.",
+    emptyText: 'No loggers defined.',
     deferEmptyText: false
   },
 

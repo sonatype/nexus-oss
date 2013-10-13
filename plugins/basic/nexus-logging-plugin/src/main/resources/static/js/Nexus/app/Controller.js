@@ -18,6 +18,10 @@
  * @since 2.7
  */
 NX.define('Nexus.app.Controller', {
+  mixins: [
+    'Nexus.LogAwareMixin'
+  ],
+
   control: function (control) {
     var me = this;
     if (Ext.isDefined(control)) {
