@@ -13,10 +13,12 @@
 
 package org.sonatype.nexus.logging.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
+import org.sonatype.nexus.logging.LoggingPlugin;
+import org.sonatype.nexus.plugin.support.StaticSecurityResourceSupport;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 /**
@@ -27,13 +29,11 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
 @Named
 @Singleton
 public class LoggingSecurityResource
-    extends AbstractStaticSecurityResource
-    implements StaticSecurityResource
+    extends StaticSecurityResourceSupport
 {
-
-  @Override
-  public String getResourcePath() {
-    return "/META-INF/nexus-logging-plugin-security.xml";
+  @Inject
+  public LoggingSecurityResource(final LoggingPlugin plugin) {
+    super(plugin);
   }
 
 }
