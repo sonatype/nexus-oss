@@ -52,6 +52,13 @@ NX.define('Nexus.logging.app.view.Log', {
           text: 'Refresh',
           tooltip: 'Refresh loggers',
           iconCls: icons.get('loggers_refresh').cls
+        },
+        '-',
+        {
+          id: 'nx-logging-button-mark',
+          text: 'Mark',
+          tooltip: 'Add a mark in Nexus log file',
+          iconCls: icons.get('loggers_mark').cls
         }
       ]
     });
