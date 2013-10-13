@@ -13,12 +13,13 @@
 
 package org.sonatype.nexus.logging.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
 
 /**
  * Logging plugin {@link UiContributor}.
@@ -28,18 +29,10 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 @Named
 @Singleton
 public class LoggingUiContributor
-    implements UiContributor
+    extends UiContributorSupport
 {
-
-  private static final String CSS = "static/css/logging.css";
-
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    UiContributionBuilder builder = new UiContributionBuilder(this, LoggingPlugin.GROUP_ID, LoggingPlugin.ARTIFACT_ID);
-    if (debug) {
-      builder.withDependency("css!" + CSS + builder.getCacheBuster(CSS));
-    }
-    return builder.build(debug);
+  @Inject
+  public LoggingUiContributor(final LoggingPlugin owner) {
+    super(owner);
   }
-
 }

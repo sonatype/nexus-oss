@@ -35,5 +35,4 @@ public class LoggingSecurityResource
   public LoggingSecurityResource(final LoggingPlugin plugin) {
     super(plugin);
   }
-
 }

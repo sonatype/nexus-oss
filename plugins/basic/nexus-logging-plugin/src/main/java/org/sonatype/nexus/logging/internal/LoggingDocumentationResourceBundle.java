@@ -13,12 +13,13 @@
 
 package org.sonatype.nexus.logging.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
+import org.sonatype.nexus.plugins.rest.NexusDocumentationBundleSupport;
 
 /**
  * Logging plugin {@link NexusDocumentationBundle}.
@@ -28,18 +29,10 @@ import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
 @Named
 @Singleton
 public class LoggingDocumentationResourceBundle
-    extends AbstractDocumentationNexusResourceBundle
-    implements NexusDocumentationBundle
+  extends NexusDocumentationBundleSupport
 {
-
-  @Override
-  public String getPluginId() {
-    return LoggingPlugin.ARTIFACT_ID;
+  @Inject
+  public LoggingDocumentationResourceBundle(final LoggingPlugin plugin) {
+    super(plugin);
   }
-
-  @Override
-  public String getDescription() {
-    return "Logging Plugin API";
-  }
-
 }
