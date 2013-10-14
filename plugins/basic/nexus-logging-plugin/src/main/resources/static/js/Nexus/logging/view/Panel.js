@@ -53,17 +53,18 @@ NX.define('Nexus.logging.view.Panel', {
           xtype: 'panel',
           border: false,
           cls: 'nx-logging-view-panel-description',
-          html: icons.get('logging').variant('x32').img + '<div>Allows changing logging configuration and viewing the current log. ' +
+          html: icons.get('logging').variant('x32').img +
+              '<div>Allows changing logging configuration and viewing the current log. ' +
               'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
           height: 60,
           flex: 0
         },
         {
-          flex: 1,
           xtype: 'tabpanel',
           border: false,
-          cls: 'nx-logging-view-panel-tabs',
+          plain: true,
           layoutOnTabChange: true,
+          flex: 1,
           items: [
             { xtype: 'nx-logging-view-loggers' },
             { xtype: 'nx-logging-view-log' }
