@@ -104,8 +104,8 @@ NX.define('Nexus.logging.controller.Logging', {
     var loggersGrid = loggingPanel.down('nx-logging-view-loggers'),
         removeBtn = loggersGrid.getTopToolbar().down("#nx-logging-button-remove-loggers");
 
-    loggersGrid.getSelectionModel().on('selectionchange', function (sm) {
-      if (sm.hasSelection()) {
+    loggersGrid.getSelectionModel().on('selectionchange', function (sm, selection) {
+      if (sm.hasSelection() && selection.record.get('name') !== 'ROOT') {
         removeBtn.enable();
       }
       else {
