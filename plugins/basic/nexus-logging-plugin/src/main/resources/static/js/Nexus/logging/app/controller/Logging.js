@@ -82,7 +82,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
   },
 
   addLogger: function (button) {
-    var win = button.up('nx-logging-view-add'),
+    var me = this,
+        win = button.up('nx-logging-view-add'),
         store = win.grid.getStore(),
         form = win.down('form')[0].getForm(),
         values = form.getFieldValues(),
@@ -96,7 +97,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
         buttons: Ext.Msg.YESNO,
         icon: Ext.MessageBox.QUESTION,
         closeable: false,
-        scope: self,
+        scope: me,
         fn: function (buttonName) {
           if (buttonName == 'yes' || buttonName == 'ok') {
             record.set('level', values.level);

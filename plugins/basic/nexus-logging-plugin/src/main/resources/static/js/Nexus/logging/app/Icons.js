@@ -25,7 +25,7 @@ NX.define('Nexus.logging.app.Icons', {
    * @constructor
    */
   constructor: function () {
-    var self = this;
+    var me = this;
 
     // helper to build an icon config with variants, where variants live in directories, foo.png x16 -> x16/foo.png
     function iconConfig(fileName, variants) {
@@ -39,7 +39,7 @@ NX.define('Nexus.logging.app.Icons', {
       return config;
     }
 
-    self.constructor.superclass.constructor.call(self, {
+    me.constructor.superclass.constructor.call(me, {
       stylePrefix: 'nx-logging-icon-',
 
       icons: {

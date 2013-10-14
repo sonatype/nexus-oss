@@ -25,7 +25,7 @@ NX.define('Nexus.logging.app.view.Add', {
   ],
 
   requires: [
-      'Nexus.logging.app.Icons'
+    'Nexus.logging.app.Icons'
   ],
 
   xtype: 'nx-logging-view-add',
@@ -42,7 +42,7 @@ NX.define('Nexus.logging.app.view.Add', {
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this,
         icons = Nexus.logging.app.Icons;
 
@@ -114,7 +114,7 @@ NX.define('Nexus.logging.app.view.Add', {
       ],
 
       listeners: {
-        show: function (component) {
+        show: function(component) {
           component.find('name', 'name')[0].focus(false, 100);
         }
       }
