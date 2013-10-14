@@ -22,6 +22,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
 
   requires: [
     'Nexus.siesta',
+    'Nexus.logging.app.Icons',
     'Nexus.logging.app.view.Add',
     'Nexus.logging.app.view.Mark'
   ],
@@ -119,16 +120,21 @@ NX.define('Nexus.logging.app.controller.Logging', {
   removeLoggers: function (button) {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         sm = loggersGrid.getSelectionModel(),
-        store = loggersGrid.getStore();
+        store = loggersGrid.getStore(),
+        icons = Nexus.logging.app.Icons;
 
     // if we have a logger selected, confirm before removal
     if (sm.hasSelection()) {
-      Ext.Msg.confirm('Remove logger?',
-        'Remove logger: ' + sm.selection.record.get('name'),
-        function(btn) {
-          if (btn === 'yes') {
+      Ext.Msg.show({
+        title: 'Remove logger?',
+        msg: 'Remove logger: ' + sm.selection.record.get('name'),
+        buttons: Ext.Msg.OKCANCEL,
+        icon: icons.get('loggers_remove').variant('x32').cls,
+        fn: function(btn) {
+          if (btn === 'ok') {
             store.remove(sm.selection.record);
           }
+        }
       });
     }
   },
