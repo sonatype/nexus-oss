@@ -11,11 +11,6 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-.nx-atlas-view-panel-tabs ul.x-tab-strip-top {
-  border-bottom-color: white;
-  background: white none;
-}
-
 .nx-atlas-view-sysinfo-body,
 .nx-atlas-view-panel-description {
   font: normal 11px arial, tahoma, verdana, helvetica;

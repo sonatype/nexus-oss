@@ -59,9 +59,9 @@ NX.define('Nexus.atlas.view.Panel', {
         },
         {
           xtype: 'tabpanel',
-          cls: 'nx-atlas-view-panel-tabs',
           flex: 1,
           border: false,
+          plain: true,
           layoutOnTabChange: true,
           items: [
             { xtype: 'nx-atlas-view-sysinfo' },
