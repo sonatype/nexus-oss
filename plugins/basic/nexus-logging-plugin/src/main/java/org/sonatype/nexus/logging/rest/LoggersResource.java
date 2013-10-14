@@ -14,7 +14,6 @@
 package org.sonatype.nexus.logging.rest;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,16 +27,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.logging.model.LevelXO;
 import org.sonatype.nexus.logging.model.LoggerXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
@@ -56,33 +55,18 @@ public class LoggersResource
 
   public static final String RESOURCE_URI = LoggingPlugin.REST_PREFIX + "/loggers";
 
-  private final Map<String, LoggerXO> loggers;
+  private final LoggingConfigurator configurator;
 
   @Inject
-  public LoggersResource() {
-    loggers = Maps.newHashMap();
-    loggers.put(
-        "ROOT", new LoggerXO().withName("ROOT").withLevel(LevelXO.INFO)
-    );
-    loggers.put(
-        "org.sonatype.nexus", new LoggerXO().withName("org.sonatype.nexus").withLevel(LevelXO.INFO)
-    );
-    loggers.put(
-        "org.sonatype.nexus.core", new LoggerXO().withName("org.sonatype.nexus.core").withLevel(LevelXO.DEBUG)
-    );
-    loggers.put(
-        "org.sonatype.nexus.capabilities", new LoggerXO().withName("org.sonatype.nexus.capabilities").withLevel(LevelXO.DEBUG)
-    );
-    loggers.put(
-        "org.sonatype.nexus.logging", new LoggerXO().withName("org.sonatype.nexus.logging").withLevel(LevelXO.DEBUG)
-    );
+  public LoggersResource(final LoggingConfigurator configurator) {
+    this.configurator = checkNotNull(configurator, "configurator");
   }
 
   @GET
   @Produces({APPLICATION_JSON, APPLICATION_XML})
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "read")
   public List<LoggerXO> get() {
-    return Lists.newArrayList(loggers.values());
+    return Lists.newArrayList(configurator.getLoggers());
   }
 
   @POST
@@ -92,30 +76,33 @@ public class LoggersResource
   public LoggerXO post(final LoggerXO logger)
       throws Exception
   {
-    loggers.put(logger.getName(), logger);
+    configurator.setLevel(logger.getName(), logger.getLevel());
+    configurator.configure();
     return logger;
   }
 
   @PUT
-  @Path("/{id}")
+  @Path("/{name}")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
-  public LoggerXO put(final @PathParam("id") String id,
+  public LoggerXO put(final @PathParam("name") String name,
                       final LoggerXO logger)
       throws Exception
   {
-    loggers.put(id, logger);
+    configurator.setLevel(name, logger.getLevel());
+    configurator.configure();
     return logger;
   }
 
   @DELETE
-  @Path("/{id}")
+  @Path("/{name}")
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
-  public void delete(final @PathParam("id") String id)
+  public void delete(final @PathParam("name") String name)
       throws Exception
   {
-    loggers.remove(id);
+    configurator.remove(name);
+    configurator.configure();
   }
 
 }
