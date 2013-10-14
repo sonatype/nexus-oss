@@ -22,20 +22,21 @@ NX.define('Nexus.app.Controller', {
     'Nexus.LogAwareMixin'
   ],
 
-  control: function (control) {
+  control: function(config) {
     var me = this;
-    if (Ext.isDefined(control)) {
-      for (var key in control) {
-        if (key.startsWith('#')) {
-          Ext.ComponentMgr.onAvailable(key.substring(1), function (obj) {
-            var events = control['#' + obj.id];
-            for (var event in events) {
-              obj.on(event, events[event], me);
-              me.logDebug('Registered for event "' + event + '" on ' + obj.id);
-            }
-          }, me);
-        }
+    Ext.iterate(config, function(key) {
+      if (key.startsWith('#')) {
+        var id = key.substring(1);
+
+        Ext.ComponentMgr.onAvailable(id, function(obj) {
+          var events = config['#' + obj.id];
+
+          Ext.iterate(events, function(event) {
+            obj.on(event, events[event], me);
+            me.logDebug('Registered for event "' + event + '" on ' + obj.id);
+          });
+        }, me);
       }
-    }
+    });
   }
 });
