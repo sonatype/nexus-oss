@@ -13,11 +13,11 @@
 /*global NX, Ext, Nexus, Sonatype*/
 
 /**
- * Mark Nexus log window.
+ * Add new logger window.
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.view.Mark', {
+NX.define('Nexus.logging.view.Add', {
   extend: 'Ext.Window',
 
   mixins: [
@@ -25,13 +25,13 @@ NX.define('Nexus.logging.app.view.Mark', {
   ],
 
   requires: [
-    'Nexus.logging.app.Icons'
+    'Nexus.logging.Icons'
   ],
 
-  xtype: 'nx-logging-view-mark',
-  cls: 'nx-logging-view-mark',
+  xtype: 'nx-logging-view-add',
+  cls: 'nx-logging-view-add',
 
-  title: 'Mark log',
+  title: 'Add logger',
 
   autoShow: true,
   constrain: true,
@@ -43,17 +43,17 @@ NX.define('Nexus.logging.app.view.Mark', {
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this,
-        icons = Nexus.logging.app.Icons;
+        icons = Nexus.logging.Icons;
 
     Ext.apply(me, {
       items: [
         {
           xtype: 'panel',
           border: false,
-          cls: 'nx-logging-view-mark-description',
-          html: icons.get('log_mark').variant('x32').img + '<div>Mark the log with a unique message for reference.</div>'
+          cls: 'nx-logging-view-add-description',
+          html: icons.get('loggers_add').variant('x32').img + '<div>Add a logger with a specific level.</div>'
         },
         {
           xtype: 'form',
@@ -66,20 +66,29 @@ NX.define('Nexus.logging.app.view.Mark', {
           items: [
             {
               xtype: 'textfield',
-              fieldLabel: 'Message',
+              fieldLabel: 'Logger',
               itemCls: 'required-field',
-              helpText: 'Message to be included in the log',
-              name: 'message',
+              helpText: 'Enter a logger name',
+              name: 'name',
               allowBlank: false,
               validateOnBlur: false, // allow cancel to be clicked w/o validating this to be non-blank
               anchor: '96%'
+            },
+            {
+              xtype: 'nx-logging-combo-logger-level',
+              fieldLabel: 'Level',
+              itemCls: 'required-field',
+              //helpText: "Select logger level",
+              name: 'level',
+              value: 'INFO',
+              width: 80
             }
           ],
 
           buttonAlign: 'right',
           buttons: [
-            { text: 'Cancel', xtype: 'link-button', formBind: false, handler: me.close, scope: me },
-            { text: 'Save', formBind: true, id: 'nx-logging-button-mark-save' }
+            { text: 'Cancel', xtype: 'link-button', handler: me.close, scope: me },
+            { text: 'Save', formBind: true, id: 'nx-logging-button-add-save' }
           ]
         }
       ],
@@ -92,7 +101,7 @@ NX.define('Nexus.logging.app.view.Mark', {
           fn: function() {
             // fire event only if form is valid
             if (me.getComponent('form').getForm().isValid()) {
-              var btn = Ext.getCmp('nx-logging-button-mark-save');
+              var btn = Ext.getCmp('nx-logging-button-add-save');
               btn.fireEvent('click', btn);
             }
           }
@@ -106,8 +115,8 @@ NX.define('Nexus.logging.app.view.Mark', {
       ],
 
       listeners: {
-        show: function (component) {
-          component.find('name', 'message')[0].focus(false, 100);
+        show: function(component) {
+          component.find('name', 'name')[0].focus(false, 100);
         }
       }
     });

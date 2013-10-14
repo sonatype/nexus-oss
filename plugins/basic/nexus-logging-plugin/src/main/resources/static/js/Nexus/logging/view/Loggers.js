@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.view.Loggers', {
+NX.define('Nexus.logging.view.Loggers', {
   extend: 'Ext.grid.EditorGridPanel',
 
   mixins: [
@@ -25,9 +25,9 @@ NX.define('Nexus.logging.app.view.Loggers', {
   ],
 
   requires: [
-    'Nexus.logging.app.Icons',
-    'Nexus.logging.app.store.Logger',
-    'Nexus.logging.app.view.LoggerLevel'
+    'Nexus.logging.Icons',
+    'Nexus.logging.store.Logger',
+    'Nexus.logging.view.LoggerLevel'
   ],
 
   xtype: 'nx-logging-view-loggers',
@@ -56,10 +56,10 @@ NX.define('Nexus.logging.app.view.Loggers', {
    */
   initComponent: function () {
     var me = this,
-        icons = Nexus.logging.app.Icons;
+        icons = Nexus.logging.Icons;
 
     Ext.apply(me, {
-      store: NX.create('Nexus.logging.app.store.Logger'),
+      store: NX.create('Nexus.logging.store.Logger'),
 
       columns: [
         {

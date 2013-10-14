@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.Icons', {
+NX.define('Nexus.logging.Icons', {
   extend: 'Nexus.util.IconContainer',
   singleton: true,
 

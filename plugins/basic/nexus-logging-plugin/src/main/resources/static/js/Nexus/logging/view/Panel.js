@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.view.Panel', {
+NX.define('Nexus.logging.view.Panel', {
   extend: 'Ext.Panel',
 
   mixins: [
@@ -25,9 +25,9 @@ NX.define('Nexus.logging.app.view.Panel', {
   ],
 
   requires: [
-    'Nexus.logging.app.view.Loggers',
-    'Nexus.logging.app.view.Log',
-    'Nexus.logging.app.Icons',
+    'Nexus.logging.view.Loggers',
+    'Nexus.logging.view.Log',
+    'Nexus.logging.Icons',
   ],
 
   title: 'Logging',
@@ -43,7 +43,7 @@ NX.define('Nexus.logging.app.view.Panel', {
    */
   initComponent: function () {
     var me = this,
-        icons = Nexus.logging.app.Icons;
+        icons = Nexus.logging.Icons;
 
     Ext.apply(me, {
       items: [

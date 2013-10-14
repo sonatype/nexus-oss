@@ -12,11 +12,11 @@
  */
 /*global define,NX*/
 define('nexus-logging-plugin-boot', [
-  'Nexus/logging/app/controller/Logging',
-  'Nexus/logging/app/view/Panel'
+  'Nexus/logging/controller/Logging',
+  'Nexus/logging/view/Panel'
 ], function () {
   NX.log.debug('Main nexus-logging-plugin modules loaded');
 
-  var controller = NX.create('Nexus.logging.app.controller.Logging');
+  var controller = NX.create('Nexus.logging.controller.Logging');
   controller.init();
 });

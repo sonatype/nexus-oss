@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.view.LoggerLevel', {
+NX.define('Nexus.logging.view.LoggerLevel', {
   extend: 'Ext.form.ComboBox',
   xtype: 'nx-logging-combo-logger-level',
 

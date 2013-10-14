@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.app.Controller', {
+NX.define('Nexus.controller.Controller', {
   mixins: [
     'Nexus.LogAwareMixin'
   ],

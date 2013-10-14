@@ -17,14 +17,14 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.controller.Logging', {
-  extend: 'Nexus.app.Controller',
+NX.define('Nexus.logging.controller.Logging', {
+  extend: 'Nexus.controller.Controller',
 
   requires: [
     'Nexus.siesta',
-    'Nexus.logging.app.Icons',
-    'Nexus.logging.app.view.Add',
-    'Nexus.logging.app.view.Mark'
+    'Nexus.logging.Icons',
+    'Nexus.logging.view.Add',
+    'Nexus.logging.view.Mark'
   ],
 
   init: function () {
@@ -121,7 +121,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore(),
-        icons = Nexus.logging.app.Icons;
+        icons = Nexus.logging.Icons;
 
     // if we have a logger selected, confirm before removal
     if (sm.hasSelection()) {

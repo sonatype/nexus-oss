@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.logging.app.store.Logger', {
+NX.define('Nexus.logging.store.Logger', {
   extend: 'Ext.data.Store',
 
   mixins: [
