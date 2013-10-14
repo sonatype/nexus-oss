@@ -107,15 +107,38 @@ NX.define('Nexus.atlas.controller.Atlas', {
   createSupportZip: function(button) {
     var me = this,
         viewport = button.up('viewport'), // mask entire viewport while creating
+        panel = Ext.getCmp('nx-atlas-view-supportzip'),
+        values = panel.down('form').getForm().getValues(),
+        request = {},
         mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Creating support ZIP file...' });
 
     me.logDebug('Creating support ZIP file');
 
     mask.show();
 
-    // TODO
-    Ext.defer(function() {
-      mask.hide();
-    }, 2000);
+    // translate 'on' -> true for boolean conversion
+    Ext.iterate(values, function(key, value) {
+      if (value === 'on') {
+        request[key] = true;
+      }
+      else {
+        request[key] = value;
+      }
+    });
+
+    Ext.Ajax.request({
+      url: Nexus.siesta.basePath + '/atlas/support-zip',
+      method: 'POST',
+      jsonData: request,
+
+      scope: me,
+      callback: function() {
+        mask.hide()
+      },
+      success: function(response, opts) {
+        //var obj = Ext.decode(response.responseText);
+        //panel.setInfo(obj);
+      }
+    });
   }
 });
