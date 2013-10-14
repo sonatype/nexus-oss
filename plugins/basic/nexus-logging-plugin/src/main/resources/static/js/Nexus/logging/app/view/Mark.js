@@ -29,6 +29,7 @@ NX.define('Nexus.logging.app.view.Mark', {
   ],
 
   xtype: 'nx-logging-view-mark',
+  cls: 'nx-logging-view-mark',
 
   title: 'Mark log',
 
@@ -37,7 +38,7 @@ NX.define('Nexus.logging.app.view.Mark', {
   resizable: false,
   width: 500,
   border: false,
-  cls: 'nx-logging-view-mark',
+  modal: true,
 
   /**
    * @override

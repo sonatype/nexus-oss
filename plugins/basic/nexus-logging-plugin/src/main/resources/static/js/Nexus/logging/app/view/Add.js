@@ -29,6 +29,7 @@ NX.define('Nexus.logging.app.view.Add', {
   ],
 
   xtype: 'nx-logging-view-add',
+  cls: 'nx-logging-view-add',
 
   title: 'Add logger',
 
@@ -37,7 +38,7 @@ NX.define('Nexus.logging.app.view.Add', {
   resizable: false,
   width: 500,
   border: false,
-  cls: 'nx-logging-view-add',
+  modal: true,
 
   /**
    * @override
