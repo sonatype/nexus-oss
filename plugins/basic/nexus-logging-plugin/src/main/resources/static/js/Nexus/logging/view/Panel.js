@@ -30,6 +30,8 @@ NX.define('Nexus.logging.view.Panel', {
     'Nexus.logging.Icons',
   ],
 
+  xtype: 'nx-logging-view-panel',
+
   title: 'Logging',
 
   border: false,
@@ -73,18 +75,4 @@ NX.define('Nexus.logging.view.Panel', {
 
     me.constructor.superclass.initComponent.apply(me, arguments);
   }
-}, function () {
-  var type = this,
-      sp = Sonatype.lib.Permissions;
-
-  // install panel into main NX navigation
-  Sonatype.Events.on('nexusNavigationInit', function (panel) {
-    panel.add({
-      enabled: sp.checkPermission('nexus:logging', sp.READ),
-      sectionId: 'st-nexus-config',
-      title: 'Logging',
-      tabId: 'logging',
-      tabCode: type
-    });
-  });
 });

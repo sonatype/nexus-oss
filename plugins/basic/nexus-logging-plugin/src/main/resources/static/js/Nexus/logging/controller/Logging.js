@@ -23,6 +23,7 @@ NX.define('Nexus.logging.controller.Logging', {
   requires: [
     'Nexus.siesta',
     'Nexus.logging.Icons',
+    'Nexus.logging.view.Panel',
     'Nexus.logging.view.Add',
     'Nexus.logging.view.Mark'
   ],
@@ -57,6 +58,8 @@ NX.define('Nexus.logging.controller.Logging', {
       }
     });
 
+    me.addNavigationMenu();
+
     me.getLogTask = {
       run: function () {
         me.loadTail();
@@ -65,6 +68,25 @@ NX.define('Nexus.logging.controller.Logging', {
       scope: me,
       started: false
     };
+  },
+
+  addNavigationMenu: function () {
+    // install panel into main NX navigation
+    Sonatype.Events.on('nexusNavigationInit', function (panel) {
+      var sp = Sonatype.lib.Permissions;
+
+      panel.add({
+        enabled: sp.checkPermission('nexus:logging', sp.READ),
+        sectionId: 'st-nexus-config',
+        title: 'Logging',
+        tabCode: function () {
+          return Ext.create({
+            xtype: 'nx-logging-view-panel',
+            id: 'logging'
+          });
+        }
+      });
+    });
   },
 
   loadLoggers: function (button) {
@@ -130,7 +152,7 @@ NX.define('Nexus.logging.controller.Logging', {
         msg: 'Remove "' + sm.selection.record.get('name') + '" logger ?',
         buttons: Ext.Msg.OKCANCEL,
         icon: icons.get('loggers_remove').variant('x32').cls,
-        fn: function(btn) {
+        fn: function (btn) {
           if (btn === 'ok') {
             store.remove(sm.selection.record);
           }
