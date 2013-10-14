@@ -67,3 +67,13 @@
 .nx-atlas-view-sysinfo-nestedsection h3 {
   padding-left: 10px;
 }
+
+.nx-atlas-view-supportzip-description {
+  font: normal 11px arial, tahoma, verdana, helvetica;
+  padding: 10px;
+}
+
+.nx-atlas-view-supportzip-form {
+  font: normal 11px arial, tahoma, verdana, helvetica;
+  padding-left: 20px;
+}

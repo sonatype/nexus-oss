@@ -17,7 +17,7 @@
  * @since 2.7
  */
 NX.define('Nexus.atlas.view.SupportZip', {
-  extend: 'Ext.Container',
+  extend: 'Ext.Panel',
 
   mixins: [
     'Nexus.LogAwareMixin'
@@ -28,11 +28,70 @@ NX.define('Nexus.atlas.view.SupportZip', {
   id: 'nx-atlas-view-supportzip',
   cls: 'nx-atlas-view-supportzip',
 
+  border: false,
+  layout: 'fit',
+
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
+
+    Ext.apply(me, {
+      items: [
+        {
+          xtype: 'container',
+          items: [
+            {
+              cls: 'nx-atlas-view-supportzip-description',
+              border: false,
+              html: 'Generate a ZIP file containing useful information about your server.  No information will be sent to Sonatype.' +
+                  '<br/><br/> Select the contents and options for generating the support ZIP file:'
+            },
+            {
+              xtype: 'form',
+              cls: 'nx-atlas-view-supportzip-form',
+              layoutConfig: {
+                labelSeparator: '',
+                labelWidth: 150
+              },
+              border: false,
+              items: [
+                {
+                  xtype: 'checkbox',
+                  fieldLabel: 'Application Properties',
+                  helpText: 'Includes memory and disk statistics, applications properties, system properties and environment variables'
+                },
+                {
+                  xtype: 'checkbox',
+                  fieldLabel: 'Thread Dump',
+                  helpText: 'Include a thread-dump'
+                },
+                {
+                  xtype: 'checkbox',
+                  fieldLabel: 'Configuration Files',
+                  helpText: 'Include Nexus configuration files'
+                },
+                {
+                  xtype: 'checkbox',
+                  fieldLabel: 'Log Files',
+                  helpText: 'Include Nexus log files'
+                },
+                {
+                  xtype: 'checkbox',
+                  fieldLabel: 'Limit Zip File Size',
+                  helpText: 'Limit the size of the generate zip to no more than 30 MB.'
+                }
+              ],
+              buttons: [
+                { text: 'Create', id: 'nx-atlas-button-create-zip' }
+              ],
+              buttonAlign: 'left'
+            }
+          ]
+        }
+      ]
+    });
 
     me.constructor.superclass.initComponent.apply(me, arguments);
   }
