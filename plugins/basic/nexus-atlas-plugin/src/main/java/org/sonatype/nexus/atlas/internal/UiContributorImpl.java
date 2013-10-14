@@ -18,11 +18,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.atlas.AtlasPlugin;
-import org.sonatype.nexus.plugin.PluginIdentity;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
 
 /**
  * Atlas {@link UiContributor}.
@@ -32,20 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class UiContributorImpl
-    implements UiContributor
+    extends UiContributorSupport
 {
-  private final PluginIdentity owner;
-
   @Inject
   public UiContributorImpl(final AtlasPlugin owner) {
-    this.owner = checkNotNull(owner);
-  }
-
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this,
-        owner.getCoordinates().getGroupId(),
-        owner.getCoordinates().getArtifactId())
-        .build(debug);
+    super(owner);
   }
 }
