@@ -13,8 +13,10 @@
 
 /*global define,NX*/
 define('nexus-atlas-plugin-boot', [
-  'Nexus/atlas/SupportToolsView'
+  'Nexus/atlas/controller/Atlas'
 ],
 function () {
   NX.log.debug('Module loaded: nexus-atlas-plugin-boot');
+
+  NX.create('Nexus.atlas.controller.Atlas').init();
 });

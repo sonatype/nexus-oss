@@ -16,26 +16,24 @@
  *
  * @since 2.7
  */
-NX.define('Nexus.atlas.SupportZipPanel', {
+NX.define('Nexus.atlas.view.SupportZip', {
   extend: 'Ext.Container',
 
   mixins: [
     'Nexus.LogAwareMixin'
   ],
 
+  xtype: 'nx-atlas-view-supportzip',
+  title: 'Support ZIP',
+  id: 'nx-atlas-view-supportzip',
+  cls: 'nx-atlas-view-supportzip',
+
   /**
    * @override
    */
   initComponent: function () {
-    var self = this;
+    var me = this;
 
-    Ext.apply(self, {
-      cls: 'nx-atlas-SupportZipPanel',
-      title: 'Support ZIP',
-      html: 'TODO'
-    });
-
-    self.constructor.superclass.initComponent.apply(self, arguments);
+    me.constructor.superclass.initComponent.apply(me, arguments);
   }
-
 });

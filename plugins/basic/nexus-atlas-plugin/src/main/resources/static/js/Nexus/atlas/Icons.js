@@ -43,7 +43,11 @@ NX.define('Nexus.atlas.Icons', {
       stylePrefix: 'nx-atlas-icon-',
 
       icons: {
-        arrow_refresh:    'arrow_refresh.png'
+        arrow_refresh:    'arrow_refresh.png',
+        globe_place:      iconConfig('globe_place.png'),
+
+        atlas:            '@globe_place',
+        refresh:          '@arrow_refresh'
       }
     });
   }

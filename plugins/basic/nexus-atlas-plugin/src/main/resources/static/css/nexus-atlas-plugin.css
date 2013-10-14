@@ -11,4 +11,24 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/* TODO */
+.nx-atlas-view-panel-tabs ul.x-tab-strip-top {
+  border-bottom-color: white;
+  background: white none;
+}
+
+.nx-atlas-view-panel-description {
+  font: normal 11px arial, tahoma, verdana, helvetica;
+}
+
+.nx-atlas-view-panel-description {
+  padding: 10px;
+}
+
+.nx-atlas-view-panel-description img {
+  float: left;
+  padding-right: 10px;
+}
+
+.nx-atlas-view-panel-description div {
+  vertical-align: middle;
+}

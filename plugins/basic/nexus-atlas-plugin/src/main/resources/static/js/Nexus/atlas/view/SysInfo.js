@@ -12,11 +12,11 @@
  */
 
 /**
- * System information panel.
+ * System information view.
  *
  * @since 2.7
  */
-NX.define('Nexus.atlas.SystemInformationPanel', {
+NX.define('Nexus.atlas.view.SysInfo', {
   extend: 'Ext.Panel',
 
   mixins: [
@@ -24,33 +24,24 @@ NX.define('Nexus.atlas.SystemInformationPanel', {
   ],
 
   requires: [
-    'Nexus.siesta'
+    'Nexus.atlas.Icons'
   ],
+
+  xtype: 'nx-atlas-view-sysinfo',
+  title: 'System Information',
+  id: 'nx-atlas-view-sysinfo',
+  cls: 'nx-atlas-view-sysinfo',
+  layout: 'fit',
+  autoScroll: true,
 
   /**
    * @override
    */
-  initComponent: function () {
-    var self = this;
+  initComponent: function() {
+    var me = this,
+        icons = Nexus.atlas.Icons;
 
-    Ext.apply(self, {
-      cls: 'nx-atlas-SystemInformationPanel',
-      title: 'System Information',
-      layout: 'fit',
-      autoScroll: true,
-      tbar: [
-        {
-          xtype: 'button',
-          text: 'Refresh',
-          scope: self,
-          handler: self.refresh
-        }
-      ]
-    });
-
-    // TODO: Automatically refresh when visible
-
-    self.sectionTpl = NX.create('Ext.XTemplate',
+    me.sectionTpl = NX.create('Ext.XTemplate',
         '<div>',
         '<h2>{name}</h2>',
         '<table>',
@@ -67,7 +58,7 @@ NX.define('Nexus.atlas.SystemInformationPanel', {
         }
     );
 
-    self.mainTpl = NX.create('Ext.XTemplate',
+    me.mainTpl = NX.create('Ext.XTemplate',
         '<div>',
         '{[ this.section("system-time", values) ]}',
         '{[ this.section("system-properties", values) ]}',
@@ -84,7 +75,7 @@ NX.define('Nexus.atlas.SystemInformationPanel', {
         {
           compiled: true,
 
-          section: function (name, values) {
+          section: function(name, values) {
             // pull off the section of data we want to render
             var data = values[name];
 
@@ -97,7 +88,7 @@ NX.define('Nexus.atlas.SystemInformationPanel', {
               })
             });
 
-            return self.sectionTpl.apply({
+            return me.sectionTpl.apply({
               name: name,
               props: props
             });
@@ -105,27 +96,23 @@ NX.define('Nexus.atlas.SystemInformationPanel', {
         }
     );
 
-    self.constructor.superclass.initComponent.apply(self, arguments);
+    Ext.apply(me, {
+      tbar: [
+        {
+          xtype: 'button',
+          id: 'nx-atlas-view-sysinfo-button-refresh',
+          text: 'Refresh',
+          tooltip: 'Refresh system information',
+          iconCls: icons.get('refresh').cls
+        }
+      ]
+    });
+
+    me.constructor.superclass.initComponent.apply(me, arguments);
   },
 
-  refresh: function () {
-    var self = this,
-        mask = NX.create('Ext.LoadMask', self.getEl(), { msg: 'Loading...' });
-
-    self.logDebug('Refreshing');
-
-    mask.show();
-    Ext.Ajax.request({
-      url: Nexus.siesta.basePath + '/atlas/system-information',
-
-      scope: self,
-      callback: function () {
-        mask.hide()
-      },
-      success: function (response, opts) {
-        var obj = Ext.decode(response.responseText);
-        self.mainTpl.overwrite(self.body, obj);
-      }
-    });
+  setInfo: function(info) {
+    var me = this;
+    me.mainTpl.overwrite(me.body, info);
   }
 });
