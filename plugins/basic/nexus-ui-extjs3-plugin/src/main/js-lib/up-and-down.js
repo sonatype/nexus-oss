@@ -14,39 +14,39 @@
 /*global Ext */
 
 Ext.applyIf(Ext.Component.prototype, {
-  up: function (query) {
+  up: function (selector) {
     var id;
 
-    if (query.startsWith('#')) {
-      id = query.substring(1);
+    if (selector.startsWith('#')) {
+      id = selector.substring(1);
       return this.findParentBy(function(container){
         return container.id === id;
       });
     }
-    return this.findParentByType(query);
+    return this.findParentByType(selector);
   }
 });
 
 Ext.applyIf(Ext.Container.prototype, {
-  up: function (query) {
+  up: function (selector) {
     var id;
 
-    if (query.startsWith('#')) {
-      id = query.substring(1);
+    if (selector.startsWith('#')) {
+      id = selector.substring(1);
       return this.findParentBy(function(container){
         return container.id === id;
       });
     }
-    return this.findParentByType(query);
+    return this.findParentByType(selector);
   },
-  down: function (query) {
+  down: function (selector) {
     var components;
 
-    if (query.startsWith('#')) {
-      components = this.find('id', query.substring(1));
+    if (selector.startsWith('#')) {
+      components = this.find('id', selector.substring(1));
     }
     else {
-      components = this.findByType(query);
+      components = this.findByType(selector);
     }
 
     if (Ext.isDefined(components) && components.length > 0) {
