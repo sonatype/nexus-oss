@@ -66,7 +66,7 @@ NX.define('Nexus.logging.app.view.Panel', {
             { xtype: 'nx-logging-view-loggers' },
             { xtype: 'nx-logging-view-log' }
           ],
-          activeItem: 0,
+          activeItem: 0
         }
       ]
     });
