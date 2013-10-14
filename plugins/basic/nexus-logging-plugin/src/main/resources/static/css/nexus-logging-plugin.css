@@ -64,5 +64,8 @@
 .nx-logging-view-log textarea {
   font-family: monospace;
   font-size: 10px;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-x: scroll;
 }
 
