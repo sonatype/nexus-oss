@@ -25,10 +25,22 @@
             http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
             http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd">
 
+  <xsd:simpleType name="level">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="TRACE"/>
+      <xsd:enumeration value="DEBUG"/>
+      <xsd:enumeration value="INFO"/>
+      <xsd:enumeration value="WARN"/>
+      <xsd:enumeration value="ERROR"/>
+      <xsd:enumeration value="FATAL"/>
+      <xsd:enumeration value="DISABLE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
   <xsd:complexType name="logger">
     <xsd:sequence>
-      <xsd:element name="name" type="xsd:string" minOccurs="0"/>
-      <xsd:element name="level" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="level" type="model:level" minOccurs="1" maxOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
 
@@ -39,6 +51,7 @@
   </xsd:complexType>
 
   <xsd:element name="logger" type="model:logger"/>
+
   <xsd:element name="marker" type="model:marker"/>
 
 </xsd:schema>

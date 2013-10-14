@@ -29,6 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.logging.LoggingPlugin;
+import org.sonatype.nexus.logging.model.LevelXO;
 import org.sonatype.nexus.logging.model.LoggerXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
@@ -61,16 +62,19 @@ public class LoggersResource
   public LoggersResource() {
     loggers = Maps.newHashMap();
     loggers.put(
-        "org.sonatype.nexus", new LoggerXO().withName("org.sonatype.nexus").withLevel("INFO")
+        "ROOT", new LoggerXO().withName("ROOT").withLevel(LevelXO.INFO)
     );
     loggers.put(
-        "org.sonatype.nexus.core", new LoggerXO().withName("org.sonatype.nexus.core").withLevel("DEBUG")
+        "org.sonatype.nexus", new LoggerXO().withName("org.sonatype.nexus").withLevel(LevelXO.INFO)
     );
     loggers.put(
-        "org.sonatype.nexus.capabilities", new LoggerXO().withName("org.sonatype.nexus.capabilities").withLevel("DEBUG")
+        "org.sonatype.nexus.core", new LoggerXO().withName("org.sonatype.nexus.core").withLevel(LevelXO.DEBUG)
     );
     loggers.put(
-        "org.sonatype.nexus.logging", new LoggerXO().withName("org.sonatype.nexus.logging").withLevel("DEBUG")
+        "org.sonatype.nexus.capabilities", new LoggerXO().withName("org.sonatype.nexus.capabilities").withLevel(LevelXO.DEBUG)
+    );
+    loggers.put(
+        "org.sonatype.nexus.logging", new LoggerXO().withName("org.sonatype.nexus.logging").withLevel(LevelXO.DEBUG)
     );
   }
 
