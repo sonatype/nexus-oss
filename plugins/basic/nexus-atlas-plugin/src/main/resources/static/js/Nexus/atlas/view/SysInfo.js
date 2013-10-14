@@ -111,6 +111,11 @@ NX.define('Nexus.atlas.view.SysInfo', {
     me.constructor.superclass.initComponent.apply(me, arguments);
   },
 
+  /**
+   * Update the system information display.
+   *
+   * @public
+   */
   setInfo: function(info) {
     var me = this;
     me.mainTpl.overwrite(me.body, info);
