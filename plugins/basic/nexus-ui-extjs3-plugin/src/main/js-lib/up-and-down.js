@@ -15,12 +15,28 @@
 
 Ext.applyIf(Ext.Component.prototype, {
   up: function (query) {
+    var id;
+
+    if (query.startsWith('#')) {
+      id = query.substring(1);
+      return this.findParentBy(function(container){
+        return container.id === id;
+      });
+    }
     return this.findParentByType(query);
   }
 });
 
 Ext.applyIf(Ext.Container.prototype, {
   up: function (query) {
+    var id;
+
+    if (query.startsWith('#')) {
+      id = query.substring(1);
+      return this.findParentBy(function(container){
+        return container.id === id;
+      });
+    }
     return this.findParentByType(query);
   },
   down: function (query) {
