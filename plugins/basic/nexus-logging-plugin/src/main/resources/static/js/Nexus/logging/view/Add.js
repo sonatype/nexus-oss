@@ -78,7 +78,7 @@ NX.define('Nexus.logging.view.Add', {
               xtype: 'nx-logging-combo-logger-level',
               fieldLabel: 'Level',
               itemCls: 'required-field',
-              //helpText: "Select logger level",
+              //helpText: 'Select logger level',
               name: 'level',
               value: 'INFO',
               width: 80
