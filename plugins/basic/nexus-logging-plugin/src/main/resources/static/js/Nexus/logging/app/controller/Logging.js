@@ -151,7 +151,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
       suppressStatus: true,
       jsonData: values,
       success: function () {
-        Nexus.messages.show('Confirmation', 'Log has been marked with "' + values.message + '"');
+        Nexus.messages.show('Confirmation', 'Log has been marked with: ' + values.message);
         // refresh the log view
         me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
       },
