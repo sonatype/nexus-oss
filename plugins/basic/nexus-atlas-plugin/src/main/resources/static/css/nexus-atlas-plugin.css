@@ -16,8 +16,13 @@
   background: white none;
 }
 
+.nx-atlas-view-sysinfo-body,
 .nx-atlas-view-panel-description {
   font: normal 11px arial, tahoma, verdana, helvetica;
+}
+
+.nx-atlas-view-sysinfo-body {
+  padding: 4px;
 }
 
 .nx-atlas-view-panel-description {
@@ -31,4 +36,17 @@
 
 .nx-atlas-view-panel-description div {
   vertical-align: middle;
+}
+
+.nx-atlas-view-sysinfo-section {
+  padding-bottom: 5px;
+}
+
+.nx-atlas-view-sysinfo-section h2 {
+  font: bold 12px;
+  padding-bottom: 2px;
+}
+
+.nx-atlas-view-sysinfo-section table {
+  padding-left: 10px;
 }

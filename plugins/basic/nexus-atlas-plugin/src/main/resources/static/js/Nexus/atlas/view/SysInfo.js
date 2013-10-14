@@ -42,7 +42,7 @@ NX.define('Nexus.atlas.view.SysInfo', {
         icons = Nexus.atlas.Icons;
 
     me.sectionTpl = NX.create('Ext.XTemplate',
-        '<div>',
+        '<div class="nx-atlas-view-sysinfo-section">',
         '<h2>{name}</h2>',
         '<table>',
         '<tpl for="props">',
@@ -59,7 +59,7 @@ NX.define('Nexus.atlas.view.SysInfo', {
     );
 
     me.mainTpl = NX.create('Ext.XTemplate',
-        '<div>',
+        '<div class="nx-atlas-view-sysinfo-body">',
         '{[ this.section("system-time", values) ]}',
         '{[ this.section("system-properties", values) ]}',
         '{[ this.section("system-environment", values) ]}',
