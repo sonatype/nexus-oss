@@ -47,13 +47,11 @@ implements Resource
 {
   static final String RESOURCE_URI = '/atlas/system-information'
 
-  // FIXME: For some crazy fucking reason closures defined in report() can't access these fields when they are private
+  private final ApplicationConfiguration applicationConfiguration
 
-  final ApplicationConfiguration applicationConfiguration
+  private final AppContext appContext
 
-  final AppContext appContext
-
-  final NexusPluginManager pluginManager
+  private final NexusPluginManager pluginManager
 
   @Inject
   SystemInformationResource(final ApplicationConfiguration applicationConfiguration,
@@ -69,6 +67,11 @@ implements Resource
   @RequiresPermissions('nexus:atlas')
   Map report() {
     log.info 'Generating system information report'
+
+    // HACK: provide local references to prevent problems with Groovy BUG accessing private fields
+    def applicationConfiguration = this.applicationConfiguration
+    def appContext = this.appContext
+    def pluginManager = this.pluginManager
 
     def fileref = { File file ->
       if (file) {
