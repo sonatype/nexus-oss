@@ -37,7 +37,7 @@ NX.define('Nexus.controller.Controller', {
         }
 
         var id = key.substring(1),
-            obj = Ext.getCmp(id);
+            obj = Ext.ComponentMgr.get(id);
 
         // If component already exists, register events on it
         if (Ext.isObject(obj)) {
