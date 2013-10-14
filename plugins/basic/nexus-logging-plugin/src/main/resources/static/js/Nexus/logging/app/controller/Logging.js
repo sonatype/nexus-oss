@@ -21,7 +21,9 @@ NX.define('Nexus.logging.app.controller.Logging', {
   extend: 'Nexus.app.Controller',
 
   requires: [
-    'Nexus.siesta'
+    'Nexus.siesta',
+    'Nexus.logging.app.view.Add',
+    'Nexus.logging.app.view.Mark'
   ],
 
   init: function () {
@@ -135,7 +137,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
   },
 
   markLog: function (button) {
-    var win = button.up('nx-logging-view-mark'),
+    var me = this,
+        win = button.up('nx-logging-view-mark'),
         form = win.down('form')[0].getForm(),
         values = form.getFieldValues();
 
@@ -148,6 +151,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
       jsonData: values,
       success: function () {
         Nexus.messages.show('Confirmation', 'Log has been marked with "' + values.message + '"');
+        // refresh the log view
+        me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
       },
       failure: function (response) {
         // TODO shall we show a message and ask user to retry?
