@@ -26,8 +26,7 @@ NX.define('Nexus.controller.Controller', {
     var me = this;
     Ext.iterate(config, function(key) {
       if (key.startsWith('#')) {
-        var id = key.substring(1);
-
+        // closure to register control events on given object
         function register(obj) {
           var events = config['#' + obj.id];
 
@@ -37,9 +36,12 @@ NX.define('Nexus.controller.Controller', {
           });
         }
 
+        var id = key.substring(1),
+            obj = Ext.getCmp(id);
+
         // If component already exists, register events on it
-        if (Ext.get(id)) {
-          register(Ext.get(id));
+        if (Ext.isObject(obj)) {
+          register(obj);
         }
         else {
           // else when the component is created we will register events then
