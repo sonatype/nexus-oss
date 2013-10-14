@@ -21,10 +21,7 @@ NX.define('Nexus.logging.app.controller.Logging', {
   extend: 'Nexus.app.Controller',
 
   requires: [
-    'Nexus.siesta',
-    'Nexus.logging.app.view.Panel',
-    'Nexus.logging.app.view.Add',
-    'Nexus.logging.app.view.Mark'
+    'Nexus.siesta'
   ],
 
   init: function () {
@@ -48,6 +45,9 @@ NX.define('Nexus.logging.app.controller.Logging', {
       },
       '#nx-logging-button-mark-save': {
         click: this.markLog
+      },
+      '#nx-logging-view-log': {
+        activate: this.retrieveLog
       },
       '#nx-logging-button-refresh-log': {
         click: this.refreshLog

@@ -27,6 +27,7 @@ NX.define('Nexus.logging.app.view.Log', {
   xtype: 'nx-logging-view-log',
 
   title: 'Log',
+  id: 'nx-logging-view-log',
   cls: 'nx-logging-view-log',
   layout: 'fit',
 
@@ -38,6 +39,8 @@ NX.define('Nexus.logging.app.view.Log', {
         icons = Nexus.logging.app.Icons;
 
     Ext.apply(me, {
+      id: 'nx-logging-view-log',
+
       items: {
         xtype: 'textarea',
         readOnly: true,
