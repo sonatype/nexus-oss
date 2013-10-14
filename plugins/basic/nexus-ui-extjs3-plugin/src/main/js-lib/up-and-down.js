@@ -24,6 +24,9 @@ Ext.applyIf(Ext.Container.prototype, {
     return this.findParentByType(query);
   },
   down: function (query) {
+    if (query.startsWith('#')) {
+      return this.find('id', query.substring(1));
+    }
     return this.findByType(query);
   }
 });
