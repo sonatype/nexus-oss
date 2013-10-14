@@ -31,34 +31,34 @@ NX.define('Nexus.logging.app.controller.Logging', {
 
     me.control({
       '#nx-logging-button-refresh-loggers': {
-        click: this.loadLoggers
+        click: me.loadLoggers
       },
       '#nx-logging-button-add-logger': {
-        click: this.showAddLogger
+        click: me.showAddLogger
       },
       '#nx-logging-button-remove-loggers': {
-        click: this.removeLoggers
+        click: me.removeLoggers
       },
       '#nx-logging-button-mark': {
-        click: this.showMarkLog
+        click: me.showMarkLog
       },
       '#nx-logging-button-add-save': {
-        click: this.addLogger
+        click: me.addLogger
       },
       '#nx-logging-button-mark-save': {
-        click: this.markLog
+        click: me.markLog
       },
       '#nx-logging-view-log': {
-        activate: this.retrieveLog
+        activate: me.retrieveLog
       },
       '#nx-logging-button-refresh-log': {
-        click: this.refreshLog
+        click: me.refreshLog
       }
     });
 
     me.getLogTask = {
       run: function () {
-        this.loadTail();
+        me.loadTail();
       },
       interval: 10000,
       scope: me,

@@ -50,6 +50,7 @@ NX.define('Nexus.logging.app.Icons', {
         bookmark_red:     iconConfig('bookmark_red.png'),
 
         logging:          '@book',
+        logger:           '@book',
 
         loggers_refresh:  '@arrow_refresh',
         loggers_add:      '@book_add',

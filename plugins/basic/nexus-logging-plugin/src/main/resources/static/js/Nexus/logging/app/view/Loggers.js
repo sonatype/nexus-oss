@@ -49,24 +49,6 @@ NX.define('Nexus.logging.app.view.Loggers', {
     msgCls: 'loading-indicator'
   },
 
-  columns: [
-    {
-      id: 'name',
-      header: 'Name',
-      dataIndex: 'name',
-      sortable: true
-    },
-    {
-      id: 'level',
-      header: 'Level',
-      dataIndex: 'level',
-      sortable: true,
-      width: 80,
-      tooltip: 'Double click to edit',
-      editor: {xtype: 'nx-logging-combo-logger-level'}
-    }
-  ],
-
   autoExpandColumn: 'name',
 
   /**
@@ -78,6 +60,36 @@ NX.define('Nexus.logging.app.view.Loggers', {
 
     Ext.apply(me, {
       store: NX.create('Nexus.logging.app.store.Logger'),
+
+      columns: [
+        {
+          width: 30,
+          resizable: false,
+          sortable: false,
+          fixed: true,
+          hideable: false,
+          menuDisabled: true,
+          renderer: function (value, metaData, record) {
+            return icons.get('logger').img;
+          }
+        },
+        {
+          id: 'name',
+          header: 'Name',
+          dataIndex: 'name',
+          sortable: true
+        },
+        {
+          id: 'level',
+          header: 'Level',
+          dataIndex: 'level',
+          sortable: true,
+          width: 80,
+          tooltip: 'Double click to edit',
+          editor: {xtype: 'nx-logging-combo-logger-level'}
+        }
+      ],
+
       tbar: [
         {
           id: 'nx-logging-button-refresh-loggers',
