@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.sonatype.nexus.log.DefaultLogConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.logging.LoggerContributor;
 import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.model.LevelXO;
 import org.sonatype.nexus.logging.model.LoggerXO;
@@ -41,6 +44,8 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -65,24 +70,26 @@ public class LoggingConfiguratorImpl
 
   private final TemplateEngine templateEngine;
 
+  private final List<LoggerContributor> contributors;
+
   private final Map<String, LoggerXO> userLoggers;
 
-  private final Map<String, LoggerXO> contributedLoggers;
 
   @Inject
   public LoggingConfiguratorImpl(final LogManager logManager,
-                                 final TemplateEngine templateEngine)
+                                 final TemplateEngine templateEngine,
+                                 final List<LoggerContributor> contributors)
   {
     this.logManager = checkNotNull(logManager);
     this.templateEngine = checkNotNull(templateEngine);
+    this.contributors = contributors;
     userLoggers = getUserLoggers();
-    contributedLoggers = getContributedLoggers();
   }
 
   @Override
   public Collection<LoggerXO> getLoggers() {
     Map<String, LoggerXO> loggers = Maps.newHashMap();
-    loggers.putAll(contributedLoggers);
+    loggers.putAll(getContributedLoggers());
     loggers.putAll(userLoggers);
     return loggers.values();
   }
@@ -194,6 +201,31 @@ public class LoggingConfiguratorImpl
 
   private Map<String, LoggerXO> getContributedLoggers() {
     Map<String, LoggerXO> loggers = Maps.newHashMap();
+    for (LoggerContributor contributor : contributors) {
+      Set<String> contributedLoggers = contributor.getLoggers();
+      if (contributedLoggers != null) {
+        for (String loggerName : contributedLoggers) {
+          Logger logger = LoggerFactory.getLogger(loggerName);
+          LevelXO level = LevelXO.OFF;
+          if (logger.isTraceEnabled()) {
+            level = LevelXO.TRACE;
+          }
+          else if (logger.isDebugEnabled()) {
+            level = LevelXO.DEBUG;
+          }
+          else if (logger.isInfoEnabled()) {
+            level = LevelXO.INFO;
+          }
+          else if (logger.isWarnEnabled()) {
+            level = LevelXO.WARN;
+          }
+          else if (logger.isErrorEnabled()) {
+            level = LevelXO.ERROR;
+          }
+          loggers.put(loggerName, new LoggerXO().withName(loggerName).withLevel(level));
+        }
+      }
+    }
     return loggers;
   }
 
