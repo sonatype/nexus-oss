@@ -93,7 +93,7 @@ public class LoggingConfiguratorImpl
     checkNotNull(level, "level");
     LoggerXO logger = userLoggers.get(name);
     if (logger == null) {
-      userLoggers.put("name", logger = new LoggerXO().withName(name).withLevel(level));
+      userLoggers.put(name, logger = new LoggerXO().withName(name).withLevel(level));
     }
     logger.setLevel(level);
   }
