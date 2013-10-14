@@ -21,10 +21,6 @@
   font: normal 11px arial, tahoma, verdana, helvetica;
 }
 
-.nx-atlas-view-sysinfo-body {
-  padding: 4px;
-}
-
 .nx-atlas-view-panel-description {
   padding: 10px;
 }
@@ -38,13 +34,28 @@
   vertical-align: middle;
 }
 
+.nx-atlas-view-sysinfo-body {
+  padding: 4px;
+}
+
+.nx-atlas-view-sysinfo-body {
+  white-space: pre;
+  word-wrap: normal;
+}
+
 .nx-atlas-view-sysinfo-section {
   padding-bottom: 5px;
 }
 
 .nx-atlas-view-sysinfo-section h2 {
-  font: bold 12px;
+  font-size: large;
+  font-weight: bold;
+  font-variant: small-caps;
   padding-bottom: 2px;
+}
+
+.nx-atlas-view-sysinfo-section .property-name {
+  padding-right: 20px;
 }
 
 .nx-atlas-view-sysinfo-section table {

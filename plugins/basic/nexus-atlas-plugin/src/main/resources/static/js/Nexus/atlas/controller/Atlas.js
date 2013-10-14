@@ -22,7 +22,6 @@ NX.define('Nexus.atlas.controller.Atlas', {
 
   requires: [
     'Nexus.siesta',
-    'Nexus.atlas.Icons',
     'Nexus.atlas.view.Panel'
   ],
 
