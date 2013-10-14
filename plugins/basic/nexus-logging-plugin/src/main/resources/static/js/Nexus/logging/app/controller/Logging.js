@@ -126,8 +126,8 @@ NX.define('Nexus.logging.app.controller.Logging', {
     // if we have a logger selected, confirm before removal
     if (sm.hasSelection()) {
       Ext.Msg.show({
-        title: 'Remove logger?',
-        msg: 'Remove logger: ' + sm.selection.record.get('name'),
+        title: 'Remove logger',
+        msg: 'Remove "' + sm.selection.record.get('name') + '" logger ?',
         buttons: Ext.Msg.OKCANCEL,
         icon: icons.get('loggers_remove').variant('x32').cls,
         fn: function(btn) {
