@@ -21,7 +21,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.goodies.common.Iso8601Date
 import org.sonatype.sisu.siesta.common.Resource
 
-import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -52,20 +51,16 @@ implements Resource
 
   final ApplicationConfiguration applicationConfiguration
 
-  final File installDirectory
-
   final AppContext appContext
 
   final NexusPluginManager pluginManager
 
   @Inject
   SystemInformationResource(final ApplicationConfiguration applicationConfiguration,
-                            final @Named('${bundleBasedir}') @Nullable File installDirectory,
                             final AppContext appContext,
                             final NexusPluginManager pluginManager)
   {
     this.applicationConfiguration = checkNotNull(applicationConfiguration)
-    this.installDirectory = installDirectory
     this.appContext = checkNotNull(appContext)
     this.pluginManager = checkNotNull(pluginManager)
   }
@@ -125,7 +120,7 @@ implements Resource
 
     def reportNexusConfiguration = {
       return [
-          'installDirectory': fileref(installDirectory),
+          'installDirectory': fileref(applicationConfiguration.installDirectory),
           'workingDirectory': fileref(applicationConfiguration.workingDirectory),
           'temporaryDirectory': fileref(applicationConfiguration.temporaryDirectory)
       ]
