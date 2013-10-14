@@ -158,6 +158,14 @@ public class LogbackLogManager
     eventBus.unregister(this);
   }
 
+  /**
+   * @since 2.7
+   */
+  @Override
+  public File getLogConfigFile(final String name) {
+    return new File(getLogConfigDir(), name);
+  }
+
   @Override
   public Set<File> getLogFiles() {
     HashSet<File> files = new HashSet<File>();

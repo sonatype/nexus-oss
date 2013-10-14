@@ -46,6 +46,16 @@ public interface LogManager
       throws IOException;
 
   void configure();
-  
+
   void shutdown();
+
+  /**
+   * Returns the log configuration file.
+   *
+   * @param name of configuration file
+   * @return log configuration file (never null)
+   * @since 2.7
+   */
+  File getLogConfigFile(String name);
+
 }
