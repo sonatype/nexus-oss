@@ -30,8 +30,6 @@ NX.define('Nexus.logging.app.view.Panel', {
     'Nexus.logging.app.Icons',
   ],
 
-  xtyle: 'nx-logging-view-panel',
-
   title: 'Logging',
 
   border: false,
@@ -68,7 +66,7 @@ NX.define('Nexus.logging.app.view.Panel', {
             { xtype: 'nx-logging-view-loggers' },
             { xtype: 'nx-logging-view-log' }
           ],
-          activeItem: 0
+          activeItem: 0,
         }
       ]
     });
