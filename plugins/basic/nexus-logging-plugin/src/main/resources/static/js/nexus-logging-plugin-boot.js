@@ -17,6 +17,5 @@ define('nexus-logging-plugin-boot', [
 ], function () {
   NX.log.debug('Main nexus-logging-plugin modules loaded');
 
-  var controller = NX.create('Nexus.logging.controller.Logging');
-  controller.init();
+  NX.create('Nexus.logging.controller.Logging').init();
 });
