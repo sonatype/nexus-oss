@@ -14,14 +14,13 @@
 package org.sonatype.nexus.atlas.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.apache.shiro.authz.annotation.RequiresRoles
 import org.sonatype.security.SecuritySystem
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.siesta.common.Resource
 
-import javax.inject.Singleton
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Singleton
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
@@ -40,8 +39,8 @@ import static com.google.common.base.Preconditions.checkNotNull
 @Path(SecurityDiagnosticResource.RESOURCE_URI)
 @Produces(MediaType.APPLICATION_JSON)
 class SecurityDiagnosticResource
-  extends ComponentSupport
-  implements Resource
+extends ComponentSupport
+implements Resource
 {
   static final String RESOURCE_URI = '/atlas/security-diagnostic'
 
@@ -68,20 +67,20 @@ class SecurityDiagnosticResource
     def mappify = { obj, Set excludes = [] ->
       obj.metaPropertyValues
           .findAll { value -> !(value.name in (excludes += ['class', 'metaClass'])) }
-          .collectEntries { [ it.name, it.value] }
+          .collectEntries { [it.name, it.value] }
     }
 
     // add details for a privilege by id
     def explainPrivilege = { data, String id ->
       def privilege = authzman.getPrivilege(id)
-      data[id] = mappify(privilege, [ 'id' ] as Set)
+      data[id] = mappify(privilege, ['id'] as Set)
     }
 
     // add details for a role by id (pre-defined to support recursion)
     def explainRole
     explainRole = { data, String id ->
       def role = authzman.getRole(id)
-      data[id] = mappify(role, [ 'roleId', 'roles', 'privileges' ] as Set)
+      data[id] = mappify(role, ['roleId', 'roles', 'privileges'] as Set)
 
       // add details for nested roles
       if (role.roles) {
@@ -102,7 +101,7 @@ class SecurityDiagnosticResource
 
     // add details for given user
     def explainUser = { data, user ->
-      data.user = mappify(user, ['roles',] as Set)
+      data.user = mappify(user, ['roles'] as Set)
 
       data.user.roles = [:]
       user.roles.each {
