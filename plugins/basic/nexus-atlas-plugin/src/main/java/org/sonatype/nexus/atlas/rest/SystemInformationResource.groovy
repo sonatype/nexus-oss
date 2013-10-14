@@ -132,7 +132,10 @@ implements Resource
     def reportNexusPlugins = {
       def data = [:]
       pluginManager.pluginResponses.each { gav, response ->
-        def item = data[gav.toString()] = [
+        def item = data[gav.artifactId] = [
+            'groupId': gav.groupId,
+            'artifactId': gav.artifactId,
+            'version': gav.version,
             'successful': response.successful
         ]
         if (response.throwable) {
