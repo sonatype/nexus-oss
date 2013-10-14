@@ -82,6 +82,7 @@ NX.define('Nexus.logging.controller.Logging', {
         enabled: sp.checkPermission('nexus:logging', sp.READ),
         sectionId: 'st-nexus-config',
         title: 'Logging',
+        tabId: 'logging',
         tabCode: function () {
           return Ext.create({
             xtype: 'nx-logging-view-panel',
