@@ -34,6 +34,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
       },
       '#nx-atlas-view-sysinfo-button-refresh': {
         'click': me.refreshSysInfo
+      },
+      '#nx-atlas-button-create-zip': {
+        'click': me.createSupportZip
       }
     });
 
@@ -94,5 +97,25 @@ NX.define('Nexus.atlas.controller.Atlas', {
    */
   refreshSysInfo: function(button) {
     this.loadSysInfo(Ext.getCmp('nx-atlas-view-sysinfo'));
+  },
+
+  /**
+   * Create support ZIP file.
+   *
+   * @private
+   */
+  createSupportZip: function(button) {
+    var me = this,
+        viewport = button.up('viewport'), // mask entire viewport while creating
+        mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Creating support ZIP file...' });
+
+    me.logDebug('Creating support ZIP file');
+
+    mask.show();
+
+    // TODO
+    Ext.defer(function() {
+      mask.hide();
+    }, 2000);
   }
 });

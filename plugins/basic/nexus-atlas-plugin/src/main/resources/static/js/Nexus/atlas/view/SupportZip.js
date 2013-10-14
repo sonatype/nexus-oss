@@ -45,11 +45,13 @@ NX.define('Nexus.atlas.view.SupportZip', {
             {
               cls: 'nx-atlas-view-supportzip-description',
               border: false,
-              html: 'Generate a ZIP file containing useful information about your server.  No information will be sent to Sonatype.' +
+              html: 'Generate a ZIP file containing useful information about your server. ' +
+                  'No information will be sent to Sonatype when creating the ZIP file.' +
                   '<br/><br/> Select the contents and options for generating the support ZIP file:'
             },
             {
               xtype: 'form',
+              itemId: 'form',
               cls: 'nx-atlas-view-supportzip-form',
               layoutConfig: {
                 labelSeparator: '',
@@ -59,26 +61,31 @@ NX.define('Nexus.atlas.view.SupportZip', {
               items: [
                 {
                   xtype: 'checkbox',
+                  name: 'applicationProperties',
                   fieldLabel: 'Application Properties',
                   helpText: 'Includes memory and disk statistics, applications properties, system properties and environment variables'
                 },
                 {
                   xtype: 'checkbox',
+                  name: 'threadDump',
                   fieldLabel: 'Thread Dump',
                   helpText: 'Include a thread-dump'
                 },
                 {
                   xtype: 'checkbox',
+                  name: 'configurationFiles',
                   fieldLabel: 'Configuration Files',
                   helpText: 'Include Nexus configuration files'
                 },
                 {
                   xtype: 'checkbox',
+                  name: 'logFiles',
                   fieldLabel: 'Log Files',
                   helpText: 'Include Nexus log files'
                 },
                 {
                   xtype: 'checkbox',
+                  name: 'limitSize',
                   fieldLabel: 'Limit Zip File Size',
                   helpText: 'Limit the size of the generate zip to no more than 30 MB.'
                 }
