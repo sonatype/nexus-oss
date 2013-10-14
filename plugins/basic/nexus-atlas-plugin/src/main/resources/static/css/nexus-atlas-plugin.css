@@ -77,3 +77,7 @@
   font: normal 11px arial, tahoma, verdana, helvetica;
   padding-left: 20px;
 }
+
+.nx-atlas-view-supportzip .x-form-item-label {
+  font: bold 11px arial, tahoma, verdana, helvetica;
+}
