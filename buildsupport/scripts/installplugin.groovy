@@ -16,7 +16,7 @@
 //
 // Usage:
 //
-//    groovy -Dinstall=./target/nexus-bundle-template-2.7.0-SNAPSHOT -Dplugin=./plugins/basic/nexus-atlas-plugin/target/nexus-atlas-plugin-2.7.0-SNAPSHOT-bundle.zip ./buildsupport/scripts/installplugin.groovy
+//    groovy -Dinstall=<nexus-install-directory> -Dplugin=<nexus-plugin-bundle-zip> ./buildsupport/scripts/installplugin.groovy
 //
 
 def pluginFile = System.getProperty('plugin') as File
