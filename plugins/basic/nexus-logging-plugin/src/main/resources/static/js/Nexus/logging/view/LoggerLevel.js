@@ -10,34 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-package org.sonatype.nexus.plugins.rest;
-
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+/*global NX, Ext, Nexus, Sonatype*/
 
 /**
- * Support for {@link NexusDocumentationBundle} implementations.
+ * Logger level combo.
  *
  * @since 2.7
  */
-public abstract class NexusDocumentationBundleSupport
-    extends AbstractDocumentationNexusResourceBundle
-{
-  private final PluginIdentity owner;
+NX.define('Nexus.logging.view.LoggerLevel', {
+  extend: 'Ext.form.ComboBox',
+  xtype: 'nx-logging-combo-logger-level',
 
-  protected NexusDocumentationBundleSupport(final PluginIdentity plugin) {
-    this.owner = checkNotNull(plugin);
-  }
+  triggerAction: 'all',
+  lazyRender: true,
+  mode: 'local',
+  emptyText: 'Select...',
+  editable: false,
+  store: NX.create('Ext.data.ArrayStore', {
+    id: 0,
+    fields: [
+      'level'
+    ],
+    data: [
+      ['TRACE'],
+      ['DEBUG'],
+      ['INFO'],
+      ['WARN'],
+      ['ERROR'],
+      ['FATAL'],
+      ['DISABLE']
+    ]
+  }),
+  valueField: 'level',
+  displayField: 'level'
 
-  @Override
-  public String getPluginId() {
-    return owner.getId();
-  }
-
-  @Override
-  public String getDescription() {
-    return String.format("%s API", owner.getId());
-  }
-}
+});

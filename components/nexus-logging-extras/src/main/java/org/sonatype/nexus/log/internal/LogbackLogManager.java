@@ -103,14 +103,15 @@ public class LogbackLogManager
   private final ApplicationConfiguration applicationConfiguration;
 
   private final List<LogConfigurationParticipant> logConfigurationParticipants;
-  
+
   private final EventBus eventBus;
 
   private ObjectName jmxName;
 
   @Inject
   public LogbackLogManager(final Injector injector, final ApplicationConfiguration applicationConfiguration,
-      final List<LogConfigurationParticipant> logConfigurationParticipants, final EventBus eventBus)
+                           final List<LogConfigurationParticipant> logConfigurationParticipants,
+                           final EventBus eventBus)
   {
     this.injector = checkNotNull(injector);
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
@@ -127,12 +128,11 @@ public class LogbackLogManager
     }
     eventBus.register(this);
   }
-  
+
   // ==
 
   @Subscribe
-  public void on(final NexusInitializedEvent evt)
-  {
+  public void on(final NexusInitializedEvent evt) {
     configure();
   }
 
@@ -310,11 +310,18 @@ public class LogbackLogManager
 
     response.setSize(log.length());
 
-    response.setFromByte(from);
+    if (count >= 0) {
+      response.setFromByte(from);
+      response.setBytesCount(count);
+    }
+    else {
+      response.setBytesCount(Math.abs(count));
+      response.setFromByte(Math.max(0, response.getSize() - response.getBytesCount()));
+    }
 
-    response.setBytesCount(count);
-
-    response.setInputStream(new LimitedInputStream(new FileInputStream(log), from, count));
+    response.setInputStream(
+        new LimitedInputStream(new FileInputStream(log), response.getFromByte(), response.getBytesCount())
+    );
 
     return response;
   }

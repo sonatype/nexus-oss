@@ -10,34 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define,NX*/
+define('nexus-logging-plugin-boot', [
+  'Nexus/logging/controller/Logging'
+], function () {
+  NX.log.debug('Main nexus-logging-plugin modules loaded');
 
-package org.sonatype.nexus.plugins.rest;
-
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-/**
- * Support for {@link NexusDocumentationBundle} implementations.
- *
- * @since 2.7
- */
-public abstract class NexusDocumentationBundleSupport
-    extends AbstractDocumentationNexusResourceBundle
-{
-  private final PluginIdentity owner;
-
-  protected NexusDocumentationBundleSupport(final PluginIdentity plugin) {
-    this.owner = checkNotNull(plugin);
-  }
-
-  @Override
-  public String getPluginId() {
-    return owner.getId();
-  }
-
-  @Override
-  public String getDescription() {
-    return String.format("%s API", owner.getId());
-  }
-}
+  NX.create('Nexus.logging.controller.Logging').init();
+});

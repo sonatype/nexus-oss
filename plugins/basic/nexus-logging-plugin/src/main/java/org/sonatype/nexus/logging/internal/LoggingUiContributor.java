@@ -11,33 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.logging.internal;
 
-import org.sonatype.nexus.plugin.PluginIdentity;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sonatype.nexus.logging.LoggingPlugin;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
 
 /**
- * Support for {@link NexusDocumentationBundle} implementations.
+ * Logging plugin {@link UiContributor}.
  *
  * @since 2.7
  */
-public abstract class NexusDocumentationBundleSupport
-    extends AbstractDocumentationNexusResourceBundle
+@Named
+@Singleton
+public class LoggingUiContributor
+    extends UiContributorSupport
 {
-  private final PluginIdentity owner;
-
-  protected NexusDocumentationBundleSupport(final PluginIdentity plugin) {
-    this.owner = checkNotNull(plugin);
-  }
-
-  @Override
-  public String getPluginId() {
-    return owner.getId();
-  }
-
-  @Override
-  public String getDescription() {
-    return String.format("%s API", owner.getId());
+  @Inject
+  public LoggingUiContributor(final LoggingPlugin owner) {
+    super(owner);
   }
 }
