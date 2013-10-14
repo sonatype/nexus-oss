@@ -50,7 +50,7 @@ NX.define('Nexus.logging.app.view.Log', {
         {
           id: 'nx-logging-button-refresh-log',
           text: 'Refresh',
-          tooltip: 'Refresh loggers',
+          tooltip: 'Refresh log',
           iconCls: icons.get('log_refresh').cls
         },
         '-',
