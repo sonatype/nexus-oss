@@ -151,7 +151,7 @@ NX.define('Nexus.logging.controller.Logging', {
     else {
       record = new store.recordType(values);
       store.add(record);
-      win.grid.getSelectionModel().select(store.indexOf(record), 0);
+      win.grid.getSelectionModel().select(store.indexOf(record), 1);
       win.close();
     }
   },
