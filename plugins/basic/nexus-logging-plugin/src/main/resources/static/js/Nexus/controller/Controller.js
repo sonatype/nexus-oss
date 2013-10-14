@@ -28,14 +28,23 @@ NX.define('Nexus.controller.Controller', {
       if (key.startsWith('#')) {
         var id = key.substring(1);
 
-        Ext.ComponentMgr.onAvailable(id, function(obj) {
+        function register(obj) {
           var events = config['#' + obj.id];
 
           Ext.iterate(events, function(event) {
             obj.on(event, events[event], me);
             me.logDebug('Registered for event "' + event + '" on ' + obj.id);
           });
-        }, me);
+        }
+
+        // If component already exists, register events on it
+        if (Ext.get(id)) {
+          register(Ext.get(id));
+        }
+        else {
+          // else when the component is created we will register events then
+          Ext.ComponentMgr.onAvailable(id, register, me);
+        }
       }
     });
   }
