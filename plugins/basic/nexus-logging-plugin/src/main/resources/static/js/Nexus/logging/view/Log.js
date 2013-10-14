@@ -70,7 +70,7 @@ NX.define('Nexus.logging.view.Log', {
   },
 
   showLog: function (text) {
-    var textarea = this.down('textarea')[0];
+    var textarea = this.down('textarea');
     textarea.setValue(text);
     // scroll to the bottom
     textarea.getEl().dom.scrollTop = 1000000;

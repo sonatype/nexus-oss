@@ -100,8 +100,8 @@ NX.define('Nexus.logging.controller.Logging', {
   },
 
   controlSelection: function (loggingPanel) {
-    var loggersGrid = loggingPanel.down('nx-logging-view-loggers')[0],
-        removeBtn = loggersGrid.getTopToolbar().down("#nx-logging-button-remove-loggers")[0];
+    var loggersGrid = loggingPanel.down('nx-logging-view-loggers'),
+        removeBtn = loggersGrid.getTopToolbar().down("#nx-logging-button-remove-loggers");
 
     loggersGrid.getSelectionModel().on('selectionchange', function (sm) {
       if (sm.hasSelection()) {
@@ -125,7 +125,7 @@ NX.define('Nexus.logging.controller.Logging', {
     var me = this,
         win = button.up('nx-logging-view-add'),
         store = win.grid.getStore(),
-        form = win.down('form')[0].getForm(),
+        form = win.down('form').getForm(),
         values = form.getFieldValues(),
         record = store.getById(values.name);
 
@@ -185,7 +185,7 @@ NX.define('Nexus.logging.controller.Logging', {
   markLog: function (button) {
     var me = this,
         win = button.up('nx-logging-view-mark'),
-        form = win.down('form')[0].getForm(),
+        form = win.down('form').getForm(),
         values = form.getFieldValues();
 
     win.close();

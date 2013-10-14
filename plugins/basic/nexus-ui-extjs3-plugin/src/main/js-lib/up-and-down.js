@@ -14,9 +14,9 @@
 /*global Ext */
 
 Ext.applyIf(Ext.Component.prototype, {
-    up: function (query) {
-      return this.findParentByType(query);
-    }
+  up: function (query) {
+    return this.findParentByType(query);
+  }
 });
 
 Ext.applyIf(Ext.Container.prototype, {
@@ -24,9 +24,17 @@ Ext.applyIf(Ext.Container.prototype, {
     return this.findParentByType(query);
   },
   down: function (query) {
+    var components;
+
     if (query.startsWith('#')) {
-      return this.find('id', query.substring(1));
+      components = this.find('id', query.substring(1));
     }
-    return this.findByType(query);
+    else {
+      components = this.findByType(query);
+    }
+
+    if (Ext.isDefined(components) && components.length > 0) {
+      return components[0];
+    }
   }
 });
