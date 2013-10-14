@@ -37,8 +37,7 @@ NX.define('Nexus.logging.view.LoggerLevel', {
       ['INFO'],
       ['WARN'],
       ['ERROR'],
-      ['FATAL'],
-      ['DISABLE']
+      ['OFF']
     ]
   }),
   valueField: 'level',

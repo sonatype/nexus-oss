@@ -32,8 +32,7 @@
       <xsd:enumeration value="INFO"/>
       <xsd:enumeration value="WARN"/>
       <xsd:enumeration value="ERROR"/>
-      <xsd:enumeration value="FATAL"/>
-      <xsd:enumeration value="DISABLE"/>
+      <xsd:enumeration value="OFF"/>
     </xsd:restriction>
   </xsd:simpleType>
 
