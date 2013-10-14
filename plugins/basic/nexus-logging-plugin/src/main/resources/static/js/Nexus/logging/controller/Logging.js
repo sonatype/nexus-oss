@@ -32,6 +32,9 @@ NX.define('Nexus.logging.controller.Logging', {
     var me = this;
 
     me.control({
+      '#logging': {
+        afterrender: me.controlSelection
+      },
       '#nx-logging-button-refresh-loggers': {
         click: me.loadLoggers
       },
@@ -94,6 +97,20 @@ NX.define('Nexus.logging.controller.Logging', {
         store = loggersGrid.getStore();
 
     store.load();
+  },
+
+  controlSelection: function (loggingPanel) {
+    var loggersGrid = loggingPanel.down('nx-logging-view-loggers')[0],
+        removeBtn = loggersGrid.getTopToolbar().down("#nx-logging-button-remove-loggers")[0];
+
+    loggersGrid.getSelectionModel().on('selectionchange', function (sm) {
+      if (sm.hasSelection()) {
+        removeBtn.enable();
+      }
+      else {
+        removeBtn.disable();
+      }
+    });
   },
 
   showAddLogger: function (button) {

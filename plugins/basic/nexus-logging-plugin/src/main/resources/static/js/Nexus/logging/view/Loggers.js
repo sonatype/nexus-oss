@@ -107,7 +107,8 @@ NX.define('Nexus.logging.view.Loggers', {
           id: 'nx-logging-button-remove-loggers',
           text: 'Remove',
           tooltip: 'Remove selected logger',
-          iconCls: icons.get('loggers_remove').cls
+          iconCls: icons.get('loggers_remove').cls,
+          disabled: true
         }
       ]
     });
