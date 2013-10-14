@@ -41,6 +41,7 @@ NX.define('Nexus.atlas.view.SysInfo', {
     var me = this,
         icons = Nexus.atlas.Icons;
 
+    // simple named section with list of key-value properties
     me.sectionTpl = NX.create('Ext.XTemplate',
         '<div class="nx-atlas-view-sysinfo-section">',
         '<h2>{name}</h2>',
@@ -58,6 +59,40 @@ NX.define('Nexus.atlas.view.SysInfo', {
         }
     );
 
+    // nested named section with list of child named sections
+    me.nestedSectionTpl = NX.create('Ext.XTemplate',
+        '<div class="nx-atlas-view-sysinfo-nestedsection">',
+        '<h2>{name}</h2>',
+        '<tpl for="nested">',
+        '<h3>{name}</h3>',
+        '<table>',
+        '<tpl for="props">',
+        '<tr>',
+        '<td class="property-name">{name}</td>',
+        '<td class="property-value">{value}</td>',
+        '</tr>',
+        '</tpl>',
+        '</table>',
+        '</tpl>',
+        '</div>',
+        {
+          compiled: true
+        }
+    );
+
+    // Helper to convert an object into an array of {name,value} properties
+    function objectToProperties(obj) {
+      var props = [];
+      Ext.iterate(obj, function(key, value) {
+        props.push({
+          name: key,
+          value: value
+        })
+      });
+      return props;
+    }
+
+    // Main template renders all sections
     me.mainTpl = NX.create('Ext.XTemplate',
         '<div class="nx-atlas-view-sysinfo-body">',
         '{[ this.section("system-time", values) ]}',
@@ -65,32 +100,49 @@ NX.define('Nexus.atlas.view.SysInfo', {
         '{[ this.section("system-environment", values) ]}',
         '{[ this.section("system-runtime", values) ]}',
         '{[ this.section("system-threads", values) ]}',
-        // FIXME: filestores is a complex structure, need to have a separate handler for it
-        //'{[ this.section("system-filestores", values) ]}',
+        '{[ this.nestedSection("system-filestores", values) ]}',
         '{[ this.section("nexus-configuration", values) ]}',
         '{[ this.section("nexus-properties", values) ]}',
-        // FIXME: plugins is a complex structure ...
-        //'{[ this.section("nexus-plugins", values) ]}',
+        '{[ this.nestedSection("nexus-plugins", values) ]}',
         '</div>',
         {
           compiled: true,
 
+          /**
+           * Render a section.
+           */
           section: function(name, values) {
             // pull off the section of data we want to render
             var data = values[name];
 
             // convert object into array of name/value objects for xtemplate to render
-            var props = [];
-            Ext.iterate(data, function(key, value) {
-              props.push({
-                name: key,
-                value: value
-              })
-            });
+            var props = objectToProperties(data);
 
             return me.sectionTpl.apply({
               name: name,
               props: props
+            });
+          },
+
+          /**
+           * Render a nested section.
+           */
+          nestedSection: function(name, values) {
+            // pull off the section of data we want to render
+            var data = values[name];
+
+            var nested = [];
+
+            Ext.iterate(data, function(key, value) {
+              nested.push({
+                name: key,
+                props: objectToProperties(value)
+              })
+            });
+
+            return me.nestedSectionTpl.apply({
+              name: name,
+              nested: nested
             });
           }
         }
