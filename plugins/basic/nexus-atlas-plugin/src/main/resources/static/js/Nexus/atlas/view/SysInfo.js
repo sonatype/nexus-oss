@@ -155,6 +155,14 @@ NX.define('Nexus.atlas.view.SysInfo', {
           text: 'Refresh',
           tooltip: 'Refresh system information',
           iconCls: icons.get('refresh').cls
+        },
+        '-',
+        {
+          xtype: 'button',
+          id: 'nx-atlas-view-sysinfo-button-print',
+          text: 'Print',
+          tooltip: 'Print system information',
+          iconCls: icons.get('print').cls
         }
       ]
     });

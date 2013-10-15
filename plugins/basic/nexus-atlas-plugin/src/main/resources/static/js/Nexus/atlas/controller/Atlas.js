@@ -35,6 +35,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
       '#nx-atlas-view-sysinfo-button-refresh': {
         'click': me.refreshSysInfo
       },
+      '#nx-atlas-view-sysinfo-button-print': {
+        'click': me.printSysInfo
+      },
       '#nx-atlas-button-create-zip': {
         'click': me.createSupportZip
       }
@@ -97,6 +100,29 @@ NX.define('Nexus.atlas.controller.Atlas', {
    */
   refreshSysInfo: function(button) {
     this.loadSysInfo(Ext.getCmp('nx-atlas-view-sysinfo'));
+  },
+
+  /**
+   * Print system information panel contents.
+   *
+   * @private
+   */
+  printSysInfo: function(button) {
+    var me = this,
+        panel = Ext.getCmp('nx-atlas-view-sysinfo'),
+        win;
+
+    win = window.open('', '', 'width=640,height=480');
+    win.document.write('<html><head>');
+    win.document.write('<title>System Information</title>');
+
+    // FIXME: Ideally want some of the style in here
+    // FIXME: ... but unsure how to resolve that URL (since it could change for debug, etc)
+
+    win.document.write('</head><body>');
+    win.document.write(panel.body.dom.innerHTML);
+    win.document.write('</body></html>');
+    win.print();
   },
 
   /**
