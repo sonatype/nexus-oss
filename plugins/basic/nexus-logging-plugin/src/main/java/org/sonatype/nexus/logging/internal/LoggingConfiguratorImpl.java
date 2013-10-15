@@ -110,6 +110,7 @@ public class LoggingConfiguratorImpl
   public void setLevel(final String name, final LevelXO level) {
     checkNotNull(name, "name");
     checkNotNull(level, "level");
+
     try {
       lock.writeLock().lock();
       LoggerXO logger = userLoggers.get(name);
@@ -128,6 +129,7 @@ public class LoggingConfiguratorImpl
   public void remove(final String name) {
     checkNotNull(name, "name");
     checkArgument(!ROOT.equals(name), ROOT + " logger cannot be removed");
+
     try {
       lock.writeLock().lock();
       userLoggers.remove(name);

@@ -31,6 +31,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
@@ -55,6 +57,13 @@ public class LogResource
   public LogResource() {
   }
 
+  /**
+   * Logs a message at INFO level.
+   *
+   * @param marker message to be logger (cannot be null/empty)
+   * @throws NullPointerException     If marker is null
+   * @throws IllegalArgumentException If marker message is null or empty
+   */
   @PUT
   @Path("/mark")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
@@ -63,6 +72,9 @@ public class LogResource
   public void put(final MarkerXO marker)
       throws Exception
   {
+    checkNotNull(marker);
+    checkArgument(StringUtils.isNotEmpty(marker.getMessage()));
+
     String asterixes = StringUtils.repeat("*", marker.getMessage().length() + 4);
     log.info("\n"
         + asterixes + "\n"

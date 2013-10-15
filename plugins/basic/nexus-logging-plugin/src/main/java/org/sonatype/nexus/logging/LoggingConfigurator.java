@@ -19,15 +19,33 @@ import org.sonatype.nexus.logging.model.LevelXO;
 import org.sonatype.nexus.logging.model.LoggerXO;
 
 /**
+ * Dynamic loggers configuration.
+ *
  * @since 2.7
  */
 public interface LoggingConfigurator
 {
 
+  /**
+   * Returns the list of current configured loggers (never null).
+   * Collection will contain all loggers contributed by {@link LoggerContributor}s, already configured loggers and one
+   * entry for "ROOT" logger.
+   */
   Collection<LoggerXO> getLoggers();
 
+  /**
+   * Sets logging level for specified logger
+   *
+   * @param name  of logger to set the level of
+   * @param level to be set
+   */
   void setLevel(String name, LevelXO level);
 
+  /**
+   * Removes specified logger.
+   *
+   * @param name of logger to be removed
+   */
   void remove(String name);
 
 }

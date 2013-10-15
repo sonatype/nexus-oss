@@ -21,6 +21,8 @@ import javax.inject.Singleton;
 import com.google.common.collect.Sets;
 
 /**
+ * Nexus Core {@link LoggerContributor}.
+ *
  * @since 2.7
  */
 @Named

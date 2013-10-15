@@ -16,11 +16,16 @@ package org.sonatype.nexus.logging;
 import java.util.Set;
 
 /**
+ * Extension point for plugins/components that want to contribute loggers.
+ *
  * @since 2.7
  */
 public interface LoggerContributor
 {
 
+  /**
+   * Returns contributes loggers (should not return null).
+   */
   Set<String> getLoggers();
 
 }

@@ -35,7 +35,9 @@ import org.sonatype.sisu.siesta.common.Resource;
 
 import com.google.common.collect.Lists;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
@@ -62,6 +64,11 @@ public class LoggersResource
     this.configurator = checkNotNull(configurator, "configurator");
   }
 
+  /**
+   * Returns a list of configured loggers (never null).
+   *
+   * @see LoggingConfigurator#getLoggers()
+   */
   @GET
   @Produces({APPLICATION_JSON, APPLICATION_XML})
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "read")
@@ -69,6 +76,13 @@ public class LoggersResource
     return Lists.newArrayList(configurator.getLoggers());
   }
 
+  /**
+   * Sets the level of a logger.
+   *
+   * @param logger logger name/level (cannot be null)
+   * @throws NullPointerException     If logger is null or level is empty
+   * @throws IllegalArgumentException If logger name is null or empty
+   */
   @POST
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
@@ -76,10 +90,21 @@ public class LoggersResource
   public LoggerXO post(final LoggerXO logger)
       throws Exception
   {
+    checkNotNull(logger, "logger");
+    checkNotNull(logger.getLevel(), "logger level");
+    checkArgument(StringUtils.isNotEmpty(logger.getName()), "name cannot be empty");
+
     configurator.setLevel(logger.getName(), logger.getLevel());
     return logger;
   }
 
+  /**
+   * Sets the level of a logger.
+   *
+   * @param name   logger name
+   * @param logger logger name/level (cannot be null)
+   * @throws NullPointerException If name is null or logger is null or level is null
+   */
   @PUT
   @Path("/{name}")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
@@ -89,16 +114,28 @@ public class LoggersResource
                       final LoggerXO logger)
       throws Exception
   {
+    checkNotNull(name, "name");
+    checkNotNull(logger, "logger");
+    checkNotNull(logger.getLevel(), "logger level");
+
     configurator.setLevel(name, logger.getLevel());
     return logger;
   }
 
+  /**
+   * Un-sets the level of a logger.
+   *
+   * @param name logger name
+   * @throws NullPointerException If name is null
+   */
   @DELETE
   @Path("/{name}")
   @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
   public void delete(final @PathParam("name") String name)
       throws Exception
   {
+    checkNotNull(name, "name");
+
     configurator.remove(name);
   }
 
