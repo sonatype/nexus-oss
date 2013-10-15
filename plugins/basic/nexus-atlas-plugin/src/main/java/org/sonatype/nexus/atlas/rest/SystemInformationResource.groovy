@@ -81,10 +81,11 @@ implements Resource
     }
 
     def reportTime = {
+      def now = new Date()
       return [
           'timezone': TimeZone.default.ID,
-          'current': System.currentTimeMillis(),
-          'iso8601': Iso8601Date.format(new Date())
+          'current': now.time,
+          'iso8601': Iso8601Date.format(now)
       ]
     }
 
