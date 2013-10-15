@@ -24,9 +24,12 @@ import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * The Interface StorageFileItemInspector.
+ *
+ * @deprecated Use {@link StorageItemInspector} instead.
  */
 @ExtensionPoint
 @Singleton
+@Deprecated
 public interface StorageFileItemInspector
 {
   /**
