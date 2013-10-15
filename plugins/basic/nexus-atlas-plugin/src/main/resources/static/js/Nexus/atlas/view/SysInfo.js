@@ -113,15 +113,11 @@ NX.define('Nexus.atlas.view.SysInfo', {
            * Render a section.
            */
           section: function(name, values) {
-            // pull off the section of data we want to render
             var data = values[name];
-
-            // convert object into array of name/value objects for xtemplate to render
-            var props = objectToProperties(data);
 
             return me.sectionTpl.apply({
               name: name,
-              props: props
+              props: objectToProperties(data)
             });
           },
 
@@ -129,10 +125,8 @@ NX.define('Nexus.atlas.view.SysInfo', {
            * Render a nested section.
            */
           nestedSection: function(name, values) {
-            // pull off the section of data we want to render
-            var data = values[name];
-
-            var nested = [];
+            var data = values[name],
+                nested = [];
 
             Ext.iterate(data, function(key, value) {
               nested.push({
