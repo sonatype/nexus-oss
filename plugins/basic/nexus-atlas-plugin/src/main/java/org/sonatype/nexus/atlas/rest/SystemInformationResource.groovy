@@ -122,7 +122,7 @@ implements Resource
       return data
     }
 
-    def reportNetworkInforfaces = {
+    def reportNetwork = {
       def data = [:]
       NetworkInterface.networkInterfaces.each { intf ->
         data[intf.name] = [
@@ -173,7 +173,7 @@ implements Resource
         'system-environment': System.getenv().sort(),
         'system-runtime': reportRuntime(),
         'system-threads': reportThreads(),
-        'system-network': reportNetworkInforfaces(),
+        'system-network': reportNetwork(),
         'system-filestores': reportFileStores(),
         'nexus-properties': appContext.flatten().sort(),
         'nexus-configuration': reportNexusConfiguration(),
