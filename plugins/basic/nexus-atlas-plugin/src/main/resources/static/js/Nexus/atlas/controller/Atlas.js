@@ -113,11 +113,17 @@ NX.define('Nexus.atlas.controller.Atlas', {
         win;
 
     win = window.open('', '', 'width=640,height=480');
+    if (win == null) {
+      alert('Print window pop-up was blocked!');
+      return;
+    }
+
     win.document.write('<html><head>');
     win.document.write('<title>System Information</title>');
 
     // FIXME: Ideally want some of the style in here
     // FIXME: ... but unsure how to resolve that URL (since it could change for debug, etc)
+    // FIXME: See for more details http://stackoverflow.com/questions/5939456/how-to-print-extjs-component
 
     win.document.write('</head><body>');
     win.document.write(panel.body.dom.innerHTML);
