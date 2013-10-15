@@ -71,7 +71,7 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
     return panel;
   },
   add : function(c) {
-    var i, arr = null, a = arguments, panel;
+    var i, arr = null, a = arguments, panel, newPanel;
 
     if (a.length > 1)
     {
@@ -101,8 +101,9 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
       panel = this.findById(c.sectionId);
       if (panel)
       {
-        panel.add(c);
+        newPanel = panel.add(c);
         panel.sort();
+        return newPanel;
       }
       else
       {
