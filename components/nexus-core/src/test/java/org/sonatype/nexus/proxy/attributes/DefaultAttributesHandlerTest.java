@@ -34,6 +34,10 @@ import static org.hamcrest.Matchers.nullValue;
 public class DefaultAttributesHandlerTest
     extends AbstractAttributesHandlerTest
 {
+  @Override
+  protected AttributesHandler createAttributesHandler() throws Exception {
+    return lookup(AttributesHandler.class);
+  }
 
   @Test
   public void testRecreateAttrs()
