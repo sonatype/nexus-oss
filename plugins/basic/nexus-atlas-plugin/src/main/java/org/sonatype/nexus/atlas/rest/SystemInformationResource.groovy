@@ -121,6 +121,25 @@ implements Resource
       return data
     }
 
+    def reportNetworkInforfaces = {
+      def data = [:]
+      NetworkInterface.networkInterfaces.each { intf ->
+        data[intf.name] = [
+            'displayName': intf.displayName,
+            'up': intf.up,
+            'virtual': intf.virtual,
+            'multicast': intf.supportsMulticast(),
+            'loopback': intf.loopback,
+            'ptp': intf.pointToPoint,
+            'mtu': intf.MTU,
+            'addresses': intf.inetAddresses.collect { addr ->
+              addr.toString()
+            }.join(',')
+        ]
+      }
+      return data
+    }
+
     // TODO: Report system network details
 
     def reportNexusConfiguration = {
@@ -155,6 +174,7 @@ implements Resource
         'system-environment': System.getenv().sort(),
         'system-runtime': reportRuntime(),
         'system-threads': reportThreads(),
+        'system-network': reportNetworkInforfaces(),
         'system-filestores': reportFileStores(),
         'nexus-properties': appContext.flatten().sort(),
         'nexus-configuration': reportNexusConfiguration(),

@@ -101,6 +101,7 @@ NX.define('Nexus.atlas.view.SysInfo', {
         '{[ this.section("system-environment", values) ]}',
         '{[ this.section("system-runtime", values) ]}',
         '{[ this.section("system-threads", values) ]}',
+        '{[ this.nestedSection("system-network", values) ]}',
         '{[ this.nestedSection("system-filestores", values) ]}',
         '{[ this.section("nexus-configuration", values) ]}',
         '{[ this.section("nexus-properties", values) ]}',
