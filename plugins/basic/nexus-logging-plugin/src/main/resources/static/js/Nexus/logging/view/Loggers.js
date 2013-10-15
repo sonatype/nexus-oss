@@ -41,6 +41,7 @@ NX.define('Nexus.logging.view.Loggers', {
 
   viewConfig: {
     emptyText: 'No loggers defined.',
+    emptyTextWhileFiltering: 'No loggers matched criteria: {criteria}',
     deferEmptyText: false
   },
 
@@ -111,6 +112,11 @@ NX.define('Nexus.logging.view.Loggers', {
           tooltip: 'Remove selected logger',
           iconCls: icons.get('loggers_remove').cls,
           disabled: true
+        },
+        '->',
+        {
+          xtype: 'nx-grid-filter-box',
+          filteredGrid: me
         }
       ]
     });
