@@ -107,10 +107,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
   createSupportZip: function(button) {
     var me = this,
         viewport = button.up('viewport'), // mask entire viewport while creating
-        panel = Ext.getCmp('nx-atlas-view-supportzip'),
-        values = panel.down('form').getForm().getValues(),
-        request = {},
-        mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Creating support ZIP file...' });
+        mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Creating support ZIP file...' }),
+        values = Ext.getCmp('nx-atlas-view-supportzip').getValues(),
+        request = {};
 
     me.logDebug('Creating support ZIP file');
 
@@ -118,12 +117,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
 
     // translate 'on' -> true for boolean conversion
     Ext.iterate(values, function(key, value) {
-      if (value === 'on') {
-        request[key] = true;
-      }
-      else {
-        request[key] = value;
-      }
+      request[key] = value === 'on' ? true : value;
     });
 
     Ext.Ajax.request({

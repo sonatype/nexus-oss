@@ -52,14 +52,13 @@ implements Resource
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RequiresPermissions('nexus:atlas')
-  Map userDiagnostic(final Map config) {
-    log.info 'Creating support ZIP with configuration: {}', config
+  Map userDiagnostic(final Map request) {
+    log.info 'Creating support ZIP for request: {}', request
 
-    // TODO
-    config.each { key, value ->
-      println "$key = $value (${value.getClass()})"
-    }
+    // TODO: Generate zip file, return reference to the file create for download
 
-    return [:]
+    return [
+        fileName: 'somefile-12345.zip'
+    ]
   }
 }

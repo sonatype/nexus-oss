@@ -73,6 +73,11 @@
   padding: 10px;
 }
 
+.nx-atlas-view-supportzip-description img {
+  float: left;
+  padding-right: 10px;
+}
+
 .nx-atlas-view-supportzip-form {
   font: normal 11px arial, tahoma, verdana, helvetica;
   padding-left: 20px;

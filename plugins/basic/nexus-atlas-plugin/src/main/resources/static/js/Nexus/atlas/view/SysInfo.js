@@ -169,7 +169,6 @@ NX.define('Nexus.atlas.view.SysInfo', {
    * @public
    */
   setInfo: function(info) {
-    var me = this;
-    me.mainTpl.overwrite(me.body, info);
+    this.mainTpl.overwrite(this.body, info);
   }
 });

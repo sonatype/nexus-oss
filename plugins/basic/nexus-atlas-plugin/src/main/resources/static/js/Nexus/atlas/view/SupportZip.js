@@ -23,6 +23,10 @@ NX.define('Nexus.atlas.view.SupportZip', {
     'Nexus.LogAwareMixin'
   ],
 
+  requires: [
+    'Nexus.atlas.Icons'
+  ],
+
   xtype: 'nx-atlas-view-supportzip',
   title: 'Support ZIP',
   id: 'nx-atlas-view-supportzip',
@@ -35,7 +39,8 @@ NX.define('Nexus.atlas.view.SupportZip', {
    * @override
    */
   initComponent: function() {
-    var me = this;
+    var me = this,
+        icons = Nexus.atlas.Icons;
 
     Ext.apply(me, {
       items: [
@@ -45,9 +50,10 @@ NX.define('Nexus.atlas.view.SupportZip', {
             {
               cls: 'nx-atlas-view-supportzip-description',
               border: false,
-              html: 'Generate a ZIP file containing useful information about your server. ' +
+              html: icons.get('zip').variant('x32').img +
+                  '<div>Generate a ZIP file containing useful support information about your server. ' +
                   'No information will be sent to Sonatype when creating the ZIP file.' +
-                  '<br/><br/> Select the contents and options for generating the support ZIP file:'
+                  '<br/><br/> Select the contents and options for generating the support ZIP file:</div>'
             },
             {
               xtype: 'form',
@@ -63,25 +69,25 @@ NX.define('Nexus.atlas.view.SupportZip', {
                   xtype: 'checkbox',
                   name: 'applicationProperties',
                   fieldLabel: 'Application Properties',
-                  helpText: 'Includes memory and disk statistics, applications properties, system properties and environment variables'
+                  helpText: 'Includes memory and disk statistics, applications properties, system properties and environment variables (recommended)'
                 },
                 {
                   xtype: 'checkbox',
                   name: 'threadDump',
                   fieldLabel: 'Thread Dump',
-                  helpText: 'Include a thread-dump'
+                  helpText: 'Include a JVM thread-dump (recommended)'
                 },
                 {
                   xtype: 'checkbox',
                   name: 'configurationFiles',
                   fieldLabel: 'Configuration Files',
-                  helpText: 'Include Nexus configuration files'
+                  helpText: 'Include configuration files (recommended)'
                 },
                 {
                   xtype: 'checkbox',
                   name: 'logFiles',
                   fieldLabel: 'Log Files',
-                  helpText: 'Include Nexus log files'
+                  helpText: 'Include log files (recommended)'
                 },
                 {
                   xtype: 'checkbox',
@@ -101,5 +107,14 @@ NX.define('Nexus.atlas.view.SupportZip', {
     });
 
     me.constructor.superclass.initComponent.apply(me, arguments);
+  },
+
+  /**
+   * Get form values.
+   *
+   * @public
+   */
+  getValues: function() {
+    return this.down('form').getForm().getValues();
   }
 });
