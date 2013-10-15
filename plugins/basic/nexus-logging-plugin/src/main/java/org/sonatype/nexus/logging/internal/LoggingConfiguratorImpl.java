@@ -42,6 +42,8 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
@@ -95,9 +97,16 @@ public class LoggingConfiguratorImpl
   @Override
   public Collection<LoggerXO> getLoggers() {
     Map<String, LoggerXO> loggers = Maps.newHashMap();
+
+    // include all runtime loggers which have explicit levels
+    loggers.putAll(getRuntimeLoggers());
+
+    // include all contributed loggers
     loggers.putAll(getContributedLoggers());
+
     try {
       lock.readLock().lock();
+      // include all custom loggers added by users
       loggers.putAll(userLoggers);
     }
     finally {
@@ -231,6 +240,57 @@ public class LoggingConfiguratorImpl
     }
   }
 
+  // FIXME: This should be adapted to LogManager to hide logback specifics?
+
+  /**
+   * Return mapping of existing runtime loggers which have explicit levels configured.
+   */
+  private Map<String, LoggerXO> getRuntimeLoggers() {
+    Map<String, LoggerXO> loggers = Maps.newHashMap();
+
+    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    for (ch.qos.logback.classic.Logger logger : loggerContext.getLoggerList()) {
+      String name = logger.getName();
+      Level level = logger.getLevel();
+      // only include loggers which explicit levels configured
+      if (level != null) {
+        loggers.put(name, new LoggerXO().withName(name).withLevel(convert(level)));
+      }
+    }
+
+
+    return loggers;
+  }
+
+  /**
+   * Convert a Logback {@link Level} into a {@link LevelXO}.
+   */
+  private LevelXO convert(final Level level) {
+    switch (level.toInt()) {
+      // FIXME: Should we add support for ALL?  ATM logback ALL -> TRACE
+      //case Level.ALL_INT:
+      //  return LevelXO.ALL;
+
+      case Level.ERROR_INT:
+        return LevelXO.ERROR;
+
+      case Level.WARN_INT:
+        return LevelXO.WARN;
+
+      case Level.INFO_INT:
+        return LevelXO.INFO;
+
+      case Level.DEBUG_INT:
+        return LevelXO.DEBUG;
+
+      case Level.TRACE_INT:
+        return LevelXO.TRACE;
+
+      default:
+        return LevelXO.TRACE;
+    }
+  }
+
   private Map<String, LoggerXO> getContributedLoggers() {
     Map<String, LoggerXO> loggers = Maps.newHashMap();
     for (LoggerContributor contributor : contributors) {
@@ -238,27 +298,34 @@ public class LoggingConfiguratorImpl
       if (contributedLoggers != null) {
         for (String loggerName : contributedLoggers) {
           Logger logger = LoggerFactory.getLogger(loggerName);
-          LevelXO level = LevelXO.OFF;
-          if (logger.isTraceEnabled()) {
-            level = LevelXO.TRACE;
-          }
-          else if (logger.isDebugEnabled()) {
-            level = LevelXO.DEBUG;
-          }
-          else if (logger.isInfoEnabled()) {
-            level = LevelXO.INFO;
-          }
-          else if (logger.isWarnEnabled()) {
-            level = LevelXO.WARN;
-          }
-          else if (logger.isErrorEnabled()) {
-            level = LevelXO.ERROR;
-          }
+          LevelXO level = levelOf(logger);
           loggers.put(loggerName, new LoggerXO().withName(loggerName).withLevel(level));
         }
       }
     }
     return loggers;
+  }
+
+  /**
+   * Get the level of a Slf4j {@link Logger}.
+   */
+  private LevelXO levelOf(final Logger logger) {
+    if (logger.isTraceEnabled()) {
+      return LevelXO.TRACE;
+    }
+    else if (logger.isDebugEnabled()) {
+      return LevelXO.DEBUG;
+    }
+    else if (logger.isInfoEnabled()) {
+      return LevelXO.INFO;
+    }
+    else if (logger.isWarnEnabled()) {
+      return LevelXO.WARN;
+    }
+    else if (logger.isErrorEnabled()) {
+      return LevelXO.ERROR;
+    }
+    return LevelXO.OFF;
   }
 
 }
