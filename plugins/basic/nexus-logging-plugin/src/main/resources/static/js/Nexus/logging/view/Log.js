@@ -161,6 +161,10 @@ NX.define('Nexus.logging.view.Log', {
     };
   },
 
+  /**
+   * Display log content.
+   * @param {String} text log content
+   */
   showLog: function (text) {
     var textarea = this.down('textarea');
     textarea.setValue(text);

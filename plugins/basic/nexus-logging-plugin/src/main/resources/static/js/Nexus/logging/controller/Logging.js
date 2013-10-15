@@ -45,7 +45,7 @@ NX.define('Nexus.logging.controller.Logging', {
         click: me.showAddLogger
       },
       '#nx-logging-button-remove-loggers': {
-        click: me.removeLoggers
+        click: me.removeLogger
       },
       '#nx-logging-button-mark': {
         click: me.showMarkLog
@@ -77,6 +77,10 @@ NX.define('Nexus.logging.controller.Logging', {
     me.addNavigationMenu();
   },
 
+  /**
+   * Adds a menu entry in left navigation bar under config section.
+   * @private
+   */
   addNavigationMenu: function () {
     // install panel into main NX navigation
     Sonatype.Events.on('nexusNavigationInit', function (panel) {
@@ -125,6 +129,11 @@ NX.define('Nexus.logging.controller.Logging', {
     }
   },
 
+  /**
+   * Opens add logger window.
+   * @param {Ext.Button} button add button that triggered the action (from loggers grid toolbar)
+   * @private
+   */
   showAddLogger: function (button) {
     var win = Ext.create({xtype: 'nx-logging-view-add'});
 
@@ -132,6 +141,11 @@ NX.define('Nexus.logging.controller.Logging', {
     win.show();
   },
 
+  /**
+   * Adds a logger to logger store.
+   * @param {Ext.Button} button save button that triggered the action (from add window)
+   * @private
+   */
   addLogger: function (button) {
     var me = this,
         win = button.up('nx-logging-view-add'),
@@ -167,7 +181,12 @@ NX.define('Nexus.logging.controller.Logging', {
     }
   },
 
-  removeLoggers: function (button) {
+  /**
+   * Remove selected logger (if any)
+   * @param {Ext.Button} button delete button that triggered the action (from loggers grid toolbar)
+   * @private
+   */
+  removeLogger: function (button) {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore(),
@@ -189,10 +208,19 @@ NX.define('Nexus.logging.controller.Logging', {
     }
   },
 
+  /**
+   * Opens mark log window.
+   * @private
+   */
   showMarkLog: function () {
     Ext.create({xtype: 'nx-logging-view-mark'}).show();
   },
 
+  /**
+   * Adds a marker to the log by calling PUT on /service/siesta/logging/log/mark REST resource.
+   * @param {Ext.Button} button save button that triggered the action (from mark log window)
+   * @private
+   */
   markLog: function (button) {
     var me = this,
         win = button.up('nx-logging-view-mark'),
@@ -227,14 +255,28 @@ NX.define('Nexus.logging.controller.Logging', {
     });
   },
 
+  /**
+   * Retrieves the log.
+   * @param {Ext.Button} button the refresh button that triggered the action (from log panel toolbar)
+   * @private
+   */
   refreshLog: function (button) {
     this.retrieveLog(button.up('nx-logging-view-log'));
   },
 
+  /**
+   * Opens a new browser window pointing to /service/internal/logs/nexus.log.
+   * @private
+   */
   downloadLog: function () {
     Sonatype.utils.openWindow(Sonatype.config.repos.urls.logs + '/nexus.log');
   },
 
+  /**
+   * Starts log retrieving task on log tab activation.
+   * @param {Ext.Panel} logPanel that was activated
+   * @private
+   */
   onLogTabActivate: function (logPanel) {
     var me = this,
         task = logPanel.retrieveLogTask;
@@ -245,6 +287,11 @@ NX.define('Nexus.logging.controller.Logging', {
     task.start();
   },
 
+  /**
+   * Stops log retrieving task on log tab deactivation.
+   * @param {Ext.Panel} logPanel that was deactivated
+   * @private
+   */
   onLogTabDeactivate: function (logPanel) {
     var task = logPanel.retrieveLogTask;
 
@@ -252,6 +299,11 @@ NX.define('Nexus.logging.controller.Logging', {
     delete task.run;
   },
 
+  /**
+   * Starts log retrieving task on logging panel activation if log tab is active.
+   * @param {Ext.Panel} panel logging panel that was activated
+   * @private
+   */
   onLoggingActivate: function (panel) {
     var logPanel = panel.down('nx-logging-view-log');
 
@@ -260,6 +312,11 @@ NX.define('Nexus.logging.controller.Logging', {
     }
   },
 
+  /**
+   * Stops log retrieving task on this panel activation if log tab is active.
+   * @param {Ext.Panel} panel logging panel that was deactivated
+   * @private
+   */
   onLoggingDeactivate: function (panel) {
     var logPanel = panel.down('nx-logging-view-log');
 
@@ -268,6 +325,12 @@ NX.define('Nexus.logging.controller.Logging', {
     }
   },
 
+  /**
+   * Changes retrieving task recurrence interval when value is changed via refresh period combobox from log panel toolbar.
+   * @param {Ext.form.ComboBox} combo refresh period combobox
+   * @param {Ext.data.Record} record selected record in combobox
+   * @private
+   */
   changeRefreshPeriod: function (combo, record) {
     var millis = record.get('seconds') * 1000,
         logPanel = combo.up('nx-logging-view-log'),
@@ -276,10 +339,20 @@ NX.define('Nexus.logging.controller.Logging', {
     task.changeInterval(millis);
   },
 
+  /**
+   * Triggers log retrieval when value is changed via refresh size combobox from log panel toolbar.
+   * @param {Ext.form.ComboBox} combo refresh size combobox
+   * @private
+   */
   changeRefreshSize: function (combo) {
     this.retrieveLog(combo.up('nx-logging-view-log'));
   },
 
+  /**
+   * Retrieves log from /service/internal/logs/nexus.log and shows it in log panel.
+   * @param {Ext.Panel} logPanel where teh log should be shown
+   * @private
+   */
   retrieveLog: function (logPanel) {
     var me = this,
         size = logPanel.getTopToolbar().down('#nx-logging-combo-refresh-size').getValue(),
