@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.logging;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.sonatype.nexus.logging.model.LevelXO;
@@ -30,7 +29,5 @@ public interface LoggingConfigurator
   void setLevel(String name, LevelXO level);
 
   void remove(String name);
-
-  void configure() throws IOException;
 
 }

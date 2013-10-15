@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,6 +72,8 @@ public class LoggingConfiguratorImpl
 
   private final TemplateEngine templateEngine;
 
+  private final ReadWriteLock lock;
+
   private final List<LoggerContributor> contributors;
 
   private final Map<String, LoggerXO> userLoggers;
@@ -83,6 +87,8 @@ public class LoggingConfiguratorImpl
     this.logManager = checkNotNull(logManager);
     this.templateEngine = checkNotNull(templateEngine);
     this.contributors = contributors;
+
+    lock = new ReentrantReadWriteLock();
     userLoggers = getUserLoggers();
   }
 
@@ -90,7 +96,13 @@ public class LoggingConfiguratorImpl
   public Collection<LoggerXO> getLoggers() {
     Map<String, LoggerXO> loggers = Maps.newHashMap();
     loggers.putAll(getContributedLoggers());
-    loggers.putAll(userLoggers);
+    try {
+      lock.readLock().lock();
+      loggers.putAll(userLoggers);
+    }
+    finally {
+      lock.readLock().unlock();
+    }
     return loggers.values();
   }
 
@@ -98,24 +110,42 @@ public class LoggingConfiguratorImpl
   public void setLevel(final String name, final LevelXO level) {
     checkNotNull(name, "name");
     checkNotNull(level, "level");
-    LoggerXO logger = userLoggers.get(name);
-    if (logger == null) {
-      userLoggers.put(name, logger = new LoggerXO().withName(name).withLevel(level));
+    try {
+      lock.writeLock().lock();
+      LoggerXO logger = userLoggers.get(name);
+      if (logger == null) {
+        userLoggers.put(name, logger = new LoggerXO().withName(name).withLevel(level));
+      }
+      logger.setLevel(level);
+      configure();
     }
-    logger.setLevel(level);
+    finally {
+      lock.writeLock().unlock();
+    }
   }
 
   @Override
   public void remove(final String name) {
     checkNotNull(name, "name");
     checkArgument(!ROOT.equals(name), ROOT + " logger cannot be removed");
-    userLoggers.remove(name);
+    try {
+      lock.writeLock().lock();
+      userLoggers.remove(name);
+      configure();
+    }
+    finally {
+      lock.writeLock().unlock();
+    }
   }
 
-  @Override
-  public void configure() throws IOException {
-    writeLoggers();
-    logManager.setConfiguration(getLogConfiguration());
+  private void configure() {
+    try {
+      writeLoggers();
+      logManager.setConfiguration(getLogConfiguration());
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   private void writeLoggers() throws IOException {

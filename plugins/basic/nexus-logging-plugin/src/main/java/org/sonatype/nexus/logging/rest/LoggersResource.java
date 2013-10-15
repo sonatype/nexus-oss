@@ -77,7 +77,6 @@ public class LoggersResource
       throws Exception
   {
     configurator.setLevel(logger.getName(), logger.getLevel());
-    configurator.configure();
     return logger;
   }
 
@@ -91,7 +90,6 @@ public class LoggersResource
       throws Exception
   {
     configurator.setLevel(name, logger.getLevel());
-    configurator.configure();
     return logger;
   }
 
@@ -102,7 +100,6 @@ public class LoggersResource
       throws Exception
   {
     configurator.remove(name);
-    configurator.configure();
   }
 
 }
