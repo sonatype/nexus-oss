@@ -36,7 +36,8 @@ NX.define('Nexus.logging.view.Log', {
    */
   initComponent: function () {
     var me = this,
-        icons = Nexus.logging.Icons;
+        icons = Nexus.logging.Icons,
+        sp = Sonatype.lib.Permissions;
 
     Ext.apply(me, {
       id: 'nx-logging-view-log',
@@ -61,7 +62,8 @@ NX.define('Nexus.logging.view.Log', {
           id: 'nx-logging-button-mark',
           text: 'Mark',
           tooltip: 'Add a mark in Nexus log file',
-          iconCls: icons.get('log_mark').cls
+          iconCls: icons.get('log_mark').cls,
+          disabled: !sp.checkPermission('nexus:logconfig', sp.EDIT)
         }
       ]
     });
