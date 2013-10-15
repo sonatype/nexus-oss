@@ -13,21 +13,20 @@
 
 package org.sonatype.nexus.proxy.attributes.inspectors;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.attributes.AbstractStorageFileItemInspector;
+import org.sonatype.nexus.proxy.attributes.AbstractStorageItemInspector;
+import org.sonatype.nexus.proxy.item.ChecksummingContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
-import org.apache.commons.codec.binary.Hex;
+import com.google.common.io.ByteStreams;
+
+import static com.google.common.io.ByteStreams.nullOutputStream;
 
 /**
  * The Class DigestCalculatingInspector calculates MD5 and SHA1 digests of a file and stores them into extended
@@ -38,11 +37,13 @@ import org.apache.commons.codec.binary.Hex;
 @Singleton
 @Named
 public class DigestCalculatingInspector
-    extends AbstractStorageFileItemInspector
+    extends AbstractStorageItemInspector
 {
 
   /**
    * The digest md5 key.
+   *
+   * @deprecated MD5 in general is deprecated for file checksum calculation, is collision prone (see Maven 3.0)
    */
   @Deprecated
   public static String DIGEST_MD5_KEY = StorageFileItem.DIGEST_MD5_KEY;
@@ -53,59 +54,57 @@ public class DigestCalculatingInspector
   public static String DIGEST_SHA1_KEY = StorageFileItem.DIGEST_SHA1_KEY;
 
   @Override
-  public Set<String> getIndexableKeywords() {
-    Set<String> result = new HashSet<String>(2);
-    result.add(DIGEST_MD5_KEY);
-    result.add(DIGEST_SHA1_KEY);
-    return result;
-  }
-
-  @Override
-  public boolean isHandled(StorageItem item) {
+  public boolean isHandled(final StorageItem item) {
     if (item instanceof StorageFileItem) {
-      if (item.getItemContext().containsKey(StorageFileItem.DIGEST_SHA1_KEY)) {
-        item.getRepositoryItemAttributes().put(DIGEST_SHA1_KEY,
-            String.valueOf(item.getItemContext().get(StorageFileItem.DIGEST_SHA1_KEY)));
-
-        // do this one "blindly"
-        item.getRepositoryItemAttributes().put(DIGEST_MD5_KEY,
-            String.valueOf(item.getItemContext().get(StorageFileItem.DIGEST_MD5_KEY)));
-
-        // we did our job, we "lifted" the digest from context
+      if (maybeGetFromContext(item)) {
+        // we did our job, we "lifted" the digests from context, so no need to recalculate them
         return false;
       }
-
+      else {
+        // we need to recalculate those, processing needed
+        return true;
+      }
     }
-
-    // handling all files otherwise
-    return true;
+    // not a file item
+    return false;
   }
 
   @Override
-  public void processStorageFileItem(StorageFileItem item, File file)
+  public void processStorageItem(final StorageItem item)
       throws Exception
   {
-    InputStream fis = new FileInputStream(file);
-    try {
-      byte[] buffer = new byte[1024];
-      MessageDigest md5 = MessageDigest.getInstance("MD5");
-      MessageDigest sha1 = MessageDigest.getInstance("SHA1");
-      int numRead;
-      do {
-        numRead = fis.read(buffer);
-        if (numRead > 0) {
-          md5.update(buffer, 0, numRead);
-          sha1.update(buffer, 0, numRead);
-        }
+    if (item instanceof StorageFileItem) {
+      final StorageFileItem file = (StorageFileItem) item;
+      final ChecksummingContentLocator sha1cl =
+          new ChecksummingContentLocator(file.getContentLocator(), MessageDigest.getInstance("SHA1"),
+              StorageFileItem.DIGEST_SHA1_KEY, item.getItemContext());
+      // md5 is deprecated but still calculated
+      ChecksummingContentLocator md5cl =
+          new ChecksummingContentLocator(sha1cl, MessageDigest.getInstance("MD5"),
+              StorageFileItem.DIGEST_MD5_KEY, item.getItemContext());
+      try (final InputStream is = md5cl.getContent()) {
+        ByteStreams.copy(is, nullOutputStream());
       }
-      while (numRead != -1);
-      String md5digestStr = new String(Hex.encodeHex(md5.digest()));
-      String sha1DigestStr = new String(Hex.encodeHex(sha1.digest()));
-      item.getRepositoryItemAttributes().put(DIGEST_MD5_KEY, md5digestStr);
-      item.getRepositoryItemAttributes().put(DIGEST_SHA1_KEY, sha1DigestStr);
+      // we made sure that above operations will make values into context
+      maybeGetFromContext(item);
     }
-    finally {
-      fis.close();
+  }
+
+  // ==
+
+  protected boolean maybeGetFromContext(final StorageItem item) {
+    if (item.getItemContext().containsKey(StorageFileItem.DIGEST_SHA1_KEY)) {
+      item.getRepositoryItemAttributes().put(DIGEST_SHA1_KEY,
+          String.valueOf(item.getItemContext().get(StorageFileItem.DIGEST_SHA1_KEY)));
+      // do this one "blindly"
+      item.getRepositoryItemAttributes().put(DIGEST_MD5_KEY,
+          String.valueOf(item.getItemContext().get(StorageFileItem.DIGEST_MD5_KEY)));
+      // we did our job, those were in context
+      return true;
+    }
+    else {
+      // no values found in context
+      return false;
     }
   }
 

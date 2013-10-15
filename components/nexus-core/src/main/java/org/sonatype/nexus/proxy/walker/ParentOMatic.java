@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  * <p>
  * Note: all the input paths are expected to be "normalized ones": being absolute, using generic "/" character as path
  * separator (since these are NOT File paths, but just hierarchical paths of strings). For example:
- * {@link RepositoryItemUid#getPath()} returns paths like these.
+ * {@link RepositoryItemUid#getPath()} returns paths like these. See {@link RepositoryItemUid} for explanation.
  * <p>
  * This class also "optimizes" the tree size to lessen memory use. This "optimization" can be turned off, see
  * constructors.
