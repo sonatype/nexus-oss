@@ -145,6 +145,13 @@ public interface StorageItem
   String getParentPath();
 
   /**
+   * Returns the depth of this item's path, 0 being root.
+   *
+   * @since 2.7.0
+   */
+  int getPathDepth();
+
+  /**
    * Returns this items remote URL (full URL from where this item was proxied), if item originates from a
    * {@link ProxyRepository}, {@code null} otherwise.
    */
