@@ -15,6 +15,9 @@ package org.sonatype.nexus.atlas.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.appcontext.AppContext
+import org.sonatype.guice.bean.locators.BeanLocator
+import org.sonatype.nexus.ApplicationStatusSource
+import org.sonatype.nexus.SystemStatus
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
 import org.sonatype.nexus.plugins.NexusPluginManager
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -47,21 +50,31 @@ implements Resource
 {
   static final String RESOURCE_URI = '/atlas/system-information'
 
+  private final BeanLocator beanLocator
+
   private final ApplicationConfiguration applicationConfiguration
+
+  private final ApplicationStatusSource applicationStatusSource
 
   private final AppContext appContext
 
   private final NexusPluginManager pluginManager
 
   @Inject
-  SystemInformationResource(final ApplicationConfiguration applicationConfiguration,
+  SystemInformationResource(final BeanLocator beanLocator,
+                            final ApplicationConfiguration applicationConfiguration,
+                            final ApplicationStatusSource applicationStatusSource,
                             final AppContext appContext,
                             final NexusPluginManager pluginManager)
   {
+    this.beanLocator = checkNotNull(beanLocator)
     this.applicationConfiguration = checkNotNull(applicationConfiguration)
+    this.applicationStatusSource = checkNotNull(applicationStatusSource)
     this.appContext = checkNotNull(appContext)
     this.pluginManager = checkNotNull(pluginManager)
   }
+
+  // TODO: Move to a service, leave REST endpoint as simple facade/adapter
 
   @GET
   @RequiresPermissions('nexus:atlas')
@@ -70,6 +83,7 @@ implements Resource
 
     // HACK: provide local references to prevent problems with Groovy BUG accessing private fields
     def applicationConfiguration = this.applicationConfiguration
+    def systemStatus = this.applicationStatusSource.systemStatus
     def appContext = this.appContext
     def pluginManager = this.pluginManager
 
@@ -136,6 +150,45 @@ implements Resource
       return data
     }
 
+    def reportNexusStatus = {
+      def data = [
+          'version': systemStatus.version,
+          'apiVersion': systemStatus.apiVersion,
+          'edition': systemStatus.editionShort,
+          'state': systemStatus.state,
+          'initializedAt': systemStatus.initializedAt,
+          'startedAt': systemStatus.startedAt,
+          'lastConfigChange': systemStatus.lastConfigChange,
+          'firstStart': systemStatus.firstStart,
+          'instanceUpgrade': systemStatus.instanceUpgraded,
+          'configurationUpgraded': systemStatus.configurationUpgraded
+      ]
+
+      if (systemStatus.errorCause) {
+        data['errorCause'] = systemStatus.errorCause.toString()
+      }
+
+      return data
+    }
+
+    def reportNexusLicense = {
+      def data = [
+          'licenseInstalled': systemStatus.licenseInstalled
+      ]
+
+      if (systemStatus.licenseInstalled) {
+        data += [
+            'licenseExpired': systemStatus.licenseExpired,
+            'trialLicense': systemStatus.trialLicense
+        ]
+        // NOTE: We should be able to resolve required components if licenseInstalled is true
+        // TODO: report license key (via lookup of ProductLicenseManager)
+        // TODO: report active users (via lookup of NexusAccessManager)
+      }
+
+      return data
+    }
+
     def reportNexusConfiguration = {
       return [
           'installDirectory': fileref(applicationConfiguration.installDirectory),
@@ -160,8 +213,6 @@ implements Resource
       return data
     }
 
-    // TODO: Report license (if we can resolve the components)
-
     def sections = [
         'system-time': reportTime(),
         'system-properties': System.properties.sort(),
@@ -169,6 +220,8 @@ implements Resource
         'system-runtime': reportRuntime(),
         'system-network': reportNetwork(),
         'system-filestores': reportFileStores(),
+        'nexus-status': reportNexusStatus(),
+        'nexus-license': reportNexusLicense(),
         'nexus-properties': appContext.flatten().sort(),
         'nexus-configuration': reportNexusConfiguration(),
         'nexus-plugins': reportNexusPlugins()

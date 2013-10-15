@@ -96,15 +96,19 @@ NX.define('Nexus.atlas.view.SysInfo', {
     me.mainTpl = NX.create('Ext.XTemplate',
         '<div class="nx-atlas-view-sysinfo-body">',
         icons.get('sysinfo').variant('x32').img,
+        // nexus details
+        '{[ this.section("nexus-status", values) ]}',
+        '{[ this.section("nexus-configuration", values) ]}',
+        '{[ this.section("nexus-properties", values) ]}',
+        '{[ this.section("nexus-license", values) ]}',
+        '{[ this.nestedSection("nexus-plugins", values) ]}',
+        // system details
         '{[ this.section("system-time", values) ]}',
         '{[ this.section("system-properties", values) ]}',
         '{[ this.section("system-environment", values) ]}',
         '{[ this.section("system-runtime", values) ]}',
         '{[ this.nestedSection("system-network", values) ]}',
         '{[ this.nestedSection("system-filestores", values) ]}',
-        '{[ this.section("nexus-configuration", values) ]}',
-        '{[ this.section("nexus-properties", values) ]}',
-        '{[ this.nestedSection("nexus-plugins", values) ]}',
         '</div>',
         {
           compiled: true,
