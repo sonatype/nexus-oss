@@ -45,33 +45,41 @@ NX.define('Nexus.logging.view.Panel', {
    */
   initComponent: function () {
     var me = this,
-        icons = Nexus.logging.Icons;
+        icons = Nexus.logging.Icons,
+        sp = Sonatype.lib.Permissions,
+        items = [
+          {
+            xtype: 'panel',
+            border: false,
+            cls: 'nx-logging-view-panel-description',
+            html: icons.get('logging').variant('x32').img +
+                '<div>Allows changing logging configuration and viewing the current log. ' +
+                'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
+            height: 60,
+            flex: 0
+          }
+        ],
+        tabs = [];
+
+    if (sp.checkPermission('nexus:logconfig', sp.READ)) {
+      tabs.push({ xtype: 'nx-logging-view-loggers' });
+    }
+    tabs.push({ xtype: 'nx-logging-view-log' });
+
+    if (tabs.length > 0) {
+      items.push({
+        xtype: 'tabpanel',
+        border: false,
+        plain: true,
+        layoutOnTabChange: true,
+        flex: 1,
+        items: tabs,
+        activeItem: 0
+      });
+    }
 
     Ext.apply(me, {
-      items: [
-        {
-          xtype: 'panel',
-          border: false,
-          cls: 'nx-logging-view-panel-description',
-          html: icons.get('logging').variant('x32').img +
-              '<div>Allows changing logging configuration and viewing the current log. ' +
-              'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
-          height: 60,
-          flex: 0
-        },
-        {
-          xtype: 'tabpanel',
-          border: false,
-          plain: true,
-          layoutOnTabChange: true,
-          flex: 1,
-          items: [
-            { xtype: 'nx-logging-view-loggers' },
-            { xtype: 'nx-logging-view-log' }
-          ],
-          activeItem: 0
-        }
-      ]
+      items: items
     });
 
     me.constructor.superclass.initComponent.apply(me, arguments);

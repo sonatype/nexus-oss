@@ -78,18 +78,20 @@ NX.define('Nexus.logging.controller.Logging', {
     Sonatype.Events.on('nexusNavigationInit', function (panel) {
       var sp = Sonatype.lib.Permissions;
 
-      panel.add({
-        enabled: sp.checkPermission('nexus:logconfig', sp.READ),
-        sectionId: 'st-nexus-config',
-        title: 'Logging',
-        tabId: 'logging',
-        tabCode: function () {
-          return Ext.create({
-            xtype: 'nx-logging-view-panel',
-            id: 'logging'
-          });
-        }
-      });
+      if (sp.checkPermission('nexus:logconfig', sp.READ)) {
+        panel.add({
+          enabled: true,
+          sectionId: 'st-nexus-config',
+          title: 'Logging',
+          tabId: 'logging',
+          tabCode: function () {
+            return Ext.create({
+              xtype: 'nx-logging-view-panel',
+              id: 'logging'
+            });
+          }
+        });
+      }
     });
   },
 
@@ -102,16 +104,19 @@ NX.define('Nexus.logging.controller.Logging', {
 
   controlSelection: function (loggingPanel) {
     var loggersGrid = loggingPanel.down('nx-logging-view-loggers'),
-        removeBtn = loggersGrid.getTopToolbar().down('#nx-logging-button-remove-loggers');
+        removeBtn = loggersGrid.getTopToolbar().down('#nx-logging-button-remove-loggers'),
+        sp = Sonatype.lib.Permissions;
 
-    loggersGrid.getSelectionModel().on('selectionchange', function (sm, selection) {
-      if (sm.hasSelection() && selection.record.get('name') !== 'ROOT') {
-        removeBtn.enable();
-      }
-      else {
-        removeBtn.disable();
-      }
-    });
+    if (sp.checkPermission('nexus:logconfig', sp.EDIT)) {
+      loggersGrid.getSelectionModel().on('selectionchange', function (sm, selection) {
+        if (sm.hasSelection() && selection.record.get('name') !== 'ROOT') {
+          removeBtn.enable();
+        }
+        else {
+          removeBtn.disable();
+        }
+      });
+    }
   },
 
   showAddLogger: function (button) {
