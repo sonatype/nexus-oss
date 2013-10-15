@@ -141,7 +141,7 @@ NX.define('Nexus.logging.view.Log', {
       start: function () {
         if (me.retrieveLogTask.run) {
           if (me.retrieveLogTask.interval > 0) {
-            //Ext.TaskMgr.start(me.retrieveLogTask);
+            Ext.TaskMgr.start(me.retrieveLogTask);
             me.retrieveLogTask.started = true;
             me.logDebug('Started refreshing log every ' + me.retrieveLogTask.interval / 1000 + ' seconds');
           }
@@ -153,7 +153,7 @@ NX.define('Nexus.logging.view.Log', {
 
       stop: function () {
         if (me.retrieveLogTask.started) {
-          //Ext.TaskMgr.stop(this.retrieveLogTask);
+          Ext.TaskMgr.stop(this.retrieveLogTask);
           me.retrieveLogTask.started = false;
           me.logDebug('Stopped refreshing log');
         }
