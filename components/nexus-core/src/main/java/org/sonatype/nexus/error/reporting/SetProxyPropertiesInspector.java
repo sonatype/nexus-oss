@@ -132,7 +132,8 @@ public class SetProxyPropertiesInspector
       else {
         properties.put(prefix + "proxyPort", String.valueOf(port));
       }
-      properties.put(prefix + "nonProxyHosts", Joiner.on("|").join(nonProxyHosts));
+      // NEXUS-5963 Do not publish nonProxyHosts
+      // properties.put(prefix + "nonProxyHosts", Joiner.on("|").join(nonProxyHosts));
 
       if (username == null || password == null || username.length() == 0 || password.length() == 0) {
         properties.remove(prefix + "proxyUser");

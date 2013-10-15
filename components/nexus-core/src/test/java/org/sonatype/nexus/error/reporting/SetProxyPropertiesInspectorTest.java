@@ -91,7 +91,8 @@ public class SetProxyPropertiesInspectorTest
 
     assertThat(System.getProperty("http.proxyHost"), is("host"));
     assertThat(System.getProperty("http.proxyPort"), is("1234"));
-    assertThat(System.getProperty("http.nonProxyHosts"), is(""));
+    // NEXUS-5963 Do not publish nonProxyHosts
+    // assertThat(System.getProperty("http.nonProxyHosts"), is(""));
   }
 
   @Test
@@ -108,7 +109,8 @@ public class SetProxyPropertiesInspectorTest
 
     assertThat(System.getProperty("http.proxyHost"), is("host"));
     assertThat(System.getProperty("http.proxyPort"), is("1234"));
-    assertThat(System.getProperty("http.nonProxyHosts"), is("host1|host2"));
+    // NEXUS-5963 Do not publish nonProxyHosts
+    // assertThat(System.getProperty("http.nonProxyHosts"), is("host1|host2"));
   }
 
   @Test
@@ -162,6 +164,7 @@ public class SetProxyPropertiesInspectorTest
     assertThat(System.getProperty("https.proxyUserName"), is("user"));
     assertThat(System.getProperty("https.proxyPassword"), is("password"));
 
-    assertThat(System.getProperty("http.nonProxyHosts"), is("host1|host2"));
+    // NEXUS-5963 Do not publish nonProxyHosts
+    // assertThat(System.getProperty("http.nonProxyHosts"), is("host1|host2"));
   }
 }
