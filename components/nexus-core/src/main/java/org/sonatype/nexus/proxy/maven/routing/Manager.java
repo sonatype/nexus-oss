@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -158,11 +159,11 @@ public interface Manager
    * list of given hosted repository if needed. If prefix list modified, returns {@code true}.
    *
    * @param mavenHostedRepository the hosted repository to which prefix list we offer entries.
-   * @param entry                 the entry offered.
+   * @param item                  the entry offered.
    * @return {@code true} if prefix list was changed, {@code false} otherwise.
    * @throws IOException in case of some IO problem.
    */
-  boolean offerEntry(final MavenHostedRepository mavenHostedRepository, String entry)
+  boolean offerEntry(final MavenHostedRepository mavenHostedRepository, StorageItem item)
       throws IOException;
 
   /**
@@ -171,11 +172,11 @@ public interface Manager
    * list of given hosted repository if needed. If prefix list modified, returns {@code true}.
    *
    * @param mavenHostedRepository the hosted repository from which prefix list we revoke entries.
-   * @param entry                 the entry revoked.
+   * @param item                  the entry revoked.
    * @return {@code true} if prefix list was changed, {@code false} otherwise.
    * @throws IOException in case of some IO problem.
    */
-  boolean revokeEntry(final MavenHostedRepository mavenHostedRepository, String entry)
+  boolean revokeEntry(final MavenHostedRepository mavenHostedRepository, StorageItem item)
       throws IOException;
 
   /**
