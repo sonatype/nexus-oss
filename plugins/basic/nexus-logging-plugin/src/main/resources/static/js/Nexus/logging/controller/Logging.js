@@ -33,7 +33,10 @@ NX.define('Nexus.logging.controller.Logging', {
 
     me.control({
       '#logging': {
-        afterrender: me.controlSelection
+        afterrender: me.controlSelection,
+        activate: me.onLoggingActivate,
+        deactivate: me.onLoggingDeactivate,
+        beforedestroy: me.onLoggingDeactivate
       },
       '#nx-logging-button-refresh-loggers': {
         click: me.loadLoggers
@@ -54,26 +57,21 @@ NX.define('Nexus.logging.controller.Logging', {
         click: me.markLog
       },
       '#nx-logging-view-log': {
-        activate: me.retrieveLog
+        activate: me.onLogTabActivate,
+        deactivate: me.onLogTabDeactivate
       },
       '#nx-logging-button-refresh-log': {
         click: me.refreshLog
       },
       '#nx-logging-button-download-log': {
         click: me.downloadLog
+      },
+      '#nx-logging-combo-refresh-period': {
+        select: me.changeRefreshPeriod
       }
     });
 
     me.addNavigationMenu();
-
-    me.getLogTask = {
-      run: function () {
-        me.loadTail();
-      },
-      interval: 10000,
-      scope: me,
-      started: false
-    };
   },
 
   addNavigationMenu: function () {
@@ -236,6 +234,47 @@ NX.define('Nexus.logging.controller.Logging', {
     Sonatype.utils.openWindow(Sonatype.config.repos.urls.logs + '/nexus.log');
   },
 
+  onLogTabActivate: function (logPanel) {
+    var me = this,
+        task = logPanel.retrieveLogTask;
+
+    task.run = function () {
+      me.retrieveLog(logPanel);
+    };
+    task.start();
+  },
+
+  onLogTabDeactivate: function (logPanel) {
+    var task = logPanel.retrieveLogTask;
+
+    task.stop();
+    delete task.run;
+  },
+
+  onLoggingActivate: function (panel) {
+    var logPanel = panel.down('nx-logging-view-log');
+
+    if (Ext.isDefined(logPanel)) {
+      logPanel.retrieveLogTask.start();
+    }
+  },
+
+  onLoggingDeactivate: function (panel) {
+    var logPanel = panel.down('nx-logging-view-log');
+
+    if (Ext.isDefined(logPanel)) {
+      logPanel.retrieveLogTask.stop();
+    }
+  },
+
+  changeRefreshPeriod: function (combo, record) {
+    var millis = record.get('seconds') * 1000,
+        logPanel = combo.up('nx-logging-view-log'),
+        task = logPanel.retrieveLogTask;
+
+    task.changeInterval(millis)
+  },
+
   retrieveLog: function (logPanel) {
     var me = this,
         mask;
@@ -245,6 +284,8 @@ NX.define('Nexus.logging.controller.Logging', {
     });
 
     mask.show();
+
+    me.logDebug('Retrieving log...');
 
     Ext.Ajax.request({
       url: Sonatype.config.repos.urls.logs + '/nexus.log',

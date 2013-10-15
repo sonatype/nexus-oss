@@ -59,7 +59,7 @@ NX.define('Nexus.logging.view.Log', {
         },
         {
           id: 'nx-logging-button-download-log',
-          text : 'Download',
+          text: 'Download',
           tooltip: 'Download log file',
           iconCls: icons.get('log_download').cls
         },
@@ -70,11 +70,70 @@ NX.define('Nexus.logging.view.Log', {
           tooltip: 'Add a mark in Nexus log file',
           iconCls: icons.get('log_mark').cls,
           disabled: !sp.checkPermission('nexus:logconfig', sp.EDIT)
+        },
+        '->',
+        {
+          xtype: 'combo',
+          id: 'nx-logging-combo-refresh-period',
+          triggerAction: 'all',
+          lazyRender: true,
+          mode: 'local',
+          emptyText: 'Select...',
+          editable: false,
+          value: 0,
+          store: NX.create('Ext.data.ArrayStore', {
+            id: 0,
+            fields: [
+              'seconds',
+              'text'
+            ],
+            data: [
+              [0, 'Refresh manually'],
+              [20, 'Refresh every 20 seconds'],
+              [60, 'Refresh every minute'],
+              [120, 'Refresh every 2 minutes'],
+              [300, 'Refresh every 5 minutes']
+            ]
+          }),
+          valueField: 'seconds',
+          displayField: 'text'
         }
       ]
     });
 
     me.constructor.superclass.initComponent.apply(me, arguments);
+
+    me.retrieveLogTask = {
+      interval: 0,
+      started: false,
+
+      changeInterval: function (millis) {
+        me.retrieveLogTask.interval = millis;
+        me.retrieveLogTask.stop();
+        me.retrieveLogTask.start();
+      },
+
+      start: function () {
+        if (me.retrieveLogTask.run) {
+          if (me.retrieveLogTask.interval > 0) {
+            //Ext.TaskMgr.start(me.retrieveLogTask);
+            me.retrieveLogTask.started = true;
+            me.logDebug('Started refreshing log every ' + me.retrieveLogTask.interval / 1000 + ' seconds');
+          }
+          else {
+            me.retrieveLogTask.run();
+          }
+        }
+      },
+
+      stop: function () {
+        if (me.retrieveLogTask.started) {
+          //Ext.TaskMgr.stop(this.retrieveLogTask);
+          me.retrieveLogTask.started = false;
+          me.logDebug('Stopped refreshing log');
+        }
+      }
+    };
   },
 
   showLog: function (text) {
