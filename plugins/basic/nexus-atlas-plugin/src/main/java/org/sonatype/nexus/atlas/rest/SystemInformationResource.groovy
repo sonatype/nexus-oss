@@ -115,19 +115,20 @@ implements Resource
       ]
     }
 
-    // TODO: report root directories and how they map to file-stores
-
     def reportFileStores = {
       def data = [:]
       def fs = FileSystems.default
       fs.fileStores.each { store ->
         data[store.name()] = [
+            'description': store.toString(), // seems to be the only place where mount-point is exposed
             'type': store.type(),
-            'totalSpace': store.getTotalSpace(),
-            'usableSpace': store.getUsableSpace(),
-            'unallocatedSpace': store.getUnallocatedSpace()
+            'totalSpace': store.totalSpace,
+            'usableSpace': store.usableSpace,
+            'unallocatedSpace': store.unallocatedSpace,
+            'readOnly': store.readOnly
         ]
       }
+
       return data
     }
 
