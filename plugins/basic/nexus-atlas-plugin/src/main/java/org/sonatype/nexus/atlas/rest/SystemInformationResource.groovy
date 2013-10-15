@@ -96,13 +96,8 @@ implements Resource
           'availableProcessors': runtime.availableProcessors(),
           'freeMemory': runtime.freeMemory(),
           'totalMemory': runtime.totalMemory(),
-          'maxMemory': runtime.maxMemory()
-      ]
-    }
-
-    def reportThreads = {
-      return [
-          'activeCount': Thread.activeCount()
+          'maxMemory': runtime.maxMemory(),
+          'threads': Thread.activeCount()
       ]
     }
 
@@ -172,7 +167,6 @@ implements Resource
         'system-properties': System.properties.sort(),
         'system-environment': System.getenv().sort(),
         'system-runtime': reportRuntime(),
-        'system-threads': reportThreads(),
         'system-network': reportNetwork(),
         'system-filestores': reportFileStores(),
         'nexus-properties': appContext.flatten().sort(),
