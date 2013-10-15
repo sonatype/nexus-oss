@@ -95,6 +95,7 @@ NX.define('Nexus.atlas.view.SysInfo', {
     // Main template renders all sections
     me.mainTpl = NX.create('Ext.XTemplate',
         '<div class="nx-atlas-view-sysinfo-body">',
+        icons.get('sysinfo').variant('x32').img,
         '{[ this.section("system-time", values) ]}',
         '{[ this.section("system-properties", values) ]}',
         '{[ this.section("system-environment", values) ]}',

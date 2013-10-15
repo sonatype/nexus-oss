@@ -44,11 +44,13 @@ NX.define('Nexus.atlas.Icons', {
 
       icons: {
         arrow_refresh:      'arrow_refresh.png',
-        globe_place:        iconConfig('globe_place.png'),
         file_extension_zip: iconConfig('file_extension_zip.png'),
+        globe_place:        iconConfig('globe_place.png'),
+        server_information: iconConfig('server_information.png'),
 
         atlas:            '@globe_place',
         refresh:          '@arrow_refresh',
+        sysinfo:          '@server_information',
         zip:              '@file_extension_zip'
       }
     });

@@ -33,6 +33,11 @@
   padding: 4px;
 }
 
+.nx-atlas-view-sysinfo-body img {
+  float: right;
+  padding: 10px;
+}
+
 .nx-atlas-view-sysinfo-body {
   white-space: pre;
   word-wrap: normal;
@@ -51,7 +56,7 @@
 }
 
 .nx-atlas-view-sysinfo-section .property-name,
-.nx-atlas-view-sysinfo-nestedsection .property-name{
+.nx-atlas-view-sysinfo-nestedsection .property-name {
   padding-right: 20px;
 }
 
@@ -74,8 +79,8 @@
 }
 
 .nx-atlas-view-supportzip-description img {
-  float: left;
-  padding-right: 10px;
+  float: right;
+  padding: 10px;
 }
 
 .nx-atlas-view-supportzip-form {
