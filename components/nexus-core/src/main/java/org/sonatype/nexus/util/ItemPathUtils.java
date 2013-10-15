@@ -15,6 +15,8 @@ package org.sonatype.nexus.util;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -26,7 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 public class ItemPathUtils
 {
-  public static final String PATH_SEPARATOR = "/";
+  public static final String PATH_SEPARATOR = RepositoryItemUid.PATH_SEPARATOR;
 
   public static final int PATH_SEPARATOR_LENGTH = PATH_SEPARATOR.length();
 
@@ -60,7 +62,7 @@ public class ItemPathUtils
     }
 
     if (path.length() > 1 && path.endsWith(PATH_SEPARATOR)) {
-      path = path.substring(0, path.length() - PATH_SEPARATOR.length());
+      path = path.substring(0, path.length() - PATH_SEPARATOR_LENGTH);
     }
 
     return path;
@@ -81,6 +83,26 @@ public class ItemPathUtils
     }
     else {
       return path.substring(0, lastSepratorPos);
+    }
+  }
+
+  /**
+   * Calculates the depth of a path, 0 being root.
+   *
+   * @since 2.7.0
+   */
+  public static int getPathDepth(String path) {
+    if (PATH_SEPARATOR.equals(path)) {
+      return 0;
+    }
+    else {
+      final String parentPath = getParentPath(path);
+      if (PATH_SEPARATOR.equals(parentPath)) {
+        return 0;
+      }
+      else {
+        return 1 + getPathDepth(parentPath);
+      }
     }
   }
 

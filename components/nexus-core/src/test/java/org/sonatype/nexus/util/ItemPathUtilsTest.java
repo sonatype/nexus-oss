@@ -16,13 +16,19 @@ package org.sonatype.nexus.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author juven
  */
 public class ItemPathUtilsTest
+  extends TestSupport
 {
   @Test
   public void testGetLCPPathFromPair()
@@ -104,5 +110,15 @@ public class ItemPathUtilsTest
     paths.add("/org/apache/maven/plugins/maven-archetype-plugin/2.0-alpha-5-SNAPSHOT");
     expected = "/";
     Assert.assertEquals(expected, ItemPathUtils.getLCPPath(paths));
+  }
+
+  @Test
+  public void testPathDepth() {
+    assertThat(ItemPathUtils.getPathDepth("/"), equalTo(0));
+    assertThat(ItemPathUtils.getPathDepth("/archetype-catalog.xml"), equalTo(0));
+    assertThat(ItemPathUtils.getPathDepth("/foo/archetype-catalog.xml"), equalTo(1));
+    assertThat(ItemPathUtils.getPathDepth("/foo/bar/archetype-catalog.xml"), equalTo(2));
+    assertThat(ItemPathUtils.getPathDepth("/0/1/2/3/4/5"), equalTo(5));
+    assertThat(ItemPathUtils.getPathDepth("/0/1/2/3/4/5/6/7/8/9/10"), equalTo(10));
   }
 }

@@ -134,7 +134,11 @@ public class LocalContentDiscovererImpl
       // cancelation
       CancelableUtil.checkInterruption();
       if (item instanceof StorageFileItem) {
-        parentOMatic.addPath(item.getPath());
+        if (item.getPathDepth() == 0) {
+          parentOMatic.addPath(item.getPath());
+        } else {
+          parentOMatic.addPath(item.getParentPath());
+        }
       }
     }
   }
