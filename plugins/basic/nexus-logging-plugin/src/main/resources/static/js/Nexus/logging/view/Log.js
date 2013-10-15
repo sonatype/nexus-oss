@@ -57,6 +57,12 @@ NX.define('Nexus.logging.view.Log', {
           tooltip: 'Refresh log',
           iconCls: icons.get('log_refresh').cls
         },
+        {
+          id: 'nx-logging-button-download-log',
+          text : 'Download',
+          tooltip: 'Download log file',
+          iconCls: icons.get('log_download').cls
+        },
         '-',
         {
           id: 'nx-logging-button-mark',

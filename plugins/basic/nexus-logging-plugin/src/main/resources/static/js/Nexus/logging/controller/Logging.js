@@ -58,6 +58,9 @@ NX.define('Nexus.logging.controller.Logging', {
       },
       '#nx-logging-button-refresh-log': {
         click: me.refreshLog
+      },
+      '#nx-logging-button-download-log': {
+        click: me.downloadLog
       }
     });
 
@@ -227,6 +230,10 @@ NX.define('Nexus.logging.controller.Logging', {
 
   refreshLog: function (button) {
     this.retrieveLog(button.up('nx-logging-view-log'));
+  },
+
+  downloadLog: function () {
+    Sonatype.utils.openWindow(Sonatype.config.repos.urls.logs + '/nexus.log');
   },
 
   retrieveLog: function (logPanel) {
