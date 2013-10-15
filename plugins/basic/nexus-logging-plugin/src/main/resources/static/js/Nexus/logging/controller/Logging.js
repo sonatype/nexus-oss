@@ -79,7 +79,7 @@ NX.define('Nexus.logging.controller.Logging', {
       var sp = Sonatype.lib.Permissions;
 
       panel.add({
-        enabled: sp.checkPermission('nexus:logging', sp.READ),
+        enabled: sp.checkPermission('nexus:logconfig', sp.READ),
         sectionId: 'st-nexus-config',
         title: 'Logging',
         tabId: 'logging',
