@@ -121,6 +121,8 @@ implements Resource
       return data
     }
 
+    // TODO: Report system network details
+
     def reportNexusConfiguration = {
       return [
           'installDirectory': fileref(applicationConfiguration.installDirectory),
