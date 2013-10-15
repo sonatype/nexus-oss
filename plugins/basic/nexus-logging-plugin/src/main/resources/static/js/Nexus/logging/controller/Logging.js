@@ -103,11 +103,13 @@ NX.define('Nexus.logging.controller.Logging', {
   },
 
   controlSelection: function (loggingPanel) {
-    var loggersGrid = loggingPanel.down('nx-logging-view-loggers'),
-        removeBtn = loggersGrid.getTopToolbar().down('#nx-logging-button-remove-loggers'),
-        sp = Sonatype.lib.Permissions;
+    var sp = Sonatype.lib.Permissions,
+        loggersGrid, removeBtn;
 
     if (sp.checkPermission('nexus:logconfig', sp.EDIT)) {
+      loggersGrid = loggingPanel.down('nx-logging-view-loggers');
+      removeBtn = loggersGrid.getTopToolbar().down('#nx-logging-button-remove-loggers');
+
       loggersGrid.getSelectionModel().on('selectionchange', function (sm, selection) {
         if (sm.hasSelection() && selection.record.get('name') !== 'ROOT') {
           removeBtn.enable();
