@@ -384,11 +384,12 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         },
         {
           xtype : 'fieldset',
-          checkboxToggle : true,
-          collapsed : true,
+          checkboxToggle : false,
+          collapsed : false,
+          collapsible : true,
           id : formId + '_' + 'globalRestApiSettings',
           name : 'globalRestApiSettings',
-          title : 'Application Server Settings (optional)',
+          title : 'Application Server Settings',
           anchor : Sonatype.view.FIELDSET_OFFSET,
           autoHeight : true,
           layoutConfig : {
