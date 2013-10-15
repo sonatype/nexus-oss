@@ -27,7 +27,7 @@ NX.define('Nexus.logging.view.Panel', {
   requires: [
     'Nexus.logging.view.Loggers',
     'Nexus.logging.view.Log',
-    'Nexus.logging.Icons',
+    'Nexus.logging.Icons'
   ],
 
   xtype: 'nx-logging-view-panel',
@@ -47,26 +47,32 @@ NX.define('Nexus.logging.view.Panel', {
     var me = this,
         icons = Nexus.logging.Icons,
         sp = Sonatype.lib.Permissions,
-        items = [
-          {
-            xtype: 'panel',
-            border: false,
-            cls: 'nx-logging-view-panel-description',
-            html: icons.get('logging').variant('x32').img +
-                '<div>Allows changing logging configuration and viewing the current log. ' +
-                'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
-            height: 60,
-            flex: 0
-          }
-        ],
-        tabs = [];
+        items = [],
+        tabs = [],
+        text = '';
 
     if (sp.checkPermission('nexus:logconfig', sp.READ)) {
       tabs.push({ xtype: 'nx-logging-view-loggers' });
+      text = 'changing logging configuration';
     }
     if (sp.checkPermission('nexus:logs', sp.READ)) {
       tabs.push({ xtype: 'nx-logging-view-log' });
+      if (!Ext.isEmpty(text)) {
+        text += ' and ';
+      }
+      text += 'viewing the current log';
     }
+
+    items.push({
+      xtype: 'panel',
+      border: false,
+      cls: 'nx-logging-view-panel-description',
+      html: icons.get('logging').variant('x32').img +
+          '<div>' + (!Ext.isEmpty(text) ? 'Allows ' + text + '. ' : '') +
+          'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
+      height: 60,
+      flex: 0
+    });
 
     if (tabs.length > 0) {
       items.push({
