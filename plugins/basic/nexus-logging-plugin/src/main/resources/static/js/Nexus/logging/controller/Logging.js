@@ -126,10 +126,9 @@ NX.define('Nexus.logging.controller.Logging', {
   },
 
   showAddLogger: function (button) {
-    var loggersGrid = button.up('nx-logging-view-loggers'),
-        win = Ext.create({xtype: 'nx-logging-view-add'});
+    var win = Ext.create({xtype: 'nx-logging-view-add'});
 
-    win.grid = loggersGrid;
+    win.grid = button.up('nx-logging-view-loggers');
     win.show();
   },
 
@@ -151,10 +150,10 @@ NX.define('Nexus.logging.controller.Logging', {
         closeable: false,
         scope: me,
         fn: function (buttonName) {
-          if (buttonName == 'yes' || buttonName == 'ok') {
-            record.set('level', values.level);
+          if (buttonName === 'yes') {
+            record.set('level', values['level']);
             store.save();
-            win.grid.getSelectionModel().select(store.indexOf(record), 0);
+            win.grid.getSelectionModel().select(store.indexOf(record), 1);
             win.close();
           }
         }
@@ -213,7 +212,6 @@ NX.define('Nexus.logging.controller.Logging', {
         me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
       },
       failure: function (response) {
-        // TODO shall we show a message and ask user to retry?
         var message;
         if (response.siestaError) {
           message = response.siestaError.message;

@@ -31,9 +31,9 @@ NX.define('Nexus.logging.Icons', {
     function iconConfig(fileName, variants) {
       var config = {};
       if (variants === undefined) {
-        variants = [ 'x32', 'x16' ]
+        variants = ['x32', 'x16'];
       }
-      Ext.each(variants, function(variant) {
+      Ext.each(variants, function (variant) {
         config[variant] = variant + '/' + fileName;
       });
       return config;
@@ -43,23 +43,23 @@ NX.define('Nexus.logging.Icons', {
       stylePrefix: 'nx-logging-icon-',
 
       icons: {
-        arrow_refresh:    'arrow_refresh.png',
-        page_white_put:   'page_white_put.png',
-        book:             iconConfig('book.png'),
-        book_add:         iconConfig('book_add.png'),
-        book_delete:      iconConfig('book_delete.png'),
-        bookmark_red:     iconConfig('bookmark_red.png'),
+        arrow_refresh: 'arrow_refresh.png',
+        page_white_put: 'page_white_put.png',
+        book: iconConfig('book.png'),
+        book_add: iconConfig('book_add.png'),
+        book_delete: iconConfig('book_delete.png'),
+        bookmark_red: iconConfig('bookmark_red.png'),
 
-        logging:          '@book',
-        logger:           '@book',
+        logging: '@book',
+        logger: '@book',
 
-        loggers_refresh:  '@arrow_refresh',
-        loggers_add:      '@book_add',
-        loggers_remove:   '@book_delete',
+        loggers_refresh: '@arrow_refresh',
+        loggers_add: '@book_add',
+        loggers_remove: '@book_delete',
 
-        log_refresh:      '@arrow_refresh',
-        log_download:     '@page_white_put',
-        log_mark:         '@bookmark_red'
+        log_refresh: '@arrow_refresh',
+        log_download: '@page_white_put',
+        log_mark: '@bookmark_red'
       }
     });
   }
