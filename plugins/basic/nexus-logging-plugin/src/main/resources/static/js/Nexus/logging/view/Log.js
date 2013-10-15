@@ -153,7 +153,7 @@ NX.define('Nexus.logging.view.Log', {
 
       stop: function () {
         if (me.retrieveLogTask.started) {
-          Ext.TaskMgr.stop(this.retrieveLogTask);
+          Ext.TaskMgr.stop(me.retrieveLogTask);
           me.retrieveLogTask.started = false;
           me.logDebug('Stopped refreshing log');
         }
