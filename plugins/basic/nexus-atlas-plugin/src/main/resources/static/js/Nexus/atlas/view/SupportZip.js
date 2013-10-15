@@ -69,31 +69,36 @@ NX.define('Nexus.atlas.view.SupportZip', {
                   xtype: 'checkbox',
                   name: 'applicationProperties',
                   fieldLabel: 'Application Properties',
-                  helpText: 'Includes memory and disk statistics, application and system properties and environment variables (recommended)'
+                  helpText: 'Includes memory and disk statistics, application and system properties and environment variables (recommended)',
+                  checked: true
                 },
                 {
                   xtype: 'checkbox',
                   name: 'threadDump',
                   fieldLabel: 'Thread Dump',
-                  helpText: 'Include a JVM thread-dump (recommended)'
+                  helpText: 'Include a JVM thread-dump (recommended)',
+                  checked: true
                 },
                 {
                   xtype: 'checkbox',
                   name: 'configurationFiles',
                   fieldLabel: 'Configuration Files',
-                  helpText: 'Include configuration files (recommended)'
+                  helpText: 'Include configuration files (recommended)',
+                  checked: true
                 },
                 {
                   xtype: 'checkbox',
                   name: 'logFiles',
                   fieldLabel: 'Log Files',
-                  helpText: 'Include log files (recommended)'
+                  helpText: 'Include log files (recommended)',
+                  checked: true
                 },
                 {
                   xtype: 'checkbox',
                   name: 'limitSize',
                   fieldLabel: 'Limit Zip File Size',
-                  helpText: 'Limit the size of the generate zip to no more than 30 MB.'
+                  helpText: 'Limit the size of the generate zip to no more than 30 MB.',
+                  checked: true
                 }
               ],
               buttons: [
