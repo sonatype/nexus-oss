@@ -69,7 +69,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
                   xtype: 'checkbox',
                   name: 'applicationProperties',
                   fieldLabel: 'Application Properties',
-                  helpText: 'Includes memory and disk statistics, applications properties, system properties and environment variables (recommended)'
+                  helpText: 'Includes memory and disk statistics, application and system properties and environment variables (recommended)'
                 },
                 {
                   xtype: 'checkbox',
