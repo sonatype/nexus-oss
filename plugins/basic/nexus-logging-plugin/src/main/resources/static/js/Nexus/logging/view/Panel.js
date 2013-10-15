@@ -64,7 +64,9 @@ NX.define('Nexus.logging.view.Panel', {
     if (sp.checkPermission('nexus:logconfig', sp.READ)) {
       tabs.push({ xtype: 'nx-logging-view-loggers' });
     }
-    tabs.push({ xtype: 'nx-logging-view-log' });
+    if (sp.checkPermission('nexus:logs', sp.READ)) {
+      tabs.push({ xtype: 'nx-logging-view-log' });
+    }
 
     if (tabs.length > 0) {
       items.push({

@@ -78,7 +78,7 @@ NX.define('Nexus.logging.controller.Logging', {
     Sonatype.Events.on('nexusNavigationInit', function (panel) {
       var sp = Sonatype.lib.Permissions;
 
-      if (sp.checkPermission('nexus:logconfig', sp.READ)) {
+      if (sp.checkPermission('nexus:logconfig', sp.READ) || sp.checkPermission('nexus:logs', sp.READ)) {
         panel.add({
           enabled: true,
           sectionId: 'st-nexus-config',
