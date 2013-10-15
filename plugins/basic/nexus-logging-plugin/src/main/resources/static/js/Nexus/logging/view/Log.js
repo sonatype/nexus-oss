@@ -13,7 +13,7 @@
 /*global NX, Ext, Nexus, Sonatype*/
 
 /**
- * Loggers grid.
+ * Log panel.
  *
  * @since 2.7
  */

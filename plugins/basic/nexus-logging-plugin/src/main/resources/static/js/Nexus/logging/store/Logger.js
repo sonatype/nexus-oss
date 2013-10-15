@@ -54,6 +54,9 @@ NX.define('Nexus.logging.store.Logger', {
 
   sortInfo: { field: 'name', direction: 'ASC' },
 
+  /**
+   * @constructor
+   */
   constructor: function () {
     this.constructor.superclass.constructor.call(this);
     Ext.apply(this.reader, {
