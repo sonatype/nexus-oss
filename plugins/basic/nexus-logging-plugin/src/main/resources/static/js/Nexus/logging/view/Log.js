@@ -97,6 +97,31 @@ NX.define('Nexus.logging.view.Log', {
           }),
           valueField: 'seconds',
           displayField: 'text'
+        },
+        {
+          xtype: 'combo',
+          id: 'nx-logging-combo-refresh-size',
+          triggerAction: 'all',
+          lazyRender: true,
+          mode: 'local',
+          emptyText: 'Select...',
+          editable: false,
+          width: 90,
+          value: 25,
+          store: NX.create('Ext.data.ArrayStore', {
+            id: 0,
+            fields: [
+              'kb',
+              'text'
+            ],
+            data: [
+              [25, 'Last 25KB'],
+              [50, 'Last 50KB'],
+              [100, 'Last 100KB']
+            ]
+          }),
+          valueField: 'kb',
+          displayField: 'text'
         }
       ]
     });

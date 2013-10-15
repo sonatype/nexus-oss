@@ -68,6 +68,9 @@ NX.define('Nexus.logging.controller.Logging', {
       },
       '#nx-logging-combo-refresh-period': {
         select: me.changeRefreshPeriod
+      },
+      '#nx-logging-combo-refresh-size': {
+        select: me.changeRefreshSize
       }
     });
 
@@ -272,11 +275,16 @@ NX.define('Nexus.logging.controller.Logging', {
         logPanel = combo.up('nx-logging-view-log'),
         task = logPanel.retrieveLogTask;
 
-    task.changeInterval(millis)
+    task.changeInterval(millis);
+  },
+
+  changeRefreshSize: function (combo) {
+    this.retrieveLog(combo.up('nx-logging-view-log'));
   },
 
   retrieveLog: function (logPanel) {
     var me = this,
+        size = logPanel.getTopToolbar().down('#nx-logging-combo-refresh-size').getValue(),
         mask;
 
     mask = NX.create('Ext.LoadMask', logPanel.body, {
@@ -285,7 +293,7 @@ NX.define('Nexus.logging.controller.Logging', {
 
     mask.show();
 
-    me.logDebug('Retrieving log...');
+    me.logDebug('Retrieving last ' + size + 'kb from log');
 
     Ext.Ajax.request({
       url: Sonatype.config.repos.urls.logs + '/nexus.log',
@@ -294,7 +302,7 @@ NX.define('Nexus.logging.controller.Logging', {
         'accept': 'text/plain'
       },
       params: {
-        count: -10240
+        count: -1024 * size
       },
       scope: me,
       suppressStatus: true,
