@@ -73,7 +73,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
     var me = this,
         mask = NX.create('Ext.LoadMask', panel.getEl(), { msg: 'Loading...' });
 
-    me.logDebug('Refreshing');
+    me.logDebug('Refreshing sysinfo');
 
     mask.show();
     Ext.Ajax.request({
