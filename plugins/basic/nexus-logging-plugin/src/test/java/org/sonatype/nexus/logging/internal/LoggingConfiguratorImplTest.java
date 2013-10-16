@@ -77,7 +77,7 @@ public class LoggingConfiguratorImplTest
     templateEngine = new SharedTemplateEngineProvider().get();
     when(logConfiguration.getRootLoggerLevel()).thenReturn("DEBUG");
     when(logManager.getConfiguration()).thenReturn(logConfiguration);
-    when(logManager.getLogConfigFile(LoggingLogConfigurationParticipant.NAME)).thenReturn(logbackXml);
+    when(logManager.getLogOverridesConfigFile()).thenReturn(logbackXml);
     when(loggerContributor.getLoggers()).thenReturn(Sets.newHashSet("contributed"));
 
     underTest = new LoggingConfiguratorImpl(

@@ -174,6 +174,14 @@ public class LogbackLogManager
    * @since 2.7
    */
   @Override
+  public File getLogOverridesConfigFile() {
+    return getLogConfigFile("logback-overrides.xml");
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
   public Map<String, LoggerLevel> getLoggers() {
     Map<String, LoggerLevel> loggers = Maps.newHashMap();
 
@@ -476,9 +484,16 @@ public class LogbackLogManager
             out.println("  <property file='${nexus.log-config-dir}/logback.properties'/>");
             if (logConfigurationParticipants != null) {
               for (LogConfigurationParticipant participant : logConfigurationParticipants) {
-                out.println(String.format("  <include file='${nexus.log-config-dir}/%s'/>",
-                    participant.getName()));
+                out.println(String.format(
+                    "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName())
+                );
               }
+            }
+            File logOverridesConfigFile = getLogOverridesConfigFile();
+            if (logOverridesConfigFile.exists()) {
+              out.println(String.format(
+                  "  <include file='${nexus.log-config-dir}/%s'/>", logOverridesConfigFile.getName())
+              );
             }
             out.write("</configuration>");
           }

@@ -168,7 +168,7 @@ public class LoggingConfiguratorImpl
       loggersToBeWritten.remove(ROOT);
       writeLogbackXml(
           loggersToBeWritten.values(),
-          logManager.getLogConfigFile(LoggingLogConfigurationParticipant.NAME),
+          logManager.getLogOverridesConfigFile(),
           templateEngine
       );
       logManager.setConfiguration(getLogConfiguration());
@@ -199,7 +199,7 @@ public class LoggingConfiguratorImpl
       String rootLevel = logManager.getConfiguration().getRootLoggerLevel();
       loggers.put(ROOT, new LoggerXO().withName(ROOT).withLevel(LevelXO.valueOf(rootLevel)));
 
-      File dynamicLoggersFile = logManager.getLogConfigFile(LoggingLogConfigurationParticipant.NAME);
+      File dynamicLoggersFile = logManager.getLogOverridesConfigFile();
       if (dynamicLoggersFile.exists()) {
         try {
           for (LoggerXO logger : readLogbackXml(dynamicLoggersFile)) {
@@ -285,7 +285,7 @@ public class LoggingConfiguratorImpl
       public void write(final BufferedOutputStream output)
           throws IOException
       {
-        URL template = this.getClass().getResource("logback-dynamic.vm"); //NON-NLS
+        URL template = this.getClass().getResource("logback-overrides.vm"); //NON-NLS
         String content = templateEngine.render(
             this,
             template,

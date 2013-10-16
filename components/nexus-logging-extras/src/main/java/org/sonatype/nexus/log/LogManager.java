@@ -60,6 +60,14 @@ public interface LogManager
   File getLogConfigFile(String name);
 
   /**
+   * Returns the overrides configuration file.
+   *
+   * @return log overrides configuration file (never null)
+   * @since 2.7
+   */
+  File getLogOverridesConfigFile();
+
+  /**
    * Return mapping of existing loggers which have explicit levels configured (never null).
    */
   Map<String, LoggerLevel> getLoggers();
