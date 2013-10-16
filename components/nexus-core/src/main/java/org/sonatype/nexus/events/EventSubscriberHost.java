@@ -132,7 +132,7 @@ public class EventSubscriberHost
 
   // == EventSubscriber support
 
-  public static class EventSubscriberMediator
+  private static class EventSubscriberMediator
       implements Mediator<Named, EventSubscriber, EventSubscriberHost>
   {
     @Override
@@ -160,7 +160,7 @@ public class EventSubscriberHost
 
   // == Legacy EventInspector support
 
-  protected static class EventInspectorMediator
+  private static class EventInspectorMediator
       implements Mediator<Named, EventInspector, EventSubscriberHost>
   {
     private final NexusExecutorService nexusExecutorService;
