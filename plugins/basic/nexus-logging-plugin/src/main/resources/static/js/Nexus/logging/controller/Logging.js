@@ -357,7 +357,7 @@ NX.define('Nexus.logging.controller.Logging', {
     me.logDebug('Retrieving last ' + size + 'kb from log');
 
     Ext.Ajax.request({
-      url: Sonatype.config.repos.urls.logs + '/nexus.logx',
+      url: Sonatype.config.repos.urls.logs + '/nexus.log',
       method: 'GET',
       headers: {
         'accept': 'text/plain'
