@@ -24,6 +24,8 @@ NX.define('Nexus.ext.GridFilterBox', {
     'Nexus.LogAwareMixin'
   ],
 
+  xtype: 'nx-grid-filter-box',
+
   /**
    * @cfg {Ext.grid.GridPanel} grid that should filtered
    */

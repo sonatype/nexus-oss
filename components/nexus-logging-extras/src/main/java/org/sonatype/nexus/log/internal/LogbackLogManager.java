@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -44,11 +45,13 @@ import org.sonatype.nexus.log.DefaultLogManagerMBean;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -57,6 +60,7 @@ import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
@@ -103,14 +107,15 @@ public class LogbackLogManager
   private final ApplicationConfiguration applicationConfiguration;
 
   private final List<LogConfigurationParticipant> logConfigurationParticipants;
-  
+
   private final EventBus eventBus;
 
   private ObjectName jmxName;
 
   @Inject
   public LogbackLogManager(final Injector injector, final ApplicationConfiguration applicationConfiguration,
-      final List<LogConfigurationParticipant> logConfigurationParticipants, final EventBus eventBus)
+                           final List<LogConfigurationParticipant> logConfigurationParticipants,
+                           final EventBus eventBus)
   {
     this.injector = checkNotNull(injector);
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
@@ -127,12 +132,11 @@ public class LogbackLogManager
     }
     eventBus.register(this);
   }
-  
+
   // ==
 
   @Subscribe
-  public void on(final NexusInitializedEvent evt)
-  {
+  public void on(final NexusInitializedEvent evt) {
     configure();
   }
 
@@ -156,6 +160,42 @@ public class LogbackLogManager
       }
     }
     eventBus.unregister(this);
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public File getLogConfigFile(final String name) {
+    return new File(getLogConfigDir(), name);
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public File getLogOverridesConfigFile() {
+    return getLogConfigFile("logback-overrides.xml");
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public Map<String, LoggerLevel> getLoggers() {
+    Map<String, LoggerLevel> loggers = Maps.newHashMap();
+
+    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    for (ch.qos.logback.classic.Logger logger : loggerContext.getLoggerList()) {
+      String name = logger.getName();
+      Level level = logger.getLevel();
+      // only include loggers which explicit levels configured
+      if (level != null) {
+        loggers.put(name, convert(level));
+      }
+    }
+
+    return loggers;
   }
 
   @Override
@@ -310,11 +350,18 @@ public class LogbackLogManager
 
     response.setSize(log.length());
 
-    response.setFromByte(from);
+    if (count >= 0) {
+      response.setFromByte(from);
+      response.setBytesCount(count);
+    }
+    else {
+      response.setBytesCount(Math.abs(count));
+      response.setFromByte(Math.max(0, response.getSize() - response.getBytesCount()));
+    }
 
-    response.setBytesCount(count);
-
-    response.setInputStream(new LimitedInputStream(new FileInputStream(log), from, count));
+    response.setInputStream(
+        new LimitedInputStream(new FileInputStream(log), response.getFromByte(), response.getBytesCount())
+    );
 
     return response;
   }
@@ -437,9 +484,16 @@ public class LogbackLogManager
             out.println("  <property file='${nexus.log-config-dir}/logback.properties'/>");
             if (logConfigurationParticipants != null) {
               for (LogConfigurationParticipant participant : logConfigurationParticipants) {
-                out.println(String.format("  <include file='${nexus.log-config-dir}/%s'/>",
-                    participant.getName()));
+                out.println(String.format(
+                    "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName())
+                );
               }
+            }
+            File logOverridesConfigFile = getLogOverridesConfigFile();
+            if (logOverridesConfigFile.exists()) {
+              out.println(String.format(
+                  "  <include file='${nexus.log-config-dir}/%s'/>", logOverridesConfigFile.getName())
+              );
             }
             out.write("</configuration>");
           }
@@ -481,6 +535,32 @@ public class LogbackLogManager
         Appender<ILoggingEvent> ap = it.next();
         injector.injectMembers(ap);
       }
+    }
+  }
+
+  /**
+   * Convert a Logback {@link Level} into a {@link LoggerLevel}.
+   */
+  private LoggerLevel convert(final Level level) {
+    switch (level.toInt()) {
+
+      case Level.ERROR_INT:
+        return LoggerLevel.ERROR;
+
+      case Level.WARN_INT:
+        return LoggerLevel.WARN;
+
+      case Level.INFO_INT:
+        return LoggerLevel.INFO;
+
+      case Level.DEBUG_INT:
+        return LoggerLevel.DEBUG;
+
+      case Level.TRACE_INT:
+        return LoggerLevel.TRACE;
+
+      default:
+        return LoggerLevel.TRACE;
     }
   }
 
