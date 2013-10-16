@@ -33,6 +33,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.sonatype.nexus.log.DefaultLogConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.logging.LoggerContributor;
 import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.model.LevelXO;
@@ -42,10 +43,9 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Maps.EntryTransformer;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -246,49 +246,13 @@ public class LoggingConfiguratorImpl
    * Return mapping of existing runtime loggers which have explicit levels configured.
    */
   private Map<String, LoggerXO> getRuntimeLoggers() {
-    Map<String, LoggerXO> loggers = Maps.newHashMap();
-
-    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-    for (ch.qos.logback.classic.Logger logger : loggerContext.getLoggerList()) {
-      String name = logger.getName();
-      Level level = logger.getLevel();
-      // only include loggers which explicit levels configured
-      if (level != null) {
-        loggers.put(name, new LoggerXO().withName(name).withLevel(convert(level)));
+    return Maps.transformEntries(logManager.getLoggers(), new EntryTransformer<String, LoggerLevel, LoggerXO>()
+    {
+      @Override
+      public LoggerXO transformEntry(final String key, final LoggerLevel value) {
+        return new LoggerXO().withName(key).withLevel(LevelXO.valueOf(value.name()));
       }
-    }
-
-
-    return loggers;
-  }
-
-  /**
-   * Convert a Logback {@link Level} into a {@link LevelXO}.
-   */
-  private LevelXO convert(final Level level) {
-    switch (level.toInt()) {
-      // FIXME: Should we add support for ALL?  ATM logback ALL -> TRACE
-      //case Level.ALL_INT:
-      //  return LevelXO.ALL;
-
-      case Level.ERROR_INT:
-        return LevelXO.ERROR;
-
-      case Level.WARN_INT:
-        return LevelXO.WARN;
-
-      case Level.INFO_INT:
-        return LevelXO.INFO;
-
-      case Level.DEBUG_INT:
-        return LevelXO.DEBUG;
-
-      case Level.TRACE_INT:
-        return LevelXO.TRACE;
-
-      default:
-        return LevelXO.TRACE;
-    }
+    });
   }
 
   private Map<String, LoggerXO> getContributedLoggers() {

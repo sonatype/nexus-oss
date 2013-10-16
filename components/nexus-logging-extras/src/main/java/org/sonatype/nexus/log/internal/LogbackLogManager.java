@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -44,11 +45,13 @@ import org.sonatype.nexus.log.DefaultLogManagerMBean;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -57,6 +60,7 @@ import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
@@ -164,6 +168,26 @@ public class LogbackLogManager
   @Override
   public File getLogConfigFile(final String name) {
     return new File(getLogConfigDir(), name);
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public Map<String, LoggerLevel> getLoggers() {
+    Map<String, LoggerLevel> loggers = Maps.newHashMap();
+
+    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    for (ch.qos.logback.classic.Logger logger : loggerContext.getLoggerList()) {
+      String name = logger.getName();
+      Level level = logger.getLevel();
+      // only include loggers which explicit levels configured
+      if (level != null) {
+        loggers.put(name, convert(level));
+      }
+    }
+
+    return loggers;
   }
 
   @Override
@@ -496,6 +520,32 @@ public class LogbackLogManager
         Appender<ILoggingEvent> ap = it.next();
         injector.injectMembers(ap);
       }
+    }
+  }
+
+  /**
+   * Convert a Logback {@link Level} into a {@link LoggerLevel}.
+   */
+  private LoggerLevel convert(final Level level) {
+    switch (level.toInt()) {
+
+      case Level.ERROR_INT:
+        return LoggerLevel.ERROR;
+
+      case Level.WARN_INT:
+        return LoggerLevel.WARN;
+
+      case Level.INFO_INT:
+        return LoggerLevel.INFO;
+
+      case Level.DEBUG_INT:
+        return LoggerLevel.DEBUG;
+
+      case Level.TRACE_INT:
+        return LoggerLevel.TRACE;
+
+      default:
+        return LoggerLevel.TRACE;
     }
   }
 
