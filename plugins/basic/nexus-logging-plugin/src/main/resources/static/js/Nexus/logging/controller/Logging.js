@@ -240,17 +240,7 @@ NX.define('Nexus.logging.controller.Logging', {
         me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
       },
       failure: function (response) {
-        var message;
-        if (response.siestaError) {
-          message = response.siestaError.message;
-        }
-        if (!message && response.responseText) {
-          message = Sonatype.utils.parseHTMLErrorMessage(response.responseText);
-        }
-        if (!message) {
-          message = response.statusText;
-        }
-        Nexus.messages.show('Failed to mark log file', message);
+        Nexus.messages.show('Failed to mark log file', me.parseExceptionMessage(response));
       }
     });
   },
@@ -350,7 +340,7 @@ NX.define('Nexus.logging.controller.Logging', {
 
   /**
    * Retrieves log from /service/internal/logs/nexus.log and shows it in log panel.
-   * @param {Ext.Panel} logPanel where teh log should be shown
+   * @param {Nexus.logging.view.Log} logPanel where teh log should be shown
    * @private
    */
   retrieveLog: function (logPanel) {
@@ -367,7 +357,7 @@ NX.define('Nexus.logging.controller.Logging', {
     me.logDebug('Retrieving last ' + size + 'kb from log');
 
     Ext.Ajax.request({
-      url: Sonatype.config.repos.urls.logs + '/nexus.log',
+      url: Sonatype.config.repos.urls.logs + '/nexus.logx',
       method: 'GET',
       headers: {
         'accept': 'text/plain'
@@ -377,9 +367,15 @@ NX.define('Nexus.logging.controller.Logging', {
       },
       scope: me,
       suppressStatus: true,
-      callback: function (options, success, response) {
+      success: function (response) {
         mask.hide();
         logPanel.showLog(response.responseText);
+      },
+      failure: function (response) {
+        mask.hide();
+        logPanel.showLog(
+            'Failed to retrieve log due to "' + me.parseExceptionMessage(response) + '".'
+        );
       }
     });
   }
