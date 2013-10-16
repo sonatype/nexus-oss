@@ -187,18 +187,21 @@ NX.define('Nexus.logging.controller.Logging', {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore(),
-        icons = Nexus.logging.Icons;
+        icons = Nexus.logging.Icons,
+        name;
 
     // if we have a logger selected, confirm before removal
     if (sm.hasSelection()) {
+      name = sm.selection.record.get('name');
       Ext.Msg.show({
         title: 'Remove logger',
-        msg: 'Remove "' + sm.selection.record.get('name') + '" logger ?',
+        msg: 'Remove "' + name + '" logger ?',
         buttons: Ext.Msg.OKCANCEL,
         icon: icons.get('loggers_remove').variant('x32').cls,
         fn: function (btn) {
           if (btn === 'ok') {
             store.remove(sm.selection.record);
+            Nexus.messages.show('Logging', 'Logger removed: ' + name);
           }
         }
       });
@@ -232,7 +235,7 @@ NX.define('Nexus.logging.controller.Logging', {
       suppressStatus: true,
       jsonData: values,
       success: function () {
-        Nexus.messages.show('Confirmation', 'Log has been marked with: ' + values.message);
+        Nexus.messages.show('Logging', 'Log has been marked with: ' + values.message);
         // refresh the log view
         me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
       },
