@@ -240,8 +240,6 @@ public class LoggingConfiguratorImpl
     }
   }
 
-  // FIXME: This should be adapted to LogManager to hide logback specifics?
-
   /**
    * Return mapping of existing runtime loggers which have explicit levels configured.
    */
