@@ -94,8 +94,7 @@ public class LoggersResource
     checkNotNull(logger.getLevel(), "logger level");
     checkArgument(StringUtils.isNotEmpty(logger.getName()), "name cannot be empty");
 
-    configurator.setLevel(logger.getName(), logger.getLevel());
-    return logger;
+    return logger.withLevel(configurator.setLevel(logger.getName(), logger.getLevel()));
   }
 
   /**
@@ -118,8 +117,7 @@ public class LoggersResource
     checkNotNull(logger, "logger");
     checkNotNull(logger.getLevel(), "logger level");
 
-    configurator.setLevel(name, logger.getLevel());
-    return logger;
+    return logger.withLevel(configurator.setLevel(name, logger.getLevel()));
   }
 
   /**

@@ -116,18 +116,28 @@ public class LoggingConfiguratorImpl
   }
 
   @Override
-  public void setLevel(final String name, final LevelXO level) {
+  public LevelXO setLevel(final String name, final LevelXO level) {
     checkNotNull(name, "name");
     checkNotNull(level, "level");
 
     try {
       lock.writeLock().lock();
+      LevelXO calculatedLevel = level;
       LoggerXO logger = userLoggers.get(name);
-      if (logger == null) {
-        userLoggers.put(name, logger = new LoggerXO().withName(name).withLevel(level));
+      if (LevelXO.DEFAULT.equals(level)) {
+        if (logger != null) {
+          userLoggers.remove(logger.getName());
+          logger = null;
+          configure();
+        }
+        calculatedLevel = levelOf(LoggerFactory.getLogger(name));
       }
-      logger.setLevel(level);
+      if (logger == null) {
+        userLoggers.put(name, logger = new LoggerXO().withName(name));
+      }
+      logger.setLevel(calculatedLevel);
       configure();
+      return calculatedLevel;
     }
     finally {
       lock.writeLock().unlock();

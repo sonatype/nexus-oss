@@ -34,12 +34,14 @@ public interface LoggingConfigurator
   Collection<LoggerXO> getLoggers();
 
   /**
-   * Sets logging level for specified logger
+   * Sets logging level for specified logger. If level is  equal to {@link LevelXO#DEFAULT} the level will be set to
+   * effective level.
    *
    * @param name  of logger to set the level of
    * @param level to be set
+   * @return passed in level or teh effective level if passed in level is equal to {@link LevelXO#DEFAULT}
    */
-  void setLevel(String name, LevelXO level);
+  LevelXO setLevel(String name, LevelXO level);
 
   /**
    * Removes specified logger.
