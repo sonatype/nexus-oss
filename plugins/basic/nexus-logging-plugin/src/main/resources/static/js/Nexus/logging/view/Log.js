@@ -70,8 +70,7 @@ NX.define('Nexus.logging.view.Log', {
           xtype: 'link-button',
           text: 'Download',
           tooltip: 'Download log file',
-          href: Sonatype.config.repos.urls.logs + '/nexus.log',
-          target: '_blank'
+          href: Nexus.siesta.basePath + '/logging/log'
         },
         '->',
         {
