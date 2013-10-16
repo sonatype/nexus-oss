@@ -120,7 +120,6 @@ public class XStreamConfiguratorLightweight
     xstream.processAnnotations(RepositoryTargetListResourceResponse.class);
     xstream.processAnnotations(RepositoryTargetResourceResponse.class);
     xstream.processAnnotations(RepositoryContentClassListResourceResponse.class);
-    xstream.processAnnotations(LogConfigResourceResponse.class);
     xstream.processAnnotations(MirrorResourceListResponse.class);
     xstream.processAnnotations(MirrorResourceListRequest.class);
     xstream.processAnnotations(MirrorStatusResourceListResponse.class);

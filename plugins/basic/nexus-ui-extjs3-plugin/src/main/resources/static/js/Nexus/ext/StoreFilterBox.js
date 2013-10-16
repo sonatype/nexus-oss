@@ -24,6 +24,8 @@ NX.define('Nexus.ext.StoreFilterBox', {
     'Nexus.LogAwareMixin'
   ],
 
+  xtype: 'nx-store-filter-box',
+
   /**
    * @cfg {Ext.data.Store} store that should filtered
    */
