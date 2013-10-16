@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -91,7 +92,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
- * state with p ersisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
+ * state with persisted user configuration. All changes incoming through its iface is reflect/maintained in Nexus current
  * state and Nexus user config.
  *
  * @author cstamas
@@ -132,6 +133,8 @@ public class DefaultNexusConfiguration
   private final List<ConfigurationModifier> configurationModifiers;
   
   private final ClassLoader uberClassLoader; 
+
+  private final File installDirectory;
 
   private final File workingDirectory;
 
@@ -175,15 +178,22 @@ public class DefaultNexusConfiguration
   // ==
 
   @Inject
-  public DefaultNexusConfiguration(final CacheManager cacheManager, EventBus eventBus,
-      @Named("file") ApplicationConfigurationSource configurationSource,
-      Provider<GlobalRemoteConnectionSettings> globalRemoteConnectionSettingsProvider,
-      Provider<GlobalRemoteProxySettings> globalRemoteProxySettingsProvider, ApplicationConfigurationValidator configurationValidator,
-      ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
-      RepositoryTypeRegistry repositoryTypeRegistry, RepositoryRegistry repositoryRegistry,
-      List<ScheduledTaskDescriptor> scheduledTaskDescriptors, SecuritySystem securitySystem,
-      @Parameters Map<String, String> parameters, VetoFormatter vetoFormatter,
-      List<ConfigurationModifier> configurationModifiers, @Named("nexus-uber") ClassLoader uberClassLoader)
+  public DefaultNexusConfiguration(final CacheManager cacheManager,
+                                   final EventBus eventBus,
+                                   final @Named("file") ApplicationConfigurationSource configurationSource,
+                                   final Provider<GlobalRemoteConnectionSettings> globalRemoteConnectionSettingsProvider,
+                                   final Provider<GlobalRemoteProxySettings> globalRemoteProxySettingsProvider,
+                                   final ApplicationConfigurationValidator configurationValidator,
+                                   final ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
+                                   final RepositoryTypeRegistry repositoryTypeRegistry,
+                                   final RepositoryRegistry repositoryRegistry,
+                                   final List<ScheduledTaskDescriptor> scheduledTaskDescriptors,
+                                   final SecuritySystem securitySystem,
+                                   final @Parameters Map<String, String> parameters,
+                                   final VetoFormatter vetoFormatter,
+                                   final List<ConfigurationModifier> configurationModifiers,
+                                   final @Named("nexus-uber") ClassLoader uberClassLoader,
+                                   final @Named("${bundleBasedir}") @Nullable File installDirectory)
   {
     this.cacheManager = checkNotNull(cacheManager);
     this.eventBus = checkNotNull(eventBus);
@@ -201,6 +211,13 @@ public class DefaultNexusConfiguration
     this.uberClassLoader = checkNotNull(uberClassLoader);
     
     // init
+    if (installDirectory != null) {
+      this.installDirectory = canonicalize(installDirectory);
+    }
+    else {
+      this.installDirectory = null;
+    }
+
     try {
       final File workingDirectory = new File(parameters.get("nexus-work"));
       this.workingDirectory = canonicalize(workingDirectory);
@@ -473,6 +490,12 @@ public class DefaultNexusConfiguration
   @Override
   public RemoteStorageContext getGlobalRemoteStorageContext() {
     return globalRemoteStorageContext;
+  }
+
+  @Nullable
+  @Override
+  public File getInstallDirectory() {
+    return this.installDirectory;
   }
 
   @Override

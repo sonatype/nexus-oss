@@ -16,6 +16,8 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -25,6 +27,14 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
  */
 public interface ApplicationConfiguration
 {
+  /**
+   * Return the directory where Nexus is installed.  This may be null for war deployments.
+   *
+   * @since 2.7
+   */
+  @Nullable
+  File getInstallDirectory();
+
   /**
    * Gets the working directory as file. The directory is created if needed and is guaranteed to exists.
    */
@@ -67,8 +77,7 @@ public interface ApplicationConfiguration
   /**
    * Saves the configuration.
    */
-  void saveConfiguration()
-      throws IOException;
+  void saveConfiguration() throws IOException;
 
   /**
    * Gets the Configuration object.
