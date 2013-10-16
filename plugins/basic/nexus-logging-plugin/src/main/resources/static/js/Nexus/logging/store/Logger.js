@@ -29,7 +29,7 @@ NX.define('Nexus.logging.store.Logger', {
   ],
 
   storeId: 'nx-logging-store-logger',
-  autoLoad: true,
+  autoDestroy: true,
   restful: true,
 
   proxy: NX.create('Ext.data.HttpProxy', {
