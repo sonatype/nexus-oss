@@ -44,7 +44,8 @@ import com.google.inject.Key;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A default host for {@link EventSubscriber}.
+ * A default host for {@link EventSubscriber}. This is an internal Nexus component and should not be used in
+ * any plugin code, and hence, is subject of change without prior notice.
  *
  * @since 2.7.0
  */
@@ -159,7 +160,7 @@ public class EventSubscriberHost
 
   // == Legacy EventInspector support
 
-  public static class EventInspectorMediator
+  protected static class EventInspectorMediator
       implements Mediator<Named, EventInspector, EventSubscriberHost>
   {
     private final NexusExecutorService nexusExecutorService;
@@ -196,7 +197,7 @@ public class EventSubscriberHost
     }
   }
 
-  public static class EventInspectorAdapter
+  private static class EventInspectorAdapter
   {
     private final BeanEntry<Named, EventInspector> eventInspectorEntry;
 
@@ -228,7 +229,7 @@ public class EventSubscriberHost
     }
   }
 
-  public static class AsynchronousEventInspectorAdapter
+  private static class AsynchronousEventInspectorAdapter
       extends EventInspectorAdapter
   {
     private final NexusExecutorService nexusExecutorService;
