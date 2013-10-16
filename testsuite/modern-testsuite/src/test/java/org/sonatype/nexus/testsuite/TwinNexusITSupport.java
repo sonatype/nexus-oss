@@ -14,7 +14,6 @@
 package org.sonatype.nexus.testsuite;
 
 import java.io.File;
-import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,15 +31,10 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import com.google.common.base.Throwables;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runners.Parameterized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * Suppot class for case when two nexus instances are needed to be tested how they interact.
@@ -75,19 +69,19 @@ public abstract class TwinNexusITSupport
     assertThat("Remote Nexus was not in running state", remote().isRunning());
 
     remoteClient = createNexusClientForAdmin(remote());
-    logRemoteThatTestIs(masterRemoteLogger(), "STARTING");
+    logRemoteThatTestIs(remoteRemoteLogger(), "STARTING");
 
     startNexus(local());
-    assertThat("Slave Nexus was not in running state", local().isRunning());
+    assertThat("Local Nexus was not in running state", local().isRunning());
 
     localClient = createNexusClientForAdmin(local());
-    logRemoteThatTestIs(slaveRemoteLogger(), "STARTING");
+    logRemoteThatTestIs(localRemoteLogger(), "STARTING");
   }
 
   @After
   public void afterTestWasRunning() {
     if (remote != null) {
-      logRemoteThatTestIs(masterRemoteLogger(), "FINISHED");
+      logRemoteThatTestIs(remoteRemoteLogger(), "FINISHED");
 
       testIndex.recordAndCopyLink(
           "master wrapper.log", new File(remote.getNexusDirectory(), "logs/wrapper.log")
@@ -97,7 +91,7 @@ public abstract class TwinNexusITSupport
       );
     }
     if (local != null) {
-      logRemoteThatTestIs(slaveRemoteLogger(), "FINISHED");
+      logRemoteThatTestIs(localRemoteLogger(), "FINISHED");
 
       testIndex.recordAndCopyLink(
           "slave wrapper.log", new File(local.getNexusDirectory(), "logs/wrapper.log")
@@ -206,24 +200,24 @@ public abstract class TwinNexusITSupport
     }
   }
 
-  protected void waitForMasterToSettleDown() {
+  protected void waitForRemoteToSettleDown() {
     remoteClient().getSubsystem(Scheduler.class).waitForAllTasksToStop();
     remoteClient().getSubsystem(Events.class).waitForCalmPeriod();
   }
 
-  protected void waitForSlaveToSettleDown() {
+  protected void waitForLocalToSettleDown() {
     localClient().getSubsystem(Scheduler.class).waitForAllTasksToStop();
     localClient().getSubsystem(Events.class).waitForCalmPeriod();
   }
 
-  protected Logger masterRemoteLogger() {
+  protected Logger remoteRemoteLogger() {
     if (remoteClient() != null) {
       return remoteClient().getSubsystem(RemoteLoggerFactory.class).getLogger(this.getClass().getName());
     }
     return null;
   }
 
-  protected Logger slaveRemoteLogger() {
+  protected Logger localRemoteLogger() {
     if (localClient() != null) {
       return localClient().getSubsystem(RemoteLoggerFactory.class).getLogger(this.getClass().getName());
     }

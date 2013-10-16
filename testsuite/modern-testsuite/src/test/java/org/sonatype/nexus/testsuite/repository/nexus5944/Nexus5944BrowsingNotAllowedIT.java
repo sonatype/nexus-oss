@@ -59,8 +59,8 @@ public class Nexus5944BrowsingNotAllowedIT
     // create local/central proxying remote/central
     localRepositories().create(MavenProxyRepository.class, "remote-central-proxy").asProxyOf(
         remoteRepositories().get(MavenProxyRepository.class, "central").contentUri()).withRepoPolicy("RELEASE").save();
-    waitForMasterToSettleDown();
-    waitForSlaveToSettleDown();
+    waitForRemoteToSettleDown();
+    waitForLocalToSettleDown();
 
     assertThat("remote-central-proxy should not be autoblocked",
         !localRepositories().get(MavenProxyRepository.class, "remote-central-proxy").status().isAutoBlocked());
