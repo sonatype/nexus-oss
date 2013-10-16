@@ -14,24 +14,10 @@
 package org.sonatype.nexus.events;
 
 /**
- * A component that receives events and simply re-emits then to the registered EventInspectors.
+ * Marker interface to mark an {@link EventSubscriber} as asynchronous.
  *
- * @author cstamas
- * @deprecated See {@link EventSubscriberHost} and {@link EventSubscriber} interface instead.
+ * @since 2.7.0
  */
-@Deprecated
-public interface EventInspectorHost
+public interface Asynchronous
 {
-  /**
-   * Shuts down event inspector cleanly (mainly maintains the thread pool).
-   */
-  @Deprecated
-  void shutdown();
-
-  /**
-   * Debug only: returns true if it is "calm period", and no async event inspector is running in the thread pool.
-   * False otherwise.
-   */
-  @Deprecated
-  boolean isCalmPeriod();
 }
