@@ -13,15 +13,11 @@
 
 package org.sonatype.nexus.proxy.attributes.inspectors;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.attributes.AbstractStorageFileItemInspector;
+import org.sonatype.nexus.proxy.attributes.AbstractStorageItemInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
@@ -33,35 +29,22 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 @Singleton
 @Named
 public class AuditingInspector
-    extends AbstractStorageFileItemInspector
+    extends AbstractStorageItemInspector
 {
   @Override
-  public Set<String> getIndexableKeywords() {
-    Set<String> result = new HashSet<String>(2);
-    result.add(AccessManager.REQUEST_USER);
-    result.add(AccessManager.REQUEST_REMOTE_ADDRESS);
-    result.add(AccessManager.REQUEST_CONFIDENTIAL);
-    return result;
-  }
-
-  @Override
-  public boolean isHandled(StorageItem item) {
+  public boolean isHandled(final StorageItem item) {
     if (item instanceof StorageFileItem) {
       final StorageFileItem fitem = (StorageFileItem) item;
-
       addIfExistsButDontContains(fitem, AccessManager.REQUEST_USER);
-
       addIfExistsButDontContains(fitem, AccessManager.REQUEST_REMOTE_ADDRESS);
-
       addIfExistsButDontContains(fitem, AccessManager.REQUEST_CONFIDENTIAL);
     }
-
     // don't do File copy for us, we done our job already
     return false;
   }
 
   @Override
-  public void processStorageFileItem(StorageFileItem item, File file)
+  public void processStorageItem(final StorageItem item)
       throws Exception
   {
     // noop
@@ -69,11 +52,10 @@ public class AuditingInspector
 
   /**
    * Save it only 1st time. Meaning, a newly proxied/cached item will have not set these attributes, but when it
-   * comes
-   * from cache, it will. By storing it only once, at first time, we have the record of who did it initally
+   * comes from cache, it will. By storing it only once, at first time, we have the record of who did it initially
    * requested.
    */
-  private void addIfExistsButDontContains(StorageFileItem item, String contextKey) {
+  private void addIfExistsButDontContains(final StorageFileItem item, final String contextKey) {
     if (item.getItemContext().containsKey(contextKey) && !item.getRepositoryItemAttributes().containsKey(contextKey)) {
       Object val = item.getItemContext().get(contextKey);
 

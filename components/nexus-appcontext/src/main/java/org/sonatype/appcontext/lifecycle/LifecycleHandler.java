@@ -20,7 +20,9 @@ package org.sonatype.appcontext.lifecycle;
  *
  * @author cstamas
  * @since 3.1
+ * @deprecated Unsupported.
  */
+@Deprecated
 public interface LifecycleHandler
 {
   /**

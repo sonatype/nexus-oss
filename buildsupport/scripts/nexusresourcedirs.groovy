@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -11,19 +11,30 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.appcontext.lifecycle;
+//
+// Helper to generate NEXUS_RESOURCE_DIRS environment variable.
+//
+// Usage from project directory:
+//
+//     export NEXUS_RESOURCE_DIRS=`groovy ./buildsupport/scripts/nexusresourcedirs.groovy`
+//
+// Aggregate projects using 'roots' property, from parent of project directories:
+//
+//     export NEXUS_RESOURCE_DIRS=`groovy -Droots=nexus-oss,nexus-pro nexus-oss/buildsupport/scripts/nexusresourcedirs.groovy`
+//
 
-/**
- * Simple shared "startable" handler. You usually use this interface to create anonymous class (but you can freely
- * extend it too!) to handle some lifecycle here.
- *
- * @author cstamas
- * @since 3.1
- * @deprecated Unsupported.
- */
-@Deprecated
-public interface Startable
-    extends LifecycleHandler
-{
+def roots = System.getProperty('roots', '.')
+def dirs = []
 
+roots.split(',').each { root ->
+  def dir = new File(root)
+  if (dir.exists()) {
+    dir.eachDirRecurse {
+      if (it.path.endsWith('src/main/resources/static')) {
+        dirs << it.parentFile.canonicalPath
+      }
+    }
+  }
 }
+
+println dirs.join(',')
