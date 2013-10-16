@@ -57,12 +57,6 @@ NX.define('Nexus.logging.view.Log', {
           tooltip: 'Refresh log',
           iconCls: icons.get('log_refresh').cls
         },
-        {
-          id: 'nx-logging-button-download-log',
-          text: 'Download',
-          tooltip: 'Download log file',
-          iconCls: icons.get('log_download').cls
-        },
         '-',
         {
           id: 'nx-logging-button-mark',
@@ -70,6 +64,14 @@ NX.define('Nexus.logging.view.Log', {
           tooltip: 'Add a mark in Nexus log file',
           iconCls: icons.get('log_mark').cls,
           disabled: !sp.checkPermission('nexus:logconfig', sp.EDIT)
+        },
+        '-',
+        {
+          xtype: 'link-button',
+          text: 'Download',
+          tooltip: 'Download log file',
+          href: Sonatype.config.repos.urls.logs + '/nexus.log',
+          target: '_blank'
         },
         '->',
         {

@@ -63,9 +63,6 @@ NX.define('Nexus.logging.controller.Logging', {
       '#nx-logging-button-refresh-log': {
         click: me.refreshLog
       },
-      '#nx-logging-button-download-log': {
-        click: me.downloadLog
-      },
       '#nx-logging-combo-refresh-period': {
         select: me.changeRefreshPeriod
       },
@@ -252,14 +249,6 @@ NX.define('Nexus.logging.controller.Logging', {
    */
   refreshLog: function (button) {
     this.retrieveLog(button.up('nx-logging-view-log'));
-  },
-
-  /**
-   * Opens a new browser window pointing to /service/internal/logs/nexus.log.
-   * @private
-   */
-  downloadLog: function () {
-    Sonatype.utils.openWindow(Sonatype.config.repos.urls.logs + '/nexus.log');
   },
 
   /**
