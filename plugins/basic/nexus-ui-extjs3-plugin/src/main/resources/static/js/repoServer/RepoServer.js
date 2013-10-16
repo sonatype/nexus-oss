@@ -337,12 +337,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     tabId : 'schedules-config',
                     tabCode : Sonatype.repoServer.SchedulesEditPanel
                   }, {
-                    enabled : sp.checkPermission('nexus:logs', sp.READ) || sp.checkPermission('nexus:configuration', sp.READ),
-                    title : 'System Files',
-                    tabId : 'view-logs',
-                    tabCode : Sonatype.repoServer.LogsViewPanel,
-                    tabTitle : 'System Files'
-                  }, {
                     enabled : sp.checkPermission('nexus:logconfig', sp.READ) && (sp.checkPermission('nexus:logconfig', sp.CREATE) || sp.checkPermission('nexus:logconfig', sp.DELETE) || sp.checkPermission('nexus:logconfig', sp.EDIT)),
                     title : 'Log Configuration',
                     tabId : 'log-config',

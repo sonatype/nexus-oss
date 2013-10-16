@@ -13,37 +13,26 @@
 
 package org.sonatype.nexus.testsuite.misc.nexus3860;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
-import org.sonatype.nexus.rest.model.LogsListResource;
-import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.NexusWebappLayout;
-import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.testsuite.plugin.nexus2810.PluginConsoleMessageUtil;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.io.IOUtils;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
@@ -55,17 +44,12 @@ import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -232,7 +216,6 @@ public abstract class AbstractCargoIT
       throws Exception
   {
     checkStatus();
-    checkLogs();
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
@@ -243,87 +226,6 @@ public abstract class AbstractCargoIT
 
     for (PluginInfoDTO info : pluginInfos) {
       assertEquals("ACTIVATED", info.getStatus());
-    }
-  }
-
-  @Test
-  public void checkLogs()
-      throws Exception
-  {
-    checkStatus();
-
-    final Response response = RequestFacade.sendMessage("service/local/logs", Method.GET);
-    try {
-      String responseText = response.getEntity().getText();
-
-      Assert.assertEquals("Status: \n" + responseText, response.getStatus().getCode(), 200);
-
-      LogsListResourceResponse logListResponse =
-          (LogsListResourceResponse) XStreamFactory.getXmlXStream().fromXML(responseText);
-      List<LogsListResource> logList = logListResponse.getData();
-      Assert.assertTrue("Log List should contain at least 1 log.", logList.size() > 0);
-
-      for (Iterator<LogsListResource> iter = logList.iterator(); iter.hasNext(); ) {
-        LogsListResource logResource = iter.next();
-
-        this.downloadAndConfirmLog(logResource.getResourceURI(), logResource.getName());
-      }
-    }
-    finally {
-      RequestFacade.releaseResponse(response);
-    }
-  }
-
-  /**
-   * Verify the logging output does not contain any nasty errors and such
-   */
-  private void downloadAndConfirmLog(String logURI, String name)
-      throws Exception
-  {
-    Response response = null;
-    InputStreamReader reader = null;
-    BufferedReader bReader = null;
-    try {
-      response = RequestFacade.sendMessage(new URL(logURI), Method.GET, null);
-      assertThat(response, ResponseMatchers.isSuccessful());
-      InputStream stream = response.getEntity().getStream();
-      if (stream == null) {
-        Assert.fail("Stream was null: " + response.getEntity().getText());
-      }
-
-      // get the first 10000 chars from the downloaded log
-      reader = new InputStreamReader(stream);
-      bReader = new BufferedReader(reader);
-
-      StringBuilder downloadedLog = new StringBuilder();
-
-      int lineCount = 10000;
-      while (bReader.ready() && lineCount-- > 0) {
-        downloadedLog.append((char) bReader.read());
-      }
-
-      String downloadedLogStr = downloadedLog.toString();
-
-      assertThat("Should have been DEBUG level logging so there should have been DEBUG in log",
-          downloadedLogStr, containsString("DEBUG"));
-
-      List<String> falsePositives = Lists.newArrayList();
-      falsePositives.add("org/sonatype/nexus/rest/error/reporting/ErrorReportingPlexusResource");
-      falsePositives.add("org.sonatype.nexus.rest.error.reporting.ErrorReportingPlexusResource");
-      falsePositives.add("org.sonatype.nexus.error.reporting.DefaultErrorReportingManager");
-
-      for (String fp : falsePositives) {
-        downloadedLogStr = downloadedLogStr.replace(fp, "");
-      }
-
-      assertThat(downloadedLogStr, not(containsString("error")));
-      assertThat(downloadedLogStr, not(containsString("exception")));
-
-    }
-    finally {
-      RequestFacade.releaseResponse(response);
-      IOUtils.closeQuietly(reader);
-      IOUtils.closeQuietly(bReader);
     }
   }
 
