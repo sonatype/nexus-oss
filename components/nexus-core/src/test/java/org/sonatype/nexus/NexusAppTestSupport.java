@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
@@ -45,7 +45,7 @@ public abstract class NexusAppTestSupport
 
   private NexusScheduler nexusScheduler;
 
-  private EventInspectorHost eventInspectorHost;
+  private EventSubscriberHost eventSubscriberHost;
 
   private EventBus eventBus;
 
@@ -128,7 +128,7 @@ public abstract class NexusAppTestSupport
 
     eventBus = lookup(EventBus.class);
     nexusScheduler = lookup(NexusScheduler.class);
-    eventInspectorHost = lookup(EventInspectorHost.class);
+    eventSubscriberHost = lookup(EventSubscriberHost.class);
     nexusConfiguration = lookup(NexusConfiguration.class);
     templateManager = lookup(TemplateManager.class);
 
@@ -197,7 +197,7 @@ public abstract class NexusAppTestSupport
   protected void wairForAsyncEventsToCalmDown()
       throws Exception
   {
-    while (!eventInspectorHost.isCalmPeriod()) {
+    while (!eventSubscriberHost.isCalmPeriod()) {
       Thread.sleep(100);
     }
   }

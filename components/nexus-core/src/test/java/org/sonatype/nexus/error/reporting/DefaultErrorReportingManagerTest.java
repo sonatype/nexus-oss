@@ -27,7 +27,7 @@ import org.sonatype.jira.mock.StubJira;
 import org.sonatype.jira.test.JiraXmlRpcTestServlet;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
@@ -43,9 +43,8 @@ import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.containsEntry;
 
 public class DefaultErrorReportingManagerTest
@@ -275,7 +274,7 @@ public class DefaultErrorReportingManagerTest
     // awake nexus, to awake EventInspector host too
     startNx();
     // we will need this to properly wait the async event inspectors to finish
-    final EventInspectorHost eventInspectorHost = lookup(EventInspectorHost.class);
+    final EventSubscriberHost eventSubscriberHost = lookup(EventSubscriberHost.class);
 
     String msg = "Runtime exception " + Long.toHexString(System.currentTimeMillis());
     ExceptionTask task = (ExceptionTask) lookup(SchedulerTask.class, "ExceptionTask");
@@ -288,14 +287,14 @@ public class DefaultErrorReportingManagerTest
     // empty() has weirdo generics
     assertThat(issues, hasSize(0));
 
-    doCall(task, eventInspectorHost);
+    doCall(task, eventSubscriberHost);
 
     issues =
         manager.retrieveIssues("APR: " + new RuntimeException(msg).getMessage(), getAuth());
 
     assertThat(issues, hasSize(1));
 
-    doCall(task, eventInspectorHost);
+    doCall(task, eventSubscriberHost);
 
     issues =
         manager.retrieveIssues("APR: " + new RuntimeException(msg).getMessage(), getAuth());
@@ -303,7 +302,7 @@ public class DefaultErrorReportingManagerTest
     assertThat(issues, hasSize(1));
   }
 
-  private void doCall(final NexusTask<?> task, final EventInspectorHost inspectorHost)
+  private void doCall(final NexusTask<?> task, final EventSubscriberHost eventSubscriberHost)
       throws InterruptedException
   {
     try {
@@ -315,7 +314,7 @@ public class DefaultErrorReportingManagerTest
       do {
         Thread.sleep(100);
       }
-      while (!inspectorHost.isCalmPeriod());
+      while (!eventSubscriberHost.isCalmPeriod());
     }
   }
 

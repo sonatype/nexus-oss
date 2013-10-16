@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -42,15 +42,15 @@ public class EventsWaitForPlexusResource
 
   private static final String RESOURCE_URI = "/events/waitFor";
 
-  private final EventInspectorHost eventInspectorHost;
+  private final EventSubscriberHost eventSubscriberHost;
 
   private final EventBus eventBus;
 
   @Inject
-  public EventsWaitForPlexusResource(final EventInspectorHost eventInspectorHost,
+  public EventsWaitForPlexusResource(final EventSubscriberHost eventSubscriberHost,
                                      final EventBus eventBus)
   {
-    this.eventInspectorHost = checkNotNull(eventInspectorHost);
+    this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
     this.eventBus = checkNotNull(eventBus);
   }
 
@@ -92,7 +92,7 @@ public class EventsWaitForPlexusResource
     try {
       final long startTime = System.currentTimeMillis();
       while (System.currentTimeMillis() - startTime <= timeout) {
-        if (eventInspectorHost.isCalmPeriod()
+        if (eventSubscriberHost.isCalmPeriod()
             && System.currentTimeMillis() - lastEventTime.get() >= window) {
           response.setStatus(Status.SUCCESS_OK);
           return "Ok";

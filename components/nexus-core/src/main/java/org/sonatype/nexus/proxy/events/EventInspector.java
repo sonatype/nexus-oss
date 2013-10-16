@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.events;
 
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plugin.ExtensionPoint;
 
@@ -22,7 +23,9 @@ import org.sonatype.plugin.ExtensionPoint;
  * A simple event inspector, a component that receives events emitted by Nexus and processes them in way they want.
  *
  * @author cstamas
+ * @deprecated Use {@link EventSubscriber} instead.
  */
+@Deprecated
 @ExtensionPoint
 @Singleton
 public interface EventInspector

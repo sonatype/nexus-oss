@@ -13,32 +13,15 @@
 
 package org.sonatype.nexus.events;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.threads.NexusExecutorService;
-import org.sonatype.nexus.threads.NexusThreadFactory;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.eventbus.AllowConcurrentEvents;
-import com.google.common.eventbus.Subscribe;
-import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,51 +34,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * same rules to all inspectors.
  *
  * @author cstamas
+ * @deprecated In favor of {@link EventSubscriberHost}.
  */
 @Named
 @EagerSingleton
+@Deprecated
 public class DefaultEventInspectorHost
     extends AbstractLoggingComponent
     implements EventInspectorHost
 {
-  private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
-      "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500);
-
-  private final Map<String, EventInspector> eventInspectors;
-
-  private final NexusExecutorService hostThreadPool;
+  private final EventSubscriberHost eventSubscriberHost;
 
   @Inject
-  public DefaultEventInspectorHost(final EventBus eventBus, final Map<String, EventInspector> eventInspectors) {
-    this.eventInspectors = checkNotNull(eventInspectors);
-
-    // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
-    final ThreadPoolExecutor target =
-        new ThreadPoolExecutor(0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
-            new NexusThreadFactory("nxevthost", "Event Inspector Host"), new CallerRunsPolicy());
-    this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
-    checkNotNull(eventBus).register(this);
-  }
-
-  // == Stop
-
-  @Subscribe
-  public void on(NexusStoppedEvent e) {
-    shutdown();
+  public DefaultEventInspectorHost(final EventSubscriberHost eventSubscriberHost) {
+    this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
   }
 
   // == EventInspectorHost iface
 
   @Override
   public void shutdown() {
-    // we need clean shutdown, wait all background event inspectors to finish to have consistent state
-    hostThreadPool.shutdown();
-    try {
-      hostThreadPool.awaitTermination(5L, TimeUnit.SECONDS);
-    }
-    catch (InterruptedException e) {
-      getLogger().debug("Interrupted while waiting for termination", e);
-    }
+    // nothing
   }
 
   /**
@@ -104,87 +63,11 @@ public class DefaultEventInspectorHost
   @VisibleForTesting
   @Override
   public boolean isCalmPeriod() {
-    // "calm period" is when we have no queued nor active threads
-    return ((ThreadPoolExecutor) hostThreadPool.getTargetExecutorService()).getQueue().isEmpty()
-        && ((ThreadPoolExecutor) hostThreadPool.getTargetExecutorService()).getActiveCount() == 0;
+    return eventSubscriberHost.isCalmPeriod();
   }
 
-  @AllowConcurrentEvents
-  @Subscribe
+  @VisibleForTesting
   public void onEvent(final Event<?> evt) {
-    try {
-      processEvent(evt, getEventInspectors());
-    }
-    catch (IllegalStateException e) {
-      // NEXUS-4775 guice exception trying to resolve circular dependencies too early
-      getLogger().trace("Event inspectors are not fully initialized, skipping handling of {}", evt, e);
-    }
-  }
-
-  // ==
-
-  protected Set<EventInspector> getEventInspectors() {
-    return new HashSet<EventInspector>(eventInspectors.values());
-  }
-
-  protected void processEvent(final Event<?> evt, final Set<EventInspector> inspectors) {
-    // 1st pass: sync ones (without handler)
-    for (EventInspector ei : inspectors) {
-      if (!(ei instanceof AsynchronousEventInspector)) {
-        try {
-          if (ei.accepts(evt)) {
-            ei.inspect(evt);
-          }
-        }
-        catch (Exception e) {
-          getLogger().warn("EventInspector implementation={} had problem accepting an event={}",
-              ei.getClass().getName(), evt.getClass(), e);
-        }
-      }
-    }
-
-    // 2nd pass: async ones
-    for (EventInspector ei : inspectors) {
-      if (ei instanceof AsynchronousEventInspector) {
-        try {
-          if (ei.accepts(evt)) {
-            final EventInspectorHandler handler = new EventInspectorHandler(getLogger(), ei, evt);
-            hostThreadPool.execute(handler);
-          }
-        }
-        catch (Exception e) {
-          getLogger().warn("Async EventInspector implementation={} had problem accepting an event={}",
-              ei.getClass().getName(), evt.getClass(), e);
-        }
-      }
-    }
-  }
-
-  // ==
-
-  public static class EventInspectorHandler
-      implements Runnable
-  {
-    private final Logger logger;
-
-    private final EventInspector ei;
-
-    private final Event<?> evt;
-
-    public EventInspectorHandler(final Logger logger, final EventInspector ei, final Event<?> evt) {
-      this.logger = logger;
-      this.ei = ei;
-      this.evt = evt;
-    }
-
-    public void run() {
-      try {
-        ei.inspect(evt);
-      }
-      catch (Exception e) {
-        logger.warn("EventInspector implementation={} had problem accepting an event={}", ei.getClass().getName(),
-            evt.getClass(), e);
-      }
-    }
+    eventSubscriberHost.onEvent(evt);
   }
 }
