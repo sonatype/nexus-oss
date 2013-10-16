@@ -53,7 +53,7 @@ NX.define('Nexus.atlas.view.Panel', {
           cls: 'nx-atlas-view-panel-description',
           border: false,
           html: icons.get('atlas').variant('x32').img +
-              '<div>Support tools provides a collection of modules to help keep your instance healthy.</div>',
+              '<div>Support tools provides a collection of modules to help keep your server healthy.</div>',
           height: 60,
           flex: 0
         },
@@ -64,8 +64,9 @@ NX.define('Nexus.atlas.view.Panel', {
           plain: true,
           layoutOnTabChange: true,
           items: [
-            { xtype: 'nx-atlas-view-sysinfo' },
-            { xtype: 'nx-atlas-view-supportzip' }
+            { xtype: 'nx-atlas-view-sysinfo' }
+            // NOTE: disabled for now, will re-enable later
+            //{ xtype: 'nx-atlas-view-supportzip' }
           ],
           activeTab: 0
         }
