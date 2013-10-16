@@ -17,10 +17,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.logging.LoggingPlugin;
 import org.sonatype.nexus.logging.model.MarkerXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -35,6 +39,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
  * Log REST resource.
@@ -53,8 +58,40 @@ public class LogResource
 
   private static final Logger log = LoggerFactory.getLogger(LogResource.class);
 
+  private final LogManager logManager;
+
   @Inject
-  public LogResource() {
+  public LogResource(final LogManager logManager) {
+    this.logManager = checkNotNull(logManager);
+  }
+
+  /**
+   * Downloads a part of nexus.log (specified by fromByte/bytesCount) or full nexus.log (if fromByte/bytesCount are
+   * null).
+   *
+   * @param fromByte   starting position
+   * @param bytesCount number of bytes
+   * @return part or full nexus.log
+   * @throws Exception If getting log fails
+   */
+  @GET
+  @Produces({TEXT_PLAIN})
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOG + "read")
+  public Response get(final @QueryParam("fromByte") Long fromByte,
+                      final @QueryParam("bytesCount") Long bytesCount)
+      throws Exception
+  {
+    Long from = fromByte;
+    if (from == null || from < 0) {
+      from = 0L;
+    }
+    Long count = bytesCount;
+    if (count == null) {
+      count = Long.MAX_VALUE;
+    }
+    return Response.ok(logManager.getApplicationLogAsStream("nexus.log", from, count).getInputStream())
+        .header("Content-Disposition", "attachment; filename=\"nexus.log\"")
+        .build();
   }
 
   /**
@@ -68,7 +105,7 @@ public class LogResource
   @Path("/mark")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
   public void put(final MarkerXO marker)
       throws Exception
   {

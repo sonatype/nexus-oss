@@ -71,7 +71,7 @@ public class LoggersResource
    */
   @GET
   @Produces({APPLICATION_JSON, APPLICATION_XML})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "read")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "read")
   public List<LoggerXO> get() {
     return Lists.newArrayList(configurator.getLoggers());
   }
@@ -86,7 +86,7 @@ public class LoggersResource
   @POST
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
   public LoggerXO post(final LoggerXO logger)
       throws Exception
   {
@@ -108,7 +108,7 @@ public class LoggersResource
   @Path("/{name}")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
   public LoggerXO put(final @PathParam("name") String name,
                       final LoggerXO logger)
       throws Exception
@@ -128,7 +128,7 @@ public class LoggersResource
    */
   @DELETE
   @Path("/{name}")
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
   public void delete(final @PathParam("name") String name)
       throws Exception
   {

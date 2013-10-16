@@ -346,13 +346,13 @@ NX.define('Nexus.logging.controller.Logging', {
     me.logDebug('Retrieving last ' + size + 'kb from log');
 
     Ext.Ajax.request({
-      url: Sonatype.config.repos.urls.logs + '/nexus.log',
+      url: Nexus.siesta.basePath + '/logging/log',
       method: 'GET',
       headers: {
         'accept': 'text/plain'
       },
       params: {
-        count: -1024 * size
+        bytesCount: -1024 * size
       },
       scope: me,
       suppressStatus: true,
