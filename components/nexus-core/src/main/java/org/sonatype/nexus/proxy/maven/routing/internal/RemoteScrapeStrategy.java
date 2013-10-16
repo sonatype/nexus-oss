@@ -23,12 +23,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.apachehttpclient.page.Page;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
-import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Page;
 import org.sonatype.nexus.proxy.maven.routing.internal.scrape.ScrapeContext;
 import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Scraper;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientManager;

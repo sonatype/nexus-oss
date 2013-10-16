@@ -11,14 +11,18 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
+package org.sonatype.nexus.apachehttpclient.page;
 
 import java.io.IOException;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,45 +32,55 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The page fetched from remote and preprocessed by JSoup.
+ * This class offers "high level" HTTP request and page processing support using JSoup.
  *
  * @author cstamas
- * @since 2.4
+ * @since 2.7
  */
 public class Page
 {
-  private final String url;
+  private final HttpUriRequest httpUriRequest;
 
   private final HttpResponse httpResponse;
 
   private final Document document;
 
   /**
-   * Constructor.
+   * Constructor used by static helper methods in this class.
    *
-   * @param url          the URL from where this page was fetched.
+   * @param httpUriRequest the HTTP request for this page.
    * @param httpResponse the HTTP response for this page (with consumed body!).
    * @param document     the JSoup document for this page or {@code null} if no body.
    */
-  public Page(final String url, final HttpResponse httpResponse, final Document document) {
-    this.url = checkNotNull(url);
+  private Page(final HttpUriRequest httpUriRequest, final HttpResponse httpResponse, final Document document) {
+    this.httpUriRequest = checkNotNull(httpUriRequest);
     this.httpResponse = checkNotNull(httpResponse);
     this.document = document;
   }
 
   /**
-   * The URL from where this page was fetched.
-   *
-   * @return the URL from where this page was fetched.
+   * The original URL of the Page.
    */
   public String getUrl() {
-    return url;
+    return httpUriRequest.getURI().toString();
+  }
+
+  /**
+   * The response code of the Page.
+   */
+  public int getStatusCode() {
+    return httpResponse.getStatusLine().getStatusCode();
+  }
+
+  /**
+   * The HTTP request for this page.
+   */
+  public HttpUriRequest getHttpUriRequest() {
+    return httpUriRequest;
   }
 
   /**
    * The HTTP response for this page (response body is consumed!). To check stuff like headers.
-   *
-   * @return the HTTP response of page.
    */
   public HttpResponse getHttpResponse() {
     return httpResponse;
@@ -74,8 +88,6 @@ public class Page
 
   /**
    * The body of the page, parsed by JSoup, or {@code null} if server did not sent any body.
-   *
-   * @return the page body document if any, or {@code null}.
    */
   public Document getDocument() {
     return document;
@@ -88,7 +100,7 @@ public class Page
    *
    * @return {@code true} if header with given name is present.
    */
-  protected boolean hasHeader(final String headerName) {
+  public boolean hasHeader(final String headerName) {
     return getHttpResponse().getFirstHeader(headerName) != null;
   }
 
@@ -97,7 +109,7 @@ public class Page
    *
    * @return {@code true} if header with given name is present and starts with given value.
    */
-  protected boolean hasHeaderAndStartsWith(final String headerName, final String value) {
+  public boolean hasHeaderAndStartsWith(final String headerName, final String value) {
     final Header header = getHttpResponse().getFirstHeader(headerName);
     return header != null && header.getValue() != null && header.getValue().startsWith(value);
   }
@@ -107,7 +119,7 @@ public class Page
    *
    * @return {@code true} if header with given name is present and equals with given value.
    */
-  protected boolean hasHeaderAndEqualsWith(final String headerName, final String value) {
+  public boolean hasHeaderAndEqualsWith(final String headerName, final String value) {
     final Header header = getHttpResponse().getFirstHeader(headerName);
     return header != null && header.getValue() != null && header.getValue().equals(value);
   }
@@ -117,31 +129,37 @@ public class Page
   private static final Logger LOG = LoggerFactory.getLogger(Page.class);
 
   /**
-   * Returns a page for given URL.
-   *
-   * @return the Page for given URL.
+   * Returns a page for given URL using HTTP GET.
    */
-  public static Page getPageFor(final ScrapeContext context, final String url)
+  public static Page getPageFor(final PageContext context, final String url)
+      throws IOException
+  {
+    return buildPageFor(context, new HttpGet(url));
+  }
+
+  /**
+   * Returns a page for given HTTP request.
+   */
+  public static Page buildPageFor(final PageContext context, final HttpUriRequest httpUriRequest)
       throws IOException
   {
     checkNotNull(context);
-    checkNotNull(url);
+    checkNotNull(httpUriRequest);
     // TODO: detect redirects
-    final HttpGet get = new HttpGet(url);
-    LOG.debug("Executing HTTP GET request against {}", url);
-    final HttpResponse response = context.executeHttpRequest(get);
+    LOG.debug("Executing HTTP {} request against {}", httpUriRequest.getMethod(), httpUriRequest.getURI());
+    final HttpResponse response = context.executeHttpRequest(httpUriRequest);
     try {
-      if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 499) {
+      if (context.isExpectedResponse(response)) {
         if (response.getEntity() != null) {
-          return new Page(url, response, Jsoup.parse(response.getEntity().getContent(), null, url));
+          return new Page(httpUriRequest, response, Jsoup.parse(response.getEntity().getContent(), null, httpUriRequest.getURI().toString()));
         }
         else {
           // no body
-          return new Page(url, response, null);
+          return new Page(httpUriRequest, response, null);
         }
       }
       else {
-        throw new UnexpectedPageResponse(url, response.getStatusLine());
+        throw new UnexpectedPageResponse(httpUriRequest.getURI().toString(), response.getStatusLine());
       }
     }
     finally {
@@ -150,10 +168,52 @@ public class Page
   }
 
   /**
+   * A context of page requests. Carries the client and performs checks. For more specific work should be extended.
+   */
+  public static class PageContext
+  {
+    private final HttpClient httpClient;
+
+    public PageContext(final HttpClient httpClient) {
+      this.httpClient = checkNotNull(httpClient);
+    }
+
+    protected HttpClient getHttpClient() {
+      return httpClient;
+    }
+
+    /**
+     * Creates a {@link HttpContext} for given HTTP request.
+     */
+    public HttpContext createHttpContext(final HttpUriRequest httpRequest)
+        throws IOException
+    {
+      return new BasicHttpContext();
+    }
+
+    /**
+     * Executes a {@link HttpUriRequest} on behalf of this context and returns the {@link HttpResponse} of the request.
+     */
+    public HttpResponse executeHttpRequest(final HttpUriRequest httpRequest)
+        throws IOException
+    {
+      final HttpContext httpContext = createHttpContext(httpRequest);
+      return getHttpClient().execute(httpRequest, httpContext);
+    }
+
+    /**
+     * Returns {@code true} if response is expected. It might check for response status code, presence of some
+     * header, etc. Default implementation checks for status code to be between 200 (inclusive) and 500 (exclusive).
+     */
+    public boolean isExpectedResponse(final HttpResponse response) {
+      return response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 499;
+    }
+  }
+
+  /**
    * Exception thrown when unexpected response code is received from page. Used to distinguish between this case and
-   * other "real" IO problems like connectivity or transport problems. Not every scraper will want to handle this
-   * either, but in cases when target is recognized, but during scrape unexpected response is hit, something the
-   * scraping chain must be stopped. See {@link AmazonS3IndexScraper} for an example.
+   * other "real" IO problems like connectivity or transport problems. Not every caller will want to handle this
+   * either.
    */
   @SuppressWarnings("serial")
   public static class UnexpectedPageResponse
