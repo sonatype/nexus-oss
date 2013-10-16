@@ -68,6 +68,9 @@ NX.define('Nexus.logging.controller.Logging', {
       },
       '#nx-logging-combo-refresh-size': {
         select: me.changeRefreshSize
+      },
+      '#nx-logging-button-download-log': {
+        click: me.downloadLog
       }
     });
 
@@ -249,6 +252,14 @@ NX.define('Nexus.logging.controller.Logging', {
    */
   refreshLog: function (button) {
     this.retrieveLog(button.up('nx-logging-view-log'));
+  },
+
+  /**
+   * Opens a new browser window pointing to GET /service/siesta/logging/log.
+   * @private
+   */
+  downloadLog: function () {
+    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/logging/log');
   },
 
   /**
