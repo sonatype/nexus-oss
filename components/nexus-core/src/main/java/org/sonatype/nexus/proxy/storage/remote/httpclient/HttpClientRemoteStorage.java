@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.page.Page;
+import org.sonatype.nexus.apachehttpclient.page.Page.PageContext;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
@@ -36,6 +38,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -358,6 +361,30 @@ public class HttpClientRemoteStorage
       }
       else if ((statusCode >= HttpStatus.SC_MULTIPLE_CHOICES && statusCode < HttpStatus.SC_BAD_REQUEST)
           || statusCode == HttpStatus.SC_NOT_FOUND) {
+        if (RepositoryItemUid.PATH_ROOT.equals(request.getRequestPath()) && statusCode == HttpStatus.SC_NOT_FOUND) {
+          // NEXUS-5944: Give it a chance: it might be remote Nexus with browsing disabled?
+          // to check that, we will check is remote is Nexus by pinging "well know" location
+          // if we got it, we will know it's only browsing forbidden on remote
+          final RemoteStorageContext ctx = getRemoteStorageContext(repository);
+          final HttpClient httpClient = (HttpClient) ctx.getContextObject(CTX_KEY_CLIENT);
+          final PageContext pageContext = new PageContext(httpClient);
+          final URL nxRepoMetadataUrl = appendQueryString(
+              getAbsoluteUrlFromBase(repository, new ResourceStoreRequest("/.meta/repository-metadata.xml")),
+              repository);
+          try {
+            final Page page = Page.getPageFor(pageContext, nxRepoMetadataUrl.toExternalForm());
+            if (page.getStatusCode() == 200) {
+              // this is a Nexus with browsing disabled. say OK
+              getLogger().debug(
+                  "Original GET request for URL {} failed with 404, but GET request for URL {} succeeded, we assume remote is a Nexus repository having browsing disabled.",
+                  remoteUrl, nxRepoMetadataUrl);
+              return true;
+            }
+          }
+          catch (IOException e) {
+            // just fall trough
+          }
+        }
         return false;
       }
       else {
