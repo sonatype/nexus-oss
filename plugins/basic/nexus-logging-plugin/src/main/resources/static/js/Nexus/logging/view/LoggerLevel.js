@@ -29,19 +29,20 @@ NX.define('Nexus.logging.view.LoggerLevel', {
   store: NX.create('Ext.data.ArrayStore', {
     id: 0,
     fields: [
-      'level'
+      'level',
+      'text'
     ],
     data: [
-      ['TRACE'],
-      ['DEBUG'],
-      ['INFO'],
-      ['WARN'],
-      ['ERROR'],
-      ['FATAL'],
-      ['DISABLE']
+      ['TRACE', 'TRACE'],
+      ['DEBUG', 'DEBUG'],
+      ['INFO', 'INFO'],
+      ['WARN', 'WARN'],
+      ['ERROR', 'ERROR'],
+      ['OFF', 'OFF'],
+      ['DEFAULT', 'DEFAULT']
     ]
   }),
   valueField: 'level',
-  displayField: 'level'
+  displayField: 'text'
 
 });

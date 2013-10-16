@@ -13,7 +13,7 @@
 /*global NX, Ext, Nexus, Sonatype*/
 
 /**
- * Logging panel.
+ * Logging main panel.
  *
  * @since 2.7
  */
@@ -27,7 +27,7 @@ NX.define('Nexus.logging.view.Panel', {
   requires: [
     'Nexus.logging.view.Loggers',
     'Nexus.logging.view.Log',
-    'Nexus.logging.Icons',
+    'Nexus.logging.Icons'
   ],
 
   xtype: 'nx-logging-view-panel',
@@ -45,32 +45,49 @@ NX.define('Nexus.logging.view.Panel', {
    */
   initComponent: function () {
     var me = this,
-        icons = Nexus.logging.Icons;
+        icons = Nexus.logging.Icons,
+        sp = Sonatype.lib.Permissions,
+        items = [],
+        tabs = [],
+        text = '';
+
+    if (sp.checkPermission('nexus:logconfig', sp.READ)) {
+      tabs.push({ xtype: 'nx-logging-view-loggers' });
+      text = 'changing logging configuration';
+    }
+    if (sp.checkPermission('nexus:logs', sp.READ)) {
+      tabs.push({ xtype: 'nx-logging-view-log' });
+      if (!Ext.isEmpty(text)) {
+        text += ' and ';
+      }
+      text += 'viewing the current log';
+    }
+
+    items.push({
+      xtype: 'panel',
+      border: false,
+      cls: 'nx-logging-view-panel-description',
+      html: icons.get('logging').variant('x32').img +
+          '<div>' + (!Ext.isEmpty(text) ? 'Allows ' + text + '. ' : '') +
+          'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
+      height: 60,
+      flex: 0
+    });
+
+    if (tabs.length > 0) {
+      items.push({
+        xtype: 'tabpanel',
+        border: false,
+        plain: true,
+        layoutOnTabChange: true,
+        flex: 1,
+        items: tabs,
+        activeItem: 0
+      });
+    }
 
     Ext.apply(me, {
-      items: [
-        {
-          xtype: 'panel',
-          border: false,
-          cls: 'nx-logging-view-panel-description',
-          html: icons.get('logging').variant('x32').img + '<div>Allows changing logging configuration and viewing the current log. ' +
-              'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
-          height: 60,
-          flex: 0
-        },
-        {
-          flex: 1,
-          xtype: 'tabpanel',
-          border: false,
-          cls: 'nx-logging-view-panel-tabs',
-          layoutOnTabChange: true,
-          items: [
-            { xtype: 'nx-logging-view-loggers' },
-            { xtype: 'nx-logging-view-log' }
-          ],
-          activeItem: 0
-        }
-      ]
+      items: items
     });
 
     me.constructor.superclass.initComponent.apply(me, arguments);

@@ -26,11 +26,6 @@
   font: normal 11px arial, tahoma, verdana, helvetica;
 }
 
-.nx-logging-view-panel-tabs ul.x-tab-strip-top {
-  border-bottom-color: white;
-  background: white none;
-}
-
 .nx-logging-view-add .x-form,
 .nx-logging-view-mark .x-form {
   padding-right: 10px;

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global NX, Nexus*/
+/*global NX, Ext, Nexus*/
 
 /**
  * Loggers store.
@@ -32,7 +32,7 @@ NX.define('Nexus.logging.store.Logger', {
   autoLoad: true,
   restful: true,
 
-  proxy: new Ext.data.HttpProxy({
+  proxy: NX.create('Ext.data.HttpProxy', {
     url: Nexus.siesta.basePath + '/logging/loggers'
   }),
 
@@ -54,6 +54,9 @@ NX.define('Nexus.logging.store.Logger', {
 
   sortInfo: { field: 'name', direction: 'ASC' },
 
+  /**
+   * @constructor
+   */
   constructor: function () {
     this.constructor.superclass.constructor.call(this);
     Ext.apply(this.reader, {

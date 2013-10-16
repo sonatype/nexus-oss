@@ -33,7 +33,10 @@ NX.define('Nexus.logging.controller.Logging', {
 
     me.control({
       '#logging': {
-        afterrender: me.controlSelection
+        afterrender: me.controlSelection,
+        activate: me.onLoggingActivate,
+        deactivate: me.onLoggingDeactivate,
+        beforedestroy: me.onLoggingDeactivate
       },
       '#nx-logging-button-refresh-loggers': {
         click: me.loadLoggers
@@ -42,7 +45,7 @@ NX.define('Nexus.logging.controller.Logging', {
         click: me.showAddLogger
       },
       '#nx-logging-button-remove-loggers': {
-        click: me.removeLoggers
+        click: me.removeLogger
       },
       '#nx-logging-button-mark': {
         click: me.showMarkLog
@@ -54,42 +57,46 @@ NX.define('Nexus.logging.controller.Logging', {
         click: me.markLog
       },
       '#nx-logging-view-log': {
-        activate: me.retrieveLog
+        activate: me.onLogTabActivate,
+        deactivate: me.onLogTabDeactivate
       },
       '#nx-logging-button-refresh-log': {
         click: me.refreshLog
+      },
+      '#nx-logging-combo-refresh-period': {
+        select: me.changeRefreshPeriod
+      },
+      '#nx-logging-combo-refresh-size': {
+        select: me.changeRefreshSize
       }
     });
 
     me.addNavigationMenu();
-
-    me.getLogTask = {
-      run: function () {
-        me.loadTail();
-      },
-      interval: 10000,
-      scope: me,
-      started: false
-    };
   },
 
+  /**
+   * Adds a menu entry in left navigation bar under config section.
+   * @private
+   */
   addNavigationMenu: function () {
     // install panel into main NX navigation
     Sonatype.Events.on('nexusNavigationInit', function (panel) {
       var sp = Sonatype.lib.Permissions;
 
-      panel.add({
-        enabled: sp.checkPermission('nexus:logging', sp.READ),
-        sectionId: 'st-nexus-config',
-        title: 'Logging',
-        tabId: 'logging',
-        tabCode: function () {
-          return Ext.create({
-            xtype: 'nx-logging-view-panel',
-            id: 'logging'
-          });
-        }
-      });
+      if (sp.checkPermission('nexus:logconfig', sp.READ) || sp.checkPermission('nexus:logs', sp.READ)) {
+        panel.add({
+          enabled: true,
+          sectionId: 'st-nexus-config',
+          title: 'Logging',
+          tabId: 'logging',
+          tabCode: function () {
+            return Ext.create({
+              xtype: 'nx-logging-view-panel',
+              id: 'logging'
+            });
+          }
+        });
+      }
     });
   },
 
@@ -101,27 +108,41 @@ NX.define('Nexus.logging.controller.Logging', {
   },
 
   controlSelection: function (loggingPanel) {
-    var loggersGrid = loggingPanel.down('nx-logging-view-loggers'),
-        removeBtn = loggersGrid.getTopToolbar().down('#nx-logging-button-remove-loggers');
+    var sp = Sonatype.lib.Permissions,
+        loggersGrid, removeBtn;
 
-    loggersGrid.getSelectionModel().on('selectionchange', function (sm, selection) {
-      if (sm.hasSelection() && selection.record.get('name') !== 'ROOT') {
-        removeBtn.enable();
-      }
-      else {
-        removeBtn.disable();
-      }
-    });
+    if (sp.checkPermission('nexus:logconfig', sp.EDIT)) {
+      loggersGrid = loggingPanel.down('nx-logging-view-loggers');
+      removeBtn = loggersGrid.getTopToolbar().down('#nx-logging-button-remove-loggers');
+
+      loggersGrid.getSelectionModel().on('selectionchange', function (sm, selection) {
+        if (sm.hasSelection() && selection.record.get('name') !== 'ROOT') {
+          removeBtn.enable();
+        }
+        else {
+          removeBtn.disable();
+        }
+      });
+    }
   },
 
+  /**
+   * Opens add logger window.
+   * @param {Ext.Button} button add button that triggered the action (from loggers grid toolbar)
+   * @private
+   */
   showAddLogger: function (button) {
-    var loggersGrid = button.up('nx-logging-view-loggers'),
-        win = Ext.create({xtype: 'nx-logging-view-add'});
+    var win = Ext.create({xtype: 'nx-logging-view-add'});
 
-    win.grid = loggersGrid;
+    win.grid = button.up('nx-logging-view-loggers');
     win.show();
   },
 
+  /**
+   * Adds a logger to logger store.
+   * @param {Ext.Button} button save button that triggered the action (from add window)
+   * @private
+   */
   addLogger: function (button) {
     var me = this,
         win = button.up('nx-logging-view-add'),
@@ -140,10 +161,10 @@ NX.define('Nexus.logging.controller.Logging', {
         closeable: false,
         scope: me,
         fn: function (buttonName) {
-          if (buttonName == 'yes' || buttonName == 'ok') {
-            record.set('level', values.level);
+          if (buttonName === 'yes') {
+            record.set('level', values['level']);
             store.save();
-            win.grid.getSelectionModel().select(store.indexOf(record), 0);
+            win.grid.getSelectionModel().select(store.indexOf(record), 1);
             win.close();
           }
         }
@@ -151,13 +172,18 @@ NX.define('Nexus.logging.controller.Logging', {
     }
     else {
       record = new store.recordType(values);
-      store.add(record);
+      store.addSorted(record);
       win.grid.getSelectionModel().select(store.indexOf(record), 1);
       win.close();
     }
   },
 
-  removeLoggers: function (button) {
+  /**
+   * Remove selected logger (if any)
+   * @param {Ext.Button} button delete button that triggered the action (from loggers grid toolbar)
+   * @private
+   */
+  removeLogger: function (button) {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore(),
@@ -179,10 +205,19 @@ NX.define('Nexus.logging.controller.Logging', {
     }
   },
 
+  /**
+   * Opens mark log window.
+   * @private
+   */
   showMarkLog: function () {
     Ext.create({xtype: 'nx-logging-view-mark'}).show();
   },
 
+  /**
+   * Adds a marker to the log by calling PUT on /service/siesta/logging/log/mark REST resource.
+   * @param {Ext.Button} button save button that triggered the action (from mark log window)
+   * @private
+   */
   markLog: function (button) {
     var me = this,
         win = button.up('nx-logging-view-mark'),
@@ -202,28 +237,104 @@ NX.define('Nexus.logging.controller.Logging', {
         me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
       },
       failure: function (response) {
-        // TODO shall we show a message and ask user to retry?
-        var message;
-        if (response.siestaError) {
-          message = response.siestaError.message;
-        }
-        if (!message && response.responseText) {
-          message = Sonatype.utils.parseHTMLErrorMessage(response.responseText);
-        }
-        if (!message) {
-          message = response.statusText;
-        }
-        Nexus.messages.show('Failed to mark log file', message);
+        Nexus.messages.show('Failed to mark log file', me.parseExceptionMessage(response));
       }
     });
   },
 
+  /**
+   * Retrieves the log.
+   * @param {Ext.Button} button the refresh button that triggered the action (from log panel toolbar)
+   * @private
+   */
   refreshLog: function (button) {
     this.retrieveLog(button.up('nx-logging-view-log'));
   },
 
+  /**
+   * Starts log retrieving task on log tab activation.
+   * @param {Ext.Panel} logPanel that was activated
+   * @private
+   */
+  onLogTabActivate: function (logPanel) {
+    var me = this,
+        task = logPanel.retrieveLogTask;
+
+    task.run = function () {
+      me.retrieveLog(logPanel);
+    };
+    task.start();
+  },
+
+  /**
+   * Stops log retrieving task on log tab deactivation.
+   * @param {Ext.Panel} logPanel that was deactivated
+   * @private
+   */
+  onLogTabDeactivate: function (logPanel) {
+    var task = logPanel.retrieveLogTask;
+
+    task.stop();
+    delete task.run;
+  },
+
+  /**
+   * Starts log retrieving task on logging panel activation if log tab is active.
+   * @param {Ext.Panel} panel logging panel that was activated
+   * @private
+   */
+  onLoggingActivate: function (panel) {
+    var logPanel = panel.down('nx-logging-view-log');
+
+    if (Ext.isDefined(logPanel)) {
+      logPanel.retrieveLogTask.start();
+    }
+  },
+
+  /**
+   * Stops log retrieving task on this panel activation if log tab is active.
+   * @param {Ext.Panel} panel logging panel that was deactivated
+   * @private
+   */
+  onLoggingDeactivate: function (panel) {
+    var logPanel = panel.down('nx-logging-view-log');
+
+    if (Ext.isDefined(logPanel)) {
+      logPanel.retrieveLogTask.stop();
+    }
+  },
+
+  /**
+   * Changes retrieving task recurrence interval when value is changed via refresh period combobox from log panel toolbar.
+   * @param {Ext.form.ComboBox} combo refresh period combobox
+   * @param {Ext.data.Record} record selected record in combobox
+   * @private
+   */
+  changeRefreshPeriod: function (combo, record) {
+    var millis = record.get('seconds') * 1000,
+        logPanel = combo.up('nx-logging-view-log'),
+        task = logPanel.retrieveLogTask;
+
+    task.changeInterval(millis);
+  },
+
+  /**
+   * Triggers log retrieval when value is changed via refresh size combobox from log panel toolbar.
+   * @param {Ext.form.ComboBox} combo refresh size combobox
+   * @private
+   */
+  changeRefreshSize: function (combo) {
+    this.retrieveLog(combo.up('nx-logging-view-log'));
+  },
+
+  /**
+   * Retrieves log from /service/internal/logs/nexus.log and shows it in log panel.
+   * @param {Nexus.logging.view.Log} logPanel where teh log should be shown
+   * @private
+   */
   retrieveLog: function (logPanel) {
     var me = this,
+        size = logPanel.getTopToolbar().down('#nx-logging-combo-refresh-size').getValue(),
         mask;
 
     mask = NX.create('Ext.LoadMask', logPanel.body, {
@@ -232,20 +343,28 @@ NX.define('Nexus.logging.controller.Logging', {
 
     mask.show();
 
+    me.logDebug('Retrieving last ' + size + 'kb from log');
+
     Ext.Ajax.request({
-      url: Sonatype.config.repos.urls.logs + '/nexus.log',
+      url: Nexus.siesta.basePath + '/logging/log',
       method: 'GET',
       headers: {
         'accept': 'text/plain'
       },
       params: {
-        count: -10240
+        bytesCount: -1024 * size
       },
       scope: me,
       suppressStatus: true,
-      callback: function (options, success, response) {
+      success: function (response) {
         mask.hide();
         logPanel.showLog(response.responseText);
+      },
+      failure: function (response) {
+        mask.hide();
+        logPanel.showLog(
+            'Failed to retrieve log due to "' + me.parseExceptionMessage(response) + '".'
+        );
       }
     });
   }

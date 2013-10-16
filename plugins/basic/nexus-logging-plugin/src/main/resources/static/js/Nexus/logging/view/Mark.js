@@ -13,7 +13,7 @@
 /*global NX, Ext, Nexus, Sonatype*/
 
 /**
- * Mark Nexus log window.
+ * Mark log window.
  *
  * @since 2.7
  */

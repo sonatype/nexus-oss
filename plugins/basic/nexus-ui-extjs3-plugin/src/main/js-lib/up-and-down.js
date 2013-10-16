@@ -14,12 +14,18 @@
 /*global Ext */
 
 Ext.applyIf(Ext.Component.prototype, {
+  /**
+   * Retrieves a container above this component, at any level, which matches the passed selector.
+   * @param {String} selector The xtype string for a container, or the class of the container directly, or a container id.
+   * When an id is used id must be prepended with '#'.
+   * @returns {*} an {Ext.Container} or undefined if no container matched the passed selector
+   */
   up: function (selector) {
     var id;
 
     if (selector.startsWith('#')) {
       id = selector.substring(1);
-      return this.findParentBy(function(container){
+      return this.findParentBy(function (container) {
         return container.id === id;
       });
     }
@@ -28,17 +34,29 @@ Ext.applyIf(Ext.Component.prototype, {
 });
 
 Ext.applyIf(Ext.Container.prototype, {
+  /**
+   * Retrieves a container above this container, at any level, which matches the passed selector.
+   * @param {String} selector The xtype string for a container, or the class of the container directly, or a container id.
+   * When an id is used id must be prepended with '#'.
+   * @returns {*} an {Ext.Container} or undefined if no container matched the passed selector
+   */
   up: function (selector) {
     var id;
 
     if (selector.startsWith('#')) {
       id = selector.substring(1);
-      return this.findParentBy(function(container){
+      return this.findParentBy(function (container) {
         return container.id === id;
       });
     }
     return this.findParentByType(selector);
   },
+  /**
+   * Retrieves the first descendant of this container which matches the passed selector.
+   * @param {String} selector The xtype string for a component, or the class of the component directly, or a component id.
+   * When an id is used id must be prepended with '#'.
+   * @returns {*} an {Ext.Component} or undefined if no component matched the passed selector
+   */
   down: function (selector) {
     var components;
 
@@ -52,5 +70,7 @@ Ext.applyIf(Ext.Container.prototype, {
     if (Ext.isDefined(components) && components.length > 0) {
       return components[0];
     }
+
+    return undefined;
   }
 });

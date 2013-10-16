@@ -27,13 +27,13 @@
 
   <xsd:simpleType name="level">
     <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="DEFAULT"/>
       <xsd:enumeration value="TRACE"/>
       <xsd:enumeration value="DEBUG"/>
       <xsd:enumeration value="INFO"/>
       <xsd:enumeration value="WARN"/>
       <xsd:enumeration value="ERROR"/>
-      <xsd:enumeration value="FATAL"/>
-      <xsd:enumeration value="DISABLE"/>
+      <xsd:enumeration value="OFF"/>
     </xsd:restriction>
   </xsd:simpleType>
 

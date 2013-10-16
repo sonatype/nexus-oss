@@ -14,7 +14,6 @@
 package org.sonatype.nexus.logging.rest;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,16 +27,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.logging.model.LevelXO;
 import org.sonatype.nexus.logging.model.LoggerXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
@@ -56,66 +57,84 @@ public class LoggersResource
 
   public static final String RESOURCE_URI = LoggingPlugin.REST_PREFIX + "/loggers";
 
-  private final Map<String, LoggerXO> loggers;
+  private final LoggingConfigurator configurator;
 
   @Inject
-  public LoggersResource() {
-    loggers = Maps.newHashMap();
-    loggers.put(
-        "ROOT", new LoggerXO().withName("ROOT").withLevel(LevelXO.INFO)
-    );
-    loggers.put(
-        "org.sonatype.nexus", new LoggerXO().withName("org.sonatype.nexus").withLevel(LevelXO.INFO)
-    );
-    loggers.put(
-        "org.sonatype.nexus.core", new LoggerXO().withName("org.sonatype.nexus.core").withLevel(LevelXO.DEBUG)
-    );
-    loggers.put(
-        "org.sonatype.nexus.capabilities", new LoggerXO().withName("org.sonatype.nexus.capabilities").withLevel(LevelXO.DEBUG)
-    );
-    loggers.put(
-        "org.sonatype.nexus.logging", new LoggerXO().withName("org.sonatype.nexus.logging").withLevel(LevelXO.DEBUG)
-    );
+  public LoggersResource(final LoggingConfigurator configurator) {
+    this.configurator = checkNotNull(configurator, "configurator");
   }
 
+  /**
+   * Returns a list of configured loggers (never null).
+   *
+   * @see LoggingConfigurator#getLoggers()
+   */
   @GET
   @Produces({APPLICATION_JSON, APPLICATION_XML})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "read")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "read")
   public List<LoggerXO> get() {
-    return Lists.newArrayList(loggers.values());
+    return Lists.newArrayList(configurator.getLoggers());
   }
 
+  /**
+   * Sets the level of a logger.
+   *
+   * @param logger logger name/level (cannot be null)
+   * @throws NullPointerException     If logger is null or level is empty
+   * @throws IllegalArgumentException If logger name is null or empty
+   */
   @POST
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
   public LoggerXO post(final LoggerXO logger)
       throws Exception
   {
-    loggers.put(logger.getName(), logger);
-    return logger;
+    checkNotNull(logger, "logger");
+    checkNotNull(logger.getLevel(), "logger level");
+    checkArgument(StringUtils.isNotEmpty(logger.getName()), "name cannot be empty");
+
+    return logger.withLevel(configurator.setLevel(logger.getName(), logger.getLevel()));
   }
 
+  /**
+   * Sets the level of a logger.
+   *
+   * @param name   logger name
+   * @param logger logger name/level (cannot be null)
+   * @throws NullPointerException If name is null or logger is null or level is null
+   */
   @PUT
-  @Path("/{id}")
+  @Path("/{name}")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
-  public LoggerXO put(final @PathParam("id") String id,
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
+  public LoggerXO put(final @PathParam("name") String name,
                       final LoggerXO logger)
       throws Exception
   {
-    loggers.put(id, logger);
-    return logger;
+    checkNotNull(name, "name");
+    checkNotNull(logger, "logger");
+    checkNotNull(logger.getLevel(), "logger level");
+
+    return logger.withLevel(configurator.setLevel(name, logger.getLevel()));
   }
 
+  /**
+   * Un-sets the level of a logger.
+   *
+   * @param name logger name
+   * @throws NullPointerException If name is null
+   */
   @DELETE
-  @Path("/{id}")
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX + "update")
-  public void delete(final @PathParam("id") String id)
+  @Path("/{name}")
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
+  public void delete(final @PathParam("name") String name)
       throws Exception
   {
-    loggers.remove(id);
+    checkNotNull(name, "name");
+
+    configurator.remove(name);
   }
 
 }

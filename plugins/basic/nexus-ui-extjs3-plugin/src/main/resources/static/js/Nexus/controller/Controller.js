@@ -22,15 +22,15 @@ NX.define('Nexus.controller.Controller', {
     'Nexus.LogAwareMixin'
   ],
 
-  control: function(config) {
+  control: function (config) {
     var me = this;
-    Ext.iterate(config, function(key) {
+    Ext.iterate(config, function (key) {
       if (key.startsWith('#')) {
         // closure to register control events on given object
         function register(obj) {
           var events = config['#' + obj.id];
 
-          Ext.iterate(events, function(event) {
+          Ext.iterate(events, function (event) {
             obj.on(event, events[event], me);
             me.logDebug('Registered for event "' + event + '" on ' + obj.id);
           });
@@ -49,5 +49,32 @@ NX.define('Nexus.controller.Controller', {
         }
       }
     });
+  },
+
+  /**
+   * Parses an error message out of an Ajax response.
+   * @param response Ajax response
+   * @param {String} [defaultMessage] to be used if a message could not be extracted from response
+   * @returns {String} parsed message
+   */
+  parseExceptionMessage: function (response, defaultMessage) {
+    var message;
+    if (response.siestaError) {
+      message = response.siestaError.message;
+    }
+    if (Ext.isEmpty(message) && response.responseText) {
+      message = Sonatype.utils.parseHTMLErrorMessage(response.responseText);
+    }
+    if (Ext.isEmpty(message)) {
+      message = response.statusText;
+    }
+    if (Ext.isEmpty(message)) {
+      message = defaultMessage;
+    }
+    if (Ext.isEmpty(message)) {
+      message = 'Could not be determined';
+    }
+    return message;
   }
+
 });
