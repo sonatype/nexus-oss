@@ -88,7 +88,14 @@ NX.define('Nexus.logging.view.Loggers', {
           sortable: true,
           width: 80,
           tooltip: 'Double click to edit',
-          editor: {xtype: 'nx-logging-combo-logger-level'}
+          editor: {
+            xtype: 'nx-logging-combo-logger-level',
+            listeners: {
+              select: function () {
+                me.stopEditing(false);
+              }
+            }
+          }
         }
       ],
 
