@@ -22,6 +22,8 @@ NX.define('Nexus.ext.SearchBox', {
 
   requires: [ 'Nexus.util.Icons' ],
 
+  xtype: 'nx-search-box',
+
   /**
    * @cfg {Number} delay between keystrokes and actual filtering (defaults to 200).
    */

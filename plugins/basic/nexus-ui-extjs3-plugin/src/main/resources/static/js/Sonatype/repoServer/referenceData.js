@@ -355,13 +355,6 @@ NX.define('Sonatype.repoServer.referenceData', {
     name : ""
   },
 
-  logConfig : {
-    rootLoggerLevel : "",
-    rootLoggerAppenders : "",
-    fileAppenderLocation : "",
-    fileAppenderPattern : ""
-  },
-
   repoMirrors : [
     {
       id : "",

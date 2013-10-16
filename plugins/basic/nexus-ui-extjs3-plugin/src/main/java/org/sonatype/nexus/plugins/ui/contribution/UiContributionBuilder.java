@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugins.ui.contribution;
 
 import java.util.List;
 
+import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.util.Condition;
 
 import com.google.common.collect.Lists;
@@ -45,6 +46,13 @@ public class UiContributionBuilder
 
   public UiContributionBuilder(final Object owner, final String groupId, final String artifactId) {
     super(owner, groupId, artifactId);
+  }
+
+  /**
+   * @since 2.7
+   */
+  public UiContributionBuilder(final PluginIdentity owner) {
+    this(owner, owner.getCoordinates().getGroupId(), owner.getCoordinates().getArtifactId());
   }
 
   /**

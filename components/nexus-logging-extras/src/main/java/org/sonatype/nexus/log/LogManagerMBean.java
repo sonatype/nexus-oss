@@ -27,6 +27,12 @@ public interface LogManagerMBean
   String getRootLoggerLevel()
       throws IOException;
 
+  /**
+   * @since 2.7
+   */
+  void makeRootLoggerLevelOff()
+      throws IOException;
+
   void makeRootLoggerLevelTrace()
       throws IOException;
 
@@ -37,6 +43,12 @@ public interface LogManagerMBean
       throws IOException;
 
   void makeRootLoggerLevelWarn()
+      throws IOException;
+
+  /**
+   * @since 2.7
+   */
+  void makeRootLoggerLevelError()
       throws IOException;
 
   void makeRootLoggerLevelDefault()

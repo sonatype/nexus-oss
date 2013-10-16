@@ -44,6 +44,16 @@ public class DefaultLogManagerMBean
     return logConfiguration.getRootLoggerLevel();
   }
 
+  /**
+   * @since 2.7
+   */
+  @Override
+  public void makeRootLoggerLevelOff()
+      throws IOException
+  {
+    setRootLoggerLevel(LoggerLevel.OFF);
+  }
+
   @Override
   public void makeRootLoggerLevelTrace()
       throws IOException
@@ -70,6 +80,16 @@ public class DefaultLogManagerMBean
       throws IOException
   {
     setRootLoggerLevel(LoggerLevel.WARN);
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public void makeRootLoggerLevelError()
+      throws IOException
+  {
+    setRootLoggerLevel(LoggerLevel.ERROR);
   }
 
   @Override

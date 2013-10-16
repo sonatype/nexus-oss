@@ -16,6 +16,7 @@ package org.sonatype.nexus.log;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.nexus.NexusStreamResponse;
@@ -46,6 +47,29 @@ public interface LogManager
       throws IOException;
 
   void configure();
-  
+
   void shutdown();
+
+  /**
+   * Returns the log configuration file.
+   *
+   * @param name of configuration file
+   * @return log configuration file (never null)
+   * @since 2.7
+   */
+  File getLogConfigFile(String name);
+
+  /**
+   * Returns the overrides configuration file.
+   *
+   * @return log overrides configuration file (never null)
+   * @since 2.7
+   */
+  File getLogOverridesConfigFile();
+
+  /**
+   * Return mapping of existing loggers which have explicit levels configured (never null).
+   */
+  Map<String, LoggerLevel> getLoggers();
+
 }

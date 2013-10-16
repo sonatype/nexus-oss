@@ -234,6 +234,15 @@
       <type>zip</type>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-logging-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>

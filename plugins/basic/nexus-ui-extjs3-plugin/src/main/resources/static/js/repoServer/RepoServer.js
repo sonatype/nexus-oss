@@ -342,11 +342,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     tabId : 'view-logs',
                     tabCode : Sonatype.repoServer.LogsViewPanel,
                     tabTitle : 'System Files'
-                  }, {
-                    enabled : sp.checkPermission('nexus:logconfig', sp.READ) && (sp.checkPermission('nexus:logconfig', sp.CREATE) || sp.checkPermission('nexus:logconfig', sp.DELETE) || sp.checkPermission('nexus:logconfig', sp.EDIT)),
-                    title : 'Log Configuration',
-                    tabId : 'log-config',
-                    tabCode : Sonatype.repoServer.LogEditPanel
                   }]
             });
 

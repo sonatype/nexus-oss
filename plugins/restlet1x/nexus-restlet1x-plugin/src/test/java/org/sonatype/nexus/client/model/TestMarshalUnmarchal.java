@@ -50,8 +50,6 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
-import org.sonatype.nexus.rest.model.LogConfigResource;
-import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.rest.model.MirrorResource;
@@ -1855,22 +1853,6 @@ public class TestMarshalUnmarchal
     this.marshalUnmarchalThenCompare(resourceResponse);
     this.validateXmlHasNoPackageNames(resourceResponse);
 
-  }
-
-  @Test
-  public void testLogConfigResourceResponse() {
-    LogConfigResourceResponse response = new LogConfigResourceResponse();
-
-    LogConfigResource data = new LogConfigResource();
-    data.setFileAppenderLocation("fileappender");
-    data.setFileAppenderPattern("pattern");
-    data.setRootLoggerAppenders("rootlogger");
-    data.setRootLoggerLevel("level");
-
-    response.setData(data);
-
-    this.marshalUnmarchalThenCompare(response);
-    this.validateXmlHasNoPackageNames(response);
   }
 
   @Test
