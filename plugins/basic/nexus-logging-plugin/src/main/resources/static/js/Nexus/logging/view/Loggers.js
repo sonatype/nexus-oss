@@ -92,6 +92,8 @@ NX.define('Nexus.logging.view.Loggers', {
             xtype: 'nx-logging-combo-logger-level',
             listeners: {
               select: function () {
+                // Automatically save when logger level is selected to avoid need for user to press enter or click away
+                // in order for value to be saved
                 me.stopEditing(false);
               }
             }
