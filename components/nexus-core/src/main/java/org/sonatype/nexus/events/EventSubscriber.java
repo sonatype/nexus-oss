@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.events;
 
+import javax.inject.Provider;
+
 /**
  * Marker interface for subscribers wanting to get events from Nexus Event Bus, aka. the new event inspectors.
  * Example of event subscriber:
@@ -34,9 +36,13 @@ package org.sonatype.nexus.events;
  * that your component should implement the EventSubscriber interface, and in that case it will get
  * auto-registered with Nexus EventBus.
  * <p/>
- * In general, event subscriber should not be event poster, still, there are cases where it post events
+ * In general, event subscriber should not post events, still, there are cases where it post events
  * implicitly (as when it performs some content manipulation, item related events will be fired). Same
  * constraints to posting events applies as for Guava EventBus.
+ * <p/>
+ * Also, be aware that event subscribers are looked up early in Nexus (during boot), and components
+ * you want to have injected might not be available yet. To circumvent this, inject their {@link Provider}
+ * instead.
  *
  * @since 2.7.0
  */
