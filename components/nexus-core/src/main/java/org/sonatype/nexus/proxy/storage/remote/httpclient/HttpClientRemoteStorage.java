@@ -27,6 +27,7 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.apachehttpclient.page.Page;
 import org.sonatype.nexus.apachehttpclient.page.Page.PageContext;
+import org.sonatype.nexus.apachehttpclient.page.Page.RepositoryPageContext;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
@@ -367,7 +368,7 @@ public class HttpClientRemoteStorage
           // if we got it, we will know it's only browsing forbidden on remote
           final RemoteStorageContext ctx = getRemoteStorageContext(repository);
           final HttpClient httpClient = (HttpClient) ctx.getContextObject(CTX_KEY_CLIENT);
-          final PageContext pageContext = new PageContext(httpClient);
+          final PageContext pageContext = new RepositoryPageContext(httpClient, repository);
           final URL nxRepoMetadataUrl = appendQueryString(
               getAbsoluteUrlFromBase(repository, new ResourceStoreRequest("/.meta/repository-metadata.xml")),
               repository);

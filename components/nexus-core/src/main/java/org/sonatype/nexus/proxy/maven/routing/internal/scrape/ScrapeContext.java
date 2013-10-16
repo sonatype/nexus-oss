@@ -13,16 +13,11 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 
-import java.io.IOException;
-
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.apachehttpclient.page.Page.PageContext;
+import org.sonatype.nexus.apachehttpclient.page.Page.RepositoryPageContext;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.protocol.HttpContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,10 +26,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author cstamas
  */
-public class ScrapeContext extends PageContext
+public class ScrapeContext extends RepositoryPageContext
 {
-  private final MavenProxyRepository remoteRepository;
-
   private final String remoteRepositoryRootUrl;
 
   private final int scrapeDepth;
@@ -51,8 +44,7 @@ public class ScrapeContext extends PageContext
   public ScrapeContext(final MavenProxyRepository remoteRepository, final HttpClient httpClient,
                        final int scrapeDepth)
   {
-    super(httpClient);
-    this.remoteRepository = checkNotNull(remoteRepository);
+    super(httpClient, remoteRepository);
     this.remoteRepositoryRootUrl = checkNotNull(remoteRepository.getRemoteUrl());
     this.scrapeDepth = checkNotNull(scrapeDepth);
     this.stopped = false;
@@ -115,18 +107,6 @@ public class ScrapeContext extends PageContext
   }
 
   // ==
-
-  /**
-   * Equips context with repository.
-   */
-  @Override
-  public HttpContext createHttpContext(final HttpUriRequest httpRequest)
-      throws IOException
-  {
-    final HttpContext httpContext = super.createHttpContext(httpRequest);
-    httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, remoteRepository);
-    return httpContext;
-  }
 
   /**
    * The remote repository root URL.

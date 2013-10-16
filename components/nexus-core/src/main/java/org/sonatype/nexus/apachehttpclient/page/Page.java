@@ -15,6 +15,9 @@ package org.sonatype.nexus.apachehttpclient.page;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -49,8 +52,8 @@ public class Page
    * Constructor used by static helper methods in this class.
    *
    * @param httpUriRequest the HTTP request for this page.
-   * @param httpResponse the HTTP response for this page (with consumed body!).
-   * @param document     the JSoup document for this page or {@code null} if no body.
+   * @param httpResponse   the HTTP response for this page (with consumed body!).
+   * @param document       the JSoup document for this page or {@code null} if no body.
    */
   private Page(final HttpUriRequest httpUriRequest, final HttpResponse httpResponse, final Document document) {
     this.httpUriRequest = checkNotNull(httpUriRequest);
@@ -151,7 +154,8 @@ public class Page
     try {
       if (context.isExpectedResponse(response)) {
         if (response.getEntity() != null) {
-          return new Page(httpUriRequest, response, Jsoup.parse(response.getEntity().getContent(), null, httpUriRequest.getURI().toString()));
+          return new Page(httpUriRequest, response,
+              Jsoup.parse(response.getEntity().getContent(), null, httpUriRequest.getURI().toString()));
         }
         else {
           // no body
@@ -207,6 +211,32 @@ public class Page
      */
     public boolean isExpectedResponse(final HttpResponse response) {
       return response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 499;
+    }
+  }
+
+  /**
+   * A context of page requests made on behalf of a Repository.
+   */
+  public static class RepositoryPageContext
+      extends PageContext
+  {
+    private final ProxyRepository proxyRepository;
+
+    public RepositoryPageContext(final HttpClient httpClient, final ProxyRepository proxyRepository) {
+      super(httpClient);
+      this.proxyRepository = checkNotNull(proxyRepository);
+    }
+
+    /**
+     * Equips context with repository.
+     */
+    @Override
+    public HttpContext createHttpContext(final HttpUriRequest httpRequest)
+        throws IOException
+    {
+      final HttpContext httpContext = super.createHttpContext(httpRequest);
+      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, proxyRepository);
+      return httpContext;
     }
   }
 
