@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.sonatype.nexus.log.DefaultLogConfiguration;
@@ -38,12 +39,14 @@ import org.sonatype.nexus.logging.LoggerContributor;
 import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.model.LevelXO;
 import org.sonatype.nexus.logging.model.LoggerXO;
+import org.sonatype.sisu.goodies.common.TestAccessible;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Maps.EntryTransformer;
 import com.google.common.io.ByteStreams;
@@ -161,38 +164,18 @@ public class LoggingConfiguratorImpl
 
   private void configure() {
     try {
-      writeLoggers();
+      Map<String, LoggerXO> loggersToBeWritten = Maps.newHashMap(userLoggers);
+      loggersToBeWritten.remove(ROOT);
+      writeLogbackXml(
+          loggersToBeWritten.values(),
+          logManager.getLogConfigFile(LoggingLogConfigurationParticipant.NAME),
+          templateEngine
+      );
       logManager.setConfiguration(getLogConfiguration());
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
     }
-  }
-
-  private void writeLoggers() throws IOException {
-    final FileReplacer fileReplacer = new FileReplacer(
-        logManager.getLogConfigFile(LoggingLogConfigurationParticipant.NAME)
-    );
-    fileReplacer.setDeleteBackupFile(true);
-    fileReplacer.replace(new ContentWriter()
-    {
-      @Override
-      public void write(final BufferedOutputStream output)
-          throws IOException
-      {
-        URL template = this.getClass().getResource("logback-dynamic.vm"); //NON-NLS
-        Map<String, LoggerXO> toWrite = Maps.newHashMap(userLoggers);
-        toWrite.remove(ROOT);
-        String content = templateEngine.render(
-            this,
-            template,
-            new TemplateParameters().set("loggers", toWrite.values())
-        );
-        try (final InputStream in = new ByteArrayInputStream(content.getBytes())) {
-          ByteStreams.copy(in, output);
-        }
-      }
-    });
   }
 
   private LogConfiguration getLogConfiguration() throws IOException {
@@ -206,6 +189,9 @@ public class LoggingConfiguratorImpl
     return configuration;
   }
 
+  /**
+   * Returns mapping of loggers read from logback configuration file.
+   */
   private Map<String, LoggerXO> getUserLoggers() {
     try {
       final Map<String, LoggerXO> loggers = Maps.newHashMap();
@@ -216,27 +202,9 @@ public class LoggingConfiguratorImpl
       File dynamicLoggersFile = logManager.getLogConfigFile(LoggingLogConfigurationParticipant.NAME);
       if (dynamicLoggersFile.exists()) {
         try {
-          SAXParserFactory spf = SAXParserFactory.newInstance();
-          spf.setValidating(false);
-          spf.setNamespaceAware(true);
-          spf.newSAXParser().parse(dynamicLoggersFile, new DefaultHandler()
-          {
-            @Override
-            public void startElement(final String uri,
-                                     final String localName,
-                                     final String qName,
-                                     final Attributes attributes) throws SAXException
-            {
-              if ("logger".equals(localName)) {
-                String name = attributes.getValue("name");
-                String level = attributes.getValue("level");
-                loggers.put(
-                    name,
-                    new LoggerXO().withName(name).withLevel(LevelXO.valueOf(level))
-                );
-              }
-            }
-          });
+          for (LoggerXO logger : readLogbackXml(dynamicLoggersFile)) {
+            loggers.put(logger.getName(), logger);
+          }
         }
         catch (Exception e) {
           throw Throwables.propagate(e);
@@ -263,6 +231,9 @@ public class LoggingConfiguratorImpl
     });
   }
 
+  /**
+   * Returns mapping of loggers contributed by {@link LoggerContributor}s, with a level calculated as effective level.
+   */
   private Map<String, LoggerXO> getContributedLoggers() {
     Map<String, LoggerXO> loggers = Maps.newHashMap();
     for (LoggerContributor contributor : contributors) {
@@ -281,7 +252,8 @@ public class LoggingConfiguratorImpl
   /**
    * Get the level of a Slf4j {@link Logger}.
    */
-  private LevelXO levelOf(final Logger logger) {
+  @TestAccessible
+  LevelXO levelOf(final Logger logger) {
     if (logger.isTraceEnabled()) {
       return LevelXO.TRACE;
     }
@@ -298,6 +270,59 @@ public class LoggingConfiguratorImpl
       return LevelXO.ERROR;
     }
     return LevelXO.OFF;
+  }
+
+  @TestAccessible
+  void writeLogbackXml(final Collection<LoggerXO> loggers,
+                       final File logbackXml,
+                       final TemplateEngine templateEngine) throws IOException
+  {
+    final FileReplacer fileReplacer = new FileReplacer(logbackXml);
+    fileReplacer.setDeleteBackupFile(true);
+    fileReplacer.replace(new ContentWriter()
+    {
+      @Override
+      public void write(final BufferedOutputStream output)
+          throws IOException
+      {
+        URL template = this.getClass().getResource("logback-dynamic.vm"); //NON-NLS
+        String content = templateEngine.render(
+            this,
+            template,
+            new TemplateParameters().set("loggers", loggers)
+        );
+        try (final InputStream in = new ByteArrayInputStream(content.getBytes())) {
+          ByteStreams.copy(in, output);
+        }
+      }
+    });
+  }
+
+  @TestAccessible
+  List<LoggerXO> readLogbackXml(final File logbackXml)
+      throws IOException, ParserConfigurationException, SAXException
+  {
+    final List<LoggerXO> loggers = Lists.newArrayList();
+
+    SAXParserFactory spf = SAXParserFactory.newInstance();
+    spf.setValidating(false);
+    spf.setNamespaceAware(true);
+    spf.newSAXParser().parse(logbackXml, new DefaultHandler()
+    {
+      @Override
+      public void startElement(final String uri,
+                               final String localName,
+                               final String qName,
+                               final Attributes attributes) throws SAXException
+      {
+        if ("logger".equals(localName)) {
+          String name = attributes.getValue("name");
+          String level = attributes.getValue("level");
+          loggers.add(new LoggerXO().withName(name).withLevel(LevelXO.valueOf(level)));
+        }
+      }
+    });
+    return loggers;
   }
 
 }
