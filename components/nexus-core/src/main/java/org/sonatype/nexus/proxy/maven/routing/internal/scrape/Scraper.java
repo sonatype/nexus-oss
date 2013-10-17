@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 
+import org.sonatype.nexus.apachehttpclient.page.Page;
 import org.sonatype.nexus.proxy.maven.routing.discovery.Prioritized;
 
 /**
