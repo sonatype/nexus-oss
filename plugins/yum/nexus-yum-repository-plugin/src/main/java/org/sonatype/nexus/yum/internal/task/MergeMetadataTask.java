@@ -27,6 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -88,18 +90,26 @@ public class MergeMetadataTask
       deleteYumTempDirs();
 
       final File repoBaseDir = RepositoryUtils.getBaseDir(groupRepository);
-      final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
-      if (memberReposBaseDirs.size() > 1) {
-        LOG.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
-        commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
-        LOG.debug("Group repository '{}' merged", groupRepository.getId());
+      RepositoryItemUid groupRepoMdUid = groupRepository.createUid("/" + PATH_OF_REPOMD_XML);
+      try {
+        groupRepoMdUid.getLock().lock(Action.update);
+
+        final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
+        if (memberReposBaseDirs.size() > 1) {
+          LOG.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
+          commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
+          LOG.debug("Group repository '{}' merged", groupRepository.getId());
+        }
+        else {
+          LOG.debug(
+              "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
+              groupRepository.getId()
+          );
+          groupRepository.deleteItem(new ResourceStoreRequest("/" + PATH_OF_REPODATA));
+        }
       }
-      else {
-        LOG.debug(
-            "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
-            groupRepository.getId()
-        );
-        groupRepository.deleteItem(new ResourceStoreRequest("/" + PATH_OF_REPODATA));
+      finally {
+        groupRepoMdUid.getLock().unlock();
       }
 
       deleteYumTempDirs();
