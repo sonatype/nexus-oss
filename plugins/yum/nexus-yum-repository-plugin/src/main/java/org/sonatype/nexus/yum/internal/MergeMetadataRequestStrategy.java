@@ -55,6 +55,7 @@ public class MergeMetadataRequestStrategy
       for (Repository member : groupRepository.getMemberRepositories()) {
         if (member.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
           try {
+            log.debug("Fetch {} from repository {}", PATH_OF_REPOMD_XML, member.getId());
             member.retrieveItem(new ResourceStoreRequest(PATH_OF_REPOMD_XML));
           }
           catch (ItemNotFoundException e) {
