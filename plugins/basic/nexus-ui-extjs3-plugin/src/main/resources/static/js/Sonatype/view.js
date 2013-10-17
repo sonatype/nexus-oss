@@ -98,7 +98,7 @@ Sonatype.view = {
           layout : 'border',
           items : [Sonatype.view.headerPanel, {
                 region : 'west',
-                title : 'Sonatype&trade; Servers',
+                title : 'Sonatype&trade;',
                 collapsible : true,
                 // collapseMode: 'mini',
                 // border: false,
