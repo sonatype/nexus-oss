@@ -42,6 +42,8 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -52,6 +54,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EagerSingleton
 public class EventsRouter
 {
+
+  private static final Logger log = LoggerFactory.getLogger(EventsRouter.class);
 
   private final Provider<RepositoryRegistry> repositoryRegistry;
 
@@ -137,7 +141,8 @@ public class EventsRouter
   @Subscribe
   public void on(RepositoryItemEventCache itemEvent) {
     ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
-    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/repodata/repomd.xml")) {
+    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
+      log.debug("Yum metadata changed for {}. Looking if we should merge it...");
       List<GroupRepository> groups = repositoryRegistry.get().getGroupsOfRepository(repository);
       for (GroupRepository group : groups) {
         if (yumRegistryProvider.get().isRegistered(group.getId())) {
