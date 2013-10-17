@@ -31,7 +31,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RequestStrategy;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,10 +70,7 @@ public class SteadyLinksRequestStrategy
               )
           );
           if (repomd instanceof StorageFileItem) {
-            InputStream in = null;
-            try {
-              in = ((StorageFileItem) repomd).getInputStream();
-
+            try (InputStream in = ((StorageFileItem) repomd).getInputStream()) {
               final String newRequestPath = matchRequestPath(requestPath, in);
               if (newRequestPath != null && !requestPath.equals(newRequestPath)) {
                 request.pushRequestPath(newRequestPath);
@@ -84,9 +80,6 @@ public class SteadyLinksRequestStrategy
 
                 LOG.debug("Request changed from '{}' to '{}'", requestPath, newRequestPath);
               }
-            }
-            finally {
-              Closeables.closeQuietly(in);
             }
           }
         }
