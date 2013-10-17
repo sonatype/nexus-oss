@@ -68,13 +68,15 @@ public class MergeMetadataRequestStrategy
       boolean shouldMerge = false;
       for (Repository member : groupRepository.getMemberRepositories()) {
         if (member.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
-          log.debug("Fetch {} from repository {}", PATH_OF_REPOMD_XML, member.getId());
           try {
+            log.debug("Fetch local {}:{}", member.getId(), PATH_OF_REPOMD_XML);
             StorageItem memberRepoMd = retrieveRepoMd(member, true);
             String sha1Local = memberRepoMd.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
+            log.debug("Fetch remote {}:{}", member.getId(), PATH_OF_REPOMD_XML);
             memberRepoMd = retrieveRepoMd(member, false);
             String sha1After = memberRepoMd.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
             if (!StringUtils.equals(sha1Local, sha1After)) {
+              log.debug("{}:{} changed. Will merge after fetching all members.", member.getId(), PATH_OF_REPOMD_XML);
               shouldMerge = true;
             }
           }
@@ -103,7 +105,7 @@ public class MergeMetadataRequestStrategy
 
   private StorageItem retrieveRepoMd(final Repository member, boolean localOnly) throws Exception {
     try {
-      return member.retrieveItem(new ResourceStoreRequest(PATH_OF_REPOMD_XML, localOnly));
+      return member.retrieveItem(new ResourceStoreRequest(PATH_OF_REPOMD_XML, localOnly, false));
     }
     catch (ItemNotFoundException e) {
       // proxy repo is not a yum repository, go on
