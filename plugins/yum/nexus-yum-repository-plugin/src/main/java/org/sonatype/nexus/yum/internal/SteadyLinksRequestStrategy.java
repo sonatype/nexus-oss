@@ -13,15 +13,11 @@
 
 package org.sonatype.nexus.yum.internal;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -47,7 +43,7 @@ public class SteadyLinksRequestStrategy
     implements RequestStrategy
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(YumRegistryImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SteadyLinksRequestStrategy.class);
 
   @VisibleForTesting
   static final String REQUEST_PATH_ORIGINAL =
@@ -78,22 +74,13 @@ public class SteadyLinksRequestStrategy
                 request.getRequestContext().put(REQUEST_PATH_ORIGINAL, requestPath);
                 request.getRequestContext().put(REQUEST_PATH_NEW, newRequestPath);
 
-                LOG.debug("Request changed from '{}' to '{}'", requestPath, newRequestPath);
+                log.debug("Request changed from '{}' to '{}'", requestPath, newRequestPath);
               }
             }
           }
         }
-        catch (final IOException e) {
-          // TODO maybe log a warn?
-        }
-        catch (ItemNotFoundException e) {
-          // TODO maybe log a warn?
-        }
-        catch (IllegalOperationException e) {
-          // TODO maybe log a warn?
-        }
-        catch (AccessDeniedException e) {
-          // TODO maybe log a warn?
+        catch (final Exception e) {
+          log.debug("Could not change paths due to {}/{}", e.getClass().getName(), e.getMessage());
         }
       }
     }
