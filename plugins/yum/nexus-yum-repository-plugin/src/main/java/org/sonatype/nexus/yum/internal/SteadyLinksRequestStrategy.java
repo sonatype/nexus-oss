@@ -74,13 +74,16 @@ public class SteadyLinksRequestStrategy
                 request.getRequestContext().put(REQUEST_PATH_ORIGINAL, requestPath);
                 request.getRequestContext().put(REQUEST_PATH_NEW, newRequestPath);
 
-                log.debug("Request changed from '{}' to '{}'", requestPath, newRequestPath);
+                log.debug("Request {}:{} changed to {}", repository, requestPath, newRequestPath);
               }
             }
           }
         }
         catch (final Exception e) {
-          log.debug("Could not change paths due to {}/{}", e.getClass().getName(), e.getMessage());
+          log.debug(
+              "Could not change request {}:{} due to {}/{}",
+              repository, requestPath, e.getClass().getName(), e.getMessage()
+          );
         }
       }
     }
