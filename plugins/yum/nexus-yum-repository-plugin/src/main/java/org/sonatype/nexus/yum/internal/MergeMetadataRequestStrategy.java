@@ -71,14 +71,16 @@ public class MergeMetadataRequestStrategy
       for (Repository member : groupRepository.getMemberRepositories()) {
         if (member.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
           try {
-            log.debug("Fetch local {}:{}", member.getId(), PATH_OF_REPOMD_XML);
+            log.debug("Fetching {}:{} member of {}", member.getId(), PATH_OF_REPOMD_XML, groupRepository.getId());
             StorageItem memberRepoMd = retrieveRepoMd(member, true);
             String sha1Local = memberRepoMd.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
-            log.debug("Fetch remote {}:{}", member.getId(), PATH_OF_REPOMD_XML);
             memberRepoMd = retrieveRepoMd(member, false);
             String sha1After = memberRepoMd.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
             if (!StringUtils.equals(sha1Local, sha1After)) {
-              log.debug("{}:{} changed. Will merge after fetching all members.", member.getId(), PATH_OF_REPOMD_XML);
+              log.debug(
+                  "{}:{} changed. Will merge {} after fetching all members.",
+                  member.getId(), PATH_OF_REPOMD_XML, groupRepository.getId()
+              );
               shouldMerge = true;
             }
           }
