@@ -19,11 +19,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 import org.sonatype.nexus.util.WrappingInputStream;
 
-import com.google.common.base.Preconditions;
-import org.codehaus.plexus.util.FileUtils;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A content locator that is backed by a file. It has ability to create a temporary file for you, and to become
@@ -68,7 +68,7 @@ public class FileContentLocator
    */
   public FileContentLocator(final File file, final String mimeType, final boolean deleteOnCloseInput) {
     super(mimeType, !deleteOnCloseInput, file.length());
-    this.file = Preconditions.checkNotNull(file);
+    this.file = checkNotNull(file);
     this.deleteOnCloseInput = deleteOnCloseInput;
   }
 
@@ -95,7 +95,9 @@ public class FileContentLocator
   }
 
   public void delete() throws IOException {
-    FileUtils.forceDelete(getFile());
+    // locator is used against files only, not directories
+    // but their existence is not enforced!
+    Files.deleteIfExists(getFile().toPath());
   }
 
   // ==
@@ -119,7 +121,9 @@ public class FileContentLocator
 
     public void close() throws IOException {
       super.close();
-      FileUtils.forceDelete(file);
+      // locator is used against files only, not directories
+      // but their existence is not enforced!
+      Files.deleteIfExists(file.toPath());
     }
   }
 }

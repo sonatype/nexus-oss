@@ -44,6 +44,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.ItemPathUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
+import com.google.common.base.Throwables;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -205,8 +206,12 @@ public class DefaultFSPeer
     }
     else {
       // we have no content, we talk about directory
-      target.mkdir();
-
+      try {
+        Files.createDirectories(target.toPath());
+      }
+      catch (IOException e) {
+        Throwables.propagate(e);
+      }
       target.setLastModified(item.getModified());
     }
   }

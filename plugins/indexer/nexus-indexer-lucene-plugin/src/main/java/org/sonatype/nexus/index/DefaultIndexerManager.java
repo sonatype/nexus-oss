@@ -2344,9 +2344,8 @@ public class DefaultIndexerManager
 
     File location = File.createTempFile(indexId, null, getTempDirectory());
 
-    if (!location.delete() || !location.mkdir()) {
-      throw new IOException("Could not create temporary directory " + location);
-    }
+    Files.delete(location.toPath());
+    Files.createDirectories(location.toPath());
 
     final DefaultIndexingContext temporary = new DefaultIndexingContext(indexId, //
         repository.getId(), //

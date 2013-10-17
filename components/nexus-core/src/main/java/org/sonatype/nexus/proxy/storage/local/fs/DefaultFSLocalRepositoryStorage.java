@@ -54,6 +54,7 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -154,7 +155,12 @@ public class DefaultFSLocalRepositoryStorage
       throws LocalStorageException
   {
     if (!repoBase.exists()) {
-      repoBase.mkdir();
+      try {
+        Files.createDirectories(repoBase.toPath());
+      }
+      catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
 
     File result = null;
