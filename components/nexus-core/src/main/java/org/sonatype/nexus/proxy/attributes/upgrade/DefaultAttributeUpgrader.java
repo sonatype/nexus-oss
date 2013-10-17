@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.attributes.upgrade;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -342,7 +343,7 @@ public class DefaultAttributeUpgrader
       final File target = new File(new File(attributesDirectory, repoId), MARKER_FILENAME);
       // this step is needed if new repo added while upgrade not done: it will NOT have legacy attributes
       // as other reposes, that were present in old/upgraded instance
-      target.getParentFile().mkdirs();
+      Files.createDirectories(target.getParentFile().toPath());
       FileUtils.fileWrite(target, MARKER_TEXT);
     }
   }

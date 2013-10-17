@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,6 +76,7 @@ import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
@@ -533,9 +535,9 @@ public class DefaultIndexerManager
     logger.debug("Added indexing context {} for repository {}", ctx.getId(), repository.getId());
   }
 
-  private File getRepositoryIndexDirectory(final Repository repository) {
+  private File getRepositoryIndexDirectory(final Repository repository) throws IOException {
     File indexDirectory = new File(getWorkingDirectory(), getContextId(repository.getId()));
-    indexDirectory.mkdirs();
+    Files.createDirectories(indexDirectory.toPath());
     return indexDirectory;
   }
 
@@ -1479,9 +1481,7 @@ public class DefaultIndexerManager
 
       targetDir = new File(getTempDirectory(), "nx-index-" + Long.toHexString(System.nanoTime()));
 
-      if (!targetDir.mkdirs()) {
-        throw new IOException("Could not create temp dir for packing indexes: " + targetDir);
-      }
+      Files.createDirectories(targetDir.toPath());
 
       IndexPackingRequest packReq = new IndexPackingRequest(context, targetDir);
       packReq.setCreateIncrementalChunks(true);

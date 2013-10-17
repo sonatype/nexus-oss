@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -132,9 +133,12 @@ public class DefaultFSLocalRepositoryStorage
       }
     }
     else {
-      if (!file.mkdirs()) {
+      try {
+        Files.createDirectories(file.toPath());
+      }
+      catch (IOException e) {
         throw new LocalStorageException("Could not create the baseDir directory for repository \""
-            + repository.getName() + "\" (ID=\"" + repository.getId() + "\") on path " + file.getAbsolutePath());
+            + repository.getName() + "\" (ID=\"" + repository.getId() + "\") on path " + file.getAbsolutePath(), e);
       }
     }
 

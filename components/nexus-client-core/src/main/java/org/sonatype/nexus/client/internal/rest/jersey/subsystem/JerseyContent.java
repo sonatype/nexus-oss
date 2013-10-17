@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 import javax.ws.rs.core.Response;
 
@@ -142,8 +143,7 @@ public class JerseyContent
   {
     if (!target.exists()) {
       final File targetDir = target.getParentFile();
-      checkState((targetDir.exists() || targetDir.mkdirs()) && targetDir.isDirectory(),
-          "Directory '%s' does not exist and could not be created", targetDir.getAbsolutePath());
+      Files.createDirectories(targetDir.toPath());
     }
     else {
       checkState(target.isFile() && target.canWrite(), "File '%s' is not a file or could not be written",

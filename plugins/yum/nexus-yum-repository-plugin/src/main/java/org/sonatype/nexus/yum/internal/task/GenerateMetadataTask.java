@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -159,7 +161,7 @@ public class GenerateMetadataTask
 
     LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
     try {
-      getRepoDir().mkdirs();
+      Files.createDirectories(getRepoDir().toPath());
 
       File rpmListFile = createRpmListFile();
       commandLineExecutor.exec(buildCreateRepositoryCommand(rpmListFile));
@@ -383,7 +385,12 @@ public class GenerateMetadataTask
     final File cacheDir = new File(
         new File(yumRegistry.getTemporaryDirectory(), CACHE_DIR_PREFIX + getRepositoryId()), name
     );
-    cacheDir.mkdirs();
+    try {
+      Files.createDirectories(cacheDir.toPath());
+    }
+    catch (IOException e) {
+      Throwables.propagate(e);
+    }
     return cacheDir;
   }
 

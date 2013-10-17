@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -329,7 +330,10 @@ public class FileConfigurationSource
   {
     // Create the dir if doesn't exist, throw runtime exception on failure
     // bad bad bad
-    if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+    try {
+      Files.createDirectories(file.getParentFile().toPath());
+    }
+    catch (IOException e) {
       String message =
           "\r\n******************************************************************************\r\n"
               + "* Could not create configuration file [ " + file.toString() + "]!!!! *\r\n"
@@ -337,7 +341,7 @@ public class FileConfigurationSource
               + "******************************************************************************";
 
       getLogger().error(message);
-      throw new IOException("Could not create configuration file " + file.getAbsolutePath());
+      throw new IOException("Could not create configuration file " + file.getAbsolutePath(), e);
     }
 
     // Clone the conf so we can encrypt the passwords

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.inject.Typed;
@@ -113,7 +114,7 @@ public class DefaultKenaiRealmConfiguration
 
       File configFile = this.getConfigFile();
       // make the parent dirs first
-      configFile.getParentFile().mkdirs();
+      Files.createDirectories(configFile.getParentFile().toPath());
 
       fileWriter = new FileWriter(configFile);
 

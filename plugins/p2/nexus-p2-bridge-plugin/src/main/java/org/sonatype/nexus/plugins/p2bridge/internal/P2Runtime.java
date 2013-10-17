@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -120,10 +121,15 @@ class P2Runtime
         );
       }
     }
-    if (!p2BridgeRuntimeDir.exists() && !p2BridgeRuntimeDir.mkdirs()) {
-      throw new RuntimeException(
-          "Cannot create nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath()
-      );
+    if (!p2BridgeRuntimeDir.exists()) {
+      try {
+        Files.createDirectories(p2BridgeRuntimeDir.toPath());
+      }
+      catch (IOException e) {
+        throw new RuntimeException(
+            "Cannot create nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath(), e
+        );
+      }
     }
     // create a fresh eclipse instance
     try {

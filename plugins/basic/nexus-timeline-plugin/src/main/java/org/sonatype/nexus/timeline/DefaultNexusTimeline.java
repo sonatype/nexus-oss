@@ -16,6 +16,7 @@ package org.sonatype.nexus.timeline;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Set;
 
@@ -122,7 +123,7 @@ public class DefaultNexusTimeline
             + newIndexDir.getAbsolutePath() + "'.");
 
     if (!newIndexDir.exists()) {
-      newIndexDir.mkdirs();
+      Files.createDirectories(newIndexDir.toPath());
     }
 
     for (File legacyIndexFile : legacyIndexFiles) {

@@ -14,7 +14,9 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -35,6 +37,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
+import com.google.common.base.Throwables;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -116,8 +119,13 @@ public abstract class AbstractRepositoryConfigurator
       localUrl = repo.defaultLocalStorageUrl;
       usingDefaultLocalUrl = true;
 
-      // Default dir is going to be valid
-      defaultStorageFile.mkdirs();
+      try {
+        // Default dir is going to be valid
+        Files.createDirectories(defaultStorageFile.toPath());
+      }
+      catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
 
     if (repo.getLocalStorage() == null) {

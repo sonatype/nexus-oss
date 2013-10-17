@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -413,13 +414,9 @@ public class DefaultErrorReportingManager
   }
 
   @VisibleForTesting
-  File getZipFile(String prefix, String suffix) {
+  File getZipFile(String prefix, String suffix) throws IOException {
     File zipDir = getApplicationConfiguration().getWorkingDirectory(ERROR_REPORT_DIR);
-
-    if (!zipDir.exists()) {
-      zipDir.mkdirs();
-    }
-
+    Files.createDirectories(zipDir.toPath());
     return new File(zipDir, prefix + "." + System.currentTimeMillis() + "." + suffix);
   }
 

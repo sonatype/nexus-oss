@@ -16,6 +16,7 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -259,7 +260,7 @@ public class DefaultNexusConfiguration
 
   private File forceMkdir(final File directory) {
     try {
-      FileUtils.forceMkdir(directory);
+      Files.createDirectories(directory.toPath());
       return directory;
     }
     catch (IOException e) {

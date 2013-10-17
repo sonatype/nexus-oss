@@ -19,6 +19,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -375,13 +376,13 @@ public class DefaultFSPeer
   protected void mkDirs(final Repository repository, final File target)
       throws LocalStorageException
   {
-    if (!target.exists() && !target.mkdirs()) {
-      // re-check is it really a "good" parent?
-      if (!target.isDirectory()) {
-        throw new LocalStorageException(String.format(
-            "Could not create the directory hierarchy in repository %s to write \"%s\"",
-            RepositoryStringUtils.getHumanizedNameString(repository), target.getAbsolutePath()));
-      }
+    try {
+      Files.createDirectories(target.toPath());
+    }
+    catch (IOException e) {
+      throw new LocalStorageException(String.format(
+          "Could not create the directory hierarchy in repository %s to write \"%s\"",
+          RepositoryStringUtils.getHumanizedNameString(repository), target.getAbsolutePath()), e);
     }
   }
 
