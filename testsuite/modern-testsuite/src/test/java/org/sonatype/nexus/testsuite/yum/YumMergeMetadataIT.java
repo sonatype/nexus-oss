@@ -19,10 +19,7 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
-import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
-import org.sonatype.nexus.client.core.subsystem.routing.Routing;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -115,7 +112,6 @@ public class YumMergeMetadataIT
   }
 
   @Test
-  @Ignore
   public void shouldReFetchProxyMetadata()
       throws Exception
   {
