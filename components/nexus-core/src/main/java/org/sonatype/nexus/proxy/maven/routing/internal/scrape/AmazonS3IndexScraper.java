@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.apachehttpclient.page.Page;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
 import org.sonatype.nexus.util.PathUtils;
 

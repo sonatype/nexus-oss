@@ -16,8 +16,10 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.nexus.apachehttpclient.page.Page;
+import org.sonatype.nexus.apachehttpclient.page.Page.PageContext;
+import org.sonatype.nexus.apachehttpclient.page.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -387,7 +389,7 @@ public class AmazonS3IndexScraperTest
 
   /**
    * This test makes no sense, as HTTP 500 response triggers mechanism in
-   * {@link Page#getPageFor(ScrapeContext, String)}, so S3 scraper is not tested at all actually.
+   * {@link Page#getPageFor(PageContext, String)}, so S3 scraper is not tested at all actually.
    */
   @Test(expected = UnexpectedPageResponse.class)
   public void onePageHttp500()

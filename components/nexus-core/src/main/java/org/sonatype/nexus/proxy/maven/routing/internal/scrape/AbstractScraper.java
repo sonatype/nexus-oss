@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.apachehttpclient.page.Page;
 import org.sonatype.nexus.proxy.maven.routing.internal.AbstractPrioritized;
 import org.sonatype.nexus.proxy.maven.routing.internal.ArrayListPrefixSource;
 import org.sonatype.nexus.util.PathUtils;
