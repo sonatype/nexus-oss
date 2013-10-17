@@ -115,44 +115,6 @@ public class YumMergeMetadataIT
   }
 
   @Test
-  public void shouldIncludeProxyRepository()
-      throws Exception
-  {
-    final Repository repo1 = createYumEnabledRepository(repositoryIdForTest("1"));
-    final Repository repo2 = createYumEnabledRepository(repositoryIdForTest("2"));
-
-    final Repository proxyRepo = repositories()
-        .create(MavenProxyRepository.class, repositoryIdForTest("proxy"))
-        .asProxyOf(repo1.contentUri())
-        .save();
-
-    final GroupRepository groupRepo = createYumEnabledGroupRepository(
-        repositoryIdForTest(), repo2.id(), proxyRepo.id()
-    );
-
-    content().upload(
-        repositoryLocation(repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm"),
-        testData().resolveFile("/rpms/test-artifact-1.2.3-1.noarch.rpm")
-    );
-
-    waitForNexusToSettleDown();
-
-    // force WL to retrieve prefixes from hosted
-    client().getSubsystem(Routing.class).updatePrefixFile(proxyRepo.id());
-
-    content().upload(
-        repositoryLocation(repo2.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm"),
-        testData.resolveFile("/rpms/test-rpm-5.6.7-1.noarch.rpm")
-    );
-
-    waitForNexusToSettleDown();
-
-    final String primaryXml = getPrimaryXmlOf(groupRepo);
-    assertThat(primaryXml, containsString("test-artifact"));
-    assertThat(primaryXml, containsString("test-rpm"));
-  }
-
-  @Test
   @Ignore
   public void shouldReFetchProxyMetadata()
       throws Exception
@@ -192,104 +154,12 @@ public class YumMergeMetadataIT
         testData().resolveFile("/rpms/foo-bar-5.1.2-1.noarch.rpm")
     );
 
-    // deploy something again to repo 2 to trigger metadata re-merge which in turn will re-download from proxy
-    content().upload(
-        repositoryLocation(repo2.id(), "a_group2/an_artifact2/2.1/an_artifact2-2.1.rpm"),
-        testData.resolveFile("/rpms/test-rpm-5.6.7-1.noarch.rpm")
-    );
-
     waitForNexusToSettleDown();
 
     primaryXml = getPrimaryXmlOf(groupRepo);
     assertThat(primaryXml, containsString("test-artifact"));
     assertThat(primaryXml, containsString("test-rpm"));
     assertThat(primaryXml, containsString("foo-bar"));
-  }
-
-  @Test
-  public void shouldRegenerateGroupRepoWhenProxyMetadataChanges()
-      throws Exception
-  {
-    final Repository repo1 = createYumEnabledRepository(repositoryIdForTest("1"));
-    final Repository repo2 = createYumEnabledRepository(repositoryIdForTest("2"));
-
-    final Repository proxyRepo = repositories()
-        .create(MavenProxyRepository.class, repositoryIdForTest("proxy"))
-        .asProxyOf(repo1.contentUri())
-        .withItemMaxAge(0)
-        .save();
-
-    // disable routing for proxy
-    client().getSubsystem(Routing.class).setDiscoveryConfigurationFor(
-        proxyRepo.id(), new DiscoveryConfiguration(false, 1)
-    );
-
-    final GroupRepository groupRepo = createYumEnabledGroupRepository(
-        repositoryIdForTest(), proxyRepo.id(), repo2.id()
-    );
-
-    content().upload(
-        repositoryLocation(repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm"),
-        testData().resolveFile("/rpms/test-artifact-1.2.3-1.noarch.rpm")
-    );
-    content().upload(
-        repositoryLocation(repo2.id(), "a_group3/an_artifact3/3.0/an_artifact3-3.0.rpm"),
-        testData().resolveFile("/rpms/foo-bar-5.1.2-1.noarch.rpm")
-    );
-
-    waitForNexusToSettleDown();
-
-    // hosted should have uploaded rpm
-    {
-      final String primaryXml = getPrimaryXmlOf(repo1);
-      assertThat(primaryXml, containsString("test-artifact"));
-    }
-    // proxy should have uploaded rpm
-    {
-      final String primaryXml = getPrimaryXmlOf(proxyRepo);
-      assertThat(primaryXml, containsString("test-artifact"));
-    }
-    // group should have uploaded rpm
-    {
-      final String primaryXml = getPrimaryXmlOf(groupRepo);
-      assertThat(primaryXml, containsString("test-artifact"));
-    }
-
-    content().upload(
-        repositoryLocation(repo1.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm"),
-        testData.resolveFile("/rpms/test-rpm-5.6.7-1.noarch.rpm")
-    );
-
-    waitForNexusToSettleDown();
-
-    // hosted should have last uploaded rpm
-    {
-      final String primaryXml = getPrimaryXmlOf(repo1);
-      assertThat(primaryXml, containsString("test-artifact"));
-      assertThat(primaryXml, containsString("test-rpm"));
-    }
-    // group should not have last uploaded rpm as nothing yet triggered the merge
-    {
-      final String primaryXml = getPrimaryXmlOf(groupRepo);
-      assertThat(primaryXml, containsString("test-artifact"));
-      assertThat(primaryXml, not(containsString("test-rpm")));
-    }
-    // retrieving primary.xml will trigger a cache event that will trigger the metadata merge
-    // proxy should have last uploaded rpm
-    {
-      final String primaryXml = getPrimaryXmlOf(proxyRepo);
-      assertThat(primaryXml, containsString("test-artifact"));
-      assertThat(primaryXml, containsString("test-rpm"));
-    }
-
-    waitForNexusToSettleDown();
-
-    // group should have last uploaded rpm
-    {
-      final String primaryXml = getPrimaryXmlOf(groupRepo);
-      assertThat(primaryXml, containsString("test-artifact"));
-      assertThat(primaryXml, containsString("test-rpm"));
-    }
   }
 
   @Test
