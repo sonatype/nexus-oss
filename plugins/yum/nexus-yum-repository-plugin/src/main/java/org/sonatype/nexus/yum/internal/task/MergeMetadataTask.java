@@ -40,7 +40,6 @@ import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,18 +120,14 @@ public class MergeMetadataTask
             new ResourceStoreRequest("/" + PATH_OF_REPOMD_XML)
         );
         if (repomdItem instanceof StorageFileItem) {
-          InputStream in = null;
-          try {
-            final RepoMD repomd = new RepoMD(in = ((StorageFileItem) repomdItem).getInputStream());
+          try (InputStream in = ((StorageFileItem) repomdItem).getInputStream()) {
+            final RepoMD repomd = new RepoMD(in);
             // do we need them all or we can skip the sqllite ?
             for (final String location : repomd.getLocations()) {
               memberRepository.retrieveItem(
                   new ResourceStoreRequest("/" + location)
               );
             }
-          }
-          finally {
-            Closeables.closeQuietly(in);
           }
         }
         // all metadata files are available by now so lets use it
