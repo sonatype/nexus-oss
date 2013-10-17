@@ -121,7 +121,7 @@ public class YumMergeMetadataIT
     final Repository proxyRepo = repositories()
         .create(MavenProxyRepository.class, repositoryIdForTest("proxy"))
         .asProxyOf(repo1.contentUri())
-        .withItemMaxAge(-1)
+        .withItemMaxAge(0)
         .save();
 
     final GroupRepository groupRepo = createYumEnabledGroupRepository(
