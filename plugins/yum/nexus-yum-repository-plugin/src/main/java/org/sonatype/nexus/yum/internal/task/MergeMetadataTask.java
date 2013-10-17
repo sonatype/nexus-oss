@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -105,7 +104,8 @@ public class MergeMetadataTask
               "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
               groupRepository.getId()
           );
-          groupRepository.deleteItem(new ResourceStoreRequest("/" + PATH_OF_REPODATA));
+          // delete without using group repository API as group repositories does not allow delete (read only)
+          deleteQuietly(new File(repoBaseDir, "repodata"));
         }
       }
       finally {
