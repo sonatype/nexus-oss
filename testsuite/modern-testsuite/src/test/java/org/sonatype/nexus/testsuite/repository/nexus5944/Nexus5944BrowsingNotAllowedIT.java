@@ -15,14 +15,13 @@ package org.sonatype.nexus.testsuite.repository.nexus5944;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.testsuite.TwinNexusITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
@@ -38,7 +37,9 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 public class Nexus5944BrowsingNotAllowedIT
     extends TwinNexusITSupport
 {
-  private static final Logger LOG = LoggerFactory.getLogger(Nexus5944BrowsingNotAllowedIT.class);
+  public static final String REMOTE_REPOSITORY_ID = "releases";
+
+  public static final String LOCAL_REPOSITORY_ID = "remote-releases";
 
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
@@ -55,16 +56,24 @@ public class Nexus5944BrowsingNotAllowedIT
   @Test
   public void remoteBrowsingNotAllowed() {
     // disable browsing on remote/central
-    remoteRepositories().get(MavenProxyRepository.class, "central").disableBrowsing().save();
+    final MavenHostedRepository remoteRepository = remoteRepositories().get(MavenHostedRepository.class,
+        REMOTE_REPOSITORY_ID);
+    remoteRepository.disableBrowsing().save();
+
     // create local/central proxying remote/central
-    localRepositories().create(MavenProxyRepository.class, "remote-central-proxy").asProxyOf(
-        remoteRepositories().get(MavenProxyRepository.class, "central").contentUri()).withRepoPolicy("RELEASE").save();
+    final MavenProxyRepository localRepository = localRepositories()
+        .create(MavenProxyRepository.class, LOCAL_REPOSITORY_ID).asProxyOf(remoteRepository.contentUri())
+        .doNotDownloadRemoteIndexes().withRepoPolicy("RELEASE").save();
     waitForRemoteToSettleDown();
     waitForLocalToSettleDown();
 
-    assertThat("remote-central-proxy should not be autoblocked",
-        !localRepositories().get(MavenProxyRepository.class, "remote-central-proxy").status().isAutoBlocked());
+    assertThat(LOCAL_REPOSITORY_ID + " should not be autoblocked",
+        !localRepositories().get(MavenProxyRepository.class, LOCAL_REPOSITORY_ID).status().isAutoBlocked());
 
+    localRepository.refresh();
+
+    assertThat(LOCAL_REPOSITORY_ID + " should not be autoblocked",
+        !localRepositories().get(MavenProxyRepository.class, LOCAL_REPOSITORY_ID).status().isAutoBlocked());
   }
 
 }
