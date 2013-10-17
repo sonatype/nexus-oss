@@ -45,6 +45,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@link PlexusBeanModule} that adds minimal Nexus {@link RepositoryType} semantics on top of Plexus/JSR330.
+ *
+ * @since 2.7
  */
 public final class NexusAnnotatedBeanModule
     implements PlexusBeanModule
