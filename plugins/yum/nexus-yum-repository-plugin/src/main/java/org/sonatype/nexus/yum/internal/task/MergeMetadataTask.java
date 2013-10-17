@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -94,13 +95,11 @@ public class MergeMetadataTask
         LOG.debug("Group repository '{}' merged", groupRepository.getId());
       }
       else {
-        final File groupRepoData = new File(repoBaseDir, "repodata");
         LOG.debug(
-            "Remove group repository repodata, because at maximum one yum member-repository left : {}",
-            groupRepoData
+            "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
+            groupRepository.getId()
         );
-        // TODO this should be done via repo API
-        deleteQuietly(groupRepoData);
+        groupRepository.deleteItem(new ResourceStoreRequest("/" + PATH_OF_REPODATA));
       }
 
       deleteYumTempDirs();
