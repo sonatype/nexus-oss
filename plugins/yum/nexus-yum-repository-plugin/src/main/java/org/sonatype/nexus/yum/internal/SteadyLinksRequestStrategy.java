@@ -76,7 +76,7 @@ public class SteadyLinksRequestStrategy
               in = ((StorageFileItem) repomd).getInputStream();
 
               final String newRequestPath = matchRequestPath(requestPath, in);
-              if (newRequestPath != null) {
+              if (newRequestPath != null && !requestPath.equals(newRequestPath)) {
                 request.pushRequestPath(newRequestPath);
 
                 request.getRequestContext().put(REQUEST_PATH_ORIGINAL, requestPath);
