@@ -132,11 +132,13 @@ public class YumMergeMetadataIT
         repositoryLocation(repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm"),
         testData().resolveFile("/rpms/test-artifact-1.2.3-1.noarch.rpm")
     );
+    remoteLogger().info("Uploaded {} to {}", "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm", repo1.id());
 
     content().upload(
         repositoryLocation(repo2.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm"),
         testData.resolveFile("/rpms/test-rpm-5.6.7-1.noarch.rpm")
     );
+    remoteLogger().info("Uploaded {} to {}", "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm", repo2.id());
 
     waitForNexusToSettleDown();
 
@@ -149,6 +151,7 @@ public class YumMergeMetadataIT
         repositoryLocation(repo1.id(), "a_group3/an_artifact3/3.0/an_artifact3-3.0.rpm"),
         testData().resolveFile("/rpms/foo-bar-5.1.2-1.noarch.rpm")
     );
+    remoteLogger().info("Uploaded {} to {}", "a_group3/an_artifact3/3.0/an_artifact3-3.0.rpm", repo1.id());
 
     waitForNexusToSettleDown();
 
