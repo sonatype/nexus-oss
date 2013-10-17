@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -131,8 +132,8 @@ public abstract class AbstractShadowRepository
         : LocalStatus.OUT_OF_SERVICE;
   }
 
-  @Override
   @Subscribe
+  @AllowConcurrentEvents
   public void onRepositoryItemEvent(final RepositoryItemEvent ievt) {
     // NEXUS-5673: do we need to act on event at all?
     if (!getLocalStatus().shouldServiceRequest()) {
