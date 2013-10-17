@@ -19,15 +19,22 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.AbstractRequestStrategy;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RequestStrategy;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.internal.task.MergeMetadataTask;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A request strategy that applies to yum enabled groups that will fetch repomd.xml from each proxy member repository
@@ -47,19 +54,29 @@ public class MergeMetadataRequestStrategy
 
   private static final String PATH_OF_REPOMD_XML = "/" + Yum.PATH_OF_REPOMD_XML;
 
+  private final NexusScheduler nexusScheduler;
+
+  public MergeMetadataRequestStrategy(final NexusScheduler nexusScheduler) {
+    this.nexusScheduler = checkNotNull(nexusScheduler);
+  }
+
   @Override
   public void onHandle(final Repository repository, final ResourceStoreRequest request, final Action action) {
     GroupRepository groupRepository = repository.adaptToFacet(GroupRepository.class);
     final String requestPath = request.getRequestPath();
     if (Action.read.equals(action) && requestPath.endsWith(PATH_OF_REPOMD_XML) && groupRepository != null) {
+      boolean shouldMerge = false;
       for (Repository member : groupRepository.getMemberRepositories()) {
         if (member.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+          log.debug("Fetch {} from repository {}", PATH_OF_REPOMD_XML, member.getId());
           try {
-            log.debug("Fetch {} from repository {}", PATH_OF_REPOMD_XML, member.getId());
-            member.retrieveItem(new ResourceStoreRequest(PATH_OF_REPOMD_XML));
-          }
-          catch (ItemNotFoundException e) {
-            // proxy repo is not a yum repository, go on
+            StorageItem memberRepoMd = retrieveRepoMd(member, true);
+            String sha1Local = memberRepoMd.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
+            memberRepoMd = retrieveRepoMd(member, false);
+            String sha1After = memberRepoMd.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
+            if (!StringUtils.equals(sha1Local, sha1After)) {
+              shouldMerge = true;
+            }
           }
           catch (Exception e) {
             log.debug(
@@ -69,7 +86,29 @@ public class MergeMetadataRequestStrategy
           }
         }
       }
+      if (shouldMerge) {
+        try {
+          // create merge task and wait for it to finish
+          MergeMetadataTask.createTaskFor(nexusScheduler, groupRepository).get();
+        }
+        catch (Exception e) {
+          log.debug(
+              "Could not merge Yum metadata on group {} due to {}/{}",
+              groupRepository.getId(), e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+          );
+        }
+      }
     }
+  }
+
+  private StorageItem retrieveRepoMd(final Repository member, boolean localOnly) throws Exception {
+    try {
+      return member.retrieveItem(new ResourceStoreRequest(PATH_OF_REPOMD_XML, localOnly));
+    }
+    catch (ItemNotFoundException e) {
+      // proxy repo is not a yum repository, go on
+    }
+    return null;
   }
 
 }
