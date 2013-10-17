@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.yum.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -56,6 +57,7 @@ public class MergeMetadataRequestStrategy
 
   private final NexusScheduler nexusScheduler;
 
+  @Inject
   public MergeMetadataRequestStrategy(final NexusScheduler nexusScheduler) {
     this.nexusScheduler = checkNotNull(nexusScheduler);
   }
