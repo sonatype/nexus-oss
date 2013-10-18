@@ -88,6 +88,13 @@ NX.define('Nexus.atlas.view.SupportZip', {
                 },
                 {
                   xtype: 'checkbox',
+                  name: 'securityFiles',
+                  fieldLabel: 'Security Files',
+                  helpText: 'Include security files (recommended)',
+                  checked: true
+                },
+                {
+                  xtype: 'checkbox',
                   name: 'logFiles',
                   fieldLabel: 'Log Files',
                   helpText: 'Include log files (recommended)',
