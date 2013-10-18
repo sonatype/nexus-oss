@@ -22,7 +22,8 @@ NX.define('Nexus.atlas.controller.Atlas', {
 
   requires: [
     'Nexus.siesta',
-    'Nexus.atlas.view.Panel'
+    'Nexus.atlas.view.Panel',
+    'Nexus.atlas.view.SupportZipCreated'
   ],
 
   init: function() {
@@ -43,6 +44,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
       },
       '#nx-atlas-button-create-zip': {
         'click': me.createSupportZip
+      },
+      '#nx-atlas-button-supportzip-download': {
+        'click': me.downloadSupportZip
       }
     });
 
@@ -174,9 +178,26 @@ NX.define('Nexus.atlas.controller.Atlas', {
         mask.hide()
       },
       success: function(response, opts) {
-        //var obj = Ext.decode(response.responseText);
-        //panel.setInfo(obj);
+        var obj = Ext.decode(response.responseText),
+            win = NX.create('Nexus.atlas.view.SupportZipCreated');
+
+        win.setValues(obj);
+        win.show();
       }
     });
+  },
+
+  /**
+   * Download support ZIP file.
+   *
+   * @private
+   */
+  downloadSupportZip: function(button) {
+    var me = this,
+        win = button.up('nx-atlas-view-supportzip-created');
+
+    // TODO:
+
+    win.close();
   }
 });

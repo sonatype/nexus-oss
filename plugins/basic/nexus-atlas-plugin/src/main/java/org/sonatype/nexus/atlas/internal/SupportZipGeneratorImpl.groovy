@@ -50,7 +50,9 @@ implements SupportZipGenerator
 
     log.info 'Generating support zip: {}', request
 
-    // TODO
+    // TODO: need some builder/content-collector abstraction,
+    // TODO ... content abstraction (with path, content, flags for security, priority & truncation)
+    // TODO ... and contributor/configurator for plugins to add content
 
     return new File('foo.zip')
   }
