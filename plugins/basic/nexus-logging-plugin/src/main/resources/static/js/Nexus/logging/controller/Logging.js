@@ -33,7 +33,7 @@ NX.define('Nexus.logging.controller.Logging', {
 
     me.control({
       '#logging': {
-        afterrender: me.controlSelection,
+        afterrender: me.bindToLoggersGrid,
         activate: me.onLoggingActivate,
         deactivate: me.onLoggingDeactivate,
         beforedestroy: me.onLoggingDeactivate
@@ -68,6 +68,9 @@ NX.define('Nexus.logging.controller.Logging', {
       },
       '#nx-logging-combo-refresh-size': {
         select: me.changeRefreshSize
+      },
+      '#nx-logging-button-download-log': {
+        click: me.downloadLog
       }
     });
 
@@ -100,6 +103,25 @@ NX.define('Nexus.logging.controller.Logging', {
     });
   },
 
+  /**
+   * Binds to grid after it has been rendered.
+   * @param {Nexus.logging.view.Panel} loggingPanel logging panel to be controlled
+   * @private
+   */
+  bindToLoggersGrid: function (loggingPanel) {
+    var me = this,
+        grid = loggingPanel.down('nx-logging-view-loggers'),
+        store = grid.getStore();
+
+    me.controlSelection(grid);
+    store.on('write', me.showSuccessMessages, me);
+    store.load();
+  },
+
+  /**
+   * Reloads logger store.
+   * @param {Ext.Button} button refresh button that triggered the action (from loggers grid toolbar)
+   */
   loadLoggers: function (button) {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         store = loggersGrid.getStore();
@@ -107,12 +129,16 @@ NX.define('Nexus.logging.controller.Logging', {
     store.load();
   },
 
-  controlSelection: function (loggingPanel) {
+  /**
+   * Configures handling of grid selection events.
+   * @param {Nexus.logging.view.Loggers} loggersGrid logging panel to be controlled
+   * @private
+   */
+  controlSelection: function (loggersGrid) {
     var sp = Sonatype.lib.Permissions,
-        loggersGrid, removeBtn;
+        removeBtn;
 
     if (sp.checkPermission('nexus:logconfig', sp.EDIT)) {
-      loggersGrid = loggingPanel.down('nx-logging-view-loggers');
       removeBtn = loggersGrid.getTopToolbar().down('#nx-logging-button-remove-loggers');
 
       loggersGrid.getSelectionModel().on('selectionchange', function (sm, selection) {
@@ -121,6 +147,28 @@ NX.define('Nexus.logging.controller.Logging', {
         }
         else {
           removeBtn.disable();
+        }
+      });
+    }
+  },
+
+  /**
+   * Shows success messages after records has been successfully written.
+   * @private
+   */
+  showSuccessMessages: function (store, action, result, res, rs) {
+    if (Ext.isDefined(rs)) {
+      Ext.each(rs, function (record) {
+        var name = record.get('name');
+
+        if (action === Ext.data.Api.actions.create) {
+          Nexus.messages.show('Logging', 'Logger added: ' + name);
+        }
+        else if (action === Ext.data.Api.actions.update) {
+          Nexus.messages.show('Logging', 'Logger updated: ' + name);
+        }
+        else if (action === Ext.data.Api.actions.destroy) {
+          Nexus.messages.show('Logging', 'Logger removed: ' + name);
         }
       });
     }
@@ -187,13 +235,15 @@ NX.define('Nexus.logging.controller.Logging', {
     var loggersGrid = button.up('nx-logging-view-loggers'),
         sm = loggersGrid.getSelectionModel(),
         store = loggersGrid.getStore(),
-        icons = Nexus.logging.Icons;
+        icons = Nexus.logging.Icons,
+        name;
 
     // if we have a logger selected, confirm before removal
     if (sm.hasSelection()) {
+      name = sm.selection.record.get('name');
       Ext.Msg.show({
         title: 'Remove logger',
-        msg: 'Remove "' + sm.selection.record.get('name') + '" logger ?',
+        msg: 'Remove "' + name + '" logger ?',
         buttons: Ext.Msg.OKCANCEL,
         icon: icons.get('loggers_remove').variant('x32').cls,
         fn: function (btn) {
@@ -232,12 +282,12 @@ NX.define('Nexus.logging.controller.Logging', {
       suppressStatus: true,
       jsonData: values,
       success: function () {
-        Nexus.messages.show('Confirmation', 'Log has been marked with: ' + values.message);
+        Nexus.messages.show('Logging', 'Log has been marked with: ' + values.message);
         // refresh the log view
         me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
       },
       failure: function (response) {
-        Nexus.messages.show('Failed to mark log file', me.parseExceptionMessage(response));
+        Nexus.messages.show('Logging', 'Failed to mark log file: ' + me.parseExceptionMessage(response));
       }
     });
   },
@@ -249,6 +299,14 @@ NX.define('Nexus.logging.controller.Logging', {
    */
   refreshLog: function (button) {
     this.retrieveLog(button.up('nx-logging-view-log'));
+  },
+
+  /**
+   * Opens a new browser window pointing to GET /service/siesta/logging/log.
+   * @private
+   */
+  downloadLog: function () {
+    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/logging/log');
   },
 
   /**

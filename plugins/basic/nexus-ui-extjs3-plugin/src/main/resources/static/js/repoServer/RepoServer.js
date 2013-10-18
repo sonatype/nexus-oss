@@ -123,7 +123,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
         // Left Panel
         this.nexusPanel = new Sonatype.navigation.NavigationPanel({
               id : 'st-nexus-tab',
-              title : 'nexus'
+              title : 'Nexus'
             });
 
         this.createSubComponents();

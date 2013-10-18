@@ -16,6 +16,7 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -49,7 +50,13 @@ public class ApplicationConfigurationAdapter
     return nexusConfiguration.getConfigurationModel();
   }
 
-  @Override 
+  @Nullable
+  @Override
+  public File getInstallDirectory() {
+    return nexusConfiguration.getInstallDirectory();
+  }
+
+  @Override
   public File getWorkingDirectory() {
     return nexusConfiguration.getWorkingDirectory();
   }
@@ -75,9 +82,7 @@ public class ApplicationConfigurationAdapter
   }
 
   @Override 
-  public void saveConfiguration()
-      throws IOException
-  {
+  public void saveConfiguration() throws IOException {
     nexusConfiguration.saveConfiguration();
   }
 
