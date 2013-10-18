@@ -90,11 +90,8 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
           key: Ext.EventObject.ENTER,
           scope: me,
           fn: function() {
-            // fire event only if form is valid
-            if (me.getComponent('form').getForm().isValid()) {
-              var btn = Ext.getCmp('nx-atlas-button-supportzip-download');
-              btn.fireEvent('click', btn);
-            }
+            var btn = Ext.getCmp('nx-atlas-button-supportzip-download');
+            btn.fireEvent('click', btn);
           }
         },
         {

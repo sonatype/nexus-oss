@@ -97,6 +97,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
         var obj = Ext.decode(response.responseText);
         panel.setInfo(obj);
       }
+      // TODO: handle failure
     });
   },
 
@@ -184,6 +185,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
         win.setValues(obj);
         win.show();
       }
+      // TODO: handle failure
     });
   },
 
