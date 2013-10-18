@@ -19,7 +19,6 @@ import javax.inject.Named;
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.plexus.appevents.Event;
 
 import com.google.common.annotations.VisibleForTesting;
 

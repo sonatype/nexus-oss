@@ -15,7 +15,7 @@ package org.sonatype.nexus.plexusplugin;
 
 import java.util.Collection;
 
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.nexus.events.Event;
 
 /**
  * An example component.

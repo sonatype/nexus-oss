@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.proxy.targets.Target;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
-import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * The target registry events superclass.

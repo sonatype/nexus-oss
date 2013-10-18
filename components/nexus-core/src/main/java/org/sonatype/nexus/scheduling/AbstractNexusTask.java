@@ -18,11 +18,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskInterruptedException;
@@ -75,7 +75,7 @@ public abstract class AbstractNexusTask<T>
     this.eventBus = eventBus;
   }
 
-  protected void notifyEventListeners(final Event<?> event) {
+  protected final void notifyEventListeners(final Object event) {
     eventBus.post(event);
   }
 
