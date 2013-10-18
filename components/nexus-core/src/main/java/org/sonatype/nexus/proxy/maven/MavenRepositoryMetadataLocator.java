@@ -40,7 +40,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
@@ -114,8 +113,6 @@ public class MavenRepositoryMetadataLocator
 
     GavCalculator gavCalculator = request.getMavenRepository().getGavCalculator();
 
-    Reader reader = null;
-
     try {
       Gav pomGav = getPomGav(request);
 
@@ -129,9 +126,9 @@ public class MavenRepositoryMetadataLocator
 
       StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(false, request);
 
-      reader = ReaderFactory.newXmlReader(pomFile.getInputStream());
-
-      packaging = getPackaging(reader);
+      try (final Reader reader = ReaderFactory.newXmlReader(pomFile.getInputStream())) {
+        packaging = getPackaging(reader);
+      }
     }
     catch (ItemNotFoundException e) {
       return null;
@@ -139,10 +136,6 @@ public class MavenRepositoryMetadataLocator
     catch (Exception e) {
       throw createIOExceptionWithCause(e.getMessage(), e);
     }
-    finally {
-      IOUtil.close(reader);
-    }
-
     return packaging;
   }
 
@@ -199,22 +192,12 @@ public class MavenRepositoryMetadataLocator
 
       StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(false, request);
 
-      Model model = null;
-
-      InputStream is = pomFile.getInputStream();
-
-      try {
+      try (final InputStream is = pomFile.getInputStream()) {
         MavenXpp3Reader rd = new MavenXpp3Reader();
-
-        model = rd.read(is);
-
-        return model;
+        return rd.read(is);
       }
       catch (XmlPullParserException e) {
         throw createIOExceptionWithCause(e.getMessage(), e);
-      }
-      finally {
-        IOUtil.close(is);
       }
     }
     catch (Exception e) {
@@ -333,15 +316,8 @@ public class MavenRepositoryMetadataLocator
       if (StorageFileItem.class.isAssignableFrom(item.getClass())) {
         StorageFileItem fileItem = (StorageFileItem) item;
 
-        InputStream is = null;
-
-        try {
-          is = fileItem.getInputStream();
-
+        try (final InputStream is = fileItem.getInputStream()) {
           result = MetadataBuilder.read(is);
-        }
-        finally {
-          IOUtil.close(is);
         }
       }
       else {

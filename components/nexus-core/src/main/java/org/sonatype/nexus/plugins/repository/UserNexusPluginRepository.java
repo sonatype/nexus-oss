@@ -15,13 +15,16 @@ package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.util.file.DirSupport;
+
 import com.google.common.base.Throwables;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link File} backed {@link NexusWritablePluginRepository} that supplies user plugins.
@@ -41,9 +44,18 @@ final class UserNexusPluginRepository
   // Implementation fields
   // ----------------------------------------------------------------------
 
+  private final File userPluginsFolder;
+
   @Inject
-  @Named("${nexus-work}/plugin-repository")
-  private File userPluginsFolder;
+  public UserNexusPluginRepository(final @Named("${nexus-work}/plugin-repository") File userPluginsFolder) {
+    this.userPluginsFolder = checkNotNull(userPluginsFolder);
+    try {
+      DirSupport.mkdirs(userPluginsFolder.toPath());
+    }
+    catch (IOException e) {
+      Throwables.propagate(e);
+    }
+  }
 
   // ----------------------------------------------------------------------
   // Public methods
@@ -63,14 +75,6 @@ final class UserNexusPluginRepository
 
   @Override
   protected File getNexusPluginsDirectory() {
-    if (!userPluginsFolder.isDirectory()) {
-      try {
-        Files.createDirectories(userPluginsFolder.toPath());
-      }
-      catch (IOException e) {
-        Throwables.propagate(e);
-      }
-    }
     return userPluginsFolder;
   }
 }

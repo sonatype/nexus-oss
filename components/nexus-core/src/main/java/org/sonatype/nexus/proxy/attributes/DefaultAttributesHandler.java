@@ -41,12 +41,11 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.util.file.FileSupport;
+import org.sonatype.nexus.util.io.StreamSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
-import org.codehaus.plexus.util.IOUtil;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -421,7 +420,7 @@ public class DefaultAttributesHandler
 
               try (final InputStream in = content.getContent(); final OutputStream out = new FileOutputStream(
                   tmpFile)) {
-                ByteStreams.copy(in, out);
+                StreamSupport.copy(in, out);
                 out.flush();
               }
             }
@@ -449,7 +448,13 @@ public class DefaultAttributesHandler
           }
           finally {
             if (deleteTmpFile && tmpFile != null) {
-              tmpFile.delete();
+              try {
+                FileSupport.delete(tmpFile.toPath());
+              }
+              catch (IOException e) {
+                tmpFile.deleteOnExit();
+                getLogger().warn("Could not delete tmp file!", e);
+              }
             }
           }
         }

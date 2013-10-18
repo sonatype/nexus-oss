@@ -16,13 +16,13 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
@@ -72,6 +72,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -82,13 +83,12 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -260,7 +260,7 @@ public class DefaultNexusConfiguration
 
   private File forceMkdir(final File directory) {
     try {
-      Files.createDirectories(directory.toPath());
+      DirSupport.mkdirs(directory.toPath());
       return directory;
     }
     catch (IOException e) {
@@ -356,7 +356,7 @@ public class DefaultNexusConfiguration
     final String userId = getCurrentUserId();
 
     if (changes != null && changes.size() > 0) {
-      if (StringUtils.isBlank(userId)) {
+      if (Strings.isNullOrEmpty(userId)) {
         // should not really happen, we should always have subject (at least anon), but...
         getLogger().info("Applying Nexus Configuration due to changes in {}...", changesToString(changes));
       }
@@ -367,7 +367,7 @@ public class DefaultNexusConfiguration
       }
     }
     else {
-      if (StringUtils.isBlank(userId)) {
+      if (Strings.isNullOrEmpty(userId)) {
         // usually on boot: no changes since "all" changed, and no subject either
         getLogger().info("Applying Nexus Configuration...");
       }
@@ -564,7 +564,7 @@ public class DefaultNexusConfiguration
       throws InvalidConfigurationException
   {
     if (enabled) {
-      if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+      if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
         throw new InvalidConfigurationException(
             "Anonymous access is getting enabled without valid username and/or password!");
       }
@@ -579,7 +579,7 @@ public class DefaultNexusConfiguration
       final boolean statusChanged = setAnonymousUserEnabled(username, true);
 
       // detect change
-      if (!StringUtils.equals(oldUsername, username) || !StringUtils.equals(oldPassword, password)) {
+      if (!Objects.equals(oldUsername, username) || !Objects.equals(oldPassword, password)) {
         try {
           // test authc with changed credentials
           try {
@@ -623,7 +623,7 @@ public class DefaultNexusConfiguration
       // info)
       final String existingUsername = getSecuritySystem().getAnonymousUsername();
 
-      if (!StringUtils.isBlank(existingUsername)) {
+      if (!Strings.isNullOrEmpty(existingUsername)) {
         // try to disable the "anonymous" user defined in XML realm, but ignore any problem (users might delete
         // or already disabled it, or completely removed XML realm)
         setAnonymousUserEnabled(existingUsername, false);
@@ -920,7 +920,7 @@ public class DefaultNexusConfiguration
   {
     ApplicationValidationContext ctx = getRepositoryValidationContext();
 
-    if (!create && !StringUtils.isEmpty(settings.getId())) {
+    if (!create && !Strings.isNullOrEmpty(settings.getId())) {
       // remove "itself" from the list to avoid hitting "duplicate repo" problem
       ctx.getExistingRepositoryIds().remove(settings.getId());
     }

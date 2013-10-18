@@ -18,9 +18,10 @@ import java.io.InputStream;
 import java.util.Locale;
 
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.util.io.StreamSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.codehaus.plexus.util.IOUtil;
+import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -52,10 +53,10 @@ public class MUtils
       throws IOException
   {
     try {
-      return readDigest(IOUtil.toString(inputStream, "UTF-8"));
+      return readDigest(StreamSupport.asString(inputStream));
     }
     finally {
-      IOUtil.close(inputStream);
+      Closeables.close(inputStream, true);
     }
   }
 

@@ -19,9 +19,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 
 import org.sonatype.nexus.util.WrappingInputStream;
+import org.sonatype.nexus.util.file.FileSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -97,7 +97,7 @@ public class FileContentLocator
   public void delete() throws IOException {
     // locator is used against files only, not directories
     // but their existence is not enforced!
-    Files.deleteIfExists(getFile().toPath());
+    FileSupport.deleteIfExists(getFile().toPath());
   }
 
   // ==
@@ -123,7 +123,7 @@ public class FileContentLocator
       super.close();
       // locator is used against files only, not directories
       // but their existence is not enforced!
-      Files.deleteIfExists(file.toPath());
+      FileSupport.deleteIfExists(file.toPath());
     }
   }
 }

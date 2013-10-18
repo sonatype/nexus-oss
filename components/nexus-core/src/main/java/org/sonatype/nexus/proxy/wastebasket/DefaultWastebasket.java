@@ -33,10 +33,12 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.sisu.resource.scanner.Listener;
 import org.sonatype.sisu.resource.scanner.Scanner;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 
 @Named
 @Singleton
@@ -144,14 +146,24 @@ public class DefaultWastebasket
         @Override
         public void onFile(File file) {
           if (age == ALL || file.lastModified() < limitDate) {
-            file.delete();
+            try {
+              FileSupport.delete(file.toPath());
+            }
+            catch (IOException e) {
+              Throwables.propagate(e);
+            }
           }
         }
 
         @Override
         public void onExitDirectory(File directory) {
           if (!basketFile.equals(directory) && directory.list().length == 0) {
-            directory.delete();
+            try {
+              FileSupport.delete(directory.toPath());
+            }
+            catch (IOException e) {
+              Throwables.propagate(e);
+            }
           }
         }
 

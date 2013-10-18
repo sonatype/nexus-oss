@@ -59,11 +59,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
 import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.DigesterUtils;
+import org.sonatype.nexus.util.io.StreamSupport;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -193,18 +193,13 @@ public class M2Repository
     // if the item is file, is M2 repository metadata and this repo is release-only or snapshot-only
     if (isCleanseRepositoryMetadata() && item instanceof StorageFileItem
         && M2ArtifactRecognizer.isMetadata(item.getPath())) {
-      InputStream orig = null;
       StorageFileItem mdFile = (StorageFileItem) item;
       ByteArrayInputStream backup = null;
       ByteArrayOutputStream backup1 = new ByteArrayOutputStream();
       try {
         // remote item is not reusable, and we usually cache remote stuff locally
-        try {
-          orig = mdFile.getInputStream();
-          IOUtil.copy(orig, backup1);
-        }
-        finally {
-          IOUtil.close(orig);
+        try (final InputStream orig = mdFile.getInputStream()) {
+          StreamSupport.copy(orig, backup1);
         }
         backup = new ByteArrayInputStream(backup1.toByteArray());
 
@@ -343,13 +338,8 @@ public class M2Repository
 
         try {
           Metadata metadata;
-          InputStream inputStream = null;
-          try {
-            inputStream = mdItem.getInputStream();
+          try (final InputStream inputStream = mdItem.getInputStream()) {
             metadata = MetadataBuilder.read(inputStream);
-          }
-          finally {
-            IOUtil.close(inputStream); // Make sure we unlock mdItem ASAP
           }
 
           Version requiredVersion = getClientSupportedVersion(userAgent);

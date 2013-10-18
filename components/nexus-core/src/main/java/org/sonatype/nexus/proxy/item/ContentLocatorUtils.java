@@ -13,20 +13,13 @@
 
 package org.sonatype.nexus.proxy.item;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.util.IOUtils;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-
-import org.codehaus.plexus.util.IOUtil;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class ContentLocatorUtils
 {
-  private static final boolean USE_MMAP = SystemPropertiesHelper.getBoolean(
-      "org.sonatype.nexus.proxy.item.ContentLocatorUtils.useMmap", false);
-
   /**
    * Reads up first bytes (exactly {@code count} of them) from ContentLocator's content. It returns byte array of
    * exact size of count, or null (ie. if file is smaller).
@@ -38,21 +31,18 @@ public class ContentLocatorUtils
   public static byte[] getFirstBytes(final int count, final ContentLocator locator)
       throws IOException
   {
+    checkArgument(count > 0);
     if (locator != null) {
-      InputStream fis = null;
-
-      try {
-        fis = locator.getContent();
-
-        if (USE_MMAP && fis instanceof FileInputStream) {
-          return IOUtils.getBytesNioMmap(count, (FileInputStream) fis);
+      try (final InputStream fis = locator.getContent()) {
+        final byte[] buf = new byte[count];
+        int ar = fis.read(buf);
+        if (ar == count) {
+          return buf;
         }
         else {
-          return IOUtils.getBytesClassic(count, fis);
+          // content is unreadable or even less than we want to read
+          return null;
         }
-      }
-      finally {
-        IOUtil.close(fis);
       }
     }
 

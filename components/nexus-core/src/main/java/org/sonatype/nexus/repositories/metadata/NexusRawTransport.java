@@ -24,8 +24,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.metadata.RawTransport;
-
-import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.util.io.StreamSupport;
 
 public class NexusRawTransport
     implements RawTransport
@@ -51,10 +50,6 @@ public class NexusRawTransport
   public byte[] readRawData(String path)
       throws Exception
   {
-    InputStream is = null;
-
-    ByteArrayOutputStream os = null;
-
     try {
       ResourceStoreRequest request = new ResourceStoreRequest(path, localOnly, remoteOnly);
 
@@ -63,14 +58,11 @@ public class NexusRawTransport
       if (item instanceof StorageFileItem) {
         StorageFileItem file = (StorageFileItem) item;
 
-        is = file.getInputStream();
-
-        os = new ByteArrayOutputStream();
-
-        IOUtil.copy(is, os);
-
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try (final InputStream is = file.getInputStream()) {
+          StreamSupport.copy(is, os);
+        }
         lastReadFile = file;
-
         return os.toByteArray();
       }
       else {
@@ -81,11 +73,6 @@ public class NexusRawTransport
     catch (ItemNotFoundException e) {
       // not found should return null
       return null;
-    }
-    finally {
-      IOUtil.close(is);
-
-      IOUtil.close(os);
     }
   }
 
