@@ -33,6 +33,7 @@
       <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port}</Set>
+        <Set name="forwarded">true</Set>
         <!-- Documentation for this fix can be found at:
              http://docs.codehaus.org/display/JETTY/Slow+Win2003
         -->
