@@ -73,7 +73,10 @@ public final class NexusAnnotatedBeanModule
    * @param space The local class space
    * @param variables The filter variables
    */
-  public NexusAnnotatedBeanModule(ClassSpace space, Map<?, ?> variables, List<RepositoryTypeDescriptor> descriptors) {
+  public NexusAnnotatedBeanModule(final ClassSpace space,
+                                  final Map<?, ?> variables,
+                                  final List<RepositoryTypeDescriptor> descriptors)
+  {
     this(space, variables, descriptors, BeanScanning.ON);
   }
 
@@ -84,8 +87,10 @@ public final class NexusAnnotatedBeanModule
    * @param variables The filter variables
    * @param scanning The scanning options
    */
-  public NexusAnnotatedBeanModule(ClassSpace space, Map<?, ?> variables, List<RepositoryTypeDescriptor> descriptors,
-      BeanScanning scanning)
+  public NexusAnnotatedBeanModule(final ClassSpace space,
+                                  final Map<?, ?> variables,
+                                  final List<RepositoryTypeDescriptor> descriptors,
+                                  final BeanScanning scanning)
   {
     this.space = space;
     this.variables = variables;
@@ -97,7 +102,7 @@ public final class NexusAnnotatedBeanModule
   // Public methods
   // ----------------------------------------------------------------------
 
-  public PlexusBeanSource configure(Binder binder) {
+  public PlexusBeanSource configure(final Binder binder) {
     if (null != space && scanning != BeanScanning.OFF) {
       new NexusSpaceModule().configure(binder);
     }
@@ -116,7 +121,7 @@ public final class NexusAnnotatedBeanModule
     }
 
     @Override
-    protected ClassSpaceVisitor visitor(Binder binder) {
+    protected ClassSpaceVisitor visitor(final Binder binder) {
       return new PlexusTypeVisitor(new NexusTypeBinder(binder, descriptors, new PlexusTypeBinder(binder)));
     }
   }
@@ -140,7 +145,10 @@ public final class NexusAnnotatedBeanModule
      * @param descriptors List to populate
      * @param delegate Original Plexus listener
      */
-    NexusTypeBinder(Binder binder, List<RepositoryTypeDescriptor> descriptors, PlexusTypeListener delegate) {
+    NexusTypeBinder(final Binder binder,
+                    final List<RepositoryTypeDescriptor> descriptors,
+                    final PlexusTypeListener delegate)
+    {
       this.binder = binder;
       this.descriptors = descriptors;
       this.delegate = delegate;
@@ -151,7 +159,7 @@ public final class NexusAnnotatedBeanModule
      */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void hear(@Deprecated Annotation qualifier, Class<?> implementation, Object source) {
+    public void hear(final @Deprecated Annotation qualifier, final Class<?> implementation, final Object source) {
       Class role = getRepositoryRole(implementation);
       if (role != null) {
         String hint = getRepositoryHint(implementation);
@@ -171,7 +179,7 @@ public final class NexusAnnotatedBeanModule
      */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void hear(Component component, DeferredClass<?> implementation, Object source) {
+    public void hear(Component component, final DeferredClass<?> implementation, final Object source) {
       Class role = getRepositoryRole(implementation.load());
       if (role != null) {
         if (StringUtils.isBlank(component.hint())) {
@@ -190,7 +198,7 @@ public final class NexusAnnotatedBeanModule
     /**
      * Scans the implementation's declared interfaces for one annotated with {@link RepositoryType}.
      */
-    private static Class<?> getRepositoryRole(Class<?> implementation) {
+    private static Class<?> getRepositoryRole(final Class<?> implementation) {
       for (Class<?> api : implementation.getInterfaces()) {
         if (api.isAnnotationPresent(RepositoryType.class)) {
           return api;
@@ -202,7 +210,7 @@ public final class NexusAnnotatedBeanModule
     /**
      * Checks for both kinds of @Named; uses fully-qualified classname if name is missing or blank.
      */
-    private static String getRepositoryHint(Class<?> implementation) {
+    private static String getRepositoryHint(final Class<?> implementation) {
       String name = null;
       if (implementation.isAnnotationPresent(javax.inject.Named.class)) {
         name = implementation.getAnnotation(javax.inject.Named.class).value();
@@ -218,7 +226,7 @@ public final class NexusAnnotatedBeanModule
      * 
      * @see {@link DefaultNexusPluginManager#createPluginInjector}
      */
-    private void addRepositoryTypeDescriptor(Class<? extends Repository> role, String hint) {
+    private void addRepositoryTypeDescriptor(final Class<? extends Repository> role, final String hint) {
       RepositoryType rt = role.getAnnotation(RepositoryType.class);
       descriptors.add(new RepositoryTypeDescriptor(role, hint, rt.pathPrefix(), rt.repositoryMaxInstanceCount()));
     }
