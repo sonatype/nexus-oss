@@ -19,6 +19,7 @@ package org.sonatype.nexus.util;
  * @author cstamas
  * @deprecated Use DigesterUtils instead!
  */
+@Deprecated
 public class StringDigester
 {
   @Deprecated

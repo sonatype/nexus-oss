@@ -24,7 +24,9 @@ import java.nio.channels.FileChannel.MapMode;
  * Small collection of reusable utils, a-la Plexus' IOUtils.
  *
  * @author cstamas
+ * @deprecated Do not use this class, will be removed in future releases.
  */
+@Deprecated
 public class IOUtils
 {
   /**

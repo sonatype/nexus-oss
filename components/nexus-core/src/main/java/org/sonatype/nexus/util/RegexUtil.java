@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.util;
 
+/**
+ * @deprecated Do not use this class, will be removed in future releases.
+ */
+@Deprecated
 public class RegexUtil
 {
 
