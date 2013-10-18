@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
@@ -81,8 +80,6 @@ public class NexusApplication
 
   private final List<NexusApplicationCustomizer> customizers;
 
-  private final ErrorReportingManager errorManager;
-
   private final StatusService statusService;
 
   private final MimeSupport mimeSupport;
@@ -97,7 +94,6 @@ public class NexusApplication
                           final @Named("StatusPlexusResource") ManagedPlexusResource statusPlexusResource,
                           final List<NexusResourceBundle> nexusResourceBundles,
                           final List<NexusApplicationCustomizer> customizers,
-                          final ErrorReportingManager errorManager,
                           final StatusService statusService,
                           final MimeSupport mimeSupport)
   {
@@ -110,7 +106,6 @@ public class NexusApplication
     this.statusPlexusResource = statusPlexusResource;
     this.nexusResourceBundles = nexusResourceBundles;
     this.customizers = customizers;
-    this.errorManager = errorManager;
     this.statusService = statusService;
     this.mimeSupport = mimeSupport;
   }
@@ -119,7 +114,6 @@ public class NexusApplication
   @VisibleForTesting
   public NexusApplication() {
     this(
-        null,
         null,
         null,
         null,
@@ -201,9 +195,6 @@ public class NexusApplication
 
     // set our StatusService
     setStatusService(statusService);
-
-    // Add error manager to context
-    getContext().getAttributes().put(ErrorReportingManager.class.getName(), errorManager);
 
     // SERVICE (two always connected, unrelated to isStarted)
 

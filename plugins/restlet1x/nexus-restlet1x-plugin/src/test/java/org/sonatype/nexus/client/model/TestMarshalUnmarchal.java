@@ -38,11 +38,6 @@ import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
 import org.sonatype.nexus.rest.model.ContentListDescribeResponseResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
-import org.sonatype.nexus.rest.model.ErrorReportRequest;
-import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
-import org.sonatype.nexus.rest.model.ErrorReportResponse;
-import org.sonatype.nexus.rest.model.ErrorReportResponseDTO;
-import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
 import org.sonatype.nexus.rest.model.FormFieldResource;
@@ -769,13 +764,6 @@ public class TestMarshalUnmarchal
     smtpSet.setTlsEnabled(true);
     smtpSet.setUsername("username");
     resource.setSmtpSettings(smtpSet);
-
-    ErrorReportingSettings errorSet = new ErrorReportingSettings();
-    errorSet.setJiraPassword("jiraPass");
-    errorSet.setJiraUsername("jiraUser");
-    errorSet.setUseGlobalProxy(true);
-
-    resource.setErrorReportingSettings(errorSet);
 
     resourceResponse.setData(resource);
 
@@ -1930,33 +1918,6 @@ public class TestMarshalUnmarchal
     resource.setTestEmail("testemail");
     resource.setTlsEnabled(true);
     resource.setUsername("username");
-
-    request.setData(resource);
-
-    this.marshalUnmarchalThenCompare(request);
-    this.validateXmlHasNoPackageNames(request);
-  }
-
-  @Test
-  public void testErrorReportRequest() {
-    ErrorReportRequest request = new ErrorReportRequest();
-
-    ErrorReportRequestDTO resource = new ErrorReportRequestDTO();
-    resource.setDescription("description");
-    resource.setTitle("title");
-
-    request.setData(resource);
-
-    this.marshalUnmarchalThenCompare(request);
-    this.validateXmlHasNoPackageNames(request);
-  }
-
-  @Test
-  public void testErrorReportResponse() {
-    ErrorReportResponse request = new ErrorReportResponse();
-
-    ErrorReportResponseDTO resource = new ErrorReportResponseDTO();
-    resource.setJiraUrl("jiraurl");
 
     request.setData(resource);
 

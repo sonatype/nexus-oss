@@ -13,31 +13,17 @@
 
 package org.sonatype.nexus.client.model;
 
-import java.util.List;
-import java.util.Map;
-
-import org.sonatype.nexus.error.reporting.ErrorReportingManager;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.rest.NexusApplication;
-import org.sonatype.nexus.rest.NexusApplicationCustomizer;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-import org.sonatype.security.web.ProtectedPathManager;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.XStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.restlet.service.StatusService;
-
-import static org.mockito.Mockito.mock;
 
 // FIXME: Why doesn't this end with Test?
 

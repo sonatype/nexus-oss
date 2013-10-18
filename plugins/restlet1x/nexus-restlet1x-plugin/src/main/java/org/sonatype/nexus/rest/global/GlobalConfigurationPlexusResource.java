@@ -43,7 +43,6 @@ import org.sonatype.nexus.notification.NotificationCheat;
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationTarget;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
-import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
@@ -257,22 +256,6 @@ public class GlobalConfigurationPlexusResource
 
             getNexusEmailer().setSMTPSystemEmailAddress(
                 new Address(settings.getSystemEmailAddress().trim()));
-          }
-
-          ErrorReportingSettings settings = resource.getErrorReportingSettings();
-
-          if (settings != null) {
-            getErrorReportingManager().setEnabled(settings.isReportErrorsAutomatically());
-            getErrorReportingManager().setJIRAUsername(settings.getJiraUsername());
-            // look up old password
-            getErrorReportingManager().setJIRAPassword(
-                this.getActualPassword(settings.getJiraPassword(),
-                    getErrorReportingManager().getJIRAPassword()));
-          }
-          else {
-            getErrorReportingManager().setEnabled(false);
-            getErrorReportingManager().setJIRAUsername(null);
-            getErrorReportingManager().setJIRAPassword(null);
           }
 
           if (resource.getGlobalConnectionSettings() != null) {
@@ -509,8 +492,6 @@ public class GlobalConfigurationPlexusResource
     resource.setGlobalRestApiSettings(restApiSettings);
 
     resource.setSmtpSettings(convert(getNexusEmailer()));
-
-    resource.setErrorReportingSettings(convert(getErrorReportingManager()));
 
     resource.setSystemNotificationSettings(convert(notificationManager));
   }
