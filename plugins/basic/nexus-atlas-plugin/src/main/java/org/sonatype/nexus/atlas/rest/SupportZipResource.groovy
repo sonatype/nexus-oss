@@ -61,10 +61,11 @@ implements Resource
   @Produces(MediaType.APPLICATION_JSON)
   @RequiresPermissions('nexus:atlas')
   Map userDiagnostic(final SupportZipGenerator.Request request) {
-    def result = supportZipGenerator.generate(request)
+    def file = supportZipGenerator.generate(request)
 
     return [
-        'file': result.zipFile.canonicalPath
+        'file': file.canonicalPath,
+        'fileName': file.name
     ]
   }
 }

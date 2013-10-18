@@ -15,9 +15,10 @@ package org.sonatype.nexus.atlas.internal
 
 import org.sonatype.nexus.atlas.SupportZipGenerator
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
-import org.sonatype.nexus.atlas.SupportZipGenerator.Result
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
+import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -32,12 +33,25 @@ class SupportZipGeneratorImpl
 extends ComponentSupport
 implements SupportZipGenerator
 {
+  private final File supportDir
+
+  @Inject
+  SupportZipGeneratorImpl(final ApplicationConfiguration applicationConfiguration) {
+    assert applicationConfiguration
+
+    // resolve where support archives will be stored
+    supportDir = applicationConfiguration.getWorkingDirectory('support')
+    log.info 'Support directory: {}', supportDir
+  }
+
   @Override
-  Result generate(final Request request) {
+  File generate(final Request request) {
+    assert request
+
     log.info 'Generating support zip: {}', request
 
     // TODO
 
-    return new Result(zipFile: 'foo.zip' as File)
+    return new File('foo.zip')
   }
 }

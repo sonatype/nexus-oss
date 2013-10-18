@@ -15,7 +15,6 @@ package org.sonatype.nexus.atlas
 
 import groovy.transform.ToString
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
-import org.sonatype.nexus.atlas.SupportZipGenerator.Result
 
 /**
  * Generates a support zip file.
@@ -40,15 +39,8 @@ interface SupportZipGenerator
     boolean limitSize
   }
 
-  // TODO: Drop if we only need to return a File
-  @ToString(includeNames=true)
-  static class Result
-  {
-    File zipFile
-  }
-
   /**
    * Generate a support-zip for the given request.
    */
-  Result generate(Request request)
+  File generate(Request request)
 }
