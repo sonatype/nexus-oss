@@ -14,6 +14,7 @@
 package org.sonatype.nexus.atlas.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.sonatype.nexus.atlas.SupportZipGenerator
 import org.sonatype.security.SecuritySystem
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.siesta.common.Resource
@@ -45,6 +46,13 @@ implements Resource
 {
   static final String RESOURCE_URI = '/atlas/support-zip'
 
+  private final SupportZipGenerator supportZipGenerator
+
+  @Inject
+  SupportZipResource(final SupportZipGenerator supportZipGenerator) {
+    this.supportZipGenerator = checkNotNull(supportZipGenerator)
+  }
+
   /**
    * Create a support ZIP file.
    */
@@ -52,13 +60,11 @@ implements Resource
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RequiresPermissions('nexus:atlas')
-  Map userDiagnostic(final Map request) {
-    log.info 'Creating support ZIP for request: {}', request
-
-    // TODO: Generate zip file, return reference to the file create for download
+  Map userDiagnostic(final SupportZipGenerator.Request request) {
+    def result = supportZipGenerator.generate(request)
 
     return [
-        fileName: 'somefile-12345.zip'
+        'file': result.zipFile.canonicalPath
     ]
   }
 }
