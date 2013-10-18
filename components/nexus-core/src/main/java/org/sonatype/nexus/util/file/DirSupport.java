@@ -19,7 +19,6 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
@@ -263,14 +262,12 @@ public final class DirSupport
   // COPY: recursive copy of whole directory tree
 
   public static void copy(final Path from, final Path to) throws IOException {
-    validateDirectory(from);
     // "copy": overwrite if exists + make files appear as "new" + copy as link if link
-    copy(from, to, StandardCopyOption.REPLACE_EXISTING, LinkOption.NOFOLLOW_LINKS);
+    copy(from, to, StandardCopyOption.REPLACE_EXISTING);
   }
 
   public static boolean copyIfExists(final Path from, final Path to) throws IOException {
     checkNotNull(from);
-    checkNotNull(to);
     if (Files.exists(from)) {
       copy(from, to);
       return true;
@@ -280,14 +277,14 @@ public final class DirSupport
     }
   }
 
-  public static void copy(final Path from, final Path to, CopyOption... options) throws IOException {
+  public static void copy(final Path from, final Path to, final CopyOption... options) throws IOException {
     validateDirectory(from);
     checkNotNull(to);
     Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
         new CopyVisitor(from, to, options));
   }
 
-  public static boolean copyIfExists(final Path from, final Path to, CopyOption... options) throws IOException {
+  public static boolean copyIfExists(final Path from, final Path to, final CopyOption... options) throws IOException {
     checkNotNull(from);
     if (Files.exists(from)) {
       copy(from, to, options);
@@ -302,7 +299,7 @@ public final class DirSupport
 
   public static void move(final Path from, final Path to) throws IOException {
     // "move": overwrite if exists + transfer attributes (last mod time) + copy as link if link
-    copy(from, to, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS);
+    copy(from, to, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
     delete(from);
   }
 
