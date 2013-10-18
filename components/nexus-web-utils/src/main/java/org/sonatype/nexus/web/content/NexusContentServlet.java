@@ -53,6 +53,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.RemoteIPFinder;
 
@@ -649,15 +650,8 @@ public class NexusContentServlet
       // user override present, tell container what buffer size we'd like
       response.setBufferSize(bufferSize);
     }
-    final byte[] buf = new byte[bufferSize];
     try (final OutputStream to = response.getOutputStream()) {
-      while (true) {
-        int r = from.read(buf);
-        if (r == -1) {
-          break;
-        }
-        to.write(buf, 0, r);
-      }
+      StreamSupport.copy(from, to, bufferSize);
     }
     response.flushBuffer();
   }

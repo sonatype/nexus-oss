@@ -25,13 +25,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
 import com.google.common.base.Predicate;
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +127,7 @@ public class DefaultNexusTimeline
     }
 
     for (File legacyIndexFile : legacyIndexFiles) {
-      FileUtils.rename(legacyIndexFile, new File(newIndexDir, legacyIndexFile.getName()));
+      DirSupport.move(legacyIndexDir.toPath(), new File(newIndexDir, legacyIndexFile.getName()).toPath());
     }
   }
 

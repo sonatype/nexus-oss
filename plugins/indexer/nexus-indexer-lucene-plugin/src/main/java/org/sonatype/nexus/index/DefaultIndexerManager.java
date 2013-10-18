@@ -72,13 +72,12 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.CompositeException;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import com.google.common.base.Strings;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.BooleanClause;
@@ -840,7 +839,7 @@ public class DefaultIndexerManager
             gav.getClassifier());
 
     // store extension if classifier is not empty
-    if (!StringUtils.isEmpty(ai.classifier)) {
+    if (!Strings.isNullOrEmpty(ai.classifier)) {
       ai.packaging = gav.getExtension();
     }
 
@@ -1511,7 +1510,7 @@ public class DefaultIndexerManager
             logger.debug("Cleanup of temp files...");
           }
 
-          FileUtils.deleteDirectory(targetDir);
+          DirSupport.deleteIfExists(targetDir.toPath());
         }
         catch (IOException e) {
           lastException = e;
@@ -2024,7 +2023,7 @@ public class DefaultIndexerManager
         filters.add(0, new ArtifactInfoFilter()
         {
           public boolean accepts(IndexingContext ctx, ArtifactInfo ai) {
-            return StringUtils.isBlank(ai.classifier);
+            return Strings.isNullOrEmpty(ai.classifier);
           }
         });
       }
@@ -2384,7 +2383,7 @@ public class DefaultIndexerManager
     }
     finally {
       temporary.close(false);
-      FileUtils.deleteDirectory(location);
+      DirSupport.deleteIfExists(location.toPath());
     }
   }
 
