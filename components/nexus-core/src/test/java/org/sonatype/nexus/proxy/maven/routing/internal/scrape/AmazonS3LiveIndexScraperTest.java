@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import java.io.IOException;
 import java.util.List;
 
+import org.sonatype.nexus.apachehttpclient.page.Page;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -90,12 +91,9 @@ public class AmazonS3LiveIndexScraperTest
   {
     final HttpClient httpClient = new DefaultHttpClient();
     final String remoteUrl = "http://spring-roo-repository.springsource.org/release/";
-    final HttpGet get = new HttpGet(remoteUrl);
-    final HttpResponse response = httpClient.execute(get);
-    final Document document = Jsoup.parse(response.getEntity().getContent(), null, remoteUrl);
     when(mavenProxyRepository.getRemoteUrl()).thenReturn(remoteUrl);
     final ScrapeContext context = new ScrapeContext(mavenProxyRepository, httpClient, 2);
-    final Page page = new Page(remoteUrl, response, document);
+    final Page page = Page.getPageFor(context, remoteUrl);
     s3scraper.scrape(context, page);
 
     if (context.isSuccessful()) {
