@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.scheduling;
 
-import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -21,7 +20,6 @@ import org.sonatype.scheduling.SchedulerTask;
  *
  * @author cstamas
  */
-@ExtensionPoint
 public interface NexusTask<T>
     extends SchedulerTask<T>
 {

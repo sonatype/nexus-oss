@@ -15,10 +15,6 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
 
-import javax.inject.Singleton;
-
-import org.sonatype.plugin.ExtensionPoint;
-
 /**
  * A Resource bundle meant for extending/contributing/spoofing existing resources (JS, CSS, Images, etc) of the Nexus
  * Web Application. This component is able only to contribute static resources, if you want to extends REST API, please
@@ -26,8 +22,6 @@ import org.sonatype.plugin.ExtensionPoint;
  *
  * @author cstamas
  */
-@ExtensionPoint
-@Singleton
 public interface NexusResourceBundle
 {
   /**

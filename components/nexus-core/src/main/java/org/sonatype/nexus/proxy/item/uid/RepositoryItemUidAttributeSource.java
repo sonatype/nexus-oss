@@ -15,17 +15,11 @@ package org.sonatype.nexus.proxy.item.uid;
 
 import java.util.Map;
 
-import javax.inject.Singleton;
-
-import org.sonatype.plugin.ExtensionPoint;
-
 /**
  * RepositoryItemUid Attribute source that is contributing attributes to core.
  *
  * @author cstamas
  */
-@ExtensionPoint
-@Singleton
 public interface RepositoryItemUidAttributeSource
 {
   /**

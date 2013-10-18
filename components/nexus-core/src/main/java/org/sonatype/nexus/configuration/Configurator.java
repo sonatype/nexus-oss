@@ -13,11 +13,8 @@
 
 package org.sonatype.nexus.configuration;
 
-import javax.inject.Singleton;
-
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps for all those config
@@ -25,8 +22,6 @@ import org.sonatype.plugin.ExtensionPoint;
  *
  * @author cstamas
  */
-@ExtensionPoint
-@Singleton
 public interface Configurator<T, C extends CoreConfiguration>
 {
   /**
