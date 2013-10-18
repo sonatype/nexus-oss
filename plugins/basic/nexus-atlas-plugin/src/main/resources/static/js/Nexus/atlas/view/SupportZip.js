@@ -109,7 +109,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
                 }
               ],
               buttons: [
-                { text: 'Create', id: 'nx-atlas-button-create-zip' }
+                { text: 'Create', id: 'nx-atlas-button-supportzip-create' }
               ],
               buttonAlign: 'left'
             }

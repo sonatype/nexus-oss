@@ -42,7 +42,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
       '#nx-atlas-view-sysinfo-button-print': {
         'click': me.printSysInfo
       },
-      '#nx-atlas-button-create-zip': {
+      '#nx-atlas-button-supportzip-create': {
         'click': me.createSupportZip
       },
       '#nx-atlas-button-supportzip-download': {
