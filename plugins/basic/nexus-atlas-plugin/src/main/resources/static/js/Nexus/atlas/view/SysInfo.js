@@ -156,6 +156,13 @@ NX.define('Nexus.atlas.view.SysInfo', {
           tooltip: 'Refresh system information',
           iconCls: icons.get('refresh').cls
         },
+        {
+          xtype: 'button',
+          id: 'nx-atlas-view-sysinfo-button-download',
+          text: 'Download',
+          tooltip: 'Download system information',
+          iconCls: icons.get('download').cls
+        },
         '-',
         {
           xtype: 'button',

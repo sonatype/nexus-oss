@@ -35,6 +35,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
       '#nx-atlas-view-sysinfo-button-refresh': {
         'click': me.refreshSysInfo
       },
+      '#nx-atlas-view-sysinfo-button-download': {
+        'click': me.downloadSysInfo
+      },
       '#nx-atlas-view-sysinfo-button-print': {
         'click': me.printSysInfo
       },
@@ -100,6 +103,15 @@ NX.define('Nexus.atlas.controller.Atlas', {
    */
   refreshSysInfo: function(button) {
     this.loadSysInfo(Ext.getCmp('nx-atlas-view-sysinfo'));
+  },
+
+  /**
+   * Download system information report.
+   *
+   * @private
+   */
+  downloadSysInfo: function(button) {
+    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/atlas/system-information');
   },
 
   /**
