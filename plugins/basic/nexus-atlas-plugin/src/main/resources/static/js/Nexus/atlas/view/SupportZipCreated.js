@@ -53,8 +53,8 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
           xtype: 'panel',
           border: false,
           cls: 'nx-atlas-view-supportzip-created-description',
-          html: icons.get('zip').variant('x32').img + '<div>Support ZIP has been created.  ' +
-              'You can reference this file on the filesystem or download the file from your browser.</div>'
+          html: icons.get('zip').variant('x32').img + '<div>Support ZIP has been created.' +
+              '<br/><br/>You can reference this file on the filesystem or download the file from your browser.</div>'
         },
         {
           xtype: 'form',
