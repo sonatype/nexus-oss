@@ -156,6 +156,8 @@ public final class NexusAnnotatedBeanModule
 
     /**
      * Adds {@link RepositoryType} semantics on top of JSR330 semantics.
+     *
+     * @param qualifier always null, removed in refactored eclipse codebase; do not rely on it
      */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
