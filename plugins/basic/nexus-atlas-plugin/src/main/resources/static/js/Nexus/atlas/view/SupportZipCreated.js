@@ -72,6 +72,7 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
               helpText: 'Support ZIP file path',
               name: 'file',
               readOnly: true,
+              selectOnFocus: true,
               anchor: '96%'
             }
           ],
