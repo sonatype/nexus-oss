@@ -50,8 +50,6 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
-import org.sonatype.nexus.rest.model.LogsListResource;
-import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
@@ -792,31 +790,6 @@ public class TestMarshalUnmarchal
     resource.setSize(42);
 
     resourceResponse.setData(resource);
-
-    this.marshalUnmarchalThenCompare(resourceResponse, this.xstreamXML); // FIXME: Need some sort of type map, for
-    // the json reader to figure out if some
-    // fields are longs not ints.
-    this.validateXmlHasNoPackageNames(resourceResponse);
-  }
-
-  @Test
-  public void testLogsListResourceResponse() {
-    LogsListResourceResponse resourceResponse = new LogsListResourceResponse();
-
-    LogsListResource item1 = new LogsListResource();
-    item1.setMimeType("mimeType1");
-    item1.setName("name1");
-    item1.setResourceURI("resourceURI1");
-    item1.setSize(42);
-
-    LogsListResource item2 = new LogsListResource();
-    item2.setMimeType("mimeType2");
-    item2.setName("name2");
-    item2.setResourceURI("resourceURI2");
-    item2.setSize(42);
-
-    resourceResponse.addData(item1);
-    resourceResponse.addData(item2);
 
     this.marshalUnmarchalThenCompare(resourceResponse, this.xstreamXML); // FIXME: Need some sort of type map, for
     // the json reader to figure out if some

@@ -112,7 +112,6 @@ public class XStreamConfiguratorLightweight
     xstream.processAnnotations(ScheduledServiceTypeResourceResponse.class);
     xstream.processAnnotations(ContentListResourceResponse.class);
     xstream.processAnnotations(ContentListDescribeResourceResponse.class);
-    xstream.processAnnotations(LogsListResourceResponse.class);
     xstream.processAnnotations(ConfigurationsListResourceResponse.class);
     xstream.processAnnotations(FeedListResourceResponse.class);
     xstream.processAnnotations(NFCResourceResponse.class);
@@ -164,9 +163,6 @@ public class XStreamConfiguratorLightweight
 
     xstream.registerLocalConverter(GlobalConfigurationListResourceResponse.class, "data",
         new AliasingListConverter(GlobalConfigurationListResource.class, "global-settings-list-item"));
-
-    xstream.registerLocalConverter(LogsListResourceResponse.class, "data", new AliasingListConverter(
-        LogsListResource.class, "logs-list-item"));
 
     xstream.registerLocalConverter(ConfigurationsListResourceResponse.class, "data", new AliasingListConverter(
         ConfigurationsListResource.class, "configs-list-item"));
