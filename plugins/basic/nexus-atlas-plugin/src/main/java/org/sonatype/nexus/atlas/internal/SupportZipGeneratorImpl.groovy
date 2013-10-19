@@ -225,8 +225,9 @@ implements SupportZipGenerator
     }
     assert !bundle.sources.isEmpty() : 'At least one bundle source must be configured'
 
+    // filter only sources which user requested
     def sources = filterSources(request, bundle)
-    // TODO: What do we do if there are no sources?
+    assert !sources.isEmpty() : 'At least one content source must be configured'
 
     try {
       // prepare bundle sources
