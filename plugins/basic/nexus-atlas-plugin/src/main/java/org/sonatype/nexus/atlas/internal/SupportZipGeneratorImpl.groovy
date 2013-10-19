@@ -214,7 +214,7 @@ implements SupportZipGenerator
   File generate(final Request request) {
     assert request
 
-    log.info 'Generating support zip: {}', request
+    log.info 'Generating support ZIP: {}', request
 
     def bundle = new SupportBundle()
 
