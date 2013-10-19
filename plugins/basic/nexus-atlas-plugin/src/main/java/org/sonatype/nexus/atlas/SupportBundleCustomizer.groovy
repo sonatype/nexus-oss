@@ -20,5 +20,8 @@ package org.sonatype.nexus.atlas
  */
 interface SupportBundleCustomizer
 {
+  /**
+   * Customize the given bundle, adding one or more content sources.
+   */
   void customize(SupportBundle supportBundle)
 }

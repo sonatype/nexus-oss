@@ -65,7 +65,8 @@ implements Resource
 
     return [
         'file': file.canonicalPath,
-        'fileName': file.name
+        'name': file.name,
+        'size': file.length()
     ]
   }
 }
