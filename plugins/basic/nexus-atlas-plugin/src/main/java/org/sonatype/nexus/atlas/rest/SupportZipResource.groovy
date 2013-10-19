@@ -60,7 +60,7 @@ implements Resource
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RequiresPermissions('nexus:atlas')
-  Map userDiagnostic(final SupportZipGenerator.Request request) {
+  Map generateZip(final SupportZipGenerator.Request request) {
     assert request
     def file = supportZipGenerator.generate(request)
 
