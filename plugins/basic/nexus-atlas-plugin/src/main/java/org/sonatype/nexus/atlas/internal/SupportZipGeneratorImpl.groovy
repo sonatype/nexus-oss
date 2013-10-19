@@ -13,14 +13,20 @@
 
 package org.sonatype.nexus.atlas.internal
 
+import org.sonatype.nexus.atlas.SupportBundle
+import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.atlas.SupportZipGenerator
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.sisu.goodies.common.ByteSize
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import java.util.concurrent.atomic.AtomicLong
+
+import static com.google.common.base.Preconditions.checkNotNull
 
 /**
  * Default {@link SupportZipGenerator}.
@@ -33,15 +39,37 @@ class SupportZipGeneratorImpl
 extends ComponentSupport
 implements SupportZipGenerator
 {
+  private final List<SupportBundleCustomizer> bundleCustomizers
+
   private final File supportDir
 
+  private final ByteSize maxZipFileSize
+
+  // FIXME: "30mb" is failing to parse, need to look at the parsing logic again and see WTF is going on :-(
+
   @Inject
-  SupportZipGeneratorImpl(final ApplicationConfiguration applicationConfiguration) {
+  SupportZipGeneratorImpl(final ApplicationConfiguration applicationConfiguration,
+                          final List<SupportBundleCustomizer> bundleCustomizers,
+                          final @Named('${atlas.supportZipGenerator.maxZipFileSize:-30m}') ByteSize maxZipFileSize)
+  {
     assert applicationConfiguration
+    this.bundleCustomizers = checkNotNull(bundleCustomizers)
 
     // resolve where support archives will be stored
     supportDir = applicationConfiguration.getWorkingDirectory('support')
     log.info 'Support directory: {}', supportDir
+
+    this.maxZipFileSize = maxZipFileSize
+    log.info 'Maximum ZIP file size: {}', maxZipFileSize
+  }
+
+  private static final AtomicLong counter = new AtomicLong()
+
+  /**
+   * Generate a unique file where the support ZIP will be saved.
+   */
+  private File uniqueFile() {
+    return new File(supportDir, "support-${System.currentTimeMillis()}-${counter.incrementAndGet()}.zip")
   }
 
   @Override
@@ -50,10 +78,39 @@ implements SupportZipGenerator
 
     log.info 'Generating support zip: {}', request
 
-    // TODO: need some builder/content-collector abstraction,
-    // TODO ... content abstraction (with path, content, flags for security, priority & truncation)
-    // TODO ... and contributor/configurator for plugins to add content
+    def bundle = new SupportBundle()
 
-    return new File('foo.zip')
+    // customize the bundle
+    bundleCustomizers.each {
+      log.debug 'Customizing bundle with: {}', it
+      it.customize(bundle)
+    }
+
+    assert !bundle.sources.isEmpty() : 'At least one bundle source must be configured'
+
+    try {
+      // prepare bundle sources
+      bundle.sources.each {
+        log.debug 'Preparing bundle source: {}', it
+        it.prepare()
+      }
+
+      // generate ZIP
+      // TODO
+
+      return uniqueFile()
+    }
+    finally {
+      // cleanup bundle sources
+      bundle.sources.each {
+        log.debug 'Cleaning bundle source: {}', it
+        try {
+          it.cleanup()
+        }
+        catch (Exception e) {
+          log.warn('Bundle source cleanup failed', e)
+        }
+      }
+    }
   }
 }
