@@ -13,11 +13,7 @@
 
 package org.sonatype.nexus.atlas.internal.customizers
 
-import com.yammer.metrics.core.Clock
-import com.yammer.metrics.core.HealthCheckRegistry
-import com.yammer.metrics.core.MetricPredicate
-import com.yammer.metrics.core.MetricsRegistry
-import com.yammer.metrics.core.VirtualMachineMetrics
+import com.yammer.metrics.core.*
 import com.yammer.metrics.reporting.ConsoleReporter
 import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
@@ -29,7 +25,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.LOW
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.OPTIONAL
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.*
 
@@ -68,6 +64,9 @@ implements SupportBundleCustomizer
   void customize(final SupportBundle supportBundle) {
     // add thread-dump
     supportBundle << new GeneratedContentSourceSupport(THREAD, 'threads.txt') {
+      {
+        this.priority = HIGH
+      }
       @Override
       protected void generate(final File file) {
         file.withOutputStream {
