@@ -128,7 +128,7 @@ implements SupportZipGenerator
   /**
    * Create a ZIP file with content from given sources.
    */
-  private File createZip(final List<ContentSource> sources) {
+  private File createZip(final List<ContentSource> sources, final boolean limitSize) {
     def prefix = uniquePrefix()
 
     // Write zip to temporary file first
@@ -186,10 +186,11 @@ implements SupportZipGenerator
       // TODO: Sort out how to pass sources available space, and detect truncation
 
       // TODO: Sort out how to deal with obfuscation, if its specific or general
+      // TODO: ... this should be a detail of the content source
 
       // add content entries, sorted so highest priority are processed first
       sources.sort().each { source ->
-        log.debug 'Adding content entry: {}; size: {}, priority: {}', source.path, source.size, source.priority
+        log.debug 'Adding content entry: {} {} bytes', source, source.size
         def entry = addEntry source.path
         source.content.withStream {
           zip << it
@@ -236,7 +237,7 @@ implements SupportZipGenerator
         it.prepare()
       }
 
-      return createZip(sources)
+      return createZip(sources, request.limitSize)
     }
     catch (Exception e) {
       log.error 'Failed to create support ZIP', e
