@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.atlas
 
-import groovy.transform.ToString
-import org.sonatype.sisu.goodies.common.ComponentSupport
-
 import static com.google.common.base.Preconditions.checkNotNull
 
 /**
@@ -23,31 +20,14 @@ import static com.google.common.base.Preconditions.checkNotNull
  *
  * @since 2.7
  */
-@ToString(includePackage=false, includeFields=true, includes='type,path')
 class FileContentSourceSupport
-extends ComponentSupport
-implements SupportBundle.ContentSource
+extends ContentSourceSupport
 {
-  private final SupportBundle.ContentSource.Type type
-
-  private final String path
-
   private final File file
 
   FileContentSourceSupport(final SupportBundle.ContentSource.Type type, final String path, final File file) {
-    this.type = checkNotNull(type)
-    this.path = checkNotNull(path)
+    super(type, path)
     this.file = checkNotNull(file)
-  }
-
-  @Override
-  SupportBundle.ContentSource.Type getType() {
-    return type
-  }
-
-  @Override
-  String getPath() {
-    return path
   }
 
   @Override

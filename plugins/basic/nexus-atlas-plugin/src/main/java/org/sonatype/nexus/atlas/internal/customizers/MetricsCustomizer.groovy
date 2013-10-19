@@ -29,6 +29,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.LOW
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.OPTIONAL
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.*
 
 /**
@@ -76,6 +78,9 @@ implements SupportBundleCustomizer
 
     // add healthchecks
     supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'healthcheck.txt') {
+      {
+        this.priority = OPTIONAL
+      }
       @Override
       protected void generate(final File file) {
         file.withPrintWriter { out ->
@@ -98,6 +103,9 @@ implements SupportBundleCustomizer
 
     // add metrics
     supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics.txt') {
+      {
+        this.priority = OPTIONAL
+      }
       @Override
       protected void generate(final File file) {
         file.withOutputStream {

@@ -14,6 +14,8 @@
 package org.sonatype.nexus.atlas.internal
 
 import org.sonatype.nexus.atlas.SupportBundle
+import org.sonatype.nexus.atlas.SupportBundle.ContentSource
+import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.atlas.SupportZipGenerator
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
@@ -75,7 +77,7 @@ implements SupportZipGenerator
   /**
    * Return set of included content source types.
    */
-  private Set<SupportBundle.ContentSource.Type> includedTypes(final Request request) {
+  private Set<Type> includedTypes(final Request request) {
     def types = []
     if (request.systemInformation) {
       types << SYSINFO
@@ -101,7 +103,7 @@ implements SupportZipGenerator
   /**
    * Filter only included content sources.
    */
-  private List<SupportBundle.ContentSource> filterSources(final Request request, final SupportBundle supportBundle) {
+  private List<ContentSource> filterSources(final Request request, final SupportBundle supportBundle) {
     def include = includedTypes(request)
     def sources = []
     supportBundle.sources.each {
@@ -126,7 +128,7 @@ implements SupportZipGenerator
   /**
    * Create a ZIP file with content from given sources.
    */
-  private File createZip(final List<SupportBundle.ContentSource> sources) {
+  private File createZip(final List<ContentSource> sources) {
     def prefix = uniquePrefix()
 
     // Write zip to temporary file first
@@ -151,7 +153,7 @@ implements SupportZipGenerator
       zip.closeEntry()
       def size = entry.compressedSize
       zipSize.addAndGet(size)
-      log.debug 'Entry size: {}', size
+      log.trace 'Entry size: {}', size
     }
 
     // helper to add entries for each directory
@@ -181,15 +183,13 @@ implements SupportZipGenerator
       // add directory entries
       addDirectoryEntries()
 
-      // TODO: handle truncation... how?
-      // TODO: Perhaps add truncatable flag to source, apply all non-truncateables first
-      // TODO: then add api to allow specific size of content
+      // TODO: Sort out how to pass sources available space, and detect truncation
 
       // TODO: Sort out how to deal with obfuscation, if its specific or general
 
-      // add content entries
-      sources.each { source ->
-        log.debug 'Adding content entry: {}; size: {}', source.path, source.size
+      // add content entries, sorted so highest priority are processed first
+      sources.sort().each { source ->
+        log.debug 'Adding content entry: {}; size: {}, priority: {}', source.path, source.size, source.priority
         def entry = addEntry source.path
         source.content.withStream {
           zip << it

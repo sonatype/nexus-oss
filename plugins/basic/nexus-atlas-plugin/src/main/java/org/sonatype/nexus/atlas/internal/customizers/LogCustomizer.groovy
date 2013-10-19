@@ -27,6 +27,7 @@ import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static groovy.io.FileType.FILES
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.LOW
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.LOG
 
@@ -57,6 +58,10 @@ implements SupportBundleCustomizer
   void customize(final SupportBundle supportBundle) {
     // add source for nexus.log
     supportBundle << new GeneratedContentSourceSupport(LOG, 'nexus.log') {
+      {
+        this.priority = LOW
+      }
+
       @Override
       protected void generate(final File file) {
         def log = logManager.getApplicationLogAsStream('nexus.log', 0, Long.MAX_VALUE)

@@ -13,42 +13,22 @@
 
 package org.sonatype.nexus.atlas
 
-import groovy.transform.ToString
-import org.sonatype.sisu.goodies.common.ComponentSupport
-
 import java.nio.file.Files
-
-import static com.google.common.base.Preconditions.checkNotNull
 
 /**
  * Support for generated {@link SupportBundle.ContentSource} implementations.
  *
+ * These sources will buffer output to a file on prepare.
+ *
  * @since 2.7
  */
-@ToString(includePackage=false, includeFields=true, includes='type,path')
 abstract class GeneratedContentSourceSupport
-extends ComponentSupport
-implements SupportBundle.ContentSource
+extends ContentSourceSupport
 {
-  private final SupportBundle.ContentSource.Type type
-
-  private final String path
-
   private File file
 
   GeneratedContentSourceSupport(final SupportBundle.ContentSource.Type type, final String path) {
-    this.type = checkNotNull(type)
-    this.path = checkNotNull(path)
-  }
-
-  @Override
-  SupportBundle.ContentSource.Type getType() {
-    return type
-  }
-
-  @Override
-  String getPath() {
-    return path
+    super(type, path)
   }
 
   @Override

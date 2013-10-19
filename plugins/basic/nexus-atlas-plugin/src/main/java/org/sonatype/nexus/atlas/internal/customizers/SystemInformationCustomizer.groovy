@@ -25,6 +25,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.REQUIRED
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
 
 /**
@@ -48,6 +49,10 @@ implements SupportBundleCustomizer
   @Override
   void customize(final SupportBundle supportBundle) {
     supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'sysinfo.json') {
+      {
+        this.priority = REQUIRED
+      }
+
       @Override
       protected void generate(final File file) {
         def report = systemInformationGenerator.report()

@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.atlas
 
+import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority
 import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
 
 /**
@@ -26,6 +27,7 @@ class SupportBundle
    * Source of content for support bundle.
    */
   static interface ContentSource
+    extends Comparable<ContentSource>
   {
     static enum Type
     {
@@ -47,6 +49,26 @@ class SupportBundle
      * Unix-style, must NOT begin or end with '/'
      */
     String getPath()
+
+    static enum Priority
+    {
+      OPTIONAL(999),
+      LOW(100),
+      DEFAULT(50),
+      HIGH(10),
+      REQUIRED(1)
+
+      final int order
+
+      Priority(final int order) {
+        this.order = order
+      }
+    }
+
+    /**
+     * Priority to determine inclusion order, lower priority sources could get truncated.
+     */
+    Priority getPriority()
 
     /**
      * The size of the content in bytes. Valid after {@link #prepare()} has been called.

@@ -24,6 +24,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
 
 /**
@@ -51,6 +52,7 @@ implements SupportBundleCustomizer
       if (file.exists()) {
         log.debug 'Including file: {}', file
         supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file)
+            .setPriority(HIGH)
       }
       else {
         log.trace 'Skipping non-existent file: {}', file
