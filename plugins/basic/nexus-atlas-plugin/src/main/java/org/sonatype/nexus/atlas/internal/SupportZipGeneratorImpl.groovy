@@ -63,6 +63,11 @@ implements SupportZipGenerator
     log.info 'Maximum ZIP file size: {}', maxZipFileSize
   }
 
+  @Override
+  File getDirectory() {
+    return supportDir
+  }
+
   private static final AtomicLong counter = new AtomicLong()
 
   /**

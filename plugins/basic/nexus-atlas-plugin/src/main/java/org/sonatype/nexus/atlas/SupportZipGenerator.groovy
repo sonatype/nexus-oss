@@ -39,6 +39,8 @@ interface SupportZipGenerator
     boolean limitSize
   }
 
+  File getDirectory()
+
   /**
    * Generate a support-zip for the given request.
    */
