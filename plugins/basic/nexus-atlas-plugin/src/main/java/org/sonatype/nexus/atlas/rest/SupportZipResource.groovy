@@ -15,7 +15,6 @@ package org.sonatype.nexus.atlas.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.atlas.SupportZipGenerator
-import org.sonatype.security.SecuritySystem
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.siesta.common.Resource
 
@@ -23,10 +22,8 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.ws.rs.Consumes
-import javax.ws.rs.GET
 import javax.ws.rs.POST
 import javax.ws.rs.Path
-import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 
