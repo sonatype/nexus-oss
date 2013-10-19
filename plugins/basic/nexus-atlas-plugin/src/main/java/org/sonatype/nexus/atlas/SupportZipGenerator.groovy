@@ -17,7 +17,7 @@ import groovy.transform.ToString
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
 
 /**
- * Generates a support zip file.
+ * Generates a support ZIP file.
  *
  * @since 2.7
  */
@@ -39,10 +39,13 @@ interface SupportZipGenerator
     boolean limitSize
   }
 
+  /**
+   * The directory where support ZIP files are generated.
+   */
   File getDirectory()
 
   /**
-   * Generate a support-zip for the given request.
+   * Generate a support ZIP for the given request.
    */
   File generate(Request request)
 }
