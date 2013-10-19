@@ -30,6 +30,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 import static com.google.common.base.Preconditions.checkNotNull
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.*
 
 /**
  * Default {@link SupportZipGenerator}.
@@ -75,26 +76,26 @@ implements SupportZipGenerator
    * Return set of included content source types.
    */
   private Set<SupportBundle.ContentSource.Type> includedTypes(final Request request) {
-    def include = []
+    def types = []
     if (request.systemInformation) {
-      include << SupportBundle.ContentSource.Type.SYSINFO
+      types << SYSINFO
     }
     if (request.threadDump) {
-      include << SupportBundle.ContentSource.Type.THREAD
+      types << THREAD
     }
     if (request.metrics) {
-      include << SupportBundle.ContentSource.Type.METRICS
+      types << METRICS
     }
     if (request.configurationFiles) {
-      include << SupportBundle.ContentSource.Type.CONFIG
+      types << CONFIG
     }
     if (request.securityFiles) {
-      include << SupportBundle.ContentSource.Type.SECURITY
+      types << SECURITY
     }
     if (request.logFiles) {
-      include << SupportBundle.ContentSource.Type.LOG
+      types << LOG
     }
-    return include
+    return types
   }
 
   /**
@@ -183,6 +184,8 @@ implements SupportZipGenerator
       // TODO: handle truncation... how?
       // TODO: Perhaps add truncatable flag to source, apply all non-truncateables first
       // TODO: then add api to allow specific size of content
+
+      // TODO: Sort out how to deal with obfuscation, if its specific or general
 
       // add content entries
       sources.each { source ->
