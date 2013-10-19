@@ -70,4 +70,6 @@ implements Resource
         'size': file.length()
     ]
   }
+
+  // TODO: Expose method to download report, pending if we want to add one-time-auth to protect it
 }
