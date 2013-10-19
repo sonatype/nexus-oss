@@ -24,7 +24,10 @@ import org.sonatype.sisu.goodies.common.ComponentSupport
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicLong
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 import static com.google.common.base.Preconditions.checkNotNull
 
@@ -68,13 +71,140 @@ implements SupportZipGenerator
     return supportDir
   }
 
+  /**
+   * Return set of included content source types.
+   */
+  private Set<SupportBundle.ContentSource.Type> includedTypes(final Request request) {
+    def include = []
+    if (request.systemInformation) {
+      include << SupportBundle.ContentSource.Type.SYSINFO
+    }
+    if (request.threadDump) {
+      include << SupportBundle.ContentSource.Type.THREAD
+    }
+    if (request.metrics) {
+      include << SupportBundle.ContentSource.Type.METRICS
+    }
+    if (request.configurationFiles) {
+      include << SupportBundle.ContentSource.Type.CONFIG
+    }
+    if (request.securityFiles) {
+      include << SupportBundle.ContentSource.Type.SECURITY
+    }
+    if (request.logFiles) {
+      include << SupportBundle.ContentSource.Type.LOG
+    }
+    return include
+  }
+
+  /**
+   * Filter only included content sources.
+   */
+  private List<SupportBundle.ContentSource> filterSources(final Request request, final SupportBundle supportBundle) {
+    def include = includedTypes(request)
+    def sources = []
+    supportBundle.sources.each {
+      if (include.contains(it.type)) {
+        log.debug 'Including content source: {}', it
+        sources << it
+      }
+    }
+    return sources
+  }
+
   private static final AtomicLong counter = new AtomicLong()
 
   /**
-   * Generate a unique file where the support ZIP will be saved.
+   * Generate a unique file prefix.
    */
-  private File uniqueFile() {
-    return new File(supportDir, "support-${System.currentTimeMillis()}-${counter.incrementAndGet()}.zip")
+  private String uniquePrefix() {
+    // TODO: Consider using a dateformat here instead?
+    return "support-${System.currentTimeMillis()}-${counter.incrementAndGet()}"
+  }
+
+  /**
+   * Create a ZIP file with content from given sources.
+   */
+  private File createZip(final List<SupportBundle.ContentSource> sources) {
+    def prefix = uniquePrefix()
+
+    // Write zip to temporary file first
+    def file = File.createTempFile("${prefix}-", '.zip')
+    log.debug 'Writing ZIP file: {}', file
+
+    def zip = new ZipOutputStream(file.newOutputStream())
+    AtomicLong zipSize = new AtomicLong(0)
+
+    // helper to create normalized entry with prefix
+    def addEntry = { String path ->
+      if (!path.startsWith('/')) {
+        path = '/' + path
+      }
+      def entry = new ZipEntry(prefix + path)
+      zip.putNextEntry(entry)
+      return entry
+    }
+
+    // helper to track the size of the zip file
+    def trackSize = { ZipEntry entry ->
+      zip.closeEntry()
+      def size = entry.compressedSize
+      zipSize.addAndGet(size)
+      log.debug 'Entry size: {}', size
+    }
+
+    // helper to add entries for each directory
+    def addDirectoryEntries = {
+      // include entry for top-level directory
+      addEntry '/'
+
+      // add unique directory entries
+      Set<String> dirs = []
+      sources.each {
+        def path = it.path.split('/') as List
+        if (path.size() > 1) {
+          // eg. 'foo/bar/baz' -> [ 'foo', 'foo/bar' ]
+          for (int l=path.size(); l>1; l--) {
+            dirs << path[0..-l].join('/')
+          }
+        }
+      }
+      dirs.sort().each {
+        log.debug 'Adding directory entry: {}', it
+        def entry = addEntry "${it}/" // must end with '/'
+        trackSize entry
+      }
+    }
+
+    try {
+      // add directory entries
+      addDirectoryEntries()
+
+      // TODO: handle truncation... how?
+      // TODO: Perhaps add truncatable flag to source, apply all non-truncateables first
+      // TODO: then add api to allow specific size of content
+
+      // add content entries
+      sources.each { source ->
+        log.debug 'Adding content entry: {}; size: {}', source.path, source.size
+        def entry = addEntry source.path
+        source.content.withStream {
+          zip << it
+        }
+        trackSize entry
+      }
+
+      log.debug 'ZIP size: {}', zipSize
+    }
+    finally {
+      zip.close()
+    }
+
+    // Move the file into place
+    def target = new File(supportDir, "${prefix}.zip")
+    Files.move(file.toPath(), target.toPath())
+    log.info 'Created support ZIP file: {}', target
+    return target
   }
 
   @Override
@@ -90,30 +220,32 @@ implements SupportZipGenerator
       log.debug 'Customizing bundle with: {}', it
       it.customize(bundle)
     }
-
     assert !bundle.sources.isEmpty() : 'At least one bundle source must be configured'
+
+    def sources = filterSources(request, bundle)
+    // TODO: What do we do if there are no sources?
 
     try {
       // prepare bundle sources
-      bundle.sources.each {
+      sources.each {
         log.debug 'Preparing bundle source: {}', it
         it.prepare()
       }
 
-      // generate ZIP
-      // TODO
-
-      return uniqueFile()
+      return createZip(sources)
+    }
+    catch (Exception e) {
+      log.error 'Failed to create support ZIP', e
     }
     finally {
       // cleanup bundle sources
-      bundle.sources.each {
+      sources.each {
         log.debug 'Cleaning bundle source: {}', it
         try {
           it.cleanup()
         }
         catch (Exception e) {
-          log.warn('Bundle source cleanup failed', e)
+          log.warn 'Bundle source cleanup failed', e
         }
       }
     }

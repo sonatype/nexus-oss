@@ -11,53 +11,49 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.atlas.internal
+package org.sonatype.nexus.atlas.internal.customizers
 
+import groovy.json.JsonOutput
+import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
+import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
+import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
+import static com.google.common.base.Preconditions.checkNotNull
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
+
 /**
- * ???
+ * Adds system information report to support bundle.
  *
  * @since 2.7
  */
 @Named
 @Singleton
-class SupportBundleCustomizerImpl
+class SystemInformationCustomizer
 extends ComponentSupport
 implements SupportBundleCustomizer
 {
+  private final SystemInformationGenerator systemInformationGenerator
+
+  @Inject
+  SystemInformationCustomizer(final SystemInformationGenerator systemInformationGenerator) {
+    this.systemInformationGenerator = checkNotNull(systemInformationGenerator)
+  }
+
   @Override
   void customize(final SupportBundle supportBundle) {
-    // HACK: For testing...
-    supportBundle << new SupportBundle.ContentSource() {
+    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'sysinfo.json') {
       @Override
-      String getPath() {
-        return null
-      }
-
-      @Override
-      int getSize() {
-        return 0
-      }
-
-      @Override
-      InputStream getContent() {
-        return null
-      }
-
-      @Override
-      void prepare() {
-        log.info 'prepare'
-      }
-
-      @Override
-      void cleanup() {
-        log.info 'cleanup'
+      protected void generate(final File file) {
+        def report = systemInformationGenerator.report()
+        JsonOutput.with {
+          file.text = prettyPrint(toJson(report))
+        }
       }
     }
   }

@@ -91,6 +91,10 @@
   padding-left: 20px;
 }
 
+.nx-atlas-view-supportzip .x-form-cb-label {
+  font: normal 11px arial, tahoma, verdana, helvetica;
+}
+
 .nx-atlas-view-supportzip-created .x-window-ml div {
   background-color: white;
 }

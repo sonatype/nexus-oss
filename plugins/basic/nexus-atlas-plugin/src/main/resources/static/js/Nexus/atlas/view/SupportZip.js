@@ -51,9 +51,9 @@ NX.define('Nexus.atlas.view.SupportZip', {
               cls: 'nx-atlas-view-supportzip-description',
               border: false,
               html: icons.get('zip').variant('x32').img +
-                  '<div>Create a ZIP file containing useful support information about your server. ' +
+                  '<div>Creates a ZIP file containing useful support information about your server. ' +
                   'No information will be sent to Sonatype when creating the ZIP file.' +
-                  '<br/><br/> Select the contents and options for generating the support ZIP file:</div>'
+                  '<br/><br/>Select the contents and options for ZIP creation:</div>'
             },
             {
               xtype: 'form',
@@ -75,37 +75,44 @@ NX.define('Nexus.atlas.view.SupportZip', {
                   items: [
                     {
                       xtype: 'checkbox',
-                      name: 'applicationProperties',
-                      boxLabel: 'Application Properties',
-                      helpText: 'Includes memory and disk statistics, application and system properties and environment variables (recommended)',
+                      name: 'systemInformation',
+                      boxLabel: 'System Information',
+                      helpText: 'Includes system information report',
                       checked: true
                     },
                     {
                       xtype: 'checkbox',
                       name: 'threadDump',
                       boxLabel: 'Thread Dump',
-                      helpText: 'Include a JVM thread-dump (recommended)',
+                      helpText: 'Include a JVM thread-dump',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'metrics',
+                      boxLabel: 'Metrics',
+                      helpText: 'Includes component metrics',
                       checked: true
                     },
                     {
                       xtype: 'checkbox',
                       name: 'configurationFiles',
                       boxLabel: 'Configuration Files',
-                      helpText: 'Include configuration files (recommended)',
+                      helpText: 'Include configuration files',
                       checked: true
                     },
                     {
                       xtype: 'checkbox',
                       name: 'securityFiles',
                       boxLabel: 'Security Files',
-                      helpText: 'Include security files (recommended)',
+                      helpText: 'Include security files',
                       checked: true
                     },
                     {
                       xtype: 'checkbox',
                       name: 'logFiles',
                       boxLabel: 'Log Files',
-                      helpText: 'Include log files (recommended)',
+                      helpText: 'Include log files',
                       checked: true
                     }
                   ]

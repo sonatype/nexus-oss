@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.atlas
 
+import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
+
 /**
  * Defines the content sources of a support ZIP file.
  *
@@ -25,8 +27,24 @@ class SupportBundle
    */
   static interface ContentSource
   {
+    static enum Type
+    {
+      SYSINFO,
+      THREAD,
+      METRICS,
+      CONFIG,
+      SECURITY,
+      LOG
+    }
+
+    /**
+     * The type of content source.
+     */
+    Type getType()
+
     /**
      * The path in the support zip where this content will be saved.
+     * Unix-style, must NOT begin or end with '/'
      */
     String getPath()
 

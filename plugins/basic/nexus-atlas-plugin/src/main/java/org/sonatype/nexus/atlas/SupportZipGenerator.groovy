@@ -23,12 +23,14 @@ import org.sonatype.nexus.atlas.SupportZipGenerator.Request
  */
 interface SupportZipGenerator
 {
-  @ToString(includeNames=true)
+  @ToString(includePackage=false, includeNames=true)
   static class Request
   {
-    boolean applicationProperties
+    boolean systemInformation
 
     boolean threadDump
+
+    boolean metrics
 
     boolean configurationFiles
 
