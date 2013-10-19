@@ -61,55 +61,72 @@ NX.define('Nexus.atlas.view.SupportZip', {
               cls: 'nx-atlas-view-supportzip-form',
               layoutConfig: {
                 labelSeparator: '',
-                labelWidth: 150
+                labelWidth: 100
               },
               border: false,
+              monitorValid: true,
               items: [
                 {
-                  xtype: 'checkbox',
-                  name: 'applicationProperties',
-                  fieldLabel: 'Application Properties',
-                  helpText: 'Includes memory and disk statistics, application and system properties and environment variables (recommended)',
-                  checked: true
+                  xtype: 'checkboxgroup',
+                  fieldLabel: 'Contents',
+                  columns: 1,
+                  allowBlank: false,
+                  anchor: '96%',
+                  items: [
+                    {
+                      xtype: 'checkbox',
+                      name: 'applicationProperties',
+                      boxLabel: 'Application Properties',
+                      helpText: 'Includes memory and disk statistics, application and system properties and environment variables (recommended)',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'threadDump',
+                      boxLabel: 'Thread Dump',
+                      helpText: 'Include a JVM thread-dump (recommended)',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'configurationFiles',
+                      boxLabel: 'Configuration Files',
+                      helpText: 'Include configuration files (recommended)',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'securityFiles',
+                      boxLabel: 'Security Files',
+                      helpText: 'Include security files (recommended)',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'logFiles',
+                      boxLabel: 'Log Files',
+                      helpText: 'Include log files (recommended)',
+                      checked: true
+                    }
+                  ]
                 },
                 {
-                  xtype: 'checkbox',
-                  name: 'threadDump',
-                  fieldLabel: 'Thread Dump',
-                  helpText: 'Include a JVM thread-dump (recommended)',
-                  checked: true
-                },
-                {
-                  xtype: 'checkbox',
-                  name: 'configurationFiles',
-                  fieldLabel: 'Configuration Files',
-                  helpText: 'Include configuration files (recommended)',
-                  checked: true
-                },
-                {
-                  xtype: 'checkbox',
-                  name: 'securityFiles',
-                  fieldLabel: 'Security Files',
-                  helpText: 'Include security files (recommended)',
-                  checked: true
-                },
-                {
-                  xtype: 'checkbox',
-                  name: 'logFiles',
-                  fieldLabel: 'Log Files',
-                  helpText: 'Include log files (recommended)',
-                  checked: true
-                },
-                {
-                  xtype: 'checkbox',
-                  name: 'limitSize',
-                  fieldLabel: 'Limit Zip File Size',
-                  helpText: 'Limit the size of the generate zip to no more than 30 MB.',
-                  checked: true
-                }
+                  xtype: 'checkboxgroup',
+                  fieldLabel: 'Options',
+                  columns: 1,
+                  anchor: '96%',
+                  items: [
+                    {
+                      xtype: 'checkbox',
+                      name: 'limitSize',
+                      boxLabel: 'Limit Zip File Size',
+                      helpText: 'Limit the size of the generate zip to no more than 30 MB.',
+                      checked: true
+                    }
+                  ]}
               ],
               buttons: [
-                { text: 'Create', id: 'nx-atlas-button-supportzip-create' }
+                { text: 'Create', id: 'nx-atlas-button-supportzip-create', formBind: true }
               ],
               buttonAlign: 'left'
             }
