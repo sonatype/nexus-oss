@@ -36,7 +36,7 @@ NX.define('Nexus.logging.view.Loggers', {
 
   stripeRows: true,
   border: false,
-  autoHeight: true,
+  autoScroll: true,
   clicksToEdit: 1,
 
   viewConfig: {
