@@ -22,10 +22,13 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.ws.rs.Consumes
+import javax.ws.rs.GET
 import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
 
 import static com.google.common.base.Preconditions.checkNotNull
 
@@ -68,5 +71,27 @@ implements Resource
     ]
   }
 
-  // TODO: Expose method to download report, pending if we want to add one-time-auth to protect it
+  // TODO: Expose one-time-auth to download
+
+  /**
+   * Download a support ZIP file.
+   */
+  @GET
+  @Path('{fileName}')
+  @Produces('application/zip')
+  @RequiresPermissions('nexus:atlas')
+  Response downloadZip(final @PathParam('fileName') String fileName) {
+    assert fileName
+
+    log.info 'Download support ZIP: {}', fileName
+    def file = new File(supportZipGenerator.directory, fileName)
+    if (!file.exists()) {
+      return Response.status(Response.Status.NOT_FOUND).build()
+    }
+
+    log.debug 'Sending support ZIP file: {}', file
+    return Response.ok(file.newInputStream())
+        .header('Content-Disposition', "attachment; filename='${fileName}'")
+        .build()
+  }
 }

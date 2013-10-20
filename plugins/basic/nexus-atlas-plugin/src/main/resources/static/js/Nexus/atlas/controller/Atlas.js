@@ -196,10 +196,13 @@ NX.define('Nexus.atlas.controller.Atlas', {
    */
   downloadSupportZip: function(button) {
     var me = this,
-        win = button.up('nx-atlas-view-supportzip-created');
+        win = button.up('nx-atlas-view-supportzip-created'),
+        fileName = win.getValues().name;
 
-    // TODO:
-
+    // close the dialog
     win.close();
+
+    // download zip
+    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/atlas/support-zip/' + fileName);
   }
 });

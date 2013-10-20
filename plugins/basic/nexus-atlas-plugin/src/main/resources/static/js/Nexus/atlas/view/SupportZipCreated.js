@@ -74,6 +74,15 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
               readOnly: true,
               selectOnFocus: true,
               anchor: '96%'
+            },
+            {
+              xtype: 'hidden',
+              name: 'name'
+            },
+            // TODO: Show this to the user?
+            {
+              xtype: 'hidden',
+              name: 'size'
             }
           ],
 
@@ -114,5 +123,17 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
    */
   setValues: function(values) {
     this.down('form').getForm().setValues(values);
+
+    // retain fileName
+    this.values = values.fileName;
+  },
+
+  /**
+   * Get form values.
+   *
+   * @public
+   */
+  getValues: function() {
+    return this.down('form').getForm().getValues();
   }
 });
