@@ -34,10 +34,11 @@ extends ContentSourceSupport
   void prepare() {
     assert file.exists()
     // TODO: Should we copy the file to temp location to ensure it exists?
+    // TODO: May have to if we have to obfuscate the file with a generic mechanism?
   }
 
   @Override
-  int getSize() {
+  long getSize() {
     assert file.exists()
     return file.length()
   }

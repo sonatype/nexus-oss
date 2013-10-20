@@ -73,7 +73,7 @@ class SupportBundle
     /**
      * The size of the content in bytes. Valid after {@link #prepare()} has been called.
      */
-    int getSize()
+    long getSize()
 
     /**
      * Content bytes. Valid after {@link #prepare()} has been called.

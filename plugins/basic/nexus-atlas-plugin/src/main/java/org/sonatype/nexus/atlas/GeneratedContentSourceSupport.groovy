@@ -42,7 +42,7 @@ extends ContentSourceSupport
   protected abstract void generate(File file)
 
   @Override
-  int getSize() {
+  long getSize() {
     assert file.exists()
     return file.length()
   }
