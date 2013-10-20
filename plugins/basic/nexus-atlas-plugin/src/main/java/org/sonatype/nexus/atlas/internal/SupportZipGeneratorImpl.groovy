@@ -119,6 +119,51 @@ implements SupportZipGenerator
     return sources
   }
 
+  @Override
+  File generate(final Request request) {
+    assert request
+
+    log.info 'Generating support ZIP: {}', request
+
+    def bundle = new SupportBundle()
+
+    // customize the bundle
+    bundleCustomizers.each {
+      log.debug 'Customizing bundle with: {}', it
+      it.customize(bundle)
+    }
+    assert !bundle.sources.isEmpty(): 'At least one bundle source must be configured'
+
+    // filter only sources which user requested
+    def sources = filterSources(request, bundle)
+    assert !sources.isEmpty(): 'At least one content source must be configured'
+
+    try {
+      // prepare bundle sources
+      sources.each {
+        log.debug 'Preparing bundle source: {}', it
+        it.prepare()
+      }
+
+      return createZip(sources, request.limitSize)
+    }
+    catch (Exception e) {
+      log.error 'Failed to create support ZIP', e
+    }
+    finally {
+      // cleanup bundle sources
+      sources.each {
+        log.debug 'Cleaning bundle source: {}', it
+        try {
+          it.cleanup()
+        }
+        catch (Exception e) {
+          log.warn 'Bundle source cleanup failed', e
+        }
+      }
+    }
+  }
+
   private static final AtomicLong counter = new AtomicLong()
 
   /**
@@ -247,50 +292,5 @@ implements SupportZipGenerator
     Files.move(file.toPath(), target.toPath())
     log.info 'Created support ZIP file: {}', target
     return target
-  }
-
-  @Override
-  File generate(final Request request) {
-    assert request
-
-    log.info 'Generating support ZIP: {}', request
-
-    def bundle = new SupportBundle()
-
-    // customize the bundle
-    bundleCustomizers.each {
-      log.debug 'Customizing bundle with: {}', it
-      it.customize(bundle)
-    }
-    assert !bundle.sources.isEmpty(): 'At least one bundle source must be configured'
-
-    // filter only sources which user requested
-    def sources = filterSources(request, bundle)
-    assert !sources.isEmpty(): 'At least one content source must be configured'
-
-    try {
-      // prepare bundle sources
-      sources.each {
-        log.debug 'Preparing bundle source: {}', it
-        it.prepare()
-      }
-
-      return createZip(sources, request.limitSize)
-    }
-    catch (Exception e) {
-      log.error 'Failed to create support ZIP', e
-    }
-    finally {
-      // cleanup bundle sources
-      sources.each {
-        log.debug 'Cleaning bundle source: {}', it
-        try {
-          it.cleanup()
-        }
-        catch (Exception e) {
-          log.warn 'Bundle source cleanup failed', e
-        }
-      }
-    }
   }
 }
