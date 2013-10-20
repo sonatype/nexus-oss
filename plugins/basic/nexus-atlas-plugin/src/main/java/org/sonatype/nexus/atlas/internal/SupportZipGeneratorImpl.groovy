@@ -53,6 +53,7 @@ implements SupportZipGenerator
   private final ByteSize maxZipFileSize
 
   // FIXME: "30mb" is failing to parse, need to look at the parsing logic again and see WTF is going on :-(
+  // FIXME: This is fixed in latest goodies
 
   // NOTE: max is 30mb, using 28mb for fudge buffer
 
